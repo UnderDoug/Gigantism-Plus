@@ -7,7 +7,6 @@ using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using Mods.GigantismPlus;
-// using Mods.GigantismPlus.HarmonyPatches;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -15,15 +14,42 @@ namespace XRL.World.Parts.Mutation
     public class GigantismPlus : BaseDefaultEquipmentMutation
     {
 
-        public int FistDamageDieCount;
+        public int NaturalWeaponDamageDieCount;
 
-        public int FistDamageDieSize;
+        public int NaturalWeaponDamageDieSize;
 
-        private string FistBaseDamage;
+        private string NaturalWeaponBaseDamage;
 
-        public int FistHitBonus;
+        public int NaturalWeaponHitBonus;
 
-        public int FistMaxStrengthBonus = 999;
+        public int NaturalWeaponMaxStrengthBonus = 999;
+
+        sealed class GiganticNaturalWeaponsReference<T>
+        {
+            public Func<T> Get { get; private set; }
+            public Action<T> Set { get; private set; }
+            public GiganticNaturalWeaponsReference(Func<object> getter, Action<object> setter)
+            {
+                Get = getter;
+                Set = setter;
+            }
+        }
+
+        public Dictionary<string, GiganticNaturalWeaponsReference<GameObject>> GiganticNaturalWeapons = new Dictionary<string, GameObject>
+        {
+            { "GiganticFist", new GiganticNaturalWeaponsReference<GameObject>(
+                () => GiganticFistObject,
+                value => { GiganticFistObject = (GameObject)value; } ) },
+            { "GiganticElongatedPaw", new GiganticNaturalWeaponsReference<GameObject>(
+                () => GiganticElongatedPawObject,
+                value => { GiganticElongatedPawObject = (GameObject)value; } ) },
+            { "GiganticBurrowingClaw", new GiganticNaturalWeaponsReference<GameObject>(
+                () => GiganticBurrowingClawObject,
+                value => { GiganticBurrowingClawObject = (GameObject)value; } ) },
+            { "GiganticElongatedBurrowingClaw", new GiganticNaturalWeaponsReference<GameObject>(
+                () => GiganticElongatedBurrowingClawObject,
+                value => { GiganticElongatedBurrowingClawObject = (GameObject)value; } ) }
+        };
 
         public GameObject GiganticFistObject;
 
@@ -63,22 +89,22 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public static int GetFistDamageDieCount(int Level)
+        public static int GetNaturalWeaponDamageDieCount(int Level)
         {
             return 1 + (int)Math.Floor((double)Level / 5.0);
         }
 
-        public static int GetFistDamageDieSize(int Level)
+        public static int GetNaturalWeaponDamageDieSize(int Level)
         {
             return 3 + (int)Math.Floor((double)Level / 3.0);
         }
 
-        public static string GetFistBaseDamage(int Level)
+        public static string GetNaturalWeaponBaseDamage(int Level)
         {
-            return $"{GetFistDamageDieCount(Level)}d{GetFistDamageDieSize(Level)}+3";
+            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}+3";
         }
 
-        public static int GetFistHitBonus(int Level)
+        public static int GetNaturalWeaponHitBonus(int Level)
         {
             return -3 + (int)Math.Floor((double)Level / 2.0);
         }
@@ -164,7 +190,27 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public string NaturalWeaponBlueprintName => Variant.Coalesce("GiganticFist");
+        private string _NaturalWeaponBlueprintName;
+
+        public string NaturalWeaponBlueprintName
+        {
+            get
+            {
+                if (_NaturalWeaponBlueprintName == null)
+                {
+                    _NaturalWeaponBlueprintName = Variant.Coalesce("GiganticFist")
+                }
+                return _NaturalWeaponBlueprintName;
+            }
+            private set
+            {
+                _NaturalWeaponBlueprintName = value;
+                if (_NaturalWeaponBlueprintName == null)
+                {
+                    _NaturalWeaponBlueprintName = NaturalWeaponBlueprintName;
+                }
+            }
+        }
         
         [NonSerialized]
         protected GameObjectBlueprint _NaturalWeaponBlueprint;
@@ -178,6 +224,15 @@ namespace XRL.World.Parts.Mutation
                     _NaturalWeaponBlueprint = GameObjectFactory.Factory.GetBlueprint(NaturalWeaponBlueprintName);
                 }
                 return _NaturalWeaponBlueprint;
+            }
+            private set
+            {
+                GameObjectBlueprint NewBlueprint = GameObjectFactory.Factory.GetBlueprint(value);
+                if (NewBlueprint != null)
+                {
+                    _NaturalWeaponBlueprint = NewBlueprint;
+                }
+                _NaturalWeaponBlueprint = NaturalWeaponBlueprint
             }
         }
 
@@ -195,17 +250,23 @@ namespace XRL.World.Parts.Mutation
         {
             // update the Fist properties.
             // updare the GiganticFist MeleeWeapon with new properties
-            FistDamageDieCount = GetFistDamageDieCount(NewLevel);
-            FistDamageDieSize = GetFistDamageDieSize(NewLevel);
-            FistBaseDamage = GetFistBaseDamage(NewLevel);
-            FistHitBonus = GetFistHitBonus(NewLevel);
-            if (GiganticFistObject != null)
+            NaturalWeaponDamageDieCount = GetNaturalWeaponDamageDieCount(NewLevel);
+            NaturalWeaponDamageDieSize = GetNaturalWeaponDamageDieSize(NewLevel);
+            NaturalWeaponBaseDamage = GetNaturalWeaponBaseDamage(NewLevel);
+            NaturalWeaponHitBonus = GetNaturalWeaponHitBonus(NewLevel);
+            
+            foreach (KeyValuePair<string, GiganticNaturalWeaponsReference<GameObject>> NaturalWeapon in GiganticNaturalWeapons)
             {
-                GiganticFistObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprint);
-                MeleeWeapon GiantFistWeapon = GiganticFistObject.GetPart<MeleeWeapon>();
-                GiantFistWeapon.BaseDamage = FistBaseDamage;
-                GiantFistWeapon.HitBonus = FistHitBonus;
-                GiantFistWeapon.MaxStrengthBonus = FistMaxStrengthBonus;
+                NaturalWeaponBlueprintName = NaturalWeapon.Key;
+                GiganticNaturalWeapons[key].Set(GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprintName));
+                if (NaturalWeapon.Value != null)
+                {
+                    MeleeWeapon GiganticNaturalWeapon = NaturalWeapon.GetPart<MeleeWeapon>();
+                    GiganticNaturalWeapon.BaseDamage = NaturalWeaponBaseDamage;
+                    GiganticNaturalWeapon.HitBonus = NaturalWeaponHitBonus;
+                    GiganticNaturalWeapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
+                }
+                NaturalWeaponBlueprintName = 
             }
 
             // Straighten up if hunching.
@@ -334,7 +395,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
-            E.Features.Add("{{gianter|gigantic stature}}");
+            E.Features.Add("{{gianter|gigantic}} stature");
             return base.HandleEvent(E);
         }
 
@@ -436,8 +497,8 @@ namespace XRL.World.Parts.Mutation
             {
                 MSPenalty = GetHunchedOverMSModifier(Level) + "}} MS";
             }
-            return "{{gigantic|Gigantic}} Fists {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetFistDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetFistDamageDieSize(Level) + "}}{{rules|+3}}\n"
-                 + "and {{rules|" + GetFistHitBonus(Level) + "}} To-Hit\n"; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
+            return "{{gigantic|Gigantic}} Fists {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetNaturalWeaponDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetNaturalWeaponDamageDieSize(Level) + "}}{{rules|+3}}\n"
+                 + "and {{rules|" + GetNaturalWeaponHitBonus(Level) + "}} To-Hit\n"; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
                  + "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}"; */
         }
 
@@ -516,7 +577,7 @@ namespace XRL.World.Parts.Mutation
             {
                 if (ParentObject.HasPart<ElongatedPaws>())
                 {
-                    if (ParentObject.HasPart<XRL.World.Parts.Mutation.BurrowingClaws>())
+                    if (ParentObject.HasPart<BurrowingClaws>())
                     {
                         if (GiganticElongatedBurrowingClawObject == null)
                         {
@@ -525,9 +586,9 @@ namespace XRL.World.Parts.Mutation
                         part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
                         var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
                         var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
-                        weapon.HitBonus = FistHitBonus;
-                        weapon.MaxStrengthBonus = FistMaxStrengthBonus;
+                        weapon.BaseDamage = $"{NaturalWeaponDamageDieCount}d{NaturalWeaponDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
+                        weapon.HitBonus = NaturalWeaponHitBonus;
+                        weapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
                     }//GiganticElongatedBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
                     else
                     {
@@ -538,12 +599,12 @@ namespace XRL.World.Parts.Mutation
                         part.DefaultBehavior = GiganticElongatedPawObject;
                         var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
                         var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
-                        weapon.HitBonus = FistHitBonus;
-                        weapon.MaxStrengthBonus = FistMaxStrengthBonus;
+                        weapon.BaseDamage = $"{NaturalWeaponDamageDieCount}d{NaturalWeaponDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
+                        weapon.HitBonus = NaturalWeaponHitBonus;
+                        weapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
                     }//GiganticElongatedPawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
                 }
-                else if (ParentObject.HasPart<XRL.World.Parts.Mutation.BurrowingClaws>())
+                else if (ParentObject.HasPart<BurrowingClaws>())
                 {
                     if (GiganticBurrowingClawObject == null)
                     {
@@ -551,9 +612,9 @@ namespace XRL.World.Parts.Mutation
                     }
                     part.DefaultBehavior = GiganticBurrowingClawObject;
                     var weapon = GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = FistBaseDamage;
-                    weapon.HitBonus = FistHitBonus;
-                    weapon.MaxStrengthBonus = FistMaxStrengthBonus;
+                    weapon.BaseDamage = NaturalWeaponBaseDamage;
+                    weapon.HitBonus = NaturalWeaponHitBonus;
+                    weapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
                 }//GiganticBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
                 else
                 {
@@ -563,9 +624,9 @@ namespace XRL.World.Parts.Mutation
                     }
                     part.DefaultBehavior = GiganticFistObject;
                     var weapon = GiganticFistObject.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = FistBaseDamage;
-                    weapon.HitBonus = FistHitBonus;
-                    weapon.MaxStrengthBonus = FistMaxStrengthBonus;
+                    weapon.BaseDamage = NaturalWeaponBaseDamage;
+                    weapon.HitBonus = NaturalWeaponHitBonus;
+                    weapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
                 }//GiganticFistObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
             }
         }

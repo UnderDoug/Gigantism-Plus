@@ -22,8 +22,13 @@ namespace XRL.World.Parts.Mutation
 
         public int NaturalWeaponHitBonus;
 
+        public int NaturalWeaponDamageBonus;
+
+        public int StrMod => ParentObject.StatMod("Strength");
+
         public int NaturalWeaponMaxStrengthBonus = 999;
 
+        /*
         sealed class GiganticNaturalWeaponsReference<T>
         {
             public Func<T> Get { get; private set; }
@@ -34,22 +39,45 @@ namespace XRL.World.Parts.Mutation
                 Set = setter;
             }
         }
+        */
 
-        public Dictionary<string, GiganticNaturalWeaponsReference<GameObject>> GiganticNaturalWeapons = new Dictionary<string, GameObject>
+        private static readonly string[] NaturalWeapons = new string[4] 
         {
-            { "GiganticFist", new GiganticNaturalWeaponsReference<GameObject>(
-                () => GiganticFistObject,
-                value => { GiganticFistObject = (GameObject)value; } ) },
-            { "GiganticElongatedPaw", new GiganticNaturalWeaponsReference<GameObject>(
-                () => GiganticElongatedPawObject,
-                value => { GiganticElongatedPawObject = (GameObject)value; } ) },
-            { "GiganticBurrowingClaw", new GiganticNaturalWeaponsReference<GameObject>(
-                () => GiganticBurrowingClawObject,
-                value => { GiganticBurrowingClawObject = (GameObject)value; } ) },
-            { "GiganticElongatedBurrowingClaw", new GiganticNaturalWeaponsReference<GameObject>(
-                () => GiganticElongatedBurrowingClawObject,
-                value => { GiganticElongatedBurrowingClawObject = (GameObject)value; } ) }
+            "GiganticFist",                  // 0: Just Gigantism.
+            "GiganticElongatedPaw",          // 1: Just ElongatedPaws.
+            "GiganticBurrowingClaw",         // 2: Just BurrowingClaws.
+            "GiganticElongatedBurrowingClaw" // 3: ElongatedPaws(1) + BurrowingClaws(2)
         };
+
+        private static readonly string[] CompatibleMutations = new string[4]
+        {
+            "GigantismPlus",    // 0
+            "ElongatedPaws",    // 1
+            "BurrowingClaws",   // 2
+            "Crystallinity"     // 3
+        };
+
+        private int _NaturalWeaponIndex;
+
+        private int NaturalWeaponIndex
+        {
+            get
+            {
+                _NaturalWeaponIndex = 0;
+                string i = "" + _NaturalWeaponIndex;
+                Debug.Entry(2, "GigantismPlus| NaturalWeaponIndex", i);
+                foreach (var entry in CompatibleMutations.Select((Value, Index) => (Value, Index)) )
+                {
+                    if (ParentObject.HasPart(entry.Value)) _NaturalWeaponIndex += entry.Index;
+                    i = "" + _NaturalWeaponIndex;
+                    string j = "" + entry.Index;
+                    Debug.Entry(2, $"GigantismPlus| NaturalWeaponIndex: {i} | [{j}] {entry.Value}");
+                }
+                return _NaturalWeaponIndex;
+            }
+        }
+
+        public GameObject GiganticNaturalWeaponObject;
 
         public GameObject GiganticFistObject;
 
@@ -58,6 +86,29 @@ namespace XRL.World.Parts.Mutation
         public GameObject GiganticBurrowingClawObject;
 
         public GameObject GiganticElongatedBurrowingClawObject;
+
+        private string _NaturalWeaponBlueprintName;
+
+        public string NaturalWeaponBlueprintName
+        {
+            get
+            {
+                _NaturalWeaponBlueprintName = NaturalWeapons[NaturalWeaponIndex];
+                return _NaturalWeaponBlueprintName;
+            }
+        }
+
+        [NonSerialized]
+        protected GameObjectBlueprint _NaturalWeaponBlueprint;
+
+        public GameObjectBlueprint NaturalWeaponBlueprint
+        {
+            get
+            {
+                _NaturalWeaponBlueprint = GameObjectFactory.Factory.GetBlueprint(NaturalWeaponBlueprintName);
+                return _NaturalWeaponBlueprint;
+            }
+        }
 
         public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
 
@@ -99,9 +150,15 @@ namespace XRL.World.Parts.Mutation
             return 3 + (int)Math.Floor((double)Level / 3.0);
         }
 
-        public static string GetNaturalWeaponBaseDamage(int Level)
+        public int GetNaturalWeaponDamageBonus()
         {
-            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}+3";
+            int Bonus = StrMod;
+            return (int)Math.Floor((double)Bonus / 2.0);
+        }
+
+        public string GetNaturalWeaponBaseDamage(int Level)
+        {
+            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}+{GetNaturalWeaponDamageBonus()}";
         }
 
         public static int GetNaturalWeaponHitBonus(int Level)
@@ -190,52 +247,6 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        private string _NaturalWeaponBlueprintName;
-
-        public string NaturalWeaponBlueprintName
-        {
-            get
-            {
-                if (_NaturalWeaponBlueprintName == null)
-                {
-                    _NaturalWeaponBlueprintName = Variant.Coalesce("GiganticFist")
-                }
-                return _NaturalWeaponBlueprintName;
-            }
-            private set
-            {
-                _NaturalWeaponBlueprintName = value;
-                if (_NaturalWeaponBlueprintName == null)
-                {
-                    _NaturalWeaponBlueprintName = NaturalWeaponBlueprintName;
-                }
-            }
-        }
-        
-        [NonSerialized]
-        protected GameObjectBlueprint _NaturalWeaponBlueprint;
-        
-        public GameObjectBlueprint NaturalWeaponBlueprint
-        {
-            get
-            {
-                if (_NaturalWeaponBlueprint == null)
-                {
-                    _NaturalWeaponBlueprint = GameObjectFactory.Factory.GetBlueprint(NaturalWeaponBlueprintName);
-                }
-                return _NaturalWeaponBlueprint;
-            }
-            private set
-            {
-                GameObjectBlueprint NewBlueprint = GameObjectFactory.Factory.GetBlueprint(value);
-                if (NewBlueprint != null)
-                {
-                    _NaturalWeaponBlueprint = NewBlueprint;
-                }
-                _NaturalWeaponBlueprint = NaturalWeaponBlueprint
-            }
-        }
-
         public GigantismPlus()
         {
             DisplayName = "{{gigantism|Gigantism}} ({{r|D}})";
@@ -246,28 +257,29 @@ namespace XRL.World.Parts.Mutation
 
         public override bool GeneratesEquipment() { return true; }
 
+        public void GenerateNaturalWeapon()
+        {
+            GiganticNaturalWeaponObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprintName);
+            if (GiganticNaturalWeaponObject != null)
+            {
+                MeleeWeapon GiganticNaturalWeapon = GiganticNaturalWeaponObject.GetPart<MeleeWeapon>();
+                GiganticNaturalWeapon.BaseDamage = NaturalWeaponBaseDamage;
+                GiganticNaturalWeapon.HitBonus = NaturalWeaponHitBonus;
+                GiganticNaturalWeapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
+            }
+        }
+
         public override bool ChangeLevel(int NewLevel)
         {
             // update the Fist properties.
-            // updare the GiganticFist MeleeWeapon with new properties
+            // update the GiganticFist MeleeWeapon with new properties
             NaturalWeaponDamageDieCount = GetNaturalWeaponDamageDieCount(NewLevel);
             NaturalWeaponDamageDieSize = GetNaturalWeaponDamageDieSize(NewLevel);
             NaturalWeaponBaseDamage = GetNaturalWeaponBaseDamage(NewLevel);
             NaturalWeaponHitBonus = GetNaturalWeaponHitBonus(NewLevel);
-            
-            foreach (KeyValuePair<string, GiganticNaturalWeaponsReference<GameObject>> NaturalWeapon in GiganticNaturalWeapons)
-            {
-                NaturalWeaponBlueprintName = NaturalWeapon.Key;
-                GiganticNaturalWeapons[key].Set(GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprintName));
-                if (NaturalWeapon.Value != null)
-                {
-                    MeleeWeapon GiganticNaturalWeapon = NaturalWeapon.GetPart<MeleeWeapon>();
-                    GiganticNaturalWeapon.BaseDamage = NaturalWeaponBaseDamage;
-                    GiganticNaturalWeapon.HitBonus = NaturalWeaponHitBonus;
-                    GiganticNaturalWeapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
-                }
-                NaturalWeaponBlueprintName = 
-            }
+            NaturalWeaponDamageBonus = GetNaturalWeaponDamageBonus();
+
+            GenerateNaturalWeapon();
 
             // Straighten up if hunching.
             // update HunchOver ability stats.
@@ -356,7 +368,8 @@ namespace XRL.World.Parts.Mutation
                 || ID == GetMaxCarriedWeightEvent.ID
                 || ID == CanEnterInteriorEvent.ID
                 || ID == InventoryActionEvent.ID
-                || ID == GetExtraPhysicalFeaturesEvent.ID;
+                || ID == GetExtraPhysicalFeaturesEvent.ID
+                || ID == StatChangeEvent.ID;
         }
 
         // don't like that these are duplicates.
@@ -465,6 +478,12 @@ namespace XRL.World.Parts.Mutation
         }
         */
 
+        public override bool HandleEvent(StatChangeEvent E)
+        {
+            if (E.Name == "Strength") ChangeLevel(this.Level);
+            return base.HandleEvent(E);
+        }
+
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             // DescribeMyActivatedAbility(EnableActivatedAbilityID, CollectStats);
@@ -509,14 +528,8 @@ namespace XRL.World.Parts.Mutation
             {
                 GO.RemovePart<Gigantism>();
                 IsGiganticCreature = true; // Enable the Gigantic flag
-                
-                foreach (BodyPart hand in body.GetParts())
-                {
-                    if (hand.Type == "Hand")
-                    {
-                        AddGiganticFistTo(hand);
-                    }
-                }
+
+                ChangeLevel(this.Level);
             }
 
             if (!GO.HasPart<Vehicle>())
@@ -553,7 +566,11 @@ namespace XRL.World.Parts.Mutation
                 {
                     foreach (BodyPart hand in body.GetParts())
                     {
-                        if (hand.Type == "Hand" && hand.DefaultBehavior != null && hand.DefaultBehavior == GiganticFistObject)
+                        if (hand.Type == "Hand" && hand.DefaultBehavior != null 
+                            && (hand.DefaultBehavior == GiganticFistObject
+                            ||  hand.DefaultBehavior == GiganticElongatedPawObject
+                            ||  hand.DefaultBehavior == GiganticBurrowingClawObject
+                            ||  hand.DefaultBehavior == GiganticElongatedBurrowingClawObject))
                         {
                             hand.DefaultBehavior = null;
                         }
@@ -571,10 +588,13 @@ namespace XRL.World.Parts.Mutation
             return base.Unmutate(GO);
         }
 
-        public void AddGiganticFistTo(BodyPart part)
+        public void AddGiganticNaturalWeaponTo(BodyPart part)
         {
             if (part != null && part.Type == "Hand")
             {
+                part.DefaultBehavior = GiganticNaturalWeaponObject;
+
+                /*
                 if (ParentObject.HasPart<ElongatedPaws>())
                 {
                     if (ParentObject.HasPart<BurrowingClaws>())
@@ -628,6 +648,7 @@ namespace XRL.World.Parts.Mutation
                     weapon.HitBonus = NaturalWeaponHitBonus;
                     weapon.MaxStrengthBonus = NaturalWeaponMaxStrengthBonus;
                 }//GiganticFistObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+                */
             }
         }
 
@@ -637,7 +658,7 @@ namespace XRL.World.Parts.Mutation
             {
                 if (hand.Type == "Hand")
                 {
-                    AddGiganticFistTo(hand);
+                    AddGiganticNaturalWeaponTo(hand);
                 }
             }
 

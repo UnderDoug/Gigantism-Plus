@@ -108,6 +108,7 @@ namespace XRL.World.Parts.Mutation
             CleanUpMutationEquipment(GO, ref GiganticElongatedPawObject);
             CleanUpMutationEquipment(GO, ref ElongatedBurrowingClawObject);
             CleanUpMutationEquipment(GO, ref GiganticElongatedBurrowingClawObject);
+
             return base.Unmutate(GO);
         }
 
@@ -144,6 +145,7 @@ namespace XRL.World.Parts.Mutation
             if (part != null && part.Type == "Hand")
             {
                 int StatMod = StrengthModifier;
+                /*
                 if (ParentObject.HasPart<GigantismPlus>())
                 {
                     if (ParentObject.HasPart<XRL.World.Parts.Mutation.BurrowingClaws>())
@@ -193,6 +195,7 @@ namespace XRL.World.Parts.Mutation
                     var weapon = ElongatedPawObject.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = $"1d4+{StatMod}";
                 }//ElongatedPawObject uses 1d4 + StrengthMod
+                */
             }
         }
 
@@ -205,7 +208,6 @@ namespace XRL.World.Parts.Mutation
                     AddElongatedPawTo(hand);
                 }
             }
-
             base.OnRegenerateDefaultEquipment(body);
         }
 

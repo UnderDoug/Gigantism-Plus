@@ -162,6 +162,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
     } //!--- public static class ModGiganticDisplayName_Shader
 
+    
     [HarmonyPatch(typeof(XRL.World.Parts.Mutation.BurrowingClaws))]
     public static class BurrowingClaws_Patches
     {
@@ -169,8 +170,26 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(XRL.World.Parts.Mutation.BurrowingClaws __instance, Body body)
         {
+            if (__instance.ParentObject.HasPart("GigantismPlus") || __instance.ParentObject.HasPart("ElongatedPaws")) return false;
+
+            // Skipping for now.
             foreach (BodyPart hand in body.GetParts())
             {
+                if (hand.Type == "Hand")
+                {
+                    if (hand.DefaultBehavior == null || hand.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
+                    {
+                        hand.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws");
+                    }
+                    var weapon = hand.DefaultBehavior.GetPart<MeleeWeapon>();
+                    weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
+                }
+            }
+            return false;
+
+
+
+                /*
                 if (hand.Type == "Hand")
                 {
                     if (__instance.ParentObject.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())
@@ -214,8 +233,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         weapon.BaseDamage = $"1d5+{elongatedPaws.StrengthModifier}";
                     }//ElongatedBurrowingClawObject uses 1d5 + StrengthMod.
                     else
-                    {
-                        if (hand.DefaultBehavior == null || hand.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
+                {
+                    if (hand.DefaultBehavior == null || hand.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
                         {
                             hand.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws");
                         }
@@ -223,8 +242,9 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
                     }//Uses basic Burrowing Claws behavior, only on all hands.
                 }
-            }
             return false; // Skip the original method
+
+            }    */        
         }
-    }
+    }  
 }

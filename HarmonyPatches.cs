@@ -163,110 +163,88 @@ namespace Mods.GigantismPlus.HarmonyPatches
     } //!--- public static class ModGiganticDisplayName_Shader
 
     
-    [HarmonyPatch(typeof(BurrowingClaws))]
+    [HarmonyPatch(typeof(XRL.World.Parts.Mutation.BurrowingClaws))]
     public static class BurrowingClaws_Patches
     {
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(BurrowingClaws.OnRegenerateDefaultEquipment))]
+        [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(XRL.World.Parts.Mutation.BurrowingClaws __instance, Body body)
         {
+            if (__instance.ParentObject.HasPart("GigantismPlus") || __instance.ParentObject.HasPart("ElongatedPaws")) return false;
 
-            XRL.World.Parts.Mutation.GigantismPlus GigantismPlusObject = (XRL.World.Parts.Mutation.GigantismPlus)__instance.ParentObject.GetPart("GigantismPlus");
-            if (GigantismPlusObject != null)
+            // Skipping for now.
+            foreach (BodyPart hand in body.GetParts())
             {
-                GigantismPlusObject.OnRegenerateDefaultEquipment(body);
-            }
-
-            XRL.World.Parts.Mutation.ElongatedPaws ElongatedPawsObject = (XRL.World.Parts.Mutation.ElongatedPaws)__instance.ParentObject.GetPart("ElongatedPaws");
-            if (ElongatedPawsObject != null)
-            {
-                ElongatedPawsObject.OnRegenerateDefaultEquipment(body);
-            }
-            
-            foreach (BodyPart part in body.GetParts())
-            {
-                if (part.Type == "Hand")
+                if (hand.Type == "Hand")
                 {
-                    bool IsPartGigantic = Array.IndexOf(XRL.World.Parts.Mutation.GigantismPlus.NaturalWeapons, part.DefaultBehavior) >= 0;
-                    bool IsPartElongated = Array.IndexOf(XRL.World.Parts.Mutation.ElongatedPaws.NaturalWeapons, part.DefaultBehavior) >= 0;
-                    if (!IsPartGigantic && !IsPartElongated)
+                    if (hand.DefaultBehavior == null || hand.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
                     {
-                        part.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws Claw");
+                        hand.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws");
                     }
-                    var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
+                    var weapon = hand.DefaultBehavior.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
                 }
             }
             return false;
-        }
 
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(BurrowingClaws.Mutate))]
-        static void MutatePostfix(BurrowingClaws __instance, GameObject GO, int Level)
-        {
-            if (__instance.ParentObject.HasPart("GigantismPlus"))
-            {
-                BaseDefaultEquipmentMutation GigantismPlusObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("GigantismPlus");
-                GigantismPlusObject.ChangeLevel(GigantismPlusObject.Level);
-            }
-            if (__instance.ParentObject.HasPart("ElongatedPaws"))
-            {
-                BaseDefaultEquipmentMutation ElongatedPawsObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("ElongatedPaws");
-                ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body); ;
-            }
 
-            GO.SyncMutationLevelAndGlimmer();
-        }
 
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(BurrowingClaws.ChangeLevel))]
-        static void ChangeLevelPostfix(BurrowingClaws __instance, int Level)
-        {
-            if (__instance.ParentObject.HasPart("GigantismPlus"))
-            {
-                BaseDefaultEquipmentMutation GigantismPlusObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("GigantismPlus");
-                GigantismPlusObject.ChangeLevel(GigantismPlusObject.Level);
-            }
-            if (__instance.ParentObject.HasPart("ElongatedPaws"))
-            {
-                BaseDefaultEquipmentMutation ElongatedPawsObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("ElongatedPaws");
-                ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body);
-            }
+                /*
+                if (hand.Type == "Hand")
+                {
+                    if (__instance.ParentObject.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())
+                    {
+                        var gigantism = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
+                        if (__instance.ParentObject.HasPart<XRL.World.Parts.Mutation.ElongatedPaws>())
+                        {
+                            if (gigantism.GiganticElongatedBurrowingClawObject == null)
+                            {
+                                gigantism.GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
+                            }
+                            hand.DefaultBehavior = gigantism.GiganticElongatedBurrowingClawObject;
+                            var elongatedPaws = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.ElongatedPaws>();
+                            var weapon = gigantism.GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
+                            weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
+                            weapon.HitBonus = gigantism.FistHitBonus;
+                            weapon.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
+                        }//GiganticElongatedBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+                        else
+                        {
+                            if (gigantism.GiganticBurrowingClawObject == null)
+                            {
+                                gigantism.GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingClaw");
+                            }
+                            hand.DefaultBehavior = gigantism.GiganticBurrowingClawObject;
+                            var weapon = gigantism.GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
+                            weapon.BaseDamage = XRL.World.Parts.Mutation.GigantismPlus.GetFistBaseDamage(__instance.Level);
+                            weapon.HitBonus = gigantism.FistHitBonus;
+                            weapon.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
+                        }//GiganticBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+                    }
+                    else if (__instance.ParentObject.HasPart<XRL.World.Parts.Mutation.ElongatedPaws>())
+                    {
+                        var elongatedPaws = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.ElongatedPaws>();
+                        if (elongatedPaws.ElongatedBurrowingClawObject == null)
+                        {
+                            elongatedPaws.ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingClaw");
+                        }
+                        hand.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject;
+                        var weapon = elongatedPaws.ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
+                        weapon.BaseDamage = $"1d5+{elongatedPaws.StrengthModifier}";
+                    }//ElongatedBurrowingClawObject uses 1d5 + StrengthMod.
+                    else
+                {
+                    if (hand.DefaultBehavior == null || hand.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
+                        {
+                            hand.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws");
+                        }
+                        var weapon = hand.DefaultBehavior.GetPart<MeleeWeapon>();
+                        weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
+                    }//Uses basic Burrowing Claws behavior, only on all hands.
+                }
+            return false; // Skip the original method
 
-            __instance.ParentObject.SyncMutationLevelAndGlimmer();
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(BurrowingClaws.Unmutate))]
-        static void UnmutatatePrefix(BurrowingClaws __instance, GameObject GO, int Level)
-        {
-            if (__instance.ParentObject.HasPart("GigantismPlus"))
-            {
-                BaseDefaultEquipmentMutation GigantismPlusObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("GigantismPlus");
-                GigantismPlusObject.ChangeLevel(GigantismPlusObject.Level);
-            }
-            if (__instance.ParentObject.HasPart("ElongatedPaws"))
-            {
-                BaseDefaultEquipmentMutation ElongatedPawsObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("ElongatedPaws");
-                ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body);
-            }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch(nameof(BurrowingClaws.AfterUnmutate))]
-        static void AfterUnmutatatePostfix(BurrowingClaws __instance, GameObject GO)
-        {
-            if (__instance.ParentObject.HasPart("GigantismPlus"))
-            {
-                BaseDefaultEquipmentMutation GigantismPlusObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("GigantismPlus");
-                GigantismPlusObject.ChangeLevel(GigantismPlusObject.Level);
-            }
-            if (__instance.ParentObject.HasPart("ElongatedPaws"))
-            {
-                BaseDefaultEquipmentMutation ElongatedPawsObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("ElongatedPaws");
-                ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body);
-            }
-            GO.SyncMutationLevelAndGlimmer();
+            }    */        
         }
     }  
 }

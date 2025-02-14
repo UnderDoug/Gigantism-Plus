@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 using XRL.World;
@@ -13,158 +12,22 @@ namespace XRL.World.Parts.Mutation
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
-        private static readonly string[] NaturalWeaponSupersedingMutations = new string[1]
-        {
-            "GigantismPlus"
-        };
+        public GameObject ElongatedPawObject;
+        public GameObject GiganticElongatedPawObject;
+        public GameObject ElongatedBurrowingClawObject;
+        public GameObject GiganticElongatedBurrowingClawObject;
 
-        public bool IsNaturalWeaponSuperseded
-        {
-            get
-            {
-                int count = 0;
-                string i = "" + count;
-                Debug.Entry(2, this.GetType().Name + "| IsNaturalWeaponSuperseded", i);
-                foreach (string Mutation in NaturalWeaponSupersedingMutations)
-                {
-                    Debug.Entry(2, this.GetType().Name + "| IsNaturalWeaponSuperseded Loop", Mutation);
-                    if (ParentObject.HasPart(Mutation)) count++;
-                }
-                i = "" + count;
-                Debug.Entry(2, this.GetType().Name + "| IsNaturalWeaponSuperseded", i);
-                return count > 0;
-            }
-        }
-
-        public int NaturalWeaponDamageDieCount;
-
-        public int NaturalWeaponDamageDieSize;
-
-        private string NaturalWeaponBaseDamage;
-
-        public int NaturalWeaponDamageBonus;
-
-        public int StrMod => ParentObject.StatMod("Strength");
-
-        public static readonly string[] NaturalWeapons = new string[2]
-        {
-            "ElongatedPaw",                                  // 0: Just ElongatedPaws(0)
-            "ElongatedBurrowingClaw"                         // 1: BurrowingClaws(1)
-            /* These are yet to be added but MUST be added 
-             * in the order they appear below. Any other
-             * entry in the list can serve as a placeholder
-             * just make sure to note what the original was
-            "ElongatedCrystallinePoint",                     // 2: Crystallinity(2)
-            "ElongatedBurrowingCrystallinePoint"             // 3: ElongatedPaws(1) + Crystallinity(2)
-            */
-        };
-
-        public static readonly string[] CompatibleMutations = new string[2]
-        {
-            // These are converted to the int value of their "bit position"
-            // ElongatedPaws is always present, and forms the 0 value.
-            "BurrowingClaws",    // 0 -> 1
-            "Crystallinity"      // 1 -> 2
-        };
-
-        private int _NaturalWeaponIndex;
-
-        private int NaturalWeaponIndex
-        {
-            get
-            {
-                _NaturalWeaponIndex = 0;
-                string i = "" + _NaturalWeaponIndex;
-                Debug.Entry(2, this.GetType().Name + "| NaturalWeaponIndex", i);
-                foreach (var entry in CompatibleMutations.Select((Value, Index) => (Value, Index)))
-                {
-                    if (ParentObject.HasPart(entry.Value))
-                    {
-                        // 2^Index converts the index to the int value of its "bit position".
-                        // adding these together according to which mutations are present
-                        // gives a "unique" ID to each combination.
-                        _NaturalWeaponIndex += (int)Math.Pow(2.0, (double)entry.Index);
-                    }
-                    i = "" + _NaturalWeaponIndex;
-                    string j = "" + (int)Math.Pow(2.0, (double)entry.Index);
-                    Debug.Entry(2, $"{this.GetType().Name}| NaturalWeaponIndex: {i} | [{j}] {entry.Value}");
-                }
-                return _NaturalWeaponIndex;
-            }
-        }
-
-        public GameObject NaturalWeaponObject;
-
-        private string _NaturalWeaponBlueprintName;
-
-        public string NaturalWeaponBlueprintName
-        {
-            get
-            {
-                _NaturalWeaponBlueprintName = NaturalWeapons[NaturalWeaponIndex];
-                Debug.Entry(2, this.GetType().Name + ", Get NaturalWeaponBlueprint", _NaturalWeaponBlueprintName);
-                return _NaturalWeaponBlueprintName;
-            }
-        }
-
-        [NonSerialized]
-        protected GameObjectBlueprint _NaturalWeaponBlueprint;
-
-        public GameObjectBlueprint NaturalWeaponBlueprint
-        {
-            get
-            {
-                _NaturalWeaponBlueprint = GameObjectFactory.Factory.GetBlueprint(NaturalWeaponBlueprintName);
-                Debug.Entry(2, this.GetType().Name + ", Get NaturalWeaponBlueprint", NaturalWeaponBlueprintName);
-                return _NaturalWeaponBlueprint;
-            }
-        }
-
-        public static int GetNaturalWeaponDamageDieCount(int Level)
-        {
-            return 1;
-        }
-
-        public int GetNaturalWeaponDamageDieSize(int Level)
-        {
-            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-            int Value = 4;
-            BurrowingClaws burrowingClaws = (BurrowingClaws)ParentObject.GetPart("BurrowingClaws");
-            if (burrowingClaws != null)
-            {
-                Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " retrieved Burrowing Claws Damage");
-
-                // adds Burrowing Claws Die Size(-2) to Elongated Burrowing Claws
-                string ClawsDamageString = burrowingClaws.GetClawsDamage(burrowingClaws.Level);
-                int ClawsDamage = int.Parse( ClawsDamageString.Substring(ClawsDamageString.Length-1) )-2;
-                Value += ClawsDamage;
-            }
-            return Value;
-        }
-
-        public int GetNaturalWeaponDamageBonus()
-        {
-            int Bonus = StrMod;
-            //return (int)Math.Floor((double)Bonus / 2.0);
-            return StrMod;
-        }
-
-        public string GetNaturalWeaponBaseDamage(int Level)
-        {
-            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}+{GetNaturalWeaponDamageBonus()}";
-        }
-
-        public override bool CanLevel() { return false; } // Disable Leveling
-
-        public override bool GeneratesEquipment() { return true; }
-
-        public override bool AllowStaticRegistration() { return true; }
+        public int StrengthModifier => ParentObject.StatMod("Strength");
 
         public ElongatedPaws()
         {
             DisplayName = "{{giant|Elongated Paws}}";
             base.Type = "Physical";
+        }
+
+        public override bool CanLevel()
+        {
+            return false;
         }
 
         public override string GetDescription()
@@ -176,27 +39,77 @@ namespace XRL.World.Parts.Mutation
                  + "+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 
-        public GameObject GenerateNaturalWeapon()
-        {
-            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-            NaturalWeaponDamageDieCount = GetNaturalWeaponDamageDieCount(Level);
-            NaturalWeaponDamageDieSize = GetNaturalWeaponDamageDieSize(Level);
-            NaturalWeaponBaseDamage = GetNaturalWeaponBaseDamage(Level);
-            NaturalWeaponDamageBonus = GetNaturalWeaponDamageBonus();
-
-            NaturalWeaponObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprintName);
-            if (NaturalWeaponObject != null)
-            {
-                MeleeWeapon NaturalWeapon = NaturalWeaponObject.GetPart<MeleeWeapon>();
-                NaturalWeapon.BaseDamage = NaturalWeaponBaseDamage;
-            }
-            return NaturalWeaponObject;
-        }
-
         public override string GetLevelText(int Level)
         {
             return "";
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == GetExtraPhysicalFeaturesEvent.ID
+                || ID == StatChangeEvent.ID;
+        }
+
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            if (Array.IndexOf(AffectedSlotTypes, E.SlotType) >= 0 && E.Actor == ParentObject)
+            {
+                E.Decreases++;
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(StatChangeEvent E)
+        {
+            Body body = E.Object.Body;
+            foreach (BodyPart hand in body.GetParts())
+            {
+                if (hand.Type == "Hand")
+                {
+                    AddElongatedPawTo(hand);
+                }
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool Mutate(GameObject GO, int Level)
+        {
+            Body body = GO.Body;
+            if (body != null)
+            {
+                foreach (BodyPart hand in body.GetParts())
+                {
+                    if (hand.Type == "Hand")
+                    {
+                        AddElongatedPawTo(hand);
+                    }
+                }
+            }
+            return base.Mutate(GO, Level);
+        }
+
+        public override bool Unmutate(GameObject GO)
+        {
+            Body body = GO.Body;
+            if (body != null)
+            {
+                foreach (BodyPart hand in body.GetParts())
+                {
+                    if (hand.Type == "Hand" && (hand.DefaultBehavior == ElongatedPawObject || hand.DefaultBehavior == GiganticElongatedPawObject || hand.DefaultBehavior == ElongatedBurrowingClawObject || hand.DefaultBehavior == GiganticElongatedBurrowingClawObject))
+                    {
+                        hand.DefaultBehavior = null;
+                    }
+                }
+            }
+            CheckAffected(GO, body);
+            CleanUpMutationEquipment(GO, ref ElongatedPawObject);
+            CleanUpMutationEquipment(GO, ref GiganticElongatedPawObject);
+            CleanUpMutationEquipment(GO, ref ElongatedBurrowingClawObject);
+            CleanUpMutationEquipment(GO, ref GiganticElongatedBurrowingClawObject);
+
+            return base.Unmutate(GO);
         }
 
         public void CheckAffected(GameObject Actor, Body Body)
@@ -227,162 +140,80 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public void AddNaturalWeaponTo(BodyPart part)
+        public void AddElongatedPawTo(BodyPart part)
         {
-            if (part != null)
+            if (part != null && part.Type == "Hand")
             {
-                // code to skip existing default behaviours if they're blacklisted in the Items.xml file could go here.
-                part.DefaultBehavior = NaturalWeaponObject;
-            }
-        }
-
-        public void AddNaturalWeaponsToPartsByType(Body Body, string Type = "Hand")
-        {
-            foreach (BodyPart part in Body.GetParts())
-            {
-                if (part.Type == Type)
+                int StatMod = StrengthModifier;
+                /*
+                if (ParentObject.HasPart<GigantismPlus>())
                 {
-                    AddNaturalWeaponTo(part);
+                    if (ParentObject.HasPart<XRL.World.Parts.Mutation.BurrowingClaws>())
+                    {
+                        if (GiganticElongatedBurrowingClawObject == null)
+                        {
+                            GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
+                        }
+                        part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
+                        var gigantism = ParentObject.GetPart<GigantismPlus>();
+                        var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
+                        weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3}";
+                        weapon.HitBonus = gigantism.FistHitBonus;
+                        weapon.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
+                    }//GiganticElongatedBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+                    else
+                    {
+                        if (GiganticElongatedPawObject == null)
+                        {
+                            GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedPaw");
+                        }
+                        part.DefaultBehavior = GiganticElongatedPawObject;
+                        var gigantism = ParentObject.GetPart<GigantismPlus>();
+                        var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
+                        weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3}";
+                        weapon.HitBonus = gigantism.FistHitBonus;
+                        weapon.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
+                    }//GiganticElongatedPawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
                 }
+                else if (ParentObject.HasPart<XRL.World.Parts.Mutation.BurrowingClaws>())
+                {
+                    if (ElongatedBurrowingClawObject == null)
+                    {
+                        ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingClaw");
+                    }
+                    part.DefaultBehavior = ElongatedBurrowingClawObject;
+                    var weapon = ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
+                    weapon.BaseDamage = $"1d5+{StatMod}";
+                }//ElongatedBurrowingClawObject uses 1d5 + StrengthMod
+                else
+                {
+                    if (ElongatedPawObject == null)
+                    {
+                        ElongatedPawObject = GameObjectFactory.Factory.CreateObject("ElongatedPaw");
+                    }
+                    part.DefaultBehavior = ElongatedPawObject;
+                    var weapon = ElongatedPawObject.GetPart<MeleeWeapon>();
+                    weapon.BaseDamage = $"1d4+{StatMod}";
+                }//ElongatedPawObject uses 1d4 + StrengthMod
+                */
             }
         }
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-            if (!this.IsNaturalWeaponSuperseded)
+            foreach (BodyPart hand in body.GetParts())
             {
-                Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " Not Superseded");
-
-                GenerateNaturalWeapon();
-                AddNaturalWeaponsToPartsByType(body);
-            }
-            foreach (string Mutation in NaturalWeaponSupersedingMutations)
-            {
-                BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart(Mutation);
-                if (MutationObject != null)
+                if (hand.Type == "Hand")
                 {
-                    MutationObject.OnRegenerateDefaultEquipment(body);
+                    AddElongatedPawTo(hand);
                 }
             }
             base.OnRegenerateDefaultEquipment(body);
         }
 
-        public override bool Mutate(GameObject GO, int Level)
+        public override bool AllowStaticRegistration()
         {
-            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-            Body body = GO.Body;
-            if (!this.IsNaturalWeaponSuperseded)
-            {
-                Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " Not Superseded");
-                GenerateNaturalWeapon();
-                AddNaturalWeaponsToPartsByType(body);
-            }
-            foreach (string Mutation in NaturalWeaponSupersedingMutations)
-            {
-                BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart(Mutation);
-                if (MutationObject != null)
-                {
-                    MutationObject.OnRegenerateDefaultEquipment(body);
-                }
-            }
-            GO.SyncMutationLevelAndGlimmer();
-            return base.Mutate(GO, Level);
-        }
-
-        public override bool Unmutate(GameObject GO)
-        {
-            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-
-            Body body = GO.Body;
-            if (!this.IsNaturalWeaponSuperseded)
-            {
-                Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " Superseded");
-
-                /*
-                 * Seeing if commenting this out lets the game do its own garbage collection on the natural weapons.
-                 * 
-                if (body != null)
-                {
-                    foreach (BodyPart part in body.GetParts())
-                    {
-                        if (part.Type == "Hand" && part.DefaultBehavior != null && part.DefaultBehavior == NaturalWeaponObject)
-                        {
-                            part.DefaultBehavior = null;
-                        }
-                    }
-                }
-                */
-            }
-            return base.Unmutate(GO);
-        }
-
-        public override void AfterUnmutate(GameObject GO)
-        {
-            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            Body body = ParentObject.Body;
-            foreach (string Mutation in NaturalWeaponSupersedingMutations)
-            {
-                BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart((string)Mutation);
-                if (MutationObject != null)
-                {
-                    MutationObject.ChangeLevel(MutationObject.Level);
-                }
-            }
-            CheckAffected(ParentObject, body);
-            ParentObject.SyncMutationLevelAndGlimmer();
-            }
-        }
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == StatChangeEvent.ID
-                || ID == SyncMutationLevelsEvent.ID;
-        }
-
-        public override bool HandleEvent(GetSlotsRequiredEvent E)
-        {
-            if (Array.IndexOf(AffectedSlotTypes, E.SlotType) >= 0 && E.Actor == ParentObject)
-            {
-                E.Decreases++;
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(StatChangeEvent E)
-        {
-            if (E.Name == "Strength")
-            {
-                Debug.Entry(2, this.GetType().Name, "StatChangeEvent");
-
-                if (!this.IsNaturalWeaponSuperseded)
-                {
-                    GenerateNaturalWeapon();
-                    AddNaturalWeaponsToPartsByType(ParentObject.Body);
-                }
-                foreach (string Mutation in NaturalWeaponSupersedingMutations)
-                {
-                    BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart(Mutation);
-                    if (MutationObject != null)
-                    {
-                        MutationObject.HandleEvent(E);
-                    }
-                }
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(SyncMutationLevelsEvent E)
-        {
-            Debug.Entry(2, this.GetType().Name, "SyncMutationLevelsEvent");
-            int reinitNaturalWeaponIndex = NaturalWeaponIndex;
-            bool reinitIsNaturalWeaponSuperseded = IsNaturalWeaponSuperseded;
-            OnRegenerateDefaultEquipment(E.Object.Body);
-            return base.HandleEvent(E);
+            return true;
         }
     }
 }

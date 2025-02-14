@@ -7,6 +7,7 @@
     <part Name="Armor" WornOn="Hand" />
     <part Name="Render" DisplayName="{{gigantic|gigantic}} fist" RenderString="F" Tile="GiganticFist_Alt.png" ColorString="&amp;x" DetailColor="z" />
     <part Name="Description" Short="A {{gigantic|gigantic}} knot of muscle and sinnew wraps itself tightly around an impossibly dense assortment of bones." />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="Cudgel" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -30,7 +31,7 @@
     <part Name="Armor" WornOn="Hand" />
     <part Name="Render" DisplayName="{{giant|elongated}} paw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
     <part Name="Description" Short="A {{giant|long}}, {{giant|slender}} paw that can wield weapons larger than usual." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="MeleeWeapon" BaseDamage="1d4" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -52,9 +53,9 @@
 
   <object Name="GiganticElongatedPaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} paw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} paw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;X" DetailColor="Z" />
     <part Name="Description" Short="A {{gigantic|gigantic}}, {{giant|long}}, {{giant|slender}} paw that can wield weapons much larger than usual." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -76,9 +77,9 @@
 
   <object Name="GiganticBurrowingClaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} burrowing claw" RenderString="F" Tile="items/sw_burrowingclaws.bmp" ColorString="&amp;x" DetailColor="z" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} burrowing claw" RenderString="F" Tile="Creatures/natural-weapon-claw.bmp" ColorString="&amp;X" DetailColor="Z" />
     <part Name="Description" Short="{{gigantic|Gigantic}} claws come together to from an {{gigantic|immense}} spade designed for breaking earth and rock alike." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -94,14 +95,14 @@
     <tag Name="VisibleAsDefaultBehavior" />
     <tag Name="ShowAsPhysicalFeature" />
       <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
   </object>
 
   <object Name="ElongatedBurrowingClaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{giant|elongated burrowing}} claw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
+    <part Name="Render" DisplayName="{{giant|elongated burrowing}} claw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="W" />
     <part Name="Description" Short="{{giant|Long}}, {{giant|slender}} claws designed for tearing through earth and rock jut from an {{giant|oddly large}} paw." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="MeleeWeapon" BaseDamage="1d5" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -122,9 +123,9 @@
 
   <object Name="GiganticElongatedBurrowingClaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} burrowing claw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} burrowing claw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;X" DetailColor="W" />
     <part Name="Description" Short="{{gigantic|Gigantic}}, {{giant|long}}, {{giant|slender}} spades designed for tearing through earth and rock jut from an oddly {{gigantic|immense}} paw." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />

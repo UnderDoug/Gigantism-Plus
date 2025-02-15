@@ -13,8 +13,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
     {
         // Goal is to simulate being Gigantic for the purposes of calculating body weight, if the GameObject in question is PseudoGigantic
 
-        /* 
-         * This code breaks the rest of the patches. Harmony is really towards the limit of my coding ability.
+        /* This code breaks the rest of the patches. Harmony is really towards the limit of my coding ability.
          * 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(GameObject.IsGiganticCreature), "get")]
@@ -174,24 +173,25 @@ namespace Mods.GigantismPlus.HarmonyPatches
             XRL.World.Parts.Mutation.GigantismPlus GigantismPlusObject = (XRL.World.Parts.Mutation.GigantismPlus)__instance.ParentObject.GetPart("GigantismPlus");
             if (GigantismPlusObject != null)
             {
-                GigantismPlusObject.OnRegenerateDefaultEquipment(body);
+                GigantismPlusObject.ChangeLevel(GigantismPlusObject.Level);
+                return false;
             }
 
             XRL.World.Parts.Mutation.ElongatedPaws ElongatedPawsObject = (XRL.World.Parts.Mutation.ElongatedPaws)__instance.ParentObject.GetPart("ElongatedPaws");
             if (ElongatedPawsObject != null)
             {
-                ElongatedPawsObject.OnRegenerateDefaultEquipment(body);
+                ElongatedPawsObject.ChangeLevel(ElongatedPawsObject.Level);
+                return false;
             }
-            
+
             foreach (BodyPart part in body.GetParts())
             {
                 if (part.Type == "Hand")
                 {
-                    bool IsPartGigantic = Array.IndexOf(XRL.World.Parts.Mutation.GigantismPlus.NaturalWeapons, part.DefaultBehavior) >= 0;
-                    bool IsPartElongated = Array.IndexOf(XRL.World.Parts.Mutation.ElongatedPaws.NaturalWeapons, part.DefaultBehavior) >= 0;
-                    if (!IsPartGigantic && !IsPartElongated)
+                    if (part.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
                     {
                         part.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws Claw");
+                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws");
                     }
                     var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
@@ -200,6 +200,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
             return false;
         }
 
+        /* Redundant.
+         * 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(BurrowingClaws.Mutate))]
         static void MutatePostfix(BurrowingClaws __instance, GameObject GO, int Level)
@@ -215,9 +217,12 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body); ;
             }
 
-            GO.SyncMutationLevelAndGlimmer();
+            SyncMutationLevelsEvent.Send(__instance.ParentObject);
         }
+        */
 
+        /* Redundant.
+         * 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(BurrowingClaws.ChangeLevel))]
         static void ChangeLevelPostfix(BurrowingClaws __instance, int Level)
@@ -233,12 +238,15 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body);
             }
 
-            __instance.ParentObject.SyncMutationLevelAndGlimmer();
+            SyncMutationLevelsEvent.Send(__instance.ParentObject);
         }
+        */
 
-        [HarmonyPrefix]
+        /* Redundant.
+         * 
+        [HarmonyPostfix]
         [HarmonyPatch(nameof(BurrowingClaws.Unmutate))]
-        static void UnmutatatePrefix(BurrowingClaws __instance, GameObject GO, int Level)
+        static void UnmutatatePostfix(BurrowingClaws __instance, GameObject GO, int Level)
         {
             if (__instance.ParentObject.HasPart("GigantismPlus"))
             {
@@ -251,7 +259,10 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body);
             }
         }
+        */
 
+        /* Redundant, Burrowing Claws doesn't call this.
+         * 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(BurrowingClaws.AfterUnmutate))]
         static void AfterUnmutatatePostfix(BurrowingClaws __instance, GameObject GO)
@@ -266,7 +277,9 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 BaseDefaultEquipmentMutation ElongatedPawsObject = (BaseDefaultEquipmentMutation)__instance.ParentObject.GetPart("ElongatedPaws");
                 ElongatedPawsObject.OnRegenerateDefaultEquipment(__instance.ParentObject.Body);
             }
-            GO.SyncMutationLevelAndGlimmer();
+
+            SyncMutationLevelsEvent.Send(__instance.ParentObject);
         }
+        */
     }  
 }

@@ -151,7 +151,10 @@ namespace XRL.World.Parts.Mutation
 
         public string GetNaturalWeaponBaseDamage(int Level)
         {
-            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}+{GetNaturalWeaponDamageBonus()}";
+            Debug.Entry(4, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            string BonusString = GetNaturalWeaponDamageBonus() != 0 ? ("+" + StrMod) : "";
+            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}{BonusString}";
         }
 
         public static int GetNaturalWeaponHitBonus(int Level)
@@ -289,8 +292,16 @@ namespace XRL.World.Parts.Mutation
             stats.Set("HunchedOverMS", HunchedOverMS);
         }
 
-        public GameObject GenerateNaturalWeapon()
+        public void GenerateNaturalWeapon(int Level)
         {
+            // update the NaturalWeapon properties.
+            NaturalWeaponDamageDieCount = GetNaturalWeaponDamageDieCount(Level);
+            NaturalWeaponDamageDieSize = GetNaturalWeaponDamageDieSize(Level);
+            NaturalWeaponDamageBonus = this.GetNaturalWeaponDamageBonus();
+            NaturalWeaponBaseDamage = this.GetNaturalWeaponBaseDamage(Level);
+            NaturalWeaponHitBonus = GetNaturalWeaponHitBonus(Level);
+
+            // update the NaturalWeapon MeleeWeapon with new properties
             NaturalWeaponObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprintName);
             if (NaturalWeaponObject != null)
             {
@@ -298,20 +309,11 @@ namespace XRL.World.Parts.Mutation
                 NaturalWeapon.BaseDamage = NaturalWeaponBaseDamage;
                 NaturalWeapon.HitBonus = NaturalWeaponHitBonus;
             }
-            return NaturalWeaponObject;
         }
 
         public override bool ChangeLevel(int NewLevel)
         {
-            // update the Fist properties.
-            // update the GiganticFist MeleeWeapon with new properties
-            NaturalWeaponDamageDieCount = GetNaturalWeaponDamageDieCount(NewLevel);
-            NaturalWeaponDamageDieSize = GetNaturalWeaponDamageDieSize(NewLevel);
-            NaturalWeaponBaseDamage = GetNaturalWeaponBaseDamage(NewLevel);
-            NaturalWeaponHitBonus = GetNaturalWeaponHitBonus(NewLevel);
-            NaturalWeaponDamageBonus = GetNaturalWeaponDamageBonus();
-
-            GenerateNaturalWeapon();
+            GenerateNaturalWeapon(NewLevel);
 
             // Straighten up if hunching.
             // update HunchOver ability stats.
@@ -343,8 +345,10 @@ namespace XRL.World.Parts.Mutation
         {
             if (part != null)
             {
+                Debug.Entry(3, this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, "Part not null");
                 // code to skip existing default behaviours if they're blacklisted in the Items.xml file could go here.
                 part.DefaultBehavior = NaturalWeaponObject;
+                part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", NaturalWeaponBlueprintName);
             }
         } //!--- public void AddNaturalWeaponTo(BodyPart part)
 
@@ -402,8 +406,6 @@ namespace XRL.World.Parts.Mutation
             {
                 GO.RemovePart<Gigantism>();
                 IsGiganticCreature = true; // Enable the Gigantic flag
-
-                ChangeLevel(this.Level);
             }
 
             if (!GO.HasPart<Vehicle>())
@@ -425,7 +427,7 @@ namespace XRL.World.Parts.Mutation
                 ActivatedAbilityEntry abilityEntry = GO.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
                 abilityEntry.DisplayName = "{{C|" + "{{W|[}}Upright{{W|]}}\nHunched\n" + "}}";
             }
-            GO.SyncMutationLevelAndGlimmer();
+
             return base.Mutate(GO, Level);
         }
 
@@ -441,9 +443,8 @@ namespace XRL.World.Parts.Mutation
                 GO.IsGiganticCreature = false; // Revert the Gigantic flag
                 Debug.Entry(3, ClassAndMethod, "IsGiganticCreature set to false");
                 Body body = GO.Body;
-                
-                /*
-                 * Seeing if commenting this out lets the game do its own garbage collection on the natural weapons.
+
+                /* Seeing if commenting this out lets the game do its own garbage collection on the natural weapons.
                  * 
                 if (body != null)
                 {
@@ -460,6 +461,9 @@ namespace XRL.World.Parts.Mutation
                 }
                 */
 
+                
+                CheckAffected(GO, body);
+
                 if (EnableActivatedAbilityID != Guid.Empty)
                 {
                     RemoveMyActivatedAbility(ref EnableActivatedAbilityID);
@@ -468,17 +472,14 @@ namespace XRL.World.Parts.Mutation
             return base.Unmutate(GO);
         }
 
+        /* This seems to always throw an exception. Not sure how to get it to stop doing that.
+         * 
         public override void AfterUnmutate(GameObject GO)
         {
             Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            if (GO != null)
-            {
-                Body body = GO.Body;
-                
-                CheckAffected(GO, body);
-            }
             ParentObject.SyncMutationLevelAndGlimmer();
         }
+        */
 
         public void CheckAffected(GameObject Actor, Body Body)
         {
@@ -724,6 +725,8 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
+        /* Redundant.
+         * 
         public override bool HandleEvent(SyncMutationLevelsEvent E)
         {
             Debug.Entry(2, this.GetType().Name, "SyncMutationLevelsEvent");
@@ -731,6 +734,7 @@ namespace XRL.World.Parts.Mutation
             ChangeLevel(this.Level);
             return base.HandleEvent(E);
         }
+        */
 
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {

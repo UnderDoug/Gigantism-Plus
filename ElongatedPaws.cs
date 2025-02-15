@@ -122,6 +122,7 @@ namespace XRL.World.Parts.Mutation
 
         public static int GetNaturalWeaponDamageDieCount(int Level)
         {
+            Debug.Entry(4, "ElongatedPaws", System.Reflection.MethodBase.GetCurrentMethod().Name);
             return 1;
         }
 
@@ -145,6 +146,7 @@ namespace XRL.World.Parts.Mutation
 
         public int GetNaturalWeaponDamageBonus()
         {
+            Debug.Entry(4, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             int Bonus = StrMod;
             //return (int)Math.Floor((double)Bonus / 2.0);
             return StrMod;
@@ -152,7 +154,10 @@ namespace XRL.World.Parts.Mutation
 
         public string GetNaturalWeaponBaseDamage(int Level)
         {
-            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}+{GetNaturalWeaponDamageBonus()}";
+            Debug.Entry(4, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+            string BonusString = GetNaturalWeaponDamageBonus() != 0 ? ("+" + StrMod) : "";
+            return $"{GetNaturalWeaponDamageDieCount(Level)}d{GetNaturalWeaponDamageDieSize(Level)}{BonusString}";
         }
 
         public override bool CanLevel() { return false; } // Disable Leveling
@@ -176,28 +181,27 @@ namespace XRL.World.Parts.Mutation
                  + "+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 
-        public GameObject GenerateNaturalWeapon()
+        public void GenerateNaturalWeapon(int Level)
         {
             Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
 
+            // update the NaturalWeapon properties.
             NaturalWeaponDamageDieCount = GetNaturalWeaponDamageDieCount(Level);
-            NaturalWeaponDamageDieSize = GetNaturalWeaponDamageDieSize(Level);
-            NaturalWeaponBaseDamage = GetNaturalWeaponBaseDamage(Level);
-            NaturalWeaponDamageBonus = GetNaturalWeaponDamageBonus();
+            NaturalWeaponDamageDieSize = this.GetNaturalWeaponDamageDieSize(Level);
+            NaturalWeaponBaseDamage = this.GetNaturalWeaponBaseDamage(Level);
+            NaturalWeaponDamageBonus = this.GetNaturalWeaponDamageBonus();
 
+            // update the NaturalWeapon MeleeWeapon with new properties
             NaturalWeaponObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprintName);
             if (NaturalWeaponObject != null)
             {
+                Debug.Entry(3, this.GetType().Name+"."+ System.Reflection.MethodBase.GetCurrentMethod().Name, "Assigning Weapon Damage");
                 MeleeWeapon NaturalWeapon = NaturalWeaponObject.GetPart<MeleeWeapon>();
                 NaturalWeapon.BaseDamage = NaturalWeaponBaseDamage;
             }
-            return NaturalWeaponObject;
         }
 
-        public override string GetLevelText(int Level)
-        {
-            return "";
-        }
+        public override string GetLevelText(int Level) { return ""; }
 
         public void CheckAffected(GameObject Actor, Body Body)
         {
@@ -227,19 +231,34 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
+        public override bool ChangeLevel(int NewLevel)
+        {
+            // Technically redundant but its base calls OnRegenerateDefaultEquipment via ParentObject?.Body?.UpdateBodyParts().
+            // This is here so that it replicates the GigantismPlus code in the Harmony Patch for Burrowing Claws.
+
+            GenerateNaturalWeapon(NewLevel);
+
+            return base.ChangeLevel(NewLevel);
+        }
+
         public void AddNaturalWeaponTo(BodyPart part)
         {
+            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             if (part != null)
             {
+                Debug.Entry(3, this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, "Part not null");
                 // code to skip existing default behaviours if they're blacklisted in the Items.xml file could go here.
                 part.DefaultBehavior = NaturalWeaponObject;
+                part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", NaturalWeaponBlueprintName);
             }
         }
 
         public void AddNaturalWeaponsToPartsByType(Body Body, string Type = "Hand")
         {
+            Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
             foreach (BodyPart part in Body.GetParts())
             {
+                Debug.Entry(3, this.GetType().Name + "." + System.Reflection.MethodBase.GetCurrentMethod().Name, "Part is " + part.Type);
                 if (part.Type == Type)
                 {
                     AddNaturalWeaponTo(part);
@@ -255,9 +274,12 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " Not Superseded");
 
-                GenerateNaturalWeapon();
+                GenerateNaturalWeapon(Level);
                 AddNaturalWeaponsToPartsByType(body);
             }
+
+            /* Seems redundant.
+             * 
             foreach (string Mutation in NaturalWeaponSupersedingMutations)
             {
                 BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart(Mutation);
@@ -266,6 +288,8 @@ namespace XRL.World.Parts.Mutation
                     MutationObject.OnRegenerateDefaultEquipment(body);
                 }
             }
+            */
+
             base.OnRegenerateDefaultEquipment(body);
         }
 
@@ -277,9 +301,12 @@ namespace XRL.World.Parts.Mutation
             if (!this.IsNaturalWeaponSuperseded)
             {
                 Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " Not Superseded");
-                GenerateNaturalWeapon();
+                GenerateNaturalWeapon(Level);
                 AddNaturalWeaponsToPartsByType(body);
             }
+
+            /* Seems redundant.
+             * 
             foreach (string Mutation in NaturalWeaponSupersedingMutations)
             {
                 BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart(Mutation);
@@ -288,7 +315,8 @@ namespace XRL.World.Parts.Mutation
                     MutationObject.OnRegenerateDefaultEquipment(body);
                 }
             }
-            GO.SyncMutationLevelAndGlimmer();
+            */
+
             return base.Mutate(GO, Level);
         }
 
@@ -301,8 +329,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, System.Reflection.MethodBase.GetCurrentMethod().Name + " Superseded");
 
-                /*
-                 * Seeing if commenting this out lets the game do its own garbage collection on the natural weapons.
+                /* Seeing if commenting this out lets the game do its own garbage collection on the natural weapons.
                  * 
                 if (body != null)
                 {
@@ -315,26 +342,28 @@ namespace XRL.World.Parts.Mutation
                     }
                 }
                 */
+
+                foreach (string Mutation in NaturalWeaponSupersedingMutations)
+                {
+                    BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart((string)Mutation);
+                    if (MutationObject != null)
+                    {
+                        MutationObject.ChangeLevel(MutationObject.Level);
+                    }
+                }
+
             }
             return base.Unmutate(GO);
         }
 
+        /* This seems to always throw an exception. Not sure how to get it to stop doing that.
+         * 
         public override void AfterUnmutate(GameObject GO)
         {
             Debug.Entry(2, this.GetType().Name, System.Reflection.MethodBase.GetCurrentMethod().Name);
-            Body body = ParentObject.Body;
-            foreach (string Mutation in NaturalWeaponSupersedingMutations)
-            {
-                BaseDefaultEquipmentMutation MutationObject = (BaseDefaultEquipmentMutation)ParentObject.GetPart((string)Mutation);
-                if (MutationObject != null)
-                {
-                    MutationObject.ChangeLevel(MutationObject.Level);
-                }
-            }
-            CheckAffected(ParentObject, body);
             ParentObject.SyncMutationLevelAndGlimmer();
-            }
         }
+        */
 
         public override bool WantEvent(int ID, int cascade)
         {
@@ -361,7 +390,7 @@ namespace XRL.World.Parts.Mutation
 
                 if (!this.IsNaturalWeaponSuperseded)
                 {
-                    GenerateNaturalWeapon();
+                    GenerateNaturalWeapon(Level);
                     AddNaturalWeaponsToPartsByType(ParentObject.Body);
                 }
                 foreach (string Mutation in NaturalWeaponSupersedingMutations)
@@ -376,6 +405,8 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
+        /* Redundant?
+         * 
         public override bool HandleEvent(SyncMutationLevelsEvent E)
         {
             Debug.Entry(2, this.GetType().Name, "SyncMutationLevelsEvent");
@@ -384,5 +415,6 @@ namespace XRL.World.Parts.Mutation
             OnRegenerateDefaultEquipment(E.Object.Body);
             return base.HandleEvent(E);
         }
+        */
     }
 }

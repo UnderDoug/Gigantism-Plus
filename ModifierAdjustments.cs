@@ -7,21 +7,16 @@ using XRL.World.Parts;
 
 namespace Mods.GigantismPlus
 {
-    [PlayerMutator]
-    public class AdjustGiganticModifier : IPlayerMutator
+    public class GiganticModifierAdjustments
     {
-        public void mutate(GameObject player)
+        public static void AdjustGiganticModifier()
         {
-            // converts the two scenarios into a single truth value for readability
-            // Option Value 2 is "Everyone"
-            // Option Value 1 is "Gigantic (D) players"
-            // Everyone || (Gigantic && player is Gigantic)
-            bool ShouldDerarify = Options.SelectGiganticDerarification == 2 || (Options.SelectGiganticDerarification == 1 && player.HasPart("GigantismPlus"));
-            bool ShouldGiganticTinkerable = Options.SelectGiganticTinkering == 2 || (Options.SelectGiganticTinkering == 1 && player.HasPart("GigantismPlus"));
+            bool ShouldDerarify = Options.SelectGiganticDerarification;
+            bool ShouldGiganticTinkerable = Options.SelectGiganticTinkering;
 
             Debug.Entry(1, "/ Checking if ModGigantic needs adjustments.");
             Debug.Entry(2, "________________________________________|");
-            
+
             Debug.Entry(2, "/ Spinning up ModList");
             // find the gigantic modifier ModEntry in the ModList
             foreach (ModEntry mod in ModificationFactory.ModList)
@@ -37,20 +32,29 @@ namespace Mods.GigantismPlus
                     if (ShouldDerarify)
                     {
                         mod.Rarity = 2;
-                        Debug.Entry(2, ModPart, "Rarity adjusted");
-                    } else Debug.Entry(2, ModPart, "No rarity adjustment");
+                        Debug.Entry(2, ModPart, "Rarity is R (decreased)");
+                    }
+                    else
+                    {
+                        mod.Rarity = 3;
+                        Debug.Entry(2, ModPart, "Rarity is R2 (default)");
+                    }
 
                     // should tinkering be allowed? 
                     // - change the tinkerability and add it to the list of recipes
                     if (ShouldGiganticTinkerable)
                     {
                         mod.TinkerAllowed = true;
-                        Debug.Entry(2, ModPart, "Can now be tinkered");
+                        Debug.Entry(2, ModPart, "Gigantic tinkering [Enabled]");
 
                         // Modifiers can actually be set to require an additional ingredient.
                         // mod.TinkerIngredient = "Torch";
-
-                    } else Debug.Entry(2, ModPart, "No tinkerability adjustment");
+                    }
+                    else 
+                    {
+                        mod.TinkerAllowed = false;
+                        Debug.Entry(2, ModPart, "Gigantic tinkering [Disabled] (default)"); 
+                    }
 
                     // this is a workaround for what I'm sure is a more straightforward and simple solution
                     // - after adjusting the ModEntry to be tinkerable, it needs to be added to the list of recipes
@@ -67,7 +71,8 @@ namespace Mods.GigantismPlus
 
                     return;
 
-                } else Debug.Entry(2, ModPart, "Not ModGigantic");
+                }
+                else Debug.Entry(2, ModPart, "Not ModGigantic");
 
                 Debug.Entry(3, "END ENTRY ------------------------------|");
                 Debug.Entry(3, "________________________________________|");
@@ -76,5 +81,24 @@ namespace Mods.GigantismPlus
             Debug.Entry(1, "\\ ModList exited, adjustment process finished.");
             Debug.Entry(1, "________________________________________");
         }
-    }
+    } //!--- public class GiganticModifierAdjustments
+
+    [PlayerMutator]
+    public class OnPlayerLoad : IPlayerMutator
+    {
+        public void mutate(GameObject player)
+        {
+            GiganticModifierAdjustments.AdjustGiganticModifier();
+        }
+    } //!--- public class OnPlayerLoad : IPlayerMutator
+
+    [HasCallAfterGameLoadedAttribute]
+    public class OnLoadGameHandler
+    {
+        [CallAfterGameLoadedAttribute]
+        public static void OnLoadGameCallback()
+        {
+            GiganticModifierAdjustments.AdjustGiganticModifier();
+        }
+    } //!--- public class OnLoadGameHandler
 }

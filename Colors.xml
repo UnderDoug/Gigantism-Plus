@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <colors>
-  <shaders Load="merge">
+  <shaders>
     <shader Name="gigantic" Type="sequence" Colors="z-Z-x-X-X-x-Z-z" ShowInPicker="false" />
     <shader Name="gigantism" Type="sequence" Colors="z-Z-x-X-x-X-x-Z-z" ShowInPicker="false" />
     <shader Name="giant" Type="alternation" Colors="z-Z-x-X-x-Z-z" ShowInPicker="true" />
     <shader Name="gianter" Type="sequence" Colors="z-Z-x-X-x-Z-z" ShowInPicker="true" />
+    <shader Name="jewels" Type="distribution" Colors="b-B-g-G-W-r-R-m-M-c-C" ShowInPicker="true" />
+    <shader Name="crystallized" Type="alternation" Colors="m-m-m-b-B-Y-B-b-m-m-m" ShowInPicker="true" />
   </shaders>
 </colors>

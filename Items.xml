@@ -2,11 +2,12 @@
 <objects>
   
   <!-- Gigantic Natural Weapons -->
-  
+
   <object Name="GiganticFist" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
     <part Name="Render" DisplayName="{{gigantic|gigantic}} fist" RenderString="F" Tile="GiganticFist_Alt.png" ColorString="&amp;x" DetailColor="z" />
-    <part Name="Description" Short="A gigantic fist capable of dealing heavy damage." />
+    <part Name="Description" Short="A {{gigantic|gigantic}} knot of muscle and sinnew wraps itself tightly around an impossibly dense assortment of bones." />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="Cudgel" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -23,38 +24,19 @@
     <tag Name="ShowAsPhysicalFeature" />
       <tag Name="SwingSound" Value="Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" />
       <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
-      <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
+    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
   </object>
+  <!-- Damage Calculation for GiganticFist ********************************************************
 
-  <object Name="ElongatedPaw" Inherits="MeleeWeapon">
-    <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{giant|elongated paw}}" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
-    <part Name="Description" Short="A long, slender paw that can wield weapons larger than usual." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
-    <part Name="Commerce" Value="0" />
-    <part Name="NaturalEquipment" />
-    <part Name="NoDamage" />
-    <part Name="NoBreak" />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
-    <removepart Name="TinkerItem" />
-    <intproperty Name="Natural" Value="1" />
-    <tag Name="MutationEquipment" Value="ElongatedPaw" />
-    <tag Name="ExcludeFromDynamicEncounters" />
-    <tag Name="NoSparkingQuest" />
-    <tag Name="NaturalGear" />
-    <tag Name="WeaponUnarmed" />
-    <tag Name="VisibleAsDefaultBehavior" />
-    <tag Name="ShowAsPhysicalFeature" />
-      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
-      <!--tag Name="EquipmentFrameColors" Value="ZKKZ" /-->
-  </object>
+  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize} + gigantismBonus}
+
+  **********************************************************************************************-->
 
   <object Name="GiganticElongatedPaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated paw}}" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
-    <part Name="Description" Short="A gigantic, long, slender paw that can wield weapons much larger than usual." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} paw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;X" DetailColor="Z" />
+    <part Name="Description" Short="A {{gigantic|gigantic}}, {{giant|long}}, {{giant|slender}} paw that can wield weapons much larger than usual." />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -70,15 +52,20 @@
     <tag Name="VisibleAsDefaultBehavior" />
     <tag Name="ShowAsPhysicalFeature" />
       <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
-		<!--tag Name="EquipmentFrameColors" Value="Yryr" /-->
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" />
+      <!--tag Name="EquipmentFrameColors" Value="Yryr" /-->
   </object>
+  <!-- Damage Calculation for GiganticElongatedPaw ************************************************
+
+  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + giganticBonus}
+
+  **********************************************************************************************-->
 
   <object Name="GiganticBurrowingClaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} burrowing claw" RenderString="F" Tile="items/sw_burrowingclaws.bmp" ColorString="&amp;x" DetailColor="z" />
-    <part Name="Description" Short="A gigantic claw designed for burrowing through earth and rock." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} burrowing claw" RenderString="F" Tile="Creatures/natural-weapon-claw.bmp" ColorString="&amp;X" DetailColor="Z" />
+    <part Name="Description" Short="{{gigantic|Gigantic}} claws come together to form an {{gigantic|immense}} spade designed for breaking earth and rock alike." />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -94,37 +81,19 @@
     <tag Name="VisibleAsDefaultBehavior" />
     <tag Name="ShowAsPhysicalFeature" />
       <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
   </object>
+  <!-- Damage Calculation for GiganticBurrowingClaw ***********************************************
 
-  <object Name="ElongatedBurrowingClaw" Inherits="MeleeWeapon">
-    <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{giant|elongated burrowing claw}}" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
-    <part Name="Description" Short="A long, slender claw designed for burrowing through earth and rock." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
-    <part Name="Commerce" Value="0" />
-    <part Name="NaturalEquipment" />
-    <part Name="NoDamage" />
-    <part Name="NoBreak" />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
-    <removepart Name="TinkerItem" />
-    <intproperty Name="Natural" Value="1" />
-    <tag Name="MutationEquipment" Value="ElongatedBurrowingClaw" />
-    <tag Name="ExcludeFromDynamicEncounters" />
-    <tag Name="NoSparkingQuest" />
-    <tag Name="NaturalGear" />
-    <tag Name="WeaponUnarmed" />
-    <tag Name="VisibleAsDefaultBehavior" />
-    <tag Name="ShowAsPhysicalFeature" />
-      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
-  </object>
+  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{giganticBonus + burrowingBonus}
+  
+  **********************************************************************************************-->
 
   <object Name="GiganticElongatedBurrowingClaw" Inherits="MeleeWeapon">
     <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated burrowing claw}}" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
-    <part Name="Description" Short="A gigantic, long, slender claw designed for burrowing through earth and rock." />
-    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} burrowing claw" RenderString="F" Tile="ElongatedBurrowingClaw.png" ColorString="&amp;X" DetailColor="W" />
+    <part Name="Description" Short="{{gigantic|Gigantic}}, {{giant|long}}, {{giant|slender}} spades designed for tearing through earth and rock jut from an oddly {{gigantic|immense}} paw." />
+    <part Name="MeleeWeapon" BaseDamage="1d3" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
     <part Name="Commerce" Value="0" />
     <part Name="NaturalEquipment" />
     <part Name="NoDamage" />
@@ -140,14 +109,249 @@
     <tag Name="VisibleAsDefaultBehavior" />
     <tag Name="ShowAsPhysicalFeature" />
       <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object> 
+  <!-- Damage Calculation for GiganticElongatedBurrowingClaw **************************************
+
+  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3 + burrowingBonus}
+
+  **********************************************************************************************-->
+
+  <!-- End Gigantic Natural Weapons -->
+  <!-- Elongated Natural Weapons -->
+
+  <object Name="ElongatedPaw" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{giant|elongated}} paw" RenderString="F" Tile="ElongatedPaw_Alt.png" ColorString="&amp;x" DetailColor="z" />
+    <part Name="Description" Short="A {{giant|long}}, {{giant|slender}} paw that can wield weapons larger than usual." />
+    <part Name="MeleeWeapon" BaseDamage="1d4" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="ElongatedPaw" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" />
+      <!--tag Name="EquipmentFrameColors" Value="ZKKZ" /-->
+  </object>
+  <!-- Damage Calculation for ElongatedPaw ********************************************************
+
+  {1d4+{StatMod / 2}}
+
+  **********************************************************************************************-->
+
+  <object Name="ElongatedBurrowingClaw" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{giant|elongated}} burrowing claw" RenderString="F" Tile="ElongatedBurrowingClaw.png" ColorString="&amp;x" DetailColor="W" />
+    <part Name="Description" Short="{{giant|Long}}, {{giant|slender}} claws designed for tearing through earth and rock jut from an {{giant|oddly large}} paw." />
+    <part Name="MeleeWeapon" BaseDamage="1d5" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="ElongatedBurrowingClaw" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+  <!-- Damage Calculation for ElongatedBurrowingClaw **********************************************
+
+  {1d{burrowingDieSize + 2}+{StatMod / 2}}
+
+  **********************************************************************************************-->
+
+  <!-- End Elongated Natural Weapons -->
+  <!-- Crystalline Natural Weapons -->
+
+  <object Name="GiganticCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{crystallized|crystalline point}}" RenderString="F" Tile="GiganticFist_Alt.png" ColorString="&amp;b" DetailColor="B" />
+    <part Name="Description" Short="{{crystallized|Crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="GiganticCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+
+  <object Name="ElongatedCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{giant|elongated}} {{crystallized|crystalline point}}" RenderString="F" Tile="ElongatedCrystallinePoint.png" ColorString="&amp;b" DetailColor="B" />
+    <part Name="Description" Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{jewels|central jewel}}." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="ElongatedCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+
+  <object Name="BurrowingCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="burrowing {{crystallized|crystalline point}}" RenderString="F" Tile="Creatures/natural-weapon-claw.bmp" ColorString="&amp;b" DetailColor="B" />
+    <part Name="Description" Short="{{crystallized|Crystalline}} points fan out from a {{jewels|central jewel}}. The points can lock together perfectly to form a spade ideal for parting earth and stone." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="BurrowingCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+
+  <object Name="GiganticBurrowingCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} burrowing {{crystallized|crystalline point}}" RenderString="F" Tile="GiganticFist_Alt.png" ColorString="&amp;m" DetailColor="W" />
+    <part Name="Description" Short="{{crystallized|Crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}. The points can lock together perfectly to form a spade ideal for parting earth and stone." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="GiganticBurrowingCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+
+  <object Name="ElongatedBurrowingCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{giant|elongated}} burrowing {{crystallized|crystalline point}}" RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png" ColorString="&amp;b" DetailColor="m" />
+    <part Name="Description" Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{jewels|central jewel}}. The points can lock together perfectly to form a spade ideal for parting earth and stone." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="ElongatedBurrowingCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
   </object>
   
-  <!-- End Gigantic Natural Weapons -->
+  <object Name="GiganticElongatedCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} {{crystallized|crystalline point}}" RenderString="F" Tile="ElongatedCrystallinePoint.png" ColorString="&amp;b" DetailColor="B" />
+    <part Name="Description" Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="GiganticElongatedCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+
+  <object Name="GiganticElongatedBurrowingCrystallinePoint" Inherits="MeleeWeapon">
+    <part Name="Armor" WornOn="Hand" />
+    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} burrowing {{crystallized|crystalline point}}" RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png" ColorString="&amp;m" DetailColor="W" />
+    <part Name="Description" Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}. The points can lock together perfectly to form a spade ideal for parting earth and stone." />
+    <part Name="MeleeWeapon" MaxStrengthBonus="999" Skill="ShortBlades" Stat="Strength" />
+    <part Name="Commerce" Value="0" />
+    <part Name="NaturalEquipment" />
+    <part Name="NoDamage" />
+    <part Name="NoBreak" />
+    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="MutationEquipment" Value="GiganticElongatedBurrowingCrystallinePoint" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="NaturalGear" />
+    <tag Name="WeaponUnarmed" />
+    <tag Name="VisibleAsDefaultBehavior" />
+    <tag Name="ShowAsPhysicalFeature" />
+      <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
+      <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
+  </object>
+  <!-- End Crystalline Natural Weapons -->
+
+  <object  Name="Crystalline Point" Load="Merge">
+		<part Name="Render" DisplayName="{{crystallized|crystalline point}}" Load="Merge" />
+	</object>
 
   <!-- Gigantic Modable Changes -->
   
 	<object  Name="LightSource" Load="Merge">
+		<tag Name="Mods" Value="Gigantify" Load="Merge" />
+	</object>
+  <object  Name="Hoversled" Load="Merge">
 		<tag Name="Mods" Value="Gigantify" Load="Merge" />
 	</object>
 

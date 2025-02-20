@@ -15,6 +15,7 @@ namespace XRL.World.Parts.Mutation
         
         private static readonly List<string> NaturalWeaponSupersedingMutations = new List<string>
         {
+          //"MassiveExoframe",
             "GigantismPlus",
             "BurrowingClaws",
             "Crystallinity"
@@ -102,7 +103,7 @@ namespace XRL.World.Parts.Mutation
             if (body != null && !this.IsNaturalWeaponSuperseded)
             {
 
-                foreach (BodyPart hand in body.GetParts())
+                foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))
                 {
                     if (hand.Type == "Hand" && (hand.DefaultBehavior == ElongatedPawObject || hand.DefaultBehavior == GiganticElongatedPawObject || hand.DefaultBehavior == ElongatedBurrowingClawObject || hand.DefaultBehavior == GiganticElongatedBurrowingClawObject))
                     {
@@ -238,7 +239,10 @@ namespace XRL.World.Parts.Mutation
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
                 }
             }
-            Debug.Entry(2, "part null or not hand");
+            else
+            {
+                Debug.Entry(2, "part null or not hand");
+            }
             Debug.Entry(2, "xxAddElongatedNaturalEquipmentTo(BodyPart part)");
         } //!--- public void AddElongatedNaturalEquipmentTo(BodyPart part)
 

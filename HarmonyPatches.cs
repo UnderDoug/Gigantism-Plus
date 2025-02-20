@@ -49,7 +49,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
             // __state lets you keep stuff between Pre- and Postfixes (might be redundant for this one)
 
             __state = __instance; // make the transferable object the current instance.
-            if (__state.HasPart<PseudoGigantism>() && !__state.IsGiganticCreature) 
+            bool IsPretendBig = __state.HasPart("CompactedExoframe") || __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && !__state.IsGiganticCreature) 
             {
                 // is the GameObject PseudoGigantic but not Gigantic
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
@@ -65,7 +66,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
         {
             // only need __state this time, since it holds the __instance anyway.
 
-            if (__state.HasPart<PseudoGigantism>() && __state.IsGiganticCreature)
+            bool IsPretendBig = __state.HasPart("CompactedExoframe") || __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && __state.IsGiganticCreature)
             {
                 // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
@@ -95,7 +97,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
             // __state lets you keep stuff between Pre- and Postfixes (might be redundant for this one)
 
             __state = Object;
-            if (__state.HasPart<PseudoGigantism>() && !__state.IsGiganticCreature)
+            bool IsPretendBig = __state.HasPart("CompactedExoframe") || __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && !__state.IsGiganticCreature)
             {
                 // is the GameObject PseudoGigantic but not Gigantic
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
@@ -111,7 +114,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
         {
             // only need __state this time, since it holds the __instance anyway.
 
-            if (__state.HasPart<PseudoGigantism>() && __state.IsGiganticCreature)
+            bool IsPretendBig = __state.HasPart("CompactedExoframe") || __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && __state.IsGiganticCreature)
             {
                 // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
@@ -213,20 +217,41 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
             Debug.Entry(3, "- BurrowingClaws Mutation is present");
 
-            Debug.Entry(3, "Checking for incompatible Mutations");
-            Debug.Entry(4, "**if (__instance.ParentObject.HasPart<Crystallinity>())");
-            if (__instance.ParentObject.HasPart<Crystallinity>())
+            List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
-                Debug.Entry(3, "- Crystallinity Mutation is present");
-                Debug.Entry(3, "xxBurrowingClaws_Patches.OnRegenerateDefaultEquipmentPrefix()");
+              //"MassiveExoframe",
+                "Crystallinity"
+            };
+
+            int SupersededCount = 0;
+            foreach (string mutation in NaturalWeaponSupersedingMutations)
+            {
+                Debug.Entry(4, $"- Checking for {mutation}");
+                if (__instance.ParentObject.HasPart(mutation))
+                {
+                    Debug.Entry(4, "-- Present, increasing SupersededCount");
+                    SupersededCount++;
+                }
+            }
+
+            Debug.Entry(4, $"- SupersededCount is {SupersededCount}");
+            bool IsNaturalWeaponSuperseded = SupersededCount > 0;
+
+            Debug.Entry(3, "Checking for incompatible Mutations or Parts");
+            Debug.Entry(4, "**if (IsNaturalWeaponSuperseded)");
+            if (IsNaturalWeaponSuperseded)
+            {
+                Debug.Entry(3, "- A Superseding Mutation or Part is resent");
+                Debug.Entry(3, "xxCrystallinity_Patches.OnRegenerateDefaultEquipmentPrefix()");
                 return false;
             }
-            Debug.Entry(3, "- Crystallinity Mutation not present");
+            Debug.Entry(3, "- No Superseding Mutation or Part is present");
+
             Debug.Entry(3, "Performing application of behaviour to parts");
 
             Debug.Entry(3, "**foreach (BodyPart hand in body.GetParts())");
             Debug.Entry(4, "**if (hand.Type == \"Hand\")");
-            foreach (BodyPart hand in body.GetParts())
+            foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))
             {
                 Debug.Entry(4, $"- Part is {hand.Type}");
                 if (hand.Type == "Hand")
@@ -356,12 +381,42 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
             Debug.Entry(3, "- Crystallinity Mutation is present");
 
+            List<string> NaturalWeaponSupersedingMutations = new List<string>
+            {
+              //"MassiveExoframe"
+            };
+            
+            int SupersededCount = 0;
+            foreach (string mutation in NaturalWeaponSupersedingMutations)
+            {
+                Debug.Entry(4, $"- Checking for {mutation}");
+                if (__instance.ParentObject.HasPart(mutation))
+                {
+                    Debug.Entry(4, "-- Present, increasing SupersededCount");
+                    SupersededCount++;
+                }
+            }
+
+            Debug.Entry(4, $"- SupersededCount is {SupersededCount}");
+            bool IsNaturalWeaponSuperseded = SupersededCount > 0;
+
+            Debug.Entry(3, "Checking for incompatible Mutations or Parts");
+            Debug.Entry(4, "**if (IsNaturalWeaponSuperseded)");
+            if (IsNaturalWeaponSuperseded)
+            {
+                Debug.Entry(3, "- A Superseding Mutation or Part is resent");
+                Debug.Entry(3, "xxCrystallinity_Patches.OnRegenerateDefaultEquipmentPrefix()");
+                return false;
+            }
+            Debug.Entry(3, "- No Superseding Mutation or Part is present");
+
+            Debug.Entry(3, "Performing application of behaviour to parts");
             string targetPartType = "Hand";
             Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
             Debug.Entry(4, "Generating List<BodyPart> list");
             // Just change the body part search logic
-            List<BodyPart> list = (from p in body.GetParts()
-                                  where p.Type == targetPartType  // Changed from VariantType to Type
+            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                   where p.Type == targetPartType  // Changed from VariantType to Type
                                    select p).ToList<BodyPart>();
 
 

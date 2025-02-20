@@ -22,10 +22,29 @@ namespace Mods.GigantismPlus
 
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
-            if (!E.Actor.IsGiganticCreature && IsObjectActivePartSubject(E.Actor) && IsReady(UseCharge: true, IgnoreCharge: false, IgnoreLiquid: false, IgnoreBootSequence: false, IgnoreBreakage: false, IgnoreRust: false, IgnoreEMP: false, IgnoreRealityStabilization: false, IgnoreSubject: false, IgnoreLocallyDefinedFailure: false, 1, null, UseChargeIfUnpowered: false, 0L, null))
+            bool isReady =
+                    IsReady(
+                        UseCharge: true,
+                        IgnoreCharge: false,
+                        IgnoreLiquid: false,
+                        IgnoreBootSequence: false,
+                        IgnoreBreakage: false,
+                        IgnoreRust: false,
+                        IgnoreEMP: false,
+                        IgnoreRealityStabilization: false,
+                        IgnoreSubject: false,
+                        IgnoreLocallyDefinedFailure: false,
+                        MultipleCharge: 1,
+                        ChargeUse: null,
+                        UseChargeIfUnpowered: false,
+                        GridMask: 0L,
+                        PowerLoadLevel: null
+                );
+
+            if (!E.Actor.IsGiganticCreature && IsObjectActivePartSubject(E.Actor) && isReady)
             {
                 E.Decreases++;
-                if (!E.Object.IsGiganticEquipment && E.SlotType != "Floating Nearby")
+                if (!E.Object.IsGiganticEquipment && E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon")
                 {
                     E.CanBeTooSmall = true;
                 }

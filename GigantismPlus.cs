@@ -184,7 +184,9 @@ namespace XRL.World.Parts.Mutation
             }
         }
         
-        private bool IsHunchFree = false;
+        public bool IsHunchFree = false;
+
+        public bool UnHunchNextTurn = false;
 
         private int _hunchOverEnergyCost = 500;
 
@@ -361,7 +363,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool WantEvent(int ID, int cascade)
         {
-
+            // InterfaceWithBecomingNook
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
                 || ID == BeforeLevelGainedEvent.ID
@@ -370,7 +372,9 @@ namespace XRL.World.Parts.Mutation
                 || ID == CanEnterInteriorEvent.ID
                 || ID == InventoryActionEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID;
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == InventoryActionEvent.ID
+                || ID == EarlyBeforeBeginTakeActionEvent.ID;
         }
 
         public override bool HandleEvent(BeforeLevelGainedEvent E)
@@ -394,6 +398,8 @@ namespace XRL.World.Parts.Mutation
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
             return base.HandleEvent(E);
+            /* Currently being handled elsewhere.
+             * 
             // Should let you install cybernetics that are a disparate size to you.
             if (E.Object.HasPart<CyberneticsBaseItem>())
             {
@@ -405,6 +411,7 @@ namespace XRL.World.Parts.Mutation
                 E.CanBeTooSmall = false;
             }
             return base.HandleEvent(E);
+            */
         }
 
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
@@ -444,31 +451,21 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
-        /* This was part of the code we were using, I thought, to enable entering interiors while gigantic.
-         * Debug-logging revealed that it wasn't firing at all. Leaving it here for the time being.
-         * 
-        public override bool HandleEvent(InventoryActionEvent E)
+        public override bool HandleEvent(EarlyBeforeBeginTakeActionEvent E)
         {
-            if (E.Command == "EnterInterior")
+            if(this.UnHunchNextTurn == true && ParentObject != null)
             {
-                Debug.Entry("A) Attempting InteriorEntry");
-                GameObject actor = E.Actor;
-                if (actor.IsGiganticCreature && !actor.HasPart<Vehicle>())
-                {
-                    Debug.Entry("A)A) We are big, so we'll HunchOver");
-                    IsHunchFree = true;
-                    CommandEvent.Send(actor, HUNCH_OVER_COMMAND_NAME);
-                    Debug.Entry("A)A)A) HunchOver Sent for Enter InventoryActionEvent");
-                }
-                else
-                {
-                    Debug.Entry("A)A) InventoryActionEvent - We aren't big");
-                }
-                Debug.Entry("A)A)A)A) Sending to base InventoryActionEvent");
+                Debug.Entry(3, "...........................................");
+                Debug.Entry(4, "**public override bool HandleEvent(EarlyBeforeBeginTakeActionEvent E)");
+                Debug.Entry(3, "Automatically Unhunching");
+                UnHunchNextTurn = false;
+                IsHunchFree = true;
+                CommandEvent.Send(ParentObject, HUNCH_OVER_COMMAND_NAME);
+                Debug.Entry(4, "x- Deferring to base.HandleEvent(E)");
+                Debug.Entry(3, "...........................................");
             }
             return base.HandleEvent(E);
         }
-        */
 
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
@@ -501,9 +498,18 @@ namespace XRL.World.Parts.Mutation
             {
                 MSPenalty = GetHunchedOverMSModifier(Level) + "}} MS";
             }
+
+            string intSign = GetFistHitBonus(Level) >= 0 ? "+" : "";
+            string toHitString = "";
+            string penaltyBonus = GetFistHitBonus(Level) >= 0 ? "bonus" : "penalty";
+            if (GetFistHitBonus(Level) != 0)
+            {
+                toHitString = "and {{rules|" + intSign + GetFistHitBonus(Level) + "}} To Hit " + penaltyBonus + "\n";
+            }
+
             string WeaponName = this.NaturalWeaponBlueprint.DisplayName();
             return WeaponName + " {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetFistDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetFistDamageDieSize(Level) + "}}{{rules|+3}}\n"
-                 + "and {{rules|" + GetFistHitBonus(Level) + "}} To-Hit\n"; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
+                 + toHitString; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
                  + "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}"; */
         }
 
@@ -835,7 +841,6 @@ namespace XRL.World.Parts.Mutation
             {
                 // Action happened 
                 UseEnergy(HunchOverEnergyCost, "Physical Defect Mutation Gigantism Hunch Over");
-
                 //
                 // Add the stat shifting code here.
                 //
@@ -843,7 +848,8 @@ namespace XRL.World.Parts.Mutation
                 actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_positiveVitality");
                 if (Message)
                 {
-                        Popup.Show("You hunch over, allowing you access to smaller spaces.");
+                    actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_positiveVitality");
+                    Popup.Show("You hunch over, allowing you access to smaller spaces.");
                 }
 
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
@@ -863,6 +869,8 @@ namespace XRL.World.Parts.Mutation
             GameObject actor = ParentObject;
             if (!IsPseudoGiganticCreature) // Already Upright over
             {
+                IsHunchFree = false;
+                UnHunchNextTurn = false;
                 Debug.Entry(1, "Tried to straighten up, but wasn't PseudoGigantic");
                 return;
             }
@@ -878,8 +886,11 @@ namespace XRL.World.Parts.Mutation
                 // Add the stat shifting code here.
                 //
 
-                actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_negativeVitality");
-                Popup.Show("You stand tall, relaxing into your immense stature.");
+                if (Message)
+                {
+                    actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_negativeVitality");
+                    Popup.Show("You stand tall, relaxing into your immense stature.");
+                }
 
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
                 abilityEntry.DisplayName =

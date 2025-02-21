@@ -561,12 +561,33 @@ namespace XRL.World.Parts
         {
             return true;
         }
-        
+
+        // These prevent the cybernetic in question from being disassembled.
+        public override void Register(GameObject Object)
+        {
+            Object.RegisterPartEvent(this, "CanBeDisassembled");
+            base.Register(Object);
+        }
+        public void CanBeDisassembled()
+        {
+            Event CanBeDisassembled = Event.New("CanBeDisassembled");
+            ParentObject.FireEvent(CanBeDisassembled);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "CanBeDisassembled")
+            {
+                return false;
+            }
+
+            return base.FireEvent(E);
+        }
+
         /* Testing Mutation Method.
-         *
+            *
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-             
+
             Registrar.Register(COMPACT_MODE_COMMAND_NAME);
 
             base.Register(Object, Registrar);

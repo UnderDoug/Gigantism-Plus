@@ -97,11 +97,11 @@ namespace Mods.GigantismPlus
                     {
                         Debug.Entry(2, ItemName, "cannot be made gigantic");
                         Debug.Entry(4, "--X Skipping");
-                        Debug.Entry(3, $"{ItemName} ]\{");
+                        Debug.Entry(3, $"{ItemName} ]//");
                         continue;
                     }
 
-                    Debug.Entry(3, $"{ItemName} ]\{");
+                    Debug.Entry(3, $"{ItemName} ]//");
                 }
                 Debug.Entry(3, "-------------------------------------------");
                 Debug.Entry(3, "- Gigantification of starting gear finished");

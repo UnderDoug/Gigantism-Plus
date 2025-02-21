@@ -305,6 +305,7 @@
           BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
                                You cannot wear equipment on your body."
           />
+    <removepart Name="TinkerItem" />
     <part Name="Metal" />
     <part Name="NoDamage" />
     <part Name="NoRust" />
@@ -314,7 +315,6 @@
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <part Name="ItemElements" Elements="immense::2" />
-    <tag Name="RenderImplantGreyInEquipment" />
     <tag Name="BaseObject" Value="*noinherit" />
   </object>
 
@@ -372,7 +372,7 @@ You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="240" />
     <part Name="CyberneticsMassiveExoframe" Model="Delta" />
-    <part Name="ModImprovedGigantismPlus" Tier="4" />
+    <part Name="ModImprovedGigantismPlus" Tier="5" />
     <part Name="ItemElements" Elements="immense::4" />
   </object>
 
@@ -392,7 +392,7 @@ You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="600" />
     <part Name="CyberneticsMassiveExoframe" Model="Sigma" />
-    <part Name="ModImprovedGigantismPlus" Tier="8" />
+    <part Name="ModImprovedGigantismPlus" Tier="10" />
     <part Name="ItemElements" Elements="immense::6" />
   </object>
 
@@ -412,7 +412,7 @@ You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="2200" />
     <part Name="CyberneticsMassiveExoframe" Model="Omega" />
-    <part Name="ModImprovedGigantismPlus" Tier="12" />
+    <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="ItemElements" Elements="immense::8" />
     <part Name="Zetachrome" />
   </object>

@@ -75,14 +75,14 @@ namespace Mods.GigantismPlus
 
                     Debug.Entry(4, "--- No Further Actions Required", "Exiting ModList");
                     Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    Debug.Entry(3, $"{ModPart} ]\{");
+                    Debug.Entry(3, $"{ModPart} ]//");
 
                     break;
 
                 }
                 else Debug.Entry(2, ModPart, "Not ModGigantic");
 
-                Debug.Entry(3, $"{ModPart} ]\{");
+                Debug.Entry(3, $"{ModPart} ]//");
             }
             Debug.Entry(3, "-------------------------------------------");
             Debug.Entry(1, "ModList exited, adjustment process finished");

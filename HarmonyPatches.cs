@@ -2,10 +2,12 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using XRL.UI;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.Parts.Skill;
 using Mods.GigantismPlus;
 
 namespace Mods.GigantismPlus.HarmonyPatches
@@ -168,26 +170,88 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
     } //!--- public static class ModGiganticDisplayName_Shader
 
-    [HarmonyPatch(typeof(XRL.World.Anatomy.BodyPart))]
-    public static class BodyPart_Equip_SmallCybernetics
+    [HarmonyPatch]
+    public static class GiganticCreature_Implant_SmallCybernetics
     {
-        // goal force equipment cybernetcs to be equipped even if they're "too small".
+        // goal force gigantic creatures who are eligible for cybernetics to hunch over when using becomming nooks.
+        // failure to do so really freaks out the cybernetic in question due to being "too small".
+        // you end up with it installed, but the equipment copy ends up in your inventory.
+
+        static void CyberneticsTerminal2Patch(GameObject Actor)
+        {
+            Debug.Entry(3, "**static void CyberneticsTerminal2Patch(GameObject Actor) called");
+
+            Debug.Entry(3, "- Checking the Actor exists, is a True Kin, and has GigantismPlus");
+            Debug.Entry(4, "**if (Actor != null && actor.IsTrueKin && actor.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())");
+            if (Actor != null && Actor.IsTrueKin() && Actor.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())
+            {
+                Debug.Entry(3, "-- Actor exists, is a True Kin, and has GigantismPlus");
+                var gigantism = Actor.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
+                if (gigantism != null)
+                {
+                    Debug.Entry(3, "-- GigantismPlus instantiated");
+                    Debug.Entry(3, "-- Making Hunch Over free, Sending Command to Hunch Over");
+
+                    gigantism.IsHunchFree = true;
+                    gigantism.UnHunchNextTurn = true;
+                    CommandEvent.Send(Actor, XRL.World.Parts.Mutation.GigantismPlus.HUNCH_OVER_COMMAND_NAME);
+
+                    Debug.Entry(3, "-- Popping up Popup");
+                    Popup.Show("You peer down into the interface.");
+                }
+            } 
+            else Debug.Entry(3, "x one or more of: actor doesn't exists, isn't a True Kin, or lacks GigantismPlus");
+        }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(BodyPart.Equip))]
-        static bool BodyPart_EquipPrefix(ref GameObject Item, ref bool Forced)
+        [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(InventoryActionEvent) })]
+        static bool InventoryActionEventPrefix(InventoryActionEvent E)
         {
             Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
-            Debug.Entry(3, "BodyPart.Equip -> BodyPart_EquipPrefix(ref GameObject Item, ref bool Forced)");
-            if (Item.HasPart<CyberneticsBaseItem>())
+            Debug.Entry(3, "CyberneticsTerminal2 -> HandleEvent(InventoryActionEvent E)");
+            if (E.Command == "InterfaceWithBecomingNook")
             {
-                Debug.Entry(4, $"Item has CyberneticsBaseItem");
-                Forced = true;
+                Debug.Entry(4, $"E.Command is {E.Command}");
+
+                CyberneticsTerminal2Patch(E.Actor);
+
+                Debug.Entry(3, "Deferring to patched method");
             }
+            return true;
+        } //!-- static bool InventoryActionEventPrefix(InventoryActionEvent E)
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(CommandSmartUseEvent) })]
+        static bool CommandSmartUseEventPrefix(CommandSmartUseEvent E)
+        {
+            Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
+            Debug.Entry(3, "CyberneticsTerminal2 -> HandleEvent(CommandSmartUseEvent E)");
+
+            CyberneticsTerminal2Patch(E.Actor);
+
+            Debug.Entry(3, "Deferring to patched method");
             return true;
         }
 
     } //!--- public static class ModGiganticDisplayName_Shader
+
+    //XRL.World.Parts.Skill.Tinkering_Disassemble
+    //public static bool CanBeConsideredScrap(GameObject obj)
+    //{
+
+    [HarmonyPatch(typeof(Tinkering_Disassemble))]
+    public static class PreventCyberneticsBeingDisassembled
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Tinkering_Disassemble.CanBeConsideredScrap))]
+        static void CanBeConsideredScrapPostfix(ref GameObject obj, ref bool __result)
+        {
+            if (obj != null && obj.HasPart<CyberneticsBaseItem>())
+            {
+                __result = false;
+            }
+        }
+    }
 
     [HarmonyPatch(typeof(XRL.World.Parts.Mutation.BurrowingClaws))]
     public static class BurrowingClaws_Patches

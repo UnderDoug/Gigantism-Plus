@@ -6,6 +6,7 @@ using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.Tinkering;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches;
 
@@ -67,8 +68,23 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
+                Debug.Entry(3, "IsCyberGiant, get");
                 if (ParentObject != null)
-                    return ParentObject.HasPart<CyberneticsMassiveExoframe>();
+                {
+                    Debug.Entry(3, "- ParentObject not null");
+                    GameObject cybernetics = ParentObject.Body.GetPartByName("body").Cybernetics;
+                    if (cybernetics != null)
+                    {
+                        Debug.Entry(3, "- cybernetics not null");
+                        Debug.Entry(3, "CyberGiant: true");
+                        return cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe";
+                    }
+                    Debug.Entry(3, "- cybernetics is null");
+                    Debug.Entry(3, "CyberGiant: false");
+                    return false;
+                }
+                Debug.Entry(3, "- ParentObject is null");
+                Debug.Entry(3, "CyberGiant: false");
                 return false;
             }
         }
@@ -202,7 +218,7 @@ namespace XRL.World.Parts.Mutation
             {
                 if (this.IsCyberGiant)
                 {
-                    return ParentObject.GetPart<CyberneticsMassiveExoframe>().ManipulatorBlueprintName;
+                    return ParentObject.Body.GetPartByName("body").Cybernetics.GetPart<CyberneticsMassiveExoframe>().ManipulatorBlueprintName;
                 }
                 return _NaturalWeaponBlueprintName; 
             }
@@ -353,7 +369,8 @@ namespace XRL.World.Parts.Mutation
                 || ID == GetMaxCarriedWeightEvent.ID
                 || ID == CanEnterInteriorEvent.ID
                 || ID == InventoryActionEvent.ID
-                || ID == GetExtraPhysicalFeaturesEvent.ID;
+                || ID == GetExtraPhysicalFeaturesEvent.ID
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID;
         }
 
         public override bool HandleEvent(BeforeLevelGainedEvent E)
@@ -374,9 +391,25 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            return base.HandleEvent(E);
+            // Should let you install cybernetics that are a disparate size to you.
+            if (E.Object.HasPart<CyberneticsBaseItem>())
+            {
+                if (!E.Actor.IsGiganticCreature && E.Object.IsGiganticEquipment)
+                    E.Decreases++;
+                else if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
+                    E.Increases++;
+
+                E.CanBeTooSmall = false;
+            }
+            return base.HandleEvent(E);
+        }
+
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
-            E.Features.Add("{{gianter|gigantic stature}}");
+            E.Features.Add("{{gianter|gigantic}} stature");
             return base.HandleEvent(E);
         }
 
@@ -476,15 +509,20 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
+            Debug.Entry(2, $"GigantismPlus -> Mutate {GO.DebugName}");
             Body body = GO.Body;
             if (body != null)
             {
+                Debug.Entry(2, "- Mutating: Have Body");
                 GO.RemovePart<Gigantism>();
+                Debug.Entry(2, "- Mutating: RemovePart<Gigantism>()");
                 IsGiganticCreature = true; // Enable the Gigantic flag
+                Debug.Entry(2, "- Mutating: IsGiganticCreature = true");
             }
 
             if (!GO.HasPart<Vehicle>())
             {
+                Debug.Entry(2, "- Mutating: Not Vehicle");
                 /* AddActivatedAbility() - Full Method Arguments.
                  * AddActivatedAbility(Name, Command, Class, Description, Icon, DisabledMessage, Toggleable, DefaultToggleState, ActiveToggle, IsAttack, IsRealityDistortionBased, IsWorldMapUsable, Silent, AIDisable, AlwaysAllowToggleOff, AffectedByWillpower, TickPerTurn, Distinct: false, Cooldown, CommandForDescription, UITileDefault, UITileToggleOn, UITileDisabled, UITileCoolingDown); */
                 EnableActivatedAbilityID =
@@ -503,6 +541,7 @@ namespace XRL.World.Parts.Mutation
                         IsWorldMapUsable: false
                         );
 
+                Debug.Entry(2, "- Mutating: Activeated Ability Assigned");
                 ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(EnableActivatedAbilityID);
                 abilityEntry.DisplayName = 
                     "{{C|" + 
@@ -510,6 +549,7 @@ namespace XRL.World.Parts.Mutation
                                 this.HunchedOverAbilityHunched + "\n" +
                        "}}";
 
+                Debug.Entry(2, "- Mutating: Activeated Ability DisplayName Changed");
                 /* This causes a village generation crash.
                  * 
                 if (this.IsCyberGiant)
@@ -522,11 +562,13 @@ namespace XRL.World.Parts.Mutation
                 */
             }
 
+            Debug.Entry(2, $"GigantismPlus -> base.Mutate {GO.DebugName}");
             return base.Mutate(GO, Level);
         }
 
         public override bool Unmutate(GameObject GO)
         {
+            Debug.Entry(2, $"GigantismPlus -> Unmutate {GO.DebugName}");
             if (GO != null)
             {
                 StraightenUp();
@@ -541,6 +583,7 @@ namespace XRL.World.Parts.Mutation
                 CheckAffected(GO, GO.Body);
             }
 
+            Debug.Entry(2, $"GigantismPlus -> base.Unmutate {GO.DebugName}");
             return base.Unmutate(GO);
         }
 
@@ -569,6 +612,7 @@ namespace XRL.World.Parts.Mutation
                             GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
                         }
                         part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
+                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
                         var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
                         var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                         weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3 + burrowingBonus}";
@@ -588,6 +632,7 @@ namespace XRL.World.Parts.Mutation
                             GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedPaw");
                         }
                         part.DefaultBehavior = GiganticElongatedPawObject;
+                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
                         var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
                         var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
                         weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
@@ -613,6 +658,7 @@ namespace XRL.World.Parts.Mutation
                         GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingClaw");
                     }
                     part.DefaultBehavior = GiganticBurrowingClawObject;
+                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
                     var weapon = GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
                     string baseDamage = GetFistBaseDamage(burrowingClaws.Level);
                     int plusIndex = baseDamage.LastIndexOf('+');
@@ -643,6 +689,7 @@ namespace XRL.World.Parts.Mutation
                         GiganticFistObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprint);/*
                     }*/
                     part.DefaultBehavior = GiganticFistObject;
+                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
                     var weapon = GiganticFistObject.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = FistBaseDamage;
                     weapon.HitBonus = FistHitBonus;
@@ -673,11 +720,11 @@ namespace XRL.World.Parts.Mutation
             FistBaseDamage = GetFistBaseDamage(Level);
             FistHitBonus = GetFistHitBonus(Level);
 
-            if (!this.IsNaturalWeaponSuperseded)
+            if (!this.IsNaturalWeaponSuperseded && body != null)
             {
                 Debug.Entry(3, "- NaturalEquipment not Superseded");
 
-                Debug.Entry(3, "**foreach (BodyPart hand in body.GetParts())\n**if (hand.Type == \"Hand\")");
+                Debug.Entry(3, "**foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))\n**if (hand.Type == \"Hand\")");
                 foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))
                 {
                     Debug.Entry(4, $"-- {hand.Type}");
@@ -691,7 +738,7 @@ namespace XRL.World.Parts.Mutation
                         Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     }
                 }
-                Debug.Entry(3, "xxforeach (BodyPart hand in body.GetParts())");
+                Debug.Entry(3, "xxforeach (BodyPart hand in body.GetParts(EvenIfDismembered: true))");
             }
             else
             {

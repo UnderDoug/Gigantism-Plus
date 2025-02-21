@@ -169,6 +169,7 @@ namespace XRL.World.Parts.Mutation
                             GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
                         }
                         part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
+                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                         var gigantism = ParentObject.GetPart<GigantismPlus>();
                         var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                         weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3 + burrowingBonus}";
@@ -188,6 +189,7 @@ namespace XRL.World.Parts.Mutation
                             GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedPaw");
                         }
                         part.DefaultBehavior = GiganticElongatedPawObject;
+                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                         var gigantism = ParentObject.GetPart<GigantismPlus>();
                         var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
                         weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3}";
@@ -213,6 +215,7 @@ namespace XRL.World.Parts.Mutation
                         ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingClaw");
                     }
                     part.DefaultBehavior = ElongatedBurrowingClawObject;
+                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                     var weapon = ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                     // Fix: Add burrowingBonus to final calculation
                     weapon.BaseDamage = $"1d{burrowingDieSize + 2}+{StatMod / 2}";
@@ -232,6 +235,7 @@ namespace XRL.World.Parts.Mutation
                         ElongatedPawObject = GameObjectFactory.Factory.CreateObject("ElongatedPaw");
                     }
                     part.DefaultBehavior = ElongatedPawObject;
+                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                     var weapon = ElongatedPawObject.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = $"1d4+{StatMod / 2}";
 
@@ -255,7 +259,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(2, "**ElongatedPaws.OnRegenerateDefaultEquipment(Body body)");
             Debug.Entry(2, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
-            if (!this.IsNaturalWeaponSuperseded)
+            if (!this.IsNaturalWeaponSuperseded && body != null)
             {
                 Debug.Entry(3, "- NaturalEquipment not Superseded");
 

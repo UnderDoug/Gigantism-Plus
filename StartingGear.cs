@@ -10,31 +10,47 @@ namespace Mods.GigantismPlus
     {
         public void mutate(GameObject player)
         {
-            Debug.Entry(1, "/ Checking if Gigantification of starting gear should occur.");
+            Debug.Entry(2, "##################################################################");
+            Debug.Entry(2, "public class GigantifyStartingLoadout : IPlayerMutator");
+            Debug.Entry(3, "[{}] public void mutate(GameObject player)");
+
+            Debug.Entry(2, "Checking if Gigantification of starting gear should occur");
+            Debug.Entry(4, "**if ((player.HasPart(\"GigantismPlus\") && Options.EnableGiganticStartingGear)");
             // Check for either mutation OR cybernetic as source of gigantism
-            if ((player.HasPart("GigantismPlus") || player.HasPart("MassiveExoframe")) && Options.EnableGiganticStartingGear)
+            if (player.HasPart("GigantismPlus") && Options.EnableGiganticStartingGear)
             {
-                if (Options.EnableGiganticStartingGear_Grenades) Debug.Entry(3, "| Checking", "grenades will be Gigantified");
-                if (!Options.EnableGiganticStartingGear_Grenades) Debug.Entry(3, "| Checking", "grenades won't be Gigantified");
-                Debug.Entry(1, "/ Spinning up InventoryAndEquipment");
-                Debug.Entry(2, "________________________________________|");
+                Debug.Entry(3, "- Player is Gigantic && Option is [Enabled]");
+
+                Debug.Entry(3, "- Checking if Grenades should be included");
+                Debug.Entry(4, "**if (Options.EnableGiganticStartingGear_Grenades)");
+                if (Options.EnableGiganticStartingGear_Grenades)
+                {
+                    Debug.Entry(3, "-- Option is [Enabled] - Grenades will be Gigantified");
+                }
+                else
+                {
+                    Debug.Entry(3, "-- Option is [Disabled] - Grenades won't be Gigantified");
+                }
+
+                Debug.Entry(3, "- Performing Gigantification");
+                Debug.Entry(3, "**foreach (GameObject item in player.GetInventoryAndEquipment())");
                 // Cycle the player's inventory and equipped items.
                 foreach (GameObject item in player.GetInventoryAndEquipment())
                 {
+                    Debug.Entry(3, "-------------------------------------------");
                     string ItemName = item.DebugName;
-                    Debug.Entry(2, "BEGIN ENTRY", ItemName);
-                    ItemName = "| " + item.Blueprint;
+                    Debug.Entry(3, $"--@ Item Entry: {ItemName}");
+                    ItemName = "--- " + item.Blueprint;
                     // Can the item have the gigantic modifier applied?
                     if (ItemModding.ModificationApplicable("ModGigantic", item))
                     {
+                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                         // Is the item already gigantic? Don't attempt to apply it again.
                         if (item.HasPart<ModGigantic>())
                         {
                             Debug.Entry(3, ItemName, "is already gigantic");
-                            Debug.Entry(3, "\\ Skipping");
-                            Debug.Entry(2, "END ENTRY ------------------------------|");
-                            Debug.Entry(2, "________________________________________|");
-                            Debug.Entry(2, "");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                             continue;
                         }
                         Debug.Entry(3, ItemName, "not gigantic");
@@ -43,10 +59,8 @@ namespace Mods.GigantismPlus
                         if (!Options.EnableGiganticStartingGear_Grenades && item.HasTag("Grenade"))
                         {
                             Debug.Entry(3, ItemName, "is a grenade (excluded)");
-                            Debug.Entry(3, "\\ Skipping");
-                            Debug.Entry(2, "END ENTRY ------------------------------|");
-                            Debug.Entry(2, "________________________________________|");
-                            Debug.Entry(2, "");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                             continue;
                         }
                         if (!item.HasTag("Grenade")) Debug.Entry(3, ItemName, "not a grenade");
@@ -56,10 +70,8 @@ namespace Mods.GigantismPlus
                         if (item.HasTag("DynamicObjectsTable:TradeGoods"))
                         {
                             Debug.Entry(3, ItemName, "is TradeGoods");
-                            Debug.Entry(3, "\\ Skipping");
-                            Debug.Entry(2, "END ENTRY ------------------------------|");
-                            Debug.Entry(2, "________________________________________|");
-                            Debug.Entry(2, "");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                             continue;
                         }
                         Debug.Entry(3, ItemName, "not TradeGoods");
@@ -68,10 +80,8 @@ namespace Mods.GigantismPlus
                         if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
                         {
                             Debug.Entry(3, ItemName, "is Tonics_NonRare");
-                            Debug.Entry(3, "\\ Skipping");
-                            Debug.Entry(2, "END ENTRY ------------------------------|");
-                            Debug.Entry(2, "________________________________________|");
-                            Debug.Entry(2, "");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                             continue;
                         }
                         Debug.Entry(3, ItemName, "not Tonics_NonRare");
@@ -80,53 +90,31 @@ namespace Mods.GigantismPlus
                         ItemModding.ApplyModification(item, "ModGigantic");
                         Debug.Entry(2, ItemName, "has been Gigantified");
                         // player.AutoEquip(item); Debug.Entry(2, ItemName, "AutoEquip Attempted");
+                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
 
                     } 
                     else
                     {
-                        Debug.Entry(2, ItemName, "cannot be made gigantic.");
-                        Debug.Entry(3, "\\ Skipping");
-                        Debug.Entry(2, "END ENTRY ------------------------------|");
-                        Debug.Entry(2, "________________________________________|");
-                        Debug.Entry(2, "");
+                        Debug.Entry(2, ItemName, "cannot be made gigantic");
+                        Debug.Entry(4, "--X Skipping");
+                        Debug.Entry(3, $"{ItemName} ]\{");
                         continue;
                     }
 
-                    Debug.Entry(2, "END ENTRY ------------------------------|");
-                    Debug.Entry(2, "________________________________________|");
-                    Debug.Entry(2, "");
+                    Debug.Entry(3, $"{ItemName} ]\{");
                 }
-                Debug.Entry(1, "\\ Gigantification of starting gear finished.");
-                Debug.Entry(1, "________________________________________");
+                Debug.Entry(3, "-------------------------------------------");
+                Debug.Entry(3, "- Gigantification of starting gear finished");
                 player.WantToReequip();
+                Debug.Entry(3, "- Attempting to reequip items");
+                Debug.Entry(2, "##################################################################");
             }
             else
             {
-                Debug.Entry(1, "\\Check failed.");
-                Debug.Entry(1, "________________________________________");
+                Debug.Entry(4, "- Player not Gigantic || Option is [Disabled]");
+                Debug.Entry(3, "- Check Failed");
+                Debug.Entry(2, "##################################################################");
             }
-
-            /* The Debug.Entries appear to indicate that this code is redundant.
-             * Keeping it here in case.
-             * 
-            // Check if player has the exoframe
-            if (player.HasPart<MassiveExoframe>())
-            {
-                // Cycle the player's inventory and equipped items
-                foreach (GameObject item in player.GetInventoryAndEquipment())
-                {
-                    if (ItemModding.ModificationApplicable("ModGigantic", item) 
-                        && !item.HasPart<ModGigantic>()
-                        && !item.HasTag("DynamicObjectsTable:TradeGoods")
-                        && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
-                    {
-                        ItemModding.ApplyModification(item, "ModGigantic");
-                        player.AutoEquip(item);
-                    }
-                }
-            }
-            */
-
         }
     }
 }

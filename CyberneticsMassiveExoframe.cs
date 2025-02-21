@@ -7,9 +7,9 @@ using XRL.World.Anatomy;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches;
 
-/*namespace XRL.World.Parts
+namespace XRL.World.Parts
 {
-    */[Serializable]
+    [Serializable]
     public class CyberneticsMassiveExoframe : IPart
     {
         /* Potentially redundant
@@ -170,6 +170,7 @@ using Mods.GigantismPlus.HarmonyPatches;
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
                 || ID == ImplantedEvent.ID
                 || ID == UnimplantedEvent.ID
                 || ID == CanEnterInteriorEvent.ID;
@@ -177,12 +178,12 @@ using Mods.GigantismPlus.HarmonyPatches;
 
         public virtual void OnImplanted(GameObject Object)
         {
-            Debug.Entry(2, "**public virtual void OnImplanted(GameObject Object)");
+            Debug.Entry(2, $"**public virtual void OnImplanted({Object.DisplayName})");
             // base
             _User = Object;
 
             // Require Part
-            Object.RequirePart<CyberneticsMassiveExoframe>();
+            // Object.RequirePart<CyberneticsMassiveExoframe>();
 
             /* Testing Mutation method.
              *
@@ -237,7 +238,7 @@ using Mods.GigantismPlus.HarmonyPatches;
 
         public virtual void OnUnimplanted(GameObject Object)
         {
-            Debug.Entry(3, "**public virtual void OnUnimplanted(GameObject Object)");
+            Debug.Entry(3, $"**public virtual void OnUnimplanted({Object.DisplayName})");
             /* Might be redundant.
              * 
             // Remove manipulator from hands
@@ -265,8 +266,8 @@ using Mods.GigantismPlus.HarmonyPatches;
             }
             */
 
-            Object.RemovePart<CyberneticsMassiveExoframe>();
-            Debug.Entry(3, "**Object.RemovePart<CyberneticsMassiveExoframe>()");
+            // Object.RemovePart<CyberneticsMassiveExoframe>();
+            // Debug.Entry(3, "**Object.RemovePart<CyberneticsMassiveExoframe>()");
 
             /* Testing Mutation Method.
              * 
@@ -274,13 +275,14 @@ using Mods.GigantismPlus.HarmonyPatches;
             */
 
             CheckEquipment(Object, Object.Body);
-            Debug.Entry(3, "**CheckEquipment(Object, Object.Body)");
+            Debug.Entry(3, $"**CheckEquipment({Object.DisplayName}, Object.Body)");
 
         } //!--- public override void OnUnimplanted(GameObject Object)
 
         public override bool HandleEvent(ImplantedEvent E)
         {
             Debug.Entry(3, "**public override bool HandleEvent(ImplantedEvent E)");
+            Debug.Entry(3, $"-- E.Implantee is {E.Implantee.DisplayName}");
             /* Temporarily Commenting this out to see if OnImplanted works instead.
              * 
             E.Implantee.IsGiganticCreature = true;
@@ -343,6 +345,7 @@ using Mods.GigantismPlus.HarmonyPatches;
         public override bool HandleEvent(UnimplantedEvent E)
         {
             Debug.Entry(3, "**public override bool HandleEvent(UnimplantedEvent E)");
+            Debug.Entry(3, $"-- E.Implantee is {E.Implantee.DisplayName}");
             /* Temporarily Commenting this out to see if OnImplanted works instead.
              *
             // Remove manipulator from hands
@@ -371,6 +374,21 @@ using Mods.GigantismPlus.HarmonyPatches;
 
             OnUnimplanted(E.Implantee);
             Debug.Entry(3, "xxreturn base.HandleEvent(E)");
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            // Lets you install this cybernetic despite being a disparate size to you.
+            if (E.Object.HasPart<CyberneticsBaseItem>())
+            {
+                if (!E.Actor.IsGiganticCreature && E.Object.IsGiganticEquipment)
+                    E.Decreases++;
+                else if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
+                    E.Increases++;
+
+                E.CanBeTooSmall = false;
+            }
             return base.HandleEvent(E);
         }
 
@@ -539,7 +557,6 @@ using Mods.GigantismPlus.HarmonyPatches;
         }
         */
 
-
         public override bool AllowStaticRegistration()
         {
             return true;
@@ -555,5 +572,5 @@ using Mods.GigantismPlus.HarmonyPatches;
             base.Register(Object, Registrar);
         }
         */
-    }/*
-}*/
+    }
+}

@@ -311,7 +311,7 @@
     <tag Name="CyberneticsUsesEqSlot" />
     <tag Name="CyberneticsOneOnly" />
     <part Name="CyberneticsMassiveExoframe" Model="Alpha" />
-    <!-- part Name="ModGigantic" /-->
+    <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <part Name="ItemElements" Elements="immense::2" />
     <tag Name="RenderImplantGreyInEquipment" />
@@ -336,11 +336,11 @@
   <!-- Massive Exoframes -->
   
   <object Name="MassiveExoframeAlpha" Inherits="BaseMassiveExoframe">
-    <part Name="Physics" Weight="75" />
+    <part Name="Physics" Weight="15" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{Y|massive exoframe {{b|alpha}}}}"
+    <part Name="Render" DisplayName="{{Y|massive exoframe {{b|alpha}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="b"
           />
@@ -357,11 +357,11 @@ You cannot wear equipment on your body."
   </object>
 
   <object Name="MassiveExoframeDelta" Inherits="BaseMassiveExoframe">
-    <part Name="Physics" Weight="90" />
+    <part Name="Physics" Weight="18" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{Y|massive exoframe {{K|delta}}}}"
+    <part Name="Render" DisplayName="{{Y|massive exoframe {{K|delta}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="K"
           />
@@ -377,11 +377,11 @@ You cannot wear equipment on your body."
   </object>
 
   <object Name="MassiveExoframeSigma" Inherits="BaseMassiveExoframe">
-    <part Name="Physics" Weight="45" />
+    <part Name="Physics" Weight="9" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{G|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{Y|massive exoframe {{G|sigma}}}}"
+    <part Name="Render" DisplayName="{{Y|massive exoframe {{G|sigma}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="G"
           />
@@ -397,11 +397,11 @@ You cannot wear equipment on your body."
   </object>
 
   <object Name="MassiveExoframeOmega" Inherits="BaseMassiveExoframe">
-    <part Name="Physics" Weight="30" />
+    <part Name="Physics" Weight="6" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{Y|massive exoframe {{zetachrome|omega}}}}"
+    <part Name="Render" DisplayName="{{Y|massive exoframe {{zetachrome|omega}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="M"
           />
@@ -483,7 +483,7 @@ You cannot wear equipment on your body."
   <!-- Modified BaseGame Natural Weapons -->
 
   <object  Name="Crystalline Point" Load="Merge">
-		<part Name="Render" DisplayName="{{crystallized|crystalline}} {{crystallized|point}}" Load="Merge" />
+		<part Name="Render" DisplayName="{{crystallized|crystalline}} {{crystallized|point}}" />
 	</object>
 
   <!-- End Modified BaseGame Natural Weapons -->

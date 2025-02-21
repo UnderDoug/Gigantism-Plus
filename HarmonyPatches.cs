@@ -168,6 +168,27 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
     } //!--- public static class ModGiganticDisplayName_Shader
 
+    [HarmonyPatch(typeof(XRL.World.Anatomy.BodyPart))]
+    public static class BodyPart_Equip_SmallCybernetics
+    {
+        // goal force equipment cybernetcs to be equipped even if they're "too small".
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(BodyPart.Equip))]
+        static bool BodyPart_EquipPrefix(ref GameObject Item, ref bool Forced)
+        {
+            Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
+            Debug.Entry(3, "BodyPart.Equip -> BodyPart_EquipPrefix(ref GameObject Item, ref bool Forced)");
+            if (Item.HasPart<CyberneticsBaseItem>())
+            {
+                Debug.Entry(4, $"Item has CyberneticsBaseItem");
+                Forced = true;
+            }
+            return true;
+        }
+
+    } //!--- public static class ModGiganticDisplayName_Shader
+
     [HarmonyPatch(typeof(XRL.World.Parts.Mutation.BurrowingClaws))]
     public static class BurrowingClaws_Patches
     {
@@ -199,7 +220,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(BurrowingClaws __instance, Body body)
         {
-            Debug.Entry(2, "__________________________________________________________________");
+            Debug.Entry(2, "==================================================================");
             Zone InstanceObjectZone = __instance.ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[No Zone?]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
@@ -279,6 +300,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 gigantism.GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
                             }
                             hand.DefaultBehavior = gigantism.GiganticElongatedBurrowingClawObject;
+                            hand.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
                             var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
                             var weapon = gigantism.GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                             weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3 + burrowingBonus}";
@@ -296,6 +318,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 gigantism.GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingClaw");
                             }
                             hand.DefaultBehavior = gigantism.GiganticBurrowingClawObject;
+                            hand.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
                             var weapon = gigantism.GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
                             string baseDamage = XRL.World.Parts.Mutation.GigantismPlus.GetFistBaseDamage(__instance.Level);
                             // Insert burrowingBonus before the last number in the damage string
@@ -326,6 +349,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                             elongatedPaws.ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingClaw");
                         }
                         hand.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject;
+                        hand.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
                         var weapon = elongatedPaws.ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                         // Use the increased die size for elongated paws (+1)
                         weapon.BaseDamage = $"1d{burrowingDieSize + 1}+{(elongatedPaws.StrengthModifier / 2) + burrowingBonus}";
@@ -340,6 +364,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         {
                             Debug.Entry(4, "---- hand.DefaultBehaviour was null or DefaultBehaviour was not \"Burrowing Claws\", init");
                             hand.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Burrowing Claws");
+                            hand.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
                         }
                         var weapon = hand.DefaultBehavior.GetPart<MeleeWeapon>();
                         weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
@@ -363,7 +388,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.Crystallinity.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(Crystallinity __instance, Body body)
         {
-            Debug.Entry(2, "__________________________________________________________________");
+            Debug.Entry(2, "==================================================================");
             Zone InstanceObjectZone = __instance.ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[No Zone?]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
@@ -477,6 +502,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 gigantism.GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingCrystallinePoint");
                             }
                             part.DefaultBehavior = gigantism.GiganticElongatedBurrowingClawObject;
+                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
                             weaponPart = gigantism.GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                             weaponPart.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize + 1}+{(elongatedPaws.StrengthModifier / 2) + 3 + burrowingBonus}";
@@ -496,6 +522,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 gigantism.GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedCrystallinePoint");
                             }
                             part.DefaultBehavior = gigantism.GiganticElongatedPawObject;
+                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
                             weaponPart = gigantism.GiganticElongatedPawObject.GetPart<MeleeWeapon>();
                             weaponPart.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize + 1}+{(elongatedPaws.StrengthModifier / 2) + 3}";
@@ -518,6 +545,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 gigantism.GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingCrystallinePoint");
                             }
                             part.DefaultBehavior = gigantism.GiganticBurrowingClawObject;
+                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             weaponPart = gigantism.GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
                             string baseDamage = XRL.World.Parts.Mutation.GigantismPlus.GetFistBaseDamage(__instance.Level);  
                             int dIndex = baseDamage.IndexOf('d');
@@ -544,6 +572,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 gigantism.GiganticFistObject = GameObjectFactory.Factory.CreateObject("GiganticCrystallinePoint");
                             }
                             part.DefaultBehavior = gigantism.GiganticFistObject;
+                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             weaponPart = gigantism.GiganticFistObject.GetPart<MeleeWeapon>();
                             string baseDamage = XRL.World.Parts.Mutation.GigantismPlus.GetFistBaseDamage(__instance.Level);  
                             int dIndex = baseDamage.IndexOf('d');
@@ -584,6 +613,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 elongatedPaws.ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingCrystallinePoint");
                             }
                             part.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject;
+                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             weaponPart = elongatedPaws.ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
                             weaponPart.BaseDamage = $"1d{burrowingDieSize + 2 + 1}+{elongatedPaws.StrengthModifier / 2}";
                             Debug.Entry(4, "**part.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject (as BurrowingCrystallinePoint)");
@@ -601,6 +631,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                                 elongatedPaws.ElongatedPawObject = GameObjectFactory.Factory.CreateObject("ElongatedCrystallinePoint");
                             }
                             part.DefaultBehavior = elongatedPaws.ElongatedPawObject;
+                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             weaponPart = elongatedPaws.ElongatedPawObject.GetPart<MeleeWeapon>();
                             weaponPart.BaseDamage = $"1d5+{elongatedPaws.StrengthModifier / 2}"; // Base 1d4 + 1 for crystalline
                             Debug.Entry(4, "**part.DefaultBehavior = elongatedPaws.ElongatedPawObject");
@@ -618,6 +649,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                             {
                                 Debug.Entry(4, "---- hand.DefaultBehaviour was null or DefaultBehaviour was not \"BurrowingCrystallinePoint\", init");
                                 part.DefaultBehavior = GameObjectFactory.Factory.CreateObject("BurrowingCrystallinePoint");
+                                part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
                             }
                             weaponPart = part.DefaultBehavior.GetPart<MeleeWeapon>();
                             int dIndex = burrowingClaws.GetClawsDamage(burrowingClaws.Level).IndexOf('d');

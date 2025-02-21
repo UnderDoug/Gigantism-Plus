@@ -44,7 +44,7 @@ namespace Mods.GigantismPlus
             if (!E.Actor.IsGiganticCreature && IsObjectActivePartSubject(E.Actor) && isReady)
             {
                 E.Decreases++;
-                if (!E.Object.IsGiganticEquipment && E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon")
+                if (!E.Object.IsGiganticEquipment && E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
                 {
                     E.CanBeTooSmall = true;
                 }

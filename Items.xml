@@ -196,7 +196,7 @@
   <object Name="ElongatedCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
     <tag Name="MutationEquipment" Value="ElongatedCrystallinePoint" />
     <part Name="Render" DisplayName="{{giant|elongated}} {{crystallized|crystalline}} {{crystallized|point}}"
-          RenderString="F" Tile="ElongatedCrystallinePoint.png"
+          RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png"
           ColorString="&amp;b" DetailColor="B"
           />
     <part Name="Description"

@@ -844,6 +844,23 @@ namespace XRL.World.Parts.Mutation
                         HitBonus: hitBonus
                         );
 
+                        // Add the EF-enforced tag to the beginning of the name of the current natural weapon
+                        if (part.DefaultBehavior != null && ParentObject.HasPart<CyberneticsMassiveExoframe>())
+                        {
+                            string color = "Y"; // Default color
+                            var exoframe = ParentObject.GetPart<CyberneticsMassiveExoframe>();
+                            color = exoframe.Model switch
+                            {
+                                "Alpha" => "b",
+                                "Delta" => "K",
+                                "Sigma" => "G",
+                                "Omega" => "zetachrome",
+                                _ => "Y"
+                            };
+                            part.DefaultBehavior.DisplayName = $"{{Y|E{{c|F}}-{{{color}|enforced}} {part.DefaultBehavior.DisplayName}";
+                            Debug.Entry(3, $"Updated DisplayName to: {part.DefaultBehavior.DisplayName}");
+                        }
+
                         Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                         continue;
                     }

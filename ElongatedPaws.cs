@@ -209,8 +209,8 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
                 int StatMod = (int)Math.Floor((double)StrengthModifier / 2.0);
 
-                Debug.Entry(4, "- Saving copy of current DefaultBehaviour in case creation fails");
-                GameObject OldDefaultBehaviour = part.DefaultBehavior;
+                Debug.Entry(4, "- Saving copy of current DefaultBehavior in case creation fails");
+                GameObject OldDefaultBehavior = part.DefaultBehavior;
 
                 Debug.Entry(3, $"- Setting part.DefaultBehaviour to new instance of \"{ElongatedPawBlueprintName}\"");
                 part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(ElongatedPawBlueprintName);
@@ -219,7 +219,7 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, "* if (part.DefaultBehavior != null)");
                 if (part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "-- part.DefaultBehaviour not null, assigning stats");
+                    Debug.Entry(3, "-- part.DefaultBehavior not null, assigning stats");
                     part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                     var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
                     
@@ -229,9 +229,9 @@ namespace XRL.World.Parts.Mutation
                 }
                 else
                 {
-                    Debug.Entry(3, $"-- part.DefaultBehaviour was null, invalid blueprint name \"{ElongatedPawBlueprintName}\"");
-                    part.DefaultBehavior = OldDefaultBehaviour;
-                    Debug.Entry(3, $"-- OldDefaultBehaviour reassigned");
+                    Debug.Entry(3, $"-- part.DefaultBehavior was null, invalid blueprint name \"{ElongatedPawBlueprintName}\"");
+                    part.DefaultBehavior = OldDefaultBehavior;
+                    Debug.Entry(3, $"-- OldDefaultBehavior reassigned");
                 }
             }
             else

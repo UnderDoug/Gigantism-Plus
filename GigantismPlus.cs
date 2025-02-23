@@ -545,7 +545,7 @@ namespace XRL.World.Parts.Mutation
             return base.Unmutate(GO);
         }
 
-        public void AddGiganticNaturalEquipmentTo(BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
+        public void AddGiganticNaturalEquipmentTo(BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
             Debug.Entry(2, "* AddGiganticNaturalEquipmentTo(BodyPart part)");
             if (Part != null && Part.Type == "Hand")
@@ -595,9 +595,9 @@ namespace XRL.World.Parts.Mutation
                 }
                 else
                 {
-                    Debug.Entry(3, $"---- part.DefaultBehaviour was null, invalid blueprint name \"{BlueprintName}\"");
-                    Part.DefaultBehavior = OldDefaultBehaviour;
-                    Debug.Entry(3, $"---- OldDefaultBehaviour reassigned");
+                    Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
+                    Part.DefaultBehavior = OldDefaultBehavior;
+                    Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
                 }
             }
             else
@@ -630,7 +630,7 @@ namespace XRL.World.Parts.Mutation
                 string ElongatedBlueprintName = "Elongated";
                 string BaseBlueprintName = "Fist";
                 string blueprintName = GiganticBlueprintName;
-                GameObject OldDefaultBehaviour = null;
+                GameObject OldDefaultBehavior = null;
 
                 Debug.Entry(3, "Generating Stats");
 

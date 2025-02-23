@@ -428,7 +428,7 @@ namespace XRL.World.Parts.Mutation
         public override string GetDescription()
         {
             string GigantismSource = (!this.IsCyberGiant) ? "unusually" : "{{c|cybernetically}}";
-            string WeaponName = this.NaturalWeaponBlueprint.DisplayName();
+            string WeaponName = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
             return "You are " + GigantismSource + " large, will {{rules|struggle to enter small spaces}} without {{g|hunching over}}, and can typically {{rules|only}} use {{gigantic|gigantic}} equipment.\n"
                  + "You are {{rules|heavy}}, can carry {{rules|twice}} as much weight, and all your natural weapons are {{gigantic|gigantic}}.\n\n"
                  + "Your " + WeaponName + "s gain:\n"

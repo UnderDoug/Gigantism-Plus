@@ -684,13 +684,13 @@ namespace XRL.World.Parts.Mutation
                         Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                         Debug.Entry(3, $"--- {part.Type} Found");
 
-                        Debug.Entry(4, "-- Saving copy of current DefaultBehaviour in case creation fails");
-                        OldDefaultBehaviour = part.DefaultBehavior;
+                        Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
+                        OldDefaultBehavior = part.DefaultBehavior;
 
                         AddGiganticNaturalEquipmentTo(
                         Part: part,
                         BlueprintName: blueprintName,
-                        OldDefaultBehaviour: OldDefaultBehaviour,
+                        OldDefaultBehavior: OldDefaultBehavior,
                         DieCount: dieCount,
                         DieSize: dieSize,
                         DamageBonus: damageBonus,

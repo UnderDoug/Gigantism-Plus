@@ -25,6 +25,7 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
+                if (ParentObject == null) return false;
                 int count = 0;
                 foreach (string mutation in NaturalWeaponSupersedingMutations)
                 {
@@ -37,12 +38,36 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public GameObject ElongatedPawObject;
-        public GameObject GiganticElongatedPawObject;
-        public GameObject ElongatedBurrowingClawObject;
-        public GameObject GiganticElongatedBurrowingClawObject;
+        private List<string> GetCompatibleMutations()
+        {
+            List<string> list = new List<string>();
+            MutationEntry mutationEntry;
+            string displayName = "";
+            foreach (string mutation in NaturalWeaponSupersedingMutations)
+            {
+                if (ParentObject.HasPart(mutation))
+                {
+                    XRL.MutationFactory.TryGetMutationEntry(mutation, out mutationEntry);
+                    displayName = mutationEntry.DisplayName;
+                    list.Add(displayName);
+                }
+            }
+            return list;
+        }
+
+        // public GameObject ElongatedPawObject;
+
+        public static string ElongatedPawBlueprintName = "ElongatedPaw";
 
         public int StrengthModifier => ParentObject.StatMod("Strength");
+
+        public int ElongatedBonusDamage
+        {
+            get
+            {
+                return (int)Math.Floor((double)this.StrengthModifier / 2.0);
+            }
+        }
 
         public ElongatedPaws()
         {
@@ -50,17 +75,42 @@ namespace XRL.World.Parts.Mutation
             base.Type = "Physical";
         }
 
+        /* May be redundant.
+         * 
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            ElongatedPaws paws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
+            paws.ElongatedPawObject = null;
+            paws.GiganticElongatedPawObject = null;
+            paws.ElongatedBurrowingClawObject = null;
+            paws.GiganticElongatedBurrowingClawObject = null;
+            return paws;
+        }
+        */
+
         public override bool CanLevel() { return false; }
 
         public override bool AllowStaticRegistration() { return true; }
 
         public override string GetDescription()
         {
+            string CompatibleMutations = "";
+            if (IsNaturalWeaponSuperseded)
+            {
+                CompatibleMutations = "\nThe above damage is being improved by";
+                foreach (string mutation in GetCompatibleMutations())
+                {
+                    CompatibleMutations += " " + mutation + ",";
+                }
+                CompatibleMutations = CompatibleMutations.Substring(CompatibleMutations.Length-1);
+                CompatibleMutations += ".";
+            }
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
                  + "You have {{giant|elongated paws}}, which are unusually large and end in spindly fingers.\n"
-                 + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons {{gigantic|a size bigger}} than you are as though they were your size.\n\n"
-                 + "Your {{giant|elongated paws}} count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|Current Strength Modifier}}\n\n"
-                 + "+{{rules|100}} reputation with {{w|Barathrumites}}";
+                 + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons {{gigantic|a size bigger}} than you are as though they were your size."
+                 + "\n\nYour {{giant|elongated paws}} count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|(StrMod/2)}}"
+                 + CompatibleMutations
+                 + "\n\n+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 
         public override string GetLevelText(int Level) { return ""; }
@@ -84,10 +134,10 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(StatChangeEvent E)
         {
-            if (E.Name == "Strength")
+            if (E.Name == "Strength" && E.Object != null)
             {
                 Body body = E.Object.Body;
-                OnRegenerateDefaultEquipment(body);
+                body.UpdateBodyParts();
             }
             return base.HandleEvent(E);
         }
@@ -100,17 +150,20 @@ namespace XRL.World.Parts.Mutation
         public override bool Unmutate(GameObject GO)
         {
             Body body = GO.Body;
+           
+            /* Checking if this is redundant.
+             * 
             if (body != null && !this.IsNaturalWeaponSuperseded)
             {
-
                 foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))
                 {
-                    if (hand.Type == "Hand" && (hand.DefaultBehavior == ElongatedPawObject || hand.DefaultBehavior == GiganticElongatedPawObject || hand.DefaultBehavior == ElongatedBurrowingClawObject || hand.DefaultBehavior == GiganticElongatedBurrowingClawObject))
+                    if (hand.Type == "Hand" && hand.DefaultBehavior.Blueprint == ElongatedPawBlueprintName)
                     {
                         hand.DefaultBehavior = null;
                     }
                 }
-            }
+            } */
+            
             CheckAffected(GO, body);
             return base.Unmutate(GO);
         }
@@ -145,125 +198,59 @@ namespace XRL.World.Parts.Mutation
 
         public void AddElongatedNaturalEquipmentTo(BodyPart part)
         {
-            Debug.Entry(2, "**AddGiganticNaturalEquipmentTo(BodyPart part)");
+            Debug.Entry(2, "@ AddGiganticNaturalEquipmentTo(BodyPart part)");
             if (part != null && part.Type == "Hand")
             {
-                Debug.Entry(3, "**if (ParentObject.HasPart<GigantismPlus>())");
-                Debug.Entry(3, "**else if (ParentObject.HasPart<BurrowingClaws>())");
-                int StatMod = StrengthModifier;
-                if (ParentObject.HasPart<GigantismPlus>())
+                Debug.Entry(3, "* if (ParentObject.HasPart<GigantismPlus>())");
+                Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
+                int StatMod = (int)Math.Floor((double)StrengthModifier / 2.0);
+
+                Debug.Entry(4, "- Saving copy of current DefaultBehaviour in case creation fails");
+                GameObject OldDefaultBehaviour = part.DefaultBehavior;
+
+                Debug.Entry(3, $"- Setting part.DefaultBehaviour to new instance of \"{ElongatedPawBlueprintName}\"");
+                part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(ElongatedPawBlueprintName);
+
+                Debug.Entry(3, $"- Checking that new GameObject was instantiated and assigned correctly");
+                Debug.Entry(4, "* if (part.DefaultBehavior != null)");
+                if (part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "-- GigantismPlus is Present");
-                    Debug.Entry(4, "**if (ParentObject.HasPart<BurrowingClaws>())");
-                    if (ParentObject.HasPart<BurrowingClaws>())
-                    {
-                        Debug.Entry(3, "--- BurrowingClaws is Present");
-                        var burrowingClaws = ParentObject.GetPart<BurrowingClaws>();
-                        int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                        int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-
-                        Debug.Entry(4, "**if (GiganticElongatedBurrowingClawObject == null)");
-                        if (GiganticElongatedBurrowingClawObject == null)
-                        {
-                            Debug.Entry(3, "---- GiganticElongatedBurrowingClawObject was null, init");
-                            GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
-                        }
-                        part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
-                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-                        var gigantism = ParentObject.GetPart<GigantismPlus>();
-                        var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3 + burrowingBonus}";
-                        weapon.HitBonus = gigantism.FistHitBonus;
-                        weapon.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
-
-                        Debug.Entry(4, "**part.DefaultBehavior = GiganticElongatedBurrowingClawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }
-                    else
-                    {
-                        Debug.Entry(3, "--- BurrowingClaws not Present");
-                        Debug.Entry(4, "**if (GiganticElongatedPawObject == null)");
-                        if (GiganticElongatedPawObject == null)
-                        {
-                            Debug.Entry(3, "---- GiganticElongatedPawObject was null, init");
-                            GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedPaw");
-                        }
-                        part.DefaultBehavior = GiganticElongatedPawObject;
-                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-                        var gigantism = ParentObject.GetPart<GigantismPlus>();
-                        var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3}";
-                        weapon.HitBonus = gigantism.FistHitBonus;
-                        weapon.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
-
-                        Debug.Entry(4, "**part.DefaultBehavior = GiganticElongatedPawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }
-                }
-                else if (ParentObject.HasPart<BurrowingClaws>())
-                {
-                    Debug.Entry(3, "-- GigantismPlus not Present");
-                    Debug.Entry(3, "-- BurrowingClaws is Present");
-                    var burrowingClaws = ParentObject.GetPart<BurrowingClaws>();
-                    int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                    int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-
-                    Debug.Entry(4, "**if (ElongatedBurrowingClawObject == null)");
-                    if (ElongatedBurrowingClawObject == null)
-                    {
-                        Debug.Entry(3, "--- ElongatedBurrowingClawObject was null, init");
-                        ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingClaw");
-                    }
-                    part.DefaultBehavior = ElongatedBurrowingClawObject;
+                    Debug.Entry(3, "-- part.DefaultBehaviour not null, assigning stats");
                     part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-                    var weapon = ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                    // Fix: Add burrowingBonus to final calculation
-                    weapon.BaseDamage = $"1d{burrowingDieSize + 2}+{StatMod / 2}";
+                    var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
+                    
+                    weapon.BaseDamage = $"1d4+{StatMod}";
 
-                    Debug.Entry(4, "**part.DefaultBehavior = ElongatedBurrowingClawObject");
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
                 }
                 else
                 {
-                    Debug.Entry(3, "-- GigantismPlus not Present");
-                    Debug.Entry(3, "-- BurrowingClaws not Present");
-
-                    Debug.Entry(4, "**if (ElongatedPawObject == null)");
-                    if (ElongatedPawObject == null)
-                    {
-                        Debug.Entry(3, "--- ElongatedPawObject was null, init");
-                        ElongatedPawObject = GameObjectFactory.Factory.CreateObject("ElongatedPaw");
-                    }
-                    part.DefaultBehavior = ElongatedPawObject;
-                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-                    var weapon = ElongatedPawObject.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = $"1d4+{StatMod / 2}";
-
-                    Debug.Entry(4, "**part.DefaultBehavior = ElongatedPawObject");
-                    Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
+                    Debug.Entry(3, $"-- part.DefaultBehaviour was null, invalid blueprint name \"{ElongatedPawBlueprintName}\"");
+                    part.DefaultBehavior = OldDefaultBehaviour;
+                    Debug.Entry(3, $"-- OldDefaultBehaviour reassigned");
                 }
             }
             else
             {
-                Debug.Entry(2, "part null or not hand");
+                Debug.Entry(2, "- part null or not type \"Hand\"");
             }
-            Debug.Entry(2, "xxAddElongatedNaturalEquipmentTo(BodyPart part)");
+            Debug.Entry(2, "x AddElongatedNaturalEquipmentTo(BodyPart part) ]//");
         } //!--- public void AddElongatedNaturalEquipmentTo(BodyPart part)
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
             Debug.Entry(2, "__________________________________________________________________");
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[No Zone?]";
+            string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2, "**ElongatedPaws.OnRegenerateDefaultEquipment(Body body)");
-            Debug.Entry(2, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Entry(2, "@ ElongatedPaws.OnRegenerateDefaultEquipment(Body body)");
+            Debug.Entry(2, $"TARGET: {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
             if (!this.IsNaturalWeaponSuperseded && body != null)
             {
                 Debug.Entry(3, "- NaturalEquipment not Superseded");
 
-                Debug.Entry(3, "**foreach (BodyPart hand in body.GetParts())\n**if (hand.Type == \"Hand\")");
+                Debug.Entry(3, "* foreach (BodyPart hand in body.GetParts())\n**if (hand.Type == \"Hand\")");
                 foreach (BodyPart hand in body.GetParts())
                 {
                     Debug.Entry(4, $"-- {hand.Type}");
@@ -277,15 +264,15 @@ namespace XRL.World.Parts.Mutation
                         Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     }
                 }
-                Debug.Entry(3, "xxforeach (BodyPart hand in body.GetParts())");
+                Debug.Entry(3, "x foreach (BodyPart hand in body.GetParts()) ]//");
             }
             else
             {
-                Debug.Entry(3, "NaturalEquipment is Superseded");
-                Debug.Entry(4, "xxAborting ElongatedPaws.OnRegenerateDefaultEquipment() Generation of Equipment");
+                Debug.Entry(3, "Handling of NaturalEquipment is Superseded");
+                Debug.Entry(4, "x Aborting ElongatedPaws.OnRegenerateDefaultEquipment() generation of equipment ]//");
             }
 
-            Debug.Entry(3, "**base.OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)");
             base.OnRegenerateDefaultEquipment(body);
 
             Debug.Entry(2, "==================================================================");

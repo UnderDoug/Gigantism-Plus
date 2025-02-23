@@ -182,6 +182,24 @@ namespace XRL.World.Parts
             // base
             _User = Object;
 
+            // Determine the model based on the implanted exoframe
+            if (ParentObject.HasPart("MassiveExoframeAlpha"))
+            {
+                Model = "Alpha";
+            }
+            else if (ParentObject.HasPart("MassiveExoframeDelta"))
+            {
+                Model = "Delta";
+            }
+            else if (ParentObject.HasPart("MassiveExoframeSigma"))
+            {
+                Model = "Sigma";
+            }
+            else if (ParentObject.HasPart("MassiveExoframeOmega"))
+            {
+                Model = "Omega";
+            }
+
             // Require Part
             // Object.RequirePart<CyberneticsMassiveExoframe>();
 
@@ -217,6 +235,21 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(3, "-- (_ManipulatorObject == null");
                 _ManipulatorObject = GameObjectFactory.Factory.CreateObject(ManipulatorBlueprint);
+            }
+
+            // Add the EF-enforced tag to the beginning of the name of the current natural weapon
+            if (_ManipulatorObject != null)
+            {
+                string color = Model switch
+                {
+                    "Alpha" => "b",
+                    "Delta" => "K",
+                    "Sigma" => "G",
+                    "Omega" => "zetachrome",
+                    _ => "Y"
+                };
+                _ManipulatorObject.DisplayName = $"{{Y|E{{c|F}}-{{{color}|enforced}} {_ManipulatorObject.DisplayName}";
+                Debug.Entry(3, $"Updated DisplayName to: {_ManipulatorObject.DisplayName}");
             }
 
             /* Seeing if I can have the GigantismPlus mutation handle this by hotswapping the Weapon Object.
@@ -563,10 +596,15 @@ namespace XRL.World.Parts
         }
 
         // These prevent the cybernetic in question from being disassembled.
-        public override void Register(GameObject Object)
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Object.RegisterPartEvent(this, "CanBeDisassembled");
-            base.Register(Object);
+            /* Testing Mutation Method.
+             *
+            Registrar.Register(COMPACT_MODE_COMMAND_NAME);
+            */
+
+            Registrar.Register("CanBeDisassembled");
+            base.Register(Object, Registrar);
         }
         public void CanBeDisassembled()
         {
@@ -583,15 +621,5 @@ namespace XRL.World.Parts
             return base.FireEvent(E);
         }
 
-        /* Testing Mutation Method.
-            *
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-
-            Registrar.Register(COMPACT_MODE_COMMAND_NAME);
-
-            base.Register(Object, Registrar);
-        }
-        */
     }
 }

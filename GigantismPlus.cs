@@ -265,6 +265,7 @@ namespace XRL.World.Parts.Mutation
                         count++;
                     }
                 }
+                Debug.Entry(4, $"Superseding Count is {count}");
                 return count > 0;
             }
         }
@@ -273,6 +274,16 @@ namespace XRL.World.Parts.Mutation
         {
             DisplayName = "{{gigantism|Gigantism}} ({{r|D}})";
             base.Type = "Physical";
+        }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+            gigantism.GiganticFistObject = null;
+            gigantism.GiganticElongatedPawObject = null;
+            gigantism.GiganticBurrowingClawObject = null;
+            gigantism.GiganticElongatedBurrowingClawObject = null;
+            return gigantism;
         }
 
         public override bool CanLevel() { return true; } // Enable leveling
@@ -593,13 +604,68 @@ namespace XRL.World.Parts.Mutation
             return base.Unmutate(GO);
         }
 
-        public void AddGiganticNaturalEquipmentTo(BodyPart part)
+        public void AddGiganticNaturalEquipmentTo(BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
-            Debug.Entry(2, "**AddGiganticNaturalEquipmentTo(BodyPart part)");
-            if (part != null && part.Type == "Hand")
+            Debug.Entry(2, "* AddGiganticNaturalEquipmentTo(BodyPart part)");
+            if (Part != null && Part.Type == "Hand")
             {
-                Debug.Entry(3, "**if (ParentObject.HasPart<ElongatedPaws>())");
-                Debug.Entry(3, "**else if (ParentObject.HasPart<BurrowingClaws>())");
+                Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
+
+                string baseDamage = $"{DieCount}d{DieSize}";
+                if (DamageBonus > 0)
+                {
+                    baseDamage += $"+{DamageBonus}";
+                }
+
+                if (Part.DefaultBehavior != null)
+                {
+                    Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
+                    Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
+
+                    MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
+                    weapon.BaseDamage = baseDamage;
+                    if (HitBonus != 0) weapon.HitBonus = HitBonus;
+                    weapon.MaxStrengthBonus = MaxStrBonus;
+
+                    var bodyPart = ParentObject.Body.GetPartByName("body");
+                    var cybernetics = bodyPart?.Cybernetics;
+                    if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                    {
+                        if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                        {
+                            var (textColor, tileColor, tileDetail) = exoframe.Model switch
+                            {
+                                "Alpha" => ("b", "&b", "B"),
+                                "Delta" => ("K", "&K", "K"), 
+                                "Sigma" => ("G", "&G", "G"),
+                                "Omega" => ("zetachrome", "&M", "M"),
+                                _ => ("Y", "&Y", "y")
+                            };
+                            Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
+                            
+                            var desc = Part.DefaultBehavior.GetPart<Description>();
+                            desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
+                            
+                            var render = Part.DefaultBehavior.GetPart<Render>();
+                            render.ColorString = tileColor;
+                            render.DetailColor = tileDetail;
+                            render.Tile = "GiganticManipulator.png";
+                        }
+                    }
+
+                    Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
+                    Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
+                }
+                else
+                {
+                    Debug.Entry(3, $"---- part.DefaultBehaviour was null, invalid blueprint name \"{BlueprintName}\"");
+                    Part.DefaultBehavior = OldDefaultBehaviour;
+                    Debug.Entry(3, $"---- OldDefaultBehaviour reassigned");
+                }
+                /* Old Code. Bypassing for now.
+                 * 
+                Debug.Entry(3, "* if (ParentObject.HasPart<ElongatedPaws>())");
+                Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
                 if (ParentObject.HasPart<ElongatedPaws>())
                 {
                     Debug.Entry(3, "-- ElongatedPaws is Present");
@@ -688,12 +754,12 @@ namespace XRL.World.Parts.Mutation
                     Debug.Entry(3, "-- ElongatedPaws not Present");
                     Debug.Entry(3, "-- BurrowingClaws not Present");
 
-                    /*Debug.Entry(4, "**if (GiganticFistObject == null)");
+                    Debug.Entry(4, "**if (GiganticFistObject == null)");
                     if (GiganticFistObject == null)
                     {
-                        Debug.Entry(3, "--- GiganticFistObject was null, init");*/
-                        GiganticFistObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprint);/*
-                    }*/
+                        Debug.Entry(3, "--- GiganticFistObject was null, init");
+                        GiganticFistObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprint);
+                    }
                     part.DefaultBehavior = GiganticFistObject;
                     part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
                     var weapon = GiganticFistObject.GetPart<MeleeWeapon>();
@@ -704,21 +770,23 @@ namespace XRL.World.Parts.Mutation
                     Debug.Entry(4, "**part.DefaultBehavior = GiganticFistObject");
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
                 }//GiganticFistObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+*/
             }
             else
             {
-                Debug.Entry(2, "part null or not hand");
+                Debug.Entry(2, "part null or not Type \"Hand\"");
             }
-            Debug.Entry(2, "xxAddGiganticNaturalEquipmentTo(BodyPart part)");
+
+            Debug.Entry(2, "x AddGiganticNaturalEquipmentTo(BodyPart part) ]//");
         } //!--- public void AddGiganticFistTo(BodyPart part)
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
             Debug.Entry(2, "__________________________________________________________________");
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[No Zone?]";
+            string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2, "**GigantismPlus.OnRegenerateDefaultEquipment(Body body)");
+            Debug.Entry(2,  "@START GigantismPlus.OnRegenerateDefaultEquipment(Body body)");
             Debug.Entry(2, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
             FistDamageDieCount = GetFistDamageDieCount(Level);
@@ -730,29 +798,91 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, "- NaturalEquipment not Superseded");
 
-                Debug.Entry(3, "**foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))\n**if (hand.Type == \"Hand\")");
-                foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))
+                string GiganticBlueprintName = "Gigantic";
+                string ElongatedBlueprintName = "Elongated";
+                string BaseBlueprintName = "Fist";
+                string blueprintName = GiganticBlueprintName;
+                GameObject OldDefaultBehaviour = null;
+
+                Debug.Entry(3, "Generating Stats");
+
+                int dieCount = FistDamageDieCount;
+                int dieSize = FistDamageDieSize;
+                int damageBonus = 3;
+                int maxStrBonus = FistMaxStrengthBonus;
+                int hitBonus = FistHitBonus;
+
+                Debug.Entry(3, $"dieCount: {dieCount} | dieSize: {dieSize} | damageBonus: {damageBonus}\n"
+                             + $"maxStrBonus: {maxStrBonus} | hitBonus: {hitBonus}");
+
+                bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
+
+                Debug.Entry(3, "Accumulating stats");
+
+                Debug.Entry(4, "* if (HasElongated)");
+                if (HasElongated)
                 {
-                    Debug.Entry(4, $"-- {hand.Type}");
-                    if (hand.Type == "Hand")
+                    Debug.Entry(3, "- ElongatedPaws Mutation is present");
+                    var elongated = ParentObject.GetPart<ElongatedPaws>();
+                    if (elongated != null)
                     {
-                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        Debug.Entry(3, $"--- {hand.Type} Found");
+                        blueprintName += ElongatedBlueprintName;
+                        Debug.Entry(4, $"> blueprintName: {blueprintName}");
+                        BaseBlueprintName = "Paw";
+                        Debug.Entry(4, $"> BaseBlueprintName: {BaseBlueprintName}");
 
-                        AddGiganticNaturalEquipmentTo(hand);
+                        damageBonus += elongated.ElongatedBonusDamage;
+                        Debug.Entry(4, $"- damageBonus: {damageBonus}");
 
-                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                        Debug.Entry(4, $"- dieCount: {dieCount} | dieSize: {dieSize} | damageBonus: {damageBonus}\n"
+                                     + $"maxStrBonus: {maxStrBonus} | hitBonus: {hitBonus}");
                     }
                 }
-                Debug.Entry(3, "xxforeach (BodyPart hand in body.GetParts(EvenIfDismembered: true))");
+                Debug.Entry(3, "Finished accumulating stats");
+
+                Debug.Entry(4, $"- dieCount: {dieCount} | dieSize: {dieSize} | damageBonus: {damageBonus}\n"
+                             + $"maxStrBonus: {maxStrBonus} | hitBonus: {hitBonus}");
+
+                blueprintName += BaseBlueprintName;
+
+                Debug.Entry(3, $"> blueprintName: {blueprintName}");
+
+                Debug.Entry(3, "* foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))\n* if (hand.Type == \"Hand\")");
+                foreach (BodyPart part in body.GetParts(EvenIfDismembered: true))
+                {
+                    Debug.Entry(4, $"-- {part.Type}");
+                    if (part.Type == "Hand")
+                    {
+                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                        Debug.Entry(3, $"--- {part.Type} Found");
+
+                        Debug.Entry(4, "-- Saving copy of current DefaultBehaviour in case creation fails");
+                        OldDefaultBehaviour = part.DefaultBehavior;
+
+                        AddGiganticNaturalEquipmentTo(
+                        Part: part,
+                        BlueprintName: blueprintName,
+                        OldDefaultBehaviour: OldDefaultBehaviour,
+                        DieCount: dieCount,
+                        DieSize: dieSize,
+                        DamageBonus: damageBonus,
+                        MaxStrBonus: maxStrBonus,
+                        HitBonus: hitBonus
+                        );
+
+                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                        continue;
+                    }
+                }
+                Debug.Entry(3, "x foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true)) ]//");
             }
             else
             {
                 Debug.Entry(3, "NaturalEquipment is Superseded");
-                Debug.Entry(4, "xxAborting GigantismPlus.OnRegenerateDefaultEquipment() Generation of Equipment");
+                Debug.Entry(4, "x Aborting GigantismPlus.OnRegenerateDefaultEquipment() Generation of Equipment ]//");
             }
 
-            Debug.Entry(3, "**base.OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)");
             base.OnRegenerateDefaultEquipment(body);
 
             Debug.Entry(2, "==================================================================");

@@ -300,6 +300,32 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 if (HitBonus != 0) weapon.HitBonus = HitBonus;
                 weapon.MaxStrengthBonus = MaxStrBonus;
 
+                var bodyPart = Part.ParentBody.GetPartByName("body");
+                var cybernetics = bodyPart?.Cybernetics;
+                if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                {
+                    if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                    {
+                        var (textColor, tileColor, tileDetail) = exoframe.Model switch
+                        {
+                            "Alpha" => ("b", "&b", "B"),
+                            "Delta" => ("K", "&K", "K"), 
+                            "Sigma" => ("G", "&G", "G"),
+                            "Omega" => ("zetachrome", "&M", "M"),
+                            _ => ("Y", "&Y", "y")
+                        };
+                        Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
+                        
+                        var desc = Part.DefaultBehavior.GetPart<Description>();
+                        desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
+                        
+                        var render = Part.DefaultBehavior.GetPart<Render>();
+                        render.ColorString = tileColor;
+                        render.DetailColor = tileDetail;
+                        render.Tile = "GiganticManipulator.png";
+                    }
+                }
+
                 Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
                 Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
             }
@@ -574,6 +600,32 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 weapon.BaseDamage = baseDamage;
                 if (HitBonus != 0) weapon.HitBonus = HitBonus;
                 weapon.MaxStrengthBonus = MaxStrBonus;
+
+                var bodyPart = Part.ParentBody.GetPartByName("body");
+                var cybernetics = bodyPart?.Cybernetics;
+                if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                {
+                    if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                    {
+                        var (textColor, tileColor, tileDetail) = exoframe.Model switch
+                        {
+                            "Alpha" => ("b", "&b", "B"),
+                            "Delta" => ("K", "&K", "K"), 
+                            "Sigma" => ("G", "&G", "G"),
+                            "Omega" => ("zetachrome", "&M", "M"),
+                            _ => ("Y", "&Y", "y")
+                        };
+                        Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
+                        
+                        var desc = Part.DefaultBehavior.GetPart<Description>();
+                        desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
+                        
+                        var render = Part.DefaultBehavior.GetPart<Render>();
+                        render.ColorString = tileColor;
+                        render.DetailColor = tileDetail;
+                        render.Tile = "GiganticManipulator.png";
+                    }
+                }
 
                 Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
                 Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");

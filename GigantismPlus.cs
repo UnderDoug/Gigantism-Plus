@@ -627,6 +627,32 @@ namespace XRL.World.Parts.Mutation
                     if (HitBonus != 0) weapon.HitBonus = HitBonus;
                     weapon.MaxStrengthBonus = MaxStrBonus;
 
+                    var bodyPart = ParentObject.Body.GetPartByName("body");
+                    var cybernetics = bodyPart?.Cybernetics;
+                    if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                    {
+                        if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                        {
+                            var (textColor, tileColor, tileDetail) = exoframe.Model switch
+                            {
+                                "Alpha" => ("b", "&b", "B"),
+                                "Delta" => ("K", "&K", "K"), 
+                                "Sigma" => ("G", "&G", "G"),
+                                "Omega" => ("zetachrome", "&M", "M"),
+                                _ => ("Y", "&Y", "y")
+                            };
+                            Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
+                            
+                            var desc = Part.DefaultBehavior.GetPart<Description>();
+                            desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
+                            
+                            var render = Part.DefaultBehavior.GetPart<Render>();
+                            render.ColorString = tileColor;
+                            render.DetailColor = tileDetail;
+                            render.Tile = "GiganticManipulator.png";
+                        }
+                    }
+
                     Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
                     Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
                 }
@@ -744,7 +770,7 @@ namespace XRL.World.Parts.Mutation
                     Debug.Entry(4, "**part.DefaultBehavior = GiganticFistObject");
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
                 }//GiganticFistObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
-                */
+*/
             }
             else
             {
@@ -843,23 +869,6 @@ namespace XRL.World.Parts.Mutation
                         MaxStrBonus: maxStrBonus,
                         HitBonus: hitBonus
                         );
-
-                        // Add the EF-enforced tag to the beginning of the name of the current natural weapon
-                        if (part.DefaultBehavior != null && ParentObject.HasPart<CyberneticsMassiveExoframe>())
-                        {
-                            string color = "Y"; // Default color
-                            var exoframe = ParentObject.GetPart<CyberneticsMassiveExoframe>();
-                            color = exoframe.Model switch
-                            {
-                                "Alpha" => "b",
-                                "Delta" => "K",
-                                "Sigma" => "G",
-                                "Omega" => "zetachrome",
-                                _ => "Y"
-                            };
-                            part.DefaultBehavior.DisplayName = $"{{Y|E{{c|F}}-{{{color}|enforced}} {part.DefaultBehavior.DisplayName}";
-                            Debug.Entry(3, $"Updated DisplayName to: {part.DefaultBehavior.DisplayName}");
-                        }
 
                         Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                         continue;

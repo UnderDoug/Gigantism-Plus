@@ -293,7 +293,7 @@
 
   <!-- Base Gigantic Cybernetics Objects -->
   
-  <object Name="BaseMassiveExoframe" Inherits="BaseCyberneticsEquipment">
+  <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
     <part Name="Physics" Weight="15" />
     <part Name="Description" Short="" />
     <part Name="Render" DisplayName="{{Y|massive exoframe}}"
@@ -303,7 +303,7 @@
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="2"
           BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-                               You cannot wear equipment on your body."
+You cannot wear equipment on your body."
           />
     <removepart Name="TinkerItem" />
     <part Name="Metal" />
@@ -311,14 +311,20 @@
     <part Name="NoRust" />
     <tag Name="CyberneticsUsesEqSlot" />
     <tag Name="CyberneticsOneOnly" />
-    <part Name="CyberneticsMassiveExoframe" Model="Alpha" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Alpha"
+          AugmentAdjectiveColor="b" 
+          AugmentTile="GiganticManipulator.png" 
+          AugmentTileColorString="&amp;c" 
+          AugmentTileDetailColor="b" 
+          />
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <part Name="ItemElements" Elements="immense::2" />
     <tag Name="BaseObject" Value="*noinherit" />
   </object>
 
-  <object Name="BaseMassiveExoframeManipulator" Inherits="GigantismPlusBaseNaturalWeapon">
+  <object Name="BaseGiganticExoframeManipulator" Inherits="GigantismPlusBaseNaturalWeapon">
     <part Name="Render" DisplayName="{{Y|exo{{c|frame}} manipulator}}"
           RenderString="M" Tile="GiganticManipulator.png"
           ColorString="&amp;c" DetailColor="b"
@@ -335,12 +341,12 @@
   <!-- End Base Gigantic Cybernetics Objects -->
   <!-- Massive Exoframes -->
   
-  <object Name="MassiveExoframeAlpha" Inherits="BaseMassiveExoframe">
+  <object Name="GiganticExoframeAlpha" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="15" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|massive exoframe {{b|alpha}}}}"
+    <part Name="Render" DisplayName="{{Y|exoframe {{b|alpha}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="b"
           />
@@ -350,18 +356,22 @@
 You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="120" />
-    <part Name="CyberneticsMassiveExoframe" Model="Alpha" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Alpha"
+          AugmentAdjectiveColor="b"
+          AugmentTileDetailColor="b"
+          />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
     <part Name="ItemElements" Elements="immense::2" />
     <tag Name="StartingCybernetic:General" />
   </object>
 
-  <object Name="MassiveExoframeDelta" Inherits="BaseMassiveExoframe">
+  <object Name="GiganticExoframeDelta" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="18" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|massive exoframe {{K|delta}}}}"
+    <part Name="Render" DisplayName="{{Y|exoframe {{K|delta}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="K"
           />
@@ -371,17 +381,21 @@ You cannot wear equipment on your body."
 You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="240" />
-    <part Name="CyberneticsMassiveExoframe" Model="Delta" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Delta"
+          AugmentAdjectiveColor="K"
+          AugmentTileDetailColor="K"
+          />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
     <part Name="ItemElements" Elements="immense::4" />
   </object>
 
-  <object Name="MassiveExoframeSigma" Inherits="BaseMassiveExoframe">
+  <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="9" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{G|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|massive exoframe {{G|sigma}}}}"
+    <part Name="Render" DisplayName="{{Y|exoframe {{G|sigma}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="G"
           />
@@ -391,17 +405,21 @@ You cannot wear equipment on your body."
 You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="600" />
-    <part Name="CyberneticsMassiveExoframe" Model="Sigma" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Sigma"
+          AugmentAdjectiveColor="G"
+          AugmentTileDetailColor="G"
+          />
     <part Name="ModImprovedGigantismPlus" Tier="10" />
     <part Name="ItemElements" Elements="immense::6" />
   </object>
 
-  <object Name="MassiveExoframeOmega" Inherits="BaseMassiveExoframe">
+  <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="6" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|massive exoframe {{zetachrome|omega}}}}"
+    <part Name="Render" DisplayName="{{Y|exoframe {{zetachrome|omega}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="M"
           />
@@ -411,7 +429,11 @@ You cannot wear equipment on your body."
 You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="2200" />
-    <part Name="CyberneticsMassiveExoframe" Model="Omega" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Omega"
+          AugmentAdjectiveColor="zetachrome"
+          AugmentTileDetailColor="M"
+          />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="ItemElements" Elements="immense::8" />
     <part Name="Zetachrome" />
@@ -420,7 +442,7 @@ You cannot wear equipment on your body."
   <!-- End Massive Exoframes -->
   <!-- Exoframe Manipulator Objects -->
   
-  <object Name="MassiveExoframeManipulatorAlpha" Inherits="BaseMassiveExoframeManipulator">
+  <object Name="GiganticExoframeManipulatorAlpha" Inherits="BaseGiganticExoframeManipulator">
     <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{b|alpha}} manipulator}}"
           RenderString="M" Tile="GiganticManipulator.png" 
           ColorString="&amp;c" DetailColor="b" 
@@ -434,7 +456,7 @@ You cannot wear equipment on your body."
     <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" />
   </object>
 
-  <object Name="MassiveExoframeManipulatorDelta" Inherits="BaseMassiveExoframeManipulator">
+  <object Name="GiganticExoframeManipulatorDelta" Inherits="BaseGiganticExoframeManipulator">
     <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{K|delta}} manipulator}}"
           RenderString="M" Tile="GiganticManipulator.png"
           ColorString="&amp;c" DetailColor="K"
@@ -448,7 +470,7 @@ You cannot wear equipment on your body."
     <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" />
   </object>
 
-  <object Name="MassiveExoframeManipulatorSigma" Inherits="BaseMassiveExoframeManipulator">
+  <object Name="GiganticExoframeManipulatorSigma" Inherits="BaseGiganticExoframeManipulator">
     <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{G|sigma}} manipulator}}"
           RenderString="M" Tile="GiganticManipulator.png"
           ColorString="&amp;c" DetailColor="G"
@@ -462,7 +484,7 @@ You cannot wear equipment on your body."
     <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_crysteel_blocked" />
   </object>
 
-  <object Name="MassiveExoframeManipulatorOmega" Inherits="BaseMassiveExoframeManipulator">
+  <object Name="GiganticExoframeManipulatorOmega" Inherits="BaseGiganticExoframeManipulator">
     <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{zetachrome|omega}} manipulator}}"
           RenderString="M" Tile="GiganticManipulator.png"
           ColorString="&amp;c" DetailColor="M"

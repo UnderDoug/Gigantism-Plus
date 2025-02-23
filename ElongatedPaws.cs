@@ -5,6 +5,7 @@ using XRL.World.Parts.Mutation;
 using XRL.World;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches; // Add this line
+using static Mods.GigantismPlus.HelperMethods;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -15,7 +16,7 @@ namespace XRL.World.Parts.Mutation
         
         private static readonly List<string> NaturalWeaponSupersedingMutations = new List<string>
         {
-          //"MassiveExoframe",
+          //"CyberneticsGiganticExoframe",
             "GigantismPlus",
             "BurrowingClaws",
             "Crystallinity"
@@ -134,10 +135,13 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(StatChangeEvent E)
         {
-            if (E.Name == "Strength" && E.Object != null)
+            if (E.Name == "Strength")
             {
                 Body body = E.Object.Body;
-                body.UpdateBodyParts();
+                if (body != null)
+                {
+                    body.UpdateBodyParts();
+                }
             }
             return base.HandleEvent(E);
         }

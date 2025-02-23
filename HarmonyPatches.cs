@@ -9,6 +9,7 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using Mods.GigantismPlus;
+using static Mods.GigantismPlus.HelperMethods;
 
 namespace Mods.GigantismPlus.HarmonyPatches
 {
@@ -16,32 +17,6 @@ namespace Mods.GigantismPlus.HarmonyPatches
     public static class PseudoGiganticCreature_GameObject_Patches
     {
         // Goal is to simulate being Gigantic for the purposes of calculating body weight, if the GameObject in question is PseudoGigantic
-
-        /* 
-         * This code breaks the rest of the patches. Harmony is really towards the limit of my coding ability.
-         * 
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(GameObject.IsGiganticCreature), "get")]
-        static bool IsGiganticCreatureGetter(GameObject __instance, ref bool __result)
-        {
-            // This is a skip. It's designed to make the only thing that counts towards gigantism whether the IntProperty is 1 or not.
-            // --instance gives you the instantiated object on which the original method call is happening
-            Debug.Entry(1,"We're in the Getter");
-            __instance.ParentObject.RemovePart<Gigantism>();
-            int intProperty = __instance.ParentObject.GetIntProperty("Gigantic");
-            if (intProperty > 0)
-            {
-                intProperty = 1;
-                __result = true;
-                Debug.Entry(1, "Gigantic IntProperty is true");
-                return false;
-            }
-            intProperty = 0;
-            __result = false;
-            Debug.Entry(1, "Gigantic IntProperty is false");
-            return false;
-        }
-        */
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(GameObject.GetBodyWeight))]
@@ -177,27 +152,30 @@ namespace Mods.GigantismPlus.HarmonyPatches
         // failure to do so really freaks out the cybernetic in question due to being "too small".
         // you end up with it installed, but the equipment copy ends up in your inventory.
 
-        static void CyberneticsTerminal2Patch(GameObject Actor)
+        static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = true)
         {
-            Debug.Entry(3, "**static void CyberneticsTerminal2Patch(GameObject Actor) called");
+            Debug.Entry(3, "* static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = false) called");
 
             Debug.Entry(3, "- Checking the Actor exists, is a True Kin, and has GigantismPlus");
-            Debug.Entry(4, "**if (Actor != null && actor.IsTrueKin && actor.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())");
-            if (Actor != null && Actor.IsTrueKin() && Actor.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())
+            Debug.Entry(4, "* if (Actor != null && actor.IsTrueKin && Actor.TryGetPart<XRL.World.Parts.Mutation.GigantismPlus>(out var gigantism)");
+            if (Actor != null && Actor.IsTrueKin() && Actor.TryGetPart<XRL.World.Parts.Mutation.GigantismPlus>(out var gigantism))
             {
                 Debug.Entry(3, "-- Actor exists, is a True Kin, and has GigantismPlus");
-                var gigantism = Actor.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
-                if (gigantism != null)
+                if (gigantism != null && (gigantism.UnHunchImmediately || IsStart))
                 {
                     Debug.Entry(3, "-- GigantismPlus instantiated");
+                    Debug.Entry(3, "-- Either UnHunchImmediately is set to true or this is the Start of the process.");
                     Debug.Entry(3, "-- Making Hunch Over free, Sending Command to Hunch Over");
 
                     gigantism.IsHunchFree = true;
-                    gigantism.UnHunchNextTurn = true;
+                    gigantism.UnHunchImmediately = IsStart;
                     CommandEvent.Send(Actor, XRL.World.Parts.Mutation.GigantismPlus.HUNCH_OVER_COMMAND_NAME);
 
-                    Debug.Entry(3, "-- Popping up Popup");
-                    Popup.Show("You peer down into the interface.");
+                    if (IsStart)
+                    {
+                        Debug.Entry(3, "-- Popping up Popup");
+                        Popup.Show("You peer down into the interface.");
+                    }
                 }
             } 
             else Debug.Entry(3, "x one or more of: actor doesn't exists, isn't a True Kin, or lacks GigantismPlus");
@@ -213,12 +191,28 @@ namespace Mods.GigantismPlus.HarmonyPatches
             {
                 Debug.Entry(4, $"E.Command is {E.Command}");
 
-                CyberneticsTerminal2Patch(E.Actor);
+                CyberneticsTerminal2_ToggleHunched(E.Actor);
 
                 Debug.Entry(3, "Deferring to patched method");
             }
             return true;
         } //!-- static bool InventoryActionEventPrefix(InventoryActionEvent E)
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(InventoryActionEvent) })]
+        static void InventoryActionEventPostfix(InventoryActionEvent E)
+        {
+            Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
+            Debug.Entry(3, "CyberneticsTerminal2 -> HandleEvent(InventoryActionEvent E)");
+            if (E.Command == "InterfaceWithBecomingNook")
+            {
+                Debug.Entry(4, $"E.Command is {E.Command}");
+
+                CyberneticsTerminal2_ToggleHunched(E.Actor, false);
+
+                Debug.Entry(3, "x CyberneticsTerminal2 -> HandleEvent(InventoryActionEvent E) ]//");
+            }
+        } //!-- static void InventoryActionEventPostfix(InventoryActionEvent E)
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(CommandSmartUseEvent) })]
@@ -227,10 +221,22 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
             Debug.Entry(3, "CyberneticsTerminal2 -> HandleEvent(CommandSmartUseEvent E)");
 
-            CyberneticsTerminal2Patch(E.Actor);
+            CyberneticsTerminal2_ToggleHunched(E.Actor);
 
             Debug.Entry(3, "Deferring to patched method");
             return true;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(CommandSmartUseEvent) })]
+        static void CommandSmartUseEventPostfix(CommandSmartUseEvent E)
+        {
+            Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
+            Debug.Entry(3, "CyberneticsTerminal2 -> HandleEvent(CommandSmartUseEvent E)");
+
+            CyberneticsTerminal2_ToggleHunched(E.Actor, false);
+
+            Debug.Entry(3, "x CyberneticsTerminal2 -> HandleEvent(CommandSmartUseEvent E) ]//");
         }
 
     } //!--- public static class ModGiganticDisplayName_Shader
@@ -280,7 +286,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                              return 0;      // Base 1d2
         }
 
-        public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
+        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
             Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
 
@@ -293,37 +299,33 @@ namespace Mods.GigantismPlus.HarmonyPatches
             if (Part.DefaultBehavior != null)
             {
                 Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
-                Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
+
+                Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
 
                 MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
                 weapon.BaseDamage = baseDamage;
                 if (HitBonus != 0) weapon.HitBonus = HitBonus;
                 weapon.MaxStrengthBonus = MaxStrBonus;
 
-                var bodyPart = Part.ParentBody.GetPartByName("body");
-                var cybernetics = bodyPart?.Cybernetics;
-                if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                if (Part.ParentBody.GetBody().Cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                 {
-                    if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                    Part.DefaultBehavior.RequirePart<Metal>();
+
+                    if (exoframe.AugmentAdjectiveColor == "zetachrome")
                     {
-                        var (textColor, tileColor, tileDetail) = exoframe.Model switch
-                        {
-                            "Alpha" => ("b", "&b", "B"),
-                            "Delta" => ("K", "&K", "K"), 
-                            "Sigma" => ("G", "&G", "G"),
-                            "Omega" => ("zetachrome", "&M", "M"),
-                            _ => ("Y", "&Y", "y")
-                        };
-                        Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
-                        
-                        var desc = Part.DefaultBehavior.GetPart<Description>();
-                        desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
-                        
-                        var render = Part.DefaultBehavior.GetPart<Render>();
-                        render.ColorString = tileColor;
-                        render.DetailColor = tileDetail;
-                        render.Tile = "GiganticManipulator.png";
+                        Part.DefaultBehavior.RequirePart<Zetachrome>();
+                        Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
                     }
+
+                    Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
+
+                    Description desc = Part.DefaultBehavior.GetPart<Description>();
+                    desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
+
+                    Render render = Part.DefaultBehavior.GetPart<Render>();
+                    render.ColorString = exoframe.AugmentTileColorString;
+                    render.DetailColor = exoframe.AugmentTileDetailColor;
+                    render.Tile = exoframe.AugmentTile;
                 }
 
                 Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
@@ -361,7 +363,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
             List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
-              //"MassiveExoframe",
+              //"CyberneticsGiganticExoframe",
                 "Crystallinity"
             };
 
@@ -486,89 +488,19 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     OldDefaultBehaviour = part.DefaultBehavior;
 
                     DoNaturalWeaponCreationAndAssign(
-                        Part: part, 
-                        BlueprintName: blueprintName, 
-                        OldDefaultBehaviour: OldDefaultBehaviour, 
-                        DieCount: dieCount, 
-                        DieSize: dieSize, 
-                        DamageBonus: damageBonus, 
-                        MaxStrBonus: maxStrBonus, 
+                        Creature: __instance.ParentObject,
+                        Part: part,
+                        BlueprintName: blueprintName,
+                        OldDefaultBehaviour: OldDefaultBehaviour,
+                        DieCount: dieCount,
+                        DieSize: dieSize,
+                        DamageBonus: damageBonus,
+                        MaxStrBonus: maxStrBonus,
                         HitBonus: hitBonus
                         );
 
                     Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     continue;
-
-                    /* Old Code. Bypassing for now.
-                     * 
-                    Debug.Entry(3, "-- Checking for compatible Mutations");
-                    Debug.Entry(4, "** if (HasGigantism)");
-                    Debug.Entry(4, "** else if (HasElongated)");
-                    if (HasGigantism)
-                    {
-                        Debug.Entry(3, "--- GigantismPlus Mutation is present");
-                        Debug.Entry(4, "*** if (HasElongated)");
-                        var gigantism = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
-
-                        dieCount = gigantism.FistDamageDieCount;
-                        dieSize = gigantism.FistDamageDieSize;
-                        maxStrBonus = gigantism.FistMaxStrengthBonus;
-                        hitBonus = gigantism.FistHitBonus;
-
-                        if (HasElongated)
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation is present");
-                            var elongated = __instance.ParentObject.GetPart<ElongatedPaws>();
-
-                            blueprintName = GiganticElongatedBurrowingClawBlueprintName;
-                            damageBonus += (int)Math.Floor((double)elongated.StrengthModifier / 2.0);
-
-                            DoNaturalWeaponCreationAndAssign(part, blueprintName, OldDefaultBehaviour, dieCount, dieSize, maxStrBonus, hitBonus);
-                        }
-                        else
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation not present");
-
-                            blueprintName = GiganticBurrowingClawBlueprintName;
-                            DoNaturalWeaponCreationAndAssign(part, blueprintName, OldDefaultBehaviour, dieCount, dieSize, maxStrBonus, hitBonus);
-                        }
-                    }
-                    else if (HasElongated)
-                    {
-                        Debug.Entry(3, "--- GigantismPlus Mutation not present");
-                        Debug.Entry(3, "--- ElongatedPaws Mutation is present");
-                        var elongated = __instance.ParentObject.GetPart<ElongatedPaws>();
-
-                        if (elongatedPaws.ElongatedBurrowingClawObject == null)
-                        {
-                            Debug.Entry(4, "---- ElongatedBurrowingClawObject was null, init");
-                            elongatedPaws.ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject(ElongatedBurrowingClawBlueprintName);
-                        }
-                        part.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject;
-                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
-                        var weapon = elongatedPaws.ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                        // Use the increased die size for elongated paws (+1)
-                        weapon.BaseDamage = $"1d{burrowingDieSize + 1}+{(elongatedPaws.StrengthModifier / 2) + burrowingBonus}";
-                        Debug.Entry(4, "**hand.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }
-                    else
-                    {
-                        Debug.Entry(3, "--- GigantismPlus Mutation not present");
-                        Debug.Entry(3, "--- ElongatedPaws Mutation not present");
-                        if (part.DefaultBehavior == null || part.DefaultBehavior.GetBlueprint(true).Name != "Burrowing Claws")
-                        {
-                            Debug.Entry(4, "---- hand.DefaultBehaviour was null or DefaultBehaviour was not \"Burrowing Claws\", init");
-                            part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BurrowingClawBlueprintName);
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "BurrowingClaws", false);
-                        }
-                        var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = __instance.GetClawsDamage(__instance.Level);
-                        Debug.Entry(4, "**hand.DefaultBehavior = GameObjectFactory.Factory.CreateObject(\"Burrowing Claws\")");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage}");
-                    }
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    */
                 }
             }
             Debug.Entry(3, "xxforeach (BodyPart hand in body.GetParts())");
@@ -581,7 +513,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
     [HarmonyPatch(typeof(XRL.World.Parts.Mutation.Crystallinity))]
     public static class Crystallinity_Patches
     {
-        public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
+        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
             Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
 
@@ -594,37 +526,33 @@ namespace Mods.GigantismPlus.HarmonyPatches
             if (Part.DefaultBehavior != null)
             {
                 Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
-                Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
+
+                Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
 
                 MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
                 weapon.BaseDamage = baseDamage;
                 if (HitBonus != 0) weapon.HitBonus = HitBonus;
                 weapon.MaxStrengthBonus = MaxStrBonus;
 
-                var bodyPart = Part.ParentBody.GetPartByName("body");
-                var cybernetics = bodyPart?.Cybernetics;
-                if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                if (Part.ParentBody.GetBody().Cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                 {
-                    if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                    Part.DefaultBehavior.RequirePart<Metal>();
+
+                    if (exoframe.AugmentAdjectiveColor == "zetachrome")
                     {
-                        var (textColor, tileColor, tileDetail) = exoframe.Model switch
-                        {
-                            "Alpha" => ("b", "&b", "B"),
-                            "Delta" => ("K", "&K", "K"), 
-                            "Sigma" => ("G", "&G", "G"),
-                            "Omega" => ("zetachrome", "&M", "M"),
-                            _ => ("Y", "&Y", "y")
-                        };
-                        Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
-                        
-                        var desc = Part.DefaultBehavior.GetPart<Description>();
-                        desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
-                        
-                        var render = Part.DefaultBehavior.GetPart<Render>();
-                        render.ColorString = tileColor;
-                        render.DetailColor = tileDetail;
-                        render.Tile = "GiganticManipulator.png";
+                        Part.DefaultBehavior.RequirePart<Zetachrome>();
+                        Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
                     }
+
+                    Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
+
+                    Description desc = Part.DefaultBehavior.GetPart<Description>();
+                    desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
+
+                    Render render = Part.DefaultBehavior.GetPart<Render>();
+                    render.ColorString = exoframe.AugmentTileColorString;
+                    render.DetailColor = exoframe.AugmentTileDetailColor;
+                    render.Tile = exoframe.AugmentTile;
                 }
 
                 Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
@@ -662,7 +590,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
             List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
-              //"MassiveExoframe"
+              //"CyberneticsGiganticExoframe"
             };
             
             int SupersededCount = 0;
@@ -823,6 +751,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     OldDefaultBehaviour = part.DefaultBehavior;
 
                     DoNaturalWeaponCreationAndAssign(
+                        Creature: __instance.ParentObject,
                         Part: part,
                         BlueprintName: blueprintName,
                         OldDefaultBehaviour: OldDefaultBehaviour,
@@ -835,221 +764,10 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
                     Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     continue;
-
-                    /* Old Code. Bypassing for now.
-                     * 
-                    Debug.Entry(4, "-- Create the base crystalline point");
-                    // Create the base crystalline point
-                    if (part.DefaultBehavior == null || part.DefaultBehavior.GetBlueprint(true).Name != "Crystalline Point")
-                    {
-                        Debug.Entry(4, "-- hand.DefaultBehaviour was null or DefaultBehaviour was not \"Crystalline Point\", init");
-                        part.DefaultBehavior = GameObjectFactory.Factory.CreateObject("Crystalline Point");
-                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                    }
-
-                    Debug.Entry(3, $"-- Apply the same weapon logic as before, just to the {targetPartType} part");
-                    // Apply the same weapon logic as before, just to the Quincunx part
-                    MeleeWeapon weaponPart = null;
-
-                    Debug.Entry(3, "-- Checking for compatible Mutations");
-                    Debug.Entry(4, "** if (__instance.ParentObject.HasPart<GigantismPlus>())");
-                    Debug.Entry(4, "** else if (__instance.ParentObject.HasPart<ElongatedPaws>())");
-                    if (__instance.ParentObject.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())
-                    {
-                        Debug.Entry(3, "--- GigantismPlus Mutation is present");
-                        // Gigantism + Other combinations
-                        var gigantism = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
-                        // Gigantism + Elongated + Burrowing
-
-                        Debug.Entry(4, "*** if ([..].HasPart<ElongatedPaws>() && [..].HasPart<BurrowingClaws>())");
-                        Debug.Entry(4, "*** else if ([..].HasPart<ElongatedPaws>()");
-                        Debug.Entry(4, "*** else if ([..].HasPart<BurrowingClaws>()");
-                        if (__instance.ParentObject.HasPart<ElongatedPaws>() && __instance.ParentObject.HasPart<BurrowingClaws>())
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation is present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation is present");
-                            var burrowingClaws = __instance.ParentObject.GetPart<BurrowingClaws>();
-                            int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-                            
-                            if (gigantism.GiganticElongatedBurrowingClawObject == null || gigantism.GiganticElongatedBurrowingClawObject.Blueprint != "GiganticElongatedBurrowingCrystallinePoint")
-                            {
-                                Debug.Entry(4, "----- GiganticElongatedBurrowingClawObject was null, init as GiganticElongatedBurrowingCrystallinePoint");
-                                gigantism.GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingCrystallinePoint");
-                            }
-                            part.DefaultBehavior = gigantism.GiganticElongatedBurrowingClawObject;
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
-                            weaponPart = gigantism.GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                            weaponPart.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize + 1}+{(elongatedPaws.StrengthModifier / 2) + 3 + burrowingBonus}";
-                            weaponPart.HitBonus = gigantism.FistHitBonus;
-                            weaponPart.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
-                            Debug.Entry(4, "**part.DefaultBehavior = gigantism.GiganticElongatedBurrowingClawObject (as GiganticElongatedBurrowingCrystallinePoint)");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage} | Hit: {weaponPart.HitBonus} | PenCap: {weaponPart.MaxStrengthBonus}");
-                        }
-                        // Gigantism + Elongated
-                        else if (__instance.ParentObject.HasPart<ElongatedPaws>())
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation is present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation not present");
-                            if (gigantism.GiganticElongatedPawObject == null || gigantism.GiganticElongatedPawObject.Blueprint != "GiganticElongatedCrystallinePoint")
-                            {
-                                Debug.Entry(4, "----- GiganticElongatedBurrowingClawObject was null, init as GiganticElongatedCrystallinePoint");
-                                gigantism.GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedCrystallinePoint");
-                            }
-                            part.DefaultBehavior = gigantism.GiganticElongatedPawObject;
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
-                            weaponPart = gigantism.GiganticElongatedPawObject.GetPart<MeleeWeapon>();
-                            weaponPart.BaseDamage = $"{gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize + 1}+{(elongatedPaws.StrengthModifier / 2) + 3}";
-                            weaponPart.HitBonus = gigantism.FistHitBonus;
-                            weaponPart.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
-                            Debug.Entry(4, "**** part.DefaultBehavior = gigantism.GiganticElongatedPawObject (as GiganticElongatedCrystallinePoint)");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage} | Hit: {weaponPart.HitBonus} | PenCap: {weaponPart.MaxStrengthBonus}");
-                        }
-                        // Gigantism + Burrowing
-                        else if (__instance.ParentObject.HasPart<BurrowingClaws>())
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation not present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation is present");
-                            var burrowingClaws = __instance.ParentObject.GetPart<BurrowingClaws>();
-                            int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-                            
-                            if (gigantism.GiganticBurrowingClawObject == null || gigantism.GiganticBurrowingClawObject.Blueprint != "GiganticBurrowingCrystallinePoint")
-                            {
-                                Debug.Entry(4, "----- GiganticBurrowingClawObject was null, init as GiganticBurrowingCrystallinePoint");
-                                gigantism.GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingCrystallinePoint");
-                            }
-                            part.DefaultBehavior = gigantism.GiganticBurrowingClawObject;
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            weaponPart = gigantism.GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
-                            string baseDamage = XRL.World.Parts.Mutation.GigantismPlus.GetFistBaseDamage(__instance.Level);  
-                            int dIndex = baseDamage.IndexOf('d');
-                            int plusIndex = baseDamage.LastIndexOf('+');
-                            if (dIndex != -1)
-                            {
-                                int dieCount = int.Parse(baseDamage.Substring(0, dIndex));
-                                int dieSize = int.Parse(baseDamage.Substring(dIndex + 1, plusIndex - (dIndex + 1)));
-                                weaponPart.BaseDamage = $"{dieCount}d{dieSize + 1}+{int.Parse(baseDamage.Substring(plusIndex + 1)) + burrowingBonus}";
-                            }
-                            weaponPart.HitBonus = gigantism.FistHitBonus;
-                            weaponPart.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
-                            Debug.Entry(4, "**** part.DefaultBehavior = gigantism.GiganticBurrowingClawObject (as GiganticBurrowingCrystallinePoint)");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage} | Hit: {weaponPart.HitBonus} | PenCap: {weaponPart.MaxStrengthBonus}");
-                        }
-                        // Just Gigantism
-                        else
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation not present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation not present");
-                            if (gigantism.GiganticFistObject == null || gigantism.GiganticFistObject.Blueprint != "GiganticCrystallinePoint")
-                            {
-                                Debug.Entry(4, "----- GiganticFistObject was null, init as GiganticCrystallinePoint");
-                                gigantism.GiganticFistObject = GameObjectFactory.Factory.CreateObject("GiganticCrystallinePoint");
-                            }
-                            part.DefaultBehavior = gigantism.GiganticFistObject;
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            weaponPart = gigantism.GiganticFistObject.GetPart<MeleeWeapon>();
-                            string baseDamage = XRL.World.Parts.Mutation.GigantismPlus.GetFistBaseDamage(__instance.Level);  
-                            int dIndex = baseDamage.IndexOf('d');
-                            int plusIndex = baseDamage.LastIndexOf('+');
-                            if (dIndex != -1)
-                            {
-                                int dieCount = int.Parse(baseDamage.Substring(0, dIndex));
-                                int dieSize = int.Parse(baseDamage.Substring(dIndex + 1, plusIndex - (dIndex + 1)));
-                                weaponPart.BaseDamage = $"{dieCount}d{dieSize + 1}+{baseDamage.Substring(plusIndex + 1)}";
-                            }
-                            weaponPart.HitBonus = gigantism.FistHitBonus;
-                            weaponPart.MaxStrengthBonus = gigantism.FistMaxStrengthBonus;
-                            Debug.Entry(4, "**** part.DefaultBehavior = gigantism.GiganticFistObject");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage} | Hit: {weaponPart.HitBonus} | PenCap: {weaponPart.MaxStrengthBonus}");
-                        }
-                    }
-                    // Non-Gigantism combinations 
-                    else 
-                    {
-                        Debug.Entry(3, "--- GigantismPlus Mutation not present");
-
-                        // Elongated + Burrowing
-                        Debug.Entry(4, "*** if ([..].HasPart<ElongatedPaws>() && [..].HasPart<BurrowingClaws>())");
-                        Debug.Entry(4, "*** else if ([..].HasPart<ElongatedPaws>()");
-                        Debug.Entry(4, "*** else if ([..].HasPart<BurrowingClaws>()");
-                        if (__instance.ParentObject.HasPart<ElongatedPaws>() && __instance.ParentObject.HasPart<BurrowingClaws>())
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation is present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation is present");
-                            var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
-                            var burrowingClaws = __instance.ParentObject.GetPart<BurrowingClaws>();
-                            int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                            int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-                            
-                            if (elongatedPaws.ElongatedBurrowingClawObject == null || elongatedPaws.ElongatedBurrowingClawObject.Blueprint != "ElongatedBurrowingCrystallinePoint")
-                            {
-                                Debug.Entry(4, "----- ElongatedBurrowingClawObject was null, init as ElongatedBurrowingCrystallinePoint");
-                                elongatedPaws.ElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("ElongatedBurrowingCrystallinePoint");
-                            }
-                            part.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject;
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            weaponPart = elongatedPaws.ElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                            weaponPart.BaseDamage = $"1d{burrowingDieSize + 2 + 1}+{elongatedPaws.StrengthModifier / 2}";
-                            Debug.Entry(4, "**** part.DefaultBehavior = elongatedPaws.ElongatedBurrowingClawObject (as BurrowingCrystallinePoint)");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage} | Hit: {weaponPart.HitBonus} | PenCap: {weaponPart.MaxStrengthBonus}");
-                        }
-                        // Just Elongated
-                        else if (__instance.ParentObject.HasPart<ElongatedPaws>())
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation is present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation not present");
-                            var elongatedPaws = __instance.ParentObject.GetPart<ElongatedPaws>();
-                            if (elongatedPaws.ElongatedPawObject == null || elongatedPaws.ElongatedPawObject.Blueprint != "ElongatedCrystallinePoint")
-                            {
-                                Debug.Entry(4, "----- ElongatedPawObject was null, init as ElongatedCrystallinePoint");
-                                elongatedPaws.ElongatedPawObject = GameObjectFactory.Factory.CreateObject("ElongatedCrystallinePoint");
-                            }
-                            part.DefaultBehavior = elongatedPaws.ElongatedPawObject;
-                            part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            weaponPart = elongatedPaws.ElongatedPawObject.GetPart<MeleeWeapon>();
-                            weaponPart.BaseDamage = $"1d5+{elongatedPaws.StrengthModifier / 2}"; // Base 1d4 + 1 for crystalline
-                            Debug.Entry(4, "**** part.DefaultBehavior = elongatedPaws.ElongatedPawObject");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage}");
-                        }
-                        // Just Burrowing
-                        else if (__instance.ParentObject.HasPart<BurrowingClaws>())
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation not present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation is present");
-                            var burrowingClaws = __instance.ParentObject.GetPart<BurrowingClaws>();
-                            int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                            
-                            if (part.DefaultBehavior == null || part.DefaultBehavior.Blueprint != "BurrowingCrystallinePoint")
-                            {
-                                Debug.Entry(4, "---- hand.DefaultBehaviour was null or DefaultBehaviour was not \"BurrowingCrystallinePoint\", init");
-                                part.DefaultBehavior = GameObjectFactory.Factory.CreateObject("BurrowingCrystallinePoint");
-                                part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
-                            }
-                            weaponPart = part.DefaultBehavior.GetPart<MeleeWeapon>();
-                            int dIndex = burrowingClaws.GetClawsDamage(burrowingClaws.Level).IndexOf('d');
-                            int dieSize = int.Parse(burrowingClaws.GetClawsDamage(burrowingClaws.Level).Substring(dIndex + 1));
-                            weaponPart.BaseDamage = $"1d{dieSize + 1}"; // Add 1 to die size for crystalline
-                            Debug.Entry(4, "**part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(\"BurrowingCrystallinePoint\")");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage}");
-                        }
-                        // Default case - just Crystallinity
-                        else
-                        {
-                            Debug.Entry(3, "---- ElongatedPaws Mutation not present");
-                            Debug.Entry(3, "---- BurrowingClaws Mutation not present");
-                            weaponPart = part.DefaultBehavior.GetPart<MeleeWeapon>();
-                            weaponPart.BaseDamage = __instance.GetPointDamage(__instance.Level);
-                            Debug.Entry(4, "**part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(\"Crystalline Point\")");
-                            Debug.Entry(4, $"---- Base: {weaponPart.BaseDamage}");
-                        }
-                    }
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                */
                 }
             }
-            Debug.Entry(3, "xxforeach (BodyPart part in body.GetParts())");
-            Debug.Entry(3, "END Crystallinity_Patches.OnRegenerateDefaultEquipmentPrefix()");
+            Debug.Entry(3, "x foreach (BodyPart part in body.GetParts())");
+            Debug.Entry(3, "END Crystallinity_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
             Debug.Entry(2, "==================================================================");
             return false; // Skip the original method
         }

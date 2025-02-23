@@ -9,6 +9,7 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches;
+using static Mods.GigantismPlus.HelperMethods;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -17,21 +18,14 @@ namespace XRL.World.Parts.Mutation
     {
 
         public int FistDamageDieCount;
-
         public int FistDamageDieSize;
-
         private string FistBaseDamage;
-
         public int FistHitBonus;
-
         public int FistMaxStrengthBonus = 999;
 
         public GameObject GiganticFistObject;
-
         public GameObject GiganticElongatedPawObject;
-
         public GameObject GiganticBurrowingClawObject;
-
         public GameObject GiganticElongatedBurrowingClawObject;
 
         public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
@@ -39,15 +33,11 @@ namespace XRL.World.Parts.Mutation
         public Guid EnableActivatedAbilityID = Guid.Empty;
 
         public int HunchedOverAVModifier;
-
         public int HunchedOverDVModifier;
-
         public int HunchedOverQNModifier;
-
         public int HunchedOverMSModifier;
 
         private bool _IsVehicleCreature = false;
-
         public bool IsVehicleCreature
         {
             get
@@ -63,31 +53,6 @@ namespace XRL.World.Parts.Mutation
                 return _IsVehicleCreature;
             }
         }
-        
-        public bool IsCyberGiant
-        {
-            get
-            {
-                Debug.Entry(3, "IsCyberGiant, get");
-                if (ParentObject != null)
-                {
-                    Debug.Entry(3, "- ParentObject not null");
-                    GameObject cybernetics = ParentObject.Body.GetPartByName("body").Cybernetics;
-                    if (cybernetics != null)
-                    {
-                        Debug.Entry(3, "- cybernetics not null");
-                        Debug.Entry(3, "CyberGiant: true");
-                        return cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe";
-                    }
-                    Debug.Entry(3, "- cybernetics is null");
-                    Debug.Entry(3, "CyberGiant: false");
-                    return false;
-                }
-                Debug.Entry(3, "- ParentObject is null");
-                Debug.Entry(3, "CyberGiant: false");
-                return false;
-            }
-        }
 
         private string HunchedOverAbilityHunched
         {
@@ -98,7 +63,6 @@ namespace XRL.World.Parts.Mutation
                 return "Hunched";
             } 
         }
-
         private string HunchedOverAbilityUpright
         {
             get
@@ -113,17 +77,14 @@ namespace XRL.World.Parts.Mutation
         {
             return 1 + (int)Math.Floor((double)Level / 5.0);
         }
-
         public static int GetFistDamageDieSize(int Level)
         {
             return 3 + (int)Math.Floor((double)Level / 3.0);
         }
-
         public static string GetFistBaseDamage(int Level)
         {
             return $"{GetFistDamageDieCount(Level)}d{GetFistDamageDieSize(Level)}+3";
         }
-
         public static int GetFistHitBonus(int Level)
         {
             return -3 + (int)Math.Floor((double)Level / 2.0);
@@ -133,17 +94,14 @@ namespace XRL.World.Parts.Mutation
         {
             return 4;
         }
-
         public static int GetHunchedOverDVModifier(int Level)
         {
             return -6;
         }
-
         public static int GetHunchedOverQNModifier(int Level)
         {
             return Math.Min(-70 + (int)Math.Floor((double)Level * 10.0),-10);
         }
-
         public static int GetHunchedOverMSModifier(int Level)
         {
             return Math.Min(-70 + (int)Math.Floor((double)Level * 10.0),-10);
@@ -164,7 +122,6 @@ namespace XRL.World.Parts.Mutation
                 }
             }
         }
-
         public bool IsPseudoGiganticCreature // designed to ensure you aren't (typically) Gigantic and PseudoGigantic at the same time 
         {
             get
@@ -183,13 +140,36 @@ namespace XRL.World.Parts.Mutation
 
             }
         }
-        
+
+        public bool IsCyberGiant
+        {
+            get
+            {
+                Debug.Entry(3, "IsCyberGiant, get");
+                if (ParentObject != null)
+                {
+                    Debug.Entry(3, "- ParentObject not null");
+                    GameObject cybernetics = ParentObject.Body.GetPartByName("body").Cybernetics;
+                    if (cybernetics != null)
+                    {
+                        Debug.Entry(3, "- cybernetics not null");
+                        Debug.Entry(3, "CyberGiant: true");
+                        return cybernetics.GetBlueprint().Inherits == "BaseGiganticExoframe";
+                    }
+                    Debug.Entry(3, "- cybernetics is null");
+                    Debug.Entry(3, "CyberGiant: false");
+                    return false;
+                }
+                Debug.Entry(3, "- ParentObject is null");
+                Debug.Entry(3, "CyberGiant: false");
+                return false;
+            }
+        }
+
+        public bool UnHunchImmediately = false;
+
         public bool IsHunchFree = false;
-
-        public bool UnHunchNextTurn = false;
-
         private int _hunchOverEnergyCost = 500;
-
         public int HunchOverEnergyCost
         {
             get
@@ -213,14 +193,13 @@ namespace XRL.World.Parts.Mutation
         }
 
         private string _NaturalWeaponBlueprintName = "GiganticFist";
-
         public string NaturalWeaponBlueprintName 
         {
             get 
             {
                 if (this.IsCyberGiant)
                 {
-                    return ParentObject.Body.GetPartByName("body").Cybernetics.GetPart<CyberneticsMassiveExoframe>().ManipulatorBlueprintName;
+                    return ParentObject.Body.GetPartByName("body").Cybernetics.GetPart<CyberneticsGiganticExoframe>().ManipulatorBlueprintName;
                 }
                 return _NaturalWeaponBlueprintName; 
             }
@@ -232,7 +211,6 @@ namespace XRL.World.Parts.Mutation
         
         [NonSerialized]
         protected GameObjectBlueprint _NaturalWeaponBlueprint;
-        
         public GameObjectBlueprint NaturalWeaponBlueprint
         {
             get
@@ -248,11 +226,10 @@ namespace XRL.World.Parts.Mutation
 
         private static readonly List<string> NaturalWeaponSupersedingMutations = new List<string>
         {
-          //"MassiveExoframe",
+          //"CyberneticsGiganticExoframe",
             "BurrowingClaws",
             "Crystallinity"
         };
-
         public bool IsNaturalWeaponSuperseded
         {
             get
@@ -292,7 +269,6 @@ namespace XRL.World.Parts.Mutation
 
         public override bool ChangeLevel(int NewLevel)
         {
-
             // Straighten up if hunching.
             // update HunchOver ability stats.
             // Hunch over if hunched before level up.
@@ -406,25 +382,6 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
-        public override bool HandleEvent(GetSlotsRequiredEvent E)
-        {
-            return base.HandleEvent(E);
-            /* Currently being handled elsewhere.
-             * 
-            // Should let you install cybernetics that are a disparate size to you.
-            if (E.Object.HasPart<CyberneticsBaseItem>())
-            {
-                if (!E.Actor.IsGiganticCreature && E.Object.IsGiganticEquipment)
-                    E.Decreases++;
-                else if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
-                    E.Increases++;
-
-                E.CanBeTooSmall = false;
-            }
-            return base.HandleEvent(E);
-            */
-        }
-
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
             E.Features.Add("{{gianter|gigantic}} stature");
@@ -459,22 +416,6 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(2, "CanEnterInteriorEvent - We aren't big.");
             }
             Debug.Entry(1, "Sending to base CanEnterInteriorEvent");
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(EarlyBeforeBeginTakeActionEvent E)
-        {
-            if(this.UnHunchNextTurn == true && ParentObject != null)
-            {
-                Debug.Entry(3, "...........................................");
-                Debug.Entry(4, "**public override bool HandleEvent(EarlyBeforeBeginTakeActionEvent E)");
-                Debug.Entry(3, "Automatically Unhunching");
-                UnHunchNextTurn = false;
-                IsHunchFree = true;
-                CommandEvent.Send(ParentObject, HUNCH_OVER_COMMAND_NAME);
-                Debug.Entry(4, "x- Deferring to base.HandleEvent(E)");
-                Debug.Entry(3, "...........................................");
-            }
             return base.HandleEvent(E);
         }
 
@@ -518,7 +459,7 @@ namespace XRL.World.Parts.Mutation
                 toHitString = "and {{rules|" + intSign + GetFistHitBonus(Level) + "}} To Hit " + penaltyBonus + "\n";
             }
 
-            string WeaponName = this.NaturalWeaponBlueprint.DisplayName();
+            string WeaponName = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
             return WeaponName + " {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetFistDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetFistDamageDieSize(Level) + "}}{{rules|+3}}\n"
                  + toHitString; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
                  + "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}"; */
@@ -544,7 +485,7 @@ namespace XRL.World.Parts.Mutation
                  * AddActivatedAbility(Name, Command, Class, Description, Icon, DisabledMessage, Toggleable, DefaultToggleState, ActiveToggle, IsAttack, IsRealityDistortionBased, IsWorldMapUsable, Silent, AIDisable, AlwaysAllowToggleOff, AffectedByWillpower, TickPerTurn, Distinct: false, Cooldown, CommandForDescription, UITileDefault, UITileToggleOn, UITileDisabled, UITileCoolingDown); */
                 EnableActivatedAbilityID =
                     AddMyActivatedAbility(
-                        Name: "{{C|" + "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}/" + this.HunchedOverAbilityUpright + "}}",
+                        Name: "{{C|" + "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}/" + this.HunchedOverAbilityHunched + "}}",
                         Command: HUNCH_OVER_COMMAND_NAME,
                         Class: "Physical Mutations",
                         Description: null,
@@ -620,37 +561,33 @@ namespace XRL.World.Parts.Mutation
                 if (Part.DefaultBehavior != null)
                 {
                     Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
-                    Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "Crystallinity", false);
+
+                    Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
 
                     MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = baseDamage;
                     if (HitBonus != 0) weapon.HitBonus = HitBonus;
                     weapon.MaxStrengthBonus = MaxStrBonus;
 
-                    var bodyPart = ParentObject.Body.GetPartByName("body");
-                    var cybernetics = bodyPart?.Cybernetics;
-                    if (cybernetics != null && cybernetics.GetBlueprint().Inherits == "BaseMassiveExoframe")
+                    if (Part.ParentBody.GetBody().Cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                     {
-                        if (cybernetics.GetPart<CyberneticsMassiveExoframe>() is CyberneticsMassiveExoframe exoframe)
+                        Part.DefaultBehavior.RequirePart<Metal>();
+
+                        if (exoframe.AugmentAdjectiveColor == "zetachrome")
                         {
-                            var (textColor, tileColor, tileDetail) = exoframe.Model switch
-                            {
-                                "Alpha" => ("b", "&b", "B"),
-                                "Delta" => ("K", "&K", "K"), 
-                                "Sigma" => ("G", "&G", "G"),
-                                "Omega" => ("zetachrome", "&M", "M"),
-                                _ => ("Y", "&Y", "y")
-                            };
-                            Part.DefaultBehavior.DisplayName = "{{Y|E{{c|F}}-{{" + textColor + "|augmented}} }}" + Part.DefaultBehavior.ShortDisplayName;
-                            
-                            var desc = Part.DefaultBehavior.GetPart<Description>();
-                            desc._Short = desc._Short + " The appendage is {{" + textColor + "|augmented}} by an exoframe {{" + textColor + "|" + exoframe.Model + "}}.";
-                            
-                            var render = Part.DefaultBehavior.GetPart<Render>();
-                            render.ColorString = tileColor;
-                            render.DetailColor = tileDetail;
-                            render.Tile = "GiganticManipulator.png";
+                            Part.DefaultBehavior.RequirePart<Zetachrome>();
+                            Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
                         }
+
+                        Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
+
+                        Description desc = Part.DefaultBehavior.GetPart<Description>();
+                        desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
+                            
+                        Render render = Part.DefaultBehavior.GetPart<Render>();
+                        render.ColorString = exoframe.AugmentTileColorString;
+                        render.DetailColor = exoframe.AugmentTileDetailColor;
+                        render.Tile = exoframe.AugmentTile;
                     }
 
                     Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
@@ -662,115 +599,6 @@ namespace XRL.World.Parts.Mutation
                     Part.DefaultBehavior = OldDefaultBehaviour;
                     Debug.Entry(3, $"---- OldDefaultBehaviour reassigned");
                 }
-                /* Old Code. Bypassing for now.
-                 * 
-                Debug.Entry(3, "* if (ParentObject.HasPart<ElongatedPaws>())");
-                Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
-                if (ParentObject.HasPart<ElongatedPaws>())
-                {
-                    Debug.Entry(3, "-- ElongatedPaws is Present");
-                    Debug.Entry(4, "**if (ParentObject.HasPart<BurrowingClaws>())");
-                    if (ParentObject.HasPart<BurrowingClaws>())
-                    {
-                        Debug.Entry(3, "--- BurrowingClaws is Present");
-                        var burrowingClaws = ParentObject.GetPart<BurrowingClaws>();
-                        int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                        int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-
-                        Debug.Entry(4, "**if (GiganticElongatedBurrowingClawObject == null)");
-                        if (GiganticElongatedBurrowingClawObject == null)
-                        {
-                            Debug.Entry(3, "---- GiganticElongatedBurrowingClawObject was null, init");
-                            GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
-                        }
-                        part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
-                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
-                        var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
-                        var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3 + burrowingBonus}";
-                        weapon.HitBonus = FistHitBonus;
-                        weapon.MaxStrengthBonus = FistMaxStrengthBonus;
-
-                        Debug.Entry(4, "**part.DefaultBehavior = GiganticElongatedBurrowingClawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }//GiganticElongatedBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
-                    else
-                    {
-                        Debug.Entry(3, "--- BurrowingClaws not Present");
-                        Debug.Entry(4, "**if (GiganticElongatedPawObject == null)");
-                        if (GiganticElongatedPawObject == null)
-                        {
-                            Debug.Entry(3, "---- GiganticElongatedPawObject was null, init");
-                            GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedPaw");
-                        }
-                        part.DefaultBehavior = GiganticElongatedPawObject;
-                        part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
-                        var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
-                        var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
-                        weapon.HitBonus = FistHitBonus;
-                        weapon.MaxStrengthBonus = FistMaxStrengthBonus;
-
-                        Debug.Entry(4, "**part.DefaultBehavior = GiganticElongatedPawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }//GiganticElongatedPawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
-                }
-                else if (ParentObject.HasPart<BurrowingClaws>())
-                {
-                    Debug.Entry(3, "-- ElongatedPaws not Present");
-                    Debug.Entry(3, "-- BurrowingClaws is Present");
-                    var burrowingClaws = ParentObject.GetPart<BurrowingClaws>();
-                    int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                    int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-
-                    Debug.Entry(4, "**if (GiganticBurrowingClawObject == null)");
-                    if (GiganticBurrowingClawObject == null)
-                    {
-                        Debug.Entry(3, "--- GiganticBurrowingClawObject was null, init");
-                        GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingClaw");
-                    }
-                    part.DefaultBehavior = GiganticBurrowingClawObject;
-                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
-                    var weapon = GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
-                    string baseDamage = GetFistBaseDamage(burrowingClaws.Level);
-                    int plusIndex = baseDamage.LastIndexOf('+');
-                    if (plusIndex != -1)
-                    {
-                        int baseBonus = int.Parse(baseDamage.Substring(plusIndex + 1));
-                        weapon.BaseDamage = $"{baseDamage.Substring(0, plusIndex)}+{baseBonus + burrowingBonus}";
-                    }
-                    else
-                    {
-                        weapon.BaseDamage = $"{baseDamage}+{burrowingBonus}";
-                    }
-                    weapon.HitBonus = FistHitBonus;
-                    weapon.MaxStrengthBonus = FistMaxStrengthBonus;
-
-                    Debug.Entry(4, "**part.DefaultBehavior = GiganticBurrowingClawObject");
-                    Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                }//GiganticBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
-                else
-                {
-                    Debug.Entry(3, "-- ElongatedPaws not Present");
-                    Debug.Entry(3, "-- BurrowingClaws not Present");
-
-                    Debug.Entry(4, "**if (GiganticFistObject == null)");
-                    if (GiganticFistObject == null)
-                    {
-                        Debug.Entry(3, "--- GiganticFistObject was null, init");
-                        GiganticFistObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprint);
-                    }
-                    part.DefaultBehavior = GiganticFistObject;
-                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
-                    var weapon = GiganticFistObject.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = FistBaseDamage;
-                    weapon.HitBonus = FistHitBonus;
-                    weapon.MaxStrengthBonus = FistMaxStrengthBonus;
-
-                    Debug.Entry(4, "**part.DefaultBehavior = GiganticFistObject");
-                    Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                }//GiganticFistObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
-*/
             }
             else
             {
@@ -1000,7 +828,7 @@ namespace XRL.World.Parts.Mutation
             if (!IsPseudoGiganticCreature) // Already Upright over
             {
                 IsHunchFree = false;
-                UnHunchNextTurn = false;
+                UnHunchImmediately = false;
                 Debug.Entry(1, "Tried to straighten up, but wasn't PseudoGigantic");
                 return;
             }
@@ -1028,18 +856,6 @@ namespace XRL.World.Parts.Mutation
                     "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 this.HunchedOverAbilityHunched + "\n" +
                        "}}";
-
-                // Old weight change code. Keeping just in case.
-                /*
-                int baseWeight = actor.GetBodyWeight();
-                int WeightAdjustment = baseWeight - (int)Math.Floor((double)baseWeight / 5);
-                int _Weight = actor.Physics._Weight;
-                actor.Physics._Weight = _Weight - WeightAdjustment;
-                Debug.Entry(3,"baseWeight", baseWeight.ToString());
-                Debug.Entry(3,"_Weight", _Weight.ToString());
-                Debug.Entry(3,"Adjustment", WeightAdjustment.ToString());
-                Debug.Entry(3,"New Weight", actor.Physics._Weight.ToString());
-                */
             }
 
             Debug.Entry(1, "Should be Standing Tall");

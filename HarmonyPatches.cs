@@ -286,7 +286,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                              return 0;      // Base 1d2
         }
 
-        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
+        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
             Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
 
@@ -298,7 +298,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
             if (Part.DefaultBehavior != null)
             {
-                Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
+                Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
 
                 Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
 
@@ -333,11 +333,11 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
             else
             {
-                Debug.Entry(3, $"---- part.DefaultBehaviour was null, invalid blueprint name \"{BlueprintName}\"");
-                Part.DefaultBehavior = OldDefaultBehaviour;
-                Debug.Entry(3, $"---- OldDefaultBehaviour reassigned");
+                Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
+                Part.DefaultBehavior = OldDefaultBehavior;
+                Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
             }
-        } //!-- public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus = 0)
+        } //!-- public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus = 0)
 
         [HarmonyPrefix]
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
@@ -397,7 +397,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             string ElongatedBlueprintName = "Elongated";
             string BaseBlueprintName = "BurrowingClaw";
             string blueprintName = "";
-            GameObject OldDefaultBehaviour;
+            GameObject OldDefaultBehavior;
             
             Debug.Entry(3, "Generating Stats");
 
@@ -472,7 +472,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             if (!HasGigantism && !HasElongated) blueprintName = BurrowingClawBlueprintName;
             Debug.Entry(3, $"> blueprintName: {blueprintName}");
 
-            Debug.Entry(3, "Performing application of behaviour to parts");
+            Debug.Entry(3, "Performing application of behavior to parts");
 
             Debug.Entry(3, "* foreach (BodyPart hand in body.GetParts())");
             Debug.Entry(4, "* if (hand.Type == \"Hand\")");
@@ -484,14 +484,14 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     Debug.Entry(3, "-- Hand Found");
 
-                    Debug.Entry(4, "-- Saving copy of current DefaultBehaviour in case creation fails");
-                    OldDefaultBehaviour = part.DefaultBehavior;
+                    Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
+                    OldDefaultBehavior = part.DefaultBehavior;
 
                     DoNaturalWeaponCreationAndAssign(
                         Creature: __instance.ParentObject,
                         Part: part,
                         BlueprintName: blueprintName,
-                        OldDefaultBehaviour: OldDefaultBehaviour,
+                        OldDefaultBehavior: OldDefaultBehavior,
                         DieCount: dieCount,
                         DieSize: dieSize,
                         DamageBonus: damageBonus,
@@ -513,7 +513,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
     [HarmonyPatch(typeof(XRL.World.Parts.Mutation.Crystallinity))]
     public static class Crystallinity_Patches
     {
-        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
+        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
             Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
 
@@ -525,7 +525,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
             if (Part.DefaultBehavior != null)
             {
-                Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
+                Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
 
                 Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
 
@@ -560,11 +560,11 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
             else
             {
-                Debug.Entry(3, $"---- part.DefaultBehaviour was null, invalid blueprint name \"{BlueprintName}\"");
-                Part.DefaultBehavior = OldDefaultBehaviour;
-                Debug.Entry(3, $"---- OldDefaultBehaviour reassigned");
+                Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
+                Part.DefaultBehavior = OldDefaultBehavior;
+                Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
             }
-        } //!-- public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehaviour, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus = 0)
+        } //!-- public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus = 0)
 
         [HarmonyPrefix]  
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.Crystallinity.OnRegenerateDefaultEquipment))]
@@ -623,7 +623,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             string ElongatedBlueprintName = "Elongated";
             string BaseBlueprintName = "CrystallinePoint";
             string blueprintName = "";
-            GameObject OldDefaultBehaviour;
+            GameObject OldDefaultBehavior;
 
             Debug.Entry(3, "Generating Stats");
 
@@ -747,14 +747,14 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     Debug.Entry(3, $"-- {targetPartType} Found");
 
-                    Debug.Entry(4, "-- Saving copy of current DefaultBehaviour in case creation fails");
-                    OldDefaultBehaviour = part.DefaultBehavior;
+                    Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
+                    OldDefaultBehavior = part.DefaultBehavior;
 
                     DoNaturalWeaponCreationAndAssign(
                         Creature: __instance.ParentObject,
                         Part: part,
                         BlueprintName: blueprintName,
-                        OldDefaultBehaviour: OldDefaultBehaviour,
+                        OldDefaultBehavior: OldDefaultBehavior,
                         DieCount: dieCount,
                         DieSize: dieSize,
                         DamageBonus: damageBonus,

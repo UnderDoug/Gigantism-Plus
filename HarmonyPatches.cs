@@ -412,7 +412,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                          + $"|> dieSize: {dieSize} \n"
                          + $"|> damageBonus: {damageBonus} \n"
                          + $"|> maxStrBonus: {maxStrBonus} \n"
-                         + $"|> hitBonus: {hitBonus}");
+                         + $"|> hitBonus: {hitBonus}\n"
+                         + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
 
             Debug.Entry(3, "[] Accumulating stats");
 
@@ -687,7 +688,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                          + $"|> dieSize: {dieSize} \n"
                          + $"|> damageBonus: {damageBonus} \n"
                          + $"|> maxStrBonus: {maxStrBonus} \n"
-                         + $"|> hitBonus: {hitBonus}");
+                         + $"|> hitBonus: {hitBonus}\n"
+                         + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
 
             Debug.Entry(3, "[] Accumulating stats");
 

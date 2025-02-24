@@ -208,7 +208,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, "* if (ParentObject.HasPart<GigantismPlus>())");
                 Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
-                int StatMod = (int)Math.Floor((double)StrengthModifier / 2.0);
+                int StatMod = ElongatedBonusDamage;
 
                 Debug.Entry(4, "- Saving copy of current DefaultBehavior in case creation fails");
                 GameObject OldDefaultBehavior = part.DefaultBehavior;

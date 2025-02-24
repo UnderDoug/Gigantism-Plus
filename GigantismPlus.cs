@@ -674,7 +674,8 @@ namespace XRL.World.Parts.Mutation
                              + $"|> dieSize: {dieSize} \n"
                              + $"|> damageBonus: {damageBonus} \n"
                              + $"|> maxStrBonus: {maxStrBonus} \n"
-                             + $"|> hitBonus: {hitBonus}");
+                             + $"|> hitBonus: {hitBonus}\n"
+                             + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
 
                 bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
 

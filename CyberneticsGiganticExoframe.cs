@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using XRL.Rules;
 using XRL.UI;
 using XRL.World;
 using XRL.World.Parts;
@@ -91,6 +92,28 @@ namespace XRL.World.Parts
             Debug.Entry(2, $"* public virtual void OnImplanted({Object.DisplayName})");
             
             _User = Object;
+
+            if (Model == "YES")
+            {
+                Popup.Show("...");
+                Popup.Show("You... You've done it...");
+                Popup.Show("...You've {{W|really}} done it...");
+                Popup.Show("At last, you have {{c|become}}...");
+                string finalMessage = "{{Y-W-W-W-O-O-O distribution|";
+                switch (Stat.TinkerRandom(1, 4))
+                {
+                    case 1: finalMessage += "THE FINAL KING OF QUD"; 
+                        break;
+                    case 2: finalMessage += "A SHINING GOLDEN GOD";
+                        break;
+                    case 3: finalMessage += "A GOLD PLUS VIP MEMBER";
+                        break;
+                    case 4: finalMessage += "REALLY REALLY YELLOW";
+                        break;
+                }
+                finalMessage += "}}";
+                Popup.Show(finalMessage);
+            }
 
             Debug.Entry(2, $"x public virtual void OnImplanted({Object.DisplayName}) ]//");
         } //!--- public override void OnImplanted(GameObject Object)

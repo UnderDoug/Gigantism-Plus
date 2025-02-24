@@ -322,6 +322,7 @@ You cannot wear equipment on your body."
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <part Name="ItemElements" Elements="immense::2" />
     <tag Name="BaseObject" Value="*noinherit" />
+    <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
   </object>
 
   <object Name="BaseGiganticExoframeManipulator" Inherits="GigantismPlusBaseNaturalWeapon">
@@ -437,6 +438,33 @@ You cannot wear equipment on your body."
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="ItemElements" Elements="immense::8" />
     <part Name="Zetachrome" />
+  </object>
+
+  <object Name="THEGIGANTICEXOFRAME" Inherits="BaseGiganticExoframe">
+    <part Name="Physics" Weight="0" />
+    <part Name="Description"
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and plates of an {{Y-W-W-W-O-O-O distribution|exotic material}}. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
+          />
+    <part Name="Render" DisplayName="{{Y|{{Y-W-W-W-O-O-O distribution|THE GIGANTIC EXOFRAME}}}}"
+          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
+          ColorString="&amp;W" DetailColor="O"
+          />
+    <part Name="CyberneticsBaseItem"
+          Slots="Body" Cost="999"
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
+You cannot wear equipment on your body."
+          />
+    <part Name="Commerce" Value="99999" />
+    <part Name="CyberneticsGiganticExoframe"
+          Model="YES"
+          AugmentAdjectiveColor="Y-W-W-W-O-O-O distribution"
+          AugmentTileDetailColor="O"
+          AugmentTileColorString="&amp;W"
+          />
+    <part Name="ModImprovedGigantismPlus" Tier="999" />
+    <part Name="ItemElements" Elements="immense::999" />
+    <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
+    <tag Name="EquipmentFrameColors" Value="WOWO" />
   </object>
 
   <!-- End Massive Exoframes -->

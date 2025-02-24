@@ -269,12 +269,15 @@ namespace XRL.World.Parts.Mutation
 
         public override bool ChangeLevel(int NewLevel)
         {
+            Debug.Header(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
             // Straighten up if hunching.
             // update HunchOver ability stats.
             // Hunch over if hunched before level up.
             bool WasHunched = false;
             if (IsPseudoGiganticCreature && !IsVehicleCreature)
             {
+                Debug.Entry(4, "Creature is PsuedoGigantic && not a Vehicle", Indent: 1);
+                Debug.Entry(4, "Sending StraightenUp", Indent: 1);
                 WasHunched = true;
                 IsHunchFree = true;
                 StraightenUp(Message: false);
@@ -286,10 +289,13 @@ namespace XRL.World.Parts.Mutation
             
             if (WasHunched && !IsVehicleCreature)
             {
+                Debug.Entry(4, "Creature was Hunched && not a Vehicle", Indent: 1);
+                Debug.Entry(4, "Sending HunchOver", Indent: 1);
                 IsHunchFree = true;
                 HunchOver(Message: false);
             }
 
+            Debug.Footer(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
             return base.ChangeLevel(NewLevel);
         }
 
@@ -308,6 +314,8 @@ namespace XRL.World.Parts.Mutation
         // - Rapid advancement checks the Physical MutationCategory Entries.
         private void SwapMutationCategory(bool Before = true)
         {
+            Debug.Header(3, "GigantismPlus","SwapMutationCategory(bool Before = true)");
+
             // prefer this for repeated uses of strings.
             string Physical = "Physical";
             string PhysicalDefects = "PhysicalDefects";
@@ -315,26 +323,42 @@ namespace XRL.World.Parts.Mutation
             // direction of swap depends on whether before or after LevelGain
             string IntoCategory = Before ? Physical : PhysicalDefects;
             string OutOfCategory = Before ? PhysicalDefects : Physical;
+
+            Debug.Entry(3, $"Into Category:   {IntoCategory}", Indent: 1);
+            Debug.Entry(3, $"Out Of Category: {OutOfCategory}", Indent: 1);
+
             MutationEntry GigantismEntry = MutationFactory.GetMutationEntryByName(this.Name);
+
+            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1);
             foreach (MutationCategory category in MutationFactory.GetCategories())
             {
+                Debug.LoopItem(4, category.Name, Indent: 2);
                 if (category.Name == IntoCategory)
                 {
-                    // UnityEngine.Debug.LogError("Adding " + GigantismEntry.DisplayName + " to " + IntoCategory + "Category");
+                    Debug.DiveIn(4, $"Found Category: {IntoCategory}", Indent: 2);
+
+                    Debug.Entry(3, $"Adding {GigantismEntry.DisplayName} to {IntoCategory} Category", Indent: 2);
                     category.Add(GigantismEntry);
                     category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
-                    /* Debug Logging. May turn this into an option.
+
+                    Debug.Entry(4, $"Displaying all entries in Category \"{IntoCategory}\"", Indent: 2);
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 2);
                     foreach (MutationEntry entry in category.Entries)
                     {
-                        UnityEngine.Debug.LogError(entry.DisplayName);
-                    }*/
+                        Debug.LoopItem(4, entry.DisplayName, Indent: 3);
+                    }
+                    Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
                 }
                 if (category.Name == OutOfCategory)
                 {
-                    // UnityEngine.Debug.LogError("Removing " + GigantismEntry.DisplayName + " from " + OutOfCategory + "Category");
+                    Debug.DiveIn(3, $"Found Category: {IntoCategory}", Indent: 2);
+                    Debug.Entry(3, $"Removing {GigantismEntry.DisplayName} from {OutOfCategory} Category", Indent: 2);
                     category.Entries.RemoveAll(r => r == GigantismEntry);
+                    Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
                 }
             }
+            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) ]//", Indent: 1);
+            Debug.Footer(3, "GigantismPlus", "SwapMutationCategory(bool Before = true)");
         } //!--- private void SwapMutationCategory(bool Before = true)
 
         private bool ShouldRapidAdvance(int Level, GameObject Actor)
@@ -378,6 +402,14 @@ namespace XRL.World.Parts.Mutation
             if (ShouldRapidAdvance(E.Level, E.Actor))
             {
                 SwapMutationCategory(false);
+            }
+            if (IsCyberGiant)
+            {
+                Body body = E.Actor.Body;
+                if (body != null)
+                {
+                    body.UpdateBodyParts();
+                }
             }
             return base.HandleEvent(E);
         }
@@ -552,15 +584,11 @@ namespace XRL.World.Parts.Mutation
             {
                 Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
 
-                string baseDamage = $"{DieCount}d{DieSize}";
-                if (DamageBonus > 0)
-                {
-                    baseDamage += $"+{DamageBonus}";
-                }
+                string baseDamage = WeaponDamageString(DieCount, DieSize, DamageBonus);
 
                 if (Part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "---- Part.DefaultBehaviour not null, assigning stats");
+                    Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
 
                     Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
 
@@ -578,6 +606,8 @@ namespace XRL.World.Parts.Mutation
                             Part.DefaultBehavior.RequirePart<Zetachrome>();
                             Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
                         }
+
+                        if (exoframe.Model == "YES") Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "WOWO");
 
                         Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
 
@@ -630,7 +660,6 @@ namespace XRL.World.Parts.Mutation
                 string ElongatedBlueprintName = "Elongated";
                 string BaseBlueprintName = "Fist";
                 string blueprintName = GiganticBlueprintName;
-                GameObject OldDefaultBehavior = null;
 
                 Debug.Entry(3, "Generating Stats");
 
@@ -640,8 +669,12 @@ namespace XRL.World.Parts.Mutation
                 int maxStrBonus = FistMaxStrengthBonus;
                 int hitBonus = FistHitBonus;
 
-                Debug.Entry(3, $"dieCount: {dieCount} | dieSize: {dieSize} | damageBonus: {damageBonus}\n"
-                             + $"maxStrBonus: {maxStrBonus} | hitBonus: {hitBonus}");
+                Debug.Entry(3, $"|^ Starting Stats");
+                Debug.Entry(3, $"|> dieCount: {dieCount} \n"
+                             + $"|> dieSize: {dieSize} \n"
+                             + $"|> damageBonus: {damageBonus} \n"
+                             + $"|> maxStrBonus: {maxStrBonus} \n"
+                             + $"|> hitBonus: {hitBonus}");
 
                 bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
 
@@ -650,33 +683,62 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, "* if (HasElongated)");
                 if (HasElongated)
                 {
-                    Debug.Entry(3, "- ElongatedPaws Mutation is present");
+                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
+                    Debug.Entry(3, "+ ElongatedPaws Mutation is present");
                     var elongated = ParentObject.GetPart<ElongatedPaws>();
                     if (elongated != null)
                     {
+                        // Add "Elongated" Adjective
                         blueprintName += ElongatedBlueprintName;
-                        Debug.Entry(4, $"> blueprintName: {blueprintName}");
                         BaseBlueprintName = "Paw";
-                        Debug.Entry(4, $"> BaseBlueprintName: {BaseBlueprintName}");
-
+                        // add damage
                         damageBonus += elongated.ElongatedBonusDamage;
-                        Debug.Entry(4, $"- damageBonus: {damageBonus}");
 
-                        Debug.Entry(4, $"- dieCount: {dieCount} | dieSize: {dieSize} | damageBonus: {damageBonus}\n"
-                                     + $"maxStrBonus: {maxStrBonus} | hitBonus: {hitBonus}");
+                        Debug.Entry(4, $"|? blueprintName: {blueprintName}");
+                        Debug.Entry(4, $"|> dieCount: {dieCount}\n"
+                                     + $"|> dieSize: {dieSize}\n"
+                                     + $"|> damageBonus: {damageBonus}\n"
+                                     + $"|> maxStrBonus: {maxStrBonus}\n"
+                                     + $"|> hitBonus: {hitBonus}\n"
+                                     + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
                     }
+                    else
+                    {
+                        Debug.Entry(3, "! Failed to instantiate elongated part");
+                    }
+                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
                 }
-                Debug.Entry(3, "Finished accumulating stats");
+                else
+                {
+                    Debug.Entry(3, "- ElongatedPaws Mutation not present");
+                }
 
-                Debug.Entry(4, $"- dieCount: {dieCount} | dieSize: {dieSize} | damageBonus: {damageBonus}\n"
-                             + $"maxStrBonus: {maxStrBonus} | hitBonus: {hitBonus}");
+                Debug.Entry(3, "[] Finished accumulating stats");
 
                 blueprintName += BaseBlueprintName;
 
-                Debug.Entry(3, $"> blueprintName: {blueprintName}");
+                Debug.Entry(4, $"|: blueprintName: {blueprintName}");
+                Debug.Entry(4, $"|> dieCount: {dieCount} \n"
+                             + $"|> dieSize: {dieSize} \n"
+                             + $"|> damageBonus: {damageBonus} \n"
+                             + $"|> maxStrBonus: {maxStrBonus} \n"
+                             + $"|> hitBonus: {hitBonus}\n"
+                             + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                Debug.Entry(3, "vvvvvvvvvvvvvvvvvvvvvvv");
 
-                Debug.Entry(3, "* foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))\n* if (hand.Type == \"Hand\")");
-                foreach (BodyPart part in body.GetParts(EvenIfDismembered: true))
+                Debug.Entry(3, "Performing application of behavior to parts");
+
+                string targetPartType = "Hand";
+                Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
+                Debug.Entry(4, "Generating List<BodyPart> list");
+                // Just change the body part search logic
+                List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                       where p.Type == targetPartType  // Changed from VariantType to Type
+                                       select p).ToList<BodyPart>();
+
+                Debug.Entry(4, "Checking list of parts for expected entries");
+                Debug.Entry(4, "* foreach (BodyPart part in list)");
+                foreach (BodyPart part in list)
                 {
                     Debug.Entry(4, $"-- {part.Type}");
                     if (part.Type == "Hand")
@@ -685,12 +747,11 @@ namespace XRL.World.Parts.Mutation
                         Debug.Entry(3, $"--- {part.Type} Found");
 
                         Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
-                        OldDefaultBehavior = part.DefaultBehavior;
 
                         AddGiganticNaturalEquipmentTo(
                         Part: part,
                         BlueprintName: blueprintName,
-                        OldDefaultBehavior: OldDefaultBehavior,
+                        OldDefaultBehavior: part.DefaultBehavior,
                         DieCount: dieCount,
                         DieSize: dieSize,
                         DamageBonus: damageBonus,
@@ -702,7 +763,7 @@ namespace XRL.World.Parts.Mutation
                         continue;
                     }
                 }
-                Debug.Entry(3, "x foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true)) ]//");
+                Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
             }
             else
             {

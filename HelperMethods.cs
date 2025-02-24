@@ -30,11 +30,13 @@ namespace Mods.GigantismPlus
             "Terrain",
             "Tiles"
         };
+
         private static List<string> TileExts = new List<string>()
         {
             ".bmp",
             ".png"
         };
+
         public static bool TryGetTilePath(string TileName, out string TilePath)
         {
             Debug.Entry(3, $"=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
@@ -92,6 +94,22 @@ namespace Mods.GigantismPlus
             Debug.Entry(3, $"=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
             TilePath = null;
             return false;
+        }
+
+        public static string WeaponDamageString(int DieSize, int DieCount, int Bonus)
+        {
+            string output = $"{DieSize}d{DieCount}";
+            
+            if (Bonus > 0)
+            {
+                output += $"+{Bonus}";
+            }
+            else if (Bonus < 0)
+            {
+                output += Bonus;
+            }
+
+            return output;
         }
     } //!-- public static class HelperClass
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 using XRL.World;
@@ -254,21 +255,32 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, "- NaturalEquipment not Superseded");
 
-                Debug.Entry(3, "* foreach (BodyPart hand in body.GetParts())\n**if (hand.Type == \"Hand\")");
-                foreach (BodyPart hand in body.GetParts())
+                Debug.Entry(3, "Performing application of behavior to parts");
+
+                string targetPartType = "Hand";
+                Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
+                Debug.Entry(4, "Generating List<BodyPart> list");
+                // Just change the body part search logic
+                List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                       where p.VariantType == targetPartType  // Changed from VariantType to Type
+                                       select p).ToList<BodyPart>();
+
+                Debug.Entry(4, "Checking list of parts for expected entries");
+                Debug.Entry(4, "* foreach (BodyPart part in list)");
+                foreach (BodyPart part in list)
                 {
-                    Debug.Entry(4, $"-- {hand.Type}");
-                    if (hand.Type == "Hand")
+                    Debug.Entry(4, $"-- {part.Type}");
+                    if (part.Type == "Hand")
                     {
                         Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        Debug.Entry(3, $"--- {hand.Type} Found");
+                        Debug.Entry(3, $"--- {part.Type} Found");
 
-                        AddElongatedNaturalEquipmentTo(hand);
+                        AddElongatedNaturalEquipmentTo(part);
 
                         Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                     }
                 }
-                Debug.Entry(3, "x foreach (BodyPart hand in body.GetParts()) ]//");
+                Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
             }
             else
             {

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
-using XRL.Rules;
+using XRL;
 using XRL.UI;
+using XRL.Core;
+using XRL.Rules;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
@@ -113,6 +115,7 @@ namespace XRL.World.Parts
                 }
                 finalMessage += "}}";
                 Popup.Show(finalMessage);
+                User.RequirePart<SecretExoframePart>();
             }
 
             Debug.Entry(2, $"x public virtual void OnImplanted({Object.DisplayName}) ]//");
@@ -123,6 +126,13 @@ namespace XRL.World.Parts
             Debug.Entry(3, $"* public virtual void OnUnimplanted({Object.DisplayName})");
 
             CheckEquipment(Object, Object.Body);
+
+            if (Model == "YES")
+            {
+                User.RequirePart<SecretExoframePart>();
+                User.RemovePart<SecretExoframePart>();
+                Popup.Show("Oh! To have tasted sweet ambrosia...");
+            }
 
             Debug.Entry(3, $"x public virtual void OnUnimplanted({Object.DisplayName}) ]//");
         } //!--- public override void OnUnimplanted(GameObject Object)
@@ -220,6 +230,33 @@ namespace XRL.World.Parts
             }
 
             return base.FireEvent(E);
+        }
+
+        [Serializable]
+        public class SecretExoframePart : IPart
+        {
+            public static readonly int ICON_COLOR_PRIORITY = 999;
+            private bool MutationColor = XRL.UI.Options.MutationColor;
+            public override bool Render(RenderEvent E)
+            {
+                bool flag = true;
+                if (ParentObject.IsPlayerControlled())
+                {
+                    if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+                    {
+                        MutationColor = XRL.UI.Options.MutationColor;
+                    }
+                    if (!MutationColor)
+                    {
+                        flag = false;
+                    }
+                }
+                if (flag)
+                {
+                    E.ApplyColors("&O", "W", ICON_COLOR_PRIORITY, ICON_COLOR_PRIORITY);
+                }
+                return base.Render(E);
+            }
         }
 
     }

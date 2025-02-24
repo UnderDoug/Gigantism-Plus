@@ -303,7 +303,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 if (HitBonus != 0) weapon.HitBonus = HitBonus;
                 weapon.MaxStrengthBonus = MaxStrBonus;
 
-                if (Part.ParentBody.GetBody().Cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+                var cybernetics = Part.ParentBody.GetBody().Cybernetics;
+                if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                 {
                     Part.DefaultBehavior.RequirePart<Metal>();
 
@@ -325,7 +326,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     render.DetailColor = exoframe.AugmentTileDetailColor;
                     render.Tile = exoframe.AugmentTile;
                 }
-
+                
                 Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
                 Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
             }
@@ -402,7 +403,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(3, "[] Generating Stats");
 
             int dieCount = 1;
-            int dieSize = HasGigantism ? 1 : GetBurrowingDieSize(level); // Get the die size, add 1 for elongated variants
+            int dieSize = GetBurrowingDieSize(level); // Base Burrowing from calculation, Gigantism overrides this to 1 in its section.
             int damageBonus = GetBurrowingBonusDamage(level);
             int maxStrBonus = 999;
             int hitBonus = 0;
@@ -432,8 +433,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // Override dieCount from mutation
                     dieCount = XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieCount(gigantism.Level);
 
-                    // Add to dieSize from mutation (it should start at 1 if GigantismPlus is present)
-                    dieSize += XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieSize(gigantism.Level);
+                    // Override dieSize from mutation, Gigantism dieSize + 1 for Burrowing.
+                    dieSize = 1 + XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieSize(gigantism.Level);
 
                     // Add to damageBonus due to being Gigantic (simulates weapon having ModGigantic)
                     damageBonus += 3;
@@ -579,7 +580,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 if (HitBonus != 0) weapon.HitBonus = HitBonus;
                 weapon.MaxStrengthBonus = MaxStrBonus;
 
-                if (Part.ParentBody.GetBody().Cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+                var cybernetics = Part.ParentBody.GetBody().Cybernetics;
+                if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                 {
                     Part.DefaultBehavior.RequirePart<Metal>();
 
@@ -678,7 +680,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(3, "[] Generating Stats");
 
             int dieCount = 1;
-            int dieSize = (HasGigantism && HasElongated && HasBurrowing) ? 1 : 3; // Base Crystalline is 3, with mutations only 1
+            int dieSize = 3; // Base Crystalline is 3, Gigantism overrides this to 1 in its section.
             int damageBonus = 0;
             int maxStrBonus = 999;
             int hitBonus = 0;
@@ -708,8 +710,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // Override dieCount from mutation
                     dieCount = XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieCount(gigantism.Level);
 
-                    // Add to dieSize from mutation (it should start at 1 if GigantismPlus is present)
-                    dieSize += XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieSize(gigantism.Level);
+                    // Override dieSize from mutation, Gigantism dieSize + 1 for Crystal.
+                    dieSize = 1 + XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieSize(gigantism.Level);
 
                     // Add to damageBonus due to being Gigantic (simulates weapon having ModGigantic)
                     damageBonus += 3;
@@ -751,7 +753,10 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     blueprintName += ElongatedBlueprintName;
 
                     // Add to dieSize if no Gigantism
+                    // Add to dieSize if no Burrowing
+                    // (this adds 2 if both are missing, per old behavior)
                     dieSize += HasGigantism ? 0 : 1;
+                    dieSize += HasBurrowing ? 0 : 1;
 
                     // add damage
                     damageBonus += elongated.ElongatedBonusDamage;

@@ -463,6 +463,7 @@ You cannot wear equipment on your body."
           />
     <part Name="ModImprovedGigantismPlus" Tier="999" />
     <part Name="ItemElements" Elements="immense::999" />
+    <part Name="LightSource" Lit="true" Radius="1" />
     <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
     <tag Name="EquipmentFrameColors" Value="WOWO" />
   </object>

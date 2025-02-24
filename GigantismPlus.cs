@@ -597,7 +597,8 @@ namespace XRL.World.Parts.Mutation
                     if (HitBonus != 0) weapon.HitBonus = HitBonus;
                     weapon.MaxStrengthBonus = MaxStrBonus;
 
-                    if (Part.ParentBody.GetBody().Cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+                    var cybernetics = Part.ParentBody.GetBody().Cybernetics;
+                    if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                     {
                         Part.DefaultBehavior.RequirePart<Metal>();
 

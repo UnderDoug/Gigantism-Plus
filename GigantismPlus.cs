@@ -508,8 +508,13 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(2, "- Mutating: RemovePart<Gigantism>()");
                 IsGiganticCreature = true; // Enable the Gigantic flag
                 Debug.Entry(2, "- Mutating: IsGiganticCreature = true");
-            }
 
+                // Add jumping properties
+                GO.SetIntProperty("JumpRangeModifier", GO.GetIntProperty("JumpRangeModifier", 0) + 1);
+                StunningForceOnJump stunning = GO.RequirePart<StunningForceOnJump>();
+                stunning.Level = 5;
+                stunning.Distance = 3;
+            }
             if (!GO.HasPart<Vehicle>())
             {
                 Debug.Entry(2, "- Mutating: Not Vehicle");
@@ -561,6 +566,25 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(2, $"GigantismPlus -> Unmutate {GO.DebugName}");
             if (GO != null)
             {
+                // Remove jumping properties
+                int currentJumpRange = GO.GetIntProperty("JumpRangeModifier", 0);
+                Debug.Entry(2, $"- Current JumpRangeModifier: {currentJumpRange}");
+                GO.SetIntProperty("JumpRangeModifier", currentJumpRange - 1);
+                Debug.Entry(2, $"- New JumpRangeModifier: {currentJumpRange - 1}");
+
+                Debug.Entry(2, "- Removing StunningForceOnJump");
+                if (GO.HasPart<StunningForceOnJump>())
+                {
+                    var stunning = GO.GetPart<StunningForceOnJump>();
+                    Debug.Entry(2, $"- Found StunningForceOnJump: Level={stunning.Level}, Distance={stunning.Distance}");
+                    GO.RemovePart<StunningForceOnJump>();
+                    Debug.Entry(2, "- StunningForceOnJump removed");
+                }
+                else
+                {
+                    Debug.Entry(2, "- No StunningForceOnJump part found to remove");
+                }
+
                 StraightenUp();
                 GO.RemovePart<PseudoGigantism>();
                 GO.IsGiganticCreature = false; // Revert the Gigantic flag

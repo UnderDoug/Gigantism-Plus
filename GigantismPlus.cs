@@ -460,7 +460,8 @@ namespace XRL.World.Parts.Mutation
         public override string GetDescription()
         {
             string GigantismSource = (!this.IsCyberGiant) ? "unusually" : "{{c|cybernetically}}";
-            string WeaponName = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
+            string WeaponName = (ParentObject == null) ? "gigantic fists" : ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
+            
             return "You are " + GigantismSource + " large, will {{rules|struggle to enter small spaces}} without {{g|hunching over}}, and can typically {{rules|only}} use {{gigantic|gigantic}} equipment.\n"
                  + "You are {{rules|heavy}}, can carry {{rules|twice}} as much weight, and all your natural weapons are {{gigantic|gigantic}}.\n\n"
                  + "Your " + WeaponName + "s gain:\n"
@@ -491,7 +492,7 @@ namespace XRL.World.Parts.Mutation
                 toHitString = "and {{rules|" + intSign + GetFistHitBonus(Level) + "}} To Hit " + penaltyBonus + "\n";
             }
 
-            string WeaponName = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
+            string WeaponName = (ParentObject == null) ? "gigantic fists" : ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
             return WeaponName + " {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetFistDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetFistDamageDieSize(Level) + "}}{{rules|+3}}\n"
                  + toHitString; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
                  + "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}"; */

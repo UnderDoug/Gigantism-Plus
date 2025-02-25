@@ -510,10 +510,10 @@ namespace XRL.World.Parts.Mutation
                 IsGiganticCreature = true; // Enable the Gigantic flag
                 Debug.Entry(2, "- Mutating: IsGiganticCreature = true");
 
-                // Add jumping properties
+                // Add jumping properties with level-scaled stunning
                 GO.SetIntProperty("JumpRangeModifier", GO.GetIntProperty("JumpRangeModifier", 0) + 1);
                 StunningForceOnJump stunning = GO.RequirePart<StunningForceOnJump>();
-                stunning.Level = 5;
+                stunning.Level = Level / 2; // Scale stunning force with mutation level
                 stunning.Distance = 3;
             }
             if (!GO.HasPart<Vehicle>())

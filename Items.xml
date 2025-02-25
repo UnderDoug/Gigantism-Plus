@@ -312,11 +312,15 @@ You cannot wear equipment on your body."
     <tag Name="CyberneticsUsesEqSlot" />
     <tag Name="CyberneticsOneOnly" />
     <part Name="CyberneticsGiganticExoframe" 
-          Model="Alpha"
+          Model="Alpha" 
           AugmentAdjectiveColor="b" 
           AugmentTile="GiganticManipulator.png" 
           AugmentTileColorString="&amp;c" 
           AugmentTileDetailColor="b" 
+          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
+          AugmentedBlockSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
+          JumpDistanceBonus="0" 
+          StunningForceLevelFactor="0.5" 
           />
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
@@ -362,9 +366,13 @@ You cannot wear equipment on your body."
           />
     <part Name="Commerce" Value="120" />
     <part Name="CyberneticsGiganticExoframe" 
-          Model="Alpha"
-          AugmentAdjectiveColor="b"
-          AugmentTileDetailColor="b"
+          Model="Alpha" 
+          AugmentAdjectiveColor="b" 
+          AugmentTileDetailColor="b" 
+          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
+          AugmentedBlockSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
+          JumpDistanceBonus="0" 
+          StunningForceLevelFactor="0.5" 
           />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
     <part Name="ItemElements" Elements="immense::2" />
@@ -394,6 +402,10 @@ You cannot wear equipment on your body."
           Model="Delta"
           AugmentAdjectiveColor="K"
           AugmentTileDetailColor="K"
+          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
+          AugmentedBlockSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          JumpDistanceBonus="1"
+          StunningForceLevelFactor="0.67"
           />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
     <part Name="ItemElements" Elements="immense::4" />
@@ -402,9 +414,9 @@ You cannot wear equipment on your body."
   <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="9" />
     <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{G|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|exoframe {{G|sigma}}}}"
+    <part Name="Render" DisplayName="{{Y|exoframe {{crysteel|sigma}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="G"
           />
@@ -420,8 +432,12 @@ You cannot wear equipment on your body."
     <part Name="Commerce" Value="600" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Sigma"
-          AugmentAdjectiveColor="G"
+          AugmentAdjectiveColor="crysteel"
           AugmentTileDetailColor="G"
+          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_crysteel_swing"
+          AugmentedBlockSound="Sounds/Melee/multiUseBlock/sfx_melee_crysteel_blocked"
+          JumpDistanceBonus="2"
+          StunningForceLevelFactor="0.75"
           />
     <part Name="ModImprovedGigantismPlus" Tier="10" />
     <part Name="ItemElements" Elements="immense::6" />
@@ -450,43 +466,14 @@ You cannot wear equipment on your body."
           Model="Omega"
           AugmentAdjectiveColor="zetachrome"
           AugmentTileDetailColor="M"
+          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_onehanded_zetachrome_swing"
+          AugmentedBlockSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          JumpDistanceBonus="3"
+          StunningForceLevelFactor="0.8"
           />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="ItemElements" Elements="immense::8" />
     <part Name="Zetachrome" />
-  </object>
-
-  <object Name="THEGIGANTICEXOFRAME" Inherits="BaseGiganticExoframe">
-    <part Name="Physics" Weight="0" />
-    <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and plates of an {{Y-W-W-W-O-O-O distribution|exotic material}}. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
-          />
-    <part Name="Render" DisplayName="{{Y|{{Y-W-W-W-O-O-O distribution|THE GIGANTIC EXOFRAME}}}}"
-          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;W" DetailColor="O"
-          />
-    <part Name="Armor" 
-          AV="9" 
-          DV="-1"
-          />
-    <part Name="CyberneticsBaseItem"
-          Slots="Body" Cost="999"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-You cannot wear equipment on your body."
-          />
-    <part Name="Commerce" Value="99999" />
-    <part Name="CyberneticsGiganticExoframe"
-          Model="YES"
-          AugmentAdjectiveColor="Y-W-W-W-O-O-O distribution"
-          AugmentTileDetailColor="O"
-          AugmentTileColorString="&amp;W"
-          />
-    <part Name="ModImprovedGigantismPlus" Tier="999" />
-    <part Name="ModExtradimensional" />
-    <part Name="ItemElements" Elements="immense::999" />
-    <part Name="LightSource" Lit="true" Radius="1" />
-    <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
-    <tag Name="EquipmentFrameColors" Value="WOWO" />
   </object>
 
   <!-- End Massive Exoframes -->

@@ -13,45 +13,52 @@ namespace Mods.GigantismPlus
         {
             bool ShouldDerarify = Options.SelectGiganticDerarification;
             bool ShouldGiganticTinkerable = Options.SelectGiganticTinkering;
+            Debug.Entry(3, "[{}] AdjustGiganticModifier()");
 
-            Debug.Entry(1, "/ Checking if ModGigantic needs adjustments.");
-            Debug.Entry(2, "________________________________________|");
-
-            Debug.Entry(2, "/ Spinning up ModList");
+            Debug.Entry(3, "Attempting ModList adjustment process");
+            Debug.Entry(4, "**foreach (ModEntry mod in ModificationFactory.ModList)");
             // find the gigantic modifier ModEntry in the ModList
             foreach (ModEntry mod in ModificationFactory.ModList)
             {
+                Debug.Entry(3, "-------------------------------------------");
                 string ModPart = mod.Part;
-                Debug.Entry(3, "BEGIN ENTRY", ModPart);
-                ModPart = "| " + ModPart;
+                Debug.Entry(3, $"--@ Mod Entry: {ModPart}");
+                ModPart = "--- " + ModPart;
                 if (mod.Part == "ModGigantic")
                 {
+                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                     Debug.Entry(3, ModPart, "Found");
                     // should the rarity be adjusted? 
                     // - change the rarity from R2 (3) to R (2) 
+                    Debug.Entry(4, "**if (ShouldDerarify)");
                     if (ShouldDerarify)
                     {
+                        Debug.Entry(4, "---- Should");
                         mod.Rarity = 2;
                         Debug.Entry(2, ModPart, "Rarity is R (decreased)");
                     }
                     else
                     {
+                        Debug.Entry(4, "---- Shouldn't");
                         mod.Rarity = 3;
                         Debug.Entry(2, ModPart, "Rarity is R2 (default)");
                     }
 
                     // should tinkering be allowed? 
                     // - change the tinkerability and add it to the list of recipes
+                    Debug.Entry(4, "**if (ShouldGiganticTinkerable)");
                     if (ShouldGiganticTinkerable)
                     {
+                        Debug.Entry(4, "---- Should");
                         mod.TinkerAllowed = true;
                         Debug.Entry(2, ModPart, "Gigantic tinkering [Enabled]");
 
                         // Modifiers can actually be set to require an additional ingredient.
                         // mod.TinkerIngredient = "Torch";
                     }
-                    else 
+                    else
                     {
+                        Debug.Entry(4, "---- Shouldn't");
                         mod.TinkerAllowed = false;
                         Debug.Entry(2, ModPart, "Gigantic tinkering [Disabled] (default)"); 
                     }
@@ -62,24 +69,23 @@ namespace Mods.GigantismPlus
                     // - only works if you flush it first since the "get" function checks if the _list is empty first and if it isn't just returns it
                     // it's probably NOT good, and could pose compatability issues with other mods if they do things post Blueprint pre-load, but I'm not nearly experienced enough to know what issues exactly
 
-                    TinkerData._TinkerRecipes.RemoveAll(r => r != null); Debug.Entry(2, "| Purged TinkerRecipes");
-                    List<TinkerData> reinitialise = TinkerData.TinkerRecipes; Debug.Entry(2, "| Reinitialised TinkerRecipes");
-                    reinitialise = null; Debug.Entry(4, "| Reinitialisation nulled");
+                    TinkerData._TinkerRecipes.RemoveAll(r => r != null); Debug.Entry(2, "--- Purged TinkerRecipes");
+                    List<TinkerData> reinitialise = TinkerData.TinkerRecipes; Debug.Entry(2, "--- Reinitialised TinkerRecipes");
+                    reinitialise = null; Debug.Entry(4, "--- Reinitialisation nulled");
 
-                    Debug.Entry(4, "\\ No Further Actions Required", "Exiting ModList");
-                    Debug.Entry(1, "________________________________________");
+                    Debug.Entry(4, "--- No Further Actions Required", "Exiting ModList");
+                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                    Debug.Entry(3, $"{ModPart} ]//");
 
-                    return;
+                    break;
 
                 }
                 else Debug.Entry(2, ModPart, "Not ModGigantic");
 
-                Debug.Entry(3, "END ENTRY ------------------------------|");
-                Debug.Entry(3, "________________________________________|");
-                Debug.Entry(3, "");
+                Debug.Entry(3, $"{ModPart} ]//");
             }
-            Debug.Entry(1, "\\ ModList exited, adjustment process finished.");
-            Debug.Entry(1, "________________________________________");
+            Debug.Entry(3, "-------------------------------------------");
+            Debug.Entry(1, "ModList exited, adjustment process finished");
         }
     } //!--- public class GiganticModifierAdjustments
 
@@ -88,7 +94,11 @@ namespace Mods.GigantismPlus
     {
         public void mutate(GameObject player)
         {
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Entry(2, "public class OnPlayerLoad : IPlayerMutator");
+            Debug.Entry(2, "public void mutate(GameObject player)");
             GiganticModifierAdjustments.AdjustGiganticModifier();
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         }
     } //!--- public class OnPlayerLoad : IPlayerMutator
 
@@ -98,7 +108,11 @@ namespace Mods.GigantismPlus
         [CallAfterGameLoadedAttribute]
         public static void OnLoadGameCallback()
         {
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Entry(2, "public class OnLoadGameHandler");
+            Debug.Entry(2, "public static void OnLoadGameCallback()");
             GiganticModifierAdjustments.AdjustGiganticModifier();
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
         }
     } //!--- public class OnLoadGameHandler
 }

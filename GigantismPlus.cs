@@ -6,8 +6,10 @@ using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.Tinkering;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches;
+using static Mods.GigantismPlus.HelperMethods;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -16,21 +18,14 @@ namespace XRL.World.Parts.Mutation
     {
 
         public int FistDamageDieCount;
-
         public int FistDamageDieSize;
-
         private string FistBaseDamage;
-
         public int FistHitBonus;
-
         public int FistMaxStrengthBonus = 999;
 
         public GameObject GiganticFistObject;
-
         public GameObject GiganticElongatedPawObject;
-
         public GameObject GiganticBurrowingClawObject;
-
         public GameObject GiganticElongatedBurrowingClawObject;
 
         public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
@@ -38,15 +33,11 @@ namespace XRL.World.Parts.Mutation
         public Guid EnableActivatedAbilityID = Guid.Empty;
 
         public int HunchedOverAVModifier;
-
         public int HunchedOverDVModifier;
-
         public int HunchedOverQNModifier;
-
         public int HunchedOverMSModifier;
 
         private bool _IsVehicleCreature = false;
-
         public bool IsVehicleCreature
         {
             get
@@ -63,21 +54,37 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
+        private string HunchedOverAbilityHunched
+        {
+            get 
+            {
+                if (this.IsCyberGiant)
+                    return "Compact";
+                return "Hunched";
+            } 
+        }
+        private string HunchedOverAbilityUpright
+        {
+            get
+            {
+                if (this.IsCyberGiant)
+                    return "Regular"; // was "Standard" but it's one too many characters
+                return "Upright";
+            }
+        }
+
         public static int GetFistDamageDieCount(int Level)
         {
             return 1 + (int)Math.Floor((double)Level / 5.0);
         }
-
         public static int GetFistDamageDieSize(int Level)
         {
             return 3 + (int)Math.Floor((double)Level / 3.0);
         }
-
         public static string GetFistBaseDamage(int Level)
         {
             return $"{GetFistDamageDieCount(Level)}d{GetFistDamageDieSize(Level)}+3";
         }
-
         public static int GetFistHitBonus(int Level)
         {
             return -3 + (int)Math.Floor((double)Level / 2.0);
@@ -87,17 +94,14 @@ namespace XRL.World.Parts.Mutation
         {
             return 4;
         }
-
         public static int GetHunchedOverDVModifier(int Level)
         {
             return -6;
         }
-
         public static int GetHunchedOverQNModifier(int Level)
         {
             return Math.Min(-70 + (int)Math.Floor((double)Level * 10.0),-10);
         }
-
         public static int GetHunchedOverMSModifier(int Level)
         {
             return Math.Min(-70 + (int)Math.Floor((double)Level * 10.0),-10);
@@ -118,7 +122,6 @@ namespace XRL.World.Parts.Mutation
                 }
             }
         }
-
         public bool IsPseudoGiganticCreature // designed to ensure you aren't (typically) Gigantic and PseudoGigantic at the same time 
         {
             get
@@ -137,11 +140,36 @@ namespace XRL.World.Parts.Mutation
 
             }
         }
-        
-        private bool IsHunchFree = false;
 
+        public bool IsCyberGiant
+        {
+            get
+            {
+                Debug.Entry(3, "IsCyberGiant, get");
+                if (ParentObject != null)
+                {
+                    Debug.Entry(3, "- ParentObject not null");
+                    GameObject cybernetics = ParentObject.Body.GetPartByName("body").Cybernetics;
+                    if (cybernetics != null)
+                    {
+                        Debug.Entry(3, "- cybernetics not null");
+                        Debug.Entry(3, "CyberGiant: true");
+                        return cybernetics.GetBlueprint().Inherits == "BaseGiganticExoframe";
+                    }
+                    Debug.Entry(3, "- cybernetics is null");
+                    Debug.Entry(3, "CyberGiant: false");
+                    return false;
+                }
+                Debug.Entry(3, "- ParentObject is null");
+                Debug.Entry(3, "CyberGiant: false");
+                return false;
+            }
+        }
+
+        public bool UnHunchImmediately = false;
+
+        public bool IsHunchFree = false;
         private int _hunchOverEnergyCost = 500;
-
         public int HunchOverEnergyCost
         {
             get
@@ -164,29 +192,44 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public string NaturalWeaponBlueprintName => Variant.Coalesce("GiganticFist");
+        private string _NaturalWeaponBlueprintName = "GiganticFist";
+        public string NaturalWeaponBlueprintName 
+        {
+            get 
+            {
+                if (this.IsCyberGiant)
+                {
+                    return ParentObject.Body.GetPartByName("body").Cybernetics.GetPart<CyberneticsGiganticExoframe>().ManipulatorBlueprintName;
+                }
+                return _NaturalWeaponBlueprintName; 
+            }
+            private set
+            {
+                this._NaturalWeaponBlueprintName = value;
+            }
+        }
         
         [NonSerialized]
         protected GameObjectBlueprint _NaturalWeaponBlueprint;
-        
         public GameObjectBlueprint NaturalWeaponBlueprint
         {
             get
             {
-                if (_NaturalWeaponBlueprint == null)
-                {
-                    _NaturalWeaponBlueprint = GameObjectFactory.Factory.GetBlueprint(NaturalWeaponBlueprintName);
-                }
+                _NaturalWeaponBlueprint = GameObjectFactory.Factory.GetBlueprint(NaturalWeaponBlueprintName);
                 return _NaturalWeaponBlueprint;
+            }
+            set
+            {
+                _NaturalWeaponBlueprint = value;
             }
         }
 
         private static readonly List<string> NaturalWeaponSupersedingMutations = new List<string>
         {
+          //"CyberneticsGiganticExoframe",
             "BurrowingClaws",
             "Crystallinity"
         };
-
         public bool IsNaturalWeaponSuperseded
         {
             get
@@ -199,6 +242,7 @@ namespace XRL.World.Parts.Mutation
                         count++;
                     }
                 }
+                Debug.Entry(4, $"Superseding Count is {count}");
                 return count > 0;
             }
         }
@@ -209,19 +253,31 @@ namespace XRL.World.Parts.Mutation
             base.Type = "Physical";
         }
 
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+            gigantism.GiganticFistObject = null;
+            gigantism.GiganticElongatedPawObject = null;
+            gigantism.GiganticBurrowingClawObject = null;
+            gigantism.GiganticElongatedBurrowingClawObject = null;
+            return gigantism;
+        }
+
         public override bool CanLevel() { return true; } // Enable leveling
 
         public override bool GeneratesEquipment() { return true; }
 
         public override bool ChangeLevel(int NewLevel)
         {
-
-        // Straighten up if hunching.
-        // update HunchOver ability stats.
-        // Hunch over if hunched before level up.
-        bool WasHunched = false;
+            Debug.Header(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
+            // Straighten up if hunching.
+            // update HunchOver ability stats.
+            // Hunch over if hunched before level up.
+            bool WasHunched = false;
             if (IsPseudoGiganticCreature && !IsVehicleCreature)
             {
+                Debug.Entry(4, "Creature is PsuedoGigantic && not a Vehicle", Indent: 1);
+                Debug.Entry(4, "Sending StraightenUp", Indent: 1);
                 WasHunched = true;
                 IsHunchFree = true;
                 StraightenUp(Message: false);
@@ -233,10 +289,13 @@ namespace XRL.World.Parts.Mutation
             
             if (WasHunched && !IsVehicleCreature)
             {
+                Debug.Entry(4, "Creature was Hunched && not a Vehicle", Indent: 1);
+                Debug.Entry(4, "Sending HunchOver", Indent: 1);
                 IsHunchFree = true;
                 HunchOver(Message: false);
             }
 
+            Debug.Footer(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
             return base.ChangeLevel(NewLevel);
         }
 
@@ -255,6 +314,8 @@ namespace XRL.World.Parts.Mutation
         // - Rapid advancement checks the Physical MutationCategory Entries.
         private void SwapMutationCategory(bool Before = true)
         {
+            Debug.Header(3, "GigantismPlus","SwapMutationCategory(bool Before = true)");
+
             // prefer this for repeated uses of strings.
             string Physical = "Physical";
             string PhysicalDefects = "PhysicalDefects";
@@ -262,26 +323,42 @@ namespace XRL.World.Parts.Mutation
             // direction of swap depends on whether before or after LevelGain
             string IntoCategory = Before ? Physical : PhysicalDefects;
             string OutOfCategory = Before ? PhysicalDefects : Physical;
+
+            Debug.Entry(3, $"Into Category:   {IntoCategory}", Indent: 1);
+            Debug.Entry(3, $"Out Of Category: {OutOfCategory}", Indent: 1);
+
             MutationEntry GigantismEntry = MutationFactory.GetMutationEntryByName(this.Name);
+
+            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1);
             foreach (MutationCategory category in MutationFactory.GetCategories())
             {
+                Debug.LoopItem(4, category.Name, Indent: 2);
                 if (category.Name == IntoCategory)
                 {
-                    // UnityEngine.Debug.LogError("Adding " + GigantismEntry.DisplayName + " to " + IntoCategory + "Category");
+                    Debug.DiveIn(4, $"Found Category: {IntoCategory}", Indent: 2);
+
+                    Debug.Entry(3, $"Adding {GigantismEntry.DisplayName} to {IntoCategory} Category", Indent: 2);
                     category.Add(GigantismEntry);
                     category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
-                    /* Debug Logging. May turn this into an option.
+
+                    Debug.Entry(4, $"Displaying all entries in Category \"{IntoCategory}\"", Indent: 2);
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 2);
                     foreach (MutationEntry entry in category.Entries)
                     {
-                        UnityEngine.Debug.LogError(entry.DisplayName);
-                    }*/
+                        Debug.LoopItem(4, entry.DisplayName, Indent: 3);
+                    }
+                    Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
                 }
                 if (category.Name == OutOfCategory)
                 {
-                    // UnityEngine.Debug.LogError("Removing " + GigantismEntry.DisplayName + " from " + OutOfCategory + "Category");
+                    Debug.DiveIn(3, $"Found Category: {IntoCategory}", Indent: 2);
+                    Debug.Entry(3, $"Removing {GigantismEntry.DisplayName} from {OutOfCategory} Category", Indent: 2);
                     category.Entries.RemoveAll(r => r == GigantismEntry);
+                    Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
                 }
             }
+            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) ]//", Indent: 1);
+            Debug.Footer(3, "GigantismPlus", "SwapMutationCategory(bool Before = true)");
         } //!--- private void SwapMutationCategory(bool Before = true)
 
         private bool ShouldRapidAdvance(int Level, GameObject Actor)
@@ -297,7 +374,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool WantEvent(int ID, int cascade)
         {
-
+            // InterfaceWithBecomingNook
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
                 || ID == BeforeLevelGainedEvent.ID
@@ -305,11 +382,12 @@ namespace XRL.World.Parts.Mutation
                 || ID == GetMaxCarriedWeightEvent.ID
                 || ID == CanEnterInteriorEvent.ID
                 || ID == InventoryActionEvent.ID
-                || ID == GetExtraPhysicalFeaturesEvent.ID;
+                || ID == GetExtraPhysicalFeaturesEvent.ID
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == InventoryActionEvent.ID
+                || ID == EarlyBeforeBeginTakeActionEvent.ID;
         }
 
-        // don't like that these are duplicates.
-        // I'm certain there's a way to collapse them into a single function that accepts either.
         public override bool HandleEvent(BeforeLevelGainedEvent E)
         {
             if (ShouldRapidAdvance(E.Level, E.Actor))
@@ -325,12 +403,20 @@ namespace XRL.World.Parts.Mutation
             {
                 SwapMutationCategory(false);
             }
+            if (IsCyberGiant)
+            {
+                Body body = E.Actor.Body;
+                if (body != null)
+                {
+                    body.UpdateBodyParts();
+                }
+            }
             return base.HandleEvent(E);
         }
 
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
-            E.Features.Add("{{gianter|gigantic stature}}");
+            E.Features.Add("{{gianter|gigantic}} stature");
             return base.HandleEvent(E);
         }
 
@@ -365,32 +451,6 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
-        /* This was part of the code we were using, I thought, to enable entering interiors while gigantic.
-         * Debug-logging revealed that it wasn't firing at all. Leaving it here for the time being.
-         * 
-        public override bool HandleEvent(InventoryActionEvent E)
-        {
-            if (E.Command == "EnterInterior")
-            {
-                Debug.Entry("A) Attempting InteriorEntry");
-                GameObject actor = E.Actor;
-                if (actor.IsGiganticCreature && !actor.HasPart<Vehicle>())
-                {
-                    Debug.Entry("A)A) We are big, so we'll HunchOver");
-                    IsHunchFree = true;
-                    CommandEvent.Send(actor, HUNCH_OVER_COMMAND_NAME);
-                    Debug.Entry("A)A)A) HunchOver Sent for Enter InventoryActionEvent");
-                }
-                else
-                {
-                    Debug.Entry("A)A) InventoryActionEvent - We aren't big");
-                }
-                Debug.Entry("A)A)A)A) Sending to base InventoryActionEvent");
-            }
-            return base.HandleEvent(E);
-        }
-        */
-
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             // DescribeMyActivatedAbility(EnableActivatedAbilityID, CollectStats);
@@ -399,9 +459,11 @@ namespace XRL.World.Parts.Mutation
 
         public override string GetDescription()
         {
-            return "You are unusually large, will {{rules|struggle to enter small spaces}} without {{g|hunching over}}, and can typically {{rules|only}} use {{gigantic|gigantic}} equipment.\n"
+            string GigantismSource = (!this.IsCyberGiant) ? "unusually" : "{{c|cybernetically}}";
+            string WeaponName = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
+            return "You are " + GigantismSource + " large, will {{rules|struggle to enter small spaces}} without {{g|hunching over}}, and can typically {{rules|only}} use {{gigantic|gigantic}} equipment.\n"
                  + "You are {{rules|heavy}}, can carry {{rules|twice}} as much weight, and all your natural weapons are {{gigantic|gigantic}}.\n\n"
-                 + "Your gigantic fists gain:\n"
+                 + "Your " + WeaponName + "s gain:\n"
                  + "{{rules|+1}} To-Hit every {{rules|2 mutation levels}}\n"
                  + "{{B|d1}} damage every {{B|3 mutation levels}}\n"
                  + "{{W|1d}} damage every {{W|5 mutation levels}}\n"
@@ -420,46 +482,83 @@ namespace XRL.World.Parts.Mutation
             {
                 MSPenalty = GetHunchedOverMSModifier(Level) + "}} MS";
             }
-            return "{{gigantic|Gigantic}} Fists {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetFistDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetFistDamageDieSize(Level) + "}}{{rules|+3}}\n"
-                 + "and {{rules|" + GetFistHitBonus(Level) + "}} To-Hit\n"; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
+
+            string intSign = GetFistHitBonus(Level) >= 0 ? "+" : "";
+            string toHitString = "";
+            string penaltyBonus = GetFistHitBonus(Level) >= 0 ? "bonus" : "penalty";
+            if (GetFistHitBonus(Level) != 0)
+            {
+                toHitString = "and {{rules|" + intSign + GetFistHitBonus(Level) + "}} To Hit " + penaltyBonus + "\n";
+            }
+
+            string WeaponName = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.ShortDisplayName;
+            return WeaponName + " {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{W|" + GetFistDamageDieCount(Level) + "}}{{rules|d}}{{B|" + GetFistDamageDieSize(Level) + "}}{{rules|+3}}\n"
+                 + toHitString; /*+ "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}";
                  + "{{rules|" + GetHunchedOverQNModifier(Level) + " QN}} and {{rules|" + GetHunchedOverMSModifier(Level) + " MS}} when {{g|Hunched Over}}"; */
         }
 
         public override bool Mutate(GameObject GO, int Level)
         {
+            Debug.Entry(2, $"GigantismPlus -> Mutate {GO.DebugName}");
             Body body = GO.Body;
             if (body != null)
             {
+                Debug.Entry(2, "- Mutating: Have Body");
                 GO.RemovePart<Gigantism>();
+                Debug.Entry(2, "- Mutating: RemovePart<Gigantism>()");
                 IsGiganticCreature = true; // Enable the Gigantic flag
+                Debug.Entry(2, "- Mutating: IsGiganticCreature = true");
             }
 
             if (!GO.HasPart<Vehicle>())
             {
-                /* AddActivatedAbility() - Fill Method Arguments.
+                Debug.Entry(2, "- Mutating: Not Vehicle");
+                /* AddActivatedAbility() - Full Method Arguments.
                  * AddActivatedAbility(Name, Command, Class, Description, Icon, DisabledMessage, Toggleable, DefaultToggleState, ActiveToggle, IsAttack, IsRealityDistortionBased, IsWorldMapUsable, Silent, AIDisable, AlwaysAllowToggleOff, AffectedByWillpower, TickPerTurn, Distinct: false, Cooldown, CommandForDescription, UITileDefault, UITileToggleOn, UITileDisabled, UITileCoolingDown); */
                 EnableActivatedAbilityID =
-                    AddMyActivatedAbility(Name: "{{C|" + "{{W|[}}Upright{{W|]}}/Hunched" + "}}",
-                                          Command: HUNCH_OVER_COMMAND_NAME,
-                                          Class: "Physical Mutations",
-                                          Description: null,
-                                          Icon: "&#214",
-                                          DisabledMessage: null,
-                                          Toggleable: true,
-                                          DefaultToggleState: false,
-                                          ActiveToggle: true, IsAttack: false,
-                                          IsRealityDistortionBased: false,
-                                          IsWorldMapUsable: false);
+                    AddMyActivatedAbility(
+                        Name: "{{C|" + "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}/" + this.HunchedOverAbilityHunched + "}}",
+                        Command: HUNCH_OVER_COMMAND_NAME,
+                        Class: "Physical Mutations",
+                        Description: null,
+                        Icon: "&#214",
+                        DisabledMessage: null,
+                        Toggleable: true,
+                        DefaultToggleState: false,
+                        ActiveToggle: true, 
+                        IsAttack: false,
+                        IsRealityDistortionBased: false,
+                        IsWorldMapUsable: false
+                        );
 
-                ActivatedAbilityEntry abilityEntry = GO.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
-                abilityEntry.DisplayName = "{{C|" + "{{W|[}}Upright{{W|]}}\nHunched\n" + "}}";
+                Debug.Entry(2, "- Mutating: Activeated Ability Assigned");
+                ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(EnableActivatedAbilityID);
+                abilityEntry.DisplayName = 
+                    "{{C|" + 
+                    "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}\n" +
+                                this.HunchedOverAbilityHunched + "\n" +
+                       "}}";
+
+                Debug.Entry(2, "- Mutating: Activeated Ability DisplayName Changed");
+                /* This causes a village generation crash.
+                 * 
+                if (this.IsCyberGiant)
+                {
+                    abilityEntry.UITileDefault.ColorString = "b";
+                    abilityEntry.UITileDefault.DetailColor = char.Parse("B");
+                    abilityEntry.UITileToggleOn.ColorString = "b";
+                    abilityEntry.UITileToggleOn.DetailColor = char.Parse("B");
+                }
+                */
             }
 
+            Debug.Entry(2, $"GigantismPlus -> base.Mutate {GO.DebugName}");
             return base.Mutate(GO, Level);
         }
 
         public override bool Unmutate(GameObject GO)
         {
+            Debug.Entry(2, $"GigantismPlus -> Unmutate {GO.DebugName}");
             if (GO != null)
             {
                 StraightenUp();
@@ -474,128 +573,79 @@ namespace XRL.World.Parts.Mutation
                 CheckAffected(GO, GO.Body);
             }
 
+            Debug.Entry(2, $"GigantismPlus -> base.Unmutate {GO.DebugName}");
             return base.Unmutate(GO);
         }
 
-        public void AddGiganticNaturalEquipmentTo(BodyPart part)
+        public void AddGiganticNaturalEquipmentTo(BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
         {
-            Debug.Entry(2, "**AddGiganticNaturalEquipmentTo(BodyPart part)");
-            if (part != null && part.Type == "Hand")
+            Debug.Entry(2, "* AddGiganticNaturalEquipmentTo(BodyPart part)");
+            if (Part != null && Part.Type == "Hand")
             {
-                Debug.Entry(3, "**if (ParentObject.HasPart<ElongatedPaws>())");
-                Debug.Entry(3, "**else if (ParentObject.HasPart<BurrowingClaws>())");
-                if (ParentObject.HasPart<ElongatedPaws>())
+                Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
+
+                string baseDamage = WeaponDamageString(DieCount, DieSize, DamageBonus);
+
+                if (Part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "-- ElongatedPaws is Present");
-                    Debug.Entry(4, "**if (ParentObject.HasPart<BurrowingClaws>())");
-                    if (ParentObject.HasPart<BurrowingClaws>())
+                    Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
+
+                    Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
+
+                    MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
+                    weapon.BaseDamage = baseDamage;
+                    if (HitBonus != 0) weapon.HitBonus = HitBonus;
+                    weapon.MaxStrengthBonus = MaxStrBonus;
+
+                    var cybernetics = Part.ParentBody.GetBody().Cybernetics;
+                    if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
                     {
-                        Debug.Entry(3, "--- BurrowingClaws is Present");
-                        var burrowingClaws = ParentObject.GetPart<BurrowingClaws>();
-                        int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                        int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
+                        Part.DefaultBehavior.RequirePart<Metal>();
 
-                        Debug.Entry(4, "**if (GiganticElongatedBurrowingClawObject == null)");
-                        if (GiganticElongatedBurrowingClawObject == null)
+                        if (exoframe.AugmentAdjectiveColor == "zetachrome")
                         {
-                            Debug.Entry(3, "---- GiganticElongatedBurrowingClawObject was null, init");
-                            GiganticElongatedBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedBurrowingClaw");
+                            Part.DefaultBehavior.RequirePart<Zetachrome>();
+                            Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
                         }
-                        part.DefaultBehavior = GiganticElongatedBurrowingClawObject;
-                        var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
-                        var weapon = GiganticElongatedBurrowingClawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3 + burrowingBonus}";
-                        weapon.HitBonus = FistHitBonus;
-                        weapon.MaxStrengthBonus = FistMaxStrengthBonus;
 
-                        Debug.Entry(4, "**part.DefaultBehavior = GiganticElongatedBurrowingClawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }//GiganticElongatedBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
-                    else
-                    {
-                        Debug.Entry(3, "--- BurrowingClaws not Present");
-                        Debug.Entry(4, "**if (GiganticElongatedPawObject == null)");
-                        if (GiganticElongatedPawObject == null)
-                        {
-                            Debug.Entry(3, "---- GiganticElongatedPawObject was null, init");
-                            GiganticElongatedPawObject = GameObjectFactory.Factory.CreateObject("GiganticElongatedPaw");
-                        }
-                        part.DefaultBehavior = GiganticElongatedPawObject;
-                        var elongatedPaws = ParentObject.GetPart<ElongatedPaws>();
-                        var weapon = GiganticElongatedPawObject.GetPart<MeleeWeapon>();
-                        weapon.BaseDamage = $"{FistDamageDieCount}d{FistDamageDieSize}+{(elongatedPaws.StrengthModifier / 2) + 3}";
-                        weapon.HitBonus = FistHitBonus;
-                        weapon.MaxStrengthBonus = FistMaxStrengthBonus;
+                        if (exoframe.Model == "YES") Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "WOWO");
 
-                        Debug.Entry(4, "**part.DefaultBehavior = GiganticElongatedPawObject");
-                        Debug.Entry(4, $"--- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                    }//GiganticElongatedPawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+                        Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
+
+                        Description desc = Part.DefaultBehavior.GetPart<Description>();
+                        desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
+                            
+                        Render render = Part.DefaultBehavior.GetPart<Render>();
+                        render.ColorString = exoframe.AugmentTileColorString;
+                        render.DetailColor = exoframe.AugmentTileDetailColor;
+                        render.Tile = exoframe.AugmentTile;
+                    }
+
+                    Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
+                    Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
                 }
-                else if (ParentObject.HasPart<BurrowingClaws>())
-                {
-                    Debug.Entry(3, "-- ElongatedPaws not Present");
-                    Debug.Entry(3, "-- BurrowingClaws is Present");
-                    var burrowingClaws = ParentObject.GetPart<BurrowingClaws>();
-                    int burrowingDieSize = BurrowingClaws_Patches.GetBurrowingDieSize(burrowingClaws.Level);
-                    int burrowingBonus = BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowingClaws.Level);
-
-                    Debug.Entry(4, "**if (GiganticBurrowingClawObject == null)");
-                    if (GiganticBurrowingClawObject == null)
-                    {
-                        Debug.Entry(3, "--- GiganticBurrowingClawObject was null, init");
-                        GiganticBurrowingClawObject = GameObjectFactory.Factory.CreateObject("GiganticBurrowingClaw");
-                    }
-                    part.DefaultBehavior = GiganticBurrowingClawObject;
-                    var weapon = GiganticBurrowingClawObject.GetPart<MeleeWeapon>();
-                    string baseDamage = GetFistBaseDamage(burrowingClaws.Level);
-                    int plusIndex = baseDamage.LastIndexOf('+');
-                    if (plusIndex != -1)
-                    {
-                        int baseBonus = int.Parse(baseDamage.Substring(plusIndex + 1));
-                        weapon.BaseDamage = $"{baseDamage.Substring(0, plusIndex)}+{baseBonus + burrowingBonus}";
-                    }
-                    else
-                    {
-                        weapon.BaseDamage = $"{baseDamage}+{burrowingBonus}";
-                    }
-                    weapon.HitBonus = FistHitBonus;
-                    weapon.MaxStrengthBonus = FistMaxStrengthBonus;
-
-                    Debug.Entry(4, "**part.DefaultBehavior = GiganticBurrowingClawObject");
-                    Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                }//GiganticBurrowingClawObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
                 else
                 {
-                    Debug.Entry(3, "-- ElongatedPaws not Present");
-                    Debug.Entry(3, "-- BurrowingClaws not Present");
-
-                    Debug.Entry(4, "**if (GiganticBurrowingClawObject == null)");
-                    if (GiganticFistObject == null)
-                    {
-                        Debug.Entry(3, "--- GiganticFistObject was null, init");
-                        GiganticFistObject = GameObjectFactory.Factory.CreateObject(NaturalWeaponBlueprint);
-                    }
-                    part.DefaultBehavior = GiganticFistObject;
-                    var weapon = GiganticFistObject.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = FistBaseDamage;
-                    weapon.HitBonus = FistHitBonus;
-                    weapon.MaxStrengthBonus = FistMaxStrengthBonus;
-
-                    Debug.Entry(4, "**part.DefaultBehavior = GiganticFistObject");
-                    Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus} | PenCap: {weapon.MaxStrengthBonus}");
-                }//GiganticFistObject uses FistDamageDieCount d FistDamageDieSize + (StrengthMod / 2) + 3
+                    Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
+                    Part.DefaultBehavior = OldDefaultBehavior;
+                    Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
+                }
             }
-            Debug.Entry(2, "part null or not hand");
-            Debug.Entry(2, "xxAddGiganticNaturalEquipmentTo(BodyPart part)");
+            else
+            {
+                Debug.Entry(2, "part null or not Type \"Hand\"");
+            }
+
+            Debug.Entry(2, "x AddGiganticNaturalEquipmentTo(BodyPart part) ]//");
         } //!--- public void AddGiganticFistTo(BodyPart part)
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
             Debug.Entry(2, "__________________________________________________________________");
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[No Zone?]";
+            string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2, "**GigantismPlus.OnRegenerateDefaultEquipment(Body body)");
+            Debug.Entry(2,  "@START GigantismPlus.OnRegenerateDefaultEquipment(Body body)");
             Debug.Entry(2, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
             FistDamageDieCount = GetFistDamageDieCount(Level);
@@ -603,33 +653,127 @@ namespace XRL.World.Parts.Mutation
             FistBaseDamage = GetFistBaseDamage(Level);
             FistHitBonus = GetFistHitBonus(Level);
 
-            if (!this.IsNaturalWeaponSuperseded)
+            if (!this.IsNaturalWeaponSuperseded && body != null)
             {
                 Debug.Entry(3, "- NaturalEquipment not Superseded");
 
-                Debug.Entry(3, "**foreach (BodyPart hand in body.GetParts())\n**if (hand.Type == \"Hand\")");
-                foreach (BodyPart hand in body.GetParts())
+                string GiganticBlueprintName = "Gigantic";
+                string ElongatedBlueprintName = "Elongated";
+                string BaseBlueprintName = "Fist";
+                string blueprintName = GiganticBlueprintName;
+
+                Debug.Entry(3, "Generating Stats");
+
+                int dieCount = FistDamageDieCount;
+                int dieSize = FistDamageDieSize;
+                int damageBonus = 3;
+                int maxStrBonus = FistMaxStrengthBonus;
+                int hitBonus = FistHitBonus;
+
+                Debug.Entry(3, $"|^ Starting Stats");
+                Debug.Entry(3, $"|> dieCount: {dieCount} \n"
+                             + $"|> dieSize: {dieSize} \n"
+                             + $"|> damageBonus: {damageBonus} \n"
+                             + $"|> maxStrBonus: {maxStrBonus} \n"
+                             + $"|> hitBonus: {hitBonus}\n"
+                             + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+
+                bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
+
+                Debug.Entry(3, "Accumulating stats");
+
+                Debug.Entry(4, "* if (HasElongated)");
+                if (HasElongated)
                 {
-                    Debug.Entry(4, $"-- {hand.Type}");
-                    if (hand.Type == "Hand")
+                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
+                    Debug.Entry(3, "+ ElongatedPaws Mutation is present");
+                    var elongated = ParentObject.GetPart<ElongatedPaws>();
+                    if (elongated != null)
+                    {
+                        // Add "Elongated" Adjective
+                        blueprintName += ElongatedBlueprintName;
+                        BaseBlueprintName = "Paw";
+                        // add damage
+                        damageBonus += elongated.ElongatedBonusDamage;
+
+                        Debug.Entry(4, $"|? blueprintName: {blueprintName}");
+                        Debug.Entry(4, $"|> dieCount: {dieCount}\n"
+                                     + $"|> dieSize: {dieSize}\n"
+                                     + $"|> damageBonus: {damageBonus}\n"
+                                     + $"|> maxStrBonus: {maxStrBonus}\n"
+                                     + $"|> hitBonus: {hitBonus}\n"
+                                     + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                    }
+                    else
+                    {
+                        Debug.Entry(3, "! Failed to instantiate elongated part");
+                    }
+                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                }
+                else
+                {
+                    Debug.Entry(3, "- ElongatedPaws Mutation not present");
+                }
+
+                Debug.Entry(3, "[] Finished accumulating stats");
+
+                blueprintName += BaseBlueprintName;
+
+                Debug.Entry(4, $"|: blueprintName: {blueprintName}");
+                Debug.Entry(4, $"|> dieCount: {dieCount} \n"
+                             + $"|> dieSize: {dieSize} \n"
+                             + $"|> damageBonus: {damageBonus} \n"
+                             + $"|> maxStrBonus: {maxStrBonus} \n"
+                             + $"|> hitBonus: {hitBonus}\n"
+                             + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                Debug.Entry(3, "vvvvvvvvvvvvvvvvvvvvvvv");
+
+                Debug.Entry(3, "Performing application of behavior to parts");
+
+                string targetPartType = "Hand";
+                Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
+                Debug.Entry(4, "Generating List<BodyPart> list");
+                // Just change the body part search logic
+                List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                       where p.Type == targetPartType  // Changed from VariantType to Type
+                                       select p).ToList<BodyPart>();
+
+                Debug.Entry(4, "Checking list of parts for expected entries");
+                Debug.Entry(4, "* foreach (BodyPart part in list)");
+                foreach (BodyPart part in list)
+                {
+                    Debug.Entry(4, $"-- {part.Type}");
+                    if (part.Type == "Hand")
                     {
                         Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        Debug.Entry(3, $"--- {hand.Type} Found");
+                        Debug.Entry(3, $"--- {part.Type} Found");
 
-                        AddGiganticNaturalEquipmentTo(hand);
+                        Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
+
+                        AddGiganticNaturalEquipmentTo(
+                        Part: part,
+                        BlueprintName: blueprintName,
+                        OldDefaultBehavior: part.DefaultBehavior,
+                        DieCount: dieCount,
+                        DieSize: dieSize,
+                        DamageBonus: damageBonus,
+                        MaxStrBonus: maxStrBonus,
+                        HitBonus: hitBonus
+                        );
 
                         Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                        continue;
                     }
                 }
-                Debug.Entry(3, "xxforeach (BodyPart hand in body.GetParts())");
+                Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
             }
             else
             {
                 Debug.Entry(3, "NaturalEquipment is Superseded");
-                Debug.Entry(4, "xxAborting GigantismPlus.OnRegenerateDefaultEquipment() Generation of Equipment");
+                Debug.Entry(4, "x Aborting GigantismPlus.OnRegenerateDefaultEquipment() Generation of Equipment ]//");
             }
 
-            Debug.Entry(3, "**base.OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)");
             base.OnRegenerateDefaultEquipment(body);
 
             Debug.Entry(2, "==================================================================");
@@ -683,23 +827,21 @@ namespace XRL.World.Parts.Mutation
                     return base.FireEvent(E);
                 }
 
+                // Not prevented from taking action
                 ToggleMyActivatedAbility(EnableActivatedAbilityID, null, Silent: true, null);
                 Debug.Entry(3, "Hunch Ability Toggled");
 
                 Debug.Entry(3, "Proceeding to Hunch Ability Effects");
                 if (IsMyActivatedAbilityToggledOn(EnableActivatedAbilityID))
-                {
-                    // Hunch
-                    HunchOver(true);
-                }
+                    HunchOver(true); // Hunch
                 else
-                {
-                    // Stand upright
-                    StraightenUp(true);
-                }
+                    StraightenUp(true); // Stand upright
+
                 Debug.Entry(2, "IsPseudoGiganticCreature", (IsPseudoGiganticCreature ? "true" : "false"));
                 Debug.Entry(2, "IsGiganticCreature", (IsGiganticCreature ? "true" : "false"));
+
             }
+
             The.Core.RenderBase();
             return base.FireEvent(E);
         }
@@ -720,7 +862,6 @@ namespace XRL.World.Parts.Mutation
             {
                 // Action happened 
                 UseEnergy(HunchOverEnergyCost, "Physical Defect Mutation Gigantism Hunch Over");
-
                 //
                 // Add the stat shifting code here.
                 //
@@ -728,11 +869,16 @@ namespace XRL.World.Parts.Mutation
                 actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_positiveVitality");
                 if (Message)
                 {
-                        Popup.Show("You hunch over, allowing you access to smaller spaces.");
+                    actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_positiveVitality");
+                    Popup.Show("You hunch over, allowing you access to smaller spaces.");
                 }
 
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
-                abilityEntry.DisplayName = "{{C|" + "Upright\n{{W|[}}Hunched{{W|]}}\n" + "}}";
+                abilityEntry.DisplayName =
+                    "{{C|" + 
+                                this.HunchedOverAbilityUpright + "\n" +
+                    "{{W|[}}" + this.HunchedOverAbilityHunched + "{{W|]}}\n" +
+                       "}}";
 
             }
             Debug.Entry(1, "Should be Hunched Over");
@@ -744,6 +890,8 @@ namespace XRL.World.Parts.Mutation
             GameObject actor = ParentObject;
             if (!IsPseudoGiganticCreature) // Already Upright over
             {
+                IsHunchFree = false;
+                UnHunchImmediately = false;
                 Debug.Entry(1, "Tried to straighten up, but wasn't PseudoGigantic");
                 return;
             }
@@ -759,23 +907,18 @@ namespace XRL.World.Parts.Mutation
                 // Add the stat shifting code here.
                 //
 
-                actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_negativeVitality");
-                Popup.Show("You stand tall, relaxing into your immense stature.");
+                if (Message)
+                {
+                    actor.PlayWorldSound("Sounds/StatusEffects/sfx_statusEffect_negativeVitality");
+                    Popup.Show("You stand tall, relaxing into your immense stature.");
+                }
 
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
-                abilityEntry.DisplayName = "{{C|" + "{{W|[}}Upright{{W|]}}\nHunched\n" + "}}";
-
-                // Old weight change code. Keeping just in case.
-                /*
-                int baseWeight = actor.GetBodyWeight();
-                int WeightAdjustment = baseWeight - (int)Math.Floor((double)baseWeight / 5);
-                int _Weight = actor.Physics._Weight;
-                actor.Physics._Weight = _Weight - WeightAdjustment;
-                Debug.Entry(3,"baseWeight", baseWeight.ToString());
-                Debug.Entry(3,"_Weight", _Weight.ToString());
-                Debug.Entry(3,"Adjustment", WeightAdjustment.ToString());
-                Debug.Entry(3,"New Weight", actor.Physics._Weight.ToString());
-                */
+                abilityEntry.DisplayName =
+                    "{{C|" +
+                    "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}\n" +
+                                this.HunchedOverAbilityHunched + "\n" +
+                       "}}";
             }
 
             Debug.Entry(1, "Should be Standing Tall");

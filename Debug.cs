@@ -16,36 +16,87 @@ namespace Mods.GigantismPlus
 
         private static bool IncludeInMessage => Options.DebugIncludeInMessage;
 
-        private static void Message(string text)
+        private static void Message(string Text)
         {
-            XRL.Messages.MessageQueue.AddPlayerMessage("{{Y|" + text + "}}");
+            XRL.Messages.MessageQueue.AddPlayerMessage("{{Y|" + Text + "}}");
         }
 
-        private static void Log(string text)
+        private static void Log(string Text)
         {
-            UnityEngine.Debug.LogError(text);
+            UnityEngine.Debug.LogError(Text);
         }
 
-        public static void Entry(int verbosity, string text)
+        public static void Entry(int Verbosity, string Text, int Indent = 0)
         {
-            if (verbosity > VerbosityOption) return;
-            Log(text);
-            if (IncludeInMessage) 
+            Debug.Indent(Verbosity, Text, Indent);
+        }
+
+        public static void Entry(string Text, int Indent = 0)
+        {
+            int Verbosity = 0;
+            Debug.Indent(Verbosity, Text, Indent);
+        }
+
+        public static void Entry(int Verbosity, string Label, string Text, int Indent = 0)
+        {
+            string output = Label + ": " + Text;
+            Entry(Verbosity, output, Indent);
+        }
+
+        public static void Indent(int Verbosity, string Text, int Spaces = 0)
+        {
+            string space = "\xFF";
+            string indent = "";
+            for (int i = 0; i < Spaces; i++)
             {
-                Message(text);
+                indent += space;
             }
+            string output = indent + Text;
+            if (Verbosity > VerbosityOption) return;
+            Log(output);
+            if (IncludeInMessage)
+                Message(output);
         }
 
-        public static void Entry(string text)
+        public static void Divider(int Verbosity = 0, string String = null, int Count = 25, int Indent = 0)
         {
-            int verbosity = 0;
-            Entry(verbosity, text);
+            string output = "";
+            if (String == null) String = "=";
+            else String = String.Substring(1);
+            for (int i = 0; i < Count; i++)
+            {
+                output += String;
+            }
+            Entry(Verbosity, output, Indent);
         }
 
-        public static void Entry(int verbosity, string label, string text)
+        public static void Header(int Verbosity, string ClassName, string MethodName)
         {
-            string output = label + ": " + text;
-            Entry(verbosity, output);
+            Divider(Verbosity);
+            string output = "@START " + ClassName + "." + MethodName;
+            Entry(Verbosity, output);
+        }
+        public static void Footer(int Verbosity, string ClassName, string MethodName)
+        {
+            string output = "///END " + ClassName + "." + MethodName + " !//";
+            Entry(Verbosity, output);
+            Divider(Verbosity);
+        }
+
+        public static void DiveIn(int Verbosity, string Text, int Indent = 0)
+        {
+            Divider(Verbosity, ">", 15, Indent);
+            Entry(Verbosity, Text, Indent);
+        }
+        public static void DiveOut(int Verbosity, string Text, int Indent = 0)
+        {
+            Entry(Verbosity, Text, Indent);
+            Divider(Verbosity, "<", 15, Indent);
+        }
+
+        public static void LoopItem(int Verbosity, string Text, int Indent = 0)
+        {
+            Entry(Verbosity, "[" + Text, Indent);
         }
 
     } //!--- public static class Debug

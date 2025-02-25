@@ -131,7 +131,7 @@ namespace XRL.World.Parts
             {
                 User.RequirePart<SecretExoframePart>();
                 User.RemovePart<SecretExoframePart>();
-                Popup.Show("Oh! To have tasted sweet ambrosia...");
+                Popup.Show("Oh! To have tasted sweet {{Y-W-W-W-O-O-O distribution|ambrosia}}...");
             }
 
             Debug.Entry(3, $"x public virtual void OnUnimplanted({Object.DisplayName}) ]//");

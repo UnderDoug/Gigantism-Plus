@@ -45,9 +45,12 @@ namespace Mods.GigantismPlus
 
         public static void Indent(int Verbosity, string Text, int Spaces = 0)
         {
-            string space = "\xFF";
+            int factor = 4;
+            // NBSP  \u00A0
+            // Space \u0020
+            string space = "\u0020";
             string indent = "";
-            for (int i = 0; i < Spaces; i++)
+            for (int i = 0; i < Spaces * factor; i++)
             {
                 indent += space;
             }
@@ -58,11 +61,11 @@ namespace Mods.GigantismPlus
                 Message(output);
         }
 
-        public static void Divider(int Verbosity = 0, string String = null, int Count = 25, int Indent = 0)
+        public static void Divider(int Verbosity = 0, string String = null, int Count = 60, int Indent = 0)
         {
             string output = "";
-            if (String == null) String = "=";
-            else String = String.Substring(1);
+            if (String == null) String = "\u003D"; // =
+            else String = String.Substring(0,1);
             for (int i = 0; i < Count; i++)
             {
                 output += String;
@@ -85,18 +88,18 @@ namespace Mods.GigantismPlus
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0)
         {
-            Divider(Verbosity, ">", 15, Indent);
-            Entry(Verbosity, Text, Indent);
+            Divider(Verbosity, "\u003E", 25, Indent); // >
+            Entry(Verbosity, Text, Indent+1);
         }
         public static void DiveOut(int Verbosity, string Text, int Indent = 0)
         {
-            Entry(Verbosity, Text, Indent);
-            Divider(Verbosity, "<", 15, Indent);
+            Entry(Verbosity, Text, Indent+1);
+            Divider(Verbosity, "\u003C", 25, Indent); // <
         }
 
         public static void LoopItem(int Verbosity, string Text, int Indent = 0)
         {
-            Entry(Verbosity, "[" + Text, Indent);
+            Entry(Verbosity, "\u005B" + Text, Indent); // [
         }
 
     } //!--- public static class Debug

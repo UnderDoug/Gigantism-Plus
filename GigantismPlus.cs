@@ -362,7 +362,8 @@ namespace XRL.World.Parts.Mutation
         // - Rapid advancement checks the Physical MutationCategory Entries.
         private void SwapMutationCategory(bool Before = true)
         {
-            Debug.Header(3, "GigantismPlus","SwapMutationCategory(bool Before = true)");
+            string state = Before ? "true" : "false";
+            Debug.Header(3, "GigantismPlus",$"SwapMutationCategory(Before: {state})");
 
             // prefer this for repeated uses of strings.
             string Physical = "Physical";
@@ -372,8 +373,8 @@ namespace XRL.World.Parts.Mutation
             string IntoCategory = Before ? Physical : PhysicalDefects;
             string OutOfCategory = Before ? PhysicalDefects : Physical;
 
-            Debug.Entry(3, $"Into Category:   {IntoCategory}", Indent: 1);
-            Debug.Entry(3, $"Out Of Category: {OutOfCategory}", Indent: 1);
+            Debug.Entry(3, $"Into Category:   \"{IntoCategory}\"", Indent: 1);
+            Debug.Entry(3, $"Out Of Category: \"{OutOfCategory}\"", Indent: 1);
 
             MutationEntry GigantismEntry = MutationFactory.GetMutationEntryByName(this.Name);
 
@@ -383,26 +384,26 @@ namespace XRL.World.Parts.Mutation
                 Debug.LoopItem(4, category.Name, Indent: 2);
                 if (category.Name == IntoCategory)
                 {
-                    Debug.DiveIn(4, $"Found Category: {IntoCategory}", Indent: 2);
+                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", Indent: 2);
 
-                    Debug.Entry(3, $"Adding {GigantismEntry.DisplayName} to {IntoCategory} Category", Indent: 2);
+                    Debug.Entry(3, $"Adding \"{GigantismEntry.DisplayName}\" Mutation to \"{IntoCategory}\" Category", Indent: 3);
                     category.Add(GigantismEntry);
                     category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
 
-                    Debug.Entry(4, $"Displaying all entries in Category \"{IntoCategory}\"", Indent: 2);
-                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 2);
+                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", Indent: 3);
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 3);
                     foreach (MutationEntry entry in category.Entries)
                     {
-                        Debug.LoopItem(4, entry.DisplayName, Indent: 3);
+                        Debug.LoopItem(4, entry.DisplayName, Indent: 4);
                     }
                     Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
                 }
                 if (category.Name == OutOfCategory)
                 {
-                    Debug.DiveIn(3, $"Found Category: {IntoCategory}", Indent: 2);
-                    Debug.Entry(3, $"Removing {GigantismEntry.DisplayName} from {OutOfCategory} Category", Indent: 2);
+                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", Indent: 2);
+                    Debug.Entry(3, $"Removing \"{GigantismEntry.DisplayName}\" from \"{OutOfCategory}\" Category", Indent: 3);
                     category.Entries.RemoveAll(r => r == GigantismEntry);
-                    Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
+                    Debug.DiveOut(3, $"x {OutOfCategory} >//", Indent: 2);
                 }
             }
             Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) ]//", Indent: 1);

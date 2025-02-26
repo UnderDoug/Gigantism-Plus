@@ -10,6 +10,7 @@ using XRL.World.Anatomy;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches;
 using static Mods.GigantismPlus.HelperMethods;
+using static Mods.GigantismPlus.Secrets;
 
 namespace XRL.World.Parts
 {
@@ -21,12 +22,17 @@ namespace XRL.World.Parts
         public GameObject User => _User ?? (_User = ParentObject.Implantee);
 
         public GameObject ImplantObject;
-            
+        
+        // XML Set Properties.
         public string Model = "Alpha";
         public string AugmentAdjectiveColor = "b";
         public string AugmentTile = "GiganticManipulator.png";
         public string AugmentTileColorString = "&c";
         public string AugmentTileDetailColor = "b";
+        public string AugmentedSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
+        public string AugmentedBlockSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+        public int JumpDistanceBonus = 0;
+        public double StunningForceLevelFactor = 0.5;
 
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
@@ -95,28 +101,7 @@ namespace XRL.World.Parts
             
             _User = Object;
 
-            if (Model == "YES")
-            {
-                Popup.Show("...");
-                Popup.Show("You... You've done it...");
-                Popup.Show("...You've {{W|really}} done it...");
-                Popup.Show("At last, you have {{c|become}}...");
-                string finalMessage = "{{Y-W-W-W-O-O-O distribution|";
-                switch (Stat.TinkerRandom(1, 4))
-                {
-                    case 1: finalMessage += "THE FINAL KING OF QUD"; 
-                        break;
-                    case 2: finalMessage += "A SHINING GOLDEN GOD";
-                        break;
-                    case 3: finalMessage += "A GOLD PLUS VIP MEMBER";
-                        break;
-                    case 4: finalMessage += "REALLY REALLY YELLOW";
-                        break;
-                }
-                finalMessage += "}}";
-                Popup.Show(finalMessage);
-                User.RequirePart<SecretExoframePart>();
-            }
+            Become(Object, Model);
 
             Debug.Entry(2, $"x public virtual void OnImplanted({Object.DisplayName}) ]//");
         } //!--- public override void OnImplanted(GameObject Object)
@@ -127,13 +112,8 @@ namespace XRL.World.Parts
 
             CheckEquipment(Object, Object.Body);
 
-            if (Model == "YES")
-            {
-                User.RequirePart<SecretExoframePart>();
-                User.RemovePart<SecretExoframePart>();
-                Popup.Show("Oh! To have tasted sweet ambrosia...");
-            }
-
+            
+            Unbecome(Object, Model);
             Debug.Entry(3, $"x public virtual void OnUnimplanted({Object.DisplayName}) ]//");
         } //!--- public override void OnUnimplanted(GameObject Object)
 
@@ -231,33 +211,5 @@ namespace XRL.World.Parts
 
             return base.FireEvent(E);
         }
-
-        [Serializable]
-        public class SecretExoframePart : IPart
-        {
-            public static readonly int ICON_COLOR_PRIORITY = 999;
-            private bool MutationColor = XRL.UI.Options.MutationColor;
-            public override bool Render(RenderEvent E)
-            {
-                bool flag = true;
-                if (ParentObject.IsPlayerControlled())
-                {
-                    if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
-                    {
-                        MutationColor = XRL.UI.Options.MutationColor;
-                    }
-                    if (!MutationColor)
-                    {
-                        flag = false;
-                    }
-                }
-                if (flag)
-                {
-                    E.ApplyColors("&O", "W", ICON_COLOR_PRIORITY, ICON_COLOR_PRIORITY);
-                }
-                return base.Render(E);
-            }
-        }
-
     }
 }

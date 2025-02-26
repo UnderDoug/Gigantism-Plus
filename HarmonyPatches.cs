@@ -286,58 +286,6 @@ namespace Mods.GigantismPlus.HarmonyPatches
                              return 0;      // Base 1d2
         }
 
-        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
-        {
-            Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
-
-            string baseDamage = WeaponDamageString(DieCount, DieSize, DamageBonus);
-
-            if (Part.DefaultBehavior != null)
-            {
-                Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
-
-                Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
-
-                MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
-                weapon.BaseDamage = baseDamage;
-                if (HitBonus != 0) weapon.HitBonus = HitBonus;
-                weapon.MaxStrengthBonus = MaxStrBonus;
-
-                var cybernetics = Part.ParentBody.GetBody().Cybernetics;
-                if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
-                {
-                    Part.DefaultBehavior.RequirePart<Metal>();
-
-                    if (exoframe.AugmentAdjectiveColor == "zetachrome")
-                    {
-                        Part.DefaultBehavior.RequirePart<Zetachrome>();
-                        Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
-                    }
-
-                    if (exoframe.Model == "YES") Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "WOWO");
-
-                    Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
-
-                    Description desc = Part.DefaultBehavior.GetPart<Description>();
-                    desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
-
-                    Render render = Part.DefaultBehavior.GetPart<Render>();
-                    render.ColorString = exoframe.AugmentTileColorString;
-                    render.DetailColor = exoframe.AugmentTileDetailColor;
-                    render.Tile = exoframe.AugmentTile;
-                }
-                
-                Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
-                Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
-            }
-            else
-            {
-                Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
-                Part.DefaultBehavior = OldDefaultBehavior;
-                Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
-            }
-        } //!-- public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus = 0)
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(BurrowingClaws __instance, Body body)
@@ -537,16 +485,15 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
                     Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
 
-                    DoNaturalWeaponCreationAndAssign(
+                    AddAccumulatedNaturalEquipmentTo(
                         Creature: __instance.ParentObject,
                         Part: part,
                         BlueprintName: blueprintName,
                         OldDefaultBehavior: part.DefaultBehavior,
-                        DieCount: dieCount,
-                        DieSize: dieSize,
-                        DamageBonus: damageBonus,
+                        BaseDamage: WeaponDamageString(dieCount, dieSize, damageBonus),
                         MaxStrBonus: maxStrBonus,
-                        HitBonus: hitBonus
+                        HitBonus: hitBonus,
+                        AssigningMutation: "Burrowing Claws"
                         );
 
                     Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
@@ -563,58 +510,6 @@ namespace Mods.GigantismPlus.HarmonyPatches
     [HarmonyPatch(typeof(XRL.World.Parts.Mutation.Crystallinity))]
     public static class Crystallinity_Patches
     {
-        public static void DoNaturalWeaponCreationAndAssign(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus)
-        {
-            Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
-
-            string baseDamage = WeaponDamageString(DieCount, DieSize, DamageBonus);
-
-            if (Part.DefaultBehavior != null)
-            {
-                Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
-
-                Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
-
-                MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
-                weapon.BaseDamage = baseDamage;
-                if (HitBonus != 0) weapon.HitBonus = HitBonus;
-                weapon.MaxStrengthBonus = MaxStrBonus;
-
-                var cybernetics = Part.ParentBody.GetBody().Cybernetics;
-                if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
-                {
-                    Part.DefaultBehavior.RequirePart<Metal>();
-
-                    if (exoframe.AugmentAdjectiveColor == "zetachrome")
-                    {
-                        Part.DefaultBehavior.RequirePart<Zetachrome>();
-                        Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
-                    }
-
-                    if (exoframe.Model == "YES") Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "WOWO");
-
-                    Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
-
-                    Description desc = Part.DefaultBehavior.GetPart<Description>();
-                    desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
-
-                    Render render = Part.DefaultBehavior.GetPart<Render>();
-                    render.ColorString = exoframe.AugmentTileColorString;
-                    render.DetailColor = exoframe.AugmentTileDetailColor;
-                    render.Tile = exoframe.AugmentTile;
-                }
-
-                Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
-                Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
-            }
-            else
-            {
-                Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
-                Part.DefaultBehavior = OldDefaultBehavior;
-                Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
-            }
-        } //!-- public static void DoNaturalWeaponCreationAndAssign(BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, int DieCount, int DieSize, int DamageBonus, int MaxStrBonus, int HitBonus = 0)
-
         [HarmonyPrefix]  
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.Crystallinity.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(Crystallinity __instance, Body body)
@@ -864,16 +759,15 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
                     Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
 
-                    DoNaturalWeaponCreationAndAssign(
+                    AddAccumulatedNaturalEquipmentTo(
                         Creature: __instance.ParentObject,
                         Part: part,
                         BlueprintName: blueprintName,
                         OldDefaultBehavior: part.DefaultBehavior,
-                        DieCount: dieCount,
-                        DieSize: dieSize,
-                        DamageBonus: damageBonus,
+                        BaseDamage: WeaponDamageString(dieCount, dieSize, damageBonus),
                         MaxStrBonus: maxStrBonus,
-                        HitBonus: hitBonus
+                        HitBonus: hitBonus,
+                        AssigningMutation: "Crystallinity"
                         );
 
                     Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");

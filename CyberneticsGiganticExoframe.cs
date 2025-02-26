@@ -101,7 +101,7 @@ namespace XRL.World.Parts
             
             _User = Object;
 
-            Become(Object, Model);
+            Become(Object, Model, ImplantObject);
 
             Debug.Entry(2, $"x public virtual void OnImplanted({Object.DisplayName}) ]//");
         } //!--- public override void OnImplanted(GameObject Object)
@@ -113,7 +113,7 @@ namespace XRL.World.Parts
             CheckEquipment(Object, Object.Body);
 
             
-            Unbecome(Object, Model);
+            Unbecome(Object, Model, ImplantObject);
             Debug.Entry(3, $"x public virtual void OnUnimplanted({Object.DisplayName}) ]//");
         } //!--- public override void OnUnimplanted(GameObject Object)
 

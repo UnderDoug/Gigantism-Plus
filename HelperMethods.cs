@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Kobold;
 using XRL.UI;
+using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
@@ -120,7 +121,9 @@ namespace Mods.GigantismPlus
 
             return output;
         }
-        
+
+        public static Random RndGP = Stat.GetSeededRandomGenerator("GigantismPlus");
+
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)

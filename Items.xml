@@ -375,7 +375,6 @@ You cannot wear equipment on your body."
           StunningForceLevelFactor="0.5" 
           />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
-    <part Name="ItemElements" Elements="immense::2" />
     <tag Name="StartingCybernetic:General" />
   </object>
 
@@ -408,7 +407,6 @@ You cannot wear equipment on your body."
           StunningForceLevelFactor="0.67"
           />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
-    <part Name="ItemElements" Elements="immense::4" />
   </object>
 
   <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
@@ -440,7 +438,6 @@ You cannot wear equipment on your body."
           StunningForceLevelFactor="0.75"
           />
     <part Name="ModImprovedGigantismPlus" Tier="10" />
-    <part Name="ItemElements" Elements="immense::6" />
   </object>
 
   <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
@@ -472,7 +469,6 @@ You cannot wear equipment on your body."
           StunningForceLevelFactor="0.8"
           />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
-    <part Name="ItemElements" Elements="immense::8" />
     <part Name="Zetachrome" />
   </object>
 

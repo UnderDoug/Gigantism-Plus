@@ -53,7 +53,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 Debug.Entry(2, "Should be Heavy and PseudoGigantic\n");
             }
         }
-    } //!--- public static class PseudoGiganticCreature_GameObject_Patches
+    } //!-- public static class PseudoGiganticCreature_GameObject_Patches
 
 
     // Why harmony for this one when it's an available event?
@@ -102,8 +102,49 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
         }
 
-    } //!--- public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
+    } //!-- public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
 
+    [HarmonyPatch(typeof(Body))]
+    public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
+    {
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
+        static void RegenerateDefaultEquipmentPrefix(ref GameObject __state,Body __instance)
+        {
+            // Object matches the paramater of the original,
+            // __state lets you keep stuff between Pre- and Postfixes (might be redundant for this one)
+
+            __state = __instance.ParentObject;
+            bool IsPretendBig = __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && !__state.IsGiganticCreature)
+            {
+                // is the GameObject PseudoGigantic but not Gigantic
+                Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
+                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic not Gigantic");
+                __state.IsGiganticCreature = true; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
+                Debug.Entry(2, "Trying to generate gigantic natural equipment while PseudoGigantic\n");
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
+        static void RegenerateDefaultEquipmentPostfix(GameObject __state)
+        {
+            // only need __state this time, since it holds the __instance anyway.
+
+            bool IsPretendBig = __state.HasPart("CompactedExoframe") || __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && __state.IsGiganticCreature)
+            {
+                // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
+                Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
+                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic and Gigantic");
+                __state.IsGiganticCreature = false; // make the GameObject not Gigantic 
+                Debug.Entry(2, "Should have generated gigantic natural equipment while PseudoGigantic\n");
+            }
+        }
+
+    } //!-- public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
 
     // Why harmony for this one when it's an available event?
     // -- this keeps the behaviour consistent with vanilla but hijacks the value
@@ -144,6 +185,39 @@ namespace Mods.GigantismPlus.HarmonyPatches
         }
 
     } //!--- public static class ModGiganticDisplayName_Shader
+
+    [HarmonyPatch(typeof(MeleeWeapon))]
+    public static class MaxStrengthBonus_Display_Patches
+    {
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(MeleeWeapon.GetSimplifiedStats))]
+        static bool GetSimplifiedStatsPrefix(MeleeWeapon __instance)
+        {
+            // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
+            if (__instance.MaxStrengthBonus > 999) __instance.MaxStrengthBonus = 999;
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(MeleeWeapon.GetDetailedStats))]
+        static bool GetDetailedStatsPrefix(MeleeWeapon __instance)
+        {
+            // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
+            if (__instance.MaxStrengthBonus > 999) __instance.MaxStrengthBonus = 999;
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(MeleeWeapon.AdjustBonusCap))]
+        static bool AdjustBonusCapPrefix(MeleeWeapon __instance)
+        {
+            // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
+            if (__instance.MaxStrengthBonus > 999) __instance.MaxStrengthBonus = 999;
+            return true;
+        }
+
+    } //!-- public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
 
     [HarmonyPatch]
     public static class GiganticCreature_Implant_SmallCybernetics

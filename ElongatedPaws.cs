@@ -155,21 +155,9 @@ namespace XRL.World.Parts.Mutation
         public override bool Unmutate(GameObject GO)
         {
             Body body = GO.Body;
-           
-            /* Checking if this is redundant.
-             * 
-            if (body != null && !this.IsNaturalWeaponSuperseded)
-            {
-                foreach (BodyPart hand in body.GetParts(EvenIfDismembered: true))
-                {
-                    if (hand.Type == "Hand" && hand.DefaultBehavior.Blueprint == ElongatedPawBlueprintName)
-                    {
-                        hand.DefaultBehavior = null;
-                    }
-                }
-            } */
             
             CheckAffected(GO, body);
+
             return base.Unmutate(GO);
         }
 
@@ -204,7 +192,7 @@ namespace XRL.World.Parts.Mutation
         public void AddElongatedNaturalEquipmentTo(BodyPart part)
         {
             Debug.Entry(2, "@ AddGiganticNaturalEquipmentTo(BodyPart part)");
-            if (part != null && part.Type == "Hand")
+            if (part != null && part.Type == "Hand" && !part.IsExternallyManagedLimb())
             {
                 Debug.Entry(3, "* if (ParentObject.HasPart<GigantismPlus>())");
                 Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");

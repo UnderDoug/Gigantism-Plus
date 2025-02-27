@@ -542,6 +542,15 @@ You cannot wear equipment on your body."
 	</object>
 
   <!-- End Modified BaseGame Natural Weapons -->
+  <!-- Modified BaseGame "Natural" Weapons -->
+  
+  <object Name="Fist of the Ape God" Load="Merge">
+    <part Name="Render" Tile="GiganticFist_Alt.png" />
+    <tag Name="GiganticEquippable" />
+  </object>
+  
+  <!-- End Modified BaseGame "Natural" Weapons -->
+  
   <!-- Gigantic Modable Changes -->
   
 	<object  Name="LightSource" Load="Merge">
@@ -551,6 +560,10 @@ You cannot wear equipment on your body."
   <object  Name="Hoversled" Load="Merge">
 		<tag Name="Mods" Value="Gigantify" Load="Merge" />
 	</object>
+
+  <object  Name="Helping Hands" Load="Merge">
+    <tag Name="Mods" Value="Gigantify" Load="Merge" />
+  </object>
 
   <!-- End Gigantic Modable Changes -->
 

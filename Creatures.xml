@@ -49,6 +49,9 @@
         <mutation Name="GigantismPlus" Level="4" />
         <removetag Name="Gigantic" />
     </object>
+    <!--object Name="Knight Templar" Load="Merge">
+        <part Name="CyberneticsHasImplants" Implants="GiganticExoframeDelta@body" />
+    </object-->
     <!-- End make creatures Gigantic -->
   
     <!-- 

@@ -125,8 +125,37 @@
     </helptext>
 	</option>
 
-  <!-- 
-  End of Mod Options
-  -->
+  <!-- NPC Equipment Options -->
+  <option 
+    ID="Option_GigantismPlus_EnableGiganticNPCGear"
+    DisplayText="Make NPC Equipment {{gigantic|Gigantic}}"
+    Category="Mods: Gigantism Plus"
+    Type="Checkbox"
+    Default="Yes"
+  >
+    <helptext>
+      Should equipment carried by {{gigantic|gigantic}} NPCs be {{gigantic|gigantic}}?
+      
+      The default is {{w|Enabled}}.
+    </helptext>
+  </option>
+  
+  <option 
+    ID="Option_GigantismPlus_EnableGiganticNPCGear_Grenades"
+    Requires="Option_GigantismPlus_EnableGiganticNPCGear==Yes"
+    DisplayText="Include NPC grenades"
+    Category="Mods: Gigantism Plus"
+    Type="Checkbox"
+    Default="No"
+  >
+    <helptext>
+      Should grenades carried by {{gigantic|gigantic}} NPCs be {{gigantic|gigantic}}?
+      {{gigantic|Gigantic}} grenades have a larger blast radius, which can make encounters significantly harder.
+      
+      The default is {{w|Disabled}}.
+    </helptext>
+  </option>
+  
+  <!-- End of Mod Options -->
 	
 </options>

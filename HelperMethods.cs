@@ -31,6 +31,10 @@ namespace Mods.GigantismPlus
 
         public static bool SelectGiganticTinkering => GetOption("Option_GigantismPlus_SelectGiganticTinkering").EqualsNoCase("Yes");
         public static bool SelectGiganticDerarification => GetOption("Option_GigantismPlus_SelectGiganticDerarification").EqualsNoCase("Yes");
+        
+        // NPC equipment options
+        public static bool EnableGiganticNPCGear => GetOption("Option_GigantismPlus_EnableGiganticNPCGear").EqualsNoCase("Yes");
+        public static bool EnableGiganticNPCGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticNPCGear_Grenades").EqualsNoCase("Yes");
 
         // Debug Settings
         public static int DebugVerbosity
@@ -243,19 +247,6 @@ namespace Mods.GigantismPlus
                     if (GetCyberneticsList(Part.ParentBody, out string FistReplacement))
                     {
                         Debug.Entry(3, $"HandBones Found: {FistReplacement}", Indent: 6);
-                        
-                        // Get cybernetics list to find the actual hand bone object
-                        List<GameObject> cyberneticsList = (from c in Part.ParentBody.GetInstalledCybernetics()
-                                                          where c.HasPart<CyberneticsFistReplacement>() == true
-                                                          select c).ToList<GameObject>();
-                                                          
-                        if (cyberneticsList.Count > 0)
-                        {
-                            // Add description text about the hand bones
-                            Description desc = Part.DefaultBehavior.GetPart<Description>();
-                            desc._Short += $" It's structure is reinforced by {cyberneticsList[0].DisplayName}.";
-                        }
-
                         switch (FistReplacement)
                         {
                             case "RealHomosapien_ZetachromeFist":
@@ -307,7 +298,7 @@ namespace Mods.GigantismPlus
                         Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
 
                         Description desc = Part.DefaultBehavior.GetPart<Description>();
-                        desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.ShortDisplayName}.";
+                        desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
 
                         Render render = Part.DefaultBehavior.GetPart<Render>();
                         render.ColorString = exoframe.AugmentTileColorString;

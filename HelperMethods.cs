@@ -184,11 +184,42 @@ namespace Mods.GigantismPlus
             return false;
         } //!-- public static bool IsExternallyManagedLimb(BodyPart part)
 
+        public static bool GetCyberneticsList(Body body, out string FistReplacement)
+        {
+            List<GameObject> cyberneticsList = (from c in body.GetInstalledCybernetics()
+                                                where c.HasPart<CyberneticsFistReplacement>() == true
+                                                select c).ToList<GameObject>();
+            if (cyberneticsList == null)
+            {
+                FistReplacement = string.Empty;
+                return false;
+            }
+            int highest = 0;
+            string[] rank = new string[4]
+            {
+                "CarbideFist",
+                "FulleriteFist",
+                "CrysteelFist",
+                "RealHomosapien_ZetachromeFist"
+            };
+            foreach (GameObject handbone in cyberneticsList)
+            {
+                string fistObject = handbone.GetPart<CyberneticsFistReplacement>().FistObject;
+                int index = Array.IndexOf(rank, fistObject);
+                if (index > highest) highest = index;
+                if (highest == rank.Length - 1) break;
+            }
+            FistReplacement = rank[highest];
+            return true;
+        }
+
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)
         {
-            Debug.Entry(2, "* HelperMethods.AddAccumulatedNaturalEquipmentTo()");
+            Debug.Divider(3, "-", 40, Indent: 4);
+            Debug.Entry(3, "* HelperMethods.AddAccumulatedNaturalEquipmentTo()", Indent: 4);
+
             if (Part != null && Part.Type == "Hand" && !Part.IsExternallyManagedLimb())
             {
                 // make Creature gigantic temporarily if they normally would be.
@@ -198,7 +229,7 @@ namespace Mods.GigantismPlus
 
                 if (Part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "---- Part.DefaultBehavior not null, assigning stats");
+                    Debug.Entry(3, "Part.DefaultBehavior not null, assigning stats", Indent: 5);
 
                     Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation, false);
 
@@ -206,6 +237,40 @@ namespace Mods.GigantismPlus
                     weapon.BaseDamage = BaseDamage;
                     if (HitBonus != 0) weapon.HitBonus = HitBonus;
                     weapon.MaxStrengthBonus = MaxStrBonus;
+
+                    Debug.Entry(3, "Checking for HandBones", Indent: 5);
+                    Debug.Entry(3, "* if (GetCyberneticsList(Part.ParentBody, out string FistReplacement))", Indent: 5);
+                    if (GetCyberneticsList(Part.ParentBody, out string FistReplacement))
+                    {
+                        Debug.Entry(3, $"HandBones Found: {FistReplacement}", Indent: 6);
+                        switch (FistReplacement)
+                        {
+                            case "RealHomosapien_ZetachromeFist":
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(4)", Indent: 6);
+                                weapon.AdjustDamageDieSize(4);
+                                break;
+                            case "CrysteelFist":
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(3)", Indent: 6);
+                                weapon.AdjustDamageDieSize(3);
+                                break;
+                            case "FulleriteFist":
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(2)", Indent: 6);
+                                weapon.AdjustDamageDieSize(2);
+                                break;
+                            case "CarbideFist":
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(1)", Indent: 6);
+                                weapon.AdjustDamageDieSize(1);
+                                break;
+                            default:
+                                Debug.Entry(3, "-FistReplacement has no assiciated bonus", Indent: 6);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Debug.Entry(3, $"No HandBones Found", Indent: 6);
+                    }
+                    Debug.Entry(3, "x if (GetCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5);
 
                     var cybernetics = Part.ParentBody.GetBody().Cybernetics;
                     if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
@@ -216,6 +281,12 @@ namespace Mods.GigantismPlus
                         {
                             Part.DefaultBehavior.RequirePart<Zetachrome>();
                             Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "mCmC");
+                        }
+                        if (exoframe.AugmentAdjectiveColor == "crysteel")
+                        {
+                            Part.DefaultBehavior.RequirePart<Crysteel>();
+                            Part.DefaultBehavior.SetIntProperty("Flawless", 1);
+                            Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "KGKG");
                         }
 
                         if (exoframe.Model == "YES") Part.DefaultBehavior.SetStringProperty("EquipmentFrameColors", "WOWO");
@@ -234,14 +305,16 @@ namespace Mods.GigantismPlus
                         Part.DefaultBehavior.SetStringProperty("BlockedSound", exoframe.AugmentedBlockSound);
                     }
 
-                    Debug.Entry(4, $"---- hand.DefaultBehavior = {BlueprintName}");
-                    Debug.Entry(4, $"---- MaxStrBonus: {weapon.MaxStrengthBonus} | Base: {weapon.BaseDamage} | Hit: {weapon.HitBonus}");
+                    Debug.Entry(4, $"]|> hand.DefaultBehavior = {BlueprintName}", Indent: 5);
+                    Debug.Entry(4, $"]|> MaxStrBonus: {weapon.MaxStrengthBonus}", Indent: 5);
+                    Debug.Entry(4, $"]|> Base: {weapon.BaseDamage}", Indent: 5);
+                    Debug.Entry(4, $"]|> Hit: {weapon.HitBonus}", Indent: 5);
                 }
                 else
                 {
-                    Debug.Entry(3, $"---- part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"");
+                    Debug.Entry(3, $"part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"", Indent: 5);
                     Part.DefaultBehavior = OldDefaultBehavior;
-                    Debug.Entry(3, $"---- OldDefaultBehavior reassigned");
+                    Debug.Entry(3, $"OldDefaultBehavior reassigned", Indent: 5);
                 }
 
                 // make Creature not gigantic if they're prentending not to be.
@@ -249,10 +322,11 @@ namespace Mods.GigantismPlus
             }
             else
             {
-                Debug.Entry(2, "part null or not Type \"Hand\"");
+                Debug.Entry(2, "part null or not Type \"Hand\"", Indent: 4);
             }
 
-            Debug.Entry(2, "x public void AddAccumulatedNaturalEquipmentTo() ]//");
+            Debug.Entry(2, "x public void AddAccumulatedNaturalEquipmentTo() ]//", Indent: 4);
+            Debug.Divider(3, "-", 40, Indent: 4);
         } //!-- public void AddGiganticFistTo(BodyPart part)
         
     } //!-- public static class HelperClass

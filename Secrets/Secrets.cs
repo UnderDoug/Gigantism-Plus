@@ -68,7 +68,7 @@ namespace Mods.GigantismPlus
                     secretExoframePart.OldBleedPrefix = User.GetStringProperty("BleedPrefix");
                     secretExoframePart.OldBleedColor = User.GetStringProperty("BleedColor");
                     User.SetStringProperty("BleedLiquid", "secretliquid-1000");
-                    User.SetStringProperty("BleedPrefix", "{{W|shiny}}");
+                    User.SetStringProperty("BleedPrefix", "{{SECRETGOLDEN|shiny}}");
                     User.SetStringProperty("BleedColor", "&W");
                 }
             }

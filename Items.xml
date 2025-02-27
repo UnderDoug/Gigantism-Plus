@@ -296,7 +296,7 @@
   <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
     <part Name="Physics" Weight="15" />
     <part Name="Description" Short="" />
-    <part Name="Render" DisplayName="{{Y|massive exoframe}}"
+    <part Name="Render" DisplayName="{{c|massive exoframe}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="r"
           />
@@ -351,7 +351,7 @@ You cannot wear equipment on your body."
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|exoframe {{b|alpha}}}}"
+    <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="b"
           />
@@ -383,7 +383,7 @@ You cannot wear equipment on your body."
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|exoframe {{K|delta}}}}"
+    <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="K"
           />
@@ -414,7 +414,7 @@ You cannot wear equipment on your body."
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|exoframe {{crysteel|sigma}}}}"
+    <part Name="Render" DisplayName="{{c|exoframe {{G|sigma}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="G"
           />
@@ -438,6 +438,8 @@ You cannot wear equipment on your body."
           StunningForceLevelFactor="0.75"
           />
     <part Name="ModImprovedGigantismPlus" Tier="10" />
+    <part Name="Crysteel" />
+    <tag Name="Flawless" />
   </object>
 
   <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
@@ -445,7 +447,7 @@ You cannot wear equipment on your body."
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
           />
-    <part Name="Render" DisplayName="{{Y|exoframe {{zetachrome|omega}}}}"
+    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="M"
           />

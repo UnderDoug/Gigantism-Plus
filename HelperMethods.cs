@@ -435,4 +435,4 @@ namespace Mods.GigantismPlus
 
     } //!-- public static class Debug
 
-}
+} //!-- namespace Mods.GigantismPlus

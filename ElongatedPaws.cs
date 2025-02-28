@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using XRL;
+using XRL.Core;
+using XRL.World;
+using XRL.World.Parts;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
-using XRL.World;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches; // Add this line
 using static Mods.GigantismPlus.HelperMethods;
@@ -14,7 +17,7 @@ namespace XRL.World.Parts.Mutation
     public class ElongatedPaws : BaseDefaultEquipmentMutation
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
-        
+
         private static readonly List<string> NaturalWeaponSupersedingMutations = new List<string>
         {
           //"CyberneticsGiganticExoframe",
@@ -22,6 +25,8 @@ namespace XRL.World.Parts.Mutation
             "BurrowingClaws",
             "Crystallinity"
         };
+
+        private string WeaponWatcherID => this.GetMutationClass();
 
         public bool IsNaturalWeaponSuperseded
         {
@@ -104,7 +109,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     CompatibleMutations += " " + mutation + ",";
                 }
-                CompatibleMutations = CompatibleMutations.Substring(CompatibleMutations.Length-1);
+                CompatibleMutations = CompatibleMutations.Substring(CompatibleMutations.Length - 1);
                 CompatibleMutations += ".";
             }
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
@@ -122,7 +127,9 @@ namespace XRL.World.Parts.Mutation
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
-                || ID == StatChangeEvent.ID;
+                || ID == StatChangeEvent.ID
+                || ID == EquipperEquippedEvent.ID
+                || ID == UnequippedEvent.ID;
         }
 
         public override bool HandleEvent(GetSlotsRequiredEvent E)
@@ -143,20 +150,44 @@ namespace XRL.World.Parts.Mutation
                 {
                     body.UpdateBodyParts();
                 }
+
+                foreach (GameObject equipped in body.GetEquippedObjects())
+                {
+                    if (equipped.TryGetPart<WeaponElongator>(out WeaponElongator weaponElongator))
+                    {
+                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), E.Object);
+                    }
+                }
+
             }
             return base.HandleEvent(E);
         }
 
         public override bool Mutate(GameObject GO, int Level)
         {
+
+            foreach (GameObject equipped in GO.Body.GetEquippedObjects())
+            {
+                if (equipped.TryGetPart<WeaponElongator>(out WeaponElongator weaponElongator))
+                {
+                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), GO);
+                }
+            }
+
             return base.Mutate(GO, Level);
         }
 
         public override bool Unmutate(GameObject GO)
         {
-            Body body = GO.Body;
-            
-            CheckAffected(GO, body);
+            foreach (GameObject equipped in GO.Body.GetEquippedObjects())
+            {
+                if (equipped.TryGetPart<WeaponElongator>(out WeaponElongator weaponElongator))
+                {
+                    weaponElongator.UnapplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                }
+            }
+
+            CheckAffected(GO, GO.Body);
 
             return base.Unmutate(GO);
         }
@@ -211,7 +242,7 @@ namespace XRL.World.Parts.Mutation
                     Debug.Entry(3, "-- part.DefaultBehavior not null, assigning stats");
                     part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                     var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
-                    
+
                     weapon.BaseDamage = $"1d4+{StatMod}";
 
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
@@ -281,5 +312,94 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Entry(2, "==================================================================");
         }
-    }
-}
+    }   
+} //!-- namespace XRL.World.Parts.Mutation
+
+namespace XRL.World.Parts
+{
+    [Serializable]
+    public class WeaponElongator : IPart
+    {
+        public GameObject Wielder = null;
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == StatChangeEvent.ID
+                || ID == UnequippedEvent.ID
+                || ID == EquippedEvent.ID;
+        }
+
+        private int appliedElongatedBonusCap = 0;
+
+        public void ApplyElongatedBonusCap(MeleeWeapon Weapon, GameObject Wielder)
+        {
+            Debug.Entry(4, "@ WeaponWatcher", $"ApplyElongatedBonusCap()", Indent: 3);
+            Debug.Entry(4, "* if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))", Indent: 3);
+            if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))
+            {
+                Debug.Entry(4, "+ elongatedPaws not null", Indent: 4);
+                UnapplyElongatedBonusCap(Weapon);
+                appliedElongatedBonusCap = elongatedPaws.ElongatedBonusDamage;
+                Weapon.AdjustBonusCap(appliedElongatedBonusCap);
+                Debug.Entry(4, $"New appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
+            }
+            Debug.Entry(4, "x WeaponWatcher", $"ApplyElongatedBonusCap() >//", Indent: 3);
+        }
+
+        public void UnapplyElongatedBonusCap(MeleeWeapon Weapon)
+        {
+            Debug.Entry(4, $"@ WeaponWatcher", "UnapplyElongatedBonusCap()", Indent: 4);
+            Debug.Entry(4, $"Old appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
+            Weapon.AdjustBonusCap(-appliedElongatedBonusCap);
+            appliedElongatedBonusCap = 0;
+        }
+
+        public override bool HandleEvent(EquippedEvent E)
+        {
+            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(EquippedEvent E)", Indent: 2);
+            GameObject item = E.Item;
+            if (item == ParentObject)
+            {
+                Wielder = E.Actor;
+                Debug.Entry(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>(), E.Actor);
+                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(EquippedEvent E) >//", Indent: 2);
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(UnequippedEvent E)
+        {
+            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(UnequippedEvent E)", Indent: 2);
+            GameObject item = E.Item;
+            if (item == ParentObject)
+            {
+                Debug.Entry(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                UnapplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
+                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(UnequippedEvent E) >//", Indent: 2);
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(StatChangeEvent E)
+        {
+            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(StatChangeEvent E)", Indent: 2);
+            Debug.Entry(4, $"E.Name: \"{E.Name}\" | E.Object: \"{E.Object.ShortDisplayNameStripped}\"", Indent: 2);
+            if (Wielder != null) Debug.Entry(4, $"Wielder: \"{Wielder.ShortDisplayNameStripped}\"", Indent: 2);
+            if (E.Name == "Strength" && E.Object == Wielder)
+            {
+                Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(StatChangeEvent {E.Name})", Indent: 2);
+                ApplyElongatedBonusCap(ParentObject.GetPart<MeleeWeapon>(), E.Object);
+                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(StatChangeEvent {E.Name}) >//", Indent: 2);
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+
+    } //!-- public class WeaponElongator : IPart
+
+} //!-- namespace XRL.World.Parts

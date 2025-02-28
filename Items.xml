@@ -555,18 +555,23 @@ You cannot wear equipment on your body."
   
   <!-- Gigantic Modable Changes -->
   
-	<object  Name="LightSource" Load="Merge">
+	<object Name="LightSource" Load="Merge">
 		<tag Name="Mods" Value="Gigantify" Load="Merge" />
 	</object>
   
-  <object  Name="Hoversled" Load="Merge">
+  <object Name="Hoversled" Load="Merge">
 		<tag Name="Mods" Value="Gigantify" Load="Merge" />
 	</object>
 
-  <object  Name="Helping Hands" Load="Merge">
+  <object Name="Helping Hands" Load="Merge">
     <tag Name="Mods" Value="Gigantify" Load="Merge" />
   </object>
 
   <!-- End Gigantic Modable Changes -->
-
+  <!-- Start Weapon Elongating-->
+  <object Name="MeleeWeapon" Load="Merge">
+    <part Name="WeaponElongator" />
+  </object>
+  <!-- End Weapon Elongating-->
+  
 </objects>

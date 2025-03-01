@@ -30,7 +30,7 @@ namespace XRL.World.Parts
         {
             if (E.IsRelevantObject(ParentObject))
             {
-                E.Add("might", 1);
+                E.Add("immense", 1);
             }
             return base.HandleEvent(E);
         }

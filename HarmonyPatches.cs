@@ -8,6 +8,8 @@ using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
+using XRL.World.Effects;
+using XRL.World.Tinkering;  // Add this for ItemModding
 using Mods.GigantismPlus;
 using static Mods.GigantismPlus.HelperMethods;
 
@@ -53,7 +55,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 Debug.Entry(2, "Should be Heavy and PseudoGigantic\n");
             }
         }
-    } //!--- public static class PseudoGiganticCreature_GameObject_Patches
+    } //!-- public static class PseudoGiganticCreature_GameObject_Patches
 
 
     // Why harmony for this one when it's an available event?
@@ -102,8 +104,49 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
         }
 
-    } //!--- public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
+    } //!-- public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
 
+    [HarmonyPatch(typeof(Body))]
+    public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
+    {
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
+        static void RegenerateDefaultEquipmentPrefix(ref GameObject __state,Body __instance)
+        {
+            // Object matches the paramater of the original,
+            // __state lets you keep stuff between Pre- and Postfixes (might be redundant for this one)
+
+            __state = __instance.ParentObject;
+            bool IsPretendBig = __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && !__state.IsGiganticCreature)
+            {
+                // is the GameObject PseudoGigantic but not Gigantic
+                Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
+                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic not Gigantic");
+                __state.IsGiganticCreature = true; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
+                Debug.Entry(2, "Trying to generate gigantic natural equipment while PseudoGigantic\n");
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
+        static void RegenerateDefaultEquipmentPostfix(GameObject __state)
+        {
+            // only need __state this time, since it holds the __instance anyway.
+
+            bool IsPretendBig = __state.HasPart("CompactedExoframe") || __state.HasPart<PseudoGigantism>();
+            if (IsPretendBig && __state.IsGiganticCreature)
+            {
+                // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
+                Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
+                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic and Gigantic");
+                __state.IsGiganticCreature = false; // make the GameObject not Gigantic 
+                Debug.Entry(2, "Should have generated gigantic natural equipment while PseudoGigantic\n");
+            }
+        }
+
+    } //!-- public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
 
     // Why harmony for this one when it's an available event?
     // -- this keeps the behaviour consistent with vanilla but hijacks the value
@@ -144,6 +187,39 @@ namespace Mods.GigantismPlus.HarmonyPatches
         }
 
     } //!--- public static class ModGiganticDisplayName_Shader
+
+    [HarmonyPatch(typeof(MeleeWeapon))]
+    public static class MaxStrengthBonus_Display_Patches
+    {
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(MeleeWeapon.GetSimplifiedStats))]
+        static bool GetSimplifiedStatsPrefix(MeleeWeapon __instance)
+        {
+            // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
+            if (__instance.MaxStrengthBonus > 999) __instance.MaxStrengthBonus = 999;
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(MeleeWeapon.GetDetailedStats))]
+        static bool GetDetailedStatsPrefix(MeleeWeapon __instance)
+        {
+            // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
+            if (__instance.MaxStrengthBonus > 999) __instance.MaxStrengthBonus = 999;
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(nameof(MeleeWeapon.AdjustBonusCap))]
+        static bool AdjustBonusCapPrefix(MeleeWeapon __instance)
+        {
+            // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
+            if (__instance.MaxStrengthBonus > 999) __instance.MaxStrengthBonus = 999;
+            return true;
+        }
+
+    } //!-- public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
 
     [HarmonyPatch]
     public static class GiganticCreature_Implant_SmallCybernetics
@@ -264,7 +340,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
     {
         public static int GetBurrowingDieSize(int Level)
         {
-            Debug.Entry(4, "* BurrowingClaws_Patches.GetBurrowingDieSize() called");
+            Debug.Entry(4, "* BurrowingClaws_Patches.GetBurrowingDieSize() called", Indent: 4);
             if (Level >= 19) return 12;     // 1d12
             if (Level >= 16) return 10;     // 1d10  
             if (Level >= 13) return  8;     // 1d8
@@ -276,7 +352,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
         public static int GetBurrowingBonusDamage(int Level)
         {
-            Debug.Entry(4, "* BurrowingClaws_Patches.GetBurrowingBonusDamage() called");
+            Debug.Entry(4, "* BurrowingClaws_Patches.GetBurrowingBonusDamage() called", Indent: 4);
             if (Level >= 19) return 6;      // Going from 1d10 to 1d12
             if (Level >= 16) return 5;      // Going from 1d8 to 1d10
             if (Level >= 13) return 4;      // Going from 1d6 to 1d8
@@ -290,23 +366,23 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(BurrowingClaws __instance, Body body)
         {
-            Debug.Entry(2, "==================================================================");
             Zone InstanceObjectZone = __instance.ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2, "[HarmonyPatch(nameof(BurrowingClaws.OnRegenerateDefaultEquipment))]");
-            Debug.Entry(3, "@START BurrowingClaws_Patches.OnRegenerateDefaultEquipmentPrefix() called");
-            Debug.Entry(2, $"TARGET {__instance.ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Entry(3,  $"[HarmonyPatch(nameof(BurrowingClaws.OnRegenerateDefaultEquipment))]");
+            Debug.Header(3, $"BurrowingClaws_Patches", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3,  $"TARGET {__instance.ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
-            Debug.Entry(3, "Checking for this Mutation");
-            Debug.Entry(4, "* if (__instance.ParentObject.HasPart<BurrowingClaws>())");
+            Debug.Entry(3, $"Checking for this Mutation", Indent: 1);
+            Debug.Entry(3, $"* if (__instance.ParentObject.HasPart<BurrowingClaws>())", Indent: 1);
             if (!__instance.ParentObject.HasPart<BurrowingClaws>())
             {
-                Debug.Entry(3, "- BurrowingClaws Mutation not present");
-                Debug.Entry(3, "x BurrowingClaws_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
+                Debug.Entry(3, $"- BurrowingClaws Mutation not present", Indent: 2);
+                Debug.Footer(3, $"BurrowingClaws_Patches", "OnRegenerateDefaultEquipmentPrefix(body)");
                 return false;
             }
-            Debug.Entry(3, "- BurrowingClaws Mutation is present");
+            Debug.Entry(3, $"+ BurrowingClaws Mutation is present", Indent: 2);
+            Debug.Entry(3, $"Proceeding", Indent: 1);
 
             List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
@@ -314,29 +390,31 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 "Crystallinity"
             };
 
+            Debug.Entry(4, $"Exposing superseding mutations loop:", Indent: 1);
+            Debug.Entry(4, $"* foreach (string mutation in NaturalWeaponSupersedingMutations)", Indent: 1);
             int SupersededCount = 0;
             foreach (string mutation in NaturalWeaponSupersedingMutations)
             {
-                Debug.Entry(4, $"- Checking for {mutation}");
+                Debug.LoopItem(4, $"Checking for {mutation}", Indent: 2);
                 if (__instance.ParentObject.HasPart(mutation))
                 {
-                    Debug.Entry(4, "-- Present, increasing SupersededCount");
+                    Debug.Entry(4, $"+ Present, increasing SupersededCount: {SupersededCount} to {SupersededCount+1}", Indent: 3);
                     SupersededCount++;
                 }
             }
 
-            Debug.Entry(4, $"- SupersededCount is {SupersededCount}");
+            Debug.Entry(3, $"SupersededCount is {SupersededCount}", Indent: 1);
             bool IsNaturalWeaponSuperseded = SupersededCount > 0;
 
-            Debug.Entry(3, "Checking for incompatible Mutations or Parts");
-            Debug.Entry(4, "* if (IsNaturalWeaponSuperseded)");
+            Debug.Entry(3, $"Checking for incompatible Mutations or Parts", Indent: 1);
+            Debug.Entry(3, $"* if (IsNaturalWeaponSuperseded)", Indent: 1);
             if (IsNaturalWeaponSuperseded)
             {
-                Debug.Entry(3, "- A Superseding Mutation or Part is resent");
-                Debug.Entry(3, "x BurrowingClaws_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
+                Debug.Entry(3,  $"A Superseding Mutation or Part is resent", Indent: 2);
+                Debug.Footer(3, $"BurrowingClaws_Patches", "OnRegenerateDefaultEquipmentPrefix()");
                 return false;
             }
-            Debug.Entry(3, "- No Superseding Mutation or Part is present");
+            Debug.Entry(3, $"No Superseding Mutation or Part is present", Indent: 2);
 
             bool HasGigantism = __instance.ParentObject.HasPart<XRL.World.Parts.Mutation.GigantismPlus>();
             bool HasElongated = __instance.ParentObject.HasPart<ElongatedPaws>();
@@ -348,7 +426,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             string BaseBlueprintName = "BurrowingClaw";
             string blueprintName = "";
             
-            Debug.Entry(3, "[] Generating Stats");
+            Debug.Entry(3, $"[] Generating Stats", Indent: 1);
 
             int dieCount = 1;
             int dieSize = GetBurrowingDieSize(level); // Base Burrowing from calculation, Gigantism overrides this to 1 in its section.
@@ -356,21 +434,21 @@ namespace Mods.GigantismPlus.HarmonyPatches
             int maxStrBonus = 999;
             int hitBonus = 0;
 
-            Debug.Entry(3, $"|^ Starting Stats");
-            Debug.Entry(3, $"|> dieCount: {dieCount} \n"
-                         + $"|> dieSize: {dieSize} \n"
-                         + $"|> damageBonus: {damageBonus} \n"
-                         + $"|> maxStrBonus: {maxStrBonus} \n"
-                         + $"|> hitBonus: {hitBonus}\n"
-                         + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+            Debug.Entry(3, $"|^ Starting Stats:", Indent: 2);
+            Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 2);
+            Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 2);
+            Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 2);
+            Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 2);
+            Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 2);
+            Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 2);
+            Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 2);
 
-            Debug.Entry(3, "[] Accumulating stats");
+            Debug.Entry(3, "[] Accumulating stats", Indent: 1);
 
-            Debug.Entry(4, "* if (HasGigantism)");
+            Debug.Entry(3, "* if (HasGigantism)", Indent: 1);
             if (HasGigantism)
             {
-                Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
-                Debug.Entry(3, "+ GigantismPlus Mutation is present");
+                Debug.DiveIn(3, "+ GigantismPlus Mutation is present", Indent: 2);
                 var gigantism = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
                 
                 if (gigantism != null)
@@ -393,30 +471,30 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // Add to hitBonus from mutation (add in case something else is giving it too)
                     hitBonus += XRL.World.Parts.Mutation.GigantismPlus.GetFistHitBonus(gigantism.Level);
 
-                    Debug.Entry(4, $"|? blueprintName: {blueprintName}");
-                    Debug.Entry(4, $"|> dieCount: {dieCount} \n"
-                                 + $"|> dieSize: {dieSize} \n"
-                                 + $"|> damageBonus: {damageBonus} \n"
-                                 + $"|> maxStrBonus: {maxStrBonus} \n"
-                                 + $"|> hitBonus: {hitBonus}\n"
-                                 + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                    Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                    Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                    Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                    Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
                 }
                 else
                 {
-                    Debug.Entry(3, "! Failed to instantiate gigantism part");
+                    Debug.Entry(3, "! Failed to instantiate gigantism part", Indent: 3);
                 }
-                Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                Debug.DiveOut(3, "x if (HasGigantism) >//", Indent: 2);
             }
             else
             {
-                Debug.Entry(3, "- GigantismPlus Mutation not present");
+                Debug.Entry(3, "- GigantismPlus Mutation not present", Indent: 2);
             }
 
-            Debug.Entry(4, "* if (HasElongated)");
+            Debug.Entry(4, "* if (HasElongated)", Indent: 2);
             if (HasElongated)
             {
-                Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
-                Debug.Entry(3, "+ ElongatedPaws Mutation is present");
+                Debug.DiveIn(3, "+ ElongatedPaws Mutation is present", Indent: 2);
                 var elongated = __instance.ParentObject.GetPart<ElongatedPaws>();
                 if (elongated != null)
                 {
@@ -429,62 +507,62 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // add damage
                     damageBonus += elongated.ElongatedBonusDamage;
 
-                    Debug.Entry(4, $"|? blueprintName: {blueprintName}");
-                    Debug.Entry(4, $"|> dieCount: {dieCount}\n"
-                                 + $"|> dieSize: {dieSize}\n"
-                                 + $"|> damageBonus: {damageBonus}\n"
-                                 + $"|> maxStrBonus: {maxStrBonus}\n"
-                                 + $"|> hitBonus: {hitBonus}\n"
-                                 + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                    Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                    Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                    Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                    Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
                 }
                 else
                 {
-                    Debug.Entry(3, "! Failed to instantiate elongated part");
+                    Debug.Entry(3, "! Failed to instantiate gigantism part", Indent: 3);
                 }
-                Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                Debug.DiveOut(3, "x if (HasElongated) >//", Indent: 2);
             }
             else
             {
-                Debug.Entry(3, "- ElongatedPaws Mutation not present");
+                Debug.Entry(3, "- ElongatedPaws Mutation not present", Indent: 2);
             }
 
-            Debug.Entry(3, "[] Finished accumulating stats");
+            Debug.Entry(3, "[] Finished accumulating stats", Indent: 1);
 
             blueprintName += BaseBlueprintName;
 
             if (!HasGigantism && !HasElongated) blueprintName = BurrowingClawBlueprintName;
 
-            Debug.Entry(4, $"|: blueprintName: {blueprintName}");
-            Debug.Entry(4, $"|> dieCount: {dieCount} \n"
-                         + $"|> dieSize: {dieSize} \n"
-                         + $"|> damageBonus: {damageBonus} \n"
-                         + $"|> maxStrBonus: {maxStrBonus} \n"
-                         + $"|> hitBonus: {hitBonus}\n"
-                         + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
-            Debug.Entry(3, "vvvvvvvvvvvvvvvvvvvvvvv");
+            Debug.Divider(3, "_", 25, Indent: 2);
+            Debug.Entry(3, $"|: blueprintName: {blueprintName}", 2);
+            Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 2);
+            Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 2);
+            Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 2);
+            Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 2);
+            Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 2);
+            Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 2);
+            Debug.Divider(3, "V", 25, Indent: 2);
 
-            Debug.Entry(3, "Performing application of behavior to parts");
+            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
             string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
-            Debug.Entry(4, "Generating List<BodyPart> list");
+            Debug.Entry(3, $"targetPartType is \"{targetPartType}\"", Indent: 1);
+            Debug.Entry(3, "Generating List<BodyPart> list", Indent: 1);
             // Just change the body part search logic
             List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
                                    where p.Type == targetPartType  // Changed from VariantType to Type
                                    select p).ToList<BodyPart>();
 
-            Debug.Entry(4, "Checking list of parts for expected entries");
-            Debug.Entry(4, "* foreach (BodyPart part in list)");
+            Debug.Entry(3, "Checking list of parts for expected entries", Indent: 1);
+            Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 1);
             foreach (BodyPart part in list)
             {
-                Debug.Entry(4, $"- Part is {part.Type}");
+                Debug.LoopItem(3, $"{part.Type}", Indent: 2);
                 if (part.Type == "Hand")
                 {
-                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Debug.Entry(3, "-- Hand Found");
+                    Debug.DiveIn(3, $"{part.Type} Found", Indent: 2);
 
-                    Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
-
+                    Debug.Entry(3, "Sending to assignment method", Indent: 3);
                     AddAccumulatedNaturalEquipmentTo(
                         Creature: __instance.ParentObject,
                         Part: part,
@@ -496,13 +574,12 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         AssigningMutation: "Burrowing Claws"
                         );
 
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    continue;
+                    Debug.DiveOut(3, $"x {part.Type} >//", Indent: 2);
                 }
             }
-            Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
-            Debug.Entry(3, "END BurrowingClaws_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
-            Debug.Entry(2, "==================================================================");
+            Debug.Entry(3, "x foreach (BodyPart part in list) ]//", Indent: 1);
+            Debug.Entry(3, "Skipping patched Method", Indent: 1);
+            Debug.Footer(3, "BurrowingClaws_Patches", $"OnRegenerateDefaultEquipment(body)");
             return false; // Skip the original method
         }
     } //!-- public static class BurrowingClaws_Patches
@@ -514,51 +591,54 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.Crystallinity.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(Crystallinity __instance, Body body)
         {
-            Debug.Entry(2, "==================================================================");
             Zone InstanceObjectZone = __instance.ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2, "[HarmonyPatch(nameof(Crystallinity.OnRegenerateDefaultEquipment))]");
-            Debug.Entry(3, "@START Crystallinity_Patches.OnRegenerateDefaultEquipmentPrefix() called");
-            Debug.Entry(2, $"TARGET {__instance.ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Entry(3,  $"[HarmonyPatch(nameof(Crystallinity.OnRegenerateDefaultEquipment))]");
+            Debug.Header(3, $"Crystallinity_Patches", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3,  $"TARGET {__instance.ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
-            Debug.Entry(4, "Checking for this Mutation");
-            Debug.Entry(4, "* if (__instance.ParentObject.HasPart<Crystallinity>())");
+            Debug.Entry(3, $"Checking for this Mutation", Indent: 1);
+            Debug.Entry(3, $"* if (__instance.ParentObject.HasPart<Crystallinity>())", Indent: 1);
             if (!__instance.ParentObject.HasPart<Crystallinity>())
             {
-                Debug.Entry(3, "- Crystallinity Mutation not present");
-                Debug.Entry(3, "x Crystallinity_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
+                Debug.Entry(3, $"- Crystallinity Mutation not present", Indent: 2);
+                Debug.Footer(3, $"Crystallinity_Patches", "OnRegenerateDefaultEquipmentPrefix(body)");
                 return false;
             }
-            Debug.Entry(3, "- Crystallinity Mutation is present");
+            Debug.Entry(3, $"+ Crystallinity Mutation is present", Indent: 2);
+            Debug.Entry(3, $"Proceeding", Indent: 1);
 
             List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
               //"CyberneticsGiganticExoframe"
             };
-            
+
+            Debug.Entry(4, $"Exposing superseding mutations loop:", Indent: 1);
+            Debug.Entry(4, $"* foreach (string mutation in NaturalWeaponSupersedingMutations)", Indent: 1);
             int SupersededCount = 0;
             foreach (string mutation in NaturalWeaponSupersedingMutations)
             {
-                Debug.Entry(4, $"- Checking for {mutation}");
+                Debug.LoopItem(4, $"Checking for {mutation}", Indent: 2);
                 if (__instance.ParentObject.HasPart(mutation))
                 {
-                    Debug.Entry(4, "-- Present, increasing SupersededCount");
+                    Debug.Entry(4, $"+ Present, increasing SupersededCount: {SupersededCount + 1}", Indent: 3);
                     SupersededCount++;
                 }
             }
-            Debug.Entry(4, $"- SupersededCount is {SupersededCount}");
+
+            Debug.Entry(3, $"SupersededCount is {SupersededCount}", Indent: 1);
             bool IsNaturalWeaponSuperseded = SupersededCount > 0;
 
-            Debug.Entry(3, "Checking for incompatible Mutations or Parts");
-            Debug.Entry(4, "* if (IsNaturalWeaponSuperseded)");
+            Debug.Entry(3, $"Checking for incompatible Mutations or Parts", Indent: 1);
+            Debug.Entry(3, $"* if (IsNaturalWeaponSuperseded)", Indent: 1);
             if (IsNaturalWeaponSuperseded)
             {
-                Debug.Entry(3, "- A Superseding Mutation or Part is resent");
-                Debug.Entry(3, "x Crystallinity_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
+                Debug.Entry(3, $"A Superseding Mutation or Part is resent", Indent: 2);
+                Debug.Footer(3, $"Crystallinity_Patches", "OnRegenerateDefaultEquipmentPrefix()");
                 return false;
             }
-            Debug.Entry(3, "- No Superseding Mutation or Part is present");
+            Debug.Entry(3, $"No Superseding Mutation or Part is present", Indent: 2);
 
             int level = __instance.Level;
             string CrystallinePointBlueprintName = "Crystalline Point";
@@ -572,7 +652,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             bool HasElongated = __instance.ParentObject.HasPart<ElongatedPaws>();
             bool HasBurrowing = __instance.ParentObject.HasPart<BurrowingClaws>();
 
-            Debug.Entry(3, "[] Generating Stats");
+            Debug.Entry(3, $"[] Generating Stats", Indent: 1);
 
             int dieCount = 1;
             int dieSize = 3; // Base Crystalline is 3, Gigantism overrides this to 1 in its section.
@@ -580,21 +660,21 @@ namespace Mods.GigantismPlus.HarmonyPatches
             int maxStrBonus = 999;
             int hitBonus = 0;
 
-            Debug.Entry(3, $"|^ Starting Stats");
-            Debug.Entry(3, $"|> dieCount: {dieCount} \n"
-                         + $"|> dieSize: {dieSize} \n"
-                         + $"|> damageBonus: {damageBonus} \n"
-                         + $"|> maxStrBonus: {maxStrBonus} \n"
-                         + $"|> hitBonus: {hitBonus}\n"
-                         + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+            Debug.Entry(3, $"|^ Starting Stats:", Indent: 2);
+            Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 2);
+            Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 2);
+            Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 2);
+            Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 2);
+            Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 2);
+            Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 2);
+            Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 2);
 
-            Debug.Entry(3, "[] Accumulating stats");
+            Debug.Entry(3, "[] Accumulating stats", Indent: 1);
 
-            Debug.Entry(4, "* if (HasGigantism)");
+            Debug.Entry(3, "* if (HasGigantism)", Indent: 1);
             if (HasGigantism)
             {
-                Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
-                Debug.Entry(3, "+ GigantismPlus Mutation is present");
+                Debug.DiveIn(3, "+ GigantismPlus Mutation is present", Indent: 2);
                 var gigantism = __instance.ParentObject.GetPart<XRL.World.Parts.Mutation.GigantismPlus>();
 
                 if (gigantism != null)
@@ -605,7 +685,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // Override dieCount from mutation
                     dieCount = XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieCount(gigantism.Level);
 
-                    // Override dieSize from mutation, Gigantism dieSize + 1 for Crystal.
+                    // Override dieSize from mutation, Gigantism dieSize + 1 for Burrowing.
                     dieSize = 1 + XRL.World.Parts.Mutation.GigantismPlus.GetFistDamageDieSize(gigantism.Level);
 
                     // Add to damageBonus due to being Gigantic (simulates weapon having ModGigantic)
@@ -617,30 +697,30 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // Add to hitBonus from mutation (add in case something else is giving it too)
                     hitBonus += XRL.World.Parts.Mutation.GigantismPlus.GetFistHitBonus(gigantism.Level);
 
-                    Debug.Entry(4, $"|? blueprintName: {blueprintName}");
-                    Debug.Entry(4, $"|> dieCount: {dieCount} \n"
-                                 + $"|> dieSize: {dieSize} \n"
-                                 + $"|> damageBonus: {damageBonus} \n"
-                                 + $"|> maxStrBonus: {maxStrBonus} \n"
-                                 + $"|> hitBonus: {hitBonus}\n"
-                                 + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                    Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                    Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                    Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                    Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
                 }
                 else
                 {
-                    Debug.Entry(3, "! Failed to instantiate gigantism part");
+                    Debug.Entry(3, "! Failed to instantiate gigantism part", Indent: 3);
                 }
-                Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                Debug.DiveOut(3, "x if (HasGigantism) >//", Indent: 2);
             }
             else
             {
-                Debug.Entry(3, "- GigantismPlus Mutation not present");
+                Debug.Entry(3, "- GigantismPlus Mutation not present", Indent: 2);
             }
 
-            Debug.Entry(4, "* if (HasElongated)");
+            Debug.Entry(4, "* if (HasElongated)", Indent: 2);
             if (HasElongated)
             {
-                Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
-                Debug.Entry(3, "+ ElongatedPaws Mutation is present");
+                Debug.DiveIn(3, "+ ElongatedPaws Mutation is present", Indent: 2);
                 var elongated = __instance.ParentObject.GetPart<ElongatedPaws>();
                 if (elongated != null)
                 {
@@ -656,30 +736,30 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // add damage
                     damageBonus += elongated.ElongatedBonusDamage;
 
-                    Debug.Entry(4, $"|? blueprintName: {blueprintName}");
-                    Debug.Entry(4, $"|> dieCount: {dieCount}\n"
-                                 + $"|> dieSize: {dieSize}\n"
-                                 + $"|> damageBonus: {damageBonus}\n"
-                                 + $"|> maxStrBonus: {maxStrBonus}\n"
-                                 + $"|> hitBonus: {hitBonus}\n"
-                                 + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                    Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                    Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                    Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                    Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
                 }
                 else
                 {
-                    Debug.Entry(3, "! Failed to instantiate elongated part");
+                    Debug.Entry(3, "! Failed to instantiate elongated part", Indent: 3);
                 }
-                Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                Debug.DiveOut(3, "x if (HasElongated) >//", Indent: 2);
             }
             else
             {
-                Debug.Entry(3, "- ElongatedPaws Mutation not present");
+                Debug.Entry(3, "- ElongatedPaws Mutation not present", Indent: 2);
             }
 
-            Debug.Entry(4, "* if (HasBurrowing)");
+            Debug.Entry(4, "* if (HasBurrowing)", Indent: 2);
             if (HasBurrowing)
             {
-                Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
-                Debug.Entry(3, "+ Burrowing Claws Mutation is present");
+                Debug.DiveIn(3, "+ Burrowing Claws Mutation is present", Indent: 2);
                 var burrowing = __instance.ParentObject.GetPart<BurrowingClaws>();
                 if (burrowing != null)
                 {
@@ -694,23 +774,24 @@ namespace Mods.GigantismPlus.HarmonyPatches
                     // Add to damageBonus from Burrowing Claws
                     damageBonus += BurrowingClaws_Patches.GetBurrowingBonusDamage(burrowing.Level);
 
-                    Debug.Entry(4, $"|? blueprintName: {blueprintName}");
-                    Debug.Entry(4, $"|> dieCount: {dieCount}\n"
-                                 + $"|> dieSize: {dieSize}\n"
-                                 + $"|> damageBonus: {damageBonus}\n"
-                                 + $"|> maxStrBonus: {maxStrBonus}\n"
-                                 + $"|> hitBonus: {hitBonus}\n"
-                                 + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                    Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                    Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                    Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                    Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                    Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+                    Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
                 }
                 else
                 {
-                    Debug.Entry(3, "! Failed to instantiate burrowing part");
+                    Debug.Entry(3, "! Failed to instantiate burrowing part", Indent: 3);
                 }
-                Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                Debug.DiveOut(3, "x if (HasEburrowing) >//", Indent: 2);
             }
             else
             {
-                Debug.Entry(3, "- Burrowing Claws Mutation not present");
+                Debug.Entry(3, "- Burrowing Claws Mutation not present", Indent: 2);
             }
 
             Debug.Entry(3, "[] Finished accumulating stats");
@@ -719,46 +800,36 @@ namespace Mods.GigantismPlus.HarmonyPatches
 
             if (!HasGigantism && !HasElongated && !HasBurrowing) blueprintName = CrystallinePointBlueprintName;
 
-            Debug.Entry(4, $"|: blueprintName: {blueprintName}");
-            Debug.Entry(4, $"|> dieCount: {dieCount} \n"
-                         + $"|> dieSize: {dieSize} \n"
-                         + $"|> damageBonus: {damageBonus} \n"
-                         + $"|> maxStrBonus: {maxStrBonus} \n"
-                         + $"|> hitBonus: {hitBonus}\n"
-                         + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
-            Debug.Entry(3, "vvvvvvvvvvvvvvvvvvvvvvv");
+            Debug.Divider(3, "_", 25, Indent: 2);
+            Debug.Entry(3, $"|: blueprintName: {blueprintName}", Indent: 2);
+            Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 2);
+            Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 2);
+            Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 2);
+            Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 2);
+            Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 2);
+            Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 2);
+            Debug.Divider(3, "V", 25, Indent: 2);
 
-            Debug.Entry(3, "Performing application of behavior to parts");
+            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
             string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
-            Debug.Entry(4, "Generating List<BodyPart> list");
+            Debug.Entry(3, $"targetPartType is \"{targetPartType}\"", Indent: 1);
+            Debug.Entry(3, "Generating List<BodyPart> list", Indent: 1);
             // Just change the body part search logic
             List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
                                    where p.Type == targetPartType  // Changed from VariantType to Type
                                    select p).ToList<BodyPart>();
 
-            Debug.Entry(4, "Checking list of parts for expected entries");
-            Debug.Entry(4, "* foreach (BodyPart part in list)");
+            Debug.Entry(3, "Checking list of parts for expected entries", Indent: 1);
+            Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 1);
             foreach (BodyPart part in list)
             {
-                Debug.Entry(4, $"- Part is {part.Type}");
-            }
-            Debug.Entry(4, "x foreach (BodyPart hand in body.GetParts()) ]//");
-
-            Debug.Entry(3, "Performing application of behavior to parts");
-            Debug.Entry(3, "* foreach (BodyPart hand in body.GetParts())");
-            Debug.Entry(4, "* if (part.Type == targetPartType)");
-            foreach (BodyPart part in list)
-            {
-                Debug.Entry(4, $"- Part is {part.Type}");
-                if (part.Type == targetPartType) // Changed from "Hand" to "Quincunx"
+                Debug.LoopItem(3, $"{part.Type}", Indent: 2);
+                if (part.Type == "Hand")
                 {
-                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Debug.Entry(3, $"-- {targetPartType} Found");
+                    Debug.DiveIn(3, $"{part.Type} Found", Indent: 2);
 
-                    Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
-
+                    Debug.Entry(3, "Sending to assignment method", Indent: 3);
                     AddAccumulatedNaturalEquipmentTo(
                         Creature: __instance.ParentObject,
                         Part: part,
@@ -770,13 +841,12 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         AssigningMutation: "Crystallinity"
                         );
 
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    continue;
+                    Debug.DiveOut(3, $"x {part.Type} >//", Indent: 2);
                 }
             }
-            Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
-            Debug.Entry(3, "END Crystallinity_Patches.OnRegenerateDefaultEquipmentPrefix() ]//");
-            Debug.Entry(2, "==================================================================");
+            Debug.Entry(3, "x foreach (BodyPart part in list) ]//", Indent: 1);
+            Debug.Entry(3, "Skipping patched Method", Indent: 1);
+            Debug.Footer(3, "Crystallinity_Patches", $"OnRegenerateDefaultEquipment(body)");
             return false; // Skip the original method
         }
     } //!-- public static class Crystallinity_Patches
@@ -830,5 +900,87 @@ namespace Mods.GigantismPlus.HarmonyPatches
             }
         }
     }//!-- public static class Crystallinity_LevelText_Patches
+
+    [HarmonyPatch(typeof(GameObjectFactory))]
+    public static class GiganticCreature_Inventory_Patches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch("CreateObject", new Type[] { 
+            typeof(GameObjectBlueprint),
+            typeof(int),
+            typeof(int),
+            typeof(string),
+            typeof(Action<GameObject>),
+            typeof(Action<GameObject>),
+            typeof(string),
+            typeof(List<GameObject>)
+        })]
+        static void CreateObjectPostfix(ref GameObject __result)
+        {
+            // Skip players and objects without inventory
+            if (__result == null || __result.IsPlayer() || __result.Inventory == null)
+                return;
+
+            // Check if the creature has GigantismPlus or appropriate exoframe
+            if (!__result.HasPart<XRL.World.Parts.Mutation.GigantismPlus>() && !__result.HasPart("CyberneticsGiganticExoframe"))
+                return;
+                
+            // Check if the option to make NPC equipment gigantic is enabled
+            if (!Options.EnableGiganticNPCGear)
+                return;
+
+            Debug.Entry(3, "Making inventory items gigantic for creature: " + __result.DebugName);
+
+            try
+            {
+                // Create a copy of the items list to avoid modifying during enumeration
+                List<GameObject> itemsToProcess = new List<GameObject>(__result.Inventory.Objects);
+                
+                // Keep track of items to equip after modification
+                List<GameObject> itemsToEquip = new List<GameObject>();
+                
+                // Process each item
+                foreach (var item in itemsToProcess)
+                {
+                    // Skip items that are already gigantic or can't be made gigantic
+                    if (item.HasPart<ModGigantic>() || !ItemModding.ModificationApplicable("ModGigantic", item))
+                        continue;
+
+                    // Check if it's a grenade and if grenades should be gigantified
+                    bool isGrenade = item.HasTag("Grenade");
+                    if (isGrenade && !Options.EnableGiganticNPCGear_Grenades)
+                    {
+                        Debug.Entry(3, "  Skipping grenade due to disabled option: " + item.DebugName);
+                        continue;
+                    }
+
+                    Debug.Entry(3, "  Applying ModGigantic to: " + item.DebugName);
+                    
+                    // Make the item gigantic
+                    ItemModding.ApplyModification(item, "ModGigantic");
+                    
+                    // If it's equippable, add it to our list to equip later
+                    if (item.HasPart<MeleeWeapon>() || item.HasPart<Armor>() || item.HasPart<XRL.World.Parts.Shield>())
+                    {
+                        itemsToEquip.Add(item);
+                    }
+                }
+                
+                // Now equip all items that should be equipped
+                foreach (var item in itemsToEquip)
+                {
+                    if (__result.Inventory.Objects.Contains(item))  // Make sure item is still in inventory
+                    {
+                        Debug.Entry(3, "  Auto-equipping item: " + item.DebugName);
+                        __result.AutoEquip(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Entry(1, $"ERROR in GiganticCreature_Inventory_Patches: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+    }
 
 } //!-- namespace Mods.GigantismPlus.HarmonyPatches

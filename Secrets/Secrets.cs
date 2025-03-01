@@ -68,7 +68,7 @@ namespace Mods.GigantismPlus
                     secretExoframePart.OldBleedPrefix = User.GetStringProperty("BleedPrefix");
                     secretExoframePart.OldBleedColor = User.GetStringProperty("BleedColor");
                     User.SetStringProperty("BleedLiquid", "secretliquid-1000");
-                    User.SetStringProperty("BleedPrefix", "{{W|shiny}}");
+                    User.SetStringProperty("BleedPrefix", "{{SECRETGOLDEN|shiny}}");
                     User.SetStringProperty("BleedColor", "&W");
                 }
             }
@@ -142,6 +142,7 @@ namespace Mods.GigantismPlus
         public SecretLiquid() 
             : base("secretliquid")
         {
+            DefaultColors = new List<string>(3) { "Y", "W", "O" };
             CirculatoryLossNoun = "gush";
             CirculatoryLossTerm = "gushing";
             Glows = true;
@@ -160,9 +161,6 @@ namespace Mods.GigantismPlus
             SlipperyWhenWet = false;
             SlipperyWhenFrozen = false;
         }
-
-        [NonSerialized]
-        public static List<string> DefaultColors = new List<string>(3) { "Y", "W", "O" };
 
         public override void BaseRenderPrimary(LiquidVolume Liquid)
         {
@@ -254,12 +252,12 @@ namespace Mods.GigantismPlus
             return 9999f;
         }
 
-        public virtual string GetColor()
+        public override string GetColor()
         {
             return "O";
         }
 
-        public virtual string GetAdjective(LiquidVolume Liquid)
+        public override string GetAdjective(LiquidVolume Liquid)
         {
             return "{{SECRETGOLDEN|shiny}}";
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using XRL;
 using XRL.UI;
 using XRL.World;
 using XRL.World.Anatomy;
@@ -273,7 +274,7 @@ namespace XRL.World.Parts.Mutation
                         count++;
                     }
                 }
-                Debug.Entry(4, $"Superseding Count is {count}");
+                Debug.Entry(4, $"Superseding Count is {count}", Indent: 4);
                 return count > 0;
             }
         }
@@ -407,7 +408,7 @@ namespace XRL.World.Parts.Mutation
                 }
             }
             Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) ]//", Indent: 1);
-            Debug.Footer(3, "GigantismPlus", "SwapMutationCategory(bool Before = true)");
+            Debug.Footer(3, "GigantismPlus", $"SwapMutationCategory(Before: {state})");
         } //!--- private void SwapMutationCategory(bool Before = true)
 
         private bool ShouldRapidAdvance(int Level, GameObject Actor)
@@ -466,6 +467,22 @@ namespace XRL.World.Parts.Mutation
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
             E.Features.Add("{{gianter|gigantic}} stature");
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
+            // exceptions are 
+            if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment && E.Object.HasTagOrProperty("GiganticEquippable"))
+            {
+                E.Decreases++;
+                if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
+                {
+                    E.CanBeTooSmall = true;
+                }
+            }
+
             return base.HandleEvent(E);
         }
 
@@ -648,28 +665,29 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            Debug.Entry(2, "__________________________________________________________________");
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2,  "@START GigantismPlus.OnRegenerateDefaultEquipment(Body body)");
-            Debug.Entry(2, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Header(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
             FistDamageDieCount = GetFistDamageDieCount(Level);
             FistDamageDieSize = GetFistDamageDieSize(Level);
             FistBaseDamage = GetFistBaseDamage(Level);
             FistHitBonus = GetFistHitBonus(Level);
 
+            Debug.Entry(3, $"Check if NaturalEquipment generation is superseded by another mutation", Indent: 1);
+            Debug.Entry(3, $"* if (!this.IsNaturalWeaponSuperseded && body != null)", Indent: 1);
             if (!this.IsNaturalWeaponSuperseded && body != null)
             {
-                Debug.Entry(3, "- NaturalEquipment not Superseded");
+                Debug.Entry(3, "NaturalEquipment not Superseded", Indent: 2);
 
                 string GiganticBlueprintName = "Gigantic";
                 string ElongatedBlueprintName = "Elongated";
                 string BaseBlueprintName = "Fist";
                 string blueprintName = GiganticBlueprintName;
 
-                Debug.Entry(3, "Generating Stats");
+                Debug.Entry(3, "[] Generating Stats", Indent: 2);
 
                 int dieCount = FistDamageDieCount;
                 int dieSize = FistDamageDieSize;
@@ -677,23 +695,23 @@ namespace XRL.World.Parts.Mutation
                 int maxStrBonus = FistMaxStrengthBonus;
                 int hitBonus = FistHitBonus;
 
-                Debug.Entry(3, $"|^ Starting Stats");
-                Debug.Entry(3, $"|> dieCount: {dieCount} \n"
-                             + $"|> dieSize: {dieSize} \n"
-                             + $"|> damageBonus: {damageBonus} \n"
-                             + $"|> maxStrBonus: {maxStrBonus} \n"
-                             + $"|> hitBonus: {hitBonus}\n"
-                             + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                Debug.Entry(3, $"|^ Starting Stats:", Indent: 3);
+                Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+                Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
 
                 bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
 
-                Debug.Entry(3, "Accumulating stats");
+                Debug.Entry(3, "[] Accumulating stats", Indent: 2);
 
-                Debug.Entry(4, "* if (HasElongated)");
+                Debug.Entry(3, "* if (HasElongated)", Indent: 2);
                 if (HasElongated)
                 {
-                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>");
-                    Debug.Entry(3, "+ ElongatedPaws Mutation is present");
+                    Debug.DiveIn(3, "+ ElongatedPaws Mutation is present", Indent: 3);
                     var elongated = ParentObject.GetPart<ElongatedPaws>();
                     if (elongated != null)
                     {
@@ -703,60 +721,60 @@ namespace XRL.World.Parts.Mutation
                         // add damage
                         damageBonus += elongated.ElongatedBonusDamage;
 
-                        Debug.Entry(4, $"|? blueprintName: {blueprintName}");
-                        Debug.Entry(4, $"|> dieCount: {dieCount}\n"
-                                     + $"|> dieSize: {dieSize}\n"
-                                     + $"|> damageBonus: {damageBonus}\n"
-                                     + $"|> maxStrBonus: {maxStrBonus}\n"
-                                     + $"|> hitBonus: {hitBonus}\n"
-                                     + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
+                        Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 4);
+                        Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 4);
+                        Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 4);
+                        Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 4);
+                        Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 4);
+                        Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 4);
+                        Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 4);
+                        Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 4);
                     }
                     else
                     {
-                        Debug.Entry(3, "! Failed to instantiate elongated part");
+                        Debug.Entry(3, "! Failed to instantiate elongated part", Indent: 4);
                     }
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<");
+                    Debug.DiveOut(3, "x if (HasElongated) >//", Indent: 3);
                 }
                 else
                 {
-                    Debug.Entry(3, "- ElongatedPaws Mutation not present");
+                    Debug.Entry(3, "- ElongatedPaws Mutation not present", Indent: 3);
                 }
 
-                Debug.Entry(3, "[] Finished accumulating stats");
+                Debug.Entry(3, "[] Finished accumulating stats", Indent: 2);
 
                 blueprintName += BaseBlueprintName;
 
-                Debug.Entry(4, $"|: blueprintName: {blueprintName}");
-                Debug.Entry(4, $"|> dieCount: {dieCount} \n"
-                             + $"|> dieSize: {dieSize} \n"
-                             + $"|> damageBonus: {damageBonus} \n"
-                             + $"|> maxStrBonus: {maxStrBonus} \n"
-                             + $"|> hitBonus: {hitBonus}\n"
-                             + $"|L {WeaponDamageString(dieCount, dieSize, damageBonus)}");
-                Debug.Entry(3, "vvvvvvvvvvvvvvvvvvvvvvv");
+                Debug.Divider(3, "_", 25, Indent: 3);
+                Debug.Entry(3, $"|: blueprintName: {blueprintName}", Indent: 3);
+                Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+                Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+                Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+                Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+                Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+                Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
+                Debug.Divider(3, "V", 25, Indent: 3);
 
-                Debug.Entry(3, "Performing application of behavior to parts");
+                Debug.Entry(3, "Performing application of behavior to parts", Indent: 2);
 
                 string targetPartType = "Hand";
-                Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
-                Debug.Entry(4, "Generating List<BodyPart> list");
+                Debug.Entry(3, $"targetPartType is \"{targetPartType}\"", Indent: 2);
+                Debug.Entry(3, "Generating List<BodyPart> list", Indent: 2);
                 // Just change the body part search logic
                 List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
                                        where p.Type == targetPartType  // Changed from VariantType to Type
                                        select p).ToList<BodyPart>();
 
-                Debug.Entry(4, "Checking list of parts for expected entries");
-                Debug.Entry(4, "* foreach (BodyPart part in list)");
+                Debug.Entry(3, "Checking list of parts for expected entries", Indent: 2);
+                Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 2);
                 foreach (BodyPart part in list)
                 {
-                    Debug.Entry(4, $"-- {part.Type}");
+                    Debug.LoopItem(3, $"{part.Type}", Indent: 3);
                     if (part.Type == "Hand")
                     {
-                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        Debug.Entry(3, $"--- {part.Type} Found");
+                        Debug.DiveIn(3, $"{part.Type} Found", Indent: 3);
 
-                        Debug.Entry(4, "-- Saving copy of current DefaultBehavior in case creation fails");
-
+                        Debug.Entry(3, "Sending to assignment method", Indent: 4);
                         AddAccumulatedNaturalEquipmentTo(
                             Creature: ParentObject,
                             Part: part,
@@ -768,22 +786,21 @@ namespace XRL.World.Parts.Mutation
                             AssigningMutation: "GigantismPlus"
                             );
 
-                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                        continue;
+                        Debug.DiveOut(3, $"x {part.Type} >//", Indent: 3);
                     }
                 }
-                Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
+                Debug.Entry(3, "x foreach (BodyPart part in list) ]//", Indent: 2);
             }
             else
             {
-                Debug.Entry(3, "NaturalEquipment is Superseded");
-                Debug.Entry(4, "x Aborting GigantismPlus.OnRegenerateDefaultEquipment() Generation of Equipment ]//");
+                Debug.Entry(3, "NaturalEquipment is Superseded", Indent: 2);
+                Debug.Entry(3, "x Aborting GigantismPlus Generation of Equipment >//", Indent: 2);
             }
 
-            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
             base.OnRegenerateDefaultEquipment(body);
 
-            Debug.Entry(2, "==================================================================");
+            Debug.Footer(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 
         public void CheckAffected(GameObject Actor, Body Body)
@@ -928,9 +945,264 @@ namespace XRL.World.Parts.Mutation
                        "}}";
             }
 
+            CheckAffected(actor, actor.Body);
             Debug.Entry(1, "Should be Standing Tall");
-        } //!--- public void StraightenUp(bool Message = false)
+        } //!-- public void StraightenUp(bool Message = false)
 
-    } //!--- public class GigantismPlus : BaseDefaultEquipmentMutation
+    } //!-- public class GigantismPlus : BaseDefaultEquipmentMutation
 
+}
+
+namespace Mods.GigantismPlus
+{
+    [Serializable]
+    public class PseudoGigantism : IPart
+    {
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID;
+        }
+
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            if (!E.Actor.IsGiganticCreature)
+            {
+                E.Decreases++;
+                if (!E.Object.IsGiganticEquipment && E.SlotType != "Floating Nearby" && !E.Object.HasPart<CyberneticsBaseItem>() && !E.Object.HasTagOrProperty("GiganticEquippable"))
+                {
+                    E.CanBeTooSmall = true;
+                }
+            }
+
+            return base.HandleEvent(E);
+        }
+
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+    } //!-- public class PsudoGigantic : IPart
+
+    [PlayerMutator]
+    public class GigantifyStartingLoadout : IPlayerMutator
+    {
+        public void mutate(GameObject player)
+        {
+            Debug.Entry(2, "##################################################################");
+            Debug.Entry(2, "public class GigantifyStartingLoadout : IPlayerMutator");
+            Debug.Entry(3, "[{}] public void mutate(GameObject player)");
+
+            Debug.Entry(2, "Checking if Gigantification of starting gear should occur");
+            Debug.Entry(4, "**if ((player.HasPart(\"GigantismPlus\") && Options.EnableGiganticStartingGear)");
+            // Check for either mutation OR cybernetic as source of gigantism
+            if (player.HasPart("GigantismPlus") && Options.EnableGiganticStartingGear)
+            {
+                Debug.Entry(3, "- Player is Gigantic && Option is [Enabled]");
+
+                Debug.Entry(3, "- Checking if Grenades should be included");
+                Debug.Entry(4, "**if (Options.EnableGiganticStartingGear_Grenades)");
+                if (Options.EnableGiganticStartingGear_Grenades)
+                {
+                    Debug.Entry(3, "-- Option is [Enabled] - Grenades will be Gigantified");
+                }
+                else
+                {
+                    Debug.Entry(3, "-- Option is [Disabled] - Grenades won't be Gigantified");
+                }
+
+                Debug.Entry(3, "- Performing Gigantification");
+                Debug.Entry(3, "**foreach (GameObject item in player.GetInventoryAndEquipment())");
+                // Cycle the player's inventory and equipped items.
+                foreach (GameObject item in player.GetInventoryAndEquipment())
+                {
+                    Debug.Entry(3, "-------------------------------------------");
+                    string ItemName = item.DebugName;
+                    Debug.Entry(3, $"--@ Item Entry: {ItemName}");
+                    ItemName = "--- " + item.Blueprint;
+                    // Can the item have the gigantic modifier applied?
+                    if (ItemModding.ModificationApplicable("ModGigantic", item))
+                    {
+                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                        // Is the item already gigantic? Don't attempt to apply it again.
+                        if (item.HasPart<ModGigantic>())
+                        {
+                            Debug.Entry(3, ItemName, "is already gigantic");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                            continue;
+                        }
+                        Debug.Entry(3, ItemName, "not gigantic");
+
+                        // Is the item a grenade, and is the option not set to include them?
+                        if (!Options.EnableGiganticStartingGear_Grenades && item.HasTag("Grenade"))
+                        {
+                            Debug.Entry(3, ItemName, "is a grenade (excluded)");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                            continue;
+                        }
+                        if (!item.HasTag("Grenade")) Debug.Entry(3, ItemName, "not a grenade");
+                        if (item.HasTag("Grenade")) Debug.Entry(3, ItemName, "is a grenade");
+
+                        // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
+                        if (item.HasTag("DynamicObjectsTable:TradeGoods"))
+                        {
+                            Debug.Entry(3, ItemName, "is TradeGoods");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                            continue;
+                        }
+                        Debug.Entry(3, ItemName, "not TradeGoods");
+
+                        // Is the item a tonic? Double doses are basically useless in the early game
+                        if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                        {
+                            Debug.Entry(3, ItemName, "is Tonics_NonRare");
+                            Debug.Entry(4, "--X Skipping");
+                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                            continue;
+                        }
+                        Debug.Entry(3, ItemName, "not Tonics_NonRare");
+
+                        // apply the gigantic mod to the item and attempt to auto-equip it
+                        ItemModding.ApplyModification(item, "ModGigantic");
+                        Debug.Entry(2, ItemName, "has been Gigantified");
+                        // player.AutoEquip(item); Debug.Entry(2, ItemName, "AutoEquip Attempted");
+                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+
+                    }
+                    else
+                    {
+                        Debug.Entry(2, ItemName, "cannot be made gigantic");
+                        Debug.Entry(4, "--X Skipping");
+                        Debug.Entry(3, $"{ItemName} ]//");
+                        continue;
+                    }
+
+                    Debug.Entry(3, $"{ItemName} ]//");
+                }
+                Debug.Entry(3, "-------------------------------------------");
+                Debug.Entry(3, "- Gigantification of starting gear finished");
+                player.WantToReequip();
+                Debug.Entry(3, "- Attempting to reequip items");
+                Debug.Entry(2, "##################################################################");
+            }
+            else
+            {
+                Debug.Entry(4, "- Player not Gigantic || Option is [Disabled]");
+                Debug.Entry(3, "- Check Failed");
+                Debug.Entry(2, "##################################################################");
+            }
+        }
+    }
+
+    public class GiganticModifierAdjustments
+    {
+        public static void AdjustGiganticModifier()
+        {
+            bool ShouldDerarify = Options.SelectGiganticDerarification;
+            bool ShouldGiganticTinkerable = Options.SelectGiganticTinkering;
+            Debug.Entry(3, "[{}] AdjustGiganticModifier()");
+
+            Debug.Entry(3, "Attempting ModList adjustment process");
+            Debug.Entry(4, "**foreach (ModEntry mod in ModificationFactory.ModList)");
+            // find the gigantic modifier ModEntry in the ModList
+            foreach (ModEntry mod in ModificationFactory.ModList)
+            {
+                Debug.Entry(3, "-------------------------------------------");
+                string ModPart = mod.Part;
+                Debug.Entry(3, $"--@ Mod Entry: {ModPart}");
+                ModPart = "--- " + ModPart;
+                if (mod.Part == "ModGigantic")
+                {
+                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Debug.Entry(3, ModPart, "Found");
+                    // should the rarity be adjusted? 
+                    // - change the rarity from R2 (3) to R (2) 
+                    Debug.Entry(4, "**if (ShouldDerarify)");
+                    if (ShouldDerarify)
+                    {
+                        Debug.Entry(4, "---- Should");
+                        mod.Rarity = 2;
+                        Debug.Entry(2, ModPart, "Rarity is R (decreased)");
+                    }
+                    else
+                    {
+                        Debug.Entry(4, "---- Shouldn't");
+                        mod.Rarity = 3;
+                        Debug.Entry(2, ModPart, "Rarity is R2 (default)");
+                    }
+
+                    // should tinkering be allowed? 
+                    // - change the tinkerability and add it to the list of recipes
+                    Debug.Entry(4, "**if (ShouldGiganticTinkerable)");
+                    if (ShouldGiganticTinkerable)
+                    {
+                        Debug.Entry(4, "---- Should");
+                        mod.TinkerAllowed = true;
+                        Debug.Entry(2, ModPart, "Gigantic tinkering [Enabled]");
+
+                        // Modifiers can actually be set to require an additional ingredient.
+                        // mod.TinkerIngredient = "Torch";
+                    }
+                    else
+                    {
+                        Debug.Entry(4, "---- Shouldn't");
+                        mod.TinkerAllowed = false;
+                        Debug.Entry(2, ModPart, "Gigantic tinkering [Disabled] (default)");
+                    }
+
+                    // this is a workaround for what I'm sure is a more straightforward and simple solution
+                    // - after adjusting the ModEntry to be tinkerable, it needs to be added to the list of recipes
+                    // - flushing the list of recipes and then requesting the list uses an internal "get" function that cycles all the TinkerData and ModEntries and adds them to the TinkerRecipes list
+                    // - only works if you flush it first since the "get" function checks if the _list is empty first and if it isn't just returns it
+                    // it's probably NOT good, and could pose compatability issues with other mods if they do things post Blueprint pre-load, but I'm not nearly experienced enough to know what issues exactly
+
+                    TinkerData._TinkerRecipes.RemoveAll(r => r != null); Debug.Entry(2, "--- Purged TinkerRecipes");
+                    List<TinkerData> reinitialise = TinkerData.TinkerRecipes; Debug.Entry(2, "--- Reinitialised TinkerRecipes");
+                    reinitialise = null; Debug.Entry(4, "--- Reinitialisation nulled");
+
+                    Debug.Entry(4, "--- No Further Actions Required", "Exiting ModList");
+                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                    Debug.Entry(3, $"{ModPart} ]//");
+
+                    break;
+
+                }
+                else Debug.Entry(2, ModPart, "Not ModGigantic");
+
+                Debug.Entry(3, $"{ModPart} ]//");
+            }
+            Debug.Entry(3, "-------------------------------------------");
+            Debug.Entry(1, "ModList exited, adjustment process finished");
+        }
+    } //!--- public class GiganticModifierAdjustments
+
+    [PlayerMutator]
+    public class OnPlayerLoad : IPlayerMutator
+    {
+        public void mutate(GameObject player)
+        {
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Entry(2, "public class OnPlayerLoad : IPlayerMutator");
+            Debug.Entry(2, "public void mutate(GameObject player)");
+            GiganticModifierAdjustments.AdjustGiganticModifier();
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        }
+    } //!--- public class OnPlayerLoad : IPlayerMutator
+
+    [HasCallAfterGameLoadedAttribute]
+    public class OnLoadGameHandler
+    {
+        [CallAfterGameLoadedAttribute]
+        public static void OnLoadGameCallback()
+        {
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Entry(2, "public class OnLoadGameHandler");
+            Debug.Entry(2, "public static void OnLoadGameCallback()");
+            GiganticModifierAdjustments.AdjustGiganticModifier();
+            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        }
+    } //!--- public class OnLoadGameHandler
 }

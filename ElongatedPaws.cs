@@ -7,6 +7,7 @@ using XRL.World;
 using Mods.GigantismPlus;
 using Mods.GigantismPlus.HarmonyPatches; // Add this line
 using static Mods.GigantismPlus.HelperMethods;
+using XRL.World.Tinkering;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -67,7 +68,36 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
+                Debug.Entry(4, $"@ ElongatedPaws.ElongatedBonusDamage", Indent: 4);
+                Debug.Entry(4, $"Returning StrMod/2: {(int)Math.Floor((double)this.StrengthModifier / 2.0)}", Indent: 5);
+                Debug.Entry(4, $"x ElongatedPaws.ElongatedBonusDamage >//", Indent: 4);
                 return (int)Math.Floor((double)this.StrengthModifier / 2.0);
+            }
+        }
+
+        public int ElongatedDieSizeBonus
+        {
+            get
+            {
+                Debug.Entry(4, $"@ ElongatedPaws.ElongatedDieSizeBonus", Indent: 4);
+                int dieSize = 0;
+
+                bool HasGigantism = ParentObject.HasPart<GigantismPlus>();
+                bool HasBurrowing = ParentObject.HasPart<BurrowingClaws>();
+
+                Debug.Entry(4, $"HasGigantism: {(HasGigantism ? "yeah" : "Nah")}", Indent: 5);
+                Debug.Entry(4, $"HasBurrowing: {(HasBurrowing ? "yeah" : "Nah")}", Indent: 5);
+
+                Debug.Entry(4, $"dieSize: {dieSize}", Indent: 4);
+
+                dieSize += !HasGigantism ? 1 : 0;
+                Debug.Entry(4, $"!HasGigantism? dieSize: {dieSize}", Indent: 4);
+                dieSize += !HasBurrowing ? 1 : 0;
+                Debug.Entry(4, $"!HasBurrowing? dieSize: {dieSize}", Indent: 4);
+
+                Debug.Entry(4, $"Final dieSize: {dieSize}", Indent: 4);
+                Debug.Entry(4, $"x ElongatedPaws.ElongatedDieSizeBonus >//", Indent: 4);
+                return dieSize;
             }
         }
 
@@ -204,27 +234,28 @@ namespace XRL.World.Parts.Mutation
         public void AddElongatedNaturalEquipmentTo(BodyPart part)
         {
             Debug.Entry(2, "@ AddGiganticNaturalEquipmentTo(BodyPart part)");
-            if (part != null && part.Type == "Hand")
+            if (part != null && part.Type == "Hand" && !part.IsExternallyManagedLimb())
             {
                 Debug.Entry(3, "* if (ParentObject.HasPart<GigantismPlus>())");
                 Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
-                int StatMod = ElongatedBonusDamage;
+                // int StatMod = ElongatedBonusDamage;
 
                 Debug.Entry(4, "- Saving copy of current DefaultBehavior in case creation fails");
                 GameObject OldDefaultBehavior = part.DefaultBehavior;
 
                 Debug.Entry(3, $"- Setting part.DefaultBehaviour to new instance of \"{ElongatedPawBlueprintName}\"");
-                part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(ElongatedPawBlueprintName);
+                // part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(ElongatedPawBlueprintName);
 
                 Debug.Entry(3, $"- Checking that new GameObject was instantiated and assigned correctly");
                 Debug.Entry(4, "* if (part.DefaultBehavior != null)");
                 if (part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "-- part.DefaultBehavior not null, assigning stats");
-                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-                    var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
                     
-                    weapon.BaseDamage = $"1d4+{StatMod}";
+                    Debug.Entry(3, "-- part.DefaultBehavior not null, assigning stats");
+                    // part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
+                    var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
+                    weapon.BaseDamage = $"1d2";
+                    ItemModding.ApplyModification(part.DefaultBehavior, "ModElongatedNaturalWeapon", Actor: ParentObject);
 
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
                 }

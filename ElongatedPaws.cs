@@ -27,8 +27,6 @@ namespace XRL.World.Parts.Mutation
             "Crystallinity"
         };
 
-        private string WeaponWatcherID => this.GetMutationClass();
-
         public bool IsNaturalWeaponSuperseded
         {
             get
@@ -90,8 +88,8 @@ namespace XRL.World.Parts.Mutation
                 bool HasGigantism = ParentObject.HasPart<GigantismPlus>();
                 bool HasBurrowing = ParentObject.HasPart<BurrowingClaws>();
 
-                Debug.Entry(4, $"HasGigantism: {(HasGigantism ? "yeah" : "Nah")}", Indent: 5);
-                Debug.Entry(4, $"HasBurrowing: {(HasBurrowing ? "yeah" : "Nah")}", Indent: 5);
+                Debug.Entry(4, $"HasGigantism: {(HasGigantism ? "yeah" : "nah")}", Indent: 5);
+                Debug.Entry(4, $"HasBurrowing: {(HasBurrowing ? "yeah" : "nah")}", Indent: 5);
 
                 Debug.Entry(4, $"dieSize: {dieSize}", Indent: 4);
 
@@ -109,7 +107,7 @@ namespace XRL.World.Parts.Mutation
         public ElongatedPaws()
         {
             DisplayName = "{{giant|Elongated Paws}}";
-            base.Type = "Physical";
+            Type = "Physical";
         }
 
         /* May be redundant.
@@ -176,14 +174,11 @@ namespace XRL.World.Parts.Mutation
             if (E.Name == "Strength")
             {
                 Body body = E.Object.Body;
-                if (body != null)
-                {
-                    body.UpdateBodyParts();
-                }
+                body?.UpdateBodyParts();
 
                 foreach (GameObject equipped in body.GetEquippedObjects())
                 {
-                    if (equipped.TryGetPart<WeaponElongator>(out WeaponElongator weaponElongator))
+                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                     {
                         weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), E.Object);
                     }
@@ -198,7 +193,7 @@ namespace XRL.World.Parts.Mutation
 
             foreach (GameObject equipped in GO.Body.GetEquippedObjects())
             {
-                if (equipped.TryGetPart<WeaponElongator>(out WeaponElongator weaponElongator))
+                if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                 {
                     weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), GO);
                 }
@@ -211,7 +206,7 @@ namespace XRL.World.Parts.Mutation
         {
             foreach (GameObject equipped in GO.Body.GetEquippedObjects())
             {
-                if (equipped.TryGetPart<WeaponElongator>(out WeaponElongator weaponElongator))
+                if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                 {
                     weaponElongator.UnapplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
                 }
@@ -271,10 +266,9 @@ namespace XRL.World.Parts.Mutation
                 {
                     
                     Debug.Entry(3, "-- part.DefaultBehavior not null, assigning stats");
-                    // part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
+                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
                     var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
                     weapon.BaseDamage = $"1d2";
-                    ItemModding.ApplyModification(part.DefaultBehavior, "ModElongatedNaturalWeapon", Actor: ParentObject);
 
                     Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
                 }
@@ -294,54 +288,61 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            Debug.Entry(2, "__________________________________________________________________");
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Entry(2, "@ ElongatedPaws.OnRegenerateDefaultEquipment(Body body)");
-            Debug.Entry(2, $"TARGET: {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Header(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
-            if (!this.IsNaturalWeaponSuperseded && body != null)
+            /* Testing without cascading delegation.
+             * 
+            if (body == null || IsNaturalWeaponSuperseded)
             {
-                Debug.Entry(3, "- NaturalEquipment not Superseded");
+                Debug.Entry(3, "NaturalEquipment is Superseded", Indent: 2);
+                Debug.Entry(3, "x Aborting ElongatedPaws Generation of Equipment >//", Indent: 2);
+                Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+                Debug.Footer(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
+                base.OnRegenerateDefaultEquipment(body);
+            }
+            */
 
-                Debug.Entry(3, "Performing application of behavior to parts");
+            if (body == null) base.OnRegenerateDefaultEquipment(body);
 
-                string targetPartType = "Hand";
-                Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
-                Debug.Entry(4, "Generating List<BodyPart> list");
-                // Just change the body part search logic
-                List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                       where p.VariantType == targetPartType  // Changed from VariantType to Type
-                                       select p).ToList<BodyPart>();
+            Debug.Entry(3, "Performing application of behavior to parts");
 
-                Debug.Entry(4, "Checking list of parts for expected entries");
-                Debug.Entry(4, "* foreach (BodyPart part in list)");
-                foreach (BodyPart part in list)
+            string targetPartType = "Hand";
+            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
+            Debug.Entry(4, "Generating List<BodyPart> list");
+            // Just change the body part search logic
+            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                    where p.Type == targetPartType  // Changed from VariantType to Type
+                                    select p).ToList();
+
+            Debug.Entry(4, "Checking list of parts for expected entries");
+            Debug.Entry(4, "* foreach (BodyPart part in list)");
+            foreach (BodyPart part in list)
+            {
+                Debug.Entry(4, $"-- {part.Type}");
+                if (part.Type == "Hand")
                 {
-                    Debug.Entry(4, $"-- {part.Type}");
-                    if (part.Type == "Hand")
-                    {
-                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        Debug.Entry(3, $"--- {part.Type} Found");
+                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                    Debug.Entry(3, $"--- {part.Type} Found");
 
-                        AddElongatedNaturalEquipmentTo(part);
+                    ItemModding.ApplyModification(part.DefaultBehavior, "ModElongatedNaturalWeapon", Actor: ParentObject);
 
-                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    }
+                    /* Testing with simple Modification Application.
+                    *
+                    AddElongatedNaturalEquipmentTo(part);
+                    */
+
+                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 }
-                Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
             }
-            else
-            {
-                Debug.Entry(3, "Handling of NaturalEquipment is Superseded");
-                Debug.Entry(4, "x Aborting ElongatedPaws.OnRegenerateDefaultEquipment() generation of equipment ]//");
-            }
-
+            Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
+           
             Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)");
-            base.OnRegenerateDefaultEquipment(body);
-
             Debug.Entry(2, "==================================================================");
+            base.OnRegenerateDefaultEquipment(body);
         }
     }   
 } //!-- namespace XRL.World.Parts.Mutation

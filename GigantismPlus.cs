@@ -58,7 +58,7 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
-                if (this.IsCyberGiant)
+                if (IsCyberGiant)
                     return "Compact";
                 return "Hunched";
             }
@@ -67,24 +67,27 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
-                if (this.IsCyberGiant)
+                if (IsCyberGiant)
                     return "Regular"; // was "Standard" but it's one too many characters
                 return "Upright";
             }
         }
 
-        public new INaturalWeapon NaturalWeapon = new()
+        private static readonly INaturalWeapon _NaturalWeapon = new()
         {
             Priority = 10,
             Adjective = "gigantic",
             AdjectiveColor = "gigantic",
             Noun = "fist",
-            Tile = "GiganticFist_Alt.png",
+            Skill = "Cudgel",
+            Stat = "Strength",
+            Tile = "GiganticFist.png",
             RenderColorString = "&x",
             RenderDetailColor = "z",
             SecondRenderColorString = "&X",
             SecondRenderDetailColor = "Z"
         };
+        public new INaturalWeapon NaturalWeapon = _NaturalWeapon;
 
         public override int GetNaturalWeaponDamageDieCount(int Level = 1)
         {
@@ -309,7 +312,7 @@ namespace XRL.World.Parts.Mutation
             Type = "Physical";
         }
 
-        public virtual string GetNaturalWeaponColoredAdjective()
+        public override string GetNaturalWeaponColoredAdjective()
         {
             return "";
         }
@@ -783,8 +786,8 @@ namespace XRL.World.Parts.Mutation
                 else
                     StraightenUp(true); // Stand upright
 
-                Debug.Entry(2, "IsPseudoGiganticCreature", (IsPseudoGiganticCreature ? "true" : "false"));
-                Debug.Entry(2, "IsGiganticCreature", (IsGiganticCreature ? "true" : "false"));
+                Debug.Entry(2, "IsPseudoGiganticCreature", IsPseudoGiganticCreature ? "true" : "false");
+                Debug.Entry(2, "IsGiganticCreature", IsGiganticCreature ? "true" : "false");
 
             }
 
@@ -822,8 +825,8 @@ namespace XRL.World.Parts.Mutation
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
                 abilityEntry.DisplayName =
                     "{{C|" + 
-                                this.HunchedOverAbilityUpright + "\n" +
-                    "{{W|[}}" + this.HunchedOverAbilityHunched + "{{W|]}}\n" +
+                                HunchedOverAbilityUpright + "\n" +
+                    "{{W|[}}" + HunchedOverAbilityHunched + "{{W|]}}\n" +
                        "}}";
 
             }
@@ -862,8 +865,8 @@ namespace XRL.World.Parts.Mutation
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
                 abilityEntry.DisplayName =
                     "{{C|" +
-                    "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}\n" +
-                                this.HunchedOverAbilityHunched + "\n" +
+                    "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
+                                HunchedOverAbilityHunched + "\n" +
                        "}}";
             }
 

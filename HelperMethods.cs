@@ -63,7 +63,6 @@ namespace HNPS_GigantismPlus
 
     public static class Utils
 	{
-
 		public static string MaybeColorText(string Color, string Text, bool Pretty = true)
 		{
 			string ColorPrefix = "";
@@ -88,13 +87,6 @@ namespace HNPS_GigantismPlus
             "Terrain",
             "Tiles"
         };
-
-        private static readonly List<string> TileExts = new()
-        {
-            ".bmp",
-            ".png"
-        };
-
         public static string BuildCustomTilePath(string DisplayName)
         {
             return Grammar.MakeTitleCase(ColorUtility.StripFormatting(DisplayName)).Replace(" ", "");
@@ -125,40 +117,26 @@ namespace HNPS_GigantismPlus
             }
             Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 5);
 
-            Debug.Entry(4, $"Listing exts", Indent: 5);
-            Debug.Entry(4, $"* foreach (string ext in TileExts)", Indent: 5);
-            foreach (string ext in TileExts)
-            {
-                Debug.LoopItem(4, $"{ext}", Indent: 6);
-            }
-            Debug.Entry(4, $"x foreach (string ext in TileExts) >//", Indent: 5);
-
             Debug.Entry(4, $"* foreach (string subfolder in TileSubfolders)", Indent: 5);
             foreach (string subfolder in TileSubfolders)
             {
                 string path = subfolder;
                 if (path != "") path += "/";
-                Debug.LoopItem(4, $"subfolder: {path}", Indent: 6);
-                foreach (string ext in TileExts)
+                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
+                if (SpriteManager.HasTextureInfo(path))
                 {
-                    path += TileName + ext;
-                    Debug.LoopItem(4, $"ext: {ext}", Indent: 7);
-                    Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
-                    if (SpriteManager.HasTextureInfo(path))
-                    {
-                        Debug.DiveIn(4, $"Yes.", Indent: 8);
-                        Debug.Entry(3, $"out Tile = {path}", Indent: 8);
-                        TilePath = path;
-                        Debug.Entry(3, $"Adding entry to _TilePathCache", Indent: 8);
-                        _TilePathCache[TileName] = TilePath;
-                        Debug.DiveOut(4, "TilePath Exists", Indent: 7);
-                        Debug.Entry(4, $"x foreach (string subfolder in subfolders) >//", Indent: 5);
-                        Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
-                        Debug.Divider(3, Count: 40, Indent: 4);
-                        return true;
-                    }
-                    Debug.Entry(4, $"No.", Indent: 8);
+                    Debug.DiveIn(4, $"Yes.", Indent: 8);
+                    Debug.Entry(3, $"out Tile = {path}", Indent: 8);
+                    TilePath = path;
+                    Debug.Entry(3, $"Adding entry to _TilePathCache", Indent: 8);
+                    _TilePathCache[TileName] = TilePath;
+                    Debug.DiveOut(4, "TilePath Exists", Indent: 7);
+                    Debug.Entry(4, $"x foreach (string subfolder in subfolders) >//", Indent: 5);
+                    Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
+                    Debug.Divider(3, Count: 40, Indent: 4);
+                    return true;
                 }
+                Debug.Entry(4, $"No.", Indent: 8);
             }
             Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 5);
             Debug.Entry(3, $"No tile \"{TileName}\" found in supplied subfolders", Indent: 5);
@@ -235,6 +213,34 @@ namespace HNPS_GigantismPlus
             }
             FistReplacement = rank[highest];
             return true;
+        }
+
+        public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
+        {
+            if (DieRoll == null)
+            {
+                return null;
+            }
+            int type = DieRoll.Type;
+            if (DieRoll.LeftValue > 0)
+            {
+                DieRoll.LeftValue += Amount;
+                return DieRoll;
+            }
+            else 
+            {
+                return new (type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.RightValue);
+            }
+        }
+        public static string AdjustDieCount(this string DieRoll, int Amount)
+        {
+            DieRoll dieRoll = new(DieRoll);
+            return AdjustDieCount(dieRoll, Amount).ToString();
+        }
+
+        public static bool HasNaturalWeaponMods(this GameObject GO)
+        {
+            return GO.GetPartsDescendedFrom<ModNaturalWeaponBase<BaseManagedDefaultEquipmentMutation>>().Any();
         }
 
         // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.

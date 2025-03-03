@@ -14,14 +14,17 @@ namespace XRL.World
 {
     public interface IDefaultNaturalWeaponManager
     {
-        public abstract class NaturalWeapon
+        public abstract class INaturalWeapon : IPart
         {
             public int DamageDieCount;
             public int DamageDieSize;
             public int DamageBonus;
             public int HitBonus;
 
-            public int Priority;
+            private int _Priority;
+            public int AdjectivePriority => _Priority;
+            public int NounPriority => -_Priority;
+
             public string Adjective;
             public string AdjectiveColor;
             public string Noun;
@@ -95,27 +98,10 @@ namespace XRL.World.Parts.Mutation
 {
     public class BaseManagedDefaultEquipmentMutation : BaseDefaultEquipmentMutation, IDefaultNaturalWeaponManager
     {
-        public class INaturalWeapon : IDefaultNaturalWeaponManager.NaturalWeapon
+        public class INaturalWeapon : IDefaultNaturalWeaponManager.INaturalWeapon
         {
             public INaturalWeapon()
             {
-                DamageDieCount = 1;
-                DamageDieSize = 2;
-                DamageBonus = 0;
-                HitBonus = 0;
-
-                Priority = 0;
-                Adjective = "natural";
-                AdjectiveColor = "Y";
-                Noun = "fist";
-
-                Skill = "Cudgel";
-                Stat = "Strength";
-                Tile = "Creatures/natural-weapon-fist.bmp";
-                RenderColorString = "&w";
-                RenderDetailColor = "W";
-                SecondRenderColorString = "&w";
-                SecondRenderDetailColor = "W";
             }
 
             public override int GetDamageDieCount(int Level = 1)
@@ -174,7 +160,18 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public INaturalWeapon NaturalWeapon = new();
+
+        public INaturalWeapon NaturalWeapon = new()
+        {
+            DamageDieCount = 1,
+            DamageDieSize = 2,
+            DamageBonus = 0,
+            HitBonus = 0,
+
+            Priority = 0,
+            Noun = "fist",
+            Tile = "Creatures/natural-weapon-fist.bmp",
+        };
 
         public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
         {
@@ -232,12 +229,6 @@ namespace XRL.World.Parts
         {
         }
 
-        private static string modificationDisplayName;
-        public override string GetModificationDisplayName()
-        {
-            return modificationDisplayName;
-        }
-
         public override void Configure()
         {
             WorksOnSelf = true;
@@ -247,8 +238,10 @@ namespace XRL.World.Parts
         {
             Wielder = who;
             AssigningMutation = Wielder.GetPart<T>();
+            Debug.Entry(4, AssigningMutation.GetMutationClass(), Indent: 12);
             Level = AssigningMutation.Level;
-            NaturalWeapon = AssigningMutation.NaturalWeapon;
+            naturalWeapon = AssigningMutation.NaturalWeapon;
+            Debug.Entry(4, NaturalWeapon.GetAdjective(), Indent: 12);
             return true;
         }
 
@@ -256,7 +249,6 @@ namespace XRL.World.Parts
         {
             return 0;
         }
-
 
         private GameObject wielder = null;
         public GameObject Wielder { get => wielder; set => wielder = value; }
@@ -282,28 +274,28 @@ namespace XRL.World.Parts
         public virtual int GetDamageDieCount()
         {
             // base damage die count is 1 
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetDamageDieCount(1) - 1;
-            return AssigningMutation.NaturalWeapon.GetDamageDieCount(Level) - 1;
+            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetDamageDieCount(1) - 1;
+            return NaturalWeapon.GetDamageDieCount(Level) - 1;
         }
         public virtual int GetDamageDieSize()
         {
             // base damage die size is 2 
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetDamageDieSize(1) - 2;
-            return AssigningMutation.NaturalWeapon.GetDamageDieSize(Level) - 2;
+            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetDamageDieSize(1) - 2;
+            return NaturalWeapon.GetDamageDieSize(Level) - 2;
         }
 
         public virtual int GetDamageBonus()
         {
             // base damage bonus is 0 
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetDamageBonus(1);
-            return AssigningMutation.NaturalWeapon.GetDamageBonus(Level);
+            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetDamageBonus(1);
+            return NaturalWeapon.GetDamageBonus(Level);
         }
 
         public virtual int GetHitBonus()
         {
             // base hit bonus is 0 
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetHitBonus(1);
-            return AssigningMutation.NaturalWeapon.GetHitBonus(Level);
+            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetHitBonus(1);
+            return NaturalWeapon.GetHitBonus(Level);
         }
 
         public override bool ModificationApplicable(GameObject Object)
@@ -315,16 +307,92 @@ namespace XRL.World.Parts
             return true;
         }
 
-        public override void ApplyModification(GameObject Object)
+        public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)
         {
-            bool hasMods = !Object.GetPartsDescendedFrom<ModNaturalWeaponBase<BaseManagedDefaultEquipmentMutation>>().Any();
-
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
             // if no other mods, bump the damage penalty of -1 off.
             // 1d2-2 into 1d2+0
-            if (!hasMods) weapon.AdjustDamage(1);
+            if (!Object.HasNaturalWeaponMods()) weapon.AdjustDamage(1);
 
+            weapon.BaseDamage.AdjustDieCount(GetDamageDieCount());
+            weapon.AdjustDamageDieSize(GetDamageDieSize());
+            weapon.AdjustDamage(GetDamageBonus());
+            if (GetHitBonus() > 0) weapon.HitBonus = GetHitBonus();
+        }
+
+        public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)
+        {
+            Render render = Object.Render;
+            MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
+            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > NounPriority)
+            {
+                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", NounPriority);
+                weapon.Skill = NaturalWeapon.Skill;
+                render.DisplayName = NaturalWeapon.Noun;
+                render.Tile = NaturalWeapon.Tile;
+                render.ColorString = (render.ColorString == NaturalWeapon.RenderColorString) ? NaturalWeapon.SecondRenderColorString : NaturalWeapon.RenderColorString;
+                render.DetailColor = (render.DetailColor == NaturalWeapon.RenderDetailColor) ? NaturalWeapon.SecondRenderDetailColor : NaturalWeapon.RenderDetailColor;
+            }
+            return NounPriority;
+        }
+
+        public override void ApplyModification(GameObject Object)
+        {
+            Render render = Object.Render;
+            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
+
+            Object.SetIntProperty("ShowAsPhysicalFeature", 1);
+
+            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation.GetMutationClass(), false);
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == GetShortDescriptionEvent.ID
+                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+        }
+
+        public override bool HandleEvent(GetDisplayNameEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+
+        public virtual string GetInstanceDescription()
+        {
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            return $"{descriptionName}: This weapon has been constructed by modifications.";
+        }
+
+    } //!-- public class ModNaturalWeaponBase : IMeleeModification
+
+    [Serializable]
+    public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
+    {
+        public ModGiganticNaturalWeapon()
+        {
+        }
+
+        public ModGiganticNaturalWeapon(int Tier)
+            : base(Tier)
+        {
+        }
+
+        public override void ApplyModification(GameObject Object)
+        {
+            /* Old code for applying the weapon mod.
+             * 
             DieRoll baseDamage = new(weapon.BaseDamage);
             Debug.Entry(4, "baseDamage.ToString()", $"{baseDamage}", Indent: 4);
             Debug.Entry(4, "baseDamage.LeftValue Before", $"{baseDamage.LeftValue}", Indent: 4);
@@ -352,150 +420,12 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4, "x if (baseDamage.LeftValue == 0) ?//", Indent: 4);
             weapon.BaseDamage = baseDamage.ToString();
+            */
 
-            weapon.AdjustDamageDieSize(GetDamageDieSize());
-            weapon.AdjustDamage(GetDamageBonus());
-            Debug.Entry(4, "baseDamage", $"{baseDamage}", Indent: 5);
-            weapon.HitBonus = GetHitBonus();
+            ApplyGenericChanges(Object, NaturalWeapon);
 
-            Render render = Object.Render;
-            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > NaturalWeapon.GetAdjectivePriority())
-            {
-                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", NaturalWeapon.GetNounPriority());
-                weapon.Skill = NaturalWeapon.Skill;
-                render.DisplayName = NaturalWeapon.Noun;
-                render.Tile = NaturalWeapon.Tile;
-                render.ColorString = (render.ColorString == NaturalWeapon.RenderColorString) ? NaturalWeapon.SecondRenderColorString : NaturalWeapon.RenderColorString;
-                render.DetailColor = (render.DetailColor == NaturalWeapon.RenderDetailColor) ? NaturalWeapon.SecondRenderDetailColor : NaturalWeapon.RenderDetailColor;
-            }
-            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
-
-            Object.SetIntProperty("ShowAsPhysicalFeature", 1);
-
-            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation.GetMutationClass(), false);
-        }
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == GetCleaveAmountEvent.ID
-                || ID == GetShortDescriptionEvent.ID
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
-
-        public override bool HandleEvent(GetCleaveAmountEvent E)
-        {
-            bool isReady = IsReady(UseCharge: true,
-                                   IgnoreCharge: false,
-                                   IgnoreLiquid: false,
-                                   IgnoreBootSequence: false,
-                                   IgnoreBreakage: false,
-                                   IgnoreRust: false, IgnoreEMP: false,
-                                   IgnoreRealityStabilization: false,
-                                   IgnoreSubject: false,
-                                   IgnoreLocallyDefinedFailure: false, 1, null,
-                                   UseChargeIfUnpowered: false, 0L, null);
-
-            if (IsObjectActivePartSubject(E.Object) && isReady)
-            {
-                E.Amount += 1 + GetDamageBonus();
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
-            if (!E.Object.HasProperName)
-            {
-                E.AddAdjective(GetModificationDisplayName(), NaturalWeapon.GetAdjectivePriority());
-            }
-
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(GetShortDescriptionEvent E)
-        {
-            E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
-            return base.HandleEvent(E);
-        }
-
-        public override bool AllowStaticRegistration()
-        {
-            return true;
-        }
-
-        public static string GetDescription()
-        {
-            string descriptionName = Grammar.MakeTitleCase(modificationDisplayName);
-            return $"{descriptionName}: " + "This weapon's damage die count and damage bonus is determined by its wielder's size.";
-        }
-
-        public virtual string GetInstanceDescription()
-        {
-            MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
-            string descriptionName = Grammar.MakeTitleCase(GetModificationDisplayName());
-
-            return $"{descriptionName}: ";
-        }
-
-    } //!-- public class ModNaturalWeaponBase : IMeleeModification
-
-    [Serializable]
-    public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
-    {
-        public ModGiganticNaturalWeapon()
-        {
-        }
-
-        public ModGiganticNaturalWeapon(int Tier)
-            : base(Tier)
-        {
-        }
-
-        private static string modificationDisplayName = "{{gigantic|gigantic}}";
-        public override string GetModificationDisplayName()
-        {
-            return modificationDisplayName;
-        }
-
-        public override void Configure()
-        {
-            WorksOnSelf = true;
-        }
-
-        public override bool BeingAppliedBy(GameObject obj, GameObject who)
-        {
-            return base.BeingAppliedBy(obj,who);
-        }
-
-        public override int GetModificationSlotUsage()
-        {
-            return base.GetModificationSlotUsage();
-        }
-        
-
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            return base.DeepCopy(Parent, MapInv);
-        }
-
-        public override int GetDamageDieCount()
-        {
-            return base.GetDamageDieCount();
-        }
-
-        public override int GetDamageBonus()
-        {
-            return base.GetDamageBonus();
-        }
-
-        public override bool ModificationApplicable(GameObject Object)
-        {
-            return base.ModificationApplicable(Object);
-        }
-
-        public override void ApplyModification(GameObject Object)
-        {
+            ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
+            
             Object.SetIntProperty("ModGiganticNoShortDescription", 1);
 
             base.ApplyModification(Object);
@@ -533,7 +463,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(GetModificationDisplayName(), NaturalWeapon.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeapon.GetColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
             }
 
             return base.HandleEvent(E);
@@ -545,16 +475,10 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public static string GetDescription()
-        {
-            string descriptionName = Grammar.MakeTitleCase(modificationDisplayName);
-            return $"{descriptionName}: " + "This weapon's damage die count and damage bonus is determined by its wielder's size.";
-        }
-
         public override string GetInstanceDescription()
         {
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
-            string descriptionName = Grammar.MakeTitleCase(GetModificationDisplayName());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
             int damageBonus = 3 + GetDamageBonus();
             List<List<string>> list = new();
             string text = "weapon";
@@ -632,10 +556,10 @@ namespace XRL.World.Parts
             return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
         }
 
-    } //!-- public class ModGiganticNaturalWeapon : IMeleeModification
+    } //!-- public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
 
     [Serializable]
-    public class ModElongatedNaturalWeapon : IMeleeModification
+    public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
     {
         public ModElongatedNaturalWeapon()
         {
@@ -646,129 +570,14 @@ namespace XRL.World.Parts
         {
         }
 
-        private static readonly string modificationDisplayName = "{{giant|elongated}}";
-        public override string GetModificationDisplayName()
-        {
-            return modificationDisplayName;
-        }
-
-        public override void Configure()
-        {
-            WorksOnSelf = true;
-        }
-
-        public override bool BeingAppliedBy(GameObject obj, GameObject who)
-        {
-            Wielder = who;
-            ElongatedPaws = Wielder.GetPart<ElongatedPaws>();
-            Level = ElongatedPaws.Level;
-            return true;
-        }
-
-        public override int GetModificationSlotUsage()
-        {
-            return 0;
-        }
-
-        private GameObject wielder = null;
-
-        public GameObject Wielder { get => wielder; set => wielder = value; }
-
-        private ElongatedPaws elongatedPaws = null;
-
-        public ElongatedPaws ElongatedPaws { get => elongatedPaws; set => elongatedPaws = value; }
-
-        private int level = 1;
-        public int Level { get => level; set => level = value; }
-
-        private const int naturalWeaponPriority = 20;
-
-        public static int NaturalWeaponPriority => naturalWeaponPriority;
-
-        public static string WeaponSkill = "ShortBlades";
-        public static string WeaponDisplayName = "paw";
-        public static string WeaponTile = "ElongatedPaw_Alt.png";
-        public static string WeaponColorString = "&x";
-        public static string WeaponDetailColor = "z";
-        public static string SecondWeaponColorString = "&X";
-        public static string SecondWeaponDetailColor = "Z";
-        
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            ModElongatedNaturalWeapon modElongatedNaturalWeapon = base.DeepCopy(Parent, MapInv) as ModElongatedNaturalWeapon;
-            modElongatedNaturalWeapon.ElongatedPaws = null;
-            modElongatedNaturalWeapon.Wielder = null;
-            return modElongatedNaturalWeapon;
-        }
-
-        public int GetDieSizeIncrease()
-        {
-            Debug.Entry(4, $"@ ModElongatedNaturalWeapon.GetDieSizeIncrease", Indent: 4);
-            if (Wielder == null && ElongatedPaws == null) return 2;
-            Debug.Entry(4, $"Wielder not null, ElongatedPaws not null", Indent: 5);
-            return ElongatedPaws.ElongatedDieSizeBonus;
-        }
-
-        public int GetBonusDamageIncrease()
-        {
-            Debug.Entry(4, $"@ ModElongatedNaturalWeapon.GetBonusDamageIncrease", Indent: 4);
-            if (Wielder == null && ElongatedPaws == null) return 2;
-            Debug.Entry(4, $"Wielder not null, ElongatedPaws not null", Indent: 5);
-            return ElongatedPaws.ElongatedBonusDamage;
-        }
-
-        public override bool ModificationApplicable(GameObject Object)
-        {
-            if (!Object.HasPart<MeleeWeapon>() && !Object.HasPart<Physics>() && Object.GetPart<Physics>().Category != "Natural Weapon")
-            {
-                return false;
-            }
-            return true;
-        }
-
         public override void ApplyModification(GameObject Object)
         {
-            Debug.Entry(4, $"@ ModElongatedNaturalWeapon.ApplyModification(Object: {Object.ShortDisplayNameStripped})", Indent: 4);
-            
-            if (Wielder != null && Wielder.HasPart<ElongatedPaws>())
-            {
-                Debug.Entry(4, $"Wielder not null, Wielder has ElongatedPaws", Indent: 5);
-                ElongatedPaws = Wielder.GetPart<ElongatedPaws>();
-            }
-            else
-            {
-                Debug.Entry(4, $"Wielder null or Wielder lacks ElongatedPaws", Indent: 5);
-            }
+            ApplyGenericChanges(Object, NaturalWeapon);
 
-            Object.RemovePart<WeaponElongator>();
+            ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
 
-            bool hasMods = !Object.GetPartsDescendedFrom<IMeleeModification>().Any();
-
-            MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
-
-            if (!hasMods) weapon.AdjustDamage(1);
-            weapon.AdjustDamageDieSize(GetDieSizeIncrease());
-            weapon.AdjustDamage(GetBonusDamageIncrease());
-
-            Render render = Object.Render;
-            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > -naturalWeaponPriority)
-            {
-                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", -naturalWeaponPriority);
-                weapon.Skill = WeaponSkill;
-                render.DisplayName = WeaponDisplayName;
-                render.Tile = WeaponTile;
-                render.ColorString = (render.ColorString == WeaponColorString) ? SecondWeaponColorString : WeaponColorString;
-                render.DetailColor = (render.DetailColor == WeaponDetailColor) ? SecondWeaponDetailColor : WeaponDetailColor;
-            }
-            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
-
-            Object.SetIntProperty("ShowAsPhysicalFeature", 1);
-
-            Object.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-            Debug.Entry(4, $"x ModElongatedNaturalWeapon.ApplyModification(Object: {Object.ShortDisplayNameStripped}) ]//", Indent: 4);
+            base.ApplyModification(Object);
         }
-
-
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -780,7 +589,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(GetModificationDisplayName(), naturalWeaponPriority);
+                E.AddAdjective(NaturalWeapon.GetColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
             }
             return base.HandleEvent(E);
         }
@@ -796,36 +605,17 @@ namespace XRL.World.Parts
             return true;
         }
 
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        public override string GetInstanceDescription()
         {
-            Registrar.Register("StatChange_Strength");
-            base.Register(Object, Registrar);
-        }
-
-        public override bool FireEvent(Event E)
-        {
-            if (E.ID == "StatChange_Strength")
-            {
-                Debug.Entry(4, "BOI, we got that StatChange_Strength Event listened to!");
-            }
-            return base.FireEvent(E);
-        }
-
-        public static string GetDescription()
-        {
-            return $"Elongated: This natural weapon has its die size increased by up to 2 based on other present mutations, and gets half your Strength Modifier in Bonus Damage.";
-        }
-
-        public string GetInstanceDescription()
-        {
-
-            string description = "{{giant|Elongated}}: This natural weapon ";
+            MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string description = $"{descriptionName}: This weapon ";
             if (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())
             {
-                description += $"has its die size increased by {GetDieSizeIncrease()}, and ";
+                description += $"has its die size increased by {NaturalWeapon.GetDamageDieSize()}, and ";
             }
             string bonusDamageIncrease = "";
-            if (GetBonusDamageIncrease() != 0) bonusDamageIncrease = $"({GetBonusDamageIncrease()}) ";
+            if (NaturalWeapon.GetDamageBonus() != 0) bonusDamageIncrease = $"({NaturalWeapon.GetDamageBonus()}) ";
             description += $"gets half its wielder's Strength Modifier {bonusDamageIncrease}added as Bonus Damage.";
             return description;
         }

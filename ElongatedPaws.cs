@@ -10,7 +10,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws : BaseDefaultEquipmentMutation, DefaultNaturalWeaponManager
+    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
@@ -54,7 +54,30 @@ namespace XRL.World.Parts.Mutation
             return list;
         }
 
-        // public GameObject ElongatedPawObject;
+        public static new INaturalWeapon NaturalWeapon = new()
+        {
+            Priority = 20,
+            Adjective = "elongated",
+            AdjectiveColor = "gigant",
+            Noun = "paw",
+            Skill = "ShortBlades",
+            Stat = "Strength",
+            Tile = "ElongatedPaw.png",
+            RenderColorString = "&x",
+            RenderDetailColor = "z",
+            SecondRenderColorString = "&X",
+            SecondRenderDetailColor = "Z"
+        };
+
+        public override int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return ElongatedBonusDamage;
+        }
+
+        public override int GetNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            return ElongatedDieSizeBonus;
+        }
 
         public static string ElongatedPawBlueprintName = "ElongatedPaw";
 
@@ -65,9 +88,9 @@ namespace XRL.World.Parts.Mutation
             get
             {
                 Debug.Entry(4, $"@ ElongatedPaws.ElongatedBonusDamage", Indent: 4);
-                Debug.Entry(4, $"Returning StrMod/2: {(int)Math.Floor((double)this.StrengthModifier / 2.0)}", Indent: 5);
+                Debug.Entry(4, $"Returning StrMod/2: {(int)Math.Floor(StrengthModifier / 2.0)}", Indent: 5);
                 Debug.Entry(4, $"x ElongatedPaws.ElongatedBonusDamage >//", Indent: 4);
-                return (int)Math.Floor((double)this.StrengthModifier / 2.0);
+                return (int)Math.Floor(StrengthModifier / 2.0);
             }
         }
 

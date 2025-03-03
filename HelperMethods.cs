@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ConsoleLib.Console;
 using Kobold;
+using XRL;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
@@ -10,10 +11,8 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
-using System.CodeDom.Compiler;
-using XRL;
 
-namespace Mods.GigantismPlus
+namespace HNPS_GigantismPlus
 {
     [HasModSensitiveStaticCache]
     public static class Options
@@ -62,7 +61,7 @@ namespace Mods.GigantismPlus
         }
     } //!-- public static class Options
 
-    public static class HelperMethods
+    public static class Utils
 	{
 
 		public static string MaybeColorText(string Color, string Text, bool Pretty = true)
@@ -79,7 +78,7 @@ namespace Mods.GigantismPlus
 
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]
         private static Dictionary<string, string> _TilePathCache = new();
-        private static List<string> TileSubfolders = new()
+        private static readonly List<string> TileSubfolders = new()
         {
             "",
             "Assets",
@@ -90,7 +89,7 @@ namespace Mods.GigantismPlus
             "Tiles"
         };
 
-        private static List<string> TileExts = new()
+        private static readonly List<string> TileExts = new()
         {
             ".bmp",
             ".png"
@@ -237,6 +236,8 @@ namespace Mods.GigantismPlus
             FistReplacement = rank[highest];
             return true;
         }
+
+        // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.
 
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
@@ -428,7 +429,7 @@ namespace Mods.GigantismPlus
         {
             string output = "";
             if (String == null) String = "\u003D"; // =
-            else String = String.Substring(0, 1);
+            else String = String[..1];
             for (int i = 0; i < Count; i++)
             {
                 output += String;

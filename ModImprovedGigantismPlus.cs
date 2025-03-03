@@ -1,12 +1,10 @@
 using System;
-using XRL.World;
 using XRL.World.Parts.Mutation;
-using Mods.GigantismPlus;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModImprovedGigantismPlus : ModImprovedMutationBase<XRL.World.Parts.Mutation.GigantismPlus>
+    public class ModImprovedGigantismPlus : ModImprovedMutationBase<GigantismPlus>
     {
         public ModImprovedGigantismPlus()
         {

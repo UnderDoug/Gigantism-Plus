@@ -8,13 +8,10 @@ using XRL.Core;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Parts;
-using XRL.World.Anatomy;
 using XRL.Liquids;
-using Mods.GigantismPlus;
-using Mods.GigantismPlus.HarmonyPatches;
-using static Mods.GigantismPlus.HelperMethods;
+using static HNPS_GigantismPlus.Utils;
 
-namespace Mods.GigantismPlus
+namespace HNPS_GigantismPlus
 {
     public static class Secrets
     {

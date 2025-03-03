@@ -2,7 +2,7 @@ using HarmonyLib;
 using XRL.World.Parts;
 using XRL.World;
 
-namespace Mods.GigantismPlus
+namespace HNPS_GigantismPlus
 {
     [HarmonyPatch(typeof(ModGigantic))]
     [HarmonyPatch("ApplyModification")]
@@ -22,7 +22,7 @@ namespace Mods.GigantismPlus
     [HarmonyPatch("ApplyModification")]
     public static class ModGigantic_WeightWhenWornPatch
     {
-        static void Postfix(ModGigantic __instance, GameObject Object)
+        static void ModGigantic_WeightWhenWornPostfix(ModGigantic __instance, GameObject Object)
         {
             Backpack part = Object.GetPart<Backpack>();
             if (part != null)
@@ -36,7 +36,7 @@ namespace Mods.GigantismPlus
     [HarmonyPatch("ApplyModification")]
     public static class ModGigantic_CarryBonusPatch 
     {
-        static void Postfix(ModGigantic __instance, GameObject Object)
+        static void ModGigantic_CarryBonusPostfix(ModGigantic __instance, GameObject Object)
         {
             Armor part = Object.GetPart<Armor>();
             if (part != null && part.CarryBonus > 0)

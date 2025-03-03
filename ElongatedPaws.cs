@@ -1,25 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using XRL;
-using XRL.Core;
-using XRL.World;
-using XRL.World.Parts;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
-using Mods.GigantismPlus;
-using Mods.GigantismPlus.HarmonyPatches; // Add this line
-using static Mods.GigantismPlus.HelperMethods;
 using XRL.World.Tinkering;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws : BaseDefaultEquipmentMutation
+    public class ElongatedPaws : BaseDefaultEquipmentMutation, DefaultNaturalWeaponManager
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
-        private static readonly List<string> NaturalWeaponSupersedingMutations = new List<string>
+        private static readonly List<string> NaturalWeaponSupersedingMutations = new()
         {
           //"CyberneticsGiganticExoframe",
             "GigantismPlus",
@@ -46,15 +41,13 @@ namespace XRL.World.Parts.Mutation
 
         private List<string> GetCompatibleMutations()
         {
-            List<string> list = new List<string>();
-            MutationEntry mutationEntry;
-            string displayName = "";
+            List<string> list = new();
             foreach (string mutation in NaturalWeaponSupersedingMutations)
             {
                 if (ParentObject.HasPart(mutation))
                 {
-                    XRL.MutationFactory.TryGetMutationEntry(mutation, out mutationEntry);
-                    displayName = mutationEntry.DisplayName;
+                    MutationFactory.TryGetMutationEntry(mutation, out MutationEntry mutationEntry);
+                    string displayName = mutationEntry.DisplayName;
                     list.Add(displayName);
                 }
             }
@@ -137,7 +130,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     CompatibleMutations += " " + mutation + ",";
                 }
-                CompatibleMutations = CompatibleMutations.Substring(CompatibleMutations.Length - 1);
+                CompatibleMutations = CompatibleMutations[^1..];
                 CompatibleMutations += ".";
             }
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
@@ -292,59 +285,43 @@ namespace XRL.World.Parts.Mutation
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
-            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
-
-            /* Testing without cascading delegation.
-             * 
-            if (body == null || IsNaturalWeaponSuperseded)
-            {
-                Debug.Entry(3, "NaturalEquipment is Superseded", Indent: 2);
-                Debug.Entry(3, "x Aborting ElongatedPaws Generation of Equipment >//", Indent: 2);
-                Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-                Debug.Footer(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
-                base.OnRegenerateDefaultEquipment(body);
-            }
-            */
+            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body == null) base.OnRegenerateDefaultEquipment(body);
 
-            Debug.Entry(3, "Performing application of behavior to parts");
+            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
             string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"");
-            Debug.Entry(4, "Generating List<BodyPart> list");
-            // Just change the body part search logic
-            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                    where p.Type == targetPartType  // Changed from VariantType to Type
-                                    select p).ToList();
+            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
+            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
 
-            Debug.Entry(4, "Checking list of parts for expected entries");
-            Debug.Entry(4, "* foreach (BodyPart part in list)");
+            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                   where p.Type == targetPartType
+                                   select p).ToList();
+
+            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
+            Debug.Entry(4, "* foreach (BodyPart part in list)", Indent: 1);
             foreach (BodyPart part in list)
             {
-                Debug.Entry(4, $"-- {part.Type}");
+                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
                 if (part.Type == "Hand")
                 {
-                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Debug.Entry(3, $"--- {part.Type} Found");
+                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
                     ItemModding.ApplyModification(part.DefaultBehavior, "ModElongatedNaturalWeapon", Actor: ParentObject);
 
-                    /* Testing with simple Modification Application.
-                    *
-                    AddElongatedNaturalEquipmentTo(part);
-                    */
-
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                    Debug.DiveOut(4, $"x {part.Type} >//", Indent: 2);
                 }
             }
-            Debug.Entry(3, "x foreach (BodyPart part in list) ]//");
-           
-            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)");
-            Debug.Entry(2, "==================================================================");
+            Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
+
+            Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+            Debug.Footer(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
             base.OnRegenerateDefaultEquipment(body);
         }
-    }   
+
+    } //!-- public class ElongatedPaws : BaseDefaultEquipmentMutation
+
 } //!-- namespace XRL.World.Parts.Mutation
 
 namespace XRL.World.Parts

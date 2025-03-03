@@ -11,13 +11,13 @@ using XRL.World.Tinkering;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Secrets;
+using UnityEngine.Tilemaps;
 
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class GigantismPlus : BaseDefaultEquipmentMutation, DefaultNaturalWeaponManager
+    public class GigantismPlus : BaseManagedDefaultEquipmentMutation
     {
-
         public int FistDamageDieCount;
         public int FistDamageDieSize;
         private string FistBaseDamage;
@@ -72,6 +72,33 @@ namespace XRL.World.Parts.Mutation
                 return "Upright";
             }
         }
+
+        public new INaturalWeapon NaturalWeapon = new()
+        {
+            Priority = 10,
+            Adjective = "gigantic",
+            AdjectiveColor = "gigantic",
+            Noun = "fist",
+            Tile = "GiganticFist_Alt.png",
+            RenderColorString = "&x",
+            RenderDetailColor = "z",
+            SecondRenderColorString = "&X",
+            SecondRenderDetailColor = "Z"
+        };
+
+        public override int GetNaturalWeaponDamageDieCount(int Level = 1)
+        {
+            return Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
+        }
+        public override int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
+        }
+        public override int GetNaturalWeaponHitBonus(int Level = 1)
+        {
+            return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
+        }
+
 
         public static int GetFistDamageDieCount(int Level)
         {

@@ -368,6 +368,14 @@ namespace HNPS_GigantismPlus
         
     } //!-- public static class HelperClass
 
+    public static class BaseDefaultEquipmentMutationExtensions
+    {
+        public static int GetNaturalWeaponDamageDieCount(this BaseDefaultEquipmentMutation Mutation)
+        {
+            return 0;
+        }
+    }
+
     public static class Debug
     {
         private static int VerbosityOption => Options.DebugVerbosity;

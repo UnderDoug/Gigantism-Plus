@@ -8,66 +8,212 @@ using XRL.World.Parts.Mutation;
 using XRL.Language;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static XRL.World.Parts.Mutation.BaseManagedDefaultEquipmentMutation;
 
 namespace XRL.World
 {
-    public interface DefaultNaturalWeaponManager
+    public interface IDefaultNaturalWeaponManager
     {
-        int NaturalWeaponDamageDieCount => 0;
-        virtual int NaturalWeaponDamageDieSize => 0;
-        virtual int NaturalWeaponDamageBonus => 0;
-        virtual int NaturalWeaponToHitBonus => 0;
-
-        virtual int NaturalWeaponPriority => 0;
-        virtual string NaturalWeaponAdjective => "natural";
-        virtual string NaturalWeaponAdjectiveColor => "Y";
-
-        virtual string NaturalWeaponSkill => "Cudgel";
-        virtual string NaturalWeaponStat => "Strength";
-        virtual string NaturalWeaponDisplayName => "fist";
-        virtual string NaturalWeaponTile => "";
-        virtual string NaturalWeaponColorString => "&K";
-        virtual string NaturalWeaponDetailColor =>"y";
-        virtual string NaturalWeaponSecondColorString => "&y";
-        virtual string NaturalWeaponSecondDetailColor => "Y";
-
-        virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        public abstract class NaturalWeapon
         {
-            return NaturalWeaponDamageDieCount;
-        }
-        virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
-        {
-            return NaturalWeaponDamageDieSize;
-        }
+            public int DamageDieCount;
+            public int DamageDieSize;
+            public int DamageBonus;
+            public int HitBonus;
 
-        virtual int GetNaturalWeaponDamageBonus(int Level = 1)
-        {
-            return NaturalWeaponDamageBonus;
-        }
+            public int Priority;
+            public string Adjective;
+            public string AdjectiveColor;
+            public string Noun;
 
-        virtual int GetNaturalWeaponToHitBonus(int Level = 1)
-        {
-            return NaturalWeaponToHitBonus;
+            public string Skill;
+            public string Stat;
+            public string Tile;
+            public string RenderColorString;
+            public string RenderDetailColor;
+            public string SecondRenderColorString;
+            public string SecondRenderDetailColor;
+
+            public abstract int GetDamageDieCount(int Level = 1);
+            public abstract int GetDamageDieSize(int Level = 1);
+            public abstract int GetDamageBonus(int Level = 1);
+            public abstract int GetHitBonus(int Level = 1);
+
+            public abstract int GetPriority();
+            public abstract int GetAdjectivePriority();
+            public abstract int GetNounPriority();
+
+            public abstract string GetNoun();
+            public abstract string GetAdjective();
+            public abstract string GetAdjectiveColor();
+            public abstract string GetColoredAdjective();
         }
 
-        virtual int GetNaturalWeaponPriority()
+        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
         {
-            return NaturalWeaponPriority;
+            return 0;
         }
 
-        virtual string GetNaturalWeaponAdjective()
+        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
         {
-            return NaturalWeaponAdjective;
+            return 0;
         }
 
-        virtual string GetNaturalWeaponAdjectiveColor()
+        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
         {
-            return NaturalWeaponAdjectiveColor;
+            return 0;
         }
 
-        virtual string GetNaturalWeaponColoredAdjective()
+        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
         {
-            return "{{" + GetNaturalWeaponAdjectiveColor() + "|" + GetNaturalWeaponAdjective() + "}}";
+            return 0;
+        }
+
+        public virtual int GetNaturalWeaponPriority()
+        {
+            return 0;
+        }
+
+        public virtual string GetNaturalWeaponAdjective()
+        {
+            return "";
+        }
+
+        public virtual string GetNaturalWeaponAdjectiveColor()
+        {
+            return "";
+        }
+
+        public virtual string GetNaturalWeaponColoredAdjective()
+        {
+            return "";
+        }
+    }
+}
+
+namespace XRL.World.Parts.Mutation
+{
+    public class BaseManagedDefaultEquipmentMutation : BaseDefaultEquipmentMutation, IDefaultNaturalWeaponManager
+    {
+        public class INaturalWeapon : IDefaultNaturalWeaponManager.NaturalWeapon
+        {
+            public INaturalWeapon()
+            {
+                DamageDieCount = 1;
+                DamageDieSize = 2;
+                DamageBonus = 0;
+                HitBonus = 0;
+
+                Priority = 0;
+                Adjective = "natural";
+                AdjectiveColor = "Y";
+                Noun = "fist";
+
+                Skill = "Cudgel";
+                Stat = "Strength";
+                Tile = "Creatures/natural-weapon-fist.bmp";
+                RenderColorString = "&w";
+                RenderDetailColor = "W";
+                SecondRenderColorString = "&w";
+                SecondRenderDetailColor = "W";
+            }
+
+            public override int GetDamageDieCount(int Level = 1)
+            {
+                return DamageDieCount;
+            }
+
+            public override int GetDamageDieSize(int Level = 1)
+            {
+                return DamageDieSize;
+            }
+
+            public override int GetDamageBonus(int Level = 1)
+            {
+                return DamageBonus;
+            }
+
+            public override int GetHitBonus(int Level = 1)
+            {
+                return HitBonus;
+            }
+
+            public override int GetPriority()
+            {
+                return Priority;
+            }
+
+            public override int GetAdjectivePriority()
+            {
+                return GetPriority();
+            }
+
+            public override int GetNounPriority()
+            {
+                return -GetPriority();
+            }
+
+            public override string GetNoun()
+            {
+                return Noun;
+            }
+
+            public override string GetAdjective()
+            {
+                return Adjective;
+            }
+
+            public override string GetAdjectiveColor()
+            {
+                return AdjectiveColor;
+            }
+
+            public override string GetColoredAdjective()
+            {
+                return "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
+            }
+        }
+
+        public INaturalWeapon NaturalWeapon = new();
+
+        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        {
+            return NaturalWeapon.GetDamageDieCount(Level);
+        }
+
+        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            return NaturalWeapon.GetDamageDieSize(Level);
+        }
+
+        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return NaturalWeapon.GetDamageBonus(Level);
+        }
+
+        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
+        {
+            return NaturalWeapon.GetHitBonus(Level);
+        }
+
+        public virtual int GetNaturalWeaponPriority()
+        {
+            return NaturalWeapon.GetPriority();
+        }
+
+        public virtual string GetNaturalWeaponAdjective()
+        {
+            return NaturalWeapon.GetAdjective();
+        }
+
+        public virtual string GetNaturalWeaponAdjectiveColor()
+        {
+            return NaturalWeapon.GetAdjectiveColor();
+        }
+
+        public virtual string GetNaturalWeaponColoredAdjective()
+        {
+            return NaturalWeapon.GetColoredAdjective();
         }
     }
 }
@@ -75,7 +221,7 @@ namespace XRL.World
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalWeaponBase<T> : IMeleeModification where T : DefaultNaturalWeaponManager, new()
+    public abstract class ModNaturalWeaponBase<T> : IMeleeModification where T : BaseManagedDefaultEquipmentMutation, new()
     {
         public ModNaturalWeaponBase()
         {
@@ -86,7 +232,7 @@ namespace XRL.World.Parts
         {
         }
 
-        private static readonly string modificationDisplayName;
+        private static string modificationDisplayName;
         public override string GetModificationDisplayName()
         {
             return modificationDisplayName;
@@ -94,27 +240,15 @@ namespace XRL.World.Parts
 
         public override void Configure()
         {
-            T mutation = new();
-            AssigningMutation = mutation;
-            //modificationDisplayName = mutation.ModAdjective;
-            ClassName = mutation.Name;
             WorksOnSelf = true;
-            naturalWeaponPriority = 0;
-            WeaponSkill = "Cudgel";
-            WeaponDisplayName = "fist";
-            WeaponTile = "";
-            WeaponColorString = "&K";
-            WeaponDetailColor = "y";
-            SecondWeaponColorString = "&y";
-            SecondWeaponDetailColor = "Y";
         }
-
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
             Wielder = who;
             AssigningMutation = Wielder.GetPart<T>();
             Level = AssigningMutation.Level;
+            NaturalWeapon = AssigningMutation.NaturalWeapon;
             return true;
         }
 
@@ -133,47 +267,43 @@ namespace XRL.World.Parts
         private int level = 1;
         public int Level { get => level; set => level = value; }
 
-        private int naturalWeaponPriority;
-        public int NaturalWeaponPriority => naturalWeaponPriority;
-
-        public string ClassName;
-        public string WeaponSkill;
-        public string WeaponDisplayName;
-        public string WeaponTile;
-        public string WeaponColorString;
-        public string WeaponDetailColor;
-        public string SecondWeaponColorString;
-        public string SecondWeaponDetailColor;
+        private INaturalWeapon naturalWeapon;
+        public INaturalWeapon NaturalWeapon { get => naturalWeapon; set => naturalWeapon = value; }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalWeaponBase<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase<T>;
             modNaturalWeaponBase.AssigningMutation = null;
             modNaturalWeaponBase.Wielder = null;
+            modNaturalWeaponBase.NaturalWeapon = null;
             return modNaturalWeaponBase;
         }
 
-        public int GetDamageDieCount()
+        public virtual int GetDamageDieCount()
         {
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.GetDamageDieCount(1);
-            return AssigningMutation.GetDamageDieCount(Level);
+            // base damage die count is 1 
+            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetDamageDieCount(1) - 1;
+            return AssigningMutation.NaturalWeapon.GetDamageDieCount(Level) - 1;
         }
-        public int GetDamageDieSize()
+        public virtual int GetDamageDieSize()
         {
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.GetDamageDieSize(1);
-            return AssigningMutation.GetDamageDieSize(Level);
-        }
-
-        public int GetDamageBonus()
-        {
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.GetDamageBonus(1);
-            return AssigningMutation.GetDamageBonus(Level);
+            // base damage die size is 2 
+            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetDamageDieSize(1) - 2;
+            return AssigningMutation.NaturalWeapon.GetDamageDieSize(Level) - 2;
         }
 
-        public int GetToHitBonus()
+        public virtual int GetDamageBonus()
         {
-            if (Wielder == null || AssigningMutation == null) return AssigningMutation.GetToHitBonus(1);
-            return AssigningMutation.GetToHitBonus(Level);
+            // base damage bonus is 0 
+            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetDamageBonus(1);
+            return AssigningMutation.NaturalWeapon.GetDamageBonus(Level);
+        }
+
+        public virtual int GetHitBonus()
+        {
+            // base hit bonus is 0 
+            if (Wielder == null || AssigningMutation == null) return AssigningMutation.NaturalWeapon.GetHitBonus(1);
+            return AssigningMutation.NaturalWeapon.GetHitBonus(Level);
         }
 
         public override bool ModificationApplicable(GameObject Object)
@@ -187,10 +317,12 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            bool hasMods = !Object.GetPartsDescendedFrom<ModNaturalWeaponBase<T>>().Any();
+            bool hasMods = !Object.GetPartsDescendedFrom<ModNaturalWeaponBase<BaseManagedDefaultEquipmentMutation>>().Any();
 
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
+            // if no other mods, bump the damage penalty of -1 off.
+            // 1d2-2 into 1d2+0
             if (!hasMods) weapon.AdjustDamage(1);
 
             DieRoll baseDamage = new(weapon.BaseDamage);
@@ -207,7 +339,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4, "baseDamageLeftDieRoll.ToString()", $"{baseDamageLeftDieRoll}", Indent: 5);
                 Debug.Entry(4, "baseDamageLeftDieRoll.LeftValue Before", $"{baseDamageLeftDieRoll.LeftValue}", Indent: 5);
 
-                baseDamageLeftDieRoll.LeftValue += GetDamageDieCount() - 1;
+                baseDamageLeftDieRoll.LeftValue += GetDamageDieCount();
 
                 Debug.Entry(4, "baseDamageLeftDieRoll.LeftValue After", $"{baseDamageLeftDieRoll.LeftValue}", Indent: 5);
                 baseDamage = new(4, baseDamageLeftDieRoll, baseDamage.RightValue);
@@ -215,30 +347,32 @@ namespace XRL.World.Parts
             else
             {
                 Debug.Entry(4, "- baseDamage.LeftValue not 0", Indent: 5);
-                baseDamage.LeftValue += GetDamageDieCount() - 1;
+                baseDamage.LeftValue += GetDamageDieCount();
                 Debug.Entry(4, "baseDamage.LeftValue After", $"{baseDamage.LeftValue}", Indent: 4);
             }
             Debug.Entry(4, "x if (baseDamage.LeftValue == 0) ?//", Indent: 4);
             weapon.BaseDamage = baseDamage.ToString();
+
+            weapon.AdjustDamageDieSize(GetDamageDieSize());
             weapon.AdjustDamage(GetDamageBonus());
             Debug.Entry(4, "baseDamage", $"{baseDamage}", Indent: 5);
+            weapon.HitBonus = GetHitBonus();
 
             Render render = Object.Render;
-            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > -naturalWeaponPriority)
+            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > NaturalWeapon.GetAdjectivePriority())
             {
-                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", -naturalWeaponPriority);
-                weapon.Skill = WeaponSkill;
-                render.DisplayName = WeaponDisplayName;
-                render.Tile = WeaponTile;
-                render.ColorString = (render.ColorString == WeaponColorString) ? SecondWeaponColorString : WeaponColorString;
-                render.DetailColor = (render.DetailColor == WeaponDetailColor) ? SecondWeaponDetailColor : WeaponDetailColor;
+                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", NaturalWeapon.GetNounPriority());
+                weapon.Skill = NaturalWeapon.Skill;
+                render.DisplayName = NaturalWeapon.Noun;
+                render.Tile = NaturalWeapon.Tile;
+                render.ColorString = (render.ColorString == NaturalWeapon.RenderColorString) ? NaturalWeapon.SecondRenderColorString : NaturalWeapon.RenderColorString;
+                render.DetailColor = (render.DetailColor == NaturalWeapon.RenderDetailColor) ? NaturalWeapon.SecondRenderDetailColor : NaturalWeapon.RenderDetailColor;
             }
             if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
 
             Object.SetIntProperty("ShowAsPhysicalFeature", 1);
 
-            Object.SetIntProperty("ModGiganticNoShortDescription", 1);
-            Object.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
+            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation.GetMutationClass(), false);
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -273,7 +407,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(GetModificationDisplayName(), naturalWeaponPriority);
+                E.AddAdjective(GetModificationDisplayName(), NaturalWeapon.GetAdjectivePriority());
             }
 
             return base.HandleEvent(E);
@@ -296,91 +430,18 @@ namespace XRL.World.Parts
             return $"{descriptionName}: " + "This weapon's damage die count and damage bonus is determined by its wielder's size.";
         }
 
-        public string GetInstanceDescription()
+        public virtual string GetInstanceDescription()
         {
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
             string descriptionName = Grammar.MakeTitleCase(GetModificationDisplayName());
-            int damageBonus = 3 + GetDamageBonus();
-            List<List<string>> list = new();
-            string text = "weapon";
-            if (part != null && ParentObject.HasTagOrProperty("ShowMeleeWeaponStats"))
-            {
-                list.Add(new List<string> { "have", $"{damageBonus.Signed()} damage" });
-                if (part.Skill == "Cudgel")
-                {
-                    list.Add(new List<string>
-            {
-                null,
-                "twice as effective when you Slam with " + ParentObject.them
-            });
-                }
-                else if (part.Skill == "Axe")
-                {
-                    list.Add(new List<string> { "cleave", $"for {(-damageBonus).Signed()} AV" });
-                }
-            }
-            if (ParentObject.HasPart<DiggingTool>() || ParentObject.HasPart<Drill>())
-            {
-                list.Add(new List<string> { "dig", "twice as fast" });
-            }
-            if (list.Count == 0)
-            {
-                return $"{descriptionName}: " + "This weapon's damage die count is determined by its wielder's size.";
-            }
-            List<string> list2 = new();
-            foreach (List<string> item in list)
-            {
-                list2.Add(GetProcessedItem(item, second: false, list, ParentObject));
-            }
-            return $"{descriptionName}: " + (ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text)) + " " + Grammar.MakeAndList(list2) + ". Its damage die count is determined by its wielder's size.";
-        }
 
-        // Ripped wholesale from ModGigantic.
-        private static string GetProcessedItem(List<string> item, bool second, List<List<string>> items, GameObject obj)
-        {
-            if (item[0] == "")
-            {
-                if (second && item == items[0])
-                {
-                    return obj.It + " " + item[1];
-                }
-                return item[1];
-            }
-            if (item[0] == null)
-            {
-                if (second && item == items[0])
-                {
-                    return obj.Itis + " " + item[1];
-                }
-                if (item != items[0])
-                {
-                    bool flag = true;
-                    foreach (List<string> item2 in items)
-                    {
-                        if (item2[0] != null)
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag)
-                    {
-                        return item[1];
-                    }
-                }
-                return obj.GetVerb("are", PrependSpace: false) + " " + item[1];
-            }
-            if (second && item == items[0])
-            {
-                return obj.It + obj.GetVerb(item[0]) + " " + item[1];
-            }
-            return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
+            return $"{descriptionName}: ";
         }
 
     } //!-- public class ModNaturalWeaponBase : IMeleeModification
 
     [Serializable]
-    public class ModGiganticNaturalWeapon : IMeleeModification
+    public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
     {
         public ModGiganticNaturalWeapon()
         {
@@ -404,128 +465,40 @@ namespace XRL.World.Parts
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            Wielder = who;
-            GigantismPlus = Wielder.GetPart<GigantismPlus>();
-            Level = GigantismPlus.Level;
-            return true;
+            return base.BeingAppliedBy(obj,who);
         }
 
         public override int GetModificationSlotUsage()
         {
-            return 0;
+            return base.GetModificationSlotUsage();
         }
-
-        private GameObject wielder = null;
-
-        public GameObject Wielder { get => wielder; set => wielder = value; }
-
-        private GigantismPlus gigantismPlus = null;
-
-        public GigantismPlus GigantismPlus { get => gigantismPlus; set => gigantismPlus = value; }
-       
-        private int level = 1;
-        public int Level { get => level; set => level = value; }
-
-        private const int naturalWeaponPriority = 10;
-
-        public static int NaturalWeaponPriority => naturalWeaponPriority;
         
-        public static string WeaponSkill = "Cudgel";
-        public static string WeaponDisplayName = "fist";
-        public static string WeaponTile = "GiganticFist_Alt.png";
-        public static string WeaponColorString = "&x";
-        public static string WeaponDetailColor = "z";
-        public static string SecondWeaponColorString = "&X";
-        public static string SecondWeaponDetailColor = "Z";
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            ModGiganticNaturalWeapon modGiganticNaturalWeapon = base.DeepCopy(Parent, MapInv) as ModGiganticNaturalWeapon;
-            modGiganticNaturalWeapon.GigantismPlus = null;
-            modGiganticNaturalWeapon.Wielder = null;
-            return modGiganticNaturalWeapon;
+            return base.DeepCopy(Parent, MapInv);
         }
 
-        public int GetDamageDieCount()
+        public override int GetDamageDieCount()
         {
-            if (Wielder == null || GigantismPlus == null) return GigantismPlus.GetFistDamageDieCount(1);
-            Debug.Entry(4, "ModGiganticNaturalWeapon.GetDamageDieCount()", "Wielder != null && GigantismPlus != null", Indent: 7);
-            Debug.Entry(4, "DamageDieCount", $"{GigantismPlus.GetFistDamageDieCount(GigantismPlus.Level)}", Indent: 7);
-            return GigantismPlus.GetFistDamageDieCount(GigantismPlus.Level);
+            return base.GetDamageDieCount();
         }
 
-        public int GetDamageBonus()
+        public override int GetDamageBonus()
         {
-            if (Wielder == null || GigantismPlus == null) return GigantismPlus.GetFistDamageBonus(1);
-            return GigantismPlus.GetFistDamageBonus(Level);
+            return base.GetDamageBonus();
         }
 
         public override bool ModificationApplicable(GameObject Object)
         {
-            if (!Object.HasPart<MeleeWeapon>() && !Object.HasPart<Physics>() && Object.GetPart<Physics>().Category != "Natural Weapon")
-            {
-                return false;
-            }
-            return true;
+            return base.ModificationApplicable(Object);
         }
 
         public override void ApplyModification(GameObject Object)
         {
-            // Change this to GigantismPlus "WeaponWatcher"
-            // Object.RemovePart<WeaponElongator>();
-
-            bool hasMods = !Object.GetPartsDescendedFrom<IMeleeModification>().Any();
-
-            MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
-
-            if (!hasMods) weapon.AdjustDamage(1);
-
-            DieRoll baseDamage = new(weapon.BaseDamage);
-            Debug.Entry(4, "baseDamage.ToString()", $"{baseDamage}", Indent: 4);
-            Debug.Entry(4, "baseDamage.LeftValue Before", $"{baseDamage.LeftValue}", Indent: 4);
-
-            Debug.Entry(4, "* if (baseDamage.LeftValue == 0)", Indent: 4);
-            if (baseDamage.LeftValue == 0)
-            {
-                Debug.Entry(4, "+ baseDamage.LeftValue is 0", Indent: 5);
-
-                DieRoll baseDamageLeftDieRoll = baseDamage.Left;
-
-                Debug.Entry(4, "baseDamageLeftDieRoll.ToString()", $"{baseDamageLeftDieRoll}", Indent: 5);
-                Debug.Entry(4, "baseDamageLeftDieRoll.LeftValue Before", $"{baseDamageLeftDieRoll.LeftValue}", Indent: 5);
-
-                baseDamageLeftDieRoll.LeftValue += GetDamageDieCount() - 1;
-
-                Debug.Entry(4, "baseDamageLeftDieRoll.LeftValue After", $"{baseDamageLeftDieRoll.LeftValue}", Indent: 5);
-                baseDamage = new(4, baseDamageLeftDieRoll, baseDamage.RightValue);
-            }
-            else
-            {
-                Debug.Entry(4, "- baseDamage.LeftValue not 0", Indent: 5);
-                baseDamage.LeftValue += GetDamageDieCount() - 1;
-                Debug.Entry(4, "baseDamage.LeftValue After", $"{baseDamage.LeftValue}", Indent: 4);
-            }
-            Debug.Entry(4, "x if (baseDamage.LeftValue == 0) ?//", Indent: 4);
-            weapon.BaseDamage = baseDamage.ToString();
-            weapon.AdjustDamage(GetDamageBonus());
-            Debug.Entry(4, "baseDamage", $"{baseDamage}", Indent: 5);
-
-            Render render = Object.Render;
-            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > -naturalWeaponPriority)
-            {
-                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", -naturalWeaponPriority);
-                weapon.Skill = WeaponSkill;
-                render.DisplayName = WeaponDisplayName;
-                render.Tile = WeaponTile;
-                render.ColorString = (render.ColorString == WeaponColorString) ? SecondWeaponColorString : WeaponColorString;
-                render.DetailColor = (render.DetailColor == WeaponDetailColor) ? SecondWeaponDetailColor : WeaponDetailColor;
-            }
-            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
-
-            Object.SetIntProperty("ShowAsPhysicalFeature", 1);
-
             Object.SetIntProperty("ModGiganticNoShortDescription", 1);
-            Object.SetStringProperty("TemporaryDefaultBehavior", "GigantismPlus", false);
+
+            base.ApplyModification(Object);
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -560,7 +533,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(GetModificationDisplayName(), naturalWeaponPriority);
+                E.AddAdjective(GetModificationDisplayName(), NaturalWeapon.GetAdjectivePriority());
             }
 
             return base.HandleEvent(E);
@@ -572,18 +545,13 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public override bool AllowStaticRegistration()
-        {
-            return true;
-        }
-
         public static string GetDescription()
         {
             string descriptionName = Grammar.MakeTitleCase(modificationDisplayName);
             return $"{descriptionName}: " + "This weapon's damage die count and damage bonus is determined by its wielder's size.";
         }
 
-        public string GetInstanceDescription()
+        public override string GetInstanceDescription()
         {
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
             string descriptionName = Grammar.MakeTitleCase(GetModificationDisplayName());

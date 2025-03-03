@@ -1,4 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <mods>
   <mod Part="ModGigantic" TinkerTier="3" TinkerDisplayName="gigantic" Tables="Gigantify,CommonMods,PotteryMods,ShevaPotteryMods,EnergyCellMods,GrenadeMods,NuggetMods,GemstoneMods,TonicMods" Load="Merge" />
+  
+  <!-- Natural Weapon Helper Mods -->
+  <mod Part="ModGiganticNaturalWeapon" TinkerDisplayName="" 
+       TinkerCategory="natural melee weapons" 
+       Tables="" Rarity="C" TinkerTier="1" 
+       CanAutoTinker="false" Value="0" 
+       />
+  <mod Part="ModElongatedNaturalWeapon" TinkerDisplayName=""
+       TinkerCategory="natural melee weapons"
+       Tables="" Rarity="C" TinkerTier="1" 
+       CanAutoTinker="false" Value="0"
+       />
+  <mod Part="ModBurrowingNaturalWeapon" TinkerDisplayName=""
+       TinkerCategory="natural melee weapons"
+       Tables="" Rarity="C" TinkerTier="1" 
+       CanAutoTinker="false" Value="0"
+       />
+  <mod Part="ModCrystallineNaturalWeapon" TinkerDisplayName=""
+       TinkerCategory="natural melee weapons"
+       Tables="" Rarity="C" TinkerTier="1" 
+       CanAutoTinker="false" Value="0"
+       />
+  <!-- End Natural Weapon Helper Mods -->
+
 </mods>

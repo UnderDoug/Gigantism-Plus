@@ -82,11 +82,15 @@ namespace XRL.World.Parts.Mutation
 
         public static int GetFistDamageDieCount(int Level)
         {
-            return 1 + (int)Math.Floor((double)Level / 5.0);
+            return Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
         }
         public static int GetFistDamageDieSize(int Level)
         {
-            return 3 + (int)Math.Floor((double)Level / 3.0);
+            return 3 + (int)Math.Floor(Level / 3.0);
+        }
+        public static int GetFistDamageBonus(int Level)
+        {
+            return (int)Math.Max(0, Math.Floor((Level-9) / 3.0) - 3);
         }
         public static string GetFistBaseDamage(int Level)
         {
@@ -94,7 +98,7 @@ namespace XRL.World.Parts.Mutation
         }
         public static int GetFistHitBonus(int Level)
         {
-            return -3 + (int)Math.Floor((double)Level / 2.0);
+            return -3 + (int)Math.Floor(Level / 2.0);
         }
 
         public static int GetHunchedOverAVModifier(int Level)
@@ -107,18 +111,18 @@ namespace XRL.World.Parts.Mutation
         }
         public static int GetHunchedOverQNModifier(int Level)
         {
-            return Math.Min(-70 + (int)Math.Floor((double)Level * 10.0),-10);
+            return Math.Min(-70 + (int)Math.Floor(Level * 10.0),-10);
         }
         public static int GetHunchedOverMSModifier(int Level)
         {
-            return Math.Min(-70 + (int)Math.Floor((double)Level * 10.0),-10);
+            return Math.Min(-70 + (int)Math.Floor(Level * 10.0),-10);
         }
 
         public int GetJumpDistanceBonus(int Level)
         {
             int baseBonus = 1;
             var cybernetics = ParentObject.Body.GetBody().Cybernetics;
-            if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+            if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
             {
                 return baseBonus + exoframe.JumpDistanceBonus;
             }
@@ -128,11 +132,11 @@ namespace XRL.World.Parts.Mutation
         {
             double factor = StunningForceLevelFactor;
             var cybernetics = ParentObject.Body.GetBody().Cybernetics;
-            if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+            if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
             {
                 factor = exoframe.StunningForceLevelFactor;
             }
-            return (int)Math.Floor((double)Level * factor);
+            return (int)Math.Floor(Level * factor);
         }
         public int GetStunningForceDistance(int Level)
         {
@@ -207,20 +211,20 @@ namespace XRL.World.Parts.Mutation
             get
             {
                 Debug.Entry(4, "HunchEnergyCost requested");
-                if (this.IsHunchFree)
+                if (IsHunchFree)
                 {
                     Debug.Entry(3, "Hunch Is Free");
-                    this.IsHunchFree = false;
+                    IsHunchFree = false;
                     return 0;
                 }
-                Debug.Entry(4, "Hunch Cost given", this._hunchOverEnergyCost.ToString());
-                return this._hunchOverEnergyCost;
+                Debug.Entry(4, "Hunch Cost given", _hunchOverEnergyCost.ToString());
+                return _hunchOverEnergyCost;
             }
             private set
             {
                 Debug.Entry(3, "attempt to set HunchEnergyCost");
-                this._hunchOverEnergyCost = value;
-                Debug.Entry(4, "new HunchEnergyCost", this._hunchOverEnergyCost.ToString());
+                _hunchOverEnergyCost = value;
+                Debug.Entry(4, "new HunchEnergyCost", _hunchOverEnergyCost.ToString());
             }
         }
 
@@ -229,7 +233,7 @@ namespace XRL.World.Parts.Mutation
         {
             get 
             {
-                if (this.IsCyberGiant)
+                if (IsCyberGiant)
                 {
                     return ParentObject.Body.GetPartByName("body").Cybernetics.GetPart<CyberneticsGiganticExoframe>().ManipulatorBlueprintName;
                 }
@@ -237,7 +241,7 @@ namespace XRL.World.Parts.Mutation
             }
             private set
             {
-                this._NaturalWeaponBlueprintName = value;
+                _NaturalWeaponBlueprintName = value;
             }
         }
         
@@ -424,7 +428,6 @@ namespace XRL.World.Parts.Mutation
 
         public override bool WantEvent(int ID, int cascade)
         {
-            // InterfaceWithBecomingNook
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
                 || ID == BeforeLevelGainedEvent.ID
@@ -434,8 +437,7 @@ namespace XRL.World.Parts.Mutation
                 || ID == InventoryActionEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == InventoryActionEvent.ID
-                || ID == EarlyBeforeBeginTakeActionEvent.ID;
+                || ID == InventoryActionEvent.ID;
         }
 
         public override bool HandleEvent(BeforeLevelGainedEvent E)
@@ -671,136 +673,146 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}");
 
+            /* Testing without cascading delegation.
+             * 
             FistDamageDieCount = GetFistDamageDieCount(Level);
             FistDamageDieSize = GetFistDamageDieSize(Level);
             FistBaseDamage = GetFistBaseDamage(Level);
             FistHitBonus = GetFistHitBonus(Level);
 
             Debug.Entry(3, $"Check if NaturalEquipment generation is superseded by another mutation", Indent: 1);
-            Debug.Entry(3, $"* if (!this.IsNaturalWeaponSuperseded && body != null)", Indent: 1);
-            if (!this.IsNaturalWeaponSuperseded && body != null)
-            {
-                Debug.Entry(3, "NaturalEquipment not Superseded", Indent: 2);
-
-                string GiganticBlueprintName = "Gigantic";
-                string ElongatedBlueprintName = "Elongated";
-                string BaseBlueprintName = "Fist";
-                string blueprintName = GiganticBlueprintName;
-
-                Debug.Entry(3, "[] Generating Stats", Indent: 2);
-
-                int dieCount = FistDamageDieCount;
-                int dieSize = FistDamageDieSize;
-                int damageBonus = 3;
-                int maxStrBonus = FistMaxStrengthBonus;
-                int hitBonus = FistHitBonus;
-
-                Debug.Entry(3, $"|^ Starting Stats:", Indent: 3);
-                Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
-                Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
-                Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
-                Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
-                Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
-                Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
-                Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
-
-                bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
-
-                Debug.Entry(3, "[] Accumulating stats", Indent: 2);
-
-                Debug.Entry(3, "* if (HasElongated)", Indent: 2);
-                if (HasElongated)
-                {
-                    Debug.DiveIn(3, "+ ElongatedPaws Mutation is present", Indent: 3);
-                    var elongated = ParentObject.GetPart<ElongatedPaws>();
-                    if (elongated != null)
-                    {
-                        // Add "Elongated" Adjective
-                        blueprintName += ElongatedBlueprintName;
-                        BaseBlueprintName = "Paw";
-                        // add damage
-                        damageBonus += elongated.ElongatedBonusDamage;
-
-                        Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 4);
-                        Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 4);
-                        Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 4);
-                        Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 4);
-                        Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 4);
-                        Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 4);
-                        Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 4);
-                        Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 4);
-                    }
-                    else
-                    {
-                        Debug.Entry(3, "! Failed to instantiate elongated part", Indent: 4);
-                    }
-                    Debug.DiveOut(3, "x if (HasElongated) >//", Indent: 3);
-                }
-                else
-                {
-                    Debug.Entry(3, "- ElongatedPaws Mutation not present", Indent: 3);
-                }
-
-                Debug.Entry(3, "[] Finished accumulating stats", Indent: 2);
-
-                blueprintName += BaseBlueprintName;
-
-                Debug.Divider(3, "_", 25, Indent: 3);
-                Debug.Entry(3, $"|: blueprintName: {blueprintName}", Indent: 3);
-                Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
-                Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
-                Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
-                Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
-                Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
-                Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
-                Debug.Divider(3, "V", 25, Indent: 3);
-
-                Debug.Entry(3, "Performing application of behavior to parts", Indent: 2);
-
-                string targetPartType = "Hand";
-                Debug.Entry(3, $"targetPartType is \"{targetPartType}\"", Indent: 2);
-                Debug.Entry(3, "Generating List<BodyPart> list", Indent: 2);
-                // Just change the body part search logic
-                List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                       where p.Type == targetPartType  // Changed from VariantType to Type
-                                       select p).ToList<BodyPart>();
-
-                Debug.Entry(3, "Checking list of parts for expected entries", Indent: 2);
-                Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 2);
-                foreach (BodyPart part in list)
-                {
-                    Debug.LoopItem(3, $"{part.Type}", Indent: 3);
-                    if (part.Type == "Hand")
-                    {
-                        Debug.DiveIn(3, $"{part.Type} Found", Indent: 3);
-
-                        Debug.Entry(3, "Sending to assignment method", Indent: 4);
-                        AddAccumulatedNaturalEquipmentTo(
-                            Creature: ParentObject,
-                            Part: part,
-                            BlueprintName: blueprintName,
-                            OldDefaultBehavior: part.DefaultBehavior,
-                            BaseDamage: WeaponDamageString(dieCount, dieSize, damageBonus),
-                            MaxStrBonus: maxStrBonus,
-                            HitBonus: hitBonus,
-                            AssigningMutation: "GigantismPlus"
-                            );
-
-                        Debug.DiveOut(3, $"x {part.Type} >//", Indent: 3);
-                    }
-                }
-                Debug.Entry(3, "x foreach (BodyPart part in list) ]//", Indent: 2);
-            }
-            else
+            Debug.Entry(3, $"* if (body == null || IsNaturalWeaponSuperseded)", Indent: 1);
+            if (body == null || IsNaturalWeaponSuperseded)
             {
                 Debug.Entry(3, "NaturalEquipment is Superseded", Indent: 2);
                 Debug.Entry(3, "x Aborting GigantismPlus Generation of Equipment >//", Indent: 2);
+                Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+                Debug.Footer(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
+                base.OnRegenerateDefaultEquipment(body);
+            }
+            Debug.Entry(3, "NaturalEquipment not Superseded", Indent: 2);
+
+            string GiganticBlueprintName = "Gigantic";
+            string ElongatedBlueprintName = "Elongated";
+            string BaseBlueprintName = "Fist";
+            string blueprintName = GiganticBlueprintName;
+
+            Debug.Entry(3, "[] Generating Stats", Indent: 2);
+
+            int dieCount = FistDamageDieCount;
+            int dieSize = FistDamageDieSize;
+            int damageBonus = 3;
+            int maxStrBonus = FistMaxStrengthBonus;
+            int hitBonus = FistHitBonus;
+
+            Debug.Entry(3, $"|^ Starting Stats:", Indent: 3);
+            Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+            Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+            Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+            Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+            Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+            Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 3);
+            Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
+
+            bool HasElongated = ParentObject.HasPart<ElongatedPaws>();
+
+            Debug.Entry(3, "[] Accumulating stats", Indent: 2);
+
+            Debug.Entry(3, "* if (HasElongated)", Indent: 2);
+            if (HasElongated)
+            {
+                Debug.DiveIn(3, "+ ElongatedPaws Mutation is present", Indent: 3);
+                var elongated = ParentObject.GetPart<ElongatedPaws>();
+                if (elongated != null)
+                {
+                    // Add "Elongated" Adjective
+                    blueprintName += ElongatedBlueprintName;
+                    BaseBlueprintName = "Paw";
+                    // add damage
+                    damageBonus += elongated.ElongatedBonusDamage;
+
+                    Debug.Entry(3, $"|? blueprintName: {blueprintName}", Indent: 4);
+                    Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 4);
+                    Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 4);
+                    Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 4);
+                    Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 4);
+                    Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 4);
+                    Debug.Entry(3, $"|[ full blueprintName: {blueprintName + BaseBlueprintName}", Indent: 4);
+                    Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 4);
+                }
+                else
+                {
+                    Debug.Entry(3, "! Failed to instantiate elongated part", Indent: 4);
+                }
+                Debug.DiveOut(3, "x if (HasElongated) >//", Indent: 3);
+            }
+            else
+            {
+                Debug.Entry(3, "- ElongatedPaws Mutation not present", Indent: 3);
             }
 
-            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-            base.OnRegenerateDefaultEquipment(body);
+            Debug.Entry(3, "[] Finished accumulating stats", Indent: 2);
 
+            blueprintName += BaseBlueprintName;
+
+            Debug.Divider(3, "_", 25, Indent: 3);
+            Debug.Entry(3, $"|: blueprintName: {blueprintName}", Indent: 3);
+            Debug.Entry(3, $"|> dieCount: {dieCount}", Indent: 3);
+            Debug.Entry(3, $"|> dieSize: {dieSize}", Indent: 3);
+            Debug.Entry(3, $"|> damageBonus: {damageBonus}", Indent: 3);
+            Debug.Entry(3, $"|> maxStrBonus: {maxStrBonus}", Indent: 3);
+            Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 3);
+            Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 3);
+            Debug.Divider(3, "V", 25, Indent: 3);
+            */
+
+            if (body == null) base.OnRegenerateDefaultEquipment(body);
+            
+            Debug.Entry(3, "Performing application of behavior to parts", Indent: 2);
+
+            string targetPartType = "Hand";
+            Debug.Entry(3, $"targetPartType is \"{targetPartType}\"", Indent: 2);
+            Debug.Entry(3, "Generating List<BodyPart> list", Indent: 2);
+            // Just change the body part search logic
+            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                    where p.Type == targetPartType  // Changed from VariantType to Type
+                                    select p).ToList();
+
+            Debug.Entry(3, "Checking list of parts for expected entries", Indent: 2);
+            Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 2);
+            foreach (BodyPart part in list)
+            {
+                Debug.LoopItem(3, $"{part.Type}", Indent: 3);
+                if (part.Type == "Hand")
+                {
+                    Debug.DiveIn(3, $"{part.Type} Found", Indent: 3);
+
+                    ItemModding.ApplyModification(part.DefaultBehavior, "ModGiganticNaturalWeapon", Actor: ParentObject);
+
+                    /* Testing with simple Modification Application.
+                     * 
+                    Debug.Entry(3, "Sending to assignment method", Indent: 4);
+                    AddAccumulatedNaturalEquipmentTo(
+                        Creature: ParentObject,
+                        Part: part,
+                        BlueprintName: blueprintName,
+                        OldDefaultBehavior: part.DefaultBehavior,
+                        BaseDamage: WeaponDamageString(dieCount, dieSize, damageBonus),
+                        MaxStrBonus: maxStrBonus,
+                        HitBonus: hitBonus,
+                        AssigningMutation: "GigantismPlus"
+                        );
+                    */
+
+                    Debug.DiveOut(3, $"x {part.Type} >//", Indent: 3);
+                }
+            }
+            Debug.Entry(3, "x foreach (BodyPart part in list) ]//", Indent: 2);
+            
+
+            Debug.Entry(3, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
             Debug.Footer(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
+            base.OnRegenerateDefaultEquipment(body);
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 
         public void CheckAffected(GameObject Actor, Body Body)

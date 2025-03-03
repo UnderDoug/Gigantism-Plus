@@ -1,21 +1,21 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using ConsoleLib.Console;
 using Kobold;
-using XRL.UI;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
-using Mods.GigantismPlus;
-using Mods.GigantismPlus.HarmonyPatches;
-using static Mods.GigantismPlus.Secrets;
+using XRL.Language;
+using System.CodeDom.Compiler;
+using XRL;
 
 namespace Mods.GigantismPlus
 {
-
+    [HasModSensitiveStaticCache]
     public static class Options
     {
         // Per the wiki, code is taken 1:1
@@ -77,7 +77,9 @@ namespace Mods.GigantismPlus
 			return ColorPrefix + Text + ColorPostfix;
 		}
 
-        private static List<string> TileSubfolders = new List<string>()
+        [ModSensitiveStaticCache(CreateEmptyInstance = true)]
+        private static Dictionary<string, string> _TilePathCache = new();
+        private static List<string> TileSubfolders = new()
         {
             "",
             "Assets",
@@ -88,67 +90,81 @@ namespace Mods.GigantismPlus
             "Tiles"
         };
 
-        private static List<string> TileExts = new List<string>()
+        private static List<string> TileExts = new()
         {
             ".bmp",
             ".png"
         };
 
+        public static string BuildCustomTilePath(string DisplayName)
+        {
+            return Grammar.MakeTitleCase(ColorUtility.StripFormatting(DisplayName)).Replace(" ", "");
+        }
         public static bool TryGetTilePath(string TileName, out string TilePath)
         {
-            Debug.Entry(3, $"=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
-            Debug.Entry(3, $"@START HelperMethods.DoesTileExist({TileName})");
-            List<string> subfolders = TileSubfolders;
-            subfolders.AddRange(TileSubfolders.ConvertAll(s => s.ToLower()));
-            subfolders.Sort();
-            subfolders = subfolders.Distinct().ToList();
+            Debug.Divider(3, Count: 40, Indent: 4);
+            Debug.Entry(3, $"@ HelperMethods.DoesTileExist({TileName})", Indent:5);
 
-            Debug.Entry(4, $"Listing subfolders");
-            Debug.Entry(4, $"* foreach (string subfolder  in subfolders)");
-            foreach (string subfolder  in subfolders)
+            Debug.Entry(4, "* if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 5);
+            if (_TilePathCache.TryGetValue(TileName, out TilePath))
             {
-                Debug.Entry(4, $"-[ {subfolder}");
+                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 6);
+                Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
+                Debug.Divider(3, Count: 40, Indent: 4);
+                return TilePath != null;
             }
+            Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 6);
 
-            Debug.Entry(4, $"Listing exts");
-            Debug.Entry(4, $"* foreach (string ext in TileExts)");
+            Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 6);
+            if (!_TilePathCache.TryAdd(TileName, TilePath)) Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 6);
+
+            Debug.Entry(4, $"Listing subfolders", Indent: 5);
+            Debug.Entry(4, $"* foreach (string subfolder  in TileSubfolders)", Indent: 5);
+            foreach (string subfolder  in TileSubfolders)
+            {
+                Debug.LoopItem(4, $"{subfolder}", Indent: 6);
+            }
+            Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 5);
+
+            Debug.Entry(4, $"Listing exts", Indent: 5);
+            Debug.Entry(4, $"* foreach (string ext in TileExts)", Indent: 5);
             foreach (string ext in TileExts)
             {
-                Debug.Entry(4, $"-[ {ext}");
+                Debug.LoopItem(4, $"{ext}", Indent: 6);
             }
+            Debug.Entry(4, $"x foreach (string ext in TileExts) >//", Indent: 5);
 
-            Debug.Entry(4, $"* foreach (string subfolder in subfolders)");
-            foreach (string subfolder in subfolders)
+            Debug.Entry(4, $"* foreach (string subfolder in TileSubfolders)", Indent: 5);
+            foreach (string subfolder in TileSubfolders)
             {
-                Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 string path = subfolder;
                 if (path != "") path += "/";
-                Debug.Entry(4, $"-- subfolder: {path}");
+                Debug.LoopItem(4, $"subfolder: {path}", Indent: 6);
                 foreach (string ext in TileExts)
                 {
-                    Debug.Entry(4, "---[");
                     path += TileName + ext;
-                    Debug.Entry(4, $"-- ext: {ext}");
-                    Debug.Entry(3, $"-- Does Tile: \"{path}\" exist?");
-                    if (Kobold.SpriteManager.HasTextureInfo(path))
+                    Debug.LoopItem(4, $"ext: {ext}", Indent: 7);
+                    Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
+                    if (SpriteManager.HasTextureInfo(path))
                     {
-                        Debug.Entry(3, $"--- Yes.");
-                        Debug.Entry(4, $"---]");
-                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                        Debug.Entry(3, $"-- out Tile = {path}");
-                        Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) >//");
-                        Debug.Entry(3, $"=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
+                        Debug.DiveIn(4, $"Yes.", Indent: 8);
+                        Debug.Entry(3, $"out Tile = {path}", Indent: 8);
                         TilePath = path;
+                        Debug.Entry(3, $"Adding entry to _TilePathCache", Indent: 8);
+                        _TilePathCache[TileName] = TilePath;
+                        Debug.DiveOut(4, "TilePath Exists", Indent: 7);
+                        Debug.Entry(4, $"x foreach (string subfolder in subfolders) >//", Indent: 5);
+                        Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
+                        Debug.Divider(3, Count: 40, Indent: 4);
                         return true;
                     }
-                    Debug.Entry(3, $"--- No.");
-                    Debug.Entry(3, $"---]");
+                    Debug.Entry(4, $"No.", Indent: 8);
                 }
-                Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
             }
-            Debug.Entry(3, $"No tile \"{TileName}\" found in supplied subfolders");
-            Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) >//");
-            Debug.Entry(3, $"=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+");
+            Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 5);
+            Debug.Entry(3, $"No tile \"{TileName}\" found in supplied subfolders", Indent: 5);
+            Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
+            Debug.Divider(3, Count: 40, Indent: 4);
             TilePath = null;
             return false;
         }
@@ -198,7 +214,7 @@ namespace Mods.GigantismPlus
                 FistReplacement = string.Empty;
                 return false;
             }
-            int highest = 0;
+            int highest = -1;
             string[] rank = new string[4]
             {
                 "CarbideFist",
@@ -212,6 +228,11 @@ namespace Mods.GigantismPlus
                 int index = Array.IndexOf(rank, fistObject);
                 if (index > highest) highest = index;
                 if (highest == rank.Length - 1) break;
+            }
+            if (highest == -1)
+            {
+                FistReplacement = string.Empty;
+                return false;
             }
             FistReplacement = rank[highest];
             return true;
@@ -229,7 +250,18 @@ namespace Mods.GigantismPlus
                 // make Creature gigantic temporarily if they normally would be.
                 if (Creature.HasPart<PseudoGigantism>()) Creature.IsGiganticCreature = true;
 
-                Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
+                if (AssigningMutation != "GigantismPlus")
+                {
+                    Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
+                }
+                else
+                {
+                    if (Creature.HasPart<ElongatedPaws>())
+                    {
+                        ItemModding.ApplyModification(Part.DefaultBehavior, "ModElongatedNaturalWeapon", Actor: Creature);
+                    }
+                    ItemModding.ApplyModification(Part.DefaultBehavior, "ModGiganticNaturalWeapon", Actor: Creature);
+                }
 
                 if (Part.DefaultBehavior != null)
                 {
@@ -238,9 +270,9 @@ namespace Mods.GigantismPlus
                     Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation, false);
 
                     MeleeWeapon weapon = Part.DefaultBehavior.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = BaseDamage;
-                    if (HitBonus != 0) weapon.HitBonus = HitBonus;
-                    weapon.MaxStrengthBonus = MaxStrBonus;
+                    // weapon.BaseDamage = BaseDamage;
+                    // if (HitBonus != 0) weapon.HitBonus = HitBonus;
+                    // weapon.MaxStrengthBonus = MaxStrBonus;
 
                     Debug.Entry(3, "Checking for HandBones", Indent: 5);
                     Debug.Entry(3, "* if (GetCyberneticsList(Part.ParentBody, out string FistReplacement))", Indent: 5);

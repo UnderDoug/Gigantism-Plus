@@ -366,16 +366,17 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(BurrowingClaws __instance, Body body)
         {
-            Zone InstanceObjectZone = __instance.ParentObject.GetCurrentZone();
+            GameObject actor = __instance.ParentObject;
+            Zone InstanceObjectZone = actor.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Entry(3,  $"[HarmonyPatch(nameof(BurrowingClaws.OnRegenerateDefaultEquipment))]");
             Debug.Header(3, $"BurrowingClaws_Patches", $"OnRegenerateDefaultEquipment(body)");
-            Debug.Entry(3,  $"TARGET {__instance.ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Entry(3,  $"TARGET {actor.DebugName} in zone {InstanceObjectZoneID}");
 
             Debug.Entry(3, $"Checking for this Mutation", Indent: 1);
-            Debug.Entry(3, $"* if (__instance.ParentObject.HasPart<BurrowingClaws>())", Indent: 1);
-            if (!__instance.ParentObject.HasPart<BurrowingClaws>())
+            Debug.Entry(3, $"* if (actor.ParentObject.HasPart<BurrowingClaws>())", Indent: 1);
+            if (!actor.HasPart<BurrowingClaws>())
             {
                 Debug.Entry(3, $"- BurrowingClaws Mutation not present", Indent: 2);
                 Debug.Footer(3, $"BurrowingClaws_Patches", "OnRegenerateDefaultEquipmentPrefix(body)");
@@ -384,6 +385,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(3, $"+ BurrowingClaws Mutation is present", Indent: 2);
             Debug.Entry(3, $"Proceeding", Indent: 1);
 
+            /* Testing without cascading delegation.
+             * 
             List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
               //"CyberneticsGiganticExoframe",
@@ -542,6 +545,9 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 2);
             Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 2);
             Debug.Divider(3, "V", 25, Indent: 2);
+            */
+
+            if (body == null) return true;
 
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
@@ -551,7 +557,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             // Just change the body part search logic
             List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
                                    where p.Type == targetPartType  // Changed from VariantType to Type
-                                   select p).ToList<BodyPart>();
+                                   select p).ToList();
 
             Debug.Entry(3, "Checking list of parts for expected entries", Indent: 1);
             Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 1);
@@ -562,6 +568,10 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 {
                     Debug.DiveIn(3, $"{part.Type} Found", Indent: 2);
 
+                    ItemModding.ApplyModification(part.DefaultBehavior, "ModBurrowingNaturalWeapon", Actor: actor);
+
+                    /* Testing with simple Modification Application.
+                     * 
                     Debug.Entry(3, "Sending to assignment method", Indent: 3);
                     AddAccumulatedNaturalEquipmentTo(
                         Creature: __instance.ParentObject,
@@ -573,6 +583,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         HitBonus: hitBonus,
                         AssigningMutation: "Burrowing Claws"
                         );
+                    */
 
                     Debug.DiveOut(3, $"x {part.Type} >//", Indent: 2);
                 }
@@ -591,16 +602,17 @@ namespace Mods.GigantismPlus.HarmonyPatches
         [HarmonyPatch(nameof(XRL.World.Parts.Mutation.Crystallinity.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(Crystallinity __instance, Body body)
         {
-            Zone InstanceObjectZone = __instance.ParentObject.GetCurrentZone();
+            GameObject actor = __instance.ParentObject;
+            Zone InstanceObjectZone = actor.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Entry(3,  $"[HarmonyPatch(nameof(Crystallinity.OnRegenerateDefaultEquipment))]");
             Debug.Header(3, $"Crystallinity_Patches", $"OnRegenerateDefaultEquipment(body)");
-            Debug.Entry(3,  $"TARGET {__instance.ParentObject.DebugName} in zone {InstanceObjectZoneID}");
+            Debug.Entry(3,  $"TARGET {actor.DebugName} in zone {InstanceObjectZoneID}");
 
             Debug.Entry(3, $"Checking for this Mutation", Indent: 1);
             Debug.Entry(3, $"* if (__instance.ParentObject.HasPart<Crystallinity>())", Indent: 1);
-            if (!__instance.ParentObject.HasPart<Crystallinity>())
+            if (!actor.HasPart<Crystallinity>())
             {
                 Debug.Entry(3, $"- Crystallinity Mutation not present", Indent: 2);
                 Debug.Footer(3, $"Crystallinity_Patches", "OnRegenerateDefaultEquipmentPrefix(body)");
@@ -609,6 +621,8 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(3, $"+ Crystallinity Mutation is present", Indent: 2);
             Debug.Entry(3, $"Proceeding", Indent: 1);
 
+            /* Testing without cascading delegation.
+             * 
             List<string> NaturalWeaponSupersedingMutations = new List<string>
             {
               //"CyberneticsGiganticExoframe"
@@ -809,6 +823,9 @@ namespace Mods.GigantismPlus.HarmonyPatches
             Debug.Entry(3, $"|> hitBonus: {hitBonus}", Indent: 2);
             Debug.Entry(3, $"|_ {WeaponDamageString(dieCount, dieSize, damageBonus)}", Indent: 2);
             Debug.Divider(3, "V", 25, Indent: 2);
+            */
+
+            if (body == null) return true;
 
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
@@ -818,7 +835,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
             // Just change the body part search logic
             List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
                                    where p.Type == targetPartType  // Changed from VariantType to Type
-                                   select p).ToList<BodyPart>();
+                                   select p).ToList();
 
             Debug.Entry(3, "Checking list of parts for expected entries", Indent: 1);
             Debug.Entry(3, "* foreach (BodyPart part in list)", Indent: 1);
@@ -829,6 +846,10 @@ namespace Mods.GigantismPlus.HarmonyPatches
                 {
                     Debug.DiveIn(3, $"{part.Type} Found", Indent: 2);
 
+                    ItemModding.ApplyModification(part.DefaultBehavior, "ModCrystallineNaturalWeapon", Actor: actor);
+
+                    /* Testing with simple Modification Application.
+                     * 
                     Debug.Entry(3, "Sending to assignment method", Indent: 3);
                     AddAccumulatedNaturalEquipmentTo(
                         Creature: __instance.ParentObject,
@@ -840,6 +861,7 @@ namespace Mods.GigantismPlus.HarmonyPatches
                         HitBonus: hitBonus,
                         AssigningMutation: "Crystallinity"
                         );
+                    */
 
                     Debug.DiveOut(3, $"x {part.Type} >//", Indent: 2);
                 }

@@ -12,6 +12,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Secrets;
 using UnityEngine.Tilemaps;
+using JetBrains.Annotations;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -72,36 +73,6 @@ namespace XRL.World.Parts.Mutation
                 return "Upright";
             }
         }
-
-        private static readonly INaturalWeapon _NaturalWeapon = new()
-        {
-            Priority = 10,
-            Adjective = "gigantic",
-            AdjectiveColor = "gigantic",
-            Noun = "fist",
-            Skill = "Cudgel",
-            Stat = "Strength",
-            Tile = "GiganticFist.png",
-            RenderColorString = "&x",
-            RenderDetailColor = "z",
-            SecondRenderColorString = "&X",
-            SecondRenderDetailColor = "Z"
-        };
-        public new INaturalWeapon NaturalWeapon = _NaturalWeapon;
-
-        public override int GetNaturalWeaponDamageDieCount(int Level = 1)
-        {
-            return Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
-        }
-        public override int GetNaturalWeaponDamageBonus(int Level = 1)
-        {
-            return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
-        }
-        public override int GetNaturalWeaponHitBonus(int Level = 1)
-        {
-            return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
-        }
-
 
         public static int GetFistDamageDieCount(int Level)
         {
@@ -310,11 +281,40 @@ namespace XRL.World.Parts.Mutation
         {
             DisplayName = "{{gigantism|Gigantism}} ({{r|D}})";
             Type = "Physical";
+
+            NaturalWeapon = new()
+            {
+                DamageDieCount = 1,
+                DamageDieSize = 2,
+                DamageBonus = 0,
+                ModPriority = 10,
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                Noun = "fist",
+                Skill = "Cudgel",
+                Stat = "Strength",
+                Tile = "GiganticFist.png",
+                RenderColorString = "&x",
+                RenderDetailColor = "z",
+                SecondRenderColorString = "&X",
+                SecondRenderDetailColor = "Z"
+            };
         }
 
-        public override string GetNaturalWeaponColoredAdjective()
+        public override bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
-            return "";
+            NaturalWeapon.DamageDieCount = Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
+            return base.CalculateNaturalWeaponDamageDieCount(Level);
+        }
+        public override bool CalculateNaturalWeaponDamageBonus(int Level = 1)
+        {
+            NaturalWeapon.DamageBonus = (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
+            return base.CalculateNaturalWeaponDamageBonus(Level);
+        }
+        public override bool CalculateNaturalWeaponHitBonus(int Level = 1)
+        {
+            NaturalWeapon.HitBonus = (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
+            return base.CalculateNaturalWeaponHitBonus(Level);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
@@ -695,8 +695,15 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
-            if (body == null) base.OnRegenerateDefaultEquipment(body);
-            
+            if (body == null)
+            {
+                Debug.Entry(3, "No Body. Aborting", Indent: 1);
+                Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+                Debug.Footer(3, "GignatismPlus", $"OnRegenerateDefaultEquipment(body)");
+                base.OnRegenerateDefaultEquipment(body);
+                return;
+            }
+
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
             string targetPartType = "Hand";
@@ -716,7 +723,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
-                    ItemModding.ApplyModification(part.DefaultBehavior, "ModGiganticNaturalWeapon", Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
 
                     Debug.DiveOut(4, $"x {part.Type} >//", Indent: 2);
                 }

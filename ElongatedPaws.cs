@@ -54,31 +54,6 @@ namespace XRL.World.Parts.Mutation
             return list;
         }
 
-        public static new INaturalWeapon NaturalWeapon = new()
-        {
-            Priority = 20,
-            Adjective = "elongated",
-            AdjectiveColor = "gigant",
-            Noun = "paw",
-            Skill = "ShortBlades",
-            Stat = "Strength",
-            Tile = "ElongatedPaw.png",
-            RenderColorString = "&x",
-            RenderDetailColor = "z",
-            SecondRenderColorString = "&X",
-            SecondRenderDetailColor = "Z"
-        };
-
-        public override int GetNaturalWeaponDamageBonus(int Level = 1)
-        {
-            return ElongatedBonusDamage;
-        }
-
-        public override int GetNaturalWeaponDamageDieSize(int Level = 1)
-        {
-            return ElongatedDieSizeBonus;
-        }
-
         public static string ElongatedPawBlueprintName = "ElongatedPaw";
 
         public int StrengthModifier => ParentObject.StatMod("Strength");
@@ -99,7 +74,7 @@ namespace XRL.World.Parts.Mutation
             get
             {
                 Debug.Entry(4, $"@ ElongatedPaws.ElongatedDieSizeBonus", Indent: 4);
-                int dieSize = 0;
+                int dieSize = 2;
 
                 bool HasGigantism = ParentObject.HasPart<GigantismPlus>();
                 bool HasBurrowing = ParentObject.HasPart<BurrowingClaws>();
@@ -124,6 +99,35 @@ namespace XRL.World.Parts.Mutation
         {
             DisplayName = "{{giant|Elongated Paws}}";
             Type = "Physical";
+
+            NaturalWeapon = new()
+            {
+                DamageDieCount = 1,
+                DamageDieSize = 3,
+                DamageBonus = 0,
+                ModPriority = 20,
+                Adjective = "elongated",
+                AdjectiveColor = "giant",
+                Noun = "paw",
+                Skill = "ShortBlades",
+                Stat = "Strength",
+                Tile = "ElongatedPaw.png",
+                RenderColorString = "&x",
+                RenderDetailColor = "z",
+                SecondRenderColorString = "&X",
+                SecondRenderDetailColor = "Z"
+            };
+        }
+
+        public override bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            NaturalWeapon.DamageBonus = ElongatedDieSizeBonus;
+            return base.CalculateNaturalWeaponDamageDieSize(Level);
+        }
+        public override bool CalculateNaturalWeaponDamageBonus(int Level = 1)
+        {
+            NaturalWeapon.DamageBonus = ElongatedBonusDamage;
+            return base.CalculateNaturalWeaponDamageBonus(Level);
         }
 
         /* May be redundant.
@@ -190,7 +194,11 @@ namespace XRL.World.Parts.Mutation
             if (E.Name == "Strength")
             {
                 Body body = E.Object.Body;
+
+                CalculateNaturalWeaponDamageBonus(Level);
+
                 body?.UpdateBodyParts();
+
 
                 foreach (GameObject equipped in body.GetEquippedObjects())
                 {
@@ -310,7 +318,14 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
-            if (body == null) base.OnRegenerateDefaultEquipment(body);
+            if (body == null)
+            {
+                Debug.Entry(3, "No Body. Aborting", Indent: 1);
+                Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+                Debug.Footer(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
+                base.OnRegenerateDefaultEquipment(body);
+                return;
+            }
 
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
@@ -331,7 +346,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
-                    ItemModding.ApplyModification(part.DefaultBehavior, "ModElongatedNaturalWeapon", Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
 
                     Debug.DiveOut(4, $"x {part.Type} >//", Indent: 2);
                 }

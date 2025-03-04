@@ -4,26 +4,28 @@ using System.Collections.Generic;
 using System.Linq;
 using ConsoleLib.Console;
 using XRL.Rules;
+using XRL.World;
+using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.Language;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
-using static XRL.World.Parts.Mutation.BaseManagedDefaultEquipmentMutation;
+using static XRL.World.IDefaultNaturalWeaponManager;
 
 namespace XRL.World
 {
     public interface IDefaultNaturalWeaponManager
     {
-        public abstract class INaturalWeapon : IPart
+        public class INaturalWeapon : IPart
         {
-            public int DamageDieCount;
-            public int DamageDieSize;
-            public int DamageBonus;
-            public int HitBonus;
+            public int DamageDieCount { get; set; }
+            public int DamageDieSize { get; set; }
+            public int DamageBonus { get; set; }
+            public int HitBonus { get; set; }
 
-            private int _Priority;
-            public int AdjectivePriority => _Priority;
-            public int NounPriority => -_Priority;
+            public int ModPriority;
+            private int AdjectivePriority => ModPriority;
+            private int NounPriority => -ModPriority;
 
             public string Adjective;
             public string AdjectiveColor;
@@ -37,60 +39,65 @@ namespace XRL.World
             public string SecondRenderColorString;
             public string SecondRenderDetailColor;
 
-            public abstract int GetDamageDieCount(int Level = 1);
-            public abstract int GetDamageDieSize(int Level = 1);
-            public abstract int GetDamageBonus(int Level = 1);
-            public abstract int GetHitBonus(int Level = 1);
+            public int GetDamageDieCount()
+            {
+                return DamageDieCount;
+            }
+            public int GetDamageDieSize()
+            {
+                return DamageDieSize;
+            }
+            public int GetDamageBonus()
+            {
+                return DamageBonus;
+            }
+            public int GetHitBonus()
+            {
+                return HitBonus;
+            }
 
-            public abstract int GetPriority();
-            public abstract int GetAdjectivePriority();
-            public abstract int GetNounPriority();
+            public int GetPriority()
+            {
+                return ModPriority;
+            }
 
-            public abstract string GetNoun();
-            public abstract string GetAdjective();
-            public abstract string GetAdjectiveColor();
-            public abstract string GetColoredAdjective();
+            public int GetAdjectivePriority()
+            {
+                return AdjectivePriority;
+            }
+
+            public int GetNounPriority()
+            {
+                return NounPriority;
+            }
+
+            public string GetNoun()
+            {
+                return Noun;
+            }
+            public string GetAdjective()
+            {
+                return Adjective;
+            }
+            public string GetAdjectiveColor()
+            {
+                return AdjectiveColor;
+            }
+            public string GetColoredAdjective()
+            {
+                return "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
+            }
         }
 
-        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
-        {
-            return 0;
-        }
+        public abstract string GetNaturalWeaponMod();
 
-        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
-        {
-            return 0;
-        }
+        public abstract bool CalculateNaturalWeaponDamageDieCount(int Level = 1);
 
-        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
-        {
-            return 0;
-        }
+        public abstract bool CalculateNaturalWeaponDamageDieSize(int Level = 1);
 
-        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
-        {
-            return 0;
-        }
+        public abstract bool CalculateNaturalWeaponDamageBonus(int Level = 1);
 
-        public virtual int GetNaturalWeaponPriority()
-        {
-            return 0;
-        }
-
-        public virtual string GetNaturalWeaponAdjective()
-        {
-            return "";
-        }
-
-        public virtual string GetNaturalWeaponAdjectiveColor()
-        {
-            return "";
-        }
-
-        public virtual string GetNaturalWeaponColoredAdjective()
-        {
-            return "";
-        }
+        public abstract bool CalculateNaturalWeaponHitBonus(int Level = 1);
     }
 }
 
@@ -98,68 +105,6 @@ namespace XRL.World.Parts.Mutation
 {
     public class BaseManagedDefaultEquipmentMutation : BaseDefaultEquipmentMutation, IDefaultNaturalWeaponManager
     {
-        public class INaturalWeapon : IDefaultNaturalWeaponManager.INaturalWeapon
-        {
-            public INaturalWeapon()
-            {
-            }
-
-            public override int GetDamageDieCount(int Level = 1)
-            {
-                return DamageDieCount;
-            }
-
-            public override int GetDamageDieSize(int Level = 1)
-            {
-                return DamageDieSize;
-            }
-
-            public override int GetDamageBonus(int Level = 1)
-            {
-                return DamageBonus;
-            }
-
-            public override int GetHitBonus(int Level = 1)
-            {
-                return HitBonus;
-            }
-
-            public override int GetPriority()
-            {
-                return Priority;
-            }
-
-            public override int GetAdjectivePriority()
-            {
-                return GetPriority();
-            }
-
-            public override int GetNounPriority()
-            {
-                return -GetPriority();
-            }
-
-            public override string GetNoun()
-            {
-                return Noun;
-            }
-
-            public override string GetAdjective()
-            {
-                return Adjective;
-            }
-
-            public override string GetAdjectiveColor()
-            {
-                return AdjectiveColor;
-            }
-
-            public override string GetColoredAdjective()
-            {
-                return "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
-            }
-        }
-
 
         public INaturalWeapon NaturalWeapon = new()
         {
@@ -168,50 +113,45 @@ namespace XRL.World.Parts.Mutation
             DamageBonus = 0,
             HitBonus = 0,
 
-            Priority = 0,
+            ModPriority = 0,
             Noun = "fist",
             Tile = "Creatures/natural-weapon-fist.bmp",
         };
 
-        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        public virtual string GetNaturalWeaponMod()
         {
-            return NaturalWeapon.GetDamageDieCount(Level);
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
         }
 
-        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
+        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
-            return NaturalWeapon.GetDamageDieSize(Level);
+            return true;
         }
 
-        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
+        public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
         {
-            return NaturalWeapon.GetDamageBonus(Level);
+            return true;
         }
 
-        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
+        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1)
         {
-            return NaturalWeapon.GetHitBonus(Level);
+            return true;
         }
 
-        public virtual int GetNaturalWeaponPriority()
+        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1)
         {
-            return NaturalWeapon.GetPriority();
+            return true;
         }
 
-        public virtual string GetNaturalWeaponAdjective()
+        public override bool ChangeLevel(int NewLevel)
         {
-            return NaturalWeapon.GetAdjective();
+            CalculateNaturalWeaponDamageDieCount(NewLevel);
+            CalculateNaturalWeaponDamageDieSize(NewLevel);
+            CalculateNaturalWeaponDamageBonus(NewLevel);
+            CalculateNaturalWeaponHitBonus(NewLevel);
+            return base.ChangeLevel(NewLevel);
         }
 
-        public virtual string GetNaturalWeaponAdjectiveColor()
-        {
-            return NaturalWeapon.GetAdjectiveColor();
-        }
-
-        public virtual string GetNaturalWeaponColoredAdjective()
-        {
-            return NaturalWeapon.GetColoredAdjective();
-        }
     }
 }
 
@@ -240,7 +180,7 @@ namespace XRL.World.Parts
             AssigningMutation = Wielder.GetPart<T>();
             Debug.Entry(4, AssigningMutation.GetMutationClass(), Indent: 12);
             Level = AssigningMutation.Level;
-            naturalWeapon = AssigningMutation.NaturalWeapon;
+            NaturalWeapon = AssigningMutation.NaturalWeapon;
             Debug.Entry(4, NaturalWeapon.GetAdjective(), Indent: 12);
             return true;
         }
@@ -273,29 +213,29 @@ namespace XRL.World.Parts
 
         public virtual int GetDamageDieCount()
         {
-            // base damage die count is 1 
-            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetDamageDieCount(1) - 1;
-            return NaturalWeapon.GetDamageDieCount(Level) - 1;
+            // base damage die count is 1
+            // example: mutation calculates die count should be 6d
+            //          this deducts 1, adding 5 to the existing 1
+            return Math.Max(0, NaturalWeapon.GetDamageDieCount() - 1);
         }
         public virtual int GetDamageDieSize()
         {
-            // base damage die size is 2 
-            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetDamageDieSize(1) - 2;
-            return NaturalWeapon.GetDamageDieSize(Level) - 2;
+            // base damage die size is 2
+            // example: mutation calculates die size should be d5
+            //          this deducts 2, adding 3 to the existing 2
+            return Math.Max(0, NaturalWeapon.GetDamageDieSize() - 2);
         }
 
         public virtual int GetDamageBonus()
         {
-            // base damage bonus is 0 
-            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetDamageBonus(1);
-            return NaturalWeapon.GetDamageBonus(Level);
+            // base damage bonus is 0
+            return NaturalWeapon.GetDamageBonus();
         }
 
         public virtual int GetHitBonus()
         {
-            // base hit bonus is 0 
-            if (Wielder == null || AssigningMutation == null) return NaturalWeapon.GetHitBonus(1);
-            return NaturalWeapon.GetHitBonus(Level);
+            // base hit bonus is 0
+            return NaturalWeapon.GetHitBonus();
         }
 
         public override bool ModificationApplicable(GameObject Object)
@@ -619,10 +559,23 @@ namespace XRL.World.Parts
             description += $"gets half its wielder's Strength Modifier {bonusDamageIncrease}added as Bonus Damage.";
             return description;
         }
-    } //!-- public class ModElongatedNaturalWeapon : IMeleeModification
+    } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
 
     [Serializable]
-    public class ModBurrowingNaturalWeapon : IMeleeModification
+    public class ModNaturalWeaponBase<T,I> : ModNaturalWeaponBase<BaseManagedDefaultEquipmentMutation> where T : BaseDefaultEquipmentMutation, new() where I : IDefaultNaturalWeaponManager
+    {
+        public ModNaturalWeaponBase()
+        {
+        }
+
+        public ModNaturalWeaponBase(int Tier)
+            : base(Tier)
+        {
+        }
+    }
+
+    [Serializable]
+    public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<ManagedBurrowingClaws, IDefaultNaturalWeaponManager>
     {
         public ModBurrowingNaturalWeapon()
         {

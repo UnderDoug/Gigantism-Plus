@@ -11,6 +11,7 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HNPS_GigantismPlus
 {
@@ -122,6 +123,7 @@ namespace HNPS_GigantismPlus
             {
                 string path = subfolder;
                 if (path != "") path += "/";
+                path += TileName;
                 Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
                 if (SpriteManager.HasTextureInfo(path))
                 {
@@ -219,16 +221,19 @@ namespace HNPS_GigantismPlus
         {
             if (DieRoll == null)
             {
+                Debug.Entry(4, "AdjustDieCount", "DieRoll null", Indent: 7);
                 return null;
             }
             int type = DieRoll.Type;
             if (DieRoll.LeftValue > 0)
             {
+                Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue > 0", Indent: 7);
                 DieRoll.LeftValue += Amount;
                 return DieRoll;
             }
-            else 
+            else
             {
+                Debug.Entry(4, "AdjustDieCount", "Collapsing", Indent: 7);
                 return new (type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.RightValue);
             }
         }
@@ -240,7 +245,8 @@ namespace HNPS_GigantismPlus
 
         public static bool HasNaturalWeaponMods(this GameObject GO)
         {
-            return GO.GetPartsDescendedFrom<ModNaturalWeaponBase<BaseManagedDefaultEquipmentMutation>>().Any();
+
+            return GO.GetPartsDescendedFrom<IMeleeModification>().Any();
         }
 
         // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.
@@ -371,7 +377,49 @@ namespace HNPS_GigantismPlus
             Debug.Entry(2, "x public void AddAccumulatedNaturalEquipmentTo() ]//", Indent: 4);
             Debug.Divider(3, "-", 40, Indent: 4);
         } //!-- public void AddGiganticFistTo(BodyPart part)
-        
+
+        // Ripped wholesale from ModGigantic.
+        public static string GetProcessedItem(List<string> item, bool second, List<List<string>> items, GameObject obj)
+        {
+            if (item[0] == "")
+            {
+                if (second && item == items[0])
+                {
+                    return obj.It + " " + item[1];
+                }
+                return item[1];
+            }
+            if (item[0] == null)
+            {
+                if (second && item == items[0])
+                {
+                    return obj.Itis + " " + item[1];
+                }
+                if (item != items[0])
+                {
+                    bool flag = true;
+                    foreach (List<string> item2 in items)
+                    {
+                        if (item2[0] != null)
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        return item[1];
+                    }
+                }
+                return obj.GetVerb("are", PrependSpace: false) + " " + item[1];
+            }
+            if (second && item == items[0])
+            {
+                return obj.It + obj.GetVerb(item[0]) + " " + item[1];
+            }
+            return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
+        } //!-- public static string GetProcessedItem(List<string> item, bool second, List<List<string>> items, GameObject obj)
+
     } //!-- public static class HelperClass
 
     public static class BaseDefaultEquipmentMutationExtensions

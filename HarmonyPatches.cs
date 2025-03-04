@@ -332,6 +332,7 @@ namespace HNPS_GigantismPlus
         }
     }
 
+    /*
     [HarmonyPatch(typeof(BurrowingClaws))]
     public static class BurrowingClaws_Patches
     {
@@ -390,7 +391,9 @@ namespace HNPS_GigantismPlus
             return false; // Skip the original method
         }
     } //!-- public static class BurrowingClaws_Patches
+    */
 
+    /*
     [HarmonyPatch(typeof(Crystallinity))]
     public static class Crystallinity_Patches
     {
@@ -449,6 +452,7 @@ namespace HNPS_GigantismPlus
             return false; // Skip the original method
         }
     } //!-- public static class Crystallinity_Patches
+    */
 
     [HarmonyPatch(typeof(Crystallinity))]
     public static class Crystallinity_RefractChance_Patches
@@ -458,7 +462,7 @@ namespace HNPS_GigantismPlus
         [HarmonyPatch(nameof(Crystallinity.Mutate))]
         static void MutatePrefix(Crystallinity __instance, GameObject GO)
         {
-            if (GO.HasPart<XRL.World.Parts.Mutation.GigantismPlus>())
+            if (GO.HasPart<GigantismPlus>())
             {
                 // Wait for the original method to create the RefractLight part
                 // Then in the postfix we'll modify its chance
@@ -481,7 +485,7 @@ namespace HNPS_GigantismPlus
         }
     } //!-- public static class Crystallinity_RefractChance_Patches
 
-    [HarmonyPatch(typeof(XRL.World.Parts.Mutation.Crystallinity))]
+    [HarmonyPatch(typeof(Crystallinity))]
     public static class Crystallinity_LevelText_Patches
     {
         // Modify the Crystallinity mutation level text to include the GigantismPlus bonus
@@ -586,19 +590,12 @@ namespace HNPS_GigantismPlus
 
 namespace XRL.World.Parts.Mutation
 {
-    public class ManagedBurrowingClaws : BurrowingClaws, IDefaultNaturalWeaponManager
+    public class HNPS_ManagedBurrowingClaws : BurrowingClaws, IDefaultNaturalWeaponManager
     {
-        public static implicit operator BaseManagedDefaultEquipmentMutation(ManagedBurrowingClaws ManagedBurrowingClaws)
+        public class INaturalWeapon : IDefaultNaturalWeaponManager.INaturalWeapon
         {
-            BaseManagedDefaultEquipmentMutation output = new()
-            {
-                NaturalWeapon = ManagedBurrowingClaws.NaturalWeapon,
-                ActivatedAbilityID = ManagedBurrowingClaws.ActivatedAbilityID,
-                BaseLevel = ManagedBurrowingClaws.BaseLevel
-            };
-            return output;
-        }
 
+        }
 
         public INaturalWeapon NaturalWeapon = new()
         {
@@ -609,6 +606,8 @@ namespace XRL.World.Parts.Mutation
 
             ModPriority = 30,
             Skill = "ShortBlades",
+            Adjective = "burrowing",
+            AdjectiveColor = "W",
             Noun = "claw",
             Tile = "Creatures/natural-weapon-claw.bmp",
             RenderColorString = "&w",
@@ -616,6 +615,15 @@ namespace XRL.World.Parts.Mutation
             SecondRenderColorString = "&w",
             SecondRenderDetailColor = "W",
         };
+        public virtual IDefaultNaturalWeaponManager.INaturalWeapon GetNaturalWeapon()
+        {
+            return NaturalWeapon;
+        }
+
+        public virtual string GetNaturalWeaponMod()
+        {
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
+        }
 
         public bool HasGigantism
         {
@@ -624,16 +632,6 @@ namespace XRL.World.Parts.Mutation
                 return ParentObject.HasPart<GigantismPlus>();
             }
         }
-        public virtual string GetNaturalWeaponMod()
-        {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
-        }
-
-        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
-        {
-            return true;
-        }
-
         public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
         {
             if (HasGigantism)
@@ -646,15 +644,9 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1)
-        {
-            return true;
-        }
-
-        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1)
-        {
-            return true;
-        }
+        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1) { return true; }
+        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1) { return true; }
+        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1) { return true; }
 
         public override bool ChangeLevel(int NewLevel)
         {
@@ -708,6 +700,103 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
             Debug.Footer(3, "ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
+        }
+    }
+
+    public class HNPS_ManagedCrystallinity : Crystallinity, IDefaultNaturalWeaponManager
+    {
+        public class INaturalWeapon : IDefaultNaturalWeaponManager.INaturalWeapon
+        {
+
+        }
+
+        public INaturalWeapon NaturalWeapon = new()
+        {
+            DamageDieCount = 1,
+            DamageDieSize = 3,
+            DamageBonus = 0,
+            HitBonus = 0,
+
+            ModPriority = 40,
+            Skill = "ShortBlades",
+            Adjective = "crystalline",
+            AdjectiveColor = "crystallized",
+            Noun = "point",
+            Tile = "Creatures/natural-weapon-claw.bmp",
+            RenderColorString = "&b",
+            RenderDetailColor = "B",
+            SecondRenderColorString = "&B",
+            SecondRenderDetailColor = "m"
+        };
+
+        public virtual IDefaultNaturalWeaponManager.INaturalWeapon GetNaturalWeapon()
+        {
+            return NaturalWeapon;
+        }
+
+        public virtual string GetNaturalWeaponMod()
+        {
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
+        }
+
+        public bool HasGigantism
+        {
+            get
+            {
+                return ParentObject.HasPart<GigantismPlus>();
+            }
+        }
+        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1) { return true; }
+        public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1) { return true; }
+        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1) { return true; }
+        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1) { return true; }
+
+        public override void OnRegenerateDefaultEquipment(Body body)
+        {
+            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Cache]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(3, "ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+
+            if (body == null)
+            {
+                Debug.Entry(3, "No Body. Aborting", Indent: 1);
+                Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+                Debug.Footer(3, "ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+                base.OnRegenerateDefaultEquipment(body);
+                return;
+            }
+
+            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
+
+            string targetPartType = "Hand";
+            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
+            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
+
+            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                   where p.Type == targetPartType
+                                   select p).ToList();
+
+            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
+            Debug.Entry(4, "* foreach (BodyPart part in list)", Indent: 1);
+            foreach (BodyPart part in list)
+            {
+                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
+                if (part.Type == "Hand")
+                {
+                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
+
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
+
+                    Debug.DiveOut(4, $"x {part.Type} >//", Indent: 2);
+                }
+            }
+            Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
+
+            Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
+            Debug.Footer(3, "ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
         }
     }
 }

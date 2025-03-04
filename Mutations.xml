@@ -5,4 +5,13 @@
     <category Name="PhysicalDefects">
         <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" Exclusions="" BearerDescription="those who are gigantic" Tile="GigantismPlus_Alt.png" Defect="true" />
     </category>
+
+    <!-- NaturalWeapon Managed vanilla mutations -->
+    <category Name="Physical">
+      <mutation Name="Burrowing Claws" Class="HNPS_ManagedBurrowingClaws" Load="Merge" />
+    </category>
+    <category Name="Mental">
+      <mutation Name="Crystallinity" Class="HNPS_ManagedCrystallinity" Load="Merge" />
+    </category>
+    <!-- End NaturalWeapon Managed vanilla mutations -->
 </mutations>

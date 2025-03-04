@@ -303,6 +303,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
+            Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponDamageDieCount", Indent: 7);
             NaturalWeapon.DamageDieCount = Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
             return base.CalculateNaturalWeaponDamageDieCount(Level);
         }
@@ -354,7 +355,7 @@ namespace XRL.World.Parts.Mutation
             Acrobatics_Jump.SyncAbility(ParentObject);
 
             // Stunning Force
-            if (ParentObject.TryGetPart<StunningForceOnJump>(out StunningForceOnJump stunning))
+            if (ParentObject.TryGetPart(out StunningForceOnJump stunning))
             {
                 stunning.Level = GetStunningForceLevelFactor(NewLevel); // Scale stunning force with mutation level
                 stunning.Distance = StunningForceDistance;

@@ -54,7 +54,7 @@ namespace Mods.GigantismPlus
                     Popup.Show(finalMessage);
                 }
                 User.RequirePart<SecretExoframePart>();
-                if (User.TryGetPart<SecretExoframePart>(out SecretExoframePart secretExoframePart))
+                if (User.TryGetPart(out SecretExoframePart secretExoframePart))
                 {
                     hadFrameCount = User.GetIntProperty(SecretExoframePart.HadFrameCountProperty);
                     secretExoframePart.HadFrameCount = hadFrameCount;
@@ -71,13 +71,28 @@ namespace Mods.GigantismPlus
                     User.SetStringProperty("BleedPrefix", "{{SECRETGOLDEN|shiny}}");
                     User.SetStringProperty("BleedColor", "&W");
                 }
+                User.RequirePart<Preacher>();
+                if (User.TryGetPart(out Preacher preacher))
+                {
+                    string preach = "{{SECRETGOLDEN|I AM BECOME GOLDEN, SHINER OF {{GOLDENSECRET|" + User.GetCurrentZone().ZoneID + "}}!!}}";
+                    preacher.Lines = new string[1] { preach };
+                    preacher.Prefix = "=subject.T= =verb:yell= {{SECRETGOLDEN|";
+                    preacher.PreacherHomily(User, false);
+                    preacher.Lines = Array.Empty<string>();
+
+                    preacher.Chance = 16;
+                    preacher.ChatWait = 250;
+                    preacher.Book = "SECRETGOLDEN QUOTES";
+                    preacher.inOrder = false;
+                }
             }
         }
         public static void Unbecome(GameObject User, string Model, GameObject ImplantObject)
         {
             if (Model == "YES")
             {
-                if (User.TryGetPart<SecretExoframePart>(out SecretExoframePart secretExoframePart))
+                string exoframeDisplayName = "{{SECRETGOLDEN|THE GIGANTIC EXOFRAME}}";
+                if (User.TryGetPart(out SecretExoframePart secretExoframePart))
                 {
                     User.SetStringProperty("BleedLiquid", secretExoframePart.OldBleedLiquid, RemoveIfNull: true);
                     User.SetStringProperty("BleedPrefix", secretExoframePart.OldBleedPrefix, RemoveIfNull: true);
@@ -85,13 +100,25 @@ namespace Mods.GigantismPlus
 
                     int hadFrameCount = secretExoframePart.HadFrameCount - 1;
                     User.SetIntProperty(SecretExoframePart.HadFrameCountProperty, hadFrameCount, RemoveIfZero: true);
+
+                    exoframeDisplayName = secretExoframePart.exoframeObject.ShortDisplayName;
                 }
                 User.RequirePart<SecretExoframePart>();
                 User.RemovePart<SecretExoframePart>();
+
                 if (User == The.Player)
                 {
                     Popup.Show("Oh! To have tasted sweet {{SECRETGOLDEN|ambrosia}}...");
                 }
+                if (User.TryGetPart(out Preacher preacher))
+                {
+                    preacher.Lines = Array.Empty<string>();
+                    string preach = "{{SECRETGOLDEN|I AM REDUCED AGAIN TO NOTHING, WITHOUT MY " + exoframeDisplayName + "!!}}";
+                    preacher.Lines = new string[1] { preach };
+                    preacher.PreacherHomily(User, false);
+                }
+                User.RequirePart<Preacher>();
+                User.RemovePart<Preacher>();
             }
 
         }
@@ -156,8 +183,8 @@ namespace Mods.GigantismPlus
             Combustibility = 1;
             ThermalConductivity = 100;
             Fluidity = 200;
-            Staining = 50;
-            Cleansing = 20;
+            Staining = 100;
+            Cleansing = 5;
             SlipperyWhenWet = false;
             SlipperyWhenFrozen = false;
         }
@@ -171,7 +198,7 @@ namespace Mods.GigantismPlus
 
         public override void RenderPrimary(LiquidVolume Liquid, RenderEvent eRender)
         {
-            if (!Liquid.IsWadingDepth())
+            if (Liquid.Volume < 90)
             {
                 return;
             }
@@ -182,29 +209,29 @@ namespace Mods.GigantismPlus
                 return;
             }
             Render render = Liquid.ParentObject.Render;
-            int num = (XRLCore.CurrentFrame + Liquid.FrameOffset) % 10;
-            if (Stat.RandomCosmetic(1, 600) == 1)
+            int num = (XRLCore.CurrentFrame + Liquid.FrameOffset) % 20;
+            if (Stat.RandomCosmetic(1, 300) == 1)
             {
                 eRender.RenderString = "\u000f";
                 eRender.TileVariantColors("&Y^W", "&Y", "W");
             }
-            if (Stat.RandomCosmetic(1, 60) == 1)
+            if (Stat.RandomCosmetic(1, 20) == 1)
             {
-                if (num < 15)
+                if (num < 6)
                 {
                     render.RenderString = "÷";
                     render.ColorString = "&Y^O";
                     render.TileColor = "&Y";
                     render.DetailColor = "O";
                 }
-                else if (num < 30)
+                else if (num < 11)
                 {
                     render.RenderString = "~";
                     render.ColorString = "&Y^O";
                     render.TileColor = "&Y";
                     render.DetailColor = "O";
                 }
-                else if (num < 45)
+                else if (num < 16)
                 {
                     render.RenderString = "\t";
                     render.ColorString = "&W^Y";

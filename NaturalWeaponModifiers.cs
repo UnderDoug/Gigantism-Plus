@@ -41,11 +41,17 @@ namespace XRL.World
 
             public int GetDamageDieCount()
             {
-                return DamageDieCount;
+                // base damage die count is 1
+                // example: mutation calculates die count should be 6d
+                //          this deducts 1, adding 5 to the existing 1
+                return DamageDieCount - 1;
             }
             public int GetDamageDieSize()
             {
-                return DamageDieSize;
+                // base damage die size is 2
+                // example: mutation calculates die size should be d5
+                //          this deducts 2, adding 3 to the existing 2
+                return DamageDieSize - 2;
             }
             public int GetDamageBonus()
             {
@@ -169,7 +175,69 @@ namespace XRL.World.Parts.Mutation
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalWeaponBase : IMeleeModification
+    public class NaturalWeaponDescriber : IPart
+    {
+        public SortedDictionary<int, string> ShortDescriptions = new();
+
+        private string _ShortDescriptionCache = null;
+
+        public string ProcessDescription(SortedDictionary<int, string> Descriptions, bool IsShort = true)
+        {
+            StringBuilder StringBuilder = Event.NewStringBuilder();
+
+            foreach (KeyValuePair<int, string> description in Descriptions)
+            {
+                if (IsShort) 
+                { 
+                    StringBuilder.AppendRules(description.Value);
+                    continue;
+                }
+                StringBuilder.AppendLine(description.Value);
+            }
+
+            return Event.FinalizeString(StringBuilder);
+        }
+
+        public void AddShortDescriptionEntry(int Priority, string Description)
+        {
+            Debug.Entry(4, $"NaturalWeaponDescriber.AddShortDescriptionEntry(int Priority: {Priority}, string Description)", Indent: 6);
+            ShortDescriptions[Priority] = Description;
+        }
+
+        public void ClearShortDescriptionCache()
+        {
+            _ShortDescriptionCache = null;
+        }
+        public void ClearShortDescriptions()
+        {
+            ShortDescriptions.Clear();
+        }
+        public void ResetShortDescription()
+        {
+            ClearShortDescriptionCache();
+            ClearShortDescriptions();
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == GetShortDescriptionEvent.ID;
+        }
+
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            Debug.Entry(4, "@ NaturalWeaponDescriber.HandleEvent(GetShortDescriptionEvent E)", Indent: 6);
+            _ShortDescriptionCache ??= ProcessDescription(ShortDescriptions);
+            Debug.Entry(4, "_ShortDescriptionCache", _ShortDescriptionCache, Indent: 6);
+            E.Postfix.AppendRules(_ShortDescriptionCache);
+            return base.HandleEvent(E);
+        }
+
+    }
+
+    [Serializable]
+    public abstract class ModNaturalWeaponBase<T> : IMeleeModification
+        where T : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon, new()
     {
         public ModNaturalWeaponBase()
         {
@@ -199,66 +267,15 @@ namespace XRL.World.Parts
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            return base.BeingAppliedBy(obj, who);
-        }
-
-        private GameObject wielder = null;
-        public GameObject Wielder { get => wielder; set => wielder = value; }
-
-        public override void ApplyModification(GameObject Object)
-        {
-            Render render = Object.Render;
-            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
-
-            Object.SetIntProperty("ShowAsPhysicalFeature", 1);
-
-            base.ApplyModification(Object);
-        }
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == GetShortDescriptionEvent.ID
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
-
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(GetShortDescriptionEvent E)
-        {
-            return base.HandleEvent(E);
-        }
-
-        public override bool AllowStaticRegistration()
-        {
-            return true;
-        }
-    }
-
-    [Serializable]
-    public abstract class ModNaturalWeaponBase<T> : ModNaturalWeaponBase
-        where T : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon, new()
-    {
-        public ModNaturalWeaponBase()
-        {
-        }
-
-        public ModNaturalWeaponBase(int Tier)
-            : base(Tier)
-        {
-        }
-
-        public override bool BeingAppliedBy(GameObject obj, GameObject who)
-        {
             Wielder = who;
             AssigningMutation = Wielder.GetPart<T>();
             Level = AssigningMutation.Level;
             NaturalWeapon = AssigningMutation.GetNaturalWeapon();
             return base.BeingAppliedBy(obj, who);
         }
+
+        private GameObject wielder = null;
+        public GameObject Wielder { get => wielder; set => wielder = value; }
 
         private T assigningMutation = null;
         public T AssigningMutation { get => assigningMutation; set => assigningMutation = value; }
@@ -282,19 +299,13 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
             Debug.Entry(4, "NaturalWeapon.GetDamageDieCount()", $"{NaturalWeapon.GetDamageDieCount()-1}", Indent: 6);
-            // base damage die count is 1
-            // example: mutation calculates die count should be 6d
-            //          this deducts 1, adding 5 to the existing 1
-            return Math.Max(0, NaturalWeapon.GetDamageDieCount() - 1);
+            return Math.Max(0, NaturalWeapon.GetDamageDieCount());
         }
         public virtual int GetDamageDieSize()
         {
             Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
             Debug.Entry(4, "NaturalWeapon.GetDamageDieSize()", $"{NaturalWeapon.GetDamageDieSize()-2}", Indent: 6);
-            // base damage die size is 2
-            // example: mutation calculates die size should be d5
-            //          this deducts 2, adding 3 to the existing 2
-            return Math.Max(0, NaturalWeapon.GetDamageDieSize() - 2);
+            return Math.Max(0, NaturalWeapon.GetDamageDieSize());
         }
 
         public virtual int GetDamageBonus()
@@ -313,24 +324,46 @@ namespace XRL.World.Parts
             return NaturalWeapon.GetHitBonus();
         }
 
-        public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)
+        public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)
         {
             Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 5);
             Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 6);
+
+            Object.RequirePart<NaturalWeaponDescriber>();
+            Debug.Entry(4, "* if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 6);
+            if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))
+            {
+                Debug.Entry(4, "+ NaturalWeaponDescriber is Present", Indent: 7);
+                if (!Object.HasNaturalWeaponMods())
+                {
+                    Debug.Entry(4, "No NaturalWeaponMods", "Resetting Short Description", Indent: 7);
+                    NaturalWeaponDescriber.ResetShortDescription();
+                }
+                else
+                {
+                    Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descripiptions", Indent: 7);
+                }
+                NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeapon.GetPriority(), InstanceDescription);
+            }
+            else
+            {
+                Debug.Entry(4, " NaturalWeaponDescriber not Present", Indent: 7);
+            }
+            Debug.Entry(4, "x if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber)) ?//", Indent: 6);
+
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
             // if no other mods, bump the damage penalty of -1 off.
             // 1d2-2 into 1d2+0
+            if (!Object.HasNaturalWeaponMods()) weapon.AdjustDamage(1);
 
-            if (Object.GetNaturalWeaponModsCount() <= 1) weapon.AdjustDamage(1);
-
-            string[] cats = new string[] { "Damage", "Combat", "Render" };
-            weapon.Trace(4, "Before", cats, Indent: 5);
+            string[] traceCats = new string[] { "Damage", "Combat", "Render" };
+            weapon.Trace(4, "Before", traceCats, Indent: 5);
             weapon.AdjustDieCount(GetDamageDieCount());
             weapon.AdjustDamageDieSize(GetDamageDieSize());
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
-            weapon.Trace(4, "After", cats, Indent: 5);
+            weapon.Trace(4, "After", traceCats, Indent: 5);
             Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 5);
         }
 
@@ -355,8 +388,12 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation.GetMutationClass(), false);
+            Render render = Object.Render;
+            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
 
+            Object.SetIntProperty("ShowAsPhysicalFeature", 1);
+            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation.GetMutationClass(), false);
+            Object.ModIntProperty("ModNaturalWeaponCount", 1);
             base.ApplyModification(Object);
         }
 
@@ -383,6 +420,11 @@ namespace XRL.World.Parts
             return $"{descriptionName}: This weapon has been constructed by modifications.";
         }
 
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+
     } //!-- public class ModNaturalWeaponBase : IMeleeModification
 
     [Serializable]
@@ -399,7 +441,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon);
+            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
             ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
             
@@ -448,15 +490,14 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
+            // E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
             return base.HandleEvent(E);
         }
 
         public override string GetInstanceDescription()
         {
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
-            string descriptionName = ParentObject.GetNaturalWeaponModsCount() <= 1 ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
             int damageBonus = 3 + GetDamageBonus();
             List<List<string>> list = new();
             string text = "weapon";
@@ -465,7 +506,7 @@ namespace XRL.World.Parts
                 list.Add(new List<string> { "have", $"{damageBonus.Signed()} damage" });
                 if (GetDamageDieCount() != 0)
                 {
-                    list.Add(new List<string> { "have", $"{GetHitBonus().Signed()} to {ParentObject.theirs} damage die count" });
+                    list.Add(new List<string> { "have", $"{GetDamageDieCount().Signed()} to {ParentObject.theirs} damage die count" });
                 }
                 if (GetHitBonus() != 0)
                 {
@@ -512,7 +553,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon);
+            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
             ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
 
@@ -536,25 +577,28 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
+            // E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
             return base.HandleEvent(E);
         }
 
         public override string GetInstanceDescription()
         {
-            MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
             string text = "weapon";
-            string descriptionName = ParentObject.GetNaturalWeaponModsCount() <= 1 ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
             string description = $"{descriptionName}: ";
             description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";
             if (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())
             {
-                description += $"gets {GetDamageDieSize().Signed()} to {ParentObject.theirs} die size, and ";
+                description += $"has {GetDamageDieSize().Signed()} to {ParentObject.theirs} damage die size, and ";
             }
-            string bonusDamageIncrease = "";
-            if (GetDamageBonus() != 0) bonusDamageIncrease = $"({GetDamageBonus()}) ";
-            description += $"gets half {ParentObject.theirs} wielder's Strength Modifier {bonusDamageIncrease}added as bonus damage.";
+            if (GetDamageBonus() == 0) 
+            {
+                description += $"adds half {ParentObject.theirs} wielder's Strength Modifier damage."; 
+            }
+            else
+            {
+                description += $"has {GetDamageBonus().Signed()} damage (Strength Modifier/2).";
+            }
             return description;
         }
     } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
@@ -582,7 +626,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon);
+            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
             ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
 
@@ -613,25 +657,24 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
+            // E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
             return base.HandleEvent(E);
         }
 
         public new string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = ParentObject.GetNaturalWeaponModsCount() <= 1 ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
             int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);
 
             StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} gets ");
+                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has ");
             
             if (dieSizeIncrease > 0)
             {
-                stringBuilder.Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} die size").Append(wallHitsRequired > 0 ? ", " : " and ");
+                stringBuilder.Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} damage die size").Append(wallHitsRequired > 0 ? ", " : " and ");
             }
             stringBuilder.Append(wallBonusPenetration).Append(" penetration vs. walls").Append(dieSizeIncrease > 0 ? ", " : " ")
                 .Append(wallHitsRequired > 0 ? "and " : ".");
@@ -667,7 +710,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon);
+            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
             ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
 
@@ -692,18 +735,18 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
+            // E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
             return base.HandleEvent(E);
         }
 
         public new string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = ParentObject.GetNaturalWeaponModsCount() <= 1 ? "\n" : "";
+            string descriptionName = !ParentObject.HasNaturalWeaponMods() ? "\n" : "";
             descriptionName += Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} gets ").Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} die size.");
+                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has ").Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} damage die size.");
             return Event.FinalizeString(stringBuilder);
         }
     } //!-- public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>

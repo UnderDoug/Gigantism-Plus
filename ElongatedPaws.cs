@@ -6,6 +6,7 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using XRL.Language;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -130,18 +131,12 @@ namespace XRL.World.Parts.Mutation
             return base.CalculateNaturalWeaponDamageBonus(Level);
         }
 
-        /* May be redundant.
-         * 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws paws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            paws.ElongatedPawObject = null;
-            paws.GiganticElongatedPawObject = null;
-            paws.ElongatedBurrowingClawObject = null;
-            paws.GiganticElongatedBurrowingClawObject = null;
+            paws.NaturalWeapon = null;
             return paws;
         }
-        */
 
         public override bool CanLevel() { return false; }
 

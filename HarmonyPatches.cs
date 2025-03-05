@@ -737,6 +737,13 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
             Debug.Footer(3, "UD_ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
         }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            UD_ManagedBurrowingClaws burrowingClaws = base.DeepCopy(Parent, MapInv) as UD_ManagedBurrowingClaws;
+            burrowingClaws.NaturalWeapon = null;
+            return burrowingClaws;
+        }
     }
 
     public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalWeapon
@@ -750,7 +757,7 @@ namespace XRL.World.Parts.Mutation
         {
             DamageDieCount = 1,
             DamageDieSize = 3,
-            DamageBonus = 0,
+            DamageBonus = -1, // this is to force the default "InorganicManipulator" to match the default fist.
             HitBonus = 0,
 
             ModPriority = 40,
@@ -833,6 +840,13 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
             Debug.Footer(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+        }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            UD_ManagedCrystallinity crystallinity = base.DeepCopy(Parent, MapInv) as UD_ManagedCrystallinity;
+            crystallinity.NaturalWeapon = null;
+            return crystallinity;
         }
     }
 }

@@ -326,7 +326,7 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            //gigantism.GiganticFistObject = null;
+            gigantism.NaturalWeapon = null;
             return gigantism;
         }
 

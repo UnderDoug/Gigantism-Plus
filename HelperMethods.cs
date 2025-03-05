@@ -255,8 +255,8 @@ namespace HNPS_GigantismPlus
 
         public static int GetNaturalWeaponModsCount(this GameObject GO)
         {
-            Debug.Entry(4, $"GetNaturalWeaponModsCount(this GameObject {GO.DebugName})",$"{GO.GetPartsDescendedFrom<ModNaturalWeaponBase>().Count()}", Indent: 5);
-            return GO.GetPartsDescendedFrom<ModNaturalWeaponBase>().Count();
+            Debug.Entry(4, $"GetNaturalWeaponModsCount(this GameObject {GO.DebugName})",$"{GO.GetIntProperty("ModNaturalWeaponCount")}", Indent: 5);
+            return GO.GetIntProperty("ModNaturalWeaponCount");
         }
         public static bool HasNaturalWeaponMods(this GameObject GO)
         {

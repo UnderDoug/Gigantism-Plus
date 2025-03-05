@@ -12,6 +12,7 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using AiUnity.NLog.Core.Targets;
 
 namespace HNPS_GigantismPlus
 {
@@ -219,6 +220,7 @@ namespace HNPS_GigantismPlus
 
         public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
         {
+            Debug.Entry(4, $"@ AdjustDieCount(this DieRoll DieRoll: {DieRoll.ToString()}, int Amount: {Amount})", Indent: 6);
             if (DieRoll == null)
             {
                 Debug.Entry(4, "AdjustDieCount", "DieRoll null", Indent: 7);
@@ -229,12 +231,15 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue > 0", Indent: 7);
                 DieRoll.LeftValue += Amount;
+                Debug.Entry(4, "DieRoll.LeftValue", $"{DieRoll.LeftValue}", Indent: 8);
+                Debug.Entry(4, "Collapse ^^<<", Indent: 8);
                 return DieRoll;
             }
             else
             {
-                Debug.Entry(4, "AdjustDieCount", "Collapsing", Indent: 7);
-                return new (type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.RightValue);
+                Debug.Entry(4, "AdjustDieCount", "Recursing >>VV", Indent: 7);
+                if (DieRoll.RightValue > 0) return new(type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.RightValue);
+                return new (type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.Right);
             }
         }
         public static string AdjustDieCount(this string DieRoll, int Amount)
@@ -242,11 +247,21 @@ namespace HNPS_GigantismPlus
             DieRoll dieRoll = new(DieRoll);
             return AdjustDieCount(dieRoll, Amount).ToString();
         }
+        public static bool AdjustDieCount(this MeleeWeapon MeleeWeapon, int Amount)
+        {
+            MeleeWeapon.BaseDamage = MeleeWeapon.BaseDamage.AdjustDieCount(Amount);
+            return true;
+        }
 
+        public static int GetNaturalWeaponModsCount(this GameObject GO)
+        {
+            Debug.Entry(4, $"GetNaturalWeaponModsCount(this GameObject {GO.DebugName})",$"{GO.GetPartsDescendedFrom<ModNaturalWeaponBase>().Count()}", Indent: 5);
+            return GO.GetPartsDescendedFrom<ModNaturalWeaponBase>().Count();
+        }
         public static bool HasNaturalWeaponMods(this GameObject GO)
         {
-
-            return GO.GetPartsDescendedFrom<IMeleeModification>().Any();
+            Debug.Entry(4, $"HasNaturalWeaponMods(this GameObject {GO.DebugName})", $"{GO.GetNaturalWeaponModsCount() > 0}", Indent: 4);
+            return GO.GetNaturalWeaponModsCount() > 0;
         }
 
         // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.
@@ -322,7 +337,7 @@ namespace HNPS_GigantismPlus
                     Debug.Entry(3, "x if (GetCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5);
 
                     var cybernetics = Part.ParentBody.GetBody().Cybernetics;
-                    if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+                    if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
                     {
                         Part.DefaultBehavior.RequirePart<Metal>();
 
@@ -422,14 +437,6 @@ namespace HNPS_GigantismPlus
 
     } //!-- public static class HelperClass
 
-    public static class BaseDefaultEquipmentMutationExtensions
-    {
-        public static int GetNaturalWeaponDamageDieCount(this BaseDefaultEquipmentMutation Mutation)
-        {
-            return 0;
-        }
-    }
-
     public static class Debug
     {
         private static int VerbosityOption => Options.DebugVerbosity;
@@ -523,9 +530,66 @@ namespace HNPS_GigantismPlus
             Divider(Verbosity, "\u003C", 25, Indent); // <
         }
 
+        public static void LoopItem(int Verbosity, string Label, string Text, int Indent = 0)
+        {
+            string output = Label + ": " + Text;
+            Entry(Verbosity, "\u005B" + output, Indent); // [
+        }
         public static void LoopItem(int Verbosity, string Text, int Indent = 0)
         {
             Entry(Verbosity, "\u005B" + Text, Indent); // [
+        }
+
+        // Class Specific Debugs
+        public static MeleeWeapon Trace(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, string[] Category = null, int Indent = 0)
+        {
+            Divider(Verbosity, "-", 25, Indent);
+            string title = Title == null ? "" : $"{Title}:";
+            int indent = Indent;
+            Entry(Verbosity, $"% {MeleeWeapon.ParentObject.DebugName} {title}", Indent);
+            if (Category == null)
+                Category = new string[4]
+                {
+                    "Damage",
+                    "Combat",
+                    "Render",
+                    "etc"
+                };
+            indent++;
+            foreach (string category in Category)
+            {
+                Entry(Verbosity, $"{category}", indent);
+                indent++;
+                switch (category)
+                {
+                    case "Damage":
+                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", indent);
+                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", indent);
+                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", indent);
+                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", indent);
+                        break;
+                    case "Combat":
+                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", indent);
+                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", indent);
+                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", indent);
+                        break;
+                    case "Render":
+                        Render Render = MeleeWeapon.ParentObject.Render;
+                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", indent);
+                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", indent);
+                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", indent);
+                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", indent);
+                        break;
+                    case "etc":
+                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", indent);
+                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", indent);
+                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", indent);
+                        break;
+                }
+                indent--;
+            }
+            Divider(Verbosity, "-", 25, Indent);
+            return MeleeWeapon;
         }
 
     } //!-- public static class Debug

@@ -175,23 +175,23 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
-                Debug.Entry(3, "IsCyberGiant, get");
+                // Debug.Entry(3, "IsCyberGiant, get");
                 if (ParentObject != null)
                 {
-                    Debug.Entry(3, "- ParentObject not null");
+                    // Debug.Entry(3, "- ParentObject not null");
                     GameObject cybernetics = ParentObject.Body.GetPartByName("body").Cybernetics;
                     if (cybernetics != null)
                     {
-                        Debug.Entry(3, "- cybernetics not null");
-                        Debug.Entry(3, "CyberGiant: true");
+                        // Debug.Entry(3, "- cybernetics not null");
+                        // Debug.Entry(3, "CyberGiant: true");
                         return cybernetics.GetBlueprint().Inherits == "BaseGiganticExoframe";
                     }
-                    Debug.Entry(3, "- cybernetics is null");
-                    Debug.Entry(3, "CyberGiant: false");
+                    // Debug.Entry(3, "- cybernetics is null");
+                    // Debug.Entry(3, "CyberGiant: false");
                     return false;
                 }
-                Debug.Entry(3, "- ParentObject is null");
-                Debug.Entry(3, "CyberGiant: false");
+                // Debug.Entry(3, "- ParentObject is null");
+                // Debug.Entry(3, "CyberGiant: false");
                 return false;
             }
         }
@@ -305,16 +305,21 @@ namespace XRL.World.Parts.Mutation
         {
             Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponDamageDieCount", Indent: 7);
             NaturalWeapon.DamageDieCount = Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
+            Debug.Entry(4, "NaturalWeapon.DamageDieCount", $"{NaturalWeapon.DamageDieCount}", Indent: 7);
             return base.CalculateNaturalWeaponDamageDieCount(Level);
         }
         public override bool CalculateNaturalWeaponDamageBonus(int Level = 1)
         {
-            NaturalWeapon.DamageBonus = (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
+            Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponDamageBonus", Indent: 7);
+            NaturalWeapon.DamageBonus = (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
+            Debug.Entry(4, "NaturalWeapon.DamageBonus", $"{NaturalWeapon.DamageBonus}", Indent: 7);
             return base.CalculateNaturalWeaponDamageBonus(Level);
         }
         public override bool CalculateNaturalWeaponHitBonus(int Level = 1)
         {
-            NaturalWeapon.HitBonus = (int)Math.Max(0, Math.Floor((Level - 9) / 3.0) - 3);
+            Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponHitBonus", Indent: 7);
+            NaturalWeapon.HitBonus = -3 + (int)Math.Floor(Level / 2.0);
+            Debug.Entry(4, "NaturalWeapon.HitBonus", $"{NaturalWeapon.HitBonus}", Indent: 7);
             return base.CalculateNaturalWeaponHitBonus(Level);
         }
 

@@ -7,11 +7,9 @@
     </category>
 
     <!-- NaturalWeapon Managed vanilla mutations -->
-    <category Name="Physical">
-      <mutation Name="Burrowing Claws" Class="HNPS_ManagedBurrowingClaws" Load="Merge" />
-    </category>
-    <category Name="Mental">
-      <mutation Name="Crystallinity" Class="HNPS_ManagedCrystallinity" Load="Merge" />
+    <category Name="Physical" Load="Merge">
+      <mutation Name="Burrowing Claws" Class="UD_ManagedBurrowingClaws" Load="Merge" />
+      <mutation Name="Crystallinity" Class="UD_ManagedCrystallinity" Load="Merge" />
     </category>
     <!-- End NaturalWeapon Managed vanilla mutations -->
 </mutations>

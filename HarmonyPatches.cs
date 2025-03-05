@@ -11,9 +11,11 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using XRL.World.Tinkering;
 using HNPS_GigantismPlus;
-using static XRL.World.IDefaultNaturalWeaponManager;
+using static XRL.World.IManagedDefaultNaturalWeapon;
 using static HNPS_GigantismPlus.Utils;
 using XRL.Language;
+using XRL.World.Effects;
+using XRL;
 
 namespace HNPS_GigantismPlus
 {
@@ -393,10 +395,10 @@ namespace HNPS_GigantismPlus
     } //!-- public static class BurrowingClaws_Patches
     */
 
-    /*
     [HarmonyPatch(typeof(Crystallinity))]
     public static class Crystallinity_Patches
     {
+        /*
         [HarmonyPrefix]  
         [HarmonyPatch(nameof(Crystallinity.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipmentPrefix(Crystallinity __instance, Body body)
@@ -451,8 +453,42 @@ namespace HNPS_GigantismPlus
             Debug.Footer(3, "Crystallinity_Patches", $"OnRegenerateDefaultEquipment(body)");
             return false; // Skip the original method
         }
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Crystallinity.Mutate))]
+        static void MutatePostfix(Crystallinity __instance)
+        {
+            GameObject GO = __instance.ParentObject;
+
+            UD_ManagedCrystallinity ManagedCrystallinity = new();
+            if (__instance.GetMutationClass() == ManagedCrystallinity.GetMutationClass()) return;
+
+            if(GO.TryGetPart(out Crystallinity Crystallinity))
+            {
+                Crystallinity.Unmutate(GO);
+            }
+
+            GO.RequirePart<Mutations>().AddMutation(new UD_ManagedCrystallinity());
+        }
+        */
+
     } //!-- public static class Crystallinity_Patches
-    */
+
+    // Intercept the application of Crystallinity via Crystal Delight, apply the Mutations.xml version instead (much more compatible).
+    [HarmonyPatch(typeof(CookingDomainSpecial_UnitCrystalTransform))]
+    public static class CookingDomainSpecial_UnitCrystalTransform_Patches
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
+        static void ApplyToPostfix(GameObject Object)
+        {
+            if (Object.TryGetPart(out Crystallinity Crystallinity))
+            {
+                Object.RequirePart<Mutations>().RemoveMutation(Crystallinity);
+                MutationEntry CrystallinityEntry = MutationFactory.GetMutationEntryByName("Crystallinity");
+                Object.RequirePart<Mutations>().AddMutation(CrystallinityEntry);
+            }
+        }
+    } //!-- public static class CookingDomainSpecial_UnitCrystalTransform_Patches
 
     [HarmonyPatch(typeof(Crystallinity))]
     public static class Crystallinity_RefractChance_Patches
@@ -590,9 +626,9 @@ namespace HNPS_GigantismPlus
 
 namespace XRL.World.Parts.Mutation
 {
-    public class HNPS_ManagedBurrowingClaws : BurrowingClaws, IDefaultNaturalWeaponManager
+    public class UD_ManagedBurrowingClaws : BurrowingClaws, IManagedDefaultNaturalWeapon
     {
-        public class INaturalWeapon : IDefaultNaturalWeaponManager.INaturalWeapon
+        public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
 
         }
@@ -615,7 +651,7 @@ namespace XRL.World.Parts.Mutation
             SecondRenderColorString = "&w",
             SecondRenderDetailColor = "W",
         };
-        public virtual IDefaultNaturalWeaponManager.INaturalWeapon GetNaturalWeapon()
+        public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
         {
             return NaturalWeapon;
         }
@@ -659,7 +695,7 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, "ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Header(3, "UD_ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
 
@@ -667,7 +703,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, "No Body. Aborting", Indent: 1);
                 Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-                Debug.Footer(3, "ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
+                Debug.Footer(3, "UD_ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
                 base.OnRegenerateDefaultEquipment(body);
                 return;
             }
@@ -699,13 +735,13 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
 
             Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-            Debug.Footer(3, "ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Footer(3, "UD_ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
         }
     }
 
-    public class HNPS_ManagedCrystallinity : Crystallinity, IDefaultNaturalWeaponManager
+    public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalWeapon
     {
-        public class INaturalWeapon : IDefaultNaturalWeaponManager.INaturalWeapon
+        public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
 
         }
@@ -729,7 +765,7 @@ namespace XRL.World.Parts.Mutation
             SecondRenderDetailColor = "m"
         };
 
-        public virtual IDefaultNaturalWeaponManager.INaturalWeapon GetNaturalWeapon()
+        public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
         {
             return NaturalWeapon;
         }
@@ -756,7 +792,7 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, "ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Header(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
 
@@ -764,7 +800,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(3, "No Body. Aborting", Indent: 1);
                 Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-                Debug.Footer(3, "ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+                Debug.Footer(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
                 base.OnRegenerateDefaultEquipment(body);
                 return;
             }
@@ -796,7 +832,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
 
             Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-            Debug.Footer(3, "ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Footer(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
         }
     }
 }

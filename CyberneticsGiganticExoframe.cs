@@ -1,16 +1,9 @@
 using System;
 using System.Collections.Generic;
-using XRL;
-using XRL.UI;
-using XRL.Core;
-using XRL.Rules;
-using XRL.World;
-using XRL.World.Parts;
 using XRL.World.Anatomy;
-using Mods.GigantismPlus;
-using Mods.GigantismPlus.HarmonyPatches;
-using static Mods.GigantismPlus.HelperMethods;
-using static Mods.GigantismPlus.Secrets;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Secrets;
 
 namespace XRL.World.Parts
 {
@@ -19,7 +12,7 @@ namespace XRL.World.Parts
     {
         [NonSerialized]
         private GameObject _User;
-        public GameObject User => _User ?? (_User = ParentObject.Implantee);
+        public GameObject User => _User ??= ParentObject.Implantee;
 
         public GameObject ImplantObject;
         
@@ -69,10 +62,7 @@ namespace XRL.World.Parts
         {
             get
             {
-                if (_ManipulatorBlueprint == null)
-                {
-                    _ManipulatorBlueprint = GameObjectFactory.Factory.GetBlueprint(ManipulatorBlueprintName);
-                }
+                _ManipulatorBlueprint ??= GameObjectFactory.Factory.GetBlueprint(ManipulatorBlueprintName);
                 return _ManipulatorBlueprint;
             }
         }

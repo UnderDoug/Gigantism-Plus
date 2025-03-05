@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using ConsoleLib.Console;
 using Kobold;
+using XRL;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
@@ -10,10 +11,10 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
-using System.CodeDom.Compiler;
-using XRL;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using AiUnity.NLog.Core.Targets;
 
-namespace Mods.GigantismPlus
+namespace HNPS_GigantismPlus
 {
     [HasModSensitiveStaticCache]
     public static class Options
@@ -62,9 +63,8 @@ namespace Mods.GigantismPlus
         }
     } //!-- public static class Options
 
-    public static class HelperMethods
+    public static class Utils
 	{
-
 		public static string MaybeColorText(string Color, string Text, bool Pretty = true)
 		{
 			string ColorPrefix = "";
@@ -79,7 +79,7 @@ namespace Mods.GigantismPlus
 
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]
         private static Dictionary<string, string> _TilePathCache = new();
-        private static List<string> TileSubfolders = new()
+        private static readonly List<string> TileSubfolders = new()
         {
             "",
             "Assets",
@@ -89,13 +89,6 @@ namespace Mods.GigantismPlus
             "Terrain",
             "Tiles"
         };
-
-        private static List<string> TileExts = new()
-        {
-            ".bmp",
-            ".png"
-        };
-
         public static string BuildCustomTilePath(string DisplayName)
         {
             return Grammar.MakeTitleCase(ColorUtility.StripFormatting(DisplayName)).Replace(" ", "");
@@ -126,40 +119,27 @@ namespace Mods.GigantismPlus
             }
             Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 5);
 
-            Debug.Entry(4, $"Listing exts", Indent: 5);
-            Debug.Entry(4, $"* foreach (string ext in TileExts)", Indent: 5);
-            foreach (string ext in TileExts)
-            {
-                Debug.LoopItem(4, $"{ext}", Indent: 6);
-            }
-            Debug.Entry(4, $"x foreach (string ext in TileExts) >//", Indent: 5);
-
             Debug.Entry(4, $"* foreach (string subfolder in TileSubfolders)", Indent: 5);
             foreach (string subfolder in TileSubfolders)
             {
                 string path = subfolder;
                 if (path != "") path += "/";
-                Debug.LoopItem(4, $"subfolder: {path}", Indent: 6);
-                foreach (string ext in TileExts)
+                path += TileName;
+                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
+                if (SpriteManager.HasTextureInfo(path))
                 {
-                    path += TileName + ext;
-                    Debug.LoopItem(4, $"ext: {ext}", Indent: 7);
-                    Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
-                    if (SpriteManager.HasTextureInfo(path))
-                    {
-                        Debug.DiveIn(4, $"Yes.", Indent: 8);
-                        Debug.Entry(3, $"out Tile = {path}", Indent: 8);
-                        TilePath = path;
-                        Debug.Entry(3, $"Adding entry to _TilePathCache", Indent: 8);
-                        _TilePathCache[TileName] = TilePath;
-                        Debug.DiveOut(4, "TilePath Exists", Indent: 7);
-                        Debug.Entry(4, $"x foreach (string subfolder in subfolders) >//", Indent: 5);
-                        Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
-                        Debug.Divider(3, Count: 40, Indent: 4);
-                        return true;
-                    }
-                    Debug.Entry(4, $"No.", Indent: 8);
+                    Debug.DiveIn(4, $"Yes.", Indent: 8);
+                    Debug.Entry(3, $"out Tile = {path}", Indent: 8);
+                    TilePath = path;
+                    Debug.Entry(3, $"Adding entry to _TilePathCache", Indent: 8);
+                    _TilePathCache[TileName] = TilePath;
+                    Debug.DiveOut(4, "TilePath Exists", Indent: 7);
+                    Debug.Entry(4, $"x foreach (string subfolder in subfolders) >//", Indent: 5);
+                    Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
+                    Debug.Divider(3, Count: 40, Indent: 4);
+                    return true;
                 }
+                Debug.Entry(4, $"No.", Indent: 8);
             }
             Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 5);
             Debug.Entry(3, $"No tile \"{TileName}\" found in supplied subfolders", Indent: 5);
@@ -238,6 +218,54 @@ namespace Mods.GigantismPlus
             return true;
         }
 
+        public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
+        {
+            Debug.Entry(4, $"@ AdjustDieCount(this DieRoll DieRoll: {DieRoll.ToString()}, int Amount: {Amount})", Indent: 6);
+            if (DieRoll == null)
+            {
+                Debug.Entry(4, "AdjustDieCount", "DieRoll null", Indent: 7);
+                return null;
+            }
+            int type = DieRoll.Type;
+            if (DieRoll.LeftValue > 0)
+            {
+                Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue > 0", Indent: 7);
+                DieRoll.LeftValue += Amount;
+                Debug.Entry(4, "DieRoll.LeftValue", $"{DieRoll.LeftValue}", Indent: 8);
+                Debug.Entry(4, "Collapse ^^<<", Indent: 8);
+                return DieRoll;
+            }
+            else
+            {
+                Debug.Entry(4, "AdjustDieCount", "Recursing >>VV", Indent: 7);
+                if (DieRoll.RightValue > 0) return new(type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.RightValue);
+                return new (type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.Right);
+            }
+        }
+        public static string AdjustDieCount(this string DieRoll, int Amount)
+        {
+            DieRoll dieRoll = new(DieRoll);
+            return AdjustDieCount(dieRoll, Amount).ToString();
+        }
+        public static bool AdjustDieCount(this MeleeWeapon MeleeWeapon, int Amount)
+        {
+            MeleeWeapon.BaseDamage = MeleeWeapon.BaseDamage.AdjustDieCount(Amount);
+            return true;
+        }
+
+        public static int GetNaturalWeaponModsCount(this GameObject GO)
+        {
+            Debug.Entry(4, $"GetNaturalWeaponModsCount(this GameObject {GO.DebugName})",$"{GO.GetIntProperty("ModNaturalWeaponCount")}", Indent: 5);
+            return GO.GetIntProperty("ModNaturalWeaponCount");
+        }
+        public static bool HasNaturalWeaponMods(this GameObject GO)
+        {
+            Debug.Entry(4, $"HasNaturalWeaponMods(this GameObject {GO.DebugName})", $"{GO.GetNaturalWeaponModsCount() > 0}", Indent: 4);
+            return GO.GetNaturalWeaponModsCount() > 0;
+        }
+
+        // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.
+
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)
@@ -309,7 +337,7 @@ namespace Mods.GigantismPlus
                     Debug.Entry(3, "x if (GetCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5);
 
                     var cybernetics = Part.ParentBody.GetBody().Cybernetics;
-                    if (cybernetics != null && cybernetics.TryGetPart<CyberneticsGiganticExoframe>(out CyberneticsGiganticExoframe exoframe))
+                    if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
                     {
                         Part.DefaultBehavior.RequirePart<Metal>();
 
@@ -364,7 +392,49 @@ namespace Mods.GigantismPlus
             Debug.Entry(2, "x public void AddAccumulatedNaturalEquipmentTo() ]//", Indent: 4);
             Debug.Divider(3, "-", 40, Indent: 4);
         } //!-- public void AddGiganticFistTo(BodyPart part)
-        
+
+        // Ripped wholesale from ModGigantic.
+        public static string GetProcessedItem(List<string> item, bool second, List<List<string>> items, GameObject obj)
+        {
+            if (item[0] == "")
+            {
+                if (second && item == items[0])
+                {
+                    return obj.It + " " + item[1];
+                }
+                return item[1];
+            }
+            if (item[0] == null)
+            {
+                if (second && item == items[0])
+                {
+                    return obj.Itis + " " + item[1];
+                }
+                if (item != items[0])
+                {
+                    bool flag = true;
+                    foreach (List<string> item2 in items)
+                    {
+                        if (item2[0] != null)
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        return item[1];
+                    }
+                }
+                return obj.GetVerb("are", PrependSpace: false) + " " + item[1];
+            }
+            if (second && item == items[0])
+            {
+                return obj.It + obj.GetVerb(item[0]) + " " + item[1];
+            }
+            return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
+        } //!-- public static string GetProcessedItem(List<string> item, bool second, List<List<string>> items, GameObject obj)
+
     } //!-- public static class HelperClass
 
     public static class Debug
@@ -428,7 +498,7 @@ namespace Mods.GigantismPlus
         {
             string output = "";
             if (String == null) String = "\u003D"; // =
-            else String = String.Substring(0, 1);
+            else String = String[..1];
             for (int i = 0; i < Count; i++)
             {
                 output += String;
@@ -460,9 +530,66 @@ namespace Mods.GigantismPlus
             Divider(Verbosity, "\u003C", 25, Indent); // <
         }
 
+        public static void LoopItem(int Verbosity, string Label, string Text, int Indent = 0)
+        {
+            string output = Label + ": " + Text;
+            Entry(Verbosity, "\u005B" + output, Indent); // [
+        }
         public static void LoopItem(int Verbosity, string Text, int Indent = 0)
         {
             Entry(Verbosity, "\u005B" + Text, Indent); // [
+        }
+
+        // Class Specific Debugs
+        public static MeleeWeapon Trace(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, string[] Category = null, int Indent = 0)
+        {
+            Divider(Verbosity, "-", 25, Indent);
+            string title = Title == null ? "" : $"{Title}:";
+            int indent = Indent;
+            Entry(Verbosity, $"% {MeleeWeapon.ParentObject.DebugName} {title}", Indent);
+            if (Category == null)
+                Category = new string[4]
+                {
+                    "Damage",
+                    "Combat",
+                    "Render",
+                    "etc"
+                };
+            indent++;
+            foreach (string category in Category)
+            {
+                Entry(Verbosity, $"{category}", indent);
+                indent++;
+                switch (category)
+                {
+                    case "Damage":
+                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", indent);
+                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", indent);
+                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", indent);
+                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", indent);
+                        break;
+                    case "Combat":
+                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", indent);
+                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", indent);
+                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", indent);
+                        break;
+                    case "Render":
+                        Render Render = MeleeWeapon.ParentObject.Render;
+                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", indent);
+                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", indent);
+                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", indent);
+                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", indent);
+                        break;
+                    case "etc":
+                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", indent);
+                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", indent);
+                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", indent);
+                        break;
+                }
+                indent--;
+            }
+            Divider(Verbosity, "-", 25, Indent);
+            return MeleeWeapon;
         }
 
     } //!-- public static class Debug

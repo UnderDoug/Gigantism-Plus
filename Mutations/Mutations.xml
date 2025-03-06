@@ -1,9 +1,9 @@
 <mutations>
     <category Name="Physical">
-        <mutation Name="ElongatedPaws" Cost="4" MaxSelected="1" Class="ElongatedPaws" Exclusions="" BearerDescription="those with elongated paws" Tile="ElongatedPaw_Alt.png" Hidden="false" ExcludeFromPool="false" />
+        <mutation Name="ElongatedPaws" Cost="4" MaxSelected="1" Class="ElongatedPaws" Exclusions="" BearerDescription="those with elongated paws" Tile="Mutations/ElongatedPaws.png" Hidden="false" ExcludeFromPool="false" />
     </category>
     <category Name="PhysicalDefects">
-        <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" Exclusions="" BearerDescription="those who are gigantic" Tile="GigantismPlus_Alt.png" Defect="true" />
+        <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" Exclusions="" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" />
     </category>
 
     <!-- NaturalWeapon Managed vanilla mutations -->

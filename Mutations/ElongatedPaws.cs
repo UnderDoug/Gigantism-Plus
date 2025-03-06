@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using XRL.World.Anatomy;
-using XRL.World.Parts.Mutation;
-using XRL.World.Tinkering;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
-using XRL.Language;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -14,48 +11,6 @@ namespace XRL.World.Parts.Mutation
     public class ElongatedPaws : BaseManagedDefaultEquipmentMutation
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
-
-        private static readonly List<string> NaturalWeaponSupersedingMutations = new()
-        {
-          //"CyberneticsGiganticExoframe",
-            "GigantismPlus",
-            "BurrowingClaws",
-            "Crystallinity"
-        };
-
-        public bool IsNaturalWeaponSuperseded
-        {
-            get
-            {
-                if (ParentObject == null) return false;
-                int count = 0;
-                foreach (string mutation in NaturalWeaponSupersedingMutations)
-                {
-                    if (ParentObject.HasPart(mutation))
-                    {
-                        count++;
-                    }
-                }
-                return count > 0;
-            }
-        }
-
-        private List<string> GetCompatibleMutations()
-        {
-            List<string> list = new();
-            foreach (string mutation in NaturalWeaponSupersedingMutations)
-            {
-                if (ParentObject.HasPart(mutation))
-                {
-                    MutationFactory.TryGetMutationEntry(mutation, out MutationEntry mutationEntry);
-                    string displayName = mutationEntry.DisplayName;
-                    list.Add(displayName);
-                }
-            }
-            return list;
-        }
-
-        public static string ElongatedPawBlueprintName = "ElongatedPaw";
 
         public int StrengthModifier => ParentObject.StatMod("Strength");
 
@@ -112,7 +67,7 @@ namespace XRL.World.Parts.Mutation
                 Noun = "paw",
                 Skill = "ShortBlades",
                 Stat = "Strength",
-                Tile = "ElongatedPaw.png",
+                Tile = "NaturalWeapons/ElongatedPaw.png",
                 RenderColorString = "&x",
                 RenderDetailColor = "z",
                 SecondRenderColorString = "&X",
@@ -133,9 +88,9 @@ namespace XRL.World.Parts.Mutation
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            ElongatedPaws paws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            paws.NaturalWeapon = null;
-            return paws;
+            ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
+            elongatedPaws.NaturalWeapon = null;
+            return elongatedPaws;
         }
 
         public override bool CanLevel() { return false; }
@@ -144,22 +99,10 @@ namespace XRL.World.Parts.Mutation
 
         public override string GetDescription()
         {
-            string CompatibleMutations = "";
-            if (IsNaturalWeaponSuperseded)
-            {
-                CompatibleMutations = "\nThe above damage is being improved by";
-                foreach (string mutation in GetCompatibleMutations())
-                {
-                    CompatibleMutations += " " + mutation + ",";
-                }
-                CompatibleMutations = CompatibleMutations[^1..];
-                CompatibleMutations += ".";
-            }
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
                  + "You have {{giant|elongated paws}}, which are unusually large and end in spindly fingers.\n"
                  + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons {{gigantic|a size bigger}} than you are as though they were your size."
                  + "\n\nYour {{giant|elongated paws}} count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|(StrMod/2)}}"
-                 + CompatibleMutations
                  + "\n\n+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 
@@ -169,10 +112,7 @@ namespace XRL.World.Parts.Mutation
         {
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == GetExtraPhysicalFeaturesEvent.ID
-                || ID == StatChangeEvent.ID
-                || ID == EquipperEquippedEvent.ID
-                || ID == UnequippedEvent.ID;
+                || ID == StatChangeEvent.ID;
         }
 
         public override bool HandleEvent(GetSlotsRequiredEvent E)
@@ -264,47 +204,6 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public void AddElongatedNaturalEquipmentTo(BodyPart part)
-        {
-            Debug.Entry(2, "@ AddGiganticNaturalEquipmentTo(BodyPart part)");
-            if (part != null && part.Type == "Hand" && !part.IsExternallyManagedLimb())
-            {
-                Debug.Entry(3, "* if (ParentObject.HasPart<GigantismPlus>())");
-                Debug.Entry(3, "* else if (ParentObject.HasPart<BurrowingClaws>())");
-                // int StatMod = ElongatedBonusDamage;
-
-                Debug.Entry(4, "- Saving copy of current DefaultBehavior in case creation fails");
-                GameObject OldDefaultBehavior = part.DefaultBehavior;
-
-                Debug.Entry(3, $"- Setting part.DefaultBehaviour to new instance of \"{ElongatedPawBlueprintName}\"");
-                // part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(ElongatedPawBlueprintName);
-
-                Debug.Entry(3, $"- Checking that new GameObject was instantiated and assigned correctly");
-                Debug.Entry(4, "* if (part.DefaultBehavior != null)");
-                if (part.DefaultBehavior != null)
-                {
-                    
-                    Debug.Entry(3, "-- part.DefaultBehavior not null, assigning stats");
-                    part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", "ElongatedPaws", false);
-                    var weapon = part.DefaultBehavior.GetPart<MeleeWeapon>();
-                    weapon.BaseDamage = $"1d2";
-
-                    Debug.Entry(4, $"-- Base: {weapon.BaseDamage} | PenCap: {weapon.MaxStrengthBonus}");
-                }
-                else
-                {
-                    Debug.Entry(3, $"-- part.DefaultBehavior was null, invalid blueprint name \"{ElongatedPawBlueprintName}\"");
-                    part.DefaultBehavior = OldDefaultBehavior;
-                    Debug.Entry(3, $"-- OldDefaultBehavior reassigned");
-                }
-            }
-            else
-            {
-                Debug.Entry(2, "- part null or not type \"Hand\"");
-            }
-            Debug.Entry(2, "x AddElongatedNaturalEquipmentTo(BodyPart part) ]//");
-        } //!--- public void AddElongatedNaturalEquipmentTo(BodyPart part)
-
         public override void OnRegenerateDefaultEquipment(Body body)
         {
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
@@ -356,92 +255,3 @@ namespace XRL.World.Parts.Mutation
     } //!-- public class ElongatedPaws : BaseDefaultEquipmentMutation
 
 } //!-- namespace XRL.World.Parts.Mutation
-
-namespace XRL.World.Parts
-{
-    [Serializable]
-    public class WeaponElongator : IPart
-    {
-        public GameObject Wielder = null;
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == StatChangeEvent.ID
-                || ID == UnequippedEvent.ID
-                || ID == EquippedEvent.ID;
-        }
-
-        private int appliedElongatedBonusCap = 0;
-
-        public void ApplyElongatedBonusCap(MeleeWeapon Weapon, GameObject Wielder)
-        {
-            Debug.Entry(4, "@ WeaponWatcher", $"ApplyElongatedBonusCap()", Indent: 3);
-            Debug.Entry(4, "* if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))", Indent: 3);
-            if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))
-            {
-                Debug.Entry(4, "+ elongatedPaws not null", Indent: 4);
-                UnapplyElongatedBonusCap(Weapon);
-                appliedElongatedBonusCap = elongatedPaws.ElongatedBonusDamage;
-                Weapon.AdjustBonusCap(appliedElongatedBonusCap);
-                Debug.Entry(4, $"New appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
-            }
-            Debug.Entry(4, "x WeaponWatcher", $"ApplyElongatedBonusCap() >//", Indent: 3);
-        }
-
-        public void UnapplyElongatedBonusCap(MeleeWeapon Weapon)
-        {
-            Debug.Entry(4, $"@ WeaponWatcher", "UnapplyElongatedBonusCap()", Indent: 4);
-            Debug.Entry(4, $"Old appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
-            Weapon.AdjustBonusCap(-appliedElongatedBonusCap);
-            appliedElongatedBonusCap = 0;
-        }
-
-        public override bool HandleEvent(EquippedEvent E)
-        {
-            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(EquippedEvent E)", Indent: 2);
-            GameObject item = E.Item;
-            if (item == ParentObject)
-            {
-                Wielder = E.Actor;
-                Debug.Entry(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
-                ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>(), E.Actor);
-                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(EquippedEvent E) >//", Indent: 2);
-            }
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(UnequippedEvent E)
-        {
-            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(UnequippedEvent E)", Indent: 2);
-            GameObject item = E.Item;
-            if (item == ParentObject)
-            {
-                Debug.Entry(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
-                UnapplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
-                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(UnequippedEvent E) >//", Indent: 2);
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(StatChangeEvent E)
-        {
-            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(StatChangeEvent E)", Indent: 2);
-            Debug.Entry(4, $"E.Name: \"{E.Name}\" | E.Object: \"{E.Object.ShortDisplayNameStripped}\"", Indent: 2);
-            if (Wielder != null) Debug.Entry(4, $"Wielder: \"{Wielder.ShortDisplayNameStripped}\"", Indent: 2);
-            if (E.Name == "Strength" && E.Object == Wielder)
-            {
-                Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(StatChangeEvent {E.Name})", Indent: 2);
-                ApplyElongatedBonusCap(ParentObject.GetPart<MeleeWeapon>(), E.Object);
-                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(StatChangeEvent {E.Name}) >//", Indent: 2);
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool AllowStaticRegistration()
-        {
-            return true;
-        }
-
-    } //!-- public class WeaponElongator : IPart
-
-} //!-- namespace XRL.World.Parts

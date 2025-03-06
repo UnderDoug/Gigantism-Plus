@@ -1,16 +1,13 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Linq;
 using XRL;
 using XRL.UI;
 using XRL.Core;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Parts;
-using XRL.World.Anatomy;
 using XRL.Liquids;
-using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus

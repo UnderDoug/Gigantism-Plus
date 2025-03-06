@@ -11,81 +11,23 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using AiUnity.NLog.Core.Targets;
 
 namespace HNPS_GigantismPlus
 {
-    [HasModSensitiveStaticCache]
-    public static class Options
-    {
-        // Per the wiki, code is taken 1:1
-        private static string GetOption(string ID, string Default = "")
-        {
-            return XRL.UI.Options.GetOption(ID, Default: Default);
-        }
-
-        // Checkbox settings
-        public static bool EnableGiganticStartingGear => GetOption("Option_GigantismPlus_EnableGiganticStartingGear").EqualsNoCase("Yes");
-        public static bool EnableGiganticStartingGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticStartingGear_Grenades").EqualsNoCase("Yes");
-        public static bool EnableGigantismRapidAdvance => GetOption("Option_GigantismPlus_EnableGigantismRapidAdvance").EqualsNoCase("Yes");
-
-        public static bool SelectGiganticTinkering => GetOption("Option_GigantismPlus_SelectGiganticTinkering").EqualsNoCase("Yes");
-        public static bool SelectGiganticDerarification => GetOption("Option_GigantismPlus_SelectGiganticDerarification").EqualsNoCase("Yes");
-        
-        // NPC equipment options
-        public static bool EnableGiganticNPCGear => GetOption("Option_GigantismPlus_EnableGiganticNPCGear").EqualsNoCase("Yes");
-        public static bool EnableGiganticNPCGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticNPCGear_Grenades").EqualsNoCase("Yes");
-
-        // Debug Settings
-        public static int DebugVerbosity
-        {
-            get
-            {
-                return Convert.ToInt32(GetOption("Option_GigantismPlus_DebugVerbosity"));
-            }
-            private set
-            {
-                DebugVerbosity = value;
-            }
-        }
-
-        public static bool DebugIncludeInMessage
-        {
-            get
-            {
-                return GetOption("Option_GigantismPlus_DebugIncludeInMessage").EqualsNoCase("Yes");
-            }
-            private set
-            {
-                DebugIncludeInMessage = value;
-            }
-        }
-    } //!-- public static class Options
-
     public static class Utils
-	{
-		public static string MaybeColorText(string Color, string Text, bool Pretty = true)
-		{
-			string ColorPrefix = "";
-			string ColorPostfix = "";
-			if (Pretty)
-			{
-				ColorPrefix = "{{" + Color + "|";
-				ColorPostfix = "}}";
-			}
-			return ColorPrefix + Text + ColorPostfix;
-		}
-
+    {
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]
         private static Dictionary<string, string> _TilePathCache = new();
         private static readonly List<string> TileSubfolders = new()
         {
             "",
+            "Abilities",
             "Assets",
             "Blueprints",
             "Creatures",
             "Items",
+            "Mutations",
+            "NaturalWeapons",
             "Terrain",
             "Tiles"
         };
@@ -96,7 +38,7 @@ namespace HNPS_GigantismPlus
         public static bool TryGetTilePath(string TileName, out string TilePath)
         {
             Debug.Divider(3, Count: 40, Indent: 4);
-            Debug.Entry(3, $"@ HelperMethods.DoesTileExist({TileName})", Indent:5);
+            Debug.Entry(3, $"@ HelperMethods.DoesTileExist({TileName})", Indent: 5);
 
             Debug.Entry(4, "* if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 5);
             if (_TilePathCache.TryGetValue(TileName, out TilePath))
@@ -113,7 +55,7 @@ namespace HNPS_GigantismPlus
 
             Debug.Entry(4, $"Listing subfolders", Indent: 5);
             Debug.Entry(4, $"* foreach (string subfolder  in TileSubfolders)", Indent: 5);
-            foreach (string subfolder  in TileSubfolders)
+            foreach (string subfolder in TileSubfolders)
             {
                 Debug.LoopItem(4, $"{subfolder}", Indent: 6);
             }
@@ -125,7 +67,7 @@ namespace HNPS_GigantismPlus
                 string path = subfolder;
                 if (path != "") path += "/";
                 path += TileName;
-                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent:7);
+                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent: 7);
                 if (SpriteManager.HasTextureInfo(path))
                 {
                     Debug.DiveIn(4, $"Yes.", Indent: 8);
@@ -152,7 +94,7 @@ namespace HNPS_GigantismPlus
         public static string WeaponDamageString(int DieSize, int DieCount, int Bonus)
         {
             string output = $"{DieSize}d{DieCount}";
-            
+
             if (Bonus > 0)
             {
                 output += $"+{Bonus}";
@@ -165,30 +107,13 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static Random RndGP = Stat.GetSeededRandomGenerator("GigantismPlus");
-
-        // checks if part is managed externally
-        public static bool IsExternallyManagedLimb(this BodyPart part)  // Renamed method
-        {
-            if (part?.Manager == null) return false;
-
-            // Check for HelpingHands or AgolgotChord managed parts
-            if (part.Manager.EndsWith("::HelpingHands") || part.Manager.EndsWith("::AgolgotChord"))
-                return true;
-
-            // Check for Nephal claws (Agolgot parts that don't use the manager)
-            if (!string.IsNullOrEmpty(part.DefaultBehaviorBlueprint) &&
-                part.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
-                return true;
-
-            return false;
-        } //!-- public static bool IsExternallyManagedLimb(BodyPart part)
+        public static Random RndGP = Stat.GetSeededRandomGenerator("HNPS_GigantismPlus");
 
         public static bool GetCyberneticsList(Body body, out string FistReplacement)
         {
             List<GameObject> cyberneticsList = (from c in body.GetInstalledCybernetics()
                                                 where c.HasPart<CyberneticsFistReplacement>() == true
-                                                select c).ToList<GameObject>();
+                                                select c).ToList();
             if (cyberneticsList == null)
             {
                 FistReplacement = string.Empty;
@@ -218,67 +143,20 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
-        {
-            Debug.Entry(4, $"@ AdjustDieCount(this DieRoll DieRoll: {DieRoll.ToString()}, int Amount: {Amount})", Indent: 6);
-            if (DieRoll == null)
-            {
-                Debug.Entry(4, "AdjustDieCount", "DieRoll null", Indent: 7);
-                return null;
-            }
-            int type = DieRoll.Type;
-            if (DieRoll.LeftValue > 0)
-            {
-                Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue > 0", Indent: 7);
-                DieRoll.LeftValue += Amount;
-                Debug.Entry(4, "DieRoll.LeftValue", $"{DieRoll.LeftValue}", Indent: 8);
-                Debug.Entry(4, "Collapse ^^<<", Indent: 8);
-                return DieRoll;
-            }
-            else
-            {
-                Debug.Entry(4, "AdjustDieCount", "Recursing >>VV", Indent: 7);
-                if (DieRoll.RightValue > 0) return new(type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.RightValue);
-                return new (type, AdjustDieCount(DieRoll.Left, Amount), DieRoll.Right);
-            }
-        }
-        public static string AdjustDieCount(this string DieRoll, int Amount)
-        {
-            DieRoll dieRoll = new(DieRoll);
-            return AdjustDieCount(dieRoll, Amount).ToString();
-        }
-        public static bool AdjustDieCount(this MeleeWeapon MeleeWeapon, int Amount)
-        {
-            MeleeWeapon.BaseDamage = MeleeWeapon.BaseDamage.AdjustDieCount(Amount);
-            return true;
-        }
-
-        public static int GetNaturalWeaponModsCount(this GameObject GO)
-        {
-            Debug.Entry(4, $"GetNaturalWeaponModsCount(this GameObject {GO.DebugName})",$"{GO.GetIntProperty("ModNaturalWeaponCount")}", Indent: 5);
-            return GO.GetIntProperty("ModNaturalWeaponCount");
-        }
-        public static bool HasNaturalWeaponMods(this GameObject GO)
-        {
-            Debug.Entry(4, $"HasNaturalWeaponMods(this GameObject {GO.DebugName})", $"{GO.GetNaturalWeaponModsCount() > 0}", Indent: 4);
-            return GO.GetNaturalWeaponModsCount() > 0;
-        }
-
         // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.
-
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)
         {
             Debug.Divider(3, "-", 40, Indent: 4);
-            Debug.Entry(3, "* HelperMethods.AddAccumulatedNaturalEquipmentTo()", Indent: 4);
+            Debug.Entry(3, "* Utils.AddAccumulatedNaturalEquipmentTo()", Indent: 4);
 
             if (Part != null && Part.Type == "Hand" && !Part.IsExternallyManagedLimb())
             {
                 // make Creature gigantic temporarily if they normally would be.
                 if (Creature.HasPart<PseudoGigantism>()) Creature.IsGiganticCreature = true;
 
-                if (AssigningMutation != "GigantismPlus")
+                if (AssigningMutation != "HNPS_GigantismPlus")
                 {
                     Part.DefaultBehavior = GameObjectFactory.Factory.CreateObject(BlueprintName);
                 }
@@ -437,161 +315,4 @@ namespace HNPS_GigantismPlus
 
     } //!-- public static class HelperClass
 
-    public static class Debug
-    {
-        private static int VerbosityOption => Options.DebugVerbosity;
-        // Verbosity translates in roughly the following way:
-        // 0 : Critical. Use sparingly, if at all, as they show up without the option. Move these to 1 when pushing to main.
-        // 1 : Show. Initial debugging entries. Broad, general "did it happen?" style entries for basic trouble-shooting.
-        // 2 : Verbose. Entries have more information in them, indicating how values are passed around and changed.
-        // 3 : Very Verbose. Entries in more locations, or after fewer steps. These contribute to tracing program flow.
-        // 4 : Maximally Verbose. Just like, all of it. Every step of a process, as much detail as possible.
-
-        private static bool IncludeInMessage => Options.DebugIncludeInMessage;
-
-        private static void Message(string Text)
-        {
-            XRL.Messages.MessageQueue.AddPlayerMessage("{{Y|" + Text + "}}");
-        }
-
-        private static void Log(string Text)
-        {
-            UnityEngine.Debug.LogError(Text);
-        }
-
-        public static void Entry(int Verbosity, string Text, int Indent = 0)
-        {
-            Debug.Indent(Verbosity, Text, Indent);
-        }
-
-        public static void Entry(string Text, int Indent = 0)
-        {
-            int Verbosity = 0;
-            Debug.Indent(Verbosity, Text, Indent);
-        }
-
-        public static void Entry(int Verbosity, string Label, string Text, int Indent = 0)
-        {
-            string output = Label + ": " + Text;
-            Entry(Verbosity, output, Indent);
-        }
-
-        public static void Indent(int Verbosity, string Text, int Spaces = 0)
-        {
-            int factor = 4;
-            // NBSP  \u00A0
-            // Space \u0020
-            string space = "\u0020";
-            string indent = "";
-            for (int i = 0; i < Spaces * factor; i++)
-            {
-                indent += space;
-            }
-            string output = indent + Text;
-            if (Verbosity > VerbosityOption) return;
-            Log(output);
-            if (IncludeInMessage)
-                Message(output);
-        }
-
-        public static void Divider(int Verbosity = 0, string String = null, int Count = 60, int Indent = 0)
-        {
-            string output = "";
-            if (String == null) String = "\u003D"; // =
-            else String = String[..1];
-            for (int i = 0; i < Count; i++)
-            {
-                output += String;
-            }
-            Entry(Verbosity, output, Indent);
-        }
-
-        public static void Header(int Verbosity, string ClassName, string MethodName)
-        {
-            Divider(Verbosity);
-            string output = "@START " + ClassName + "." + MethodName;
-            Entry(Verbosity, output);
-        }
-        public static void Footer(int Verbosity, string ClassName, string MethodName)
-        {
-            string output = "///END " + ClassName + "." + MethodName + " !//";
-            Entry(Verbosity, output);
-            Divider(Verbosity);
-        }
-
-        public static void DiveIn(int Verbosity, string Text, int Indent = 0)
-        {
-            Divider(Verbosity, "\u003E", 25, Indent); // >
-            Entry(Verbosity, Text, Indent + 1);
-        }
-        public static void DiveOut(int Verbosity, string Text, int Indent = 0)
-        {
-            Entry(Verbosity, Text, Indent + 1);
-            Divider(Verbosity, "\u003C", 25, Indent); // <
-        }
-
-        public static void LoopItem(int Verbosity, string Label, string Text, int Indent = 0)
-        {
-            string output = Label + ": " + Text;
-            Entry(Verbosity, "\u005B" + output, Indent); // [
-        }
-        public static void LoopItem(int Verbosity, string Text, int Indent = 0)
-        {
-            Entry(Verbosity, "\u005B" + Text, Indent); // [
-        }
-
-        // Class Specific Debugs
-        public static MeleeWeapon Trace(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, string[] Category = null, int Indent = 0)
-        {
-            Divider(Verbosity, "-", 25, Indent);
-            string title = Title == null ? "" : $"{Title}:";
-            int indent = Indent;
-            Entry(Verbosity, $"% {MeleeWeapon.ParentObject.DebugName} {title}", Indent);
-            if (Category == null)
-                Category = new string[4]
-                {
-                    "Damage",
-                    "Combat",
-                    "Render",
-                    "etc"
-                };
-            indent++;
-            foreach (string category in Category)
-            {
-                Entry(Verbosity, $"{category}", indent);
-                indent++;
-                switch (category)
-                {
-                    case "Damage":
-                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", indent);
-                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", indent);
-                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", indent);
-                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", indent);
-                        break;
-                    case "Combat":
-                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", indent);
-                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", indent);
-                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", indent);
-                        break;
-                    case "Render":
-                        Render Render = MeleeWeapon.ParentObject.Render;
-                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", indent);
-                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", indent);
-                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", indent);
-                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", indent);
-                        break;
-                    case "etc":
-                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", indent);
-                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", indent);
-                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", indent);
-                        break;
-                }
-                indent--;
-            }
-            Divider(Verbosity, "-", 25, Indent);
-            return MeleeWeapon;
-        }
-
-    } //!-- public static class Debug
-
-} //!-- namespace Mods.GigantismPlus
+} //!-- namespace HNPS_GigantismPlus

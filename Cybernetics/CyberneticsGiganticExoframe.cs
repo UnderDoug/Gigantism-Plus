@@ -29,19 +29,11 @@ namespace XRL.World.Parts
 
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
-            return MaybeColorText(
-                Color: AugmentAdjectiveColor,
-                Pretty: Pretty,
-                Text: "augmented"
-                );
+            return ("augmented").MaybeColor(AugmentAdjectiveColor, Pretty);
         }
         public string GetAugmentAdjective(bool Pretty = true)
         {
-            return MaybeColorText(
-                Color: "Y",
-                Pretty: Pretty,
-                Text: "E" + MaybeColorText("c", "F", Pretty) + "-" + GetShortAugmentAdjective(Pretty)
-                );
+            return ($"E{ ("F").MaybeColor("c", Pretty) }-{GetShortAugmentAdjective(Pretty)}").MaybeColor("Y", Pretty);
         }
 
         public GameObject _ManipulatorObject;

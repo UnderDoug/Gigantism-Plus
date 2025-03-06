@@ -298,13 +298,13 @@ namespace XRL.World.Parts
         public virtual int GetDamageDieCount()
         {
             Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
-            Debug.Entry(4, "NaturalWeapon.GetDamageDieCount()", $"{NaturalWeapon.GetDamageDieCount()-1}", Indent: 6);
+            Debug.Entry(4, "NaturalWeapon.GetDamageDieCount()", $"{NaturalWeapon.GetDamageDieCount()}", Indent: 6);
             return Math.Max(0, NaturalWeapon.GetDamageDieCount());
         }
         public virtual int GetDamageDieSize()
         {
             Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
-            Debug.Entry(4, "NaturalWeapon.GetDamageDieSize()", $"{NaturalWeapon.GetDamageDieSize()-2}", Indent: 6);
+            Debug.Entry(4, "NaturalWeapon.GetDamageDieSize()", $"{NaturalWeapon.GetDamageDieSize()}", Indent: 6);
             return Math.Max(0, NaturalWeapon.GetDamageDieSize());
         }
 

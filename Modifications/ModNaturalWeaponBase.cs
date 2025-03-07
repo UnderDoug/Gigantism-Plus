@@ -39,10 +39,10 @@ namespace XRL.World.Parts
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            Wielder = who;
-            AssigningMutation = Wielder.GetPart<T>();
+            Wielder ??= who;
+            AssigningMutation ??= Wielder.GetPart<T>();
+            NaturalWeapon ??= AssigningMutation.GetNaturalWeapon();
             Level = AssigningMutation.Level;
-            NaturalWeapon = AssigningMutation.GetNaturalWeapon();
             return base.BeingAppliedBy(obj, who);
         }
 

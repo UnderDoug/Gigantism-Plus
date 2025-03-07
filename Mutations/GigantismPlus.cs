@@ -199,21 +199,21 @@ namespace XRL.World.Parts.Mutation
 
         public override bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
-            Debug.Entry(4, "HNPS_GigantismPlus", "CalculateNaturalWeaponDamageDieCount", Indent: 7);
+            Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponDamageDieCount", Indent: 7);
             NaturalWeapon.DamageDieCount = Math.Min(1 + (int)Math.Floor(Level / 3.0), 8);
             Debug.Entry(4, "NaturalWeapon.DamageDieCount", $"{NaturalWeapon.DamageDieCount}", Indent: 7);
             return base.CalculateNaturalWeaponDamageDieCount(Level);
         }
         public override bool CalculateNaturalWeaponDamageBonus(int Level = 1)
         {
-            Debug.Entry(4, "HNPS_GigantismPlus", "CalculateNaturalWeaponDamageBonus", Indent: 7);
+            Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponDamageBonus", Indent: 7);
             NaturalWeapon.DamageBonus = (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
             Debug.Entry(4, "NaturalWeapon.DamageBonus", $"{NaturalWeapon.DamageBonus}", Indent: 7);
             return base.CalculateNaturalWeaponDamageBonus(Level);
         }
         public override bool CalculateNaturalWeaponHitBonus(int Level = 1)
         {
-            Debug.Entry(4, "HNPS_GigantismPlus", "CalculateNaturalWeaponHitBonus", Indent: 7);
+            Debug.Entry(4, "GigantismPlus", "CalculateNaturalWeaponHitBonus", Indent: 7);
             NaturalWeapon.HitBonus = -3 + (int)Math.Floor(Level / 2.0);
             Debug.Entry(4, "NaturalWeapon.HitBonus", $"{NaturalWeapon.HitBonus}", Indent: 7);
             return base.CalculateNaturalWeaponHitBonus(Level);
@@ -232,7 +232,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool ChangeLevel(int NewLevel)
         {
-            Debug.Header(4, "HNPS_GigantismPlus", $"ChangeLevel({NewLevel})");
+            Debug.Header(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
             // Straighten up if hunching.
             // Hunch over if hunched before level up.
             bool WasHunched = false;
@@ -275,7 +275,7 @@ namespace XRL.World.Parts.Mutation
                 IsHunchFree = true;
                 HunchOver(Message: false);
             }
-            Debug.Footer(4, "HNPS_GigantismPlus", $"ChangeLevel({NewLevel})");
+            Debug.Footer(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
             return base.ChangeLevel(NewLevel);
         }
 
@@ -295,7 +295,7 @@ namespace XRL.World.Parts.Mutation
         private void SwapMutationCategory(bool Before = true)
         {
             string state = Before ? "true" : "false";
-            Debug.Header(3, "HNPS_GigantismPlus",$"SwapMutationCategory(Before: {state})");
+            Debug.Header(3, "GigantismPlus",$"SwapMutationCategory(Before: {state})");
 
             // prefer this for repeated uses of strings.
             string Physical = "Physical";
@@ -339,7 +339,7 @@ namespace XRL.World.Parts.Mutation
                 }
             }
             Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) ]//", Indent: 1);
-            Debug.Footer(3, "HNPS_GigantismPlus", $"SwapMutationCategory(Before: {state})");
+            Debug.Footer(3, "GigantismPlus", $"SwapMutationCategory(Before: {state})");
         } //!--- private void SwapMutationCategory(bool Before = true)
 
         private bool ShouldRapidAdvance(int Level, GameObject Actor)
@@ -534,7 +534,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
-            Debug.Entry(2, $"HNPS_GigantismPlus -> Mutate {GO.DebugName}");
+            Debug.Entry(2, $"GigantismPlus -> Mutate {GO.DebugName}");
             Body body = GO.Body;
             if (body != null)
             {
@@ -587,13 +587,13 @@ namespace XRL.World.Parts.Mutation
                 */
             }
 
-            Debug.Entry(2, $"HNPS_GigantismPlus -> base.Mutate {GO.DebugName}");
+            Debug.Entry(2, $"GigantismPlus -> base.Mutate {GO.DebugName}");
             return base.Mutate(GO, Level);
         }
 
         public override bool Unmutate(GameObject GO)
         {
-            Debug.Entry(2, $"HNPS_GigantismPlus -> Unmutate {GO.DebugName}");
+            Debug.Entry(2, $"GigantismPlus -> Unmutate {GO.DebugName}");
             if (GO != null)
             {
                 // Remove jumping properties
@@ -627,7 +627,7 @@ namespace XRL.World.Parts.Mutation
                 CheckAffected(GO, GO.Body);
             }
 
-            Debug.Entry(2, $"HNPS_GigantismPlus -> base.Unmutate {GO.DebugName}");
+            Debug.Entry(2, $"GigantismPlus -> base.Unmutate {GO.DebugName}");
             return base.Unmutate(GO);
         }
 
@@ -636,7 +636,7 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Cache]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, "HNPS_GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Header(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body == null)
@@ -675,7 +675,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
             
             Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-            Debug.Footer(3, "HNPS_GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Footer(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
             base.OnRegenerateDefaultEquipment(body);
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 

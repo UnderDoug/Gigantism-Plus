@@ -50,9 +50,9 @@ namespace XRL.World.Parts.Mutation
         }
 
         // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
-        public virtual string GetNaturalWeaponMod()
+        public virtual string GetNaturalWeaponMod(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
         }
 
         // Optional: allows you to easily check the presence of another mutation if you wanted to adjust any calculations on that basis

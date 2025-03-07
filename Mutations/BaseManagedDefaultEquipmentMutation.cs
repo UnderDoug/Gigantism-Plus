@@ -26,9 +26,9 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeapon;
         }
 
-        public virtual string GetNaturalWeaponMod()
+        public virtual string GetNaturalWeaponMod(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
         }
 
         public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)

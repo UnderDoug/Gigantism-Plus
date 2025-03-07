@@ -13,8 +13,10 @@ namespace HNPS_GigantismPlus.Harmony
     {
         [HarmonyPostfix]
         [HarmonyPatch(nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
-        static void ApplyToPostfix(GameObject Object)
+        static void ApplyTo_Postfix(GameObject Object)
         {
+            return; // Skipping Patch: unnecessary if Crystallinity isn't being merged into the extended class.
+
             if (Object.TryGetPart(out Crystallinity Crystallinity))
             {
                 Object.RequirePart<Mutations>().RemoveMutation(Crystallinity);
@@ -23,4 +25,5 @@ namespace HNPS_GigantismPlus.Harmony
             }
         }
     } //!-- public static class CookingDomainSpecial_UnitCrystalTransform_Patches
+
 }

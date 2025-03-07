@@ -7,6 +7,7 @@ using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
 
 namespace HNPS_GigantismPlus
 {
@@ -156,6 +157,26 @@ namespace HNPS_GigantismPlus
                 dictionary.Add(Convert.ToInt32(array2[0]), dieRoll);
             }
             return dictionary;
+        }
+
+        public static UD_ManagedBurrowingClaws ConvertToManaged(this BurrowingClaws burrowingClaws)
+        {
+            UD_ManagedBurrowingClaws managedBurrowingClaws = new()
+            {
+                Level = burrowingClaws.Level
+            };
+
+            return managedBurrowingClaws;
+        }
+        public static UD_ManagedCrystallinity ConvertToManaged(this Crystallinity crystallinity)
+        {
+            UD_ManagedCrystallinity managedCrystallinity = new()
+            {
+                Level = crystallinity.Level,
+                RefractAdded = crystallinity.RefractAdded
+            };
+
+            return managedCrystallinity;
         }
     }
 }

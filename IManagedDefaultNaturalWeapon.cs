@@ -83,7 +83,7 @@ namespace XRL.World
 
         public abstract INaturalWeapon GetNaturalWeapon();
 
-        public abstract string GetNaturalWeaponMod();
+        public abstract string GetNaturalWeaponMod(bool Managed = true);
 
         public abstract bool CalculateNaturalWeaponDamageDieCount(int Level = 1);
 

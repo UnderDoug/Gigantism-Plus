@@ -38,18 +38,56 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeapon;
         }
 
-        public virtual string GetNaturalWeaponMod()
+        public virtual string GetNaturalWeaponMod(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon";
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
         }
 
+        private bool _HasGigantism = false;
         public bool HasGigantism
         {
             get
             {
-                return ParentObject.HasPart<GigantismPlus>();
+                if (ParentObject != null)
+                    return ParentObject.HasPart<GigantismPlus>();
+                return _HasGigantism;
+            }
+            set
+            {
+                _HasGigantism = value;
             }
         }
+
+        private bool _HasElongated = false;
+        public bool HasElongated
+        {
+            get
+            {
+                if (ParentObject != null)
+                    return ParentObject.HasPart<ElongatedPaws>();
+                return _HasElongated;
+            }
+            set
+            {
+                _HasElongated = value;
+            }
+        }
+
+        private bool _HasBurrowing = false;
+        public bool HasBurrowing
+        {
+            get
+            {
+                if (ParentObject != null)
+                    return ParentObject.HasPartDescendedFrom<BurrowingClaws>();
+                return _HasBurrowing;
+            }
+            set
+            {
+                _HasBurrowing = value;
+            }
+        }
+
         public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1) { return true; }
         public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1) { return true; }
         public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1) { return true; }

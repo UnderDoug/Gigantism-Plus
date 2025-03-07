@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
 using System.Text;
-using System.Web.UI;
 using XRL;
 using XRL.Rules;
 using XRL.World;
@@ -79,12 +79,14 @@ namespace HNPS_GigantismPlus
         {
             return Int >= 0 ? "bonus" : "penalty";
         }
+
         public static string BonusOrPenalty(this string SignedInt)
         {
             if (int.TryParse(SignedInt, out int Int))
                 return Int >= 0 ? "bonus" : "penalty";
             throw new ArgumentException($"int.TryParse(SignedInt) failed to parse \"{SignedInt}\". SignedInt must be capable of conversion to int.");
         }
+
         public static StringBuilder AppendGigantic(this StringBuilder sb, string value)
         {
             sb.AppendColored("gigantic", value);
@@ -99,6 +101,61 @@ namespace HNPS_GigantismPlus
         {
             if (Pretty) return Text.Color(Color);
             return Text;
+        }
+
+        // ripped from the CyberneticPropertyModifier part, converted into extension.
+        // Props must equal "string:int;string:int;string:int" where
+        // string   is an IntProperty
+        // int      is the value
+        // ;        delimits each pair.
+        // Example: "ChargeRangeModifier:2;JumpRangeModifier:1"
+        public static Dictionary<string, int> ParseProps(this string Props)
+        {
+            Dictionary<string, int> dictionary = new();
+            string[] array = Props.Split(';');
+            for (int i = 0; i < array.Length; i++)
+            {
+                string[] array2 = array[i].Split(':');
+                dictionary.Add(array2[0], Convert.ToInt32(array2[1]));
+            }
+            return dictionary;
+        }
+
+        // as above, but for int:int progressions (good for single value level progressions).
+        // Progression must equal "int:int;int:int;int:int" where
+        // int      is the progression "interval"
+        // int      is the value being progression
+        // ;        delimits each pair.
+        // Example: "1:2;3:3;6:4;9:5" starts at 2, and increases 1 every 3rd "interval"
+        public static Dictionary<int, int> ParseIntProgInt(this string Progression)
+        {
+            Dictionary<int, int> dictionary = new();
+            string[] array = Progression.Split(';');
+            for (int i = 0; i < array.Length; i++)
+            {
+                string[] array2 = array[i].Split(':');
+                dictionary.Add(Convert.ToInt32(array2[0]), Convert.ToInt32(array2[1]));
+            }
+            return dictionary;
+        }
+
+        // as above, but for int:DieRoll progressions (good for level-based damage progressions).
+        // Progression must equal "int:(string)DieRoll;int:(string)DieRoll;int:(string)DieRoll" where
+        // int              is the progression "interval"
+        // (string)DieRoll  is string formatted DieRoll being progression
+        // ;                delimits each pair.
+        // Example: "1:1d2;3:1d3;6:1d4;9:1d5" starts at 1d2, and increases d1 every 3rd "interval"
+        public static Dictionary<int, DieRoll> ParseIntProgDieRoll(this string Progression)
+        {
+            Dictionary<int, DieRoll> dictionary = new();
+            string[] array = Progression.Split(';');
+            for (int i = 0; i < array.Length; i++)
+            {
+                string[] array2 = array[i].Split(':');
+                DieRoll dieRoll = new DieRoll(array2[1]);
+                dictionary.Add(Convert.ToInt32(array2[0]), dieRoll);
+            }
+            return dictionary;
         }
     }
 }

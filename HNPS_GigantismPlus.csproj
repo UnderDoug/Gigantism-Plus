@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<AssemblyName>Mods</AssemblyName>
 		<PackageId>Mods</PackageId>
@@ -13,6 +13,9 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageIcon>preview.png</PackageIcon>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Include="Sandbox\UD\Items.xml" />
+	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="$(QudLibPath)/0Harmony.dll" />
 		<Reference Include="$(QudLibPath)/Accessibility.dll" />
@@ -146,5 +149,8 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Sandbox\HNPS\" />
 	</ItemGroup>
 </Project>

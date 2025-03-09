@@ -8,17 +8,7 @@
 			<p>Attempting to sprint or fly while hunched over will cause you stand up straight.</p-->
 		</description>
 		<!-- Foreground is tile body, Detail is tile arms -->
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="x" />
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOn.png" Foreground="z" Detail="x"  State="ToggleOn" />
-	</ability>
-	
-  <ability Command="CommandToggleExoframeCompactMode">
-		<description>
-			<p>Your exoframe can compact itself to allow entry into smaller spaces.</p>
-			<p>While compacted you gain +4 AV but take -6 DV and suffer significant movement and quickness penalties.</p>
-		</description>
-    <!-- Foreground is tile body, Detail is tile arms -->
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOff.png" Foreground="b" Detail="B" />
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOn.png" Foreground="b" Detail="B" State="ToggleOn" />
+		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="x" />
+		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOn.png" Foreground="z" Detail="x"  State="ToggleOn" />
 	</ability>
 </activatedabilities>

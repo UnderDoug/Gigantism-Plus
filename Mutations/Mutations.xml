@@ -1,0 +1,15 @@
+<mutations>
+    <category Name="Physical">
+        <mutation Name="ElongatedPaws" Cost="4" MaxSelected="1" Class="ElongatedPaws" Exclusions="" BearerDescription="those with elongated paws" Tile="Mutations/ElongatedPaws.png" Hidden="false" ExcludeFromPool="false" />
+    </category>
+    <category Name="PhysicalDefects">
+        <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" Exclusions="" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" />
+    </category>
+
+    <!-- NaturalWeapon Managed vanilla mutations -->
+    <category Name="Physical" Load="Merge">
+      <!--mutation Name="Burrowing Claws" Class="UD_ManagedBurrowingClaws" Load="Merge" /-->
+      <!--mutation Name="Crystallinity" Class="UD_ManagedCrystallinity" Load="Merge" /-->
+    </category>
+    <!-- End NaturalWeapon Managed vanilla mutations -->
+</mutations>

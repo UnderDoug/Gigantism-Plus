@@ -324,7 +324,6 @@ You cannot wear equipment on your body."
           />
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
-    <part Name="ItemElements" Elements="immense::2" />
     <tag Name="BaseObject" Value="*noinherit" />
     <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
   </object>
@@ -376,6 +375,7 @@ You cannot wear equipment on your body."
           />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
     <tag Name="StartingCybernetic:General" />
+    <tag Name="Tier" Value="2" />
   </object>
 
   <object Name="GiganticExoframeDelta" Inherits="BaseGiganticExoframe">
@@ -407,6 +407,7 @@ You cannot wear equipment on your body."
           StunningForceLevelFactor="0.67"
           />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
+    <tag Name="Tier" Value="4" />
   </object>
 
   <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
@@ -440,6 +441,7 @@ You cannot wear equipment on your body."
     <part Name="ModImprovedGigantismPlus" Tier="10" />
     <part Name="Crysteel" />
     <tag Name="Flawless" />
+    <tag Name="Tier" Value="6" />
   </object>
 
   <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
@@ -472,6 +474,7 @@ You cannot wear equipment on your body."
           />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="Zetachrome" />
+    <tag Name="Tier" Value="8" />
   </object>
 
   <!-- End Massive Exoframes -->

@@ -17,7 +17,7 @@ namespace HNPS_GigantismPlus.Harmony
         {
             GameObject actor = __instance.ParentObject;
             Zone InstanceObjectZone = actor.GetCurrentZone();
-            string InstanceObjectZoneID = "[Cache]";
+            string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Entry(3, $"[HarmonyPatch(nameof(BurrowingClaws.OnRegenerateDefaultEquipment))]");
             Debug.Header(3, $"BurrowingClaws_Patches", $"OnRegenerateDefaultEquipment(body)");

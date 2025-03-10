@@ -88,21 +88,52 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
+        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1) 
+        {
+            NaturalWeapon.DamageDieCount = GetNaturalWeaponDamageDieCount(Level);
+            return true; 
+        }
         public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            NaturalWeapon.DamageDieSize = GetNaturalWeaponDamageDieSize(Level);
+            return true;
+        }
+        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1) 
+        {
+            NaturalWeapon.DamageBonus = GetNaturalWeaponDamageBonus(Level);
+            return true; 
+        }
+        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1) 
+        {
+            NaturalWeapon.HitBonus = GetNaturalWeaponHitBonus(Level);
+            return true; 
+        }
+
+
+        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        {
+            return NaturalWeapon.DamageDieCount;
+        }
+
+        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
         {
             if (HasGigantism)
             {
-                NaturalWeapon.DamageDieSize = 3;
-                return true;
+                return 3;
             }
             DieRoll baseDamage = new(GetClawsDamage(Level));
-            NaturalWeapon.DamageDieSize = baseDamage.RightValue;
-            return true;
+            return baseDamage.RightValue;
         }
 
-        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1) { return true; }
-        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1) { return true; }
-        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1) { return true; }
+        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return NaturalWeapon.DamageBonus;
+        }
+
+        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
+        {
+            return NaturalWeapon.HitBonus;
+        }
 
         public override bool ChangeLevel(int NewLevel)
         {
@@ -113,7 +144,7 @@ namespace XRL.World.Parts.Mutation
         public override void OnRegenerateDefaultEquipment(Body body)
         {
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[Cache]";
+            string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(3, "UD_ManagedBurrowingClaws", $"OnRegenerateDefaultEquipment(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);

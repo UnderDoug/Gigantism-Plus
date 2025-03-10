@@ -33,22 +33,46 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
+            NaturalWeapon.DamageDieCount = GetNaturalWeaponDamageDieCount(Level);
             return true;
         }
 
         public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
         {
+            NaturalWeapon.DamageDieSize = GetNaturalWeaponDamageDieSize(Level);
             return true;
         }
 
         public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1)
         {
+            NaturalWeapon.DamageBonus = GetNaturalWeaponDamageBonus(Level);
             return true;
         }
 
         public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1)
         {
+            NaturalWeapon.HitBonus = GetNaturalWeaponHitBonus(Level);
             return true;
+        }
+
+        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        {
+            return NaturalWeapon.DamageDieCount;
+        }
+
+        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            return NaturalWeapon.DamageDieSize;
+        }
+
+        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return NaturalWeapon.DamageBonus;
+        }
+
+        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
+        {
+            return NaturalWeapon.HitBonus;
         }
 
         public override bool ChangeLevel(int NewLevel)

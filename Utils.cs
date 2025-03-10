@@ -11,6 +11,9 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
+using NUnit.Framework.Internal.Commands;
+using System.Runtime.CompilerServices;
+using NUnit.Framework.Constraints;
 
 namespace HNPS_GigantismPlus
 {
@@ -38,57 +41,60 @@ namespace HNPS_GigantismPlus
         public static bool TryGetTilePath(string TileName, out string TilePath)
         {
             Debug.Divider(3, Count: 40, Indent: 4);
-            Debug.Entry(3, $"@ HelperMethods.DoesTileExist({TileName})", Indent: 5);
+            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 5);
 
-            Debug.Entry(4, "* if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 5);
+            bool found = false;
+            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 5);
             if (_TilePathCache.TryGetValue(TileName, out TilePath))
             {
                 Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 6);
-                Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
-                Debug.Divider(3, Count: 40, Indent: 4);
-                return TilePath != null;
+                goto Exit;
             }
             Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 6);
+            Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 5);
 
             Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 6);
-            if (!_TilePathCache.TryAdd(TileName, TilePath)) Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 6);
+            if (!_TilePathCache.TryAdd(TileName, TilePath)) 
+                Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 6);
 
             Debug.Entry(4, $"Listing subfolders", Indent: 5);
-            Debug.Entry(4, $"* foreach (string subfolder  in TileSubfolders)", Indent: 5);
+            Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 5);
             foreach (string subfolder in TileSubfolders)
             {
                 Debug.LoopItem(4, $"{subfolder}", Indent: 6);
             }
             Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 5);
 
-            Debug.Entry(4, $"* foreach (string subfolder in TileSubfolders)", Indent: 5);
+            Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 5);
+            Debug.Divider(3, "-", Count: 25, Indent: 5);
             foreach (string subfolder in TileSubfolders)
             {
                 string path = subfolder;
                 if (path != "") path += "/";
                 path += TileName;
-                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent: 7);
+                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent: 6);
                 if (SpriteManager.HasTextureInfo(path))
                 {
-                    Debug.DiveIn(4, $"Yes.", Indent: 8);
-                    Debug.Entry(3, $"out Tile = {path}", Indent: 8);
+                    Debug.DiveIn(4, $"Yes.", Indent: 7);
+                    Debug.Entry(3, $"out Tile = {path}", Indent: 7);
                     TilePath = path;
-                    Debug.Entry(3, $"Adding entry to _TilePathCache", Indent: 8);
                     _TilePathCache[TileName] = TilePath;
-                    Debug.DiveOut(4, "TilePath Exists", Indent: 7);
-                    Debug.Entry(4, $"x foreach (string subfolder in subfolders) >//", Indent: 5);
-                    Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
-                    Debug.Divider(3, Count: 40, Indent: 4);
-                    return true;
+                    Debug.Entry(3, $"Added entry to _TilePathCache", Indent: 7);
+                    Debug.DiveOut(4, "TilePath Exists", Indent: 6);
+                    break;
                 }
-                Debug.Entry(4, $"No.", Indent: 8);
+                Debug.Entry(4, $"No.", Indent: 7);
             }
+            Debug.Divider(3, "-", Count: 25, Indent: 5);
             Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 5);
-            Debug.Entry(3, $"No tile \"{TileName}\" found in supplied subfolders", Indent: 5);
-            Debug.Entry(3, $"x HelperMethods.DoesTileExist({TileName}) ]//", Indent: 5);
+
+            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 5);
+
+            Exit:
+            found = TilePath != null;
+            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) ]//", Indent: 5);
             Debug.Divider(3, Count: 40, Indent: 4);
-            TilePath = null;
-            return false;
+            return found;
         }
 
         public static string WeaponDamageString(int DieSize, int DieCount, int Bonus)
@@ -108,40 +114,6 @@ namespace HNPS_GigantismPlus
         }
 
         public static Random RndGP = Stat.GetSeededRandomGenerator("HNPS_GigantismPlus");
-
-        public static bool GetCyberneticsList(Body body, out string FistReplacement)
-        {
-            List<GameObject> cyberneticsList = (from c in body.GetInstalledCybernetics()
-                                                where c.HasPart<CyberneticsFistReplacement>() == true
-                                                select c).ToList();
-            if (cyberneticsList == null)
-            {
-                FistReplacement = string.Empty;
-                return false;
-            }
-            int highest = -1;
-            string[] rank = new string[4]
-            {
-                "CarbideFist",
-                "FulleriteFist",
-                "CrysteelFist",
-                "RealHomosapien_ZetachromeFist"
-            };
-            foreach (GameObject handbone in cyberneticsList)
-            {
-                string fistObject = handbone.GetPart<CyberneticsFistReplacement>().FistObject;
-                int index = Array.IndexOf(rank, fistObject);
-                if (index > highest) highest = index;
-                if (highest == rank.Length - 1) break;
-            }
-            if (highest == -1)
-            {
-                FistReplacement = string.Empty;
-                return false;
-            }
-            FistReplacement = rank[highest];
-            return true;
-        }
 
         // !! This is currently not firing from any of the NaturalWeapon Mutations but it has code that will make implementing the cybernetics adjustments easier.
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
@@ -181,8 +153,8 @@ namespace HNPS_GigantismPlus
                     // weapon.MaxStrengthBonus = MaxStrBonus;
 
                     Debug.Entry(3, "Checking for HandBones", Indent: 5);
-                    Debug.Entry(3, "* if (GetCyberneticsList(Part.ParentBody, out string FistReplacement))", Indent: 5);
-                    if (GetCyberneticsList(Part.ParentBody, out string FistReplacement))
+                    Debug.Entry(3, "* if (TryGetNaturalWeaponCyberneticsList(Part.ParentBody, out string FistReplacement))", Indent: 5);
+                    if (Part.ParentBody.TryGetNaturalWeaponCyberneticsList(out string FistReplacement))
                     {
                         Debug.Entry(3, $"HandBones Found: {FistReplacement}", Indent: 6);
                         switch (FistReplacement)
@@ -212,7 +184,7 @@ namespace HNPS_GigantismPlus
                     {
                         Debug.Entry(3, $"No HandBones Found", Indent: 6);
                     }
-                    Debug.Entry(3, "x if (GetCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5);
+                    Debug.Entry(3, "x if (TryGetNaturalWeaponCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5);
 
                     var cybernetics = Part.ParentBody.GetBody().Cybernetics;
                     if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
@@ -313,6 +285,53 @@ namespace HNPS_GigantismPlus
             return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
         } //!-- public static string GetProcessedItem(List<string> item, bool second, List<List<string>> items, GameObject obj)
 
-    } //!-- public static class HelperClass
+        public static int ExplodingDie(int Number, DieRoll DieRoll, int Step = 1, int Limit = 0, int Indent = 0)
+        {
+            Debug.Entry(4,
+                $"ExplodingDie(Number: {Number}, DieRoll: {DieRoll.ToString()}, Step: {Step}, Limit: {Limit})",
+                Indent: Indent);
+
+            int High = DieRoll.Max();
+            int oldIndent = Indent;
+
+            Debug.Entry(4, $"Explodes on High Roll: {High}", Indent: Indent);
+            Begin:
+            if (Limit != 0 && High >= Limit)
+            {
+                Debug.Entry(4, "Limit 0 or DieRoll.Max() >= Limit", Indent: ++Indent);
+                Debug.Entry(4, "Exiting", Indent: Indent--);
+                Number = Limit;
+                goto Exit;
+            }
+
+            Debug.Entry(4, $"Rollin' the Die!", Indent: Indent);
+            int Result = DieRoll.Resolve();
+            if (Result == High)
+            {
+                Debug.Entry(4, $"Result: {Result}, Success!", Indent: ++Indent);
+                Debug.Entry(4, $"Increasing Number by {Step}", Indent: Indent);
+                Debug.Entry(4, $"Sending Number for another roll!", Indent: Indent);
+                Number += Step;
+                Indent++;
+                // Number = ExplodingDie(Number += Step, DieRoll, Step, Limit, ++Indent);
+                goto Begin;
+            }
+            else
+            {
+                Debug.Entry(4, $"Result: {Result}, Failure!", Indent: ++Indent);
+            }
+
+            Exit:
+            Debug.Entry(4, $"Final Number: {Number}", Indent: oldIndent);
+            return Number;
+        }
+
+        public static int ExplodingDie(int Number, string DieRoll, int Step = 1, int Limit = 0, int Indent = 0)
+        {
+            DieRoll dieRoll = new(DieRoll);
+            return ExplodingDie(Number, dieRoll, Step, Limit, Indent);
+        }
+
+    } //!-- public static class Utils
 
 } //!-- namespace HNPS_GigantismPlus

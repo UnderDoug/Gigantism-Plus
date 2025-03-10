@@ -5,7 +5,7 @@ using HNPS_GigantismPlus;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class WeaponElongator : IPart
+    public class WeaponElongator : IScribedPart
     {
         public GameObject Wielder = null;
 

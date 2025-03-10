@@ -3,7 +3,7 @@
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class PseudoGigantism : IPart
+    public class PseudoGigantism : IScribedPart
     {
         public override bool WantEvent(int ID, int cascade)
         {

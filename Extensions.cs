@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using XRL;
 using XRL.Rules;
@@ -8,6 +9,7 @@ using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.Tinkering;
 
 namespace HNPS_GigantismPlus
 {
@@ -49,6 +51,7 @@ namespace HNPS_GigantismPlus
             }
             else
             {
+                Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue == 0", Indent: 7);
                 Debug.Entry(4, "AdjustDieCount", "Recursing >>VV", Indent: 7);
                 if (DieRoll.RightValue > 0) return new(type, DieRoll.Left.AdjustDieCount(Amount), DieRoll.RightValue);
                 return new(type, DieRoll.Left.AdjustDieCount(Amount), DieRoll.Right);
@@ -67,12 +70,10 @@ namespace HNPS_GigantismPlus
 
         public static int GetNaturalWeaponModsCount(this GameObject GO)
         {
-            Debug.Entry(4, $"GetNaturalWeaponModsCount(this GameObject {GO.DebugName})", $"{GO.GetIntProperty("ModNaturalWeaponCount")}", Indent: 5);
             return GO.GetIntProperty("ModNaturalWeaponCount");
         }
         public static bool HasNaturalWeaponMods(this GameObject GO)
         {
-            Debug.Entry(4, $"HasNaturalWeaponMods(this GameObject {GO.DebugName})", $"{GO.GetNaturalWeaponModsCount() > 0}", Indent: 4);
             return GO.GetNaturalWeaponModsCount() > 0;
         }
 
@@ -91,6 +92,12 @@ namespace HNPS_GigantismPlus
         public static StringBuilder AppendGigantic(this StringBuilder sb, string value)
         {
             sb.AppendColored("gigantic", value);
+            return sb;
+        }
+        public static StringBuilder AppendRule(this StringBuilder sb, string value)
+        {
+            // different from AppendRules (plural) since this doesn't force a new-line.
+            sb.AppendColored("rules", value);
             return sb;
         }
 
@@ -178,5 +185,207 @@ namespace HNPS_GigantismPlus
 
             return managedCrystallinity;
         }
+
+        public static bool TryGetNaturalWeaponCyberneticsList(this Body body, out string FistReplacement)
+        {
+            List<GameObject> cyberneticsList = (from c in body.GetInstalledCybernetics()
+                                                where c.HasPart<CyberneticsFistReplacement>() == true
+                                                select c).ToList();
+            if (cyberneticsList == null)
+            {
+                FistReplacement = string.Empty;
+                return false;
+            }
+            int highest = -1;
+            string[] rank = new string[4]
+            {
+                "CarbideFist",
+                "FulleriteFist",
+                "CrysteelFist",
+                "RealHomosapien_ZetachromeFist"
+            };
+            foreach (GameObject handbone in cyberneticsList)
+            {
+                string fistObject = handbone.GetPart<CyberneticsFistReplacement>().FistObject;
+                int index = Array.IndexOf(rank, fistObject);
+                if (index > highest) highest = index;
+                if (highest == rank.Length - 1) break;
+            }
+            if (highest == -1)
+            {
+                FistReplacement = string.Empty;
+                return false;
+            }
+            FistReplacement = rank[highest];
+            return true;
+        }
+
+        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
+        {
+            string creatureDebugName = Creature.DebugName;
+            string creatureBlueprint = Creature.Blueprint;
+
+
+            bool creatureIsMerchant = Creature.IsMerchant();
+            int merchantChance = 1;
+            int merchantGrenadeOdds = 2;
+            int merchantTradeGoodsOdds = 4;
+            int merchantTonicsOdds = 4;
+            int merchantRareTonicsOdds = 10;
+
+            if (!Option) goto Exit; // skip if Option disabled
+            if (!Creature.IsCreature) goto Exit; // skip non-creatures
+            if (!Creature.HasPart<GigantismPlus>())goto Exit; // skip non-gigantic creatures
+            if (Creature.Inventory == null) goto Exit; // skip objects without inventory
+            if (Creature.GetIntProperty("InventoryGigantified") > 0) goto Exit; // skip if inventory has already been gigantified.
+
+            Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption})", Indent: 1);
+            Debug.Divider(3, Indent: 1);
+
+            Debug.Entry(3, "Making inventory items gigantic for creature", creatureBlueprint, Indent: 1);
+
+            // Create a copy of the items list to avoid modifying during enumeration
+            List<GameObject> itemsToProcess = new(Creature.Inventory.Objects);
+
+            Debug.Entry(3, "> foreach (var item in itemsToProcess)", Indent: 1);
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            foreach (GameObject item in itemsToProcess)
+            {
+                string ItemDebug = item.DebugName;
+                string ItemName = item.Blueprint;
+                Debug.DiveIn(3, $"{ItemDebug}", Indent: 1);
+                int NoThanks = 0;
+                // Can the item have the gigantic modifier applied?
+                if (ItemModding.ModificationApplicable("ModGigantic", item))
+                {
+                    Debug.LoopItem(4, "can be made ModGigantic", Indent: 3);
+                    // Is the item already gigantic? Don't attempt to apply it again.
+                    if (item.HasPart<ModGigantic>())
+                    {
+                        Debug.LoopItem(4, "already gigantic", "NoThanks++; x/", Indent: 3);
+                        NoThanks++;
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, "not gigantic", Indent: 3);
+                    }
+
+                    // Is the item a grenade, and is the option not set to include them?
+                    if (item.HasTag("Grenade"))
+                    {
+                        if (!GrenadeOption || creatureIsMerchant)
+                        {
+                            if (!GrenadeOption) Debug.LoopItem(4, "grenade (excluded)", "NoThanks++; x/", Indent: 3);
+                            if (creatureIsMerchant) Debug.LoopItem(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 3);
+                            NoThanks++;
+
+                            if (creatureIsMerchant && merchantChance.ChanceIn(merchantGrenadeOdds))
+                            {
+                                Debug.LoopItem(4,
+                                    $"but! MerchanctChance {merchantChance} in {merchantGrenadeOdds}",
+                                    $"NoThanks--;",
+                                    Indent: 4);
+                                NoThanks--;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, "not grenade", Indent: 3);
+                    }
+
+                    // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
+                    if (item.HasTag("DynamicObjectsTable:TradeGoods"))
+                    {
+                        Debug.LoopItem(4, "TradeGoods", "NoThanks++; x/", Indent: 3);
+                        NoThanks++;
+
+                        if (creatureIsMerchant && merchantChance.ChanceIn(merchantTradeGoodsOdds))
+                        {
+                            Debug.LoopItem(4,
+                                $"but! MerchanctChance {merchantChance} in {merchantTradeGoodsOdds}",
+                                $"NoThanks--;",
+                                Indent: 4);
+                            NoThanks--;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, "not TradeGoods", Indent: 3);
+                    }
+
+                    // Is the item a non-rare tonic? Double doses are basically useless in the early game
+                    if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                    {
+                        Debug.Entry(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 3);
+                        NoThanks++;
+
+                        if (creatureIsMerchant && merchantChance.ChanceIn(merchantTonicsOdds))
+                        {
+                            Debug.LoopItem(4,
+                                $"but! MerchanctChance {merchantChance} in {merchantTonicsOdds}",
+                                $"NoThanks--;",
+                                Indent: 4);
+                            NoThanks--;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, "not Tonics_NonRare", Indent: 3);
+                    }
+
+                    // Is the item a rare tonic? Double doses are basically useless in the early game
+                    if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                    {
+                        Debug.Entry(4, "Rare Tonic", "NoThanks++; x/", Indent: 3);
+                        NoThanks++;
+
+                        if (creatureIsMerchant && merchantChance.ChanceIn(merchantRareTonicsOdds))
+                        {
+                            Debug.LoopItem(4,
+                                $"but! MerchanctChance {merchantChance} in {merchantRareTonicsOdds}",
+                                $"NoThanks--;",
+                                Indent: 4);
+                            NoThanks--;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, "not Rare Tonics", Indent: 3);
+                    }
+
+                    Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
+                    if (NoThanks > 0) goto Skip;
+
+                    Debug.Entry(3, $"Gigantifying {ItemName}", Indent: 2);
+                    ItemModding.ApplyModification(item, "ModGigantic");
+                    if (!item.HasPart<ModGigantic>()) Debug.Entry(3, ItemName, "<!!> Gigantification Failed", Indent: 2);
+                    else Debug.Entry(3, ItemName, "has been Gigantified", Indent: 2);
+                    Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
+                    continue;
+                }
+                else
+                {
+                    Debug.LoopItem(4, "cannot be made gigantic x/", Indent: 3);
+                }
+            Skip:
+                Debug.Entry(3, "/x Skipping", Indent: 2);
+                Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
+            }
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Entry(4, "x foreach (GameObject item in itemsToProcess) >//", Indent: 1);
+
+            // Now equip all items that should be equipped
+
+            Debug.LoopItem(3, "Creature.WantToReequip()", Indent: 1);
+            Creature.WantToReequip();
+
+            Debug.Divider(3, Indent: 1);
+            Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) ]//", Indent: 1);
+            
+            Exit:
+            return;
+        } //!-- public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
+        
     }
 }

@@ -74,12 +74,12 @@ namespace HNPS_GigantismPlus
         public static void Header(int Verbosity, string ClassName, string MethodName)
         {
             Divider(Verbosity);
-            string output = "@START " + ClassName + "." + MethodName;
+            string output = "@START: " + ClassName + "." + MethodName;
             Entry(Verbosity, output);
         }
         public static void Footer(int Verbosity, string ClassName, string MethodName)
         {
-            string output = "///END " + ClassName + "." + MethodName + " !//";
+            string output = "///END: " + ClassName + "." + MethodName + " !//";
             Entry(Verbosity, output);
             Divider(Verbosity);
         }
@@ -106,7 +106,7 @@ namespace HNPS_GigantismPlus
         }
 
         // Class Specific Debugs
-        public static MeleeWeapon Trace(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, string[] Category = null, int Indent = 0)
+        public static MeleeWeapon Vomit(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, string[] Category = null, int Indent = 0)
         {
             Divider(Verbosity, "-", 25, Indent);
             string title = Title == null ? "" : $"{Title}:";

@@ -69,59 +69,51 @@ namespace XRL.World.Parts
 
         public virtual int GetDamageDieCount()
         {
-            Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
-            Debug.Entry(4, "NaturalWeapon.GetDamageDieCount()", $"{NaturalWeapon.GetDamageDieCount()}", Indent: 6);
             return Math.Max(0, NaturalWeapon.GetDamageDieCount());
         }
         public virtual int GetDamageDieSize()
         {
-            Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
-            Debug.Entry(4, "NaturalWeapon.GetDamageDieSize()", $"{NaturalWeapon.GetDamageDieSize()}", Indent: 6);
             return Math.Max(0, NaturalWeapon.GetDamageDieSize());
         }
 
         public virtual int GetDamageBonus()
         {
-            Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
-            Debug.Entry(4, "NaturalWeapon.GetDamageBonus()", $"{NaturalWeapon.GetDamageBonus()}", Indent: 6);
             // base damage bonus is 0
             return NaturalWeapon.GetDamageBonus();
         }
 
         public virtual int GetHitBonus()
         {
-            Debug.Entry(4, $"ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>; Level: {Level}", Indent: 5);
-            Debug.Entry(4, "NaturalWeapon.GetHitBonus()", $"{NaturalWeapon.GetHitBonus()}", Indent: 6);
             // base hit bonus is 0
             return NaturalWeapon.GetHitBonus();
         }
 
         public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)
         {
-            Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 5);
-            Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 6);
+            Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
-            Debug.Entry(4, "* if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 6);
+            Debug.Entry(4, "* if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 5);
             if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))
             {
-                Debug.Entry(4, "+ NaturalWeaponDescriber is Present", Indent: 7);
+                Debug.Entry(4, "+ NaturalWeaponDescriber is Present", Indent: 6);
                 if (!Object.HasNaturalWeaponMods())
                 {
-                    Debug.Entry(4, "No NaturalWeaponMods", "Resetting Short Description", Indent: 7);
+                    Debug.Entry(4, "No NaturalWeaponMods", "Resetting Short Description", Indent: 6);
                     NaturalWeaponDescriber.ResetShortDescription();
                 }
                 else
                 {
-                    Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descripiptions", Indent: 7);
+                    Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descripiptions", Indent: 6);
                 }
                 NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeapon.GetPriority(), InstanceDescription);
             }
             else
             {
-                Debug.Entry(4, " NaturalWeaponDescriber not Present", Indent: 7);
+                Debug.Entry(4, " NaturalWeaponDescriber not Present", Indent: 6);
             }
-            Debug.Entry(4, "x if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber)) ?//", Indent: 6);
+            Debug.Entry(4, "x if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber)) ?//", Indent: 5);
 
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
@@ -129,22 +121,32 @@ namespace XRL.World.Parts
             // 1d2-2 into 1d2+0
             if (!Object.HasNaturalWeaponMods()) weapon.AdjustDamage(1);
 
-            string[] traceCats = new string[] { "Damage", "Combat", "Render" };
-            weapon.Trace(4, "Before", traceCats, Indent: 5);
+            string[] vomitCats = new string[] { "Damage" };
+            weapon.Vomit(4, "Generic, Before", vomitCats, Indent: 4);
+
+            Debug.Entry(4, $"NaturalWeapon Adjustments", Indent: 4);
+            Debug.LoopItem(4, $"DamageDieCount", $"{GetDamageDieCount().Signed()}", Indent: 5);
+            Debug.LoopItem(4, $"GetDamageDieSize", $"{GetDamageDieSize().Signed()}", Indent: 5);
+            Debug.LoopItem(4, $"GetDamageBonus", $"{GetDamageBonus().Signed()}", Indent: 5);
+            Debug.LoopItem(4, $"GetHitBonus", $"{GetHitBonus().Signed()}", Indent: 5);
+
             weapon.AdjustDieCount(GetDamageDieCount());
             weapon.AdjustDamageDieSize(GetDamageDieSize());
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
-            weapon.Trace(4, "After", traceCats, Indent: 5);
-            Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 5);
+            weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
+            Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
         }
 
         public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)
         {
-            Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)", Indent: 5);
-            Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 6);
+            Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)", Indent: 4);
+            Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 5);
             Render render = Object.Render;
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
+
+            string[] vomitCats = new string[] { "Combat", "Render" };
+            weapon.Vomit(4, "Priority, Before", vomitCats, Indent: 4);
             if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > NounPriority)
             {
                 Object.SetIntProperty("CurrentNaturalWeaponBasePriority", NounPriority);
@@ -154,7 +156,8 @@ namespace XRL.World.Parts
                 render.ColorString = (render.ColorString == NaturalWeapon.RenderColorString) ? NaturalWeapon.SecondRenderColorString : NaturalWeapon.RenderColorString;
                 render.DetailColor = (render.DetailColor == NaturalWeapon.RenderDetailColor) ? NaturalWeapon.SecondRenderDetailColor : NaturalWeapon.RenderDetailColor;
             }
-            Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)", Indent: 5);
+            weapon.Vomit(4, "Priority, After", vomitCats, Indent: 4);
+            Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)", Indent: 4);
             return NounPriority;
         }
 

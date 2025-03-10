@@ -64,23 +64,50 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        // Required by IManagedDefaultNaturalWeapon and is used to calculate the relevant damage component
+        // Required by IManagedDefaultNaturalWeapon and is used to assign the relevant damage component
+        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
+        {
+            NaturalWeapon.DamageDieCount = GetNaturalWeaponDamageDieCount(Level);
+            return true;
+        }
         public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            NaturalWeapon.DamageDieSize = GetNaturalWeaponDamageDieSize(Level);
+            return true;
+        }
+        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1)
+        {
+            NaturalWeapon.DamageBonus = GetNaturalWeaponDamageBonus(Level);
+            return true;
+        }
+        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1)
+        {
+            NaturalWeapon.HitBonus = GetNaturalWeaponHitBonus(Level);
+            return true;
+        }
+        
+        // Required by IManagedDefaultNaturalWeapon and is used to calculate the relevant damage component
+        // Can be altered as below to be as simple or complex as you like 
+        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
         {
             if (HasGigantism) // Only apply the calculation if Gigantism isn't present
             {
-                NaturalWeapon.DamageDieSize = 2; 
-                return true;
+                return 2;
             }
-            NaturalWeapon.DamageDieSize = 1 + (int)Math.Floor((double)Level/3); // Starting at 2, increase every 3rd level
-            return true;
+            return 1 + (int)Math.Floor((double)Level / 3); // Starting at 2, increase every 3rd level
         }
-
-        // Required by IManagedDefaultNaturalWeapon and is used to calculate the relevant damage component
-        // Can be altered as above to be as simple or complex as you like 
-        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1) { return true; }
-        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1) { return true; }
-        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1) { return true; }
+        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        {
+            return NaturalWeapon.DamageDieCount;
+        }
+        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return NaturalWeapon.DamageBonus;
+        }
+        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
+        {
+            return NaturalWeapon.HitBonus;
+        }
 
         // ChangeLevel is the first call in the process for default equipment being updated/generated
         // so it makes sense to calculate the values here

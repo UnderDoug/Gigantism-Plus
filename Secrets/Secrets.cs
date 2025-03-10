@@ -70,7 +70,7 @@ namespace HNPS_GigantismPlus
                 User.RequirePart<Preacher>();
                 if (User.TryGetPart(out Preacher preacher))
                 {
-                    string preach = "{{SECRETGOLDEN|I AM BECOME GOLDEN, SHINER OF {{GOLDENSECRET|" + User.GetCurrentZone().ZoneID + "}}!!}}";
+                    string preach = "{{SECRETGOLDEN|I AM BECOME GOLDEN, SHINER OF {{GOLDENSECRET|" + User?.GetCurrentZone()?.ZoneID + "}}!!}}";
                     preacher.Lines = new string[1] { preach };
                     preacher.Prefix = "=subject.T= =verb:yell= {{SECRETGOLDEN|";
                     preacher.PreacherHomily(User, false);

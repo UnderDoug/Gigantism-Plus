@@ -12,111 +12,12 @@ namespace HNPS_GigantismPlus
     {
         public void mutate(GameObject player)
         {
-            Debug.Entry(2, "##################################################################");
-            Debug.Entry(2, "public class GigantifyStartingLoadout : IPlayerMutator");
-            Debug.Entry(3, "[{}] public void mutate(GameObject player)");
+            GameObject GO = player;
+            Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
 
-            Debug.Entry(2, "Checking if Gigantification of starting gear should occur");
-            Debug.Entry(4, "**if ((player.HasPart(\"HNPS_GigantismPlus\") && Options.EnableGiganticStartingGear)");
-            // Check for either mutation OR cybernetic as source of gigantism
-            if (player.HasPart<GigantismPlus>() && Options.EnableGiganticStartingGear)
-            {
-                Debug.Entry(3, "- Player is Gigantic && Option is [Enabled]");
+            GO.GigantifyInventory(Options.EnableGiganticStartingGear, Options.EnableGiganticStartingGear_Grenades);
 
-                Debug.Entry(3, "- Checking if Grenades should be included");
-                Debug.Entry(4, "**if (Options.EnableGiganticStartingGear_Grenades)");
-                if (Options.EnableGiganticStartingGear_Grenades)
-                {
-                    Debug.Entry(3, "-- Option is [Enabled] - Grenades will be Gigantified");
-                }
-                else
-                {
-                    Debug.Entry(3, "-- Option is [Disabled] - Grenades won't be Gigantified");
-                }
-
-                Debug.Entry(3, "- Performing Gigantification");
-                Debug.Entry(3, "**foreach (GameObject item in player.GetInventoryAndEquipment())");
-                // Cycle the player's inventory and equipped items.
-                foreach (GameObject item in player.GetInventoryAndEquipment())
-                {
-                    Debug.Entry(3, "-------------------------------------------");
-                    string ItemName = item.DebugName;
-                    Debug.Entry(3, $"--@ Item Entry: {ItemName}");
-                    ItemName = "--- " + item.Blueprint;
-                    // Can the item have the gigantic modifier applied?
-                    if (ItemModding.ModificationApplicable("ModGigantic", item))
-                    {
-                        Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                        // Is the item already gigantic? Don't attempt to apply it again.
-                        if (item.HasPart<ModGigantic>())
-                        {
-                            Debug.Entry(3, ItemName, "is already gigantic");
-                            Debug.Entry(4, "--X Skipping");
-                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                            continue;
-                        }
-                        Debug.Entry(3, ItemName, "not gigantic");
-
-                        // Is the item a grenade, and is the option not set to include them?
-                        if (!Options.EnableGiganticStartingGear_Grenades && item.HasTag("Grenade"))
-                        {
-                            Debug.Entry(3, ItemName, "is a grenade (excluded)");
-                            Debug.Entry(4, "--X Skipping");
-                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                            continue;
-                        }
-                        if (!item.HasTag("Grenade")) Debug.Entry(3, ItemName, "not a grenade");
-                        if (item.HasTag("Grenade")) Debug.Entry(3, ItemName, "is a grenade");
-
-                        // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
-                        if (item.HasTag("DynamicObjectsTable:TradeGoods"))
-                        {
-                            Debug.Entry(3, ItemName, "is TradeGoods");
-                            Debug.Entry(4, "--X Skipping");
-                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                            continue;
-                        }
-                        Debug.Entry(3, ItemName, "not TradeGoods");
-
-                        // Is the item a tonic? Double doses are basically useless in the early game
-                        if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
-                        {
-                            Debug.Entry(3, ItemName, "is Tonics_NonRare");
-                            Debug.Entry(4, "--X Skipping");
-                            Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                            continue;
-                        }
-                        Debug.Entry(3, ItemName, "not Tonics_NonRare");
-
-                        // apply the gigantic mod to the item and attempt to auto-equip it
-                        ItemModding.ApplyModification(item, "ModGigantic");
-                        Debug.Entry(2, ItemName, "has been Gigantified");
-                        // player.AutoEquip(item); Debug.Entry(2, ItemName, "AutoEquip Attempted");
-                        Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-
-                    }
-                    else
-                    {
-                        Debug.Entry(2, ItemName, "cannot be made gigantic");
-                        Debug.Entry(4, "--X Skipping");
-                        Debug.Entry(3, $"{ItemName} ]//");
-                        continue;
-                    }
-
-                    Debug.Entry(3, $"{ItemName} ]//");
-                }
-                Debug.Entry(3, "-------------------------------------------");
-                Debug.Entry(3, "- Gigantification of starting gear finished");
-                player.WantToReequip();
-                Debug.Entry(3, "- Attempting to reequip items");
-                Debug.Entry(2, "##################################################################");
-            }
-            else
-            {
-                Debug.Entry(4, "- Player not Gigantic || Option is [Disabled]");
-                Debug.Entry(3, "- Check Failed");
-                Debug.Entry(2, "##################################################################");
-            }
+            Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
         }
     }
 
@@ -126,79 +27,95 @@ namespace HNPS_GigantismPlus
         {
             bool ShouldDerarify = Options.SelectGiganticDerarification;
             bool ShouldGiganticTinkerable = Options.SelectGiganticTinkering;
-            Debug.Entry(3, "[{}] AdjustGiganticModifier()");
+            Debug.Entry(3, "@ GiganticModifierAdjustments.AdjustGiganticModifier()", Indent: 1);
 
-            Debug.Entry(3, "Attempting ModList adjustment process");
-            Debug.Entry(4, "**foreach (ModEntry mod in ModificationFactory.ModList)");
+            Debug.Entry(4, "? if (!ShouldDerarify && !ShouldGiganticTinkerable)", Indent: 2);
+            if (!ShouldDerarify && !ShouldGiganticTinkerable)
+            {
+                Debug.Entry(3, $"ShouldDerarify: {ShouldDerarify} | ShouldGiganticTinkerable: {ShouldGiganticTinkerable}", Indent: 3);
+                Debug.Entry(3, "No action necessary, Aborting", Indent: 3);
+                Debug.Entry(4, "x if (!ShouldDerarify && !ShouldGiganticTinkerable) ?//", Indent: 2);
+                goto Exit;
+            }
+            Debug.Entry(3, $"+ ShouldDerarify: {ShouldDerarify} | ShouldGiganticTinkerable: {ShouldGiganticTinkerable}", Indent: 3);
+            Debug.Entry(4, "x if (!ShouldDerarify && !ShouldGiganticTinkerable) ?//", Indent: 2);
+
+            Debug.Entry(3, "Attempting ModList adjustment process", Indent: 2);
+            Debug.Entry(4, "> foreach (ModEntry mod in ModificationFactory.ModList)", Indent: 2);
+            Debug.Divider(4, "-", Count: 25, Indent: 2);
             // find the gigantic modifier ModEntry in the ModList
             foreach (ModEntry mod in ModificationFactory.ModList)
             {
-                Debug.Entry(3, "-------------------------------------------");
                 string ModPart = mod.Part;
-                Debug.Entry(3, $"--@ Mod Entry: {ModPart}");
-                ModPart = "--- " + ModPart;
+                Debug.LoopItem(4, $"{ModPart}", Indent: 3);
                 if (mod.Part == "ModGigantic")
                 {
-                    Debug.Entry(3, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                    Debug.Entry(3, ModPart, "Found");
+                    Debug.DiveIn(3, $"{ModPart}: Found", Indent: 3);
                     // should the rarity be adjusted? 
-                    // - change the rarity from R2 (3) to R (2) 
-                    Debug.Entry(4, "**if (ShouldDerarify)");
+                    // - change the rarity from R2 (3) to R (2)
+                    Debug.Entry(4, "? if (ShouldDerarify)", Indent: 4);
                     if (ShouldDerarify)
                     {
-                        Debug.Entry(4, "---- Should");
+                        Debug.Entry(4, "+ Should", Indent: 5);
                         mod.Rarity = 2;
-                        Debug.Entry(2, ModPart, "Rarity is R (decreased)");
+                        Debug.Entry(3, ModPart, "Rarity is R (decreased)", Indent: 5);
                     }
                     else
                     {
-                        Debug.Entry(4, "---- Shouldn't");
+                        Debug.Entry(4, "- Shouldn't", Indent: 5);
                         mod.Rarity = 3;
-                        Debug.Entry(2, ModPart, "Rarity is R2 (default)");
+                        Debug.Entry(3, ModPart, "Rarity is R2 (default)", Indent: 5);
                     }
+                    Debug.Entry(4, "x if (ShouldDerarify) ?//", Indent: 4);
 
                     // should tinkering be allowed? 
                     // - change the tinkerability and add it to the list of recipes
-                    Debug.Entry(4, "**if (ShouldGiganticTinkerable)");
+                    Debug.Entry(4, "? if (ShouldGiganticTinkerable)", Indent: 4);
                     if (ShouldGiganticTinkerable)
                     {
-                        Debug.Entry(4, "---- Should");
+                        Debug.Entry(4, "+ Should", Indent: 5);
                         mod.TinkerAllowed = true;
-                        Debug.Entry(2, ModPart, "Gigantic tinkering [Enabled]");
+                        Debug.Entry(2, ModPart, "Gigantic tinkering [Enabled]", Indent: 5);
 
                         // Modifiers can actually be set to require an additional ingredient.
                         // mod.TinkerIngredient = "Torch";
                     }
                     else
                     {
-                        Debug.Entry(4, "---- Shouldn't");
+                        Debug.Entry(4, "- Shouldn't", Indent: 5);
                         mod.TinkerAllowed = false;
-                        Debug.Entry(2, ModPart, "Gigantic tinkering [Disabled] (default)");
+                        Debug.Entry(2, ModPart, "Gigantic tinkering [Disabled] (default)", Indent: 5);
                     }
+                    Debug.Entry(4, "x if (ShouldDerarify) ?//", Indent: 4);
 
+                    Debug.Entry(3, "Reinitialising TinkerData._TinkerRecipes", Indent: 4);
                     // this is a workaround for what I'm sure is a more straightforward and simple solution
                     // - after adjusting the ModEntry to be tinkerable, it needs to be added to the list of recipes
-                    // - flushing the list of recipes and then requesting the list uses an internal "get" function that cycles all the TinkerData and ModEntries and adds them to the TinkerRecipes list
-                    // - only works if you flush it first since the "get" function checks if the _list is empty first and if it isn't just returns it
-                    // it's probably NOT good, and could pose compatability issues with other mods if they do things post Blueprint pre-load, but I'm not nearly experienced enough to know what issues exactly
+                    // - flushing the list of recipes and then requesting the list uses an internal "get" function
+                    //   that cycles all the TinkerData and ModEntries and adds them to the TinkerRecipes list
+                    // - only works if you flush it first since the "get" function checks if the _list is empty first
+                    //   and if it isn't just returns it.
+                    // - it's probably NOT good, and could pose compatability issues with other mods if they do things
+                    //   post Blueprint pre-load, but I'm not nearly experienced enough to know what issues exactly.
+                    TinkerData._TinkerRecipes.RemoveAll(r => r != null); 
+                    Debug.Entry(2, "TinkerData._TinkerRecipes.RemoveAll(r => r != null);", Indent: 5);
 
-                    TinkerData._TinkerRecipes.RemoveAll(r => r != null); Debug.Entry(2, "--- Purged TinkerRecipes");
-                    List<TinkerData> reinitialise = TinkerData.TinkerRecipes; Debug.Entry(2, "--- Reinitialised TinkerRecipes");
-                    reinitialise = null; Debug.Entry(4, "--- Reinitialisation nulled");
+                    List<TinkerData> reinitialise = TinkerData.TinkerRecipes; 
+                    Debug.Entry(4, "List<TinkerData> reinitialise = TinkerData.TinkerRecipes;", Indent: 5);
 
-                    Debug.Entry(4, "--- No Further Actions Required", "Exiting ModList");
-                    Debug.Entry(3, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
-                    Debug.Entry(3, $"{ModPart} ]//");
+                    reinitialise = null; 
+                    Debug.Entry(4, "reinitialise = null;", Indent: 5);
 
+                    Debug.Entry(4, "No Further Actions Required", "Exiting ModList", Indent: 4);
+                    Debug.DiveOut(3, $"{ModPart}", Indent: 3);
                     break;
-
                 }
-                else Debug.Entry(2, ModPart, "Not ModGigantic");
-
-                Debug.Entry(3, $"{ModPart} ]//");
             }
-            Debug.Entry(3, "-------------------------------------------");
-            Debug.Entry(1, "ModList exited, adjustment process finished");
+            Debug.Divider(4, "-", Count: 25, Indent: 2);
+            Debug.Entry(4, "x foreach (ModEntry mod in ModificationFactory.ModList) >//", Indent: 2);
+            Debug.Entry(3, "ModList exited, adjustment process finished", Indent: 2);
+            Exit:
+            Debug.Entry(3, "x GiganticModifierAdjustments.AdjustGiganticModifier() @//", Indent: 1);
         }
     } //!--- public class GiganticModifierAdjustments
 
@@ -207,25 +124,21 @@ namespace HNPS_GigantismPlus
     {
         public void mutate(GameObject player)
         {
-            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            Debug.Entry(2, "public class OnPlayerLoad : IPlayerMutator");
-            Debug.Entry(2, "public void mutate(GameObject player)");
+            Debug.Header(3, "OnPlayerLoad", $"mutate(GameObject player: {player.DebugName})");
             GiganticModifierAdjustments.AdjustGiganticModifier();
-            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Footer(3, "OnPlayerLoad", $"mutate(GameObject player: {player.DebugName})");
         }
     } //!--- public class OnPlayerLoad : IPlayerMutator
 
-    [HasCallAfterGameLoadedAttribute]
+    [HasCallAfterGameLoaded]
     public class OnLoadGameHandler
     {
-        [CallAfterGameLoadedAttribute]
+        [CallAfterGameLoaded]
         public static void OnLoadGameCallback()
         {
-            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            Debug.Entry(2, "public class OnLoadGameHandler");
-            Debug.Entry(2, "public static void OnLoadGameCallback()");
+            Debug.Header(3, "OnPlayerLoad", $"OnLoadGameCallback()");
             GiganticModifierAdjustments.AdjustGiganticModifier();
-            Debug.Entry(2, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Footer(3, "OnPlayerLoad", $"OnLoadGameCallback()");
         }
     } //!--- public class OnLoadGameHandler
 }

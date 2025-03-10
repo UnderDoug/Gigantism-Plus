@@ -92,5 +92,13 @@ namespace XRL.World
         public abstract bool CalculateNaturalWeaponDamageBonus(int Level = 1);
 
         public abstract bool CalculateNaturalWeaponHitBonus(int Level = 1);
+
+        public abstract int GetNaturalWeaponDamageDieCount(int Level = 1);
+
+        public abstract int GetNaturalWeaponDamageDieSize(int Level = 1);
+
+        public abstract int GetNaturalWeaponDamageBonus(int Level = 1);
+
+        public abstract int GetNaturalWeaponHitBonus(int Level = 1);
     }
 }

@@ -31,7 +31,7 @@ namespace XRL.World.Parts
 
         public void AddShortDescriptionEntry(int Priority, string Description)
         {
-            Debug.Entry(4, $"NaturalWeaponDescriber.AddShortDescriptionEntry(int Priority: {Priority}, string Description)", Indent: 6);
+            Debug.Entry(4, $"NaturalWeaponDescriber.AddShortDescriptionEntry(int Priority: {Priority}, string Description)", Indent: 7);
             ShortDescriptions[Priority] = Description;
         }
 

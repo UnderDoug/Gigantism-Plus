@@ -100,7 +100,7 @@ namespace XRL.World.ObjectBuilders
                 string addImplant = exoframe + "@body";
                 Object.RequirePart<CyberneticsHasImplants>();
                 CyberneticsHasImplants hasImplants = Object.GetPart<CyberneticsHasImplants>();
-                hasImplants.Implants = hasImplants.Implants == "" ? addImplant : ","+addImplant;
+                hasImplants.Implants = hasImplants.Implants == "" ? addImplant : addImplant+",";
 
                 GameObject exoframeObject = GameObjectFactory.create(exoframe);
                 CyberneticsGiganticExoframe exoframeCybernetic = exoframeObject.GetPart<CyberneticsGiganticExoframe>();
@@ -108,13 +108,13 @@ namespace XRL.World.ObjectBuilders
                 NamePrefix = exoframeCybernetic.GetShortAugmentAdjective();
 
                 Render render = Object.Render;
-                string tileColor = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor;
-                render.ColorString = "&"+ exoframeCybernetic.AugmentTileDetailColor;
-                render.TileColor = "&"+ exoframeCybernetic.AugmentTileDetailColor;
+                string tileColor = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor; ;
+                render.ColorString = "&" + exoframeCybernetic.AugmentTileDetailColor;
+                render.TileColor = "&" + exoframeCybernetic.AugmentTileDetailColor;
                 if (render.DetailColor == exoframeCybernetic.AugmentTileDetailColor)
                 {
-                    render.DetailColor = ColorUtility.FindLastForeground(tileColor)?.ToString() ?? Crayons.GetRandomColor();
-                }
+                        render.DetailColor = ColorUtility.FindLastForeground(tileColor)?.ToString() ?? Crayons.GetRandomColor();
+                    }
                 if (!NamePrefix.IsNullOrEmpty())
                 {
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);

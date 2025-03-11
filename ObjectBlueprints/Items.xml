@@ -343,7 +343,7 @@ You cannot wear equipment on your body."
   </object>
 
   <!-- End Base Gigantic Cybernetics Objects -->
-  <!-- Massive Exoframes -->
+  <!-- Gigantic Exoframes -->
   
   <object Name="GiganticExoframeAlpha" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="15" />
@@ -477,7 +477,7 @@ You cannot wear equipment on your body."
     <tag Name="Tier" Value="8" />
   </object>
 
-  <!-- End Massive Exoframes -->
+  <!-- End Gigantic Exoframes -->
   <!-- Exoframe Manipulator Objects -->
   
   <object Name="GiganticExoframeManipulatorAlpha" Inherits="BaseGiganticExoframeManipulator">

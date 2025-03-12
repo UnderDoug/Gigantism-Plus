@@ -77,7 +77,7 @@ namespace XRL.World
             }
             public string GetColoredAdjective()
             {
-                return "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
+                return "{{" + GetAdjectiveColor() ?? "Y" + "|" + GetAdjective() + "}}";
             }
         }
 

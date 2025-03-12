@@ -17,8 +17,13 @@ namespace XRL.World.Parts.Mutation
             HitBonus = 0,
 
             ModPriority = 0,
+            AdjectiveColor = "y",
             Noun = "fist",
             Tile = "Creatures/natural-weapon-fist.bmp",
+            RenderColorString = "&K",
+            RenderDetailColor = "y",
+            SecondRenderColorString = "&y",
+            SecondRenderDetailColor = "Y"
         };
 
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()

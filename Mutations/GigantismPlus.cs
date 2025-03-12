@@ -188,7 +188,7 @@ namespace XRL.World.Parts.Mutation
 
         public GigantismPlus()
         {
-            DisplayName = "{{gigantism|Gigantism}} ({{r|D}})";
+            DisplayName = "Gigantism".Color("gigantism") + " ({{r|D}})";
             Type = "Physical";
 
             NaturalWeapon = new()

@@ -53,7 +53,7 @@ namespace XRL.World.Parts.Mutation
 
         public ElongatedPaws()
         {
-            DisplayName = "{{giant|Elongated Paws}}";
+            DisplayName = "Elongated Paws".Color("giant");
             Type = "Physical";
 
             NaturalWeapon = new()

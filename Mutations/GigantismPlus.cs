@@ -6,6 +6,7 @@ using XRL.UI;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
 using HNPS_GigantismPlus;
+using System.Runtime.CompilerServices;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -523,9 +524,13 @@ namespace XRL.World.Parts.Mutation
         public override string GetDescription()
         {
             string WeaponNoun = "fist";
+            int stunningForceDistance = 3;
+            double stunningForceLevelFactor = 0.5;
             if (ParentObject != null)
             {
                 WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
+                stunningForceDistance = StunningForceDistance;
+                stunningForceLevelFactor = StunningForceLevelFactor;
             }
 
             string gigantismSource = (!IsCyberGiant) ? "unusually" : "cybernetically".Color("c");
@@ -544,9 +549,9 @@ namespace XRL.World.Parts.Mutation
                 .AppendLine().AppendLine();
 
             SB.Append("You you cause a ").AppendRule("shockwave").Append(" where you land ")
-                .Append("after jumping at least ").AppendRule($"{StunningForceDistance}").Append(" tiles.").AppendLine()
+                .Append("after jumping at least ").AppendRule($"{stunningForceDistance}").Append(" tiles.").AppendLine()
                 .Append("Your shockwave's ").AppendRule("damage").Append(" and ").AppendRule("force")
-                .Append(" increases every ").AppendRule($"{(int)(1 / StunningForceLevelFactor)} levels");
+                .Append(" increases every ").AppendRule($"{(int)(1 / stunningForceLevelFactor)} levels");
             if (IsCyberGiant) 
                 SB.AppendLine().Append("This amount is being boosted by your ").Append(exoframeName);
             SB.AppendLine().AppendLine();

@@ -18,5 +18,6 @@
         <part Name="Examiner" Complexity="4" />
         <tag Name="EquipSound" Value="sfx_equip_armor_artifact_light" />
         <stag Name="Movement" />
+      <tag Name="Mods" Value="Gigantify,BootMods,CommonMods" />
     </object>
 </objects>

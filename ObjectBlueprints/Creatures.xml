@@ -10,7 +10,7 @@
       <part Name="InventoryGigantifier" />
       <builder Name="Gigantified" ChanceOneIn="5000" />
     </object>
-    <object Name="BaseTrueKin" Load="Merge">
+    <object Name="Templar" Load="Merge">
       <builder Name="Gigantified" ChanceOneIn="500" />
     </object>
     <object Name="Great Saltback" Load="Merge">
@@ -57,10 +57,10 @@
         <mutation Name="GigantismPlus" Level="4" />
         <removetag Name="Gigantic" />
     </object>
-  
-    <object Name="Knight Templar" Load="Merge">
+
+    <!--object Name="Knight Templar" Load="Merge">
         <part Name="CyberneticsHasImplants" Implants="GiganticExoframeDelta@body" />
-    </object>
+    </object-->
     <!-- End make creatures Gigantic -->
   
     <!-- 
@@ -71,4 +71,141 @@
       <mutation Name="ElongatedPaws" />
     </object>
     <!-- End make creatures Elongated -->
+
+    <!-- 
+        Putus Templar: Giant-Slayers
+     -->
+    <object Name="TemplarGiantSlayerBase" Inherits="Templar">
+      <part Name="Render" DisplayName="Templar Giant-Slayer"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png" 
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"  
+            />
+      <part Name="Description" Short="An over-square jaw competes with =pronouns.possessive= broad, furrowed brow for posession of =pronouns.possessive= face. =pronouns.Possessive= posture hints at a once bent spine, and =pronouns.possessive= gait all but betrays it. =pronouns.Subjective= =verb:flex:afterpronoun= =pronouns.possessive= immense fists in subconcious anticipation of imminent glory, while =pronouns.possessive= deep-set, monochrome eyes flicker hopefully across the horizon." />
+      <removeskill Name="LongBlades" />
+      <removeskill Name="LongBladesProficiency" />
+      <skill Name="Acrobatics" />
+      <skill Name="Acrobatics_Jump" />
+      <skill Name="Cudgel" />
+      <skill Name="Cudgel_Expertise" />
+      <tag Name="BaseObject" Value="*noinherit" />
+      <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Equipment Pool" />
+      <builder Name="Gigantified" ChanceOneIn="1" />
+    </object>
+
+    <object Name="Templar Squire Giant-Slayer" Inherits="TemplarGiantSlayerBase">
+      <part Name="Render" DisplayName="Templar Squire Giant-Slayer"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"
+            />
+      <stat Name="Level" Value="11" />
+      <stat Name="Hitpoints" Value="32" />
+      <stat Name="Strength" Boost="2" />
+      <inventoryobject Blueprint="Carbide Shield" />
+      <tag Name="InventoryPopulationTable" Value="Templar Squire Giant-Slayer Extra Armor" />
+    </object>
+
+    <object Name="Templar Giant-Slayer" Inherits="TemplarGiantSlayerBase">
+      <part Name="Render" DisplayName="Templar Giant-Slayer"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+      <stat Name="Level" Value="21" />
+      <stat Name="Hitpoints" Value="65" />
+      <stat Name="Strength" Boost="3" />
+      <stat Name="Willpower" Boost="1" />
+      <skill Name="Endurance" />
+      <skill Name="Endurance_ShakeItOff" />
+      <skill Name="Cudgel_Bludgeon" />
+      <skill Name="Cudgel_Slam" />
+      <skill Name="SingleWeaponFighting" />
+      <skill Name="SingleWeaponFighting_OpportuneAttacks" />
+      <inventoryobject Blueprint="Fullerite Shield" />
+      <inventoryobject Blueprint="Fullerite Gauntlets" AutoMod="ModSpiked" />
+      <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Extra Armor" />
+      <part Name="CyberneticsHasRandomImplants"
+            ImplantChance="25" ChangeColor="false" 
+            ImplantTable="Cybernetics4" LicensesAtLeast="6" />
+    </object>
+
+    <object Name="Giant-Slayer Commander" Inherits="TemplarGiantSlayerBase">
+      <part Name="Render" DisplayName="Giant-Slayer Commander"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+      <stat Name="Level" Value="31" />
+      <stat Name="Hitpoints" Value="250" />
+      <stat Name="Strength" Boost="4" />
+      <stat Name="Willpower" Boost="2" />
+      <stat Name="Toughness" Boost="1" />
+      <skill Name="Endurance" />
+      <skill Name="Endurance_ShakeItOff" />
+      <skill Name="Endurance_Weathered" />
+      <skill Name="Tactics" />
+      <skill Name="Tactics_Charge" />
+      <skill Name="Cudgel_Bludgeon" />
+      <skill Name="Cudgel_Slam" />
+      <skill Name="Cudgel_ChargingStrike" />
+      <skill Name="Cudgel_Backswing" />
+      <skill Name="SingleWeaponFighting" />
+      <skill Name="SingleWeaponFighting_OpportuneAttacks" />
+      <skill Name="SingleWeaponFighting_WeaponExpertise" />
+      <inventoryobject Blueprint="Crysteel Shield" AutoMod="ModSpiked" />
+      <inventoryobject Blueprint="Crysteel Gauntlets" AutoMod="ModSpiked" />
+      <tag Name="InventoryPopulationTable" Value="Giant-Slayer Commander Extra Armor" />
+      <part Name="CyberneticsHasRandomImplants"
+            ImplantChance="45" ChangeColor="false"
+            ImplantTable="Cybernetics5" LicensesAtLeast="8" />
+    </object>
+
+    <object Name="Uplifted Giant-Slayer Commander" Inherits="Giant-Slayer Commander">
+      <part Name="Render" DisplayName="Giant-Slayer Commander"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+      <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
+      <tag Name="NamingTag" Value="KnightCommander" />
+      <tag Name="NoLibrarian" />
+      <tag Name="ExcludeFromVillagePopulations" />
+    </object>
+
+    <object Name="Grand Giant-Slayer" Inherits="TemplarGiantSlayerBase">
+      <part Name="Render" DisplayName="Grand Giant-Slayer"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+      <stat Name="Level" Value="41" />
+      <stat Name="Hitpoints" Value="415" />
+      <stat Name="Strength" Boost="5" />
+      <stat Name="Willpower" Boost="2" />
+      <stat Name="Toughness" Boost="2" />
+      <skill Name="Endurance" />
+      <skill Name="Endurance_ShakeItOff" />
+      <skill Name="Endurance_Weathered" />
+      <skill Name="Endurance_Calloused" />
+      <skill Name="Tactics" />
+      <skill Name="Tactics_Charge" />
+      <skill Name="Cudgel_Bludgeon" />
+      <skill Name="Cudgel_Slam" />
+      <skill Name="Cudgel_ChargingStrike" />
+      <skill Name="Cudgel_Backswing" />
+      <skill Name="Cudgel_Conk" />
+      <skill Name="Cudgel_Demolish" />
+      <skill Name="SingleWeaponFighting" />
+      <skill Name="SingleWeaponFighting_OpportuneAttacks" />
+      <skill Name="SingleWeaponFighting_WeaponExpertise" />
+      <skill Name="SingleWeaponFighting_PenetratingStrikes" />
+      <inventoryobject Blueprint="Flawless Crysteel Shield" AutoMod="ModSpiked" />
+      <inventoryobject Blueprint="Flawless Crysteel Gauntlets" AutoMod="ModSpiked" />
+      <tag Name="InventoryPopulationTable" Value="Grand Giant-Slayer Extra Armor" />
+      <part Name="CyberneticsHasRandomImplants"
+            ImplantChance="65" ChangeColor="false"
+            ImplantTable="Cybernetics5" LicensesAtLeast="10" />
+    </object>
+
+    <object Name="Uplifted Grand Giant-Slayer" Inherits="Grand Giant-Slayer">
+      <part Name="Render" DisplayName="Grand Giant-Slayer"
+            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+      <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
+      <tag Name="NamingTag" Value="KnightCommander" />
+      <tag Name="NoLibrarian" />
+      <tag Name="ExcludeFromVillagePopulations" />
+    </object>
+  
 </objects>

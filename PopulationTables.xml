@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<populations>
+  <!--
+
+  Some example tables
+
+  <population Name="Things">
+    <object Blueprint="Thing" Chance="50" />
+    <object Blueprint="BigThing" Chance="30" />
+    <object Blueprint="HugeThing" Chance="30" />
+  </population>
+
+  <population Name="Widgets">
+    <group Name="Widgets" Style="pickone" Chance="100,100,100,100,100,100,100,100">
+      <object Blueprint="BrownWidget" Weight="70" />
+      <object Blueprint="GoldWidget" Weight="5" />
+      <object Blueprint="BlueWidget" Weight="10" />
+      <object Blueprint="RedWidget" Weight="10" />
+    </group>
+  </population>
+
+  <population Name="BoxOfThingsOrWidgets">
+    <group Name="ThingsOrWidgets" Style="pickone">
+      <group Name="Things" Style="pickone" Weight="1">
+        <table Name="Things" Weight="1" Number="1-6" />
+      </group>
+      <group Name="Widgets" Style="pickone" Weight="1">
+        <table Name="Widgets" Weight="1" Number="1-6" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="BoxOfThingsAndWidgets">
+    <group Name="ThingsAndWidgets" Style="pickeach">
+      <object Blueprint="Things" Number="2" />
+      <object Blueprint="Widgets" Number="4-6" />
+    </group>
+  </population>
+  -->
+
+  <population Name="Templar Giant-Slayer Equipment Pool">
+    <group Name="Items" Style="pickone">
+      
+      <group Name="Explosives" Style="pickeach" Weight="50">
+        <table Name="Explosives 3" Number="1-3" />
+        <table Name="Explosives 1" Number="3-5" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="Templar Squire Giant-Slayer Extra Armor">
+    <group Name="Items" Style="pickone">
+      <object Blueprint="Carbide Gauntlets" Weight="20" />
+      <object Blueprint="Carbide Boots" Weight="10" />
+      <object Blueprint="Steel Helmet" Weight="5" />
+    </group>
+  </population>
+
+  <population Name="Templar Giant-Slayer Extra Armor">
+    <group Name="Items" Style="pickone">
+      <object Blueprint="Fullerite Boots" Weight="10" />
+      <object Blueprint="Fullerite Armet" Weight="5" />
+    </group>
+  </population>
+
+  <population Name="Giant-Slayer Commander Extra Armor">
+    <group Name="Items" Style="pickone">
+      <object Blueprint="Crysteel Boots" Weight="10" />
+      <object Blueprint="Crysteel Coronet" Weight="5" />
+    </group>
+  </population>
+
+  <population Name="Grand Giant-Slayer Extra Armor">
+    <group Name="Items" Style="pickone">
+      <object Blueprint="Flawless Crysteel Boots" Weight="100" />
+      <object Blueprint="Flawless Crysteel Coronet" Weight="50" />
+      <object Blueprint="Zetachrome Pumps" Weight="10" />
+      <object Blueprint="Zetachrome Apex" Weight="5" />
+      <object Blueprint="Mental Aggregator" Weight="1" />
+    </group>
+  </population>
+  
+  <!-- 
+  
+  Encounter changes
+  
+  -->
+  
+  <population Name="Grit Gate Templar Scouts">
+    <group Name="Contents" Style="pickeach" Load="Merge">
+      <object Number="1" Blueprint="Templar Squire Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="OmonporchBattle_Major">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <object Blueprint="Templar Giant-Slayer" />
+      <object Blueprint="Templar Squire Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Templar">
+    <group Name="Creatures" Style="pickone" Load="Merge">
+      <object Blueprint="Templar Giant-Slayer" />
+      <object Blueprint="Giant-Slayer Commander" />
+    </group>
+  </population>
+
+  <population Name="Templar War Party Major">
+    <group Name="Contents" Style="pickeach" Load="Merge">
+      <group Name="Types" Style="pickone" Load="Merge" >
+        <removegroup Name="GunnerOrKnight" />
+        <group Name="Giant-Slayer" Style="pickeach">
+          <table Number="6" Name="Templar Weighted Toward Giant-Slayer" />
+          <group Name="Giant-Slayer Leader" Style="pickone">
+            <object Blueprint="Templar Giant-Slayer" />
+          </group>
+        </group>
+      </group>
+    </group>
+  </population>
+
+  <population Name="OmonporchBattle_Major_KnightCommander">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <group Name="Backup" Style="pickone" Load="Merge">
+        <object Blueprint="Grand Giant-Slayer" />
+      </group>
+    </group>
+  </population>
+  
+  <population Name="OmonporchBattle_Major_GrandNewfather">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <group Name="Backup" Style="pickone" Load="Merge">
+        <object Blueprint="Grand Giant-Slayer" />
+      </group>
+    </group>
+  </population>
+  
+  <population Name="OmonporchBattle_Major_TemplarMech">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <group Name="Backup" Style="pickone" Load="Merge">
+        <object Blueprint="Grand Giant-Slayer" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="OmonporchBattle_Minor">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <group Name="Boss" Style="pickone" Load="Merge">
+        <object Blueprint="Giant-Slayer Commander" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="OmonporchBattle_Reinforcements_Major">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <group Name="Boss" Style="pickone" Load="Merge">
+        <object Blueprint="Grand Giant-Slayer" />
+      </group>
+    </group>
+  </population>
+  
+  <population Name="OmonporchBattle_Reinforcements_Minor">
+    <group Name="Options" Style="pickeach" Load="Merge">
+      <group Name="Boss" Style="pickone" Load="Merge">
+        <object Blueprint="Grand Giant-Slayer" />
+      </group>
+    </group>
+  </population>
+
+  <!-- 
+  
+  Encounter additions
+  
+  -->
+  
+  <population Name="Templar Weighted Toward Giant-Slayer">
+    <group Name="Creatures" Style="pickone">
+      <object Weight="85" Blueprint="Templar Giant-Slayer" />
+      <table Weight="15" Name="Templar" />
+    </group>
+  </population>
+  
+  <population Name="Templar Weighted Toward Giant-Slayer Commander">
+    <group Name="Creatures" Style="pickone">
+      <object Weight="85" Blueprint="Giant-Slayer Commander" />
+      <table Weight="15" Name="Templar" />
+    </group>
+  </population>
+
+  <population Name="Templar Leaders Weighted Toward Templar Giant-Slayer">
+    <group Name="Creatures" Style="pickone">
+      <object Weight="80" Blueprint="Templar Giant-Slayer" />
+      <object Weight="10" Blueprint="Gunner-Knight Templar" />
+      <object Weight="10" Blueprint="Knight Templar" />
+    </group>
+  </population>
+  
+  <population Name="Templar Giant-Hunter Party Major">
+    <group Name="Contents" Style="pickeach">
+      <group Name="Boss" Style="pickone" >
+        <object Weight="95" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+        <object Weight="5" Number="1" Blueprint="Uplifted Grand Giant-Slayer" />
+      </group>
+      <group Name="Types" Style="pickone">
+        <group Name="Giant-Slayer" Style="pickeach">
+          <table Number="6" Name="Templar Weighted Toward Giant-Slayer" />
+          <group Name="Giant Slayer Leader" Style="pickone">
+            <object Blueprint="Templar Giant-Slayer" />
+            <object Blueprint="Banner-Knight Templar" />
+          </group>
+        </group>
+        <group Name="Gunner" Style="pickeach">
+          <table Number="6" Name="Templar Weighted Toward Giant-Slayer" />
+          <group Name="Gunner Leader" Style="pickone">
+            <object Blueprint="Templar Giant-Slayer" />
+            <object Blueprint="Gunner-Knight Templar" />
+          </group>
+        </group>
+        <group Name="GunnerKnightGiantSlayer" Style="pickeach">
+          <table Number="3" Name="Templar Weighted Toward Gunner" />
+          <table Number="3" Name="Templar Weighted Toward Knight" />
+          <table Number="6" Name="Templar Weighted Toward Giant-Slayer" />
+          <group Name="GunnerOrKnight Leader" Style="pickeach">
+            <table Number="1" Name="Templar Leaders Weighted Toward Giant-Slayer Commander" />
+          </group>
+        </group>
+      </group>
+    </group>
+  </population>
+  
+  <population Name="Templar Giant-Hunter Party Minor">
+    <group Name="Contents" Style="pickeach">
+      <group Name="Group1" Style="pickone">
+        <table Weight="80" Name="Templar Weighted Toward Giant-Slayer" />
+        <object Weight="20" Number="4" Blueprint="Templar Squire Giant-Slayer" />
+      </group>
+      <group Name="Group2" Style="pickone">
+        <table Weight="80" Name="Templar Weighted Toward Giant-Slayer" />
+        <object Weight="20" Number="4" Blueprint="Templar Squire Giant-Slayer" />
+      </group>
+      <group Name="Group3" Style="pickone">
+        <table Weight="80" Name="Templar Weighted Toward Giant-Slayer" />
+        <object Weight="20" Number="4" Blueprint="Templar Squire Giant-Slayer" />
+      </group>
+    </group>
+  </population>
+  
+</populations>

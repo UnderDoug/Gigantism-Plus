@@ -106,8 +106,24 @@ namespace HNPS_GigantismPlus
         }
         public static string MaybeColor(this string Text, string Color, bool Pretty = true)
         {
-            if (Pretty) return Text.Color(Color);
+            if (Pretty && Color != "") return Text.Color(Color);
             return Text;
+        }
+
+        public static string OptionalColor(this string Text, string Color, string FallbackColor = "", int Option = 3)
+        {
+            // 3: Most Colorful
+            // 2: Vanilla Only
+            // 1: Plain Text
+            return Text.MaybeColor(Color, Option > 2).MaybeColor(FallbackColor, Option > 1);
+        }
+        public static string OptionalColorGigantic(this string Text, int Option = 3)
+        {
+            return Text.OptionalColor(Color: "gigantic", FallbackColor: "w", Option);
+        }
+        public static string OptionalColorGiant(this string Text, int Option = 3)
+        {
+            return Text.OptionalColor(Color: "giant", FallbackColor: "w", Option);
         }
 
         // ripped from the CyberneticPropertyModifier part, converted into extension.

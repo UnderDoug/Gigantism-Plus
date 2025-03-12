@@ -12,6 +12,18 @@ namespace HNPS_GigantismPlus
             return XRL.UI.Options.GetOption(ID, Default: Default);
         }
 
+        public static int Colorfulness
+        {
+            get
+            {
+                return Convert.ToInt32(GetOption("Option_GigantismPlus_Colorfulness"));
+            }
+            private set 
+            {
+                Colorfulness = value;
+            }
+        }
+
         // Checkbox settings
         public static bool EnableGiganticStartingGear => GetOption("Option_GigantismPlus_EnableGiganticStartingGear").EqualsNoCase("Yes");
         public static bool EnableGiganticStartingGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticStartingGear_Grenades").EqualsNoCase("Yes");

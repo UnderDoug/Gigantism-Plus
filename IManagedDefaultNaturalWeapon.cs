@@ -15,6 +15,7 @@ namespace XRL.World
 
             public string Adjective;
             public string AdjectiveColor;
+            public string AdjectiveColorFallback;
             public string Noun;
 
             public string Skill;
@@ -73,11 +74,16 @@ namespace XRL.World
             }
             public string GetAdjectiveColor()
             {
-                return AdjectiveColor;
+                return AdjectiveColor ?? "Y";
             }
-            public string GetColoredAdjective()
+            public string GetAdjectiveColorFallback()
             {
-                return "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
+                return AdjectiveColorFallback ?? "y";
+            }
+            public virtual string GetColoredAdjective()
+            {
+                string colorText = "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
+                return "{{" + GetAdjectiveColorFallback() + "|" + colorText + "}}";
             }
         }
 

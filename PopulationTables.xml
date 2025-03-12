@@ -109,7 +109,7 @@
   <population Name="Templar War Party Major">
     <group Name="Contents" Style="pickeach" Load="Merge">
       <group Name="Types" Style="pickone" Load="Merge" >
-        <removegroup Name="GunnerOrKnight" />
+        <group Name="GunnerOrKnight"></group>
         <group Name="Giant-Slayer" Style="pickeach">
           <table Number="6" Name="Templar Weighted Toward Giant-Slayer" />
           <group Name="Giant-Slayer Leader" Style="pickone">

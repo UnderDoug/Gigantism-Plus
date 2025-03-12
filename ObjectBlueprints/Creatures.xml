@@ -185,7 +185,7 @@
       <skill Name="Cudgel_ChargingStrike" />
       <skill Name="Cudgel_Backswing" />
       <skill Name="Cudgel_Conk" />
-      <skill Name="Cudgel_Demolish" />
+      <skill Name="Cudgel_SmashUp" />
       <skill Name="SingleWeaponFighting" />
       <skill Name="SingleWeaponFighting_OpportuneAttacks" />
       <skill Name="SingleWeaponFighting_WeaponExpertise" />

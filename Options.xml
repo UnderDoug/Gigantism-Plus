@@ -28,7 +28,7 @@
 	
   <option
         ID="Option_GigantismPlus_DebugIncludeInMessage"
-		Requires="Option_GigantismPlus_DebugVerbosity!=0"
+		    Requires="Option_GigantismPlus_DebugVerbosity!=0"
         DisplayText="{{giant|Gigantism Plus}}: Also show debug entries in the Message Queue"
         Category="Debug"
         Type="Checkbox"
@@ -48,7 +48,28 @@
   <!-- 
   Mod Options
   -->
-	
+
+  <option
+		ID="Option_GigantismPlus_Colorfulness"
+	      DisplayText="Use colorful text strings throughout the mod"
+	      Category="Mods: Gigantism Plus"
+        Type="Slider"
+        Default="3"
+        Min="1"
+        Max="3"
+        Increment="1"
+	>
+    <helptext>
+      This mod makes use of a number of custom {{giant|colors}} and {{gianter|shaders}} in a lot of places vanilla does, but also in a number of places vanilla doesn't. To give you the ability to maintain the vanilla aesthetic, this slider should adjust which colors appear where.
+
+      {{Z|3}}: {{gigantic|Gigantic}} shaders (or their {{w|Fallbacks}} if they fail to load) all throughout the mod.
+      {{w|2}}: {{w|Fallback}} shaders all throughout the mod.
+      {{Y|1}}: Regular, plain text with some infrequent use of {{w|Fallback}} where it matches vanilla.
+
+      The default is {{Z|3}}.
+    </helptext>
+  </option>
+  
 	<option 
 		ID="Option_GigantismPlus_EnableGiganticStartingGear"
 	    DisplayText="{{gigantic|Gigantify}} starting equipment for {{gigantic|Gigantic}} ({{r|D}}) players ({{R|new save}})"

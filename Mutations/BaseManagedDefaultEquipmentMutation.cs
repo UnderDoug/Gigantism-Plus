@@ -1,4 +1,6 @@
 ﻿using XRL.Language;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -6,7 +8,10 @@ namespace XRL.World.Parts.Mutation
     {
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
-
+            public override string GetColoredAdjective()
+            {
+                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
+            }
         }
 
         public INaturalWeapon NaturalWeapon = new()
@@ -17,8 +22,14 @@ namespace XRL.World.Parts.Mutation
             HitBonus = 0,
 
             ModPriority = 0,
+            AdjectiveColor = "y",
+            AdjectiveColorFallback = "Y",
             Noun = "fist",
             Tile = "Creatures/natural-weapon-fist.bmp",
+            RenderColorString = "&K",
+            RenderDetailColor = "y",
+            SecondRenderColorString = "&y",
+            SecondRenderDetailColor = "Y"
         };
 
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()

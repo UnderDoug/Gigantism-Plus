@@ -7,7 +7,9 @@ namespace XRL.World.Parts
     [Serializable]
     public class WeaponElongator : IScribedPart
     {
-        public GameObject Wielder = null;
+        private GameObject Wielder = null;
+
+        private ElongatedPaws ElongatedPaws = null;
 
         public override bool WantEvent(int ID, int cascade)
         {
@@ -19,65 +21,66 @@ namespace XRL.World.Parts
 
         private int appliedElongatedBonusCap = 0;
 
-        public void ApplyElongatedBonusCap(MeleeWeapon Weapon, GameObject Wielder)
+        public void ApplyElongatedBonusCap(MeleeWeapon Weapon, ElongatedPaws elongatedPaws = null)
         {
-            Debug.Entry(4, "@ WeaponWatcher", $"ApplyElongatedBonusCap()", Indent: 3);
-            Debug.Entry(4, "* if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))", Indent: 3);
-            if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))
-            {
-                Debug.Entry(4, "+ elongatedPaws not null", Indent: 4);
-                UnapplyElongatedBonusCap(Weapon);
-                appliedElongatedBonusCap = elongatedPaws.ElongatedBonusDamage;
-                Weapon.AdjustBonusCap(appliedElongatedBonusCap);
-                Debug.Entry(4, $"New appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
-            }
-            Debug.Entry(4, "x WeaponWatcher", $"ApplyElongatedBonusCap() >//", Indent: 3);
+            elongatedPaws ??= ElongatedPaws;
+            Debug.Entry(4, $"* {nameof(ApplyElongatedBonusCap)}(MeleeWeapon Weapon)", Indent: 3);
+            UnapplyElongatedBonusCap(Weapon);
+            appliedElongatedBonusCap = elongatedPaws.ElongatedBonusDamage;
+            Weapon.AdjustBonusCap(appliedElongatedBonusCap);
+            Debug.LoopItem(4, $"New appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyElongatedBonusCap)}(MeleeWeapon Weapon) *//", Indent: 3);
         }
 
         public void UnapplyElongatedBonusCap(MeleeWeapon Weapon)
         {
-            Debug.Entry(4, $"@ WeaponWatcher", "UnapplyElongatedBonusCap()", Indent: 4);
-            Debug.Entry(4, $"Old appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 4);
+            Debug.Entry(4, $"* {nameof(UnapplyElongatedBonusCap)}(MeleeWeapon Weapon)", Indent: 4);
+            Debug.LoopItem(4, $"Old appliedElongatedBonusCap: {appliedElongatedBonusCap}", Indent: 5);
             Weapon.AdjustBonusCap(-appliedElongatedBonusCap);
             appliedElongatedBonusCap = 0;
         }
 
         public override bool HandleEvent(EquippedEvent E)
         {
-            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(EquippedEvent E)", Indent: 2);
             GameObject item = E.Item;
             if (item == ParentObject)
             {
                 Wielder = E.Actor;
-                Debug.Entry(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
-                ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>(), E.Actor);
-                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(EquippedEvent E) >//", Indent: 2);
+                if (Wielder.TryGetPart(out ElongatedPaws elongatedPaws))
+                {
+                    Debug.Entry(4, $"@ {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(EquippedEvent)} E)", Indent: 2);
+                    ElongatedPaws = elongatedPaws;
+                    Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                    ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
+                    Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(EquippedEvent)} E) @//", Indent: 2);
+                }
             }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(UnequippedEvent E)
         {
-            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(UnequippedEvent E)", Indent: 2);
             GameObject item = E.Item;
-            if (item == ParentObject)
+            if (item == ParentObject && Wielder != null && ElongatedPaws != null)
             {
-                Debug.Entry(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                Debug.Entry(4, $"@ {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(UnequippedEvent)} E)", Indent: 2);
+                Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
                 UnapplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
-                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(UnequippedEvent E) >//", Indent: 2);
+                Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(UnequippedEvent)} E) @//", Indent: 2);
+
+                ElongatedPaws = null;
+                Wielder = null;
             }
             return base.HandleEvent(E);
         }
 
         public override bool HandleEvent(StatChangeEvent E)
         {
-            Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(StatChangeEvent E)", Indent: 2);
-            Debug.Entry(4, $"E.Name: \"{E.Name}\" | E.Object: \"{E.Object.ShortDisplayNameStripped}\"", Indent: 2);
-            if (Wielder != null) Debug.Entry(4, $"Wielder: \"{Wielder.ShortDisplayNameStripped}\"", Indent: 2);
-            if (E.Name == "Strength" && E.Object == Wielder)
+            if (E.Object == Wielder && ElongatedPaws != null && E.Name == "Strength")
             {
-                Debug.Entry(4, "@ WeaponWatcher", $"HandleEvent(StatChangeEvent {E.Name})", Indent: 2);
-                ApplyElongatedBonusCap(ParentObject.GetPart<MeleeWeapon>(), E.Object);
-                Debug.Entry(4, "x WeaponWatcher", $"HandleEvent(StatChangeEvent {E.Name}) >//", Indent: 2);
+                Debug.Entry(4, $"@ {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(StatChangeEvent)} E: {E.Name})", Indent: 2);
+                Debug.LoopItem(4, $" E.Object: \"{E.Object.ShortDisplayNameStripped}\"", Indent: 2);
+                ApplyElongatedBonusCap(ParentObject.GetPart<MeleeWeapon>());
+                Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(StatChangeEvent)} E) @//", Indent: 2);
             }
             return base.HandleEvent(E);
         }

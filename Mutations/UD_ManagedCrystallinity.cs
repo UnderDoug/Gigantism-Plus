@@ -4,7 +4,7 @@ using System.Linq;
 using XRL.Language;
 using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
-using XRL.Rules;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -12,7 +12,10 @@ namespace XRL.World.Parts.Mutation
     {
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
-
+            public override string GetColoredAdjective()
+            {
+                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
+            }
         }
 
         public INaturalWeapon NaturalWeapon = new()
@@ -26,6 +29,7 @@ namespace XRL.World.Parts.Mutation
             Skill = "ShortBlades",
             Adjective = "crystalline",
             AdjectiveColor = "crystallized",
+            AdjectiveColorFallback = "M",
             Noun = "point",
             Tile = "Creatures/natural-weapon-claw.bmp",
             RenderColorString = "&b",

@@ -6,7 +6,7 @@ using XRL.UI;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
 using HNPS_GigantismPlus;
-using System.Runtime.CompilerServices;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -188,7 +188,7 @@ namespace XRL.World.Parts.Mutation
 
         public GigantismPlus()
         {
-            DisplayName = "Gigantism".Color("gigantism") + " ({{r|D}})";
+            DisplayName = "{{gigantic|Gigantism}} ({{r|D}})";
             Type = "Physical";
 
             NaturalWeapon = new()
@@ -421,7 +421,7 @@ namespace XRL.World.Parts.Mutation
             bool RapidAdvancement = IsMutant
                                  && (Level + 5) % 10 == 0
                                  && !Actor.IsEsper()
-                                 && HNPS_GigantismPlus.Options.EnableGigantismRapidAdvance;
+                                 && EnableGigantismRapidAdvance;
 
             return RapidAdvancement;
         } //!--- private bool ShouldRapidAdvance(int Level, GameObject Actor)
@@ -463,7 +463,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
-            E.Features.Add("{{gianter|gigantic}} stature");
+            E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
             return base.HandleEvent(E);
         }
 

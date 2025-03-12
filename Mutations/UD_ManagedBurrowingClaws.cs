@@ -1,10 +1,11 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using XRL.Language;
 using XRL.Rules;
 using XRL.World.Anatomy;
+using HNPS_GigantismPlus;
+using  static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -12,7 +13,10 @@ namespace XRL.World.Parts.Mutation
     {
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
-
+            public override string GetColoredAdjective()
+            {
+                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
+            }
         }
 
         public INaturalWeapon NaturalWeapon = new()
@@ -26,6 +30,7 @@ namespace XRL.World.Parts.Mutation
             Skill = "ShortBlades",
             Adjective = "burrowing",
             AdjectiveColor = "W",
+            AdjectiveColorFallback = "y",
             Noun = "claw",
             Tile = "Creatures/natural-weapon-claw.bmp",
             RenderColorString = "&w",

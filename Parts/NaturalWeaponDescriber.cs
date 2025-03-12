@@ -6,7 +6,7 @@ using HNPS_GigantismPlus;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class NaturalWeaponDescriber : IPart
+    public class NaturalWeaponDescriber : IScribedPart
     {
         public SortedDictionary<int, string> ShortDescriptions = new();
 
@@ -31,7 +31,10 @@ namespace XRL.World.Parts
 
         public void AddShortDescriptionEntry(int Priority, string Description)
         {
-            Debug.Entry(4, $"NaturalWeaponDescriber.AddShortDescriptionEntry(int Priority: {Priority}, string Description)", Indent: 7);
+            Debug.Entry(4,
+                $"@ {nameof(NaturalWeaponDescriber)}"
+                + $".{nameof(AddShortDescriptionEntry)}(int Priority: {Priority}, string Description)",
+                Indent: 7);
             ShortDescriptions[Priority] = Description;
         }
 
@@ -57,9 +60,11 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            Debug.Entry(4, "@ NaturalWeaponDescriber.HandleEvent(GetShortDescriptionEvent E)", Indent: 6);
+            Debug.Entry(4, 
+                $"@ {nameof(NaturalWeaponDescriber)}"
+                +$".{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.ShortDisplayName})", 
+                Indent: 6);
             _ShortDescriptionCache ??= ProcessDescription(ShortDescriptions);
-            Debug.Entry(4, "_ShortDescriptionCache", _ShortDescriptionCache, Indent: 6);
             E.Postfix.AppendRules(_ShortDescriptionCache);
             return base.HandleEvent(E);
         }

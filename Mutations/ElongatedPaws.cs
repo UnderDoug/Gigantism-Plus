@@ -4,6 +4,7 @@ using System.Linq;
 using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -53,7 +54,7 @@ namespace XRL.World.Parts.Mutation
 
         public ElongatedPaws()
         {
-            DisplayName = "Elongated Paws".Color("giant");
+            DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
             NaturalWeapon = new()
@@ -64,6 +65,7 @@ namespace XRL.World.Parts.Mutation
                 ModPriority = 20,
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
+                AdjectiveColorFallback = "w",
                 Noun = "paw",
                 Skill = "ShortBlades",
                 Stat = "Strength",
@@ -139,7 +141,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                     {
-                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), E.Object);
+                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), this);
                     }
                 }
 
@@ -154,7 +156,7 @@ namespace XRL.World.Parts.Mutation
             {
                 if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                 {
-                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), GO);
+                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), this);
                 }
             }
 

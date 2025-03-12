@@ -80,15 +80,15 @@
             RenderString="t" Tile="Creatures/GiantSlayer_Templar.png" 
             ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"  
             />
-      <part Name="Description" Short="Wet skin scintillates behind =pronouns.possessive= ears. =pronouns.Possessive= spine cambers in anticipation of its blood-fated curvature, and =pronouns.subjective= =verb:poke:afterpronoun= out =pronouns.possessive= chin in emulation of =pronouns.possessive= elders. Sword grease stains =pronouns.possessive= hands." />
-      <skill Name="Shield" />
-      <skill Name="Shield_Block" />
+      <part Name="Description" Short="An over-square jaw competes with =pronouns.possessive= broad, furrowed brow for posession of =pronouns.possessive= face. =pronouns.Possessive= posture hints at a once bent spine, and =pronouns.possessive= gait all but betrays it. =pronouns.Subjective= =verb:flex:afterpronoun= =pronouns.possessive= immense fists in subconcious anticipation of imminent glory, while =pronouns.possessive= deep-set, monochrome eyes flicker hopefully across the horizon." />
+      <removeskill Name="LongBlades" />
+      <removeskill Name="LongBladesProficiency" />
       <skill Name="Acrobatics" />
       <skill Name="Acrobatics_Jump" />
       <skill Name="Cudgel" />
       <skill Name="Cudgel_Expertise" />
       <tag Name="BaseObject" Value="*noinherit" />
-      <tag Name="InventoryPopulationTable" Value="Knight Templar Extra Armor" />
+      <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Equipment Pool" />
       <builder Name="Gigantified" ChanceOneIn="1" />
     </object>
 
@@ -101,6 +101,7 @@
       <stat Name="Hitpoints" Value="32" />
       <stat Name="Strength" Boost="2" />
       <inventoryobject Blueprint="Carbide Shield" />
+      <tag Name="InventoryPopulationTable" Value="Templar Squire Giant-Slayer Extra Armor" />
     </object>
 
     <object Name="Templar Giant-Slayer" Inherits="TemplarGiantSlayerBase">
@@ -118,6 +119,8 @@
       <skill Name="SingleWeaponFighting" />
       <skill Name="SingleWeaponFighting_OpportuneAttacks" />
       <inventoryobject Blueprint="Fullerite Shield" />
+      <inventoryobject Blueprint="Fullerite Gauntlets" AutoMod="ModSpiked" />
+      <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Extra Armor" />
       <part Name="CyberneticsHasRandomImplants"
             ImplantChance="25" ChangeColor="false" 
             ImplantTable="Cybernetics4" LicensesAtLeast="6" />
@@ -144,7 +147,9 @@
       <skill Name="SingleWeaponFighting" />
       <skill Name="SingleWeaponFighting_OpportuneAttacks" />
       <skill Name="SingleWeaponFighting_WeaponExpertise" />
-      <inventoryobject Blueprint="Crysteel Shield" />
+      <inventoryobject Blueprint="Crysteel Shield" AutoMod="ModSpiked" />
+      <inventoryobject Blueprint="Crysteel Gauntlets" AutoMod="ModSpiked" />
+      <tag Name="InventoryPopulationTable" Value="Giant-Slayer Commander Extra Armor" />
       <part Name="CyberneticsHasRandomImplants"
             ImplantChance="45" ChangeColor="false"
             ImplantTable="Cybernetics5" LicensesAtLeast="8" />
@@ -153,8 +158,7 @@
     <object Name="Uplifted Giant-Slayer Commander" Inherits="Giant-Slayer Commander">
       <part Name="Render" DisplayName="Giant-Slayer Commander"
             RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"
-            />
+            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
       <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
       <tag Name="NamingTag" Value="KnightCommander" />
       <tag Name="NoLibrarian" />
@@ -186,7 +190,9 @@
       <skill Name="SingleWeaponFighting_OpportuneAttacks" />
       <skill Name="SingleWeaponFighting_WeaponExpertise" />
       <skill Name="SingleWeaponFighting_PenetratingStrikes" />
-      <inventoryobject Blueprint="Flawless Crysteel Shield" />
+      <inventoryobject Blueprint="Flawless Crysteel Shield" AutoMod="ModSpiked" />
+      <inventoryobject Blueprint="Flawless Crysteel Gauntlets" AutoMod="ModSpiked" />
+      <tag Name="InventoryPopulationTable" Value="Grand Giant-Slayer Extra Armor" />
       <part Name="CyberneticsHasRandomImplants"
             ImplantChance="65" ChangeColor="false"
             ImplantTable="Cybernetics5" LicensesAtLeast="10" />
@@ -200,35 +206,6 @@
       <tag Name="NamingTag" Value="KnightCommander" />
       <tag Name="NoLibrarian" />
       <tag Name="ExcludeFromVillagePopulations" />
-    </object>
-    
-
-<!-- This is just for reference. Delete it once done.-->
-    <object Name="Templar" Inherits="BaseTrueKin">
-      <part Name="Corpse" CorpseChance="100" CorpseBlueprint="Human Corpse" />
-      <part Name="Brain" Hostile="false" Factions="Templar-100" />
-      <part Name="Description" Short="Oiled and brushed mail hang across =pronouns.possessive= crooked spine and salient jaw. The color too was sucked out of =pronouns.possessive= irises by =pronouns.possessive= tangled lineage, and =pronouns.possessive= wet rosy lips catch the light and toss it back across a sharp sneer." />
-      <tag Name="HeroIntBoost" Value="0" />
-      <tag Name="HeroAgiBoost" Value="0" />
-      <tag Name="SecretAdjectives" Value="templar" />
-      <tag Name="BaseObject" Value="*noinherit" />
-      <skill Name="LongBlades" />
-      <skill Name="LongBladesProficiency" />
-      <skill Name="Shield" />
-      <skill Name="Shield_Block" />
-      <tag Name="Culture" Value="Templar" />
-      <tag Name="Unenslavable" />
-      <stag Name="Contemporary" />
-    </object>
-
-    <object Name="TemplarSquireBase" Inherits="Templar">
-      <part Name="Render" DisplayName="Templar squire" ColorString="&amp;Y" TileColor="&amp;r" RenderString="t" Tile="Creatures/sw_templar_squire.bmp" DetailColor="Y" />
-      <part Name="Description" Short="Wet skin scintillates behind =pronouns.possessive= ears. =pronouns.Possessive= spine cambers in anticipation of its blood-fated curvature, and =pronouns.subjective= =verb:poke:afterpronoun= out =pronouns.possessive= chin in emulation of =pronouns.possessive= elders. Sword grease stains =pronouns.possessive= hands." />
-      <stat Name="Level" Value="9" />
-      <stat Name="Hitpoints" Value="25" />
-      <stat Name="Strength" Boost="1" />
-      <stat Name="Willpower" Boost="1" />
-      <tag Name="BaseObject" Value="*noinherit" />
     </object>
   
 </objects>

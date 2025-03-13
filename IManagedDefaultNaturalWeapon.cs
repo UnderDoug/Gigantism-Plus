@@ -1,3 +1,5 @@
+using XRL.World.Parts;
+
 namespace XRL.World
 {
     public interface IManagedDefaultNaturalWeapon
@@ -106,5 +108,17 @@ namespace XRL.World
         public abstract int GetNaturalWeaponDamageBonus(int Level = 1);
 
         public abstract int GetNaturalWeaponHitBonus(int Level = 1);
+
+        // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
+        public virtual bool WantEvent(int ID, int cascade)
+        {
+            return ID == PooledEvent<RegenerateDefaultEquipmentEvent>.ID
+                || ID == PooledEvent<DecorateDefaultEquipmentEvent>.ID;
+        }
+        public abstract bool HandleEvent(RegenerateDefaultEquipmentEvent E);
+        public abstract bool HandleEvent(DecorateDefaultEquipmentEvent E);
+
+        public abstract void OnDecorateDefaultEquipment(Body body);
+        public abstract void OnRegenerateDefaultEquipment(Body body);
     }
 }

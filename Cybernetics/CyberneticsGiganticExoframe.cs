@@ -8,7 +8,7 @@ using static HNPS_GigantismPlus.Secrets;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class CyberneticsGiganticExoframe : IPart
+    public class CyberneticsGiganticExoframe : IScribedPart
     {
         [NonSerialized]
         private GameObject _User;

@@ -33,10 +33,12 @@ namespace XRL.World.Parts.Mutation
             AdjectiveColorFallback = "y",
             Noun = "claw",
             Tile = "Creatures/natural-weapon-claw.bmp",
-            RenderColorString = "&w",
-            RenderDetailColor = "W",
-            SecondRenderColorString = "&w",
-            SecondRenderDetailColor = "W",
+            ColorString = "&w",
+            DetailColor = "W",
+            SecondColorString = "&w",
+            SecondDetailColor = "W",
+            SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
+            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked"
         };
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
         {
@@ -46,6 +48,12 @@ namespace XRL.World.Parts.Mutation
         public virtual string GetNaturalWeaponMod(bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+        }
+
+        public virtual bool CalculateNaturalWeaponLevel(int Level = 1)
+        {
+            NaturalWeapon.Level = Level;
+            return true;
         }
 
         private bool _HasGigantism = false;

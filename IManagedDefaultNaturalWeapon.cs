@@ -4,8 +4,9 @@ namespace XRL.World
 {
     public interface IManagedDefaultNaturalWeapon
     {
-        public abstract class INaturalWeapon : IPart
+        public class INaturalWeapon : IScribedPart
         {
+            public int Level { get; set; }
             public int DamageDieCount { get; set; }
             public int DamageDieSize { get; set; }
             public int DamageBonus { get; set; }
@@ -23,11 +24,17 @@ namespace XRL.World
             public string Skill;
             public string Stat;
             public string Tile;
-            public string RenderColorString;
-            public string RenderDetailColor;
-            public string SecondRenderColorString;
-            public string SecondRenderDetailColor;
+            public string ColorString;
+            public string DetailColor;
+            public string SecondColorString;
+            public string SecondDetailColor;
+            public string SwingSound;
+            public string BlockedSound;
 
+            public int GetLevel()
+            {
+                return Level;
+            }
             public int GetDamageDieCount()
             {
                 // base damage die count is 1
@@ -92,6 +99,7 @@ namespace XRL.World
         public abstract INaturalWeapon GetNaturalWeapon();
 
         public abstract string GetNaturalWeaponMod(bool Managed = true);
+        public abstract bool CalculateNaturalWeaponLevel(int Level = 1);
 
         public abstract bool CalculateNaturalWeaponDamageDieCount(int Level = 1);
 
@@ -110,14 +118,6 @@ namespace XRL.World
         public abstract int GetNaturalWeaponHitBonus(int Level = 1);
 
         // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
-        public virtual bool WantEvent(int ID, int cascade)
-        {
-            return ID == PooledEvent<RegenerateDefaultEquipmentEvent>.ID
-                || ID == PooledEvent<DecorateDefaultEquipmentEvent>.ID;
-        }
-        public abstract bool HandleEvent(RegenerateDefaultEquipmentEvent E);
-        public abstract bool HandleEvent(DecorateDefaultEquipmentEvent E);
-
         public abstract void OnDecorateDefaultEquipment(Body body);
         public abstract void OnRegenerateDefaultEquipment(Body body);
     }

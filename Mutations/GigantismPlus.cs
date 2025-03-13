@@ -203,16 +203,15 @@ namespace XRL.World.Parts.Mutation
                 Skill = "Cudgel",
                 Stat = "Strength",
                 Tile = "NaturalWeapons/GiganticFist.png",
-                RenderColorString = "&x",
-                RenderDetailColor = "z",
-                SecondRenderColorString = "&X",
-                SecondRenderDetailColor = "Z"
+                ColorString = "&x",
+                DetailColor = "z",
+                SecondColorString = "&X",
+                SecondDetailColor = "Z",
+                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing",
+                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block"
             };
-        }
 
-        public double DamageDieCountFactor { get { int everyLevels = 3; return 1 / everyLevels; } }
-        public double DamageBonusFactor { get { int everyLevels = 3; return 1 / everyLevels; } }
-        public double HitBonusFactor { get { int everyLevels = 2; return 1 / everyLevels; } }
+        }
 
         public override int GetNaturalWeaponDamageDieCount(int Level = 1)
         {
@@ -756,8 +755,8 @@ namespace XRL.World.Parts.Mutation
 
                 Debug.Entry(4, "GO.WantToReequip()", Indent: 2);
                 GO.WantToReequip();
-                Debug.Entry(4, "CheckAffected(GO, GO.Body)", Indent: 2);
-                CheckAffected(GO, GO.Body);
+                Debug.Entry(4, "GO.CheckAffectedEquipmentSlots()", Indent: 2);
+                GO.CheckAffectedEquipmentSlots();
             }
             else
             {
@@ -817,30 +816,6 @@ namespace XRL.World.Parts.Mutation
             Debug.Footer(3, "GigantismPlus", $"OnRegenerateDefaultEquipment(body)");
             base.OnRegenerateDefaultEquipment(body);
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
-
-        public void CheckAffected(GameObject Actor, Body Body)
-        {
-            if (Actor == null || Body == null)
-            {
-                return;
-            }
-            List<GameObject> list = Event.NewGameObjectList();
-            foreach (BodyPart item in Body.LoopParts())
-            {
-                GameObject equipped = item.Equipped;
-                if (equipped != null && !list.Contains(equipped))
-                {
-                    list.Add(equipped);
-                    int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
-                    int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, item.Type);
-                    if (partCountEquippedOn != slotsRequiredFor && item.TryUnequip(Silent: true, SemiForced: true) && partCountEquippedOn > slotsRequiredFor)
-                    {
-                        equipped.SplitFromStack();
-                        item.Equip(equipped, 0, Silent: true, ForDeepCopy: false, Forced: false, SemiForced: true);
-                    }
-                }
-            }
-        }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
@@ -960,7 +935,7 @@ namespace XRL.World.Parts.Mutation
                        "}}";
             }
 
-            CheckAffected(actor, actor.Body);
+            actor.CheckAffectedEquipmentSlots();
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
 

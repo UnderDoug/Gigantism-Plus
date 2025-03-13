@@ -9,7 +9,7 @@ namespace XRL.World.Parts
 {
     [Serializable]
     public abstract class ModNaturalWeaponBase<T> : IMeleeModification
-        where T : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon, new()
+        where T : IPart, IManagedDefaultNaturalWeapon, new()
     {
         public ModNaturalWeaponBase()
         {
@@ -40,28 +40,30 @@ namespace XRL.World.Parts
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
             Wielder ??= who;
-            AssigningMutation ??= Wielder.GetPart<T>();
-            NaturalWeapon ??= AssigningMutation.GetNaturalWeapon();
-            Level = AssigningMutation.Level;
+            AssigningPart ??= Wielder.GetPart<T>();
+            NaturalWeapon ??= AssigningPart.GetNaturalWeapon();
+            Level = NaturalWeapon.GetLevel();
             return base.BeingAppliedBy(obj, who);
         }
 
-        private GameObject wielder = null;
-        public GameObject Wielder { get => wielder; set => wielder = value; }
+        private GameObject _wielder = null;
+        public GameObject Wielder { get => _wielder; set => _wielder = value; }
 
-        private T assigningMutation = null;
-        public T AssigningMutation { get => assigningMutation; set => assigningMutation = value; }
+        private T _assigningPart = null;
+        public T AssigningPart { get => _assigningPart; set => _assigningPart = value; }
 
-        private int level = 1;
-        public int Level { get => level; set => level = value; }
+        private int _level = 1;
+        public int Level { get => _level; set => _level = value; }
 
-        private INaturalWeapon naturalWeapon;
-        public INaturalWeapon NaturalWeapon { get => naturalWeapon; set => naturalWeapon = value; }
+        private INaturalWeapon _naturalWeapon;
+        public INaturalWeapon NaturalWeapon { get => _naturalWeapon; set => _naturalWeapon = value; }
+
+        public const string CURRENT_PRIORITY = "CurrentNaturalWeaponBasePriority";
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalWeaponBase<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase<T>;
-            modNaturalWeaponBase.AssigningMutation = null;
+            modNaturalWeaponBase.AssigningPart = null;
             modNaturalWeaponBase.Wielder = null;
             modNaturalWeaponBase.NaturalWeapon = null;
             return modNaturalWeaponBase;
@@ -90,11 +92,11 @@ namespace XRL.World.Parts
 
         public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)
         {
-            Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
-            Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 5);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
-            Debug.Entry(4, "* if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 5);
+            Debug.Entry(4, "? if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 5);
             if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))
             {
                 Debug.Entry(4, "+ NaturalWeaponDescriber is Present", Indent: 6);
@@ -111,9 +113,9 @@ namespace XRL.World.Parts
             }
             else
             {
-                Debug.Entry(4, " NaturalWeaponDescriber not Present", Indent: 6);
+                Debug.Entry(4, "- NaturalWeaponDescriber not Present", Indent: 6);
             }
-            Debug.Entry(4, "x if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber)) ?//", Indent: 5);
+            Debug.Entry(4, $"x if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber)) ?//", Indent: 5);
 
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
@@ -135,29 +137,66 @@ namespace XRL.World.Parts
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
             weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
-            Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
         }
 
         public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)
         {
-            Debug.Entry(4, $"@ ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)", Indent: 4);
-            Debug.Entry(4, $"{AssigningMutation.GetMutationClass()} Mutation Level: {Level}", Indent: 5);
+            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
+
             Render render = Object.Render;
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
             string[] vomitCats = new string[] { "Combat", "Render" };
-            weapon.Vomit(4, "Priority, Before", vomitCats, Indent: 4);
-            if (Object.GetIntProperty("CurrentNaturalWeaponBasePriority") > NounPriority)
+
+            int CurrentPriority = Object.GetIntProperty(CURRENT_PRIORITY);
+
+            Debug.Entry(4, $"? if (CurrentPriority > NounPriority)", Indent: 5);
+            if (CurrentPriority > NounPriority)
             {
-                Object.SetIntProperty("CurrentNaturalWeaponBasePriority", NounPriority);
-                weapon.Skill = NaturalWeapon.Skill;
-                render.DisplayName = NaturalWeapon.Noun;
-                render.Tile = NaturalWeapon.Tile;
-                render.ColorString = (render.ColorString == NaturalWeapon.RenderColorString) ? NaturalWeapon.SecondRenderColorString : NaturalWeapon.RenderColorString;
-                render.DetailColor = (render.DetailColor == NaturalWeapon.RenderDetailColor) ? NaturalWeapon.SecondRenderDetailColor : NaturalWeapon.RenderDetailColor;
+                Debug.Entry(4, $"+ CurrentPriority ({CurrentPriority}) > NounPriority ({NounPriority})", Indent: 6);
+
+                Object.SetIntProperty(CURRENT_PRIORITY, NounPriority);
+                
+                weapon.Vomit(4, "Priority, Before", vomitCats, Indent: 6);
+
+                Debug.Entry(4, $"NaturalWeapon Attribute", Indent: 6);
+                Debug.LoopItem(4, $"NaturalWeapon.Skill", $"{NaturalWeapon.Skill}", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.Noun", $"{NaturalWeapon.Noun}", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.Tile", $"{NaturalWeapon.Tile}", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.ColorString", $"{NaturalWeapon.ColorString} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.SecondColorString", $"{NaturalWeapon.SecondColorString} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.DetailColor", $"{NaturalWeapon.ColorString} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.SecondDetailColor", $"{NaturalWeapon.SecondDetailColor} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.SwingSound", $"{NaturalWeapon.SwingSound} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.BlockedSound", $"{NaturalWeapon.BlockedSound} ", Indent: 7);
+
+                weapon.Skill = NaturalWeapon.Skill ?? weapon.Skill;
+                render.DisplayName = NaturalWeapon.Noun ?? render.DisplayName;
+                render.Tile = NaturalWeapon.Tile ?? render.Tile;
+
+                render.ColorString = 
+                    (render.ColorString == NaturalWeapon.ColorString) 
+                    ? NaturalWeapon.SecondColorString 
+                    : NaturalWeapon.ColorString;
+
+                render.DetailColor = 
+                    (render.DetailColor == NaturalWeapon.DetailColor) 
+                    ? NaturalWeapon.SecondDetailColor 
+                    : NaturalWeapon.DetailColor;
+
+                Object.SetSwingSound(NaturalWeapon.SwingSound);
+                Object.SetBlockedSound(NaturalWeapon.BlockedSound);
+
+                weapon.Vomit(4, "Priority, After", vomitCats, Indent: 6);
             }
-            weapon.Vomit(4, "Priority, After", vomitCats, Indent: 4);
-            Debug.Entry(4, $"x ModNaturalWeaponBase<{AssigningMutation.GetMutationClass()}>", "ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)", Indent: 4);
+            else
+            {
+                Debug.Entry(4, $"- CurrentPriority ({CurrentPriority}) <= NounPriority ({NounPriority})", Indent: 6);
+                weapon.Vomit(4, "Priority, Unchanged", vomitCats, Indent: 6);
+            }
+            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
             return NounPriority;
         }
 
@@ -167,7 +206,7 @@ namespace XRL.World.Parts
             if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
 
             Object.SetIntProperty("ShowAsPhysicalFeature", 1);
-            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation.GetMutationClass(), false);
+            Object.SetStringProperty("TemporaryDefaultBehavior", AssigningPart.Name, false);
             Object.ModIntProperty("ModNaturalWeaponCount", 1);
             base.ApplyModification(Object);
         }

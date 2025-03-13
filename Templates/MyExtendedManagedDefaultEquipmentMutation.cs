@@ -37,10 +37,10 @@ namespace XRL.World.Parts.Mutation
             Adjective = "hooked",           // Appears in the display name: "hooked spade" (no default)
             AdjectiveColor = "R",           // Can be a shader, alters the color of the displayed adjective (no default)
             Tile = "Creatures/natural-weapon-drill.bmp", // The path to the Tile that will appear in the equipment slot
-            RenderColorString = "&w",       // The black pixels of the Tile
-            RenderDetailColor = "r",        // The white pixels of the Tile
-            SecondRenderColorString = "&W", // If the tile is already the above color, this get used instead
-            SecondRenderDetailColor = "R",  // If the tile is already the above color, this get used instead
+            ColorString = "&w",       // The black pixels of the Tile
+            DetailColor = "r",        // The white pixels of the Tile
+            SecondColorString = "&W", // If the tile is already the above color, this get used instead
+            SecondDetailColor = "R",  // If the tile is already the above color, this get used instead
         };
 
         // Required by IManagedDefaultNaturalWeapon and allows the Modification to get the above part from the mutation.

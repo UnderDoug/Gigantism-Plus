@@ -20,7 +20,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModBurrowingNaturalWeapon modBurrowingNaturalWeapon = base.DeepCopy(Parent, MapInv) as ModBurrowingNaturalWeapon;
-            modBurrowingNaturalWeapon.AssigningMutation = null;
+            modBurrowingNaturalWeapon.AssigningPart = null;
             modBurrowingNaturalWeapon.Wielder = null;
             modBurrowingNaturalWeapon.NaturalWeapon = null;
             return modBurrowingNaturalWeapon;

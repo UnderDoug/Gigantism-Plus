@@ -402,5 +402,50 @@ namespace HNPS_GigantismPlus
             return;
         } //!-- public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
         
+        public static void SetSwingSound(this GameObject Object, string Path)
+        {
+            if (Path != null && Path != "")
+                Object.SetStringProperty("SwingSound", Path);
+        }
+        public static void SetBlockedSound(this GameObject Object, string Path)
+        {
+            if (Path != null && Path != "")
+                Object.SetStringProperty("BlockedSound", Path);
+        }
+        public static void SetEquipmentFrameColors(this GameObject Object, string Path = null)
+        {
+            Object.SetStringProperty("EquipmentFrameColors", Path, true);
+        }
+
+        public static void CheckAffectedEquipmentSlots(this GameObject Actor)
+        {
+            Body Body = Actor?.Body;
+            Debug.Entry(3, $"* CheckAffectedEquipmentSlots(this GameObject Actor: {Actor.ShortDisplayName})");
+            if (Actor == null || Body == null)
+            {
+                Debug.Entry(3, "x (Actor == null || Body == null)");
+                return;
+            }
+
+            List<GameObject> list = Event.NewGameObjectList();
+            Debug.Entry(3, "* foreach (BodyPart bodyPart in Body.LoopParts())");
+            foreach (BodyPart bodyPart in Body.LoopParts())
+            {
+                GameObject equipped = bodyPart.Equipped;
+                if (equipped != null && !list.Contains(equipped))
+                {
+                    Debug.Entry(3, "- Part", equipped.DebugName);
+                    list.Add(equipped);
+                    int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
+                    int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
+                    if (partCountEquippedOn != slotsRequiredFor && bodyPart.TryUnequip(true, true, false, false) && partCountEquippedOn > slotsRequiredFor)
+                    {
+                        equipped.SplitFromStack();
+                        bodyPart.Equip(equipped, new int?(0), true, false, false, true);
+                    }
+                }
+            }
+            Debug.Entry(3, $"x CheckAffectedEquipmentSlots(this GameObject Actor: {Actor.ShortDisplayName}) *//");
+        }
     }
 }

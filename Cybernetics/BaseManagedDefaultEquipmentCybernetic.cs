@@ -1,11 +1,37 @@
-﻿using XRL.Language;
+﻿using System;
+using XRL.Language;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
 
-namespace XRL.World.Parts.Mutation
+namespace XRL.World.Parts
 {
-    public class BaseManagedDefaultEquipmentMutation : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
+    public class BaseManagedDefaultEquipmentCybernetic : IScribedPart, IManagedDefaultNaturalWeapon
     {
+        [NonSerialized]
+        private GameObject _User;
+        public GameObject Implantee
+        {
+            get
+            {
+                return _User ??= ParentObject.Implantee;
+            }
+            set
+            {
+                _User = value;
+            }
+        }
+
+        public GameObject ImplantObject;
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            BaseManagedDefaultEquipmentCybernetic cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic;
+            cybernetic.Implantee = null;
+            cybernetic.ImplantObject = null;
+            return cybernetic;
+        }
+
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
             public override string GetColoredAdjective()
@@ -29,7 +55,9 @@ namespace XRL.World.Parts.Mutation
             ColorString = "&K",
             DetailColor = "y",
             SecondColorString = "&y",
-            SecondDetailColor = "Y"
+            SecondDetailColor = "Y",
+            SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
+            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
         };
 
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
@@ -92,14 +120,51 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeapon.HitBonus;
         }
 
-        public override bool ChangeLevel(int NewLevel)
+        public override bool WantEvent(int ID, int cascade)
         {
-            CalculateNaturalWeaponLevel(NewLevel);
-            CalculateNaturalWeaponDamageDieCount(NewLevel);
-            CalculateNaturalWeaponDamageDieSize(NewLevel);
-            CalculateNaturalWeaponDamageBonus(NewLevel);
-            CalculateNaturalWeaponHitBonus(NewLevel);
-            return base.ChangeLevel(NewLevel);
+            return ID == ImplantedEvent.ID
+                || ID == UnimplantedEvent.ID
+                || ID == PooledEvent<RegenerateDefaultEquipmentEvent>.ID
+                || ID == PooledEvent<DecorateDefaultEquipmentEvent>.ID;
+        }
+
+        public virtual void OnImplanted(GameObject Implantee, GameObject Implant)
+        {
+        } //!--- public override void OnImplanted(GameObject Object)
+
+        public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
+        {
+        } //!--- public override void OnUnimplanted(GameObject Object)
+
+        public override bool HandleEvent(ImplantedEvent E)
+        {
+            Implantee = E.Implantee;
+            ImplantObject = E.Item;
+            OnImplanted(Implantee, ImplantObject);
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(UnimplantedEvent E)
+        {
+            OnUnimplanted(E.Implantee, E.Item);
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(RegenerateDefaultEquipmentEvent E)
+        {
+            OnRegenerateDefaultEquipment(Implantee.Body);
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(DecorateDefaultEquipmentEvent E)
+        {
+            OnDecorateDefaultEquipment(Implantee.Body);
+            return base.HandleEvent(E);
+        }
+
+        public virtual void OnRegenerateDefaultEquipment(Body body)
+        {
+        }
+        public virtual void OnDecorateDefaultEquipment(Body body)
+        {
         }
 
     }

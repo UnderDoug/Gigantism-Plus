@@ -70,10 +70,12 @@ namespace XRL.World.Parts.Mutation
                 Skill = "ShortBlades",
                 Stat = "Strength",
                 Tile = "NaturalWeapons/ElongatedPaw.png",
-                RenderColorString = "&x",
-                RenderDetailColor = "z",
-                SecondRenderColorString = "&X",
-                SecondRenderDetailColor = "Z"
+                ColorString = "&x",
+                DetailColor = "z",
+                SecondColorString = "&X",
+                SecondDetailColor = "Z",
+                SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
+                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"
             };
         }
 
@@ -151,7 +153,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
-
+            GO.CheckAffectedEquipmentSlots();
             foreach (GameObject equipped in GO.Body.GetEquippedObjects())
             {
                 if (equipped.TryGetPart(out WeaponElongator weaponElongator))
@@ -173,37 +175,9 @@ namespace XRL.World.Parts.Mutation
                 }
             }
 
-            CheckAffected(GO, GO.Body);
+            GO.CheckAffectedEquipmentSlots();
 
             return base.Unmutate(GO);
-        }
-
-        public void CheckAffected(GameObject Actor, Body Body)
-        {
-            if (Actor == null || Body == null)
-            {
-                return;
-            }
-            List<GameObject> list = Event.NewGameObjectList();
-            foreach (BodyPart item in Body.LoopParts())
-            {
-                if (Array.IndexOf(AffectedSlotTypes, item.Type) < 0)
-                {
-                    continue;
-                }
-                GameObject equipped = item.Equipped;
-                if (equipped != null && !list.Contains(equipped))
-                {
-                    list.Add(equipped);
-                    int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
-                    int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, item.Type);
-                    if (partCountEquippedOn != slotsRequiredFor && item.TryUnequip(Silent: true, SemiForced: true) && partCountEquippedOn > slotsRequiredFor)
-                    {
-                        equipped.SplitFromStack();
-                        item.Equip(equipped, 0, Silent: true, ForDeepCopy: false, Forced: false, SemiForced: true);
-                    }
-                }
-            }
         }
 
         public override void OnRegenerateDefaultEquipment(Body body)

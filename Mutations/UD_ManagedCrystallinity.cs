@@ -37,7 +37,11 @@ namespace XRL.World.Parts.Mutation
             SecondColorString = "&B",
             SecondDetailColor = "m",
             SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
-            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked"
+            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked",
+            AddedParts = new()
+            {
+                "Inorganic"
+            }
         };
 
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
@@ -122,6 +126,25 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
+        public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
+        {
+            string[] parts = Parts.Split(',');
+            foreach (string part in parts)
+            {
+                NaturalWeapon.AddedParts.Add(part);
+            }
+            return true;
+        }
+
+        public virtual bool ProcessNaturalWeaponAddedProps(string Props)
+        {
+            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
+            {
+                NaturalWeapon.AddedStringProps = StringProps;
+                NaturalWeapon.AddedIntProps = IntProps;
+            }
+            return true;
+        }
 
         public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
         {
@@ -141,6 +164,26 @@ namespace XRL.World.Parts.Mutation
         public virtual int GetNaturalWeaponHitBonus(int Level = 1)
         {
             return NaturalWeapon.HitBonus;
+        }
+
+        public virtual List<string> GetNaturalWeaponAddedParts()
+        {
+            return NaturalWeapon.AddedParts;
+        }
+
+        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps()
+        {
+            return NaturalWeapon.AddedStringProps;
+        }
+
+        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps()
+        {
+            return NaturalWeapon.AddedIntProps;
+        }
+
+        public virtual string GetNaturalWeaponEquipmentFrameColors()
+        {
+            return NaturalWeapon.EquipmentFrameColors;
         }
 
         public override void OnRegenerateDefaultEquipment(Body body)

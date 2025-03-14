@@ -17,9 +17,12 @@ namespace XRL.World.Parts
         public string AugmentTile = "NaturalWeapons/GiganticManipulator.png";
         public string AugmentTileColorString = "&c";
         public string AugmentTileDetailColor = "b";
-        public string AugmentedSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
-        public string AugmentedBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
-        
+        public string AugmentSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
+        public string AugmentBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+        public string AugmentAddParts;
+        public string AugmentAddProps;
+        public string AugmentEquipmentFrameColors;
+
         public int JumpDistanceBonus = 0;
         public double StunningForceLevelFactor = 0.5;
 
@@ -89,8 +92,8 @@ namespace XRL.World.Parts
             NaturalWeapon.DetailColor = AugmentTileDetailColor;
             NaturalWeapon.SecondColorString = NaturalWeapon.ColorString;
             NaturalWeapon.SecondDetailColor = NaturalWeapon.DetailColor;
-            NaturalWeapon.SwingSound = AugmentedSwingSound;
-            NaturalWeapon.BlockedSound = AugmentedBlockedSound;
+            NaturalWeapon.SwingSound = AugmentSwingSound;
+            NaturalWeapon.BlockedSound = AugmentBlockedSound;
 
             Become(Implantee, Model, Implant);
 

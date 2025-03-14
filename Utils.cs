@@ -212,8 +212,8 @@ namespace HNPS_GigantismPlus
                         render.DetailColor = exoframe.AugmentTileDetailColor;
                         render.Tile = exoframe.AugmentTile;
 
-                        Part.DefaultBehavior.SetStringProperty("SwingSound", exoframe.AugmentedSwingSound);
-                        Part.DefaultBehavior.SetStringProperty("BlockedSound", exoframe.AugmentedBlockedSound);
+                        Part.DefaultBehavior.SetStringProperty("SwingSound", exoframe.AugmentSwingSound);
+                        Part.DefaultBehavior.SetStringProperty("BlockedSound", exoframe.AugmentBlockedSound);
                     }
 
                     Debug.Entry(4, $"]|> hand.DefaultBehavior = {BlueprintName}", Indent: 5);

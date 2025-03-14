@@ -4,6 +4,7 @@ using XRL.Language;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.IManagedDefaultNaturalWeapon;
+using System.Collections.Generic;
 
 namespace XRL.World.Parts
 {
@@ -92,7 +93,7 @@ namespace XRL.World.Parts
 
         public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)
         {
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
@@ -137,7 +138,7 @@ namespace XRL.World.Parts
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
             weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription) *//", Indent: 4);
         }
 
         public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)
@@ -169,8 +170,9 @@ namespace XRL.World.Parts
                 Debug.LoopItem(4, $"NaturalWeapon.SecondColorString", $"{NaturalWeapon.SecondColorString} ", Indent: 7);
                 Debug.LoopItem(4, $"NaturalWeapon.DetailColor", $"{NaturalWeapon.ColorString} ", Indent: 7);
                 Debug.LoopItem(4, $"NaturalWeapon.SecondDetailColor", $"{NaturalWeapon.SecondDetailColor} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeapon.SwingSound", $"{NaturalWeapon.SwingSound} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeapon.BlockedSound", $"{NaturalWeapon.BlockedSound} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.SwingSound", $"{NaturalWeapon.GetSwingSound()} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.BlockedSound", $"{NaturalWeapon.GetBlockedSound()} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeapon.EquipmentFrameColors", $"{NaturalWeapon.GetEquipmentFrameColors()} ", Indent: 7);
 
                 weapon.Skill = NaturalWeapon.Skill ?? weapon.Skill;
                 render.DisplayName = NaturalWeapon.Noun ?? render.DisplayName;
@@ -186,8 +188,9 @@ namespace XRL.World.Parts
                     ? NaturalWeapon.SecondDetailColor 
                     : NaturalWeapon.DetailColor;
 
-                Object.SetSwingSound(NaturalWeapon.SwingSound);
-                Object.SetBlockedSound(NaturalWeapon.BlockedSound);
+                Object.SetSwingSound(NaturalWeapon.GetSwingSound());
+                Object.SetBlockedSound(NaturalWeapon.GetBlockedSound());
+                Object.SetEquipmentFrameColors(NaturalWeapon.GetEquipmentFrameColors());
 
                 weapon.Vomit(4, "Priority, After", vomitCats, Indent: 6);
             }
@@ -198,6 +201,38 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
             return NounPriority;
+        }
+
+        public virtual void ApplyPartAndPropChanges(GameObject Object, INaturalWeapon NaturalWeapon)
+        {
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
+
+            Debug.Entry(4, "> foreach (string part in NaturalWeapon.GetAddedParts())", Indent: 5);
+            foreach (string part in NaturalWeapon.GetAddedParts())
+            {
+                Debug.LoopItem(4, "part", part, Indent: 6);
+                Object.RequirePart(part);
+            }
+            Debug.Entry(4, $"x foreach (string part in NaturalWeapon.GetAddedParts()) >//", Indent: 5);
+
+            Debug.Entry(4, "> foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps())", Indent: 5);
+            foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps())
+            {
+                Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
+                Object.SetStringProperty(Name: entry.Key, Value: entry.Value, RemoveIfNull: true);
+            }
+            Debug.Entry(4, $"x foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps()) >//", Indent: 5);
+
+            Debug.Entry(4, "> foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps())", Indent: 5);
+            foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps())
+            {
+                Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
+                Object.SetIntProperty(Name: entry.Key, Value: entry.Value, RemoveIfZero: true);
+            }
+            Debug.Entry(4, $"x foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps()) >//", Indent: 5);
+
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
         }
 
         public override void ApplyModification(GameObject Object)

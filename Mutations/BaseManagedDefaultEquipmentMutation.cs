@@ -1,6 +1,7 @@
 ﻿using XRL.Language;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
+using System.Collections.Generic;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -72,6 +73,26 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
+        public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
+        {
+            string[] parts = Parts.Split(',');
+            foreach (string part in parts)
+            {
+                NaturalWeapon.AddedParts.Add(part);
+            }
+            return true;
+        }
+
+        public virtual bool ProcessNaturalWeaponAddedProps(string Props)
+        {
+            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
+            {
+                NaturalWeapon.AddedStringProps = StringProps;
+                NaturalWeapon.AddedIntProps = IntProps;
+            }
+            return true;
+        }
+
         public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
         {
             return NaturalWeapon.DamageDieCount;
@@ -90,6 +111,26 @@ namespace XRL.World.Parts.Mutation
         public virtual int GetNaturalWeaponHitBonus(int Level = 1)
         {
             return NaturalWeapon.HitBonus;
+        }
+
+        public virtual List<string> GetNaturalWeaponAddedParts()
+        {
+            return NaturalWeapon.AddedParts;
+        }
+
+        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps()
+        {
+            return NaturalWeapon.AddedStringProps;
+        }
+
+        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps()
+        {
+            return NaturalWeapon.AddedIntProps;
+        }
+
+        public virtual string GetNaturalWeaponEquipmentFrameColors()
+        {
+            return NaturalWeapon.EquipmentFrameColors;
         }
 
         public override bool ChangeLevel(int NewLevel)

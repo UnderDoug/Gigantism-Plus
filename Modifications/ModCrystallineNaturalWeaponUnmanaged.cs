@@ -19,13 +19,13 @@ namespace XRL.World.Parts
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
             Wielder ??= who;
-            AssigningMutation ??= Wielder.GetPart<Crystallinity>().ConvertToManaged();
-            NaturalWeapon ??= AssigningMutation.GetNaturalWeapon();
-            Level = AssigningMutation.Level;
-            AssigningMutation.CalculateNaturalWeaponDamageDieCount(Level);
-            AssigningMutation.CalculateNaturalWeaponDamageDieSize(Level);
-            AssigningMutation.CalculateNaturalWeaponDamageBonus(Level);
-            AssigningMutation.CalculateNaturalWeaponHitBonus(Level);
+            AssigningPart ??= Wielder.GetPart<Crystallinity>().ConvertToManaged();
+            NaturalWeapon ??= AssigningPart.GetNaturalWeapon();
+            Level = AssigningPart.Level;
+            AssigningPart.CalculateNaturalWeaponDamageDieCount(Level);
+            AssigningPart.CalculateNaturalWeaponDamageDieSize(Level);
+            AssigningPart.CalculateNaturalWeaponDamageBonus(Level);
+            AssigningPart.CalculateNaturalWeaponHitBonus(Level);
             return base.BeingAppliedBy(obj, who);
         }
 

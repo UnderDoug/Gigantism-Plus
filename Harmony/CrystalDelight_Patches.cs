@@ -4,6 +4,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Effects;
+using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -15,7 +16,8 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
         static void ApplyTo_Postfix(GameObject Object)
         {
-            return; // Skipping Patch: unnecessary if Crystallinity isn't being merged into the extended class.
+
+            if (!EnableManagedVanillaMutations) return; // Skip if Crystallinity isn't being merged into the extended class.
 
             if (Object.TryGetPart(out Crystallinity Crystallinity))
             {

@@ -4,29 +4,50 @@ using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Secrets;
+using static HNPS_GigantismPlus.Options;
+using System.Linq;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class CyberneticsGiganticExoframe : IPart
+    public class CyberneticsGiganticExoframe : BaseManagedDefaultEquipmentCybernetic
     {
-        [NonSerialized]
-        private GameObject _User;
-        public GameObject User => _User ??= ParentObject.Implantee;
-
-        public GameObject ImplantObject;
-        
         // XML Set Properties.
         public string Model = "Alpha";
         public string AugmentAdjectiveColor = "b";
-        public string AugmentTile = "GiganticManipulator.png";
+        public string AugmentTile = "NaturalWeapons/GiganticManipulator.png";
         public string AugmentTileColorString = "&c";
         public string AugmentTileDetailColor = "b";
-        public string AugmentedSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
-        public string AugmentedBlockSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+        public string AugmentSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
+        public string AugmentBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+        public string AugmentAddParts;
+        public string AugmentAddProps;
+        public string AugmentEquipmentFrameColors;
+
         public int JumpDistanceBonus = 0;
         public double StunningForceLevelFactor = 0.5;
 
+        public CyberneticsGiganticExoframe()
+        {
+            NaturalWeapon = new INaturalWeapon()
+            {
+                DamageDieCount = 1, // Default, equal to +0
+                DamageDieSize = 2,  // Default, equal to +0
+                ModPriority = -10,  // Lower = more priority. Cosmetic, so highest priority;
+                Adjective = "augmented",
+                AdjectiveColor = "b",
+                Tile = "NaturalWeapons/GiganticManipulator.png",
+                ColorString = "&c",
+                DetailColor = "b",
+                SecondColorString = "&c",
+                SecondDetailColor = "b",
+                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
+                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked",
+                AddedParts = new(),
+                AddedStringProps = new(),
+                AddedIntProps = new()
+            };
+        }
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
             return ("augmented").MaybeColor(AugmentAdjectiveColor, Pretty);
@@ -35,92 +56,103 @@ namespace XRL.World.Parts
         {
             return ($"E{ ("F").MaybeColor("c", Pretty) }-{GetShortAugmentAdjective(Pretty)}").MaybeColor("Y", Pretty);
         }
-
-        public GameObject _ManipulatorObject;
-
-        public string ManipulatorBlueprintName
+        public virtual string GetNaturalWeaponColoredAdjective()
         {
-            get
-            {
-                return "GiganticExoframeManipulator" + Model;
-            }
-
+            string output = $"E{"F".Color("c")}-";
+            output += NaturalWeapon.GetAdjective().OptionalColor(NaturalWeapon.GetAdjectiveColor(), NaturalWeapon.GetAdjectiveColorFallback(), Colorfulness);
+            return output.Color("Y");
         }
-
-        [NonSerialized]
-        protected GameObjectBlueprint _ManipulatorBlueprint;
-
-        public GameObjectBlueprint ManipulatorBlueprint
-        {
-            get
-            {
-                _ManipulatorBlueprint ??= GameObjectFactory.Factory.GetBlueprint(ManipulatorBlueprintName);
-                return _ManipulatorBlueprint;
-            }
-        }
-
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
-            exoframe._ManipulatorObject = null;
-            exoframe._User = null;
+            exoframe.Implantee = null;
             exoframe.ImplantObject = null;
             return exoframe;
         }
+
+        public override void OnDecorateDefaultEquipment(Body body)
+        {
+            Zone InstanceObjectZone = Implantee.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(3, $"{nameof(CyberneticsGiganticExoframe)}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
+            Debug.Entry(3, $"TARGET {Implantee.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+            if (body == null)
+            {
+                Debug.Entry(3, "No Body. Aborting", Indent: 1);
+                goto Exit;
+            }
+
+            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
+
+            string targetPartType = "Hand";
+            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
+            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
+
+            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
+                                   where p.Type == targetPartType
+                                   select p).ToList();
+
+            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
+            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
+            foreach (BodyPart part in list)
+            {
+                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
+                if (part.Type == "Hand")
+                {
+                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
+
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
+
+                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
+                }
+            }
+            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
+
+            Exit:
+            Debug.Entry(4, $"* base.{nameof(OnDecorateDefaultEquipment)}(body)", Indent: 1);
+            Debug.Footer(3, $"{nameof(CyberneticsGiganticExoframe)}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
+            base.OnDecorateDefaultEquipment(body);
+        }
+
+        public override void OnImplanted(GameObject Implantee, GameObject Implant)
+        {
+            Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
+
+            // Mapping Augment properties to NaturalWeapon ones.
+            NaturalWeapon.AdjectiveColor = AugmentAdjectiveColor;
+            NaturalWeapon.Tile = AugmentTile;
+            NaturalWeapon.ColorString = AugmentTileColorString;
+            NaturalWeapon.DetailColor = AugmentTileDetailColor;
+            NaturalWeapon.SecondColorString = NaturalWeapon.ColorString;
+            NaturalWeapon.SecondDetailColor = NaturalWeapon.DetailColor;
+            NaturalWeapon.SwingSound = AugmentSwingSound;
+            NaturalWeapon.BlockedSound = AugmentBlockedSound;
+            ProcessNaturalWeaponAddedParts(AugmentAddParts);
+            ProcessNaturalWeaponAddedProps(AugmentAddProps);
+            NaturalWeapon.EquipmentFrameColors = AugmentEquipmentFrameColors;
+
+            Become(Implantee, Model, Implant);
+
+            Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
+        } //!--- public override void OnImplanted(GameObject Object)
+
+        public override void OnUnimplanted(GameObject Implantee, GameObject Implant)
+        {
+            Debug.Entry(3, $"* OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
+
+            Implantee.CheckAffectedEquipmentSlots();
+
+            Unbecome(Implantee, Model, ImplantObject);
+            Debug.Entry(3, $"x OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
+        } //!--- public override void OnUnimplanted(GameObject Object)
 
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == ImplantedEvent.ID
-                || ID == UnimplantedEvent.ID
                 || ID == CanEnterInteriorEvent.ID;
-        }
-
-        public virtual void OnImplanted(GameObject Object)
-        {
-            Debug.Entry(2, $"* public virtual void OnImplanted({Object.DisplayName})");
-            
-            _User = Object;
-
-            Become(Object, Model, ImplantObject);
-
-            Debug.Entry(2, $"x public virtual void OnImplanted({Object.DisplayName}) ]//");
-        } //!--- public override void OnImplanted(GameObject Object)
-
-        public virtual void OnUnimplanted(GameObject Object)
-        {
-            Debug.Entry(3, $"* public virtual void OnUnimplanted({Object.DisplayName})");
-
-            CheckEquipment(Object, Object.Body);
-
-            
-            Unbecome(Object, Model, ImplantObject);
-            Debug.Entry(3, $"x public virtual void OnUnimplanted({Object.DisplayName}) ]//");
-        } //!--- public override void OnUnimplanted(GameObject Object)
-
-        public override bool HandleEvent(ImplantedEvent E)
-        {
-            Debug.Entry(3, "@START CyberneticsGiganticExoframe.HandleEvent(UnimplantedEvent E)");
-            Debug.Entry(3, $"TARGET Implantee is {E.Implantee.DisplayName}");
-
-            ImplantObject = E.Item;
-
-            OnImplanted(E.Implantee);
-
-            Debug.Entry(3, "x return base.HandleEvent(E) ]//");
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(UnimplantedEvent E)
-        {
-            Debug.Entry(3, "@START CyberneticsGiganticExoframe.HandleEvent(UnimplantedEvent E)");
-            Debug.Entry(3, $"TARGET Unimplantee is {E.Implantee.DisplayName}");
-
-            OnUnimplanted(E.Implantee);
-
-            Debug.Entry(3, "x return base.HandleEvent(E) ]//");
-            return base.HandleEvent(E);
         }
 
         public override bool HandleEvent(GetSlotsRequiredEvent E)
@@ -136,36 +168,6 @@ namespace XRL.World.Parts
                 E.CanBeTooSmall = false;
             }
             return base.HandleEvent(E);
-        }
-
-        public void CheckEquipment(GameObject Actor, Body Body)
-        {
-            Debug.Entry(3, "* public void CheckEquipment(GameObject Actor, Body Body)");
-            if (Actor == null || Body == null)
-            { 
-                Debug.Entry(3, "x (Actor == null || Body == null)");
-                return;
-            }
-
-            List<GameObject> list = Event.NewGameObjectList();
-            Debug.Entry(3, "* foreach (BodyPart bodyPart in Body.LoopParts())");
-            foreach (BodyPart bodyPart in Body.LoopParts())
-            {
-                GameObject equipped = bodyPart.Equipped;
-                if (equipped != null && !list.Contains(equipped))
-                {
-                    Debug.Entry(3, "- Part", equipped.DebugName);
-                    list.Add(equipped);
-                    int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
-                    int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
-                    if (partCountEquippedOn != slotsRequiredFor && bodyPart.TryUnequip(true, true, false, false) && partCountEquippedOn > slotsRequiredFor)
-                    {
-                        equipped.SplitFromStack();
-                        bodyPart.Equip(equipped, new int?(0), true, false, false, true);
-                    }
-                }
-            }
-            Debug.Entry(3, "x public void CheckEquipment(GameObject Actor, Body Body)");
         }
 
         public override bool AllowStaticRegistration()

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -36,6 +38,8 @@ namespace HNPS_GigantismPlus
         public static bool EnableGiganticNPCGear => GetOption("Option_GigantismPlus_EnableGiganticNPCGear").EqualsNoCase("Yes");
         public static bool EnableGiganticNPCGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticNPCGear_Grenades").EqualsNoCase("Yes");
 
+        public static bool EnableManagedVanillaMutations => GetOption("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
+
         // Debug Settings
         public static int DebugVerbosity
         {
@@ -60,5 +64,15 @@ namespace HNPS_GigantismPlus
                 DebugIncludeInMessage = value;
             }
         }
+
+        // OnClick Handlers
+        public static bool OnOptionManagedVanilla()
+        {
+            Debug.Entry(4, $"@ {nameof(Options)}.{nameof(OnOptionManagedVanilla)}", Indent: 0);
+            ManagedVanillaMutation();
+            Debug.Entry(4, $"x {nameof(Options)}.{nameof(OnOptionManagedVanilla)} @//", Indent: 0);
+            return true;
+        }
+
     } //!-- public static class Options
 }

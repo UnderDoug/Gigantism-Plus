@@ -1,9 +1,13 @@
+using System.Collections.Generic;
+using XRL.World.Parts;
+
 namespace XRL.World
 {
     public interface IManagedDefaultNaturalWeapon
     {
-        public abstract class INaturalWeapon : IPart
+        public class INaturalWeapon : IScribedPart
         {
+            public int Level { get; set; }
             public int DamageDieCount { get; set; }
             public int DamageDieSize { get; set; }
             public int DamageBonus { get; set; }
@@ -21,11 +25,23 @@ namespace XRL.World
             public string Skill;
             public string Stat;
             public string Tile;
-            public string RenderColorString;
-            public string RenderDetailColor;
-            public string SecondRenderColorString;
-            public string SecondRenderDetailColor;
+            public string ColorString;
+            public string DetailColor;
+            public string SecondColorString;
+            public string SecondDetailColor;
+            public string SwingSound;
+            public string BlockedSound;
 
+            public List<string> AddedParts;
+            public Dictionary<string, string> AddedStringProps;
+            public Dictionary<string, int> AddedIntProps;
+
+            public string EquipmentFrameColors;
+
+            public int GetLevel()
+            {
+                return Level;
+            }
             public int GetDamageDieCount()
             {
                 // base damage die count is 1
@@ -85,11 +101,41 @@ namespace XRL.World
                 string colorText = "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
                 return "{{" + GetAdjectiveColorFallback() + "|" + colorText + "}}";
             }
+            public string GetSwingSound()
+            {
+                return SwingSound;
+            }
+            public string GetBlockedSound()
+            {
+                return BlockedSound;
+            }
+            public List<string> GetAddedParts()
+            {
+                return AddedParts;
+            }
+            public Dictionary<string, string> GetAddedStringProps()
+            {
+                return AddedStringProps;
+            }
+            public Dictionary<string, int> GetAddedIntProps()
+            {
+                return AddedIntProps;
+            }
+            public string GetEquipmentFrameColors()
+            {
+                return EquipmentFrameColors;
+            }
         }
 
         public abstract INaturalWeapon GetNaturalWeapon();
 
         public abstract string GetNaturalWeaponMod(bool Managed = true);
+        public abstract bool CalculateNaturalWeaponLevel(int Level = 1);
+
+        public virtual string GetNaturalWeaponColoredAdjective()
+        {
+            return GetNaturalWeapon().GetColoredAdjective();
+        }
 
         public abstract bool CalculateNaturalWeaponDamageDieCount(int Level = 1);
 
@@ -99,6 +145,10 @@ namespace XRL.World
 
         public abstract bool CalculateNaturalWeaponHitBonus(int Level = 1);
 
+        public abstract bool ProcessNaturalWeaponAddedParts(string Parts);
+
+        public abstract bool ProcessNaturalWeaponAddedProps(string Props);
+
         public abstract int GetNaturalWeaponDamageDieCount(int Level = 1);
 
         public abstract int GetNaturalWeaponDamageDieSize(int Level = 1);
@@ -106,5 +156,17 @@ namespace XRL.World
         public abstract int GetNaturalWeaponDamageBonus(int Level = 1);
 
         public abstract int GetNaturalWeaponHitBonus(int Level = 1);
+
+        public abstract List<string> GetNaturalWeaponAddedParts();
+
+        public abstract Dictionary<string, string> GetNaturalWeaponAddedStringProps();
+
+        public abstract Dictionary<string, int> GetNaturalWeaponAddedIntProps();
+
+        public abstract string GetNaturalWeaponEquipmentFrameColors();
+
+        // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
+        public abstract void OnDecorateDefaultEquipment(Body body);
+        public abstract void OnRegenerateDefaultEquipment(Body body);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -132,7 +133,7 @@ namespace HNPS_GigantismPlus
         // int      is the value
         // ;        delimits each pair.
         // Example: "ChargeRangeModifier:2;JumpRangeModifier:1"
-        public static Dictionary<string, int> ParseProps(this string Props)
+        public static Dictionary<string, int> ParseIntProps(this string Props)
         {
             Dictionary<string, int> dictionary = new();
             string[] array = Props.Split(';');
@@ -140,6 +141,24 @@ namespace HNPS_GigantismPlus
             {
                 string[] array2 = array[i].Split(':');
                 dictionary.Add(array2[0], Convert.ToInt32(array2[1]));
+            }
+            return dictionary;
+        }
+
+        // as above, but for int:int progressions (good for single value level progressions).
+        // Props must equal "string:string;string:string;string:string" where
+        // string   is a StringProperty
+        // string      is the value
+        // ;        delimits each pair.
+        // Example: "StringProp:StringValue;AnotherStringProp:SecondValue"
+        public static Dictionary<string, string> ParseStringProps(this string Props)
+        {
+            Dictionary<string, string> dictionary = new();
+            string[] array = Props.Split(';');
+            for (int i = 0; i < array.Length; i++)
+            {
+                string[] array2 = array[i].Split(':');
+                dictionary.Add(array2[0], array2[1]);
             }
             return dictionary;
         }
@@ -179,6 +198,31 @@ namespace HNPS_GigantismPlus
                 dictionary.Add(Convert.ToInt32(array2[0]), dieRoll);
             }
             return dictionary;
+        }
+
+        // Similar to above, but it takes a series of string and int properties, intermixed, and gives them to two appropriately typed dictionaries.
+        public static bool ParseProps(this string Props, out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps)
+        {
+            Dictionary<string, string> stringDictionary = new();
+            Dictionary<string, int> intDictionary = new();
+            string[] props = Props.Split(';');
+            for (int i = 0; i < props.Length; i++)
+            {
+                string[] prop = props[i].Split(':');
+                if (int.TryParse(prop[1], out int result))
+                {
+                    intDictionary.Add(prop[0], result);
+                }
+                else
+                {
+                    stringDictionary.Add(prop[0], prop[1]);
+                }
+            }
+            StringProps = stringDictionary;
+            IntProps = intDictionary;
+            if (StringProps.Count == 0 && IntProps.Count == 0)
+                return false;
+            return true;
         }
 
         public static UD_ManagedBurrowingClaws ConvertToManaged(this BurrowingClaws burrowingClaws)
@@ -402,5 +446,63 @@ namespace HNPS_GigantismPlus
             return;
         } //!-- public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
         
+        public static void SetSwingSound(this GameObject Object, string Path)
+        {
+            if (Path != null && Path != "")
+                Object.SetStringProperty("SwingSound", Path);
+        }
+        public static void SetBlockedSound(this GameObject Object, string Path)
+        {
+            if (Path != null && Path != "")
+                Object.SetStringProperty("BlockedSound", Path);
+        }
+        public static void SetEquipmentFrameColors(this GameObject Object, string Path = null)
+        {
+            Object.SetStringProperty("EquipmentFrameColors", Path, true);
+        }
+
+        public static void CheckAffectedEquipmentSlots(this GameObject Actor)
+        {
+            Body Body = Actor?.Body;
+            Debug.Entry(3, $"* CheckAffectedEquipmentSlots(this GameObject Actor: {Actor.ShortDisplayName})");
+            if (Actor == null || Body == null)
+            {
+                Debug.Entry(3, "x (Actor == null || Body == null)");
+                return;
+            }
+
+            List<GameObject> list = Event.NewGameObjectList();
+            Debug.Entry(3, "* foreach (BodyPart bodyPart in Body.LoopParts())");
+            foreach (BodyPart bodyPart in Body.LoopParts())
+            {
+                GameObject equipped = bodyPart.Equipped;
+                if (equipped != null && !list.Contains(equipped))
+                {
+                    Debug.Entry(3, "- Part", equipped.DebugName);
+                    list.Add(equipped);
+                    int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
+                    int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
+                    if (partCountEquippedOn != slotsRequiredFor && bodyPart.TryUnequip(true, true, false, false) && partCountEquippedOn > slotsRequiredFor)
+                    {
+                        equipped.SplitFromStack();
+                        bodyPart.Equip(equipped, new int?(0), true, false, false, true);
+                    }
+                }
+            }
+            Debug.Entry(3, $"x CheckAffectedEquipmentSlots(this GameObject Actor: {Actor.ShortDisplayName}) *//");
+        }
+
+        public static IPart RequirePart(this GameObject Object, string Part, bool DoRegistration = true, bool Creation = false)
+        {
+            if (Object.HasPart(Part))
+            {
+                return Object.GetPart(Part);
+            }
+            GamePartBlueprint gamePartBlueprint = new(Part);
+            IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
+            part.ParentObject = Object;
+            gamePartBlueprint.InitializePartInstance(part);
+            return Object.AddPart(part, DoRegistration: DoRegistration, Creation: Creation);
+        }
     }
 }

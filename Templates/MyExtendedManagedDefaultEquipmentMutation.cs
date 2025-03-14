@@ -37,10 +37,10 @@ namespace XRL.World.Parts.Mutation
             Adjective = "hooked",           // Appears in the display name: "hooked spade" (no default)
             AdjectiveColor = "R",           // Can be a shader, alters the color of the displayed adjective (no default)
             Tile = "Creatures/natural-weapon-drill.bmp", // The path to the Tile that will appear in the equipment slot
-            RenderColorString = "&w",       // The black pixels of the Tile
-            RenderDetailColor = "r",        // The white pixels of the Tile
-            SecondRenderColorString = "&W", // If the tile is already the above color, this get used instead
-            SecondRenderDetailColor = "R",  // If the tile is already the above color, this get used instead
+            ColorString = "&w",       // The black pixels of the Tile
+            DetailColor = "r",        // The white pixels of the Tile
+            SecondColorString = "&W", // If the tile is already the above color, this get used instead
+            SecondDetailColor = "R",  // If the tile is already the above color, this get used instead
         };
 
         // Required by IManagedDefaultNaturalWeapon and allows the Modification to get the above part from the mutation.
@@ -64,6 +64,12 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
+        public virtual bool CalculateNaturalWeaponLevel(int Level = 1)
+        {
+            NaturalWeapon.Level = Level;
+            return true;
+        }
+
         // Required by IManagedDefaultNaturalWeapon and is used to assign the relevant damage component
         public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
@@ -85,7 +91,27 @@ namespace XRL.World.Parts.Mutation
             NaturalWeapon.HitBonus = GetNaturalWeaponHitBonus(Level);
             return true;
         }
-        
+
+        public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
+        {
+            string[] parts = Parts.Split(',');
+            foreach (string part in parts)
+            {
+                NaturalWeapon.AddedParts.Add(part);
+            }
+            return true;
+        }
+
+        public virtual bool ProcessNaturalWeaponAddedProps(string Props)
+        {
+            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
+            {
+                NaturalWeapon.AddedStringProps = StringProps;
+                NaturalWeapon.AddedIntProps = IntProps;
+            }
+            return true;
+        }
+
         // Required by IManagedDefaultNaturalWeapon and is used to calculate the relevant damage component
         // Can be altered as below to be as simple or complex as you like 
         public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
@@ -107,6 +133,26 @@ namespace XRL.World.Parts.Mutation
         public virtual int GetNaturalWeaponHitBonus(int Level = 1)
         {
             return NaturalWeapon.HitBonus;
+        }
+
+        public virtual List<string> GetNaturalWeaponAddedParts()
+        {
+            return NaturalWeapon.AddedParts;
+        }
+
+        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps()
+        {
+            return NaturalWeapon.AddedStringProps;
+        }
+
+        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps()
+        {
+            return NaturalWeapon.AddedIntProps;
+        }
+
+        public virtual string GetNaturalWeaponEquipmentFrameColors()
+        {
+            return NaturalWeapon.EquipmentFrameColors;
         }
 
         // ChangeLevel is the first call in the process for default equipment being updated/generated

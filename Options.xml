@@ -176,7 +176,35 @@
       The default is {{w|Disabled}}.
     </helptext>
   </option>
-  
-  <!-- End of Mod Options -->
+
+  <!-- Advanced Options -->
+
+  <option
+		ID="Option_GigantismPlus_ManagedVanilla"
+	      DisplayText="Use &quot;up-classed&quot; versions of vanilla mutations that have natural weapons"
+        Requires="OptionShowAdvancedOptions==Yes"
+	      Category="Mods: Gigantism Plus"
+        Type="Checkbox"
+        Default="No"
+        OnClick="HNPS_GigantismPlus.Options.OnOptionManagedVanilla"
+	  >
+    <helptext>
+      This mod adjusts how a number of vanilla mutations grant their natural weapons.
+
+      With this option enabled, the mod will replace the mutation entries' class for the mutations in question with an alternate version that implements the adjustments intended by the mod, but are otherwise identical in behaviour. Wishes that target the mutation class instead of the mutation name will require the alternate class name.
+
+      With this option disabled, the mod will leave the mutation entries for the mutations in question completely vanilla, and uses a patch to bypass the relevant parts of their regular behaviour and deferring those parts to the relevant mutation class mentioned above. Other mods that make changes to the mutations in question will likely have their behaviour by this mod due to the nature of the patch.
+      
+      Mutations currently affected:
+      &#xF9; {{Y|Burrowing Claws}}
+      &#xF9; {{crystalline|Crystallinity}}
+
+      {{r|If the above reads like nonsense then this option is fine to leave on default.}}
+
+      The default is {{w|Disabled}}.
+    </helptext>
+  </option>
 	
+  <!-- End of Mod Options -->
+  
 </options>

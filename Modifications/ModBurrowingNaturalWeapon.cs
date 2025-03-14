@@ -20,7 +20,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModBurrowingNaturalWeapon modBurrowingNaturalWeapon = base.DeepCopy(Parent, MapInv) as ModBurrowingNaturalWeapon;
-            modBurrowingNaturalWeapon.AssigningMutation = null;
+            modBurrowingNaturalWeapon.AssigningPart = null;
             modBurrowingNaturalWeapon.Wielder = null;
             modBurrowingNaturalWeapon.NaturalWeapon = null;
             return modBurrowingNaturalWeapon;
@@ -30,14 +30,15 @@ namespace XRL.World.Parts
         {
             ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
-
-            Object.RequirePart<DiggingTool>();
             Object.RequirePart<BurrowingClawsProperties>();
 
             BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
             burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
             burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
+
+            ApplyPriorityChanges(Object, NaturalWeapon);
+
+            ApplyPartAndPropChanges(Object, NaturalWeapon);
 
             base.ApplyModification(Object);
         }

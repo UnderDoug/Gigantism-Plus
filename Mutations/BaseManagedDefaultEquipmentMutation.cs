@@ -17,6 +17,7 @@ namespace XRL.World.Parts.Mutation
 
         public INaturalWeapon NaturalWeapon = new()
         {
+            Level = 1,
             DamageDieCount = 1,
             DamageDieSize = 2,
             DamageBonus = 0,
@@ -25,8 +26,6 @@ namespace XRL.World.Parts.Mutation
             ModPriority = 0,
             AdjectiveColor = "y",
             AdjectiveColorFallback = "Y",
-            Noun = "fist",
-            Tile = "Creatures/natural-weapon-fist.bmp",
             ColorString = "&K",
             DetailColor = "y",
             SecondColorString = "&y",
@@ -75,6 +74,8 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
         {
+            if (Parts == null) return false;
+            NaturalWeapon.AddedParts ??= new();
             string[] parts = Parts.Split(',');
             foreach (string part in parts)
             {
@@ -85,6 +86,7 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool ProcessNaturalWeaponAddedProps(string Props)
         {
+            if (Props == null) return false;
             if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
             {
                 NaturalWeapon.AddedStringProps = StringProps;

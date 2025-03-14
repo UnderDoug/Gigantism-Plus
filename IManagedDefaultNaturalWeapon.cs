@@ -132,6 +132,11 @@ namespace XRL.World
         public abstract string GetNaturalWeaponMod(bool Managed = true);
         public abstract bool CalculateNaturalWeaponLevel(int Level = 1);
 
+        public virtual string GetNaturalWeaponColoredAdjective()
+        {
+            return GetNaturalWeapon().GetColoredAdjective();
+        }
+
         public abstract bool CalculateNaturalWeaponDamageDieCount(int Level = 1);
 
         public abstract bool CalculateNaturalWeaponDamageDieSize(int Level = 1);

@@ -4,6 +4,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -125,6 +126,7 @@ namespace HNPS_GigantismPlus
         public void mutate(GameObject player)
         {
             Debug.Header(3, "OnPlayerLoad", $"mutate(GameObject player: {player.DebugName})");
+            ManagedVanillaMutation();
             GiganticModifierAdjustments.AdjustGiganticModifier();
             Debug.Footer(3, "OnPlayerLoad", $"mutate(GameObject player: {player.DebugName})");
         }
@@ -137,6 +139,7 @@ namespace HNPS_GigantismPlus
         public static void OnLoadGameCallback()
         {
             Debug.Header(3, "OnPlayerLoad", $"OnLoadGameCallback()");
+            ManagedVanillaMutation();
             GiganticModifierAdjustments.AdjustGiganticModifier();
             Debug.Footer(3, "OnPlayerLoad", $"OnLoadGameCallback()");
         }

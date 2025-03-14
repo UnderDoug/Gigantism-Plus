@@ -502,7 +502,7 @@ namespace HNPS_GigantismPlus
             IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
             part.ParentObject = Object;
             gamePartBlueprint.InitializePartInstance(part);
-            return Object.AddPart(part, DoRegistration: DoRegistration,Creation: Creation);
+            return Object.AddPart(part, DoRegistration: DoRegistration, Creation: Creation);
         }
     }
 }

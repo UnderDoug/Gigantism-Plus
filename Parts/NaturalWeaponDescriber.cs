@@ -63,7 +63,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, 
                 $"@ {nameof(NaturalWeaponDescriber)}"
                 +$".{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.ShortDisplayName})", 
-                Indent: 6);
+                Indent: 0);
             _ShortDescriptionCache ??= ProcessDescription(ShortDescriptions);
             E.Postfix.AppendRules(_ShortDescriptionCache);
             return base.HandleEvent(E);

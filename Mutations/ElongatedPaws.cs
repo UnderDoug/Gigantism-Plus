@@ -59,6 +59,7 @@ namespace XRL.World.Parts.Mutation
 
             NaturalWeapon = new()
             {
+                Level = 1,
                 DamageDieCount = 1,
                 DamageDieSize = 3,
                 DamageBonus = 0,
@@ -185,16 +186,13 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Header(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body == null)
             {
                 Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-                Debug.Footer(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
-                base.OnRegenerateDefaultEquipment(body);
-                return;
+                goto Exit;
             }
 
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
@@ -208,7 +206,7 @@ namespace XRL.World.Parts.Mutation
                                    select p).ToList();
 
             Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "* foreach (BodyPart part in list)", Indent: 1);
+            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
             foreach (BodyPart part in list)
             {
                 Debug.LoopItem(4, $"{part.Type}", Indent: 2);
@@ -218,13 +216,14 @@ namespace XRL.World.Parts.Mutation
 
                     part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
 
-                    Debug.DiveOut(4, $"x {part.Type} >//", Indent: 2);
+                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }
             }
-            Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
+            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
 
-            Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-            Debug.Footer(3, "ElongatedPaws", $"OnRegenerateDefaultEquipment(body)");
+            Exit:
+            Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
+            Debug.Footer(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
             base.OnRegenerateDefaultEquipment(body);
         }
 

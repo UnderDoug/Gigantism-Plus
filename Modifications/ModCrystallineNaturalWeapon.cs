@@ -31,7 +31,9 @@ namespace XRL.World.Parts
         {
             ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
+            ApplyPriorityChanges(Object, NaturalWeapon);
+
+            ApplyPartAndPropChanges(Object, NaturalWeapon);
 
             base.ApplyModification(Object);
         }

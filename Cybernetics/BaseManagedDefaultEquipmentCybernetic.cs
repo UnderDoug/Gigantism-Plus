@@ -43,6 +43,7 @@ namespace XRL.World.Parts
 
         public INaturalWeapon NaturalWeapon = new()
         {
+            Level = 1,
             DamageDieCount = 1,
             DamageDieSize = 2,
             DamageBonus = 0,
@@ -51,14 +52,15 @@ namespace XRL.World.Parts
             ModPriority = 0,
             AdjectiveColor = "y",
             AdjectiveColorFallback = "Y",
-            Noun = "fist",
-            Tile = "Creatures/natural-weapon-fist.bmp",
             ColorString = "&K",
             DetailColor = "y",
             SecondColorString = "&y",
             SecondDetailColor = "Y",
             SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
-            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked",
+            AddedParts = new(),
+            AddedStringProps = new(),
+            AddedIntProps = new()
         };
 
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
@@ -103,6 +105,8 @@ namespace XRL.World.Parts
 
         public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
         {
+            if (Parts == null) return false;
+            NaturalWeapon.AddedParts ??= new();
             string[] parts = Parts.Split(',');
             foreach (string part in parts)
             {
@@ -113,6 +117,7 @@ namespace XRL.World.Parts
 
         public virtual bool ProcessNaturalWeaponAddedProps(string Props)
         {
+            if (Props == null) return false;
             if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
             {
                 NaturalWeapon.AddedStringProps = StringProps;

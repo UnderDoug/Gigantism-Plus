@@ -20,6 +20,7 @@ namespace XRL.World.Parts.Mutation
 
         public INaturalWeapon NaturalWeapon = new()
         {
+            Level = 1,
             DamageDieCount = 1,
             DamageDieSize = 3,
             DamageBonus = -1, // this is to force the default "InorganicManipulator" to match the default fist.
@@ -128,6 +129,8 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
         {
+            if (Parts == null) return false;
+            NaturalWeapon.AddedParts ??= new();
             string[] parts = Parts.Split(',');
             foreach (string part in parts)
             {
@@ -138,6 +141,7 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool ProcessNaturalWeaponAddedProps(string Props)
         {
+            if (Props == null) return false;
             if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
             {
                 NaturalWeapon.AddedStringProps = StringProps;
@@ -191,17 +195,13 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+            Debug.Header(3, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
             Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
 
             if (body == null)
             {
                 Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-                Debug.Footer(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
-                base.OnRegenerateDefaultEquipment(body);
-                return;
+                goto Exit;
             }
 
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
@@ -215,7 +215,7 @@ namespace XRL.World.Parts.Mutation
                                    select p).ToList();
 
             Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "* foreach (BodyPart part in list)", Indent: 1);
+            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
             foreach (BodyPart part in list)
             {
                 Debug.LoopItem(4, $"{part.Type}", Indent: 2);
@@ -225,13 +225,13 @@ namespace XRL.World.Parts.Mutation
 
                     part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
 
-                    Debug.DiveOut(4, $"x {part.Type} >//", Indent: 2);
+                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }
             }
-            Debug.Entry(4, "x foreach (BodyPart part in list) ]//", Indent: 1);
+            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
 
-            Debug.Entry(4, "* base.OnRegenerateDefaultEquipment(body)", Indent: 1);
-            Debug.Footer(3, "UD_ManagedCrystallinity", $"OnRegenerateDefaultEquipment(body)");
+            Exit:
+            Debug.Footer(3, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

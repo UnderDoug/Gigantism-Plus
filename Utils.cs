@@ -11,6 +11,7 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
+using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
@@ -327,6 +328,44 @@ namespace HNPS_GigantismPlus
         {
             DieRoll dieRoll = new(DieRoll);
             return ExplodingDie(Number, dieRoll, Step, Limit, Indent);
+        }
+
+        public static void SwapMutationEnrtyClass(MutationEntry Entry, string Class, int Indent = 0)
+        {
+            Debug.Entry(4, 
+                $"@ {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0)",
+                Indent: Indent);
+            Debug.Entry(4,
+                $"Entry: {Entry.Name} | Class: {Class}",
+                Indent: Indent);
+
+            Entry.Class = Class;
+
+            Debug.Entry(4,
+                $"x {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0) @//",
+                Indent: Indent);
+        }
+
+        public static void ManagedVanillaMutation()
+        {
+            List<(string, string, string)> MutationEntries = new List<(string Name, string Vanilla, string Managed)>
+            {
+                ("Burrowing Claws", "BurrowingClaws", "UD_ManagedBurrowingClaws"),
+                ("Crystallinity", "Crystallinity", "UD_ManagedCrystallinity")
+            };
+            foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries)
+            {
+                Debug.LoopItem(4, $"entry.Name: {entry.Name}", Indent: 1);
+                MutationEntry vanillaMutation = MutationFactory.GetMutationEntryByName(entry.Name);
+                if (EnableManagedVanillaMutations)
+                {
+                    SwapMutationEnrtyClass(vanillaMutation, entry.Managed, Indent: 2);
+                }
+                else
+                {
+                    SwapMutationEnrtyClass(vanillaMutation, entry.Vanilla, Indent: 2);
+                }
+            }
         }
 
     } //!-- public static class Utils

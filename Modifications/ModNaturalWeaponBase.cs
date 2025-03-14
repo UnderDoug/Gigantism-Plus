@@ -5,6 +5,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.IManagedDefaultNaturalWeapon;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace XRL.World.Parts
 {
@@ -59,7 +60,8 @@ namespace XRL.World.Parts
         private INaturalWeapon _naturalWeapon;
         public INaturalWeapon NaturalWeapon { get => _naturalWeapon; set => _naturalWeapon = value; }
 
-        public const string CURRENT_PRIORITY = "CurrentNaturalWeaponBasePriority";
+        public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
+        public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
@@ -110,6 +112,7 @@ namespace XRL.World.Parts
                 {
                     Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descripiptions", Indent: 6);
                 }
+                if (InstanceDescription != null && InstanceDescription != string.Empty)
                 NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeapon.GetPriority(), InstanceDescription);
             }
             else
@@ -121,7 +124,7 @@ namespace XRL.World.Parts
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
             // if no other mods, bump the damage penalty of -1 off.
-            // 1d2-2 into 1d2+0
+            // 1d2-1 into 1d2+0
             if (!Object.HasNaturalWeaponMods()) weapon.AdjustDamage(1);
 
             string[] vomitCats = new string[] { "Damage" };
@@ -138,10 +141,10 @@ namespace XRL.World.Parts
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
             weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription) *//", Indent: 4);
         }
 
-        public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon, int NounPriority)
+        public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon)
         {
             Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
@@ -151,16 +154,21 @@ namespace XRL.World.Parts
 
             string[] vomitCats = new string[] { "Combat", "Render" };
 
-            int CurrentPriority = Object.GetIntProperty(CURRENT_PRIORITY);
+            int NounPriority = NaturalWeapon.GetNounPriority();
+            int AdjectivePriority = NaturalWeapon.GetAdjectivePriority();
+            int CurrentNounPriority = Object.GetIntProperty(CURRENT_NOUN_PRIORITY);
+            int CurrentAdjectivePriority = Object.GetIntProperty(CURRENT_ADJECTIVE_PRIORITY);
 
-            Debug.Entry(4, $"? if (CurrentPriority > NounPriority)", Indent: 5);
-            if (CurrentPriority > NounPriority)
+            Debug.Entry(4, $"? if (NounPriority != 0 && NounPriority < CurrentPriority)", Indent: 5);
+            if (NounPriority != 0 && NounPriority < CurrentNounPriority )
             {
-                Debug.Entry(4, $"+ CurrentPriority ({CurrentPriority}) > NounPriority ({NounPriority})", Indent: 6);
+                Debug.Entry(4, 
+                    $"+ NounPriority != 0 &&  NounPriority ({NounPriority}) < CurrentNounPriority ({CurrentNounPriority})", 
+                    Indent: 6);
 
-                Object.SetIntProperty(CURRENT_PRIORITY, NounPriority);
+                Object.SetIntProperty(CURRENT_NOUN_PRIORITY, NounPriority);
                 
-                weapon.Vomit(4, "Priority, Before", vomitCats, Indent: 6);
+                weapon.Vomit(4, "NounPriority, Before", vomitCats, Indent: 6);
 
                 Debug.Entry(4, $"NaturalWeapon Attribute", Indent: 6);
                 Debug.LoopItem(4, $"NaturalWeapon.Skill", $"{NaturalWeapon.Skill}", Indent: 7);
@@ -172,7 +180,6 @@ namespace XRL.World.Parts
                 Debug.LoopItem(4, $"NaturalWeapon.SecondDetailColor", $"{NaturalWeapon.SecondDetailColor} ", Indent: 7);
                 Debug.LoopItem(4, $"NaturalWeapon.SwingSound", $"{NaturalWeapon.GetSwingSound()} ", Indent: 7);
                 Debug.LoopItem(4, $"NaturalWeapon.BlockedSound", $"{NaturalWeapon.GetBlockedSound()} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeapon.EquipmentFrameColors", $"{NaturalWeapon.GetEquipmentFrameColors()} ", Indent: 7);
 
                 weapon.Skill = NaturalWeapon.Skill ?? weapon.Skill;
                 render.DisplayName = NaturalWeapon.Noun ?? render.DisplayName;
@@ -190,17 +197,49 @@ namespace XRL.World.Parts
 
                 Object.SetSwingSound(NaturalWeapon.GetSwingSound());
                 Object.SetBlockedSound(NaturalWeapon.GetBlockedSound());
-                Object.SetEquipmentFrameColors(NaturalWeapon.GetEquipmentFrameColors());
 
-                weapon.Vomit(4, "Priority, After", vomitCats, Indent: 6);
+                weapon.Vomit(4, "NounPriority, After", vomitCats, Indent: 6);
             }
             else
             {
-                Debug.Entry(4, $"- CurrentPriority ({CurrentPriority}) <= NounPriority ({NounPriority})", Indent: 6);
+                Debug.Entry(4, 
+                    $"- NounPriority == 0 || NounPriority ({NounPriority}) >= CurrentNounPriority ({CurrentNounPriority})", 
+                    Indent: 6);
                 weapon.Vomit(4, "Priority, Unchanged", vomitCats, Indent: 6);
             }
+            Debug.Entry(4, $"x if (NounPriority != 0 && NounPriority < CurrentNounPriority) ?//", Indent: 5);
+
+            Debug.Entry(4, $"? if (AdjectivePriority != 0 && AdjectivePriority < CurrentAdjectivePriority)", Indent: 5);
+            if (AdjectivePriority != 0 && AdjectivePriority < CurrentAdjectivePriority)
+            {
+                Debug.Entry(4,
+                    $"+ AdjectivePriority != 0 && " 
+                    + $"CurrentAdjectivePriority AdjectivePriority ({AdjectivePriority}) < ({CurrentAdjectivePriority})",
+                    Indent: 6);
+
+                Object.SetIntProperty(CURRENT_ADJECTIVE_PRIORITY, AdjectivePriority);
+
+                weapon.Vomit(4, "AdjectivePriority, Before", vomitCats, Indent: 6);
+
+                Debug.Entry(4, $"NaturalWeapon Attribute", Indent: 6);
+                Debug.LoopItem(4, $"NaturalWeapon.EquipmentFrameColors", $"{NaturalWeapon.GetEquipmentFrameColors()} ", Indent: 7);
+
+                Object.SetEquipmentFrameColors(NaturalWeapon.GetEquipmentFrameColors());
+
+                weapon.Vomit(4, "AdjectivePriority, After", vomitCats, Indent: 6);
+            }
+            else
+            {
+                Debug.Entry(4,
+                    $"- AdjectivePriority == 0 || " 
+                    + $"AdjectivePriority ({AdjectivePriority}) >= CurrentAdjectivePriority ({CurrentAdjectivePriority})",
+                    Indent: 6);
+                weapon.Vomit(4, "AdjectivePriority, Unchanged", vomitCats, Indent: 6);
+            }
+            Debug.Entry(4, $"x if (AdjectivePriority != 0 && AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
+
             Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
-            return NounPriority;
+            return NaturalWeapon.Priority;
         }
 
         public virtual void ApplyPartAndPropChanges(GameObject Object, INaturalWeapon NaturalWeapon)
@@ -208,31 +247,40 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
-            Debug.Entry(4, "> foreach (string part in NaturalWeapon.GetAddedParts())", Indent: 5);
-            foreach (string part in NaturalWeapon.GetAddedParts())
+            if (NaturalWeapon.GetAddedParts() != null)
             {
-                Debug.LoopItem(4, "part", part, Indent: 6);
-                Object.RequirePart(part);
+                Debug.Entry(4, "> foreach (string part in NaturalWeapon.GetAddedParts())", Indent: 5);
+                foreach (string part in NaturalWeapon.GetAddedParts())
+                {
+                    Debug.LoopItem(4, "part", part, Indent: 6);
+                    Object.RequirePart(part);
+                }
+                Debug.Entry(4, $"x foreach (string part in NaturalWeapon.GetAddedParts()) >//", Indent: 5);
             }
-            Debug.Entry(4, $"x foreach (string part in NaturalWeapon.GetAddedParts()) >//", Indent: 5);
 
-            Debug.Entry(4, "> foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps())", Indent: 5);
-            foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps())
+            if (NaturalWeapon.GetAddedStringProps() != null)
             {
-                Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
-                Object.SetStringProperty(Name: entry.Key, Value: entry.Value, RemoveIfNull: true);
+                Debug.Entry(4, "> foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps())", Indent: 5);
+                foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps())
+                {
+                    Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
+                    Object.SetStringProperty(Name: entry.Key, Value: entry.Value, RemoveIfNull: true);
+                }
+                Debug.Entry(4, $"x foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps()) >//", Indent: 5);
             }
-            Debug.Entry(4, $"x foreach (KeyValuePair<string, string> entry in NaturalWeapon.GetAddedStringProps()) >//", Indent: 5);
 
-            Debug.Entry(4, "> foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps())", Indent: 5);
-            foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps())
+            if (NaturalWeapon.GetAddedIntProps() != null)
             {
-                Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
-                Object.SetIntProperty(Name: entry.Key, Value: entry.Value, RemoveIfZero: true);
+                Debug.Entry(4, "> foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps())", Indent: 5);
+                foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps())
+                {
+                    Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
+                    Object.SetIntProperty(Name: entry.Key, Value: entry.Value, RemoveIfZero: true);
+                }
+                Debug.Entry(4, $"x foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps()) >//", Indent: 5);
             }
-            Debug.Entry(4, $"x foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps()) >//", Indent: 5);
 
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
         }
 
         public override void ApplyModification(GameObject Object)

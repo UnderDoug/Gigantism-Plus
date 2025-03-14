@@ -22,9 +22,9 @@ namespace XRL.World.Parts
         {
             ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
+            ApplyPriorityChanges(Object, NaturalWeapon);
 
-            Object.SetIntProperty("ModGiganticNoShortDescription", 1);
+            ApplyPartAndPropChanges(Object, NaturalWeapon);
 
             base.ApplyModification(Object);
         }

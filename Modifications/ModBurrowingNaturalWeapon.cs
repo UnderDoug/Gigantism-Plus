@@ -30,14 +30,15 @@ namespace XRL.World.Parts
         {
             ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon, NaturalWeapon.GetNounPriority());
-
-            Object.RequirePart<DiggingTool>();
             Object.RequirePart<BurrowingClawsProperties>();
 
             BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
             burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
             burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
+
+            ApplyPriorityChanges(Object, NaturalWeapon);
+
+            ApplyPartAndPropChanges(Object, NaturalWeapon);
 
             base.ApplyModification(Object);
         }

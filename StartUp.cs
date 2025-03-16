@@ -5,6 +5,9 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
+using XRL.Core;
+using ConsoleLib.Console;
 
 namespace HNPS_GigantismPlus
 {
@@ -16,7 +19,7 @@ namespace HNPS_GigantismPlus
             GameObject GO = player;
             Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
 
-            GO.GigantifyInventory(Options.EnableGiganticStartingGear, Options.EnableGiganticStartingGear_Grenades);
+            GO.GigantifyInventory(EnableGiganticStartingGear, EnableGiganticStartingGear_Grenades);
 
             Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
         }
@@ -26,8 +29,8 @@ namespace HNPS_GigantismPlus
     {
         public static void AdjustGiganticModifier()
         {
-            bool ShouldDerarify = Options.SelectGiganticDerarification;
-            bool ShouldGiganticTinkerable = Options.SelectGiganticTinkering;
+            bool ShouldDerarify = SelectGiganticDerarification;
+            bool ShouldGiganticTinkerable = SelectGiganticTinkering;
             Debug.Entry(3, "@ GiganticModifierAdjustments.AdjustGiganticModifier()", Indent: 1);
 
             Debug.Entry(4, "? if (!ShouldDerarify && !ShouldGiganticTinkerable)", Indent: 2);
@@ -120,28 +123,138 @@ namespace HNPS_GigantismPlus
         }
     } //!--- public class GiganticModifierAdjustments
 
+    [HasModSensitiveStaticCache]
+    public static class GigantismPlusModBasedInitialiser
+    {
+        [ModSensitiveCacheInit]
+        public static void AdditionalSetup()
+        {
+            // Called at game startup and whenever mod configuration changes
+        }
+    }
+
+    [HasGameBasedStaticCache]
+    public static class GigantismPlusGameBasedInitialiser
+    {
+        [GameBasedCacheInit]
+        public static void AdditionalSetup()
+        {
+            Debug.Header(3, 
+                $"{nameof(GigantismPlusGameBasedInitialiser)}", 
+                $"{nameof(AdditionalSetup)}()");
+            
+            GiganticModifierAdjustments.AdjustGiganticModifier();
+
+            Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
+            Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
+            EnableManagedVanillaMutations = 
+                EnableManagedVanillaMutations != null 
+                ? EnableManagedVanillaMutations 
+                : EnableManagedVanillaMutationsCurrent;
+            Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
+            ManagedVanillaMutation();
+            
+            Debug.Footer(3, 
+                $"{nameof(GigantismPlusGameBasedInitialiser)}", 
+                $"{nameof(AdditionalSetup)}()");
+        }
+    }
+
     [PlayerMutator]
-    public class OnPlayerLoad : IPlayerMutator
+    public class GigantismPlusOnPlayerLoad : IPlayerMutator
     {
         public void mutate(GameObject player)
         {
-            Debug.Header(3, "OnPlayerLoad", $"mutate(GameObject player: {player.DebugName})");
+            Debug.Header(3, 
+                $"{nameof(GigantismPlusOnPlayerLoad)}", 
+                $"{nameof(mutate)}(GameObject player: {player.DebugName})");
+
+            Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
+            Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
+            if (The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla"))
+            {
+                Debug.Entry(4, 
+                    $"The.Game.HasStringGameState(\"Option_GigantismPlus_ManagedVanilla\")", 
+                    $"{The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla")}", 
+                    Indent: 2);
+                EnableManagedVanillaMutations = The.Game.GetStringGameState("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
+                Debug.Entry(4,
+                    $"EnableManagedVanillaMutations set to",
+                    $"{The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla")}",
+                    Indent: 2);
+            }
+            else
+            {
+                Debug.Entry(4,
+                    $"The.Game.HasStringGameState(\"Option_GigantismPlus_ManagedVanilla\")",
+                    $"{The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla")}",
+                    Indent: 2);
+                The.Game.SetStringGameState("Option_GigantismPlus_ManagedVanilla", (bool)EnableManagedVanillaMutations ? "Yes" : "No");
+                Debug.Entry(4,
+                    $"GameState \"Option_GigantismPlus_ManagedVanilla\" set to",
+                    $"{((bool)EnableManagedVanillaMutations ? "Yes" : "No")}",
+                    Indent: 2);
+            }
+            Debug.Entry(4, 
+                $"After  GameState \"Option_GigantismPlus_ManagedVanilla\"", 
+                $"{The.Game.GetStringGameState("Option_GigantismPlus_ManagedVanilla")}", 
+                Indent: 1);
+            Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
+
             ManagedVanillaMutation();
-            GiganticModifierAdjustments.AdjustGiganticModifier();
-            Debug.Footer(3, "OnPlayerLoad", $"mutate(GameObject player: {player.DebugName})");
+
+            Debug.Footer(3, 
+                $"{nameof(GigantismPlusOnPlayerLoad)}",
+                $"{nameof(mutate)}(GameObject player: {player.DebugName})");
         }
     } //!--- public class OnPlayerLoad : IPlayerMutator
 
     [HasCallAfterGameLoaded]
-    public class OnLoadGameHandler
+    public class GigantismPlusOnLoadGameHandler
     {
         [CallAfterGameLoaded]
         public static void OnLoadGameCallback()
         {
-            Debug.Header(3, "OnPlayerLoad", $"OnLoadGameCallback()");
+            Debug.Header(3,
+                $"{nameof(GigantismPlusOnLoadGameHandler)}",
+                $"{nameof(OnLoadGameCallback)}()");
+
+            Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
+            Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
+            if (The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla"))
+            {
+                Debug.Entry(4,
+                    $"The.Game.HasStringGameState(\"Option_GigantismPlus_ManagedVanilla\")",
+                    $"{The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla")}",
+                    Indent: 2);
+                EnableManagedVanillaMutations = The.Game.GetStringGameState("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
+                Debug.Entry(4,
+                    $"EnableManagedVanillaMutations set to",
+                    $"{The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla")}",
+                    Indent: 2);
+            }
+            else
+            {
+                Debug.Entry(4,
+                    $"The.Game.HasStringGameState(\"Option_GigantismPlus_ManagedVanilla\")",
+                    $"{The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla")}",
+                    Indent: 2);
+                The.Game.SetStringGameState("Option_GigantismPlus_ManagedVanilla", (bool)EnableManagedVanillaMutations ? "Yes" : "No");
+                Debug.Entry(4,
+                    $"GameState \"Option_GigantismPlus_ManagedVanilla\" set to",
+                    $"{((bool)EnableManagedVanillaMutations ? "Yes" : "No")}",
+                    Indent: 2);
+            }
+            Debug.Entry(4,
+                $"After  GameState \"Option_GigantismPlus_ManagedVanilla\"",
+                $"{The.Game.GetStringGameState("Option_GigantismPlus_ManagedVanilla")}",
+                Indent: 1);
+
             ManagedVanillaMutation();
-            GiganticModifierAdjustments.AdjustGiganticModifier();
-            Debug.Footer(3, "OnPlayerLoad", $"OnLoadGameCallback()");
+
+            Debug.Footer(3,
+                $"{nameof(GigantismPlusOnLoadGameHandler)}",
+                $"{nameof(OnLoadGameCallback)}()");
         }
     } //!--- public class OnLoadGameHandler
 }

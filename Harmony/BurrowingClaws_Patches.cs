@@ -16,7 +16,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(BurrowingClaws.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipment_Prefix(BurrowingClaws __instance, Body body)
         {
-            if (EnableManagedVanillaMutations) return true;
+            if ((bool)EnableManagedVanillaMutations) return true;
             GameObject actor = __instance.ParentObject;
             Zone InstanceObjectZone = actor.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
@@ -53,7 +53,7 @@ namespace HNPS_GigantismPlus.Harmony
                     managedBurrowingClaws.HasGigantism = actor.HasPart<GigantismPlus>();
                     managedBurrowingClaws.HasElongated = actor.HasPart<ElongatedPaws>();
                     managedBurrowingClaws.HasCrystallinity = actor.HasPartDescendedFrom<Crystallinity>();
-                    part.DefaultBehavior.ApplyModification(managedBurrowingClaws.GetNaturalWeaponMod(Managed: false), Actor: actor);
+                    part.DefaultBehavior.ApplyModification(managedBurrowingClaws.GetNaturalWeaponModName(Managed: false), Actor: actor);
 
                     Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }

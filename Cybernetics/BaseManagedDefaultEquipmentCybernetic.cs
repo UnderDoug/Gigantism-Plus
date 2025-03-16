@@ -1,38 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL.Language;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
-using System.Collections.Generic;
 
 namespace XRL.World.Parts
 {
-    public class BaseManagedDefaultEquipmentCybernetic : IScribedPart, IManagedDefaultNaturalWeapon
+    [Serializable]
+    public class BaseManagedDefaultEquipmentCybernetic : IPart, IManagedDefaultNaturalWeapon
     {
-        [NonSerialized]
-        private GameObject _User;
+        private GameObject _implantee = null;
         public GameObject Implantee
         {
             get
             {
-                return _User ??= ParentObject.Implantee;
+                return _implantee ??= ImplantObject?.Equipped;
             }
-            set
-            {
-                _User = value;
-            }
+            set => _implantee = value == null ? null : _implantee;
         }
 
-        public GameObject ImplantObject;
+        private GameObject _implantObject = null;
+        public GameObject ImplantObject
+        {
+            get
+            {
+                return _implantObject ??= ParentObject;
+            }
+            set => _implantObject = value == null ? null : _implantObject;
+        }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentCybernetic cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic;
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;
+            cybernetic.NaturalWeapon = null;
             return cybernetic;
         }
 
+        [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
             public override string GetColoredAdjective()
@@ -68,9 +75,14 @@ namespace XRL.World.Parts
             return NaturalWeapon;
         }
 
-        public virtual string GetNaturalWeaponMod(bool Managed = true)
+        public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+        }
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        {
+            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
         }
 
         public virtual bool CalculateNaturalWeaponLevel(int Level = 1)
@@ -213,5 +225,14 @@ namespace XRL.World.Parts
         {
         }
 
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+        }
+
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+        }
     }
 }

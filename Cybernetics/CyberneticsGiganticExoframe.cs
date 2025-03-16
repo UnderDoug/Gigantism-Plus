@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using XRL.World.Anatomy;
+using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Secrets;
 using static HNPS_GigantismPlus.Options;
-using System.Linq;
 
 namespace XRL.World.Parts
 {
@@ -29,7 +30,7 @@ namespace XRL.World.Parts
 
         public CyberneticsGiganticExoframe()
         {
-            NaturalWeapon = new INaturalWeapon()
+            NaturalWeapon = new()
             {
                 DamageDieCount = 1, // Default, equal to +0
                 DamageDieSize = 2,  // Default, equal to +0
@@ -65,8 +66,24 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
-            exoframe.Implantee = null;
-            exoframe.ImplantObject = null;
+            exoframe.NaturalWeapon = new()
+            {
+                DamageDieCount = 1,
+                DamageDieSize = 2,
+                ModPriority = -10,
+                Adjective = "augmented",
+                AdjectiveColor = "b",
+                Tile = "NaturalWeapons/GiganticManipulator.png",
+                ColorString = "&c",
+                DetailColor = "b",
+                SecondColorString = "&c",
+                SecondDetailColor = "b",
+                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
+                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked",
+                AddedParts = new(),
+                AddedStringProps = new(),
+                AddedIntProps = new()
+            };
             return exoframe;
         }
 
@@ -103,7 +120,7 @@ namespace XRL.World.Parts
                 {
                     Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<CyberneticsGiganticExoframe>(), Actor: Implantee);
 
                     Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }

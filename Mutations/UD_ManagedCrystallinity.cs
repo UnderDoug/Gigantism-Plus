@@ -8,8 +8,10 @@ using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
+    [Serializable]
     public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalWeapon
     {
+        [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
             public override string GetColoredAdjective()
@@ -22,7 +24,7 @@ namespace XRL.World.Parts.Mutation
         {
             Level = 1,
             DamageDieCount = 1,
-            DamageDieSize = 3,
+            DamageDieSize = 1,
             DamageBonus = -1, // this is to force the default "InorganicManipulator" to match the default fist.
             HitBonus = 0,
 
@@ -50,9 +52,14 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeapon;
         }
 
-        public virtual string GetNaturalWeaponMod(bool Managed = true)
+        public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+        }
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        {
+            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
         }
 
         public virtual bool CalculateNaturalWeaponLevel(int Level = 1)
@@ -157,12 +164,18 @@ namespace XRL.World.Parts.Mutation
 
         public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
         {
-            return NaturalWeapon.DamageDieSize;
+            if (HasGigantism && (HasElongated || HasBurrowing))
+                return 0;
+            return 1;
         }
 
         public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
         {
-            return NaturalWeapon.DamageBonus;
+            if (HasGigantism && (HasElongated || HasBurrowing))
+            {
+                return 1;
+            }
+            return 0;
         }
 
         public virtual int GetNaturalWeaponHitBonus(int Level = 1)
@@ -223,7 +236,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<UD_ManagedCrystallinity>(), Actor: ParentObject);
 
                     Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }

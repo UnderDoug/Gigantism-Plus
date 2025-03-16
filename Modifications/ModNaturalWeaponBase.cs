@@ -1,11 +1,10 @@
 ﻿using System;
-using XRL.World.Parts.Mutation;
+using SerializeField = UnityEngine.SerializeField;
+using System.Collections.Generic;
 using XRL.Language;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.IManagedDefaultNaturalWeapon;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace XRL.World.Parts
 {
@@ -41,24 +40,39 @@ namespace XRL.World.Parts
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            Wielder ??= who;
-            AssigningPart ??= Wielder.GetPart<T>();
-            NaturalWeapon ??= AssigningPart.GetNaturalWeapon();
-            Level = NaturalWeapon.GetLevel();
+            if (obj.Physics.Equipped != who) obj.Physics.Equipped = who;
             return base.BeingAppliedBy(obj, who);
         }
 
         private GameObject _wielder = null;
-        public GameObject Wielder { get => _wielder; set => _wielder = value; }
+        public GameObject Wielder => _wielder ??= ParentObject?.Equipped;
 
         private T _assigningPart = null;
-        public T AssigningPart { get => _assigningPart; set => _assigningPart = value; }
+        public T AssigningPart
+        {
+            get
+            {
+                return _assigningPart ??= Wielder?.GetNaturalWeaponCompatiblePart<T>();
+            }
+            set
+            {
+                Type valueType = value.GetType();
+                bool typeMatch = valueType.IsEquivalentTo(typeof(T));
+                if (typeMatch)
+                {
+                    _assigningPart = value;
+                    return;
+                }
+                _assigningPart = null;
+            }
+        }
 
+        [SerializeField]
         private int _level = 1;
-        public int Level { get => _level; set => _level = value; }
+        public int Level => _level = NaturalWeapon?.GetLevel() != null ? NaturalWeapon.GetLevel() : _level;
 
-        private INaturalWeapon _naturalWeapon;
-        public INaturalWeapon NaturalWeapon { get => _naturalWeapon; set => _naturalWeapon = value; }
+        private INaturalWeapon _naturalWeapon = null;
+        public INaturalWeapon NaturalWeapon => _naturalWeapon ??= AssigningPart.GetNaturalWeapon();
 
         public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
         public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
@@ -66,10 +80,14 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalWeaponBase<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase<T>;
-            modNaturalWeaponBase.AssigningPart = null;
-            modNaturalWeaponBase.Wielder = null;
-            modNaturalWeaponBase.NaturalWeapon = null;
-            return modNaturalWeaponBase;
+            return ClearForCopy(modNaturalWeaponBase);
+        }
+        public static ModNaturalWeaponBase<T> ClearForCopy(ModNaturalWeaponBase<T> ModNaturalWeaponBase)
+        {
+            ModNaturalWeaponBase._assigningPart = null;
+            ModNaturalWeaponBase._wielder = null;
+            ModNaturalWeaponBase._naturalWeapon = null;
+            return ModNaturalWeaponBase;
         }
 
         public virtual int GetDamageDieCount()
@@ -163,7 +181,7 @@ namespace XRL.World.Parts
             if (NounPriority != 0 && NounPriority < CurrentNounPriority )
             {
                 Debug.Entry(4, 
-                    $"+ NounPriority != 0 &&  NounPriority ({NounPriority}) < CurrentNounPriority ({CurrentNounPriority})", 
+                    $"+ NounPriority != 0 && NounPriority ({NounPriority}) < CurrentNounPriority ({CurrentNounPriority})", 
                     Indent: 6);
 
                 Object.SetIntProperty(CURRENT_NOUN_PRIORITY, NounPriority);
@@ -287,8 +305,8 @@ namespace XRL.World.Parts
         {
             Render render = Object.Render;
             if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
-
             Object.SetIntProperty("ShowAsPhysicalFeature", 1);
+            Object.SetIntProperty("UndesirableWeapon", 0);
             Object.SetStringProperty("TemporaryDefaultBehavior", AssigningPart.Name, false);
             Object.ModIntProperty("ModNaturalWeaponCount", 1);
             base.ApplyModification(Object);
@@ -316,5 +334,15 @@ namespace XRL.World.Parts
             return true;
         }
 
-    } //!-- public class ModNaturalWeaponBase : IMeleeModification
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+        }
+
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+        }
+
+    } //!-- public class ModNaturalWeaponBase : IMeleeModification where T : IPart, IManagedDefaultNaturalWeapon, new()
 }

@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using ConsoleLib.Console;
 using Kobold;
 using XRL;
@@ -336,11 +336,19 @@ namespace HNPS_GigantismPlus
                 $"@ {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0)",
                 Indent: Indent);
             Debug.Entry(4,
-                $"Entry: {Entry.Name} | Class: {Class}",
+                $"Entry.DisplayName: {Entry.DisplayName ?? "[Nameless]"} | Entry.Class: {Entry.Class} | Destination Class: {Class}",
                 Indent: Indent);
 
-            Entry.Class = Class;
-
+            if (Entry.Class != Class)
+            {
+                Debug.Entry(4, $"Classes don't match, swapping", Indent: Indent+1);
+                Entry.Class = Class;
+            }
+            else
+            {
+                Debug.Entry(4, $"Classes already match, no action necessary", Indent: Indent + 1);
+            }
+                
             Debug.Entry(4,
                 $"x {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0) @//",
                 Indent: Indent);
@@ -348,24 +356,28 @@ namespace HNPS_GigantismPlus
 
         public static void ManagedVanillaMutation()
         {
+            Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutation)}()", Indent: 1);
             List<(string, string, string)> MutationEntries = new List<(string Name, string Vanilla, string Managed)>
             {
                 ("Burrowing Claws", "BurrowingClaws", "UD_ManagedBurrowingClaws"),
                 ("Crystallinity", "Crystallinity", "UD_ManagedCrystallinity")
             };
-            foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries)
+            Debug.Entry(4, $"> foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries)", Indent: 1);
+            foreach ((string Name, string Vanilla, string Managed) in MutationEntries)
             {
-                Debug.LoopItem(4, $"entry.Name: {entry.Name}", Indent: 1);
-                MutationEntry vanillaMutation = MutationFactory.GetMutationEntryByName(entry.Name);
-                if (EnableManagedVanillaMutations)
+                Debug.LoopItem(4, $"Name: {Name} | Vanilla: {Vanilla} | Managed: {Managed}", Indent: 1);
+                MutationEntry vanillaMutation = MutationFactory.GetMutationEntryByName(Name);
+                if ((bool)EnableManagedVanillaMutations)
                 {
-                    SwapMutationEnrtyClass(vanillaMutation, entry.Managed, Indent: 2);
+                    SwapMutationEnrtyClass(vanillaMutation, Managed, Indent: 2);
                 }
                 else
                 {
-                    SwapMutationEnrtyClass(vanillaMutation, entry.Vanilla, Indent: 2);
+                    SwapMutationEnrtyClass(vanillaMutation, Vanilla, Indent: 2);
                 }
             }
+            Debug.Entry(4, $"x foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries) >//", Indent: 1);
+            Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutation)}() *//", Indent: 1);
         }
 
     } //!-- public static class Utils

@@ -17,7 +17,7 @@ namespace HNPS_GigantismPlus.Harmony
         static void ApplyTo_Postfix(GameObject Object)
         {
 
-            if (!EnableManagedVanillaMutations) return; // Skip if Crystallinity isn't being merged into the extended class.
+            if (!(bool)EnableManagedVanillaMutations) return; // Skip if Crystallinity isn't being merged into the extended class.
 
             if (Object.TryGetPart(out Crystallinity Crystallinity))
             {

@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using ConsoleLib.Console;
-using XRL.Wish;
+using XRL.Rules;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
+using XRL.Wish;
 using static HNPS_GigantismPlus.Utils;
-using System.Collections.Generic;
-using XRL.Rules;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -140,6 +141,7 @@ namespace XRL.World.ObjectBuilders
             int Tier = ExplodingDie(objectTier, gigantified.DieRoll, Step: 1, Limit: 8, Indent: 2);
             Gigantify(@object, Level, Tier, "gigantic".MaybeColor("gigantic"));
             The.PlayerCell.getClosestEmptyCell().AddObject(@object);
+            @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
         }
     }
 }

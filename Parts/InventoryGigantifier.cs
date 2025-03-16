@@ -1,5 +1,6 @@
 ﻿using System;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts
 {
@@ -21,7 +22,7 @@ namespace XRL.World.Parts
             Debug.Header(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)");
             Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
             
-            GO.GigantifyInventory(Options.EnableGiganticNPCGear, Options.EnableGiganticNPCGear_Grenades);
+            GO.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
             Debug.Footer(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)");
             
@@ -29,5 +30,5 @@ namespace XRL.World.Parts
             GO.RemovePart(this);
             return base.HandleEvent(E);
         }
-    } // public class InventoryGigantifier : IPart
+    } // public class InventoryGigantifier : IScribedPart
 }

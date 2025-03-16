@@ -14,6 +14,7 @@ namespace XRL.World.Parts.Mutation
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
         public int StrengthModifier => ParentObject.StatMod("Strength");
+        public int AgilityModifier => ParentObject.StatMod("Agility");
 
         public int ElongatedBonusDamage
         {
@@ -23,32 +24,6 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, $"Returning StrMod/2: {(int)Math.Floor(StrengthModifier / 2.0)}", Indent: 5);
                 Debug.Entry(4, $"x ElongatedPaws.ElongatedBonusDamage >//", Indent: 4);
                 return (int)Math.Floor(StrengthModifier / 2.0);
-            }
-        }
-
-        public int ElongatedDieSizeBonus
-        {
-            get
-            {
-                Debug.Entry(4, $"@ ElongatedPaws.ElongatedDieSizeBonus", Indent: 4);
-                int dieSize = 2;
-
-                bool HasGigantism = ParentObject.HasPart<GigantismPlus>();
-                bool HasBurrowing = ParentObject.HasPart<BurrowingClaws>();
-
-                Debug.Entry(4, $"HasGigantism: {(HasGigantism ? "yeah" : "nah")}", Indent: 5);
-                Debug.Entry(4, $"HasBurrowing: {(HasBurrowing ? "yeah" : "nah")}", Indent: 5);
-
-                Debug.Entry(4, $"dieSize: {dieSize}", Indent: 4);
-
-                dieSize += !HasGigantism ? 1 : 0;
-                Debug.Entry(4, $"!HasGigantism? dieSize: {dieSize}", Indent: 4);
-                dieSize += !HasBurrowing ? 1 : 0;
-                Debug.Entry(4, $"!HasBurrowing? dieSize: {dieSize}", Indent: 4);
-
-                Debug.Entry(4, $"Final dieSize: {dieSize}", Indent: 4);
-                Debug.Entry(4, $"x ElongatedPaws.ElongatedDieSizeBonus >//", Indent: 4);
-                return dieSize;
             }
         }
 
@@ -80,21 +55,69 @@ namespace XRL.World.Parts.Mutation
             };
         }
 
-        public override bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
+        private bool _HasGigantism = false;
+        public bool HasGigantism
         {
-            NaturalWeapon.DamageBonus = ElongatedDieSizeBonus;
-            return base.CalculateNaturalWeaponDamageDieSize(Level);
+            get
+            {
+                if (ParentObject != null)
+                    return ParentObject.HasPart<GigantismPlus>();
+                return _HasGigantism;
+            }
+            set
+            {
+                _HasGigantism = value;
+            }
         }
-        public override bool CalculateNaturalWeaponDamageBonus(int Level = 1)
+
+        private bool _HasBurrowing = false;
+        public bool HasBurrowing
         {
-            NaturalWeapon.DamageBonus = ElongatedBonusDamage;
-            return base.CalculateNaturalWeaponDamageBonus(Level);
+            get
+            {
+                if (ParentObject != null)
+                    return ParentObject.HasPartDescendedFrom<BurrowingClaws>();
+                return _HasBurrowing;
+            }
+            set
+            {
+                _HasBurrowing = value;
+            }
+        }
+
+        private bool _HasCrystallinity = false;
+        public bool HasCrystallinity
+        {
+            get
+            {
+                if (ParentObject != null)
+                    return ParentObject.HasPartDescendedFrom<Crystallinity>();
+                return _HasCrystallinity;
+            }
+            set
+            {
+                _HasCrystallinity = value;
+            }
+        }
+
+        public override int GetNaturalWeaponDamageDieSize(int Level = 1)
+        {
+            int dieSize = 0;
+            
+            if (!HasGigantism) dieSize++;
+            if (!HasBurrowing) dieSize++;
+
+            return dieSize;
+        }
+
+        public override int GetNaturalWeaponDamageBonus(int Level = 1)
+        {
+            return (int)Math.Floor(StrengthModifier / 2.0);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalWeapon = null;
             return elongatedPaws;
         }
 
@@ -131,7 +154,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(StatChangeEvent E)
         {
-            if (E.Name == "Strength")
+            if (E.Name == "Strength") // || E.Name == "Agility")
             {
                 Body body = E.Object.Body;
 
@@ -144,7 +167,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                     {
-                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), this);
+                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
                     }
                 }
 
@@ -155,15 +178,21 @@ namespace XRL.World.Parts.Mutation
         public override bool Mutate(GameObject GO, int Level)
         {
             GO.CheckAffectedEquipmentSlots();
+            
+            return base.Mutate(GO, Level);
+        }
+
+        public override void AfterMutate()
+        {
+            GameObject GO = ParentObject;
             foreach (GameObject equipped in GO.Body.GetEquippedObjects())
             {
                 if (equipped.TryGetPart(out WeaponElongator weaponElongator))
                 {
-                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>(), this);
+                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
                 }
             }
-
-            return base.Mutate(GO, Level);
+            base.AfterMutate();
         }
 
         public override bool Unmutate(GameObject GO)
@@ -214,7 +243,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<ElongatedPaws>(), Actor: ParentObject);
 
                     Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }

@@ -1,3 +1,5 @@
+using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
 using XRL.World.Parts;
 
@@ -5,7 +7,8 @@ namespace XRL.World
 {
     public interface IManagedDefaultNaturalWeapon
     {
-        public class INaturalWeapon : IScribedPart
+        [Serializable]
+        public abstract class INaturalWeapon : IScribedPart
         {
             public int Level { get; set; }
             public int DamageDieCount { get; set; }
@@ -129,7 +132,9 @@ namespace XRL.World
 
         public abstract INaturalWeapon GetNaturalWeapon();
 
-        public abstract string GetNaturalWeaponMod(bool Managed = true);
+        public abstract string GetNaturalWeaponModName(bool Managed = true);
+        public abstract ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalWeapon, new();
         public abstract bool CalculateNaturalWeaponLevel(int Level = 1);
 
         public virtual string GetNaturalWeaponColoredAdjective()

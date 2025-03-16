@@ -4,17 +4,22 @@ using System.Collections.Generic;
 using XRL;
 using XRL.UI;
 using XRL.Core;
+using XRL.Wish;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Parts;
+using XRL.World.Anatomy;
+using XRL.World.Capabilities;
+using XRL.World.Parts.Mutation;
 using XRL.Liquids;
 using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public static class Secrets
     {
-        private static string[] BecomingStrings = new string[4]
+        private static List<string> BecomingStrings = new()
         {
             "THE FINAL KING OF QUD",
             "A SHINING GOLDEN GOD",
@@ -22,7 +27,7 @@ namespace HNPS_GigantismPlus
             "REALLY REALLY YELLOW"
         };
 
-        private static string[] GoldExoframeNames = new string[4]
+        private static List<string> GoldExoframeNames = new()
         {
             "EMPORER'S THRONE",
             "SHINY METAL ASS",
@@ -38,14 +43,12 @@ namespace HNPS_GigantismPlus
                 if (User == The.Player && hadFrameCount == 0)
                 {
                     User.SetIntProperty(SecretExoframePart.HadFrameCountProperty, 3);
-                    int modRnd = BecomingStrings.Length;
-                    int index = RndGP.Next() % modRnd;
                     Popup.Show("...");
                     Popup.Show("You... You've done it...");
                     Popup.Show("...You've {{W|really}} done it...");
                     Popup.Show("At last, you have {{c|become}}...");
                     string finalMessage = "{{SECRETGOLDEN|";
-                    finalMessage += BecomingStrings[index];
+                    finalMessage += BecomingStrings.GetRandomElement(RndGP);
                     finalMessage += "}}";
                     Popup.Show(finalMessage);
                 }
@@ -54,11 +57,8 @@ namespace HNPS_GigantismPlus
                 {
                     hadFrameCount = User.GetIntProperty(SecretExoframePart.HadFrameCountProperty);
                     secretExoframePart.HadFrameCount = hadFrameCount;
-
-                    int modRnd = GoldExoframeNames.Length;
-                    int index = RndGP.Next() % modRnd;
-                    secretExoframePart.exoframeObject = ImplantObject;
-                    secretExoframePart.exoframeObject.DisplayName = "{{SECRETGOLDEN|" + GoldExoframeNames[index] + "}}";
+                    secretExoframePart.ExoframeObject = ImplantObject;
+                    secretExoframePart.ExoframeObject.DisplayName = "{{SECRETGOLDEN|" + GoldExoframeNames.GetRandomElement(RndGP) + "}}";
 
                     secretExoframePart.OldBleedLiquid = User.GetStringProperty("BleedLiquid");
                     secretExoframePart.OldBleedPrefix = User.GetStringProperty("BleedPrefix");
@@ -97,7 +97,7 @@ namespace HNPS_GigantismPlus
                     int hadFrameCount = secretExoframePart.HadFrameCount - 1;
                     User.SetIntProperty(SecretExoframePart.HadFrameCountProperty, hadFrameCount, RemoveIfZero: true);
 
-                    exoframeDisplayName = secretExoframePart.exoframeObject.ShortDisplayName;
+                    exoframeDisplayName = secretExoframePart.ExoframeObject.ShortDisplayName;
                 }
                 User.RequirePart<SecretExoframePart>();
                 User.RemovePart<SecretExoframePart>();
@@ -122,7 +122,7 @@ namespace HNPS_GigantismPlus
         [Serializable]
         public class SecretExoframePart : IPart
         {
-            public GameObject exoframeObject = null;
+            public GameObject ExoframeObject = null;
             public static string HadFrameCountProperty = "HADTHEGIGANTICEXOFRAME";
             public int HadFrameCount = 0;
 
@@ -155,6 +155,25 @@ namespace HNPS_GigantismPlus
                     E.ApplyColors("&O", "W", ICON_COLOR_PRIORITY, ICON_COLOR_PRIORITY);
                 }
                 return base.Render(E);
+            }
+
+            public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+            {
+                SecretExoframePart secretExoframePart = base.DeepCopy(Parent, MapInv) as SecretExoframePart;
+                secretExoframePart.ExoframeObject = null;
+                return secretExoframePart;
+            }
+
+            public override void Write(GameObject Basis, SerializationWriter Writer)
+            {
+                base.Write(Basis, Writer);
+                Writer.WriteGameObject(ExoframeObject);
+            }
+
+            public override void Read(GameObject Basis, SerializationReader Reader)
+            {
+                base.Read(Basis, Reader);
+                ExoframeObject = Reader.ReadGameObject();
             }
         }
     }
@@ -325,6 +344,113 @@ namespace HNPS_GigantismPlus
             if (Liquid.IsOpenVolume() && GO.IsAlive)
             {
                 GO.Heal(15, Message: false, FloatText: true, RandomMinimum: true);
+            }
+        }
+    }
+
+    [HasWishCommand]
+    public class SecretGiganticExoframeWishHandler
+    {
+        [WishCommand(Command = "I AM BECOME")]
+        public static void Become()
+        {
+            Become("");
+        }
+
+        [WishCommand(Command = "I AM BECOME")]
+        public static void Become(string Degree)
+        {
+            List<string> degrees = new() { "SHINY", "SHINIER", "SHINIEST" };
+            Degree = Degree.ToUpper();
+            if (Degree != "" && !degrees.Contains(Degree))
+            {
+                Popup.Show(
+                    $"ARISTOCRAT".Color("GOLDENSECRET") + ", " +
+                    $"THOU MOST CERTAINLY ARE NOT BECOME ".Color("SECRETGOLDEN") + 
+                    $"{Degree}".Color("R"));
+                return;
+            }
+
+            BodyPart body = The.Player?.Body?.GetBody();
+            GameObject cybernetics = body.Cybernetics;
+            if (cybernetics == null) goto DoImplant;
+            if (cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
+            {
+                if (exoframe.Model == "YES")
+                {
+                    Popup.Show($"DOTH THINE {cybernetics.ShortDisplayName} NOT SUFFICE?");
+                    goto CalcDegrees;
+                }
+                body.Unimplant();
+            }
+
+            DoImplant:
+            GameObject secretGiganticExoframe = GameObjectFactory.create("THEGIGANTICEXOFRAME");
+            body.Implant(secretGiganticExoframe);
+
+            CalcDegrees:
+            int xpToAward = 0;
+            List<string> skillsToLearn = new()
+            {
+                "Acrobatics",
+                "Acrobatics_Jump",
+                "Cudgel",
+                "Cudgel_Expertise",
+                "Endurance",
+                "Endurance_ShakeItOff"
+            };
+            List<string> shinySkills = new()
+            {
+                "Acrobatics_SwiftReflexes",
+                "Cudgel_Bludgeon",
+                "Cudgel_Slam",
+                "SingleWeaponFighting",
+                "SingleWeaponFighting_OpportuneAttacks"
+            };
+            List<string> shinierSkills = new()
+            {
+                "Acrobatics_Dodge",
+                "Endurance_Weathered",
+                "Tactics",
+                "Tactics_Charge",
+                "Cudgel_ChargingStrike",
+                "Cudgel_Backswing",
+                "SingleWeaponFighting_WeaponExpertise"
+            };
+            List<string> shiniestSkills = new()
+            {
+                "Endurance_Calloused",
+                "Tactics_Juke",
+                "Cudgel_Conk",
+                "Cudgel_SmashUp",
+                "SingleWeaponFighting_PenetratingStrikes",
+                "SingleWeaponFighting_WeaponMastery"
+            };
+            SortedDictionary<int, (string, int, List<string>)> Shininesses = new()
+            {
+                { 1, ("SHINY",     15100, shinySkills) },
+                { 2, ("SHINIER",  219375, shinierSkills) },
+                { 3, ("SHINIEST", 725625, shiniestSkills) }
+            };
+            
+            if (!degrees.Contains(Degree)) goto DoDegrees;
+            foreach ((int Key, (string Shininess, int XpToAward, List<string> Skills)) in Shininesses)
+            {
+                xpToAward += XpToAward;
+                List<string> skillsList = new(skillsToLearn.Count + Skills.Count);
+                skillsList.AddRange(skillsToLearn);
+                skillsList.AddRange(Skills);
+                skillsToLearn = skillsList;
+                if (Degree == Shininess) goto DoDegrees;
+            }
+
+            DoDegrees:
+            Popup.Suppress = true;
+            The.Player.AwardXP(xpToAward);
+            Popup.Suppress = false;
+            foreach (string skill in skillsToLearn)
+            {
+                The.Player.AddSkill(skill);
             }
         }
     }

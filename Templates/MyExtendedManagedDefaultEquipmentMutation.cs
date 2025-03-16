@@ -8,9 +8,11 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
+    [Serializable]
     public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
     {
         // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the INaturalWeapon Part
+        [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
 
@@ -50,9 +52,14 @@ namespace XRL.World.Parts.Mutation
         }
 
         // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
-        public virtual string GetNaturalWeaponMod(bool Managed = true)
+        public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+        }
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        {
+            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
         }
 
         // Optional: allows you to easily check the presence of another mutation if you wanted to adjust any calculations on that basis
@@ -188,7 +195,7 @@ namespace XRL.World.Parts.Mutation
                     // This is the important part, and is how the modification gets applied.
                     // the process will fail if there's no default behavior (Hand parts always have them), so you may want to 
                     // do a (part.DefaultBehavior != null) check first and add a default behavior to Modify.
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponModName(), Actor: ParentObject);
                 }
             }
         }

@@ -1,12 +1,16 @@
-﻿using XRL.Language;
+﻿using System;
+using System.Collections.Generic;
+using XRL.Language;
+using XRL.World;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
-using System.Collections.Generic;
 
 namespace XRL.World.Parts.Mutation
 {
+    [Serializable]
     public class BaseManagedDefaultEquipmentMutation : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
     {
+        [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
             public override string GetColoredAdjective()
@@ -37,9 +41,14 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeapon;
         }
 
-        public virtual string GetNaturalWeaponMod(bool Managed = true)
+        public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+        }
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        {
+            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
         }
 
         public virtual bool CalculateNaturalWeaponLevel(int Level = 1)
@@ -135,6 +144,28 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeapon.EquipmentFrameColors;
         }
 
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            BaseManagedDefaultEquipmentMutation mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation;
+            mutation.NaturalWeapon = new()
+            {
+                Level = 1,
+                DamageDieCount = 1,
+                DamageDieSize = 2,
+                DamageBonus = 0,
+                HitBonus = 0,
+
+                ModPriority = 0,
+                AdjectiveColor = "y",
+                AdjectiveColorFallback = "Y",
+                ColorString = "&K",
+                DetailColor = "y",
+                SecondColorString = "&y",
+                SecondDetailColor = "Y"
+            };
+            return mutation;
+        }
+
         public override bool ChangeLevel(int NewLevel)
         {
             CalculateNaturalWeaponLevel(NewLevel);
@@ -145,5 +176,14 @@ namespace XRL.World.Parts.Mutation
             return base.ChangeLevel(NewLevel);
         }
 
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+        }
+
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+        }
     }
 }

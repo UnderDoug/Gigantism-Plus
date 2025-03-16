@@ -34,29 +34,23 @@ namespace HNPS_GigantismPlus
 
         public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
         {
-            Debug.Entry(4, $"@ AdjustDieCount(this DieRoll DieRoll: {DieRoll.ToString()}, int Amount: {Amount})", Indent: 6);
             if (DieRoll == null)
             {
-                Debug.Entry(4, "AdjustDieCount", "DieRoll null", Indent: 7);
                 return null;
             }
             int type = DieRoll.Type;
             if (DieRoll.LeftValue > 0)
             {
-                Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue > 0", Indent: 7);
                 DieRoll.LeftValue += Amount;
-                Debug.Entry(4, "DieRoll.LeftValue", $"{DieRoll.LeftValue}", Indent: 8);
-                Debug.Entry(4, "Collapse ^^<<", Indent: 8);
                 return DieRoll;
             }
             else
             {
-                Debug.Entry(4, "AdjustDieCount", "DieRoll.LeftValue == 0", Indent: 7);
-                Debug.Entry(4, "AdjustDieCount", "Recursing >>VV", Indent: 7);
                 if (DieRoll.RightValue > 0) return new(type, DieRoll.Left.AdjustDieCount(Amount), DieRoll.RightValue);
                 return new(type, DieRoll.Left.AdjustDieCount(Amount), DieRoll.Right);
             }
-        }
+        } //!-- public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
+       
         public static string AdjustDieCount(this string DieRoll, int Amount)
         {
             DieRoll dieRoll = new(DieRoll);
@@ -65,6 +59,16 @@ namespace HNPS_GigantismPlus
         public static bool AdjustDieCount(this MeleeWeapon MeleeWeapon, int Amount)
         {
             MeleeWeapon.BaseDamage = MeleeWeapon.BaseDamage.AdjustDieCount(Amount);
+            return true;
+        }
+        public static bool AdjustDieCount(this ThrownWeapon ThrownWeapon, int Amount)
+        {
+            ThrownWeapon.Damage = ThrownWeapon.Damage.AdjustDieCount(Amount);
+            return true;
+        }
+        public static bool AdjustDieCount(this Projectile Projectile, int Amount)
+        {
+            Projectile.BaseDamage = Projectile.BaseDamage.AdjustDieCount(Amount);
             return true;
         }
 
@@ -81,12 +85,14 @@ namespace HNPS_GigantismPlus
         {
             return Int >= 0 ? "bonus" : "penalty";
         }
-
         public static string BonusOrPenalty(this string SignedInt)
         {
             if (int.TryParse(SignedInt, out int Int))
                 return Int >= 0 ? "bonus" : "penalty";
-            throw new ArgumentException($"int.TryParse(SignedInt) failed to parse \"{SignedInt}\". SignedInt must be capable of conversion to int.");
+            throw new ArgumentException(
+                $"{nameof(BonusOrPenalty)}(this string SignedInt): " +
+                $"int.TryParse(SignedInt) failed to parse \"{SignedInt}\". " +
+                $"SignedInt must be capable of conversion to int.");
         }
 
         public static StringBuilder AppendGigantic(this StringBuilder sb, string value)
@@ -503,6 +509,64 @@ namespace HNPS_GigantismPlus
             part.ParentObject = Object;
             gamePartBlueprint.InitializePartInstance(part);
             return Object.AddPart(part, DoRegistration: DoRegistration, Creation: Creation);
+        }
+
+        public static IPart ConvertToPart(this string Part)
+        {
+            GamePartBlueprint gamePartBlueprint = new(Part);
+            IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
+            return part;
+        }
+
+        public static IModification ConvertToModification(this string ModPartName)
+        {
+            IModification ModPart;
+            Type type = ModManager.ResolveType("XRL.World.Parts." + ModPartName);
+            if (type == null)
+            {
+                MetricsManager.LogError("ConvertToModification", "Couldn't resolve unknown mod part: " + ModPartName);
+                return null;
+            }
+            ModPart = Activator.CreateInstance(type) as IModification;
+            if (ModPart == null)
+            {
+                if (!(Activator.CreateInstance(type) is IPart))
+                {
+                    MetricsManager.LogError("failed to load " + type);
+                }
+                else
+                {
+                    MetricsManager.LogError(type?.ToString() + " is not an IModification");
+                }
+                return null;
+            }
+            return ModPart;
+        }
+
+        public static ModNaturalWeaponBase<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        {
+            IModification ModPart = ModPartName.ConvertToModification();
+            return (ModNaturalWeaponBase<T>)ModPart;
+        }
+
+        public static T GetNaturalWeaponCompatiblePart<T>(this GameObject Object) where T : IPart, IManagedDefaultNaturalWeapon
+        {
+            T part = Object?.GetPart<T>();
+            if (part != null) return part;
+            List<GameObject> Cybernetics = Object?.Body?.GetInstalledCybernetics();
+            if (Cybernetics == null) return null;
+            foreach (GameObject cybernetic in Cybernetics)
+            {
+                part = cybernetic.GetPart<T>();
+                if (part != null) return part;
+            }
+            return null;
+        }
+
+        public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalWeaponBase<T> ModPart, GameObject Actor) where T : IPart, IManagedDefaultNaturalWeapon, new()
+        {
+            return obj.ApplyModification(ModPart, Actor: Actor);
         }
     }
 }

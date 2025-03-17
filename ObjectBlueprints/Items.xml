@@ -576,10 +576,18 @@ You cannot wear equipment on your body."
   </object>
 
   <!-- End Gigantic Modable Changes -->
-  <!-- Start Weapon Elongating-->
+  <!-- Start Weapon Elongating -->
   <object Name="MeleeWeapon" Load="Merge">
     <part Name="WeaponElongator" />
   </object>
-  <!-- End Weapon Elongating-->
+  <!-- End Weapon Elongating -->
+
+  <!-- Start Testing -->
+  <object Name="Gigantism Giver Axe" Inherits="Battle Axe8">
+    <part Name="Render" DisplayName="{{zetachrome|zetachrome}} {{gigantic|gigantism}} giving battle axe" Tile="Items/sw_axe_7.bmp" ColorString="&amp;Z" DetailColor="y" />
+    <part Name="ModImprovedGigantismPlus" Tier="16" />
+    <tag Name="GiganticEquippable" />
+  </object>
+  <!-- End Testing -->
   
 </objects>

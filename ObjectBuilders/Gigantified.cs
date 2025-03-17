@@ -131,17 +131,31 @@ namespace XRL.World.ObjectBuilders
         public static void Wish(string Blueprint)
         {
             WishResult wishResult = WishSearcher.SearchForBlueprint(Blueprint);
-            GameObject @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
+            GameObject @object;
+            if (GameObjectFactory.Factory.Blueprints.TryGetValue(wishResult.Result, out GameObjectBlueprint blueprint))
+            {
+                GamePartBlueprint gigantifiedPartBlueprint = new("XRL.World.ObjectBuilders", nameof(Gigantified))
+                {
+                    Name = nameof(Gigantified),
+                    ChanceOneIn = 1
+                };
+                blueprint.Builders[gigantifiedPartBlueprint.Name] = gigantifiedPartBlueprint;
+                @object = GameObjectFactory.Factory.CreateObject(blueprint, 0, 0, null, null, null, "Wish");
+            }
+            else
+            {
+                @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
+                Gigantified gigantified = new();
+                gigantified.Initialize();
 
-            Gigantified gigantified = new();
-            gigantified.Initialize();
+                int Level = ExplodingDie(1, "1d2", Step: 1, Limit: 16, Indent: 2);
+                int objectTier = (int)Math.Floor(@object.GetBlueprint().Stat("Level") / 5.0);
+                int Tier = ExplodingDie(objectTier, gigantified.DieRoll, Step: 1, Limit: 8, Indent: 2);
+                Gigantify(@object, Level, Tier, "gigantic".MaybeColor("gigantic"));
+                @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
+            }
 
-            int Level = ExplodingDie(1, "1d2", Step: 1, Limit: 16, Indent: 2);
-            int objectTier = (int)Math.Floor(@object.GetBlueprint().Stat("Level") / 5.0);
-            int Tier = ExplodingDie(objectTier, gigantified.DieRoll, Step: 1, Limit: 8, Indent: 2);
-            Gigantify(@object, Level, Tier, "gigantic".MaybeColor("gigantic"));
             The.PlayerCell.getClosestEmptyCell().AddObject(@object);
-            @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
         }
     }
 }

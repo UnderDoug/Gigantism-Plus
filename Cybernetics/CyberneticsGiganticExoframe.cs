@@ -63,29 +63,6 @@ namespace XRL.World.Parts
             output += NaturalWeapon.GetAdjective().OptionalColor(NaturalWeapon.GetAdjectiveColor(), NaturalWeapon.GetAdjectiveColorFallback(), Colorfulness);
             return output.Color("Y");
         }
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
-            exoframe.NaturalWeapon = new()
-            {
-                DamageDieCount = 1,
-                DamageDieSize = 2,
-                ModPriority = -10,
-                Adjective = "augmented",
-                AdjectiveColor = "b",
-                Tile = "NaturalWeapons/GiganticManipulator.png",
-                ColorString = "&c",
-                DetailColor = "b",
-                SecondColorString = "&c",
-                SecondDetailColor = "b",
-                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked",
-                AddedParts = new(),
-                AddedStringProps = new(),
-                AddedIntProps = new()
-            };
-            return exoframe;
-        }
 
         public override void OnDecorateDefaultEquipment(Body body)
         {
@@ -211,6 +188,12 @@ namespace XRL.World.Parts
             }
 
             return base.FireEvent(E);
+        }
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
+            exoframe.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            return exoframe;
         }
     }
 }

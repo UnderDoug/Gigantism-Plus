@@ -15,7 +15,40 @@ namespace XRL.World.Parts.Mutation
         [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
+            public INaturalWeapon()
+            {
+            }
+            public INaturalWeapon(INaturalWeapon NaturalWeapon)
+            {
+                Level = NaturalWeapon.Level;
+                DamageDieCount = NaturalWeapon.DamageDieCount;
+                DamageDieSize = NaturalWeapon.DamageDieSize;
+                DamageBonus = NaturalWeapon.DamageBonus;
+                HitBonus = NaturalWeapon.HitBonus;
 
+                ModPriority = NaturalWeapon.ModPriority;
+
+                Adjective = NaturalWeapon.Adjective;
+                AdjectiveColor = NaturalWeapon.AdjectiveColor;
+                AdjectiveColorFallback = NaturalWeapon.AdjectiveColorFallback;
+                Noun = NaturalWeapon.Noun;
+
+                Skill = NaturalWeapon.Skill;
+                Stat = NaturalWeapon.Stat;
+                Tile = NaturalWeapon.Tile;
+                ColorString = NaturalWeapon.ColorString;
+                DetailColor = NaturalWeapon.DetailColor;
+                SecondColorString = NaturalWeapon.SecondColorString;
+                SecondDetailColor = NaturalWeapon.SecondDetailColor;
+                SwingSound = NaturalWeapon.SwingSound;
+                BlockedSound = NaturalWeapon.BlockedSound;
+
+                AddedParts = NaturalWeapon.AddedParts;
+                AddedStringProps = NaturalWeapon.AddedStringProps;
+                AddedIntProps = NaturalWeapon.AddedIntProps;
+
+                EquipmentFrameColors = NaturalWeapon.EquipmentFrameColors;
+            }
         }
 
         public INaturalWeapon NaturalWeapon = new()
@@ -205,7 +238,7 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             MyExtendedManagedDefaultEquipmentMutation myMutation = base.DeepCopy(Parent, MapInv) as MyExtendedManagedDefaultEquipmentMutation;
-            myMutation.NaturalWeapon = null;
+            myMutation.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
             return myMutation;
         }
     }

@@ -13,6 +13,40 @@ namespace XRL.World.Parts.Mutation
         [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
+            public INaturalWeapon()
+            {
+            }
+            public INaturalWeapon(INaturalWeapon NaturalWeapon)
+            {
+                Level = NaturalWeapon.Level;
+                DamageDieCount = NaturalWeapon.DamageDieCount;
+                DamageDieSize = NaturalWeapon.DamageDieSize;
+                DamageBonus = NaturalWeapon.DamageBonus;
+                HitBonus = NaturalWeapon.HitBonus;
+
+                ModPriority = NaturalWeapon.ModPriority;
+
+                Adjective = NaturalWeapon.Adjective;
+                AdjectiveColor = NaturalWeapon.AdjectiveColor;
+                AdjectiveColorFallback = NaturalWeapon.AdjectiveColorFallback;
+                Noun = NaturalWeapon.Noun;
+
+                Skill = NaturalWeapon.Skill;
+                Stat = NaturalWeapon.Stat;
+                Tile = NaturalWeapon.Tile;
+                ColorString = NaturalWeapon.ColorString;
+                DetailColor = NaturalWeapon.DetailColor;
+                SecondColorString = NaturalWeapon.SecondColorString;
+                SecondDetailColor = NaturalWeapon.SecondDetailColor;
+                SwingSound = NaturalWeapon.SwingSound;
+                BlockedSound = NaturalWeapon.BlockedSound;
+
+                AddedParts = NaturalWeapon.AddedParts;
+                AddedStringProps = NaturalWeapon.AddedStringProps;
+                AddedIntProps = NaturalWeapon.AddedIntProps;
+
+                EquipmentFrameColors = NaturalWeapon.EquipmentFrameColors;
+            }
             public override string GetColoredAdjective()
             {
                 return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
@@ -147,22 +181,7 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentMutation mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation;
-            mutation.NaturalWeapon = new()
-            {
-                Level = 1,
-                DamageDieCount = 1,
-                DamageDieSize = 2,
-                DamageBonus = 0,
-                HitBonus = 0,
-
-                ModPriority = 0,
-                AdjectiveColor = "y",
-                AdjectiveColorFallback = "Y",
-                ColorString = "&K",
-                DetailColor = "y",
-                SecondColorString = "&y",
-                SecondDetailColor = "Y"
-            };
+            mutation.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
             return mutation;
         }
 

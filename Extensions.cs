@@ -287,32 +287,29 @@ namespace HNPS_GigantismPlus
 
         public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
         {
-            string creatureDebugName = Creature.DebugName;
             string creatureBlueprint = Creature.Blueprint;
 
-
-            bool creatureIsMerchant = Creature.IsMerchant();
-            int merchantChance = 1;
-            int merchantGrenadeOdds = 2;
-            int merchantTradeGoodsOdds = 4;
-            int merchantTonicsOdds = 4;
-            int merchantRareTonicsOdds = 10;
+            bool creatureIsMerchant = Creature.HasPart<GenericInventoryRestocker>();
+            (DieRoll die, int high) merchantBaseChance = (new("1d5"), 4);
+            (DieRoll die, int high) merchantGrenades = (new("1d2"), 2);
+            (DieRoll die, int high) merchantTradeGoods = (new("1d4"), 4);
+            (DieRoll die, int high) merchantTonics = (new("1d4"), 4);
+            (DieRoll die, int high) merchantRareTonics = (new("1d10"), 10);
 
             if (!Option) goto Exit; // skip if Option disabled
             if (!Creature.IsCreature) goto Exit; // skip non-creatures
-            if (!Creature.HasPart<GigantismPlus>())goto Exit; // skip non-gigantic creatures
-            if (Creature.Inventory == null) goto Exit; // skip objects without inventory
-            if (Creature.GetIntProperty("InventoryGigantified") > 0) goto Exit; // skip if inventory has already been gigantified.
+            if (Creature.Inventory == null) goto Exit; // skip objects without inventoryalready been gigantified.
 
             Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption})", Indent: 1);
             Debug.Divider(3, Indent: 1);
 
             Debug.Entry(3, "Making inventory items gigantic for creature", creatureBlueprint, Indent: 1);
+            Debug.Entry(3, $"Creature is merchant", creatureIsMerchant ? "Yeh" : "Nah", Indent: 1);
 
             // Create a copy of the items list to avoid modifying during enumeration
-            List<GameObject> itemsToProcess = new(Creature.Inventory.Objects);
+            List<GameObject> itemsToProcess = new(Creature.GetInventoryAndEquipment());
 
-            Debug.Entry(3, "> foreach (var item in itemsToProcess)", Indent: 1);
+            Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)", Indent: 1);
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             foreach (GameObject item in itemsToProcess)
             {
@@ -340,14 +337,21 @@ namespace HNPS_GigantismPlus
                     {
                         if (!GrenadeOption || creatureIsMerchant)
                         {
-                            if (!GrenadeOption) Debug.LoopItem(4, "grenade (excluded)", "NoThanks++; x/", Indent: 3);
-                            if (creatureIsMerchant) Debug.LoopItem(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 3);
-                            NoThanks++;
+                            if (!GrenadeOption)
+                            { 
+                                Debug.LoopItem(4, "grenade (excluded)", "NoThanks++; x/", Indent: 3); 
+                                NoThanks++; 
+                            }
+                            if (creatureIsMerchant) 
+                            { 
+                                Debug.LoopItem(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 3); 
+                                NoThanks++; 
+                            }
 
-                            if (creatureIsMerchant && merchantChance.ChanceIn(merchantGrenadeOdds))
+                            if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high)
                             {
                                 Debug.LoopItem(4,
-                                    $"but! MerchanctChance {merchantChance} in {merchantGrenadeOdds}",
+                                    $"but! merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
                                     $"NoThanks--;",
                                     Indent: 4);
                                 NoThanks--;
@@ -365,10 +369,10 @@ namespace HNPS_GigantismPlus
                         Debug.LoopItem(4, "TradeGoods", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
 
-                        if (creatureIsMerchant && merchantChance.ChanceIn(merchantTradeGoodsOdds))
+                        if (creatureIsMerchant && merchantTradeGoods.die.Resolve() >= merchantTradeGoods.high)
                         {
                             Debug.LoopItem(4,
-                                $"but! MerchanctChance {merchantChance} in {merchantTradeGoodsOdds}",
+                                $"but! merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
                                 $"NoThanks--;",
                                 Indent: 4);
                             NoThanks--;
@@ -385,10 +389,10 @@ namespace HNPS_GigantismPlus
                         Debug.Entry(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
 
-                        if (creatureIsMerchant && merchantChance.ChanceIn(merchantTonicsOdds))
+                        if (creatureIsMerchant && merchantTonics.die.Resolve() >= merchantTonics.high)
                         {
                             Debug.LoopItem(4,
-                                $"but! MerchanctChance {merchantChance} in {merchantTonicsOdds}",
+                                $"but! merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
                                 $"NoThanks--;",
                                 Indent: 4);
                             NoThanks--;
@@ -405,10 +409,10 @@ namespace HNPS_GigantismPlus
                         Debug.Entry(4, "Rare Tonic", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
 
-                        if (creatureIsMerchant && merchantChance.ChanceIn(merchantRareTonicsOdds))
+                        if (creatureIsMerchant && merchantRareTonics.die.Resolve() >= merchantRareTonics.high)
                         {
                             Debug.LoopItem(4,
-                                $"but! MerchanctChance {merchantChance} in {merchantRareTonicsOdds}",
+                                $"but! merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
                                 $"NoThanks--;",
                                 Indent: 4);
                             NoThanks--;
@@ -419,13 +423,36 @@ namespace HNPS_GigantismPlus
                         Debug.LoopItem(4, "not Rare Tonics", Indent: 3);
                     }
 
-                    Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
+                    // Is the item held by a merchant, and did their roll fail?
+                    if (creatureIsMerchant && merchantBaseChance.die.Resolve() < merchantBaseChance.high)
+                    {
+                        Debug.Entry(4, 
+                            $"merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}", 
+                            "NoThanks++; x/",
+                            Indent: 3);
+                        NoThanks++;
+                    }
+                    else if (creatureIsMerchant)
+                    {
+                        Debug.LoopItem(4, 
+                            $"merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}", 
+                            Indent: 3);
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4,
+                            $"creatureIsMerchant: False",
+                            Indent: 3);
+                    }
+
+                        Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
                     if (NoThanks > 0) goto Skip;
 
                     Debug.Entry(3, $"Gigantifying {ItemName}", Indent: 2);
-                    ItemModding.ApplyModification(item, "ModGigantic");
+                    item.ApplyModification("ModGigantic");
                     if (!item.HasPart<ModGigantic>()) Debug.Entry(3, ItemName, "<!!> Gigantification Failed", Indent: 2);
                     else Debug.Entry(3, ItemName, "has been Gigantified", Indent: 2);
+
                     Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
                     continue;
                 }
@@ -446,7 +473,7 @@ namespace HNPS_GigantismPlus
             Creature.WantToReequip();
 
             Debug.Divider(3, Indent: 1);
-            Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) ]//", Indent: 1);
+            Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", Indent: 1);
             
             Exit:
             return;

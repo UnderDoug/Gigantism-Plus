@@ -16,17 +16,6 @@ namespace XRL.World.Parts.Mutation
         public int StrengthModifier => ParentObject.StatMod("Strength");
         public int AgilityModifier => ParentObject.StatMod("Agility");
 
-        public int ElongatedBonusDamage
-        {
-            get
-            {
-                Debug.Entry(4, $"@ ElongatedPaws.ElongatedBonusDamage", Indent: 4);
-                Debug.Entry(4, $"Returning StrMod/2: {(int)Math.Floor(StrengthModifier / 2.0)}", Indent: 5);
-                Debug.Entry(4, $"x ElongatedPaws.ElongatedBonusDamage >//", Indent: 4);
-                return (int)Math.Floor(StrengthModifier / 2.0);
-            }
-        }
-
         public ElongatedPaws()
         {
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
@@ -113,12 +102,6 @@ namespace XRL.World.Parts.Mutation
         public override int GetNaturalWeaponDamageBonus(int Level = 1)
         {
             return (int)Math.Floor(StrengthModifier / 2.0);
-        }
-
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            return elongatedPaws;
         }
 
         public override bool CanLevel() { return false; }
@@ -254,6 +237,13 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
             Debug.Footer(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
             base.OnRegenerateDefaultEquipment(body);
+        }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
+            elongatedPaws.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            return elongatedPaws;
         }
 
     } //!-- public class ElongatedPaws : BaseDefaultEquipmentMutation

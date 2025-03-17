@@ -14,23 +14,5 @@ namespace XRL.World.Parts
             : base(Tier)
         {
         }
-
-        public override bool WantEvent(int ID, int Cascade)
-        {
-            if (!base.WantEvent(ID, Cascade))
-            {
-                return ID == PooledEvent<GetItemElementsEvent>.ID;
-            }
-            return true;
-        }
-
-        public override bool HandleEvent(GetItemElementsEvent E)
-        {
-            if (E.IsRelevantObject(ParentObject))
-            {
-                E.Add("might", 1);
-            }
-            return base.HandleEvent(E);
-        }
     }
 }

@@ -214,36 +214,6 @@ namespace XRL.World.Parts.Mutation
             return -3 + (int)Math.Floor(Level / 2.0);
         }
 
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            gigantism.NaturalWeapon = new()
-            {
-                Level = 1,
-                DamageDieCount = 1,
-                DamageDieSize = 2,
-                DamageBonus = 0,
-                ModPriority = 10,
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                Noun = "fist",
-                Skill = "Cudgel",
-                Stat = "Strength",
-                Tile = "NaturalWeapons/GiganticFist.png",
-                ColorString = "&x",
-                DetailColor = "z",
-                SecondColorString = "&X",
-                SecondDetailColor = "Z",
-                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block",
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 }
-                }
-            };
-            return gigantism;
-        }
-
         public override bool CanLevel() { return true; } // Enable leveling
 
         public override bool GeneratesEquipment() { return true; }
@@ -947,6 +917,13 @@ namespace XRL.World.Parts.Mutation
             actor.CheckAffectedEquipmentSlots();
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+            gigantism.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            return gigantism;
+        }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {

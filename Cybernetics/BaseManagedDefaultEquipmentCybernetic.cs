@@ -30,15 +30,6 @@ namespace XRL.World.Parts
             set => _implantObject = value == null ? null : _implantObject;
         }
 
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            BaseManagedDefaultEquipmentCybernetic cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic;
-            cybernetic.Implantee = null;
-            cybernetic.ImplantObject = null;
-            cybernetic.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
-            return cybernetic;
-        }
-
         [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
@@ -267,6 +258,15 @@ namespace XRL.World.Parts
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+        }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            BaseManagedDefaultEquipmentCybernetic cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic;
+            cybernetic.Implantee = null;
+            cybernetic.ImplantObject = null;
+            cybernetic.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            return cybernetic;
         }
     }
 }

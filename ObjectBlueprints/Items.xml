@@ -583,11 +583,11 @@ You cannot wear equipment on your body."
   <!-- End Weapon Elongating -->
 
   <!-- Start Testing -->
-  <object Name="Gigantism Giver Axe" Inherits="Battle Axe8">
+  <!-- object Name="Gigantism Giver Axe" Inherits="Battle Axe8">
     <part Name="Render" DisplayName="{{zetachrome|zetachrome}} {{gigantic|gigantism}} giving battle axe" Tile="Items/sw_axe_7.bmp" ColorString="&amp;Z" DetailColor="y" />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <tag Name="GiganticEquippable" />
-  </object>
+  </object-->
   <!-- End Testing -->
   
 </objects>

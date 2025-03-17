@@ -13,6 +13,7 @@ using XRL.World.Capabilities;
 using XRL.World.Parts.Mutation;
 using XRL.Liquids;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
@@ -378,7 +379,7 @@ namespace HNPS_GigantismPlus
             {
                 if (exoframe.Model == "YES")
                 {
-                    Popup.Show($"DOTH THINE {cybernetics.ShortDisplayName} NOT SUFFICE?");
+                    Popup.Show($"DOTH THINE {cybernetics.ShortDisplayName} NOT SUFFICE?".Color("SECRETGOLDEN"));
                     goto CalcDegrees;
                 }
                 body.Unimplant();
@@ -452,6 +453,8 @@ namespace HNPS_GigantismPlus
             {
                 The.Player.AddSkill(skill);
             }
+
+            The.Player.GigantifyInventory(EnableGiganticStartingGear, EnableGiganticStartingGear_Grenades);
         }
     }
 }

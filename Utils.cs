@@ -90,7 +90,7 @@ namespace HNPS_GigantismPlus
 
             Exit:
             found = TilePath != null;
-            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) ]//", Indent: 5);
+            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 5);
             Debug.Divider(3, Count: 40, Indent: 4);
             return found;
         }

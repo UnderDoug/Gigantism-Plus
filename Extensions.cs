@@ -107,10 +107,6 @@ namespace HNPS_GigantismPlus
             return sb;
         }
 
-        public static string Color(this string Text, string Color)
-        {
-            return "{{" + Color + "|" + Text + "}}";
-        }
         public static string MaybeColor(this string Text, string Color, bool Pretty = true)
         {
             if (Pretty && Color != "") return Text.Color(Color);
@@ -320,16 +316,16 @@ namespace HNPS_GigantismPlus
                 // Can the item have the gigantic modifier applied?
                 if (ItemModding.ModificationApplicable("ModGigantic", item))
                 {
-                    Debug.LoopItem(4, "can be made ModGigantic", Indent: 3);
+                    Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 3);
                     // Is the item already gigantic? Don't attempt to apply it again.
                     if (item.HasPart<ModGigantic>())
                     {
-                        Debug.LoopItem(4, "already gigantic", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "already gigantic", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
                     }
                     else
                     {
-                        Debug.LoopItem(4, "not gigantic", Indent: 3);
+                        Debug.CheckYeh(4, "not already gigantic", Indent: 3);
                     }
 
                     // Is the item a grenade, and is the option not set to include them?
@@ -339,40 +335,44 @@ namespace HNPS_GigantismPlus
                         {
                             if (!GrenadeOption)
                             { 
-                                Debug.LoopItem(4, "grenade (excluded)", "NoThanks++; x/", Indent: 3); 
+                                Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 3); 
                                 NoThanks++; 
                             }
                             if (creatureIsMerchant) 
                             { 
-                                Debug.LoopItem(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 3); 
+                                Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 3); 
                                 NoThanks++; 
                             }
 
                             if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high)
                             {
                                 Debug.LoopItem(4,
-                                    $"but! merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
+                                    $"but!] merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
                                     $"NoThanks--;",
                                     Indent: 4);
                                 NoThanks--;
                             }
                         }
+                        else if (GrenadeOption)
+                        {
+                            Debug.CheckYeh(4, "grenade (included)", Indent: 3);
+                        }
                     }
                     else
                     {
-                        Debug.LoopItem(4, "not grenade", Indent: 3);
+                        Debug.CheckYeh(4, "not grenade", Indent: 3);
                     }
 
                     // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
                     if (item.HasTag("DynamicObjectsTable:TradeGoods"))
                     {
-                        Debug.LoopItem(4, "TradeGoods", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
 
                         if (creatureIsMerchant && merchantTradeGoods.die.Resolve() >= merchantTradeGoods.high)
                         {
                             Debug.LoopItem(4,
-                                $"but! merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
+                                $"but!] merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
                                 $"NoThanks--;",
                                 Indent: 4);
                             NoThanks--;
@@ -380,19 +380,19 @@ namespace HNPS_GigantismPlus
                     }
                     else
                     {
-                        Debug.LoopItem(4, "not TradeGoods", Indent: 3);
+                        Debug.CheckYeh(4, "not TradeGoods", Indent: 3);
                     }
 
                     // Is the item a non-rare tonic? Double doses are basically useless in the early game
                     if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
                     {
-                        Debug.Entry(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
 
                         if (creatureIsMerchant && merchantTonics.die.Resolve() >= merchantTonics.high)
                         {
                             Debug.LoopItem(4,
-                                $"but! merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
+                                $"but!] merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
                                 $"NoThanks--;",
                                 Indent: 4);
                             NoThanks--;
@@ -400,19 +400,19 @@ namespace HNPS_GigantismPlus
                     }
                     else
                     {
-                        Debug.LoopItem(4, "not Tonics_NonRare", Indent: 3);
+                        Debug.CheckYeh(4, "not Tonics_NonRare", Indent: 3);
                     }
 
                     // Is the item a rare tonic? Double doses are basically useless in the early game
                     if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
                     {
-                        Debug.Entry(4, "Rare Tonic", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
 
                         if (creatureIsMerchant && merchantRareTonics.die.Resolve() >= merchantRareTonics.high)
                         {
                             Debug.LoopItem(4,
-                                $"but! merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
+                                $"but!] merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
                                 $"NoThanks--;",
                                 Indent: 4);
                             NoThanks--;
@@ -420,32 +420,39 @@ namespace HNPS_GigantismPlus
                     }
                     else
                     {
-                        Debug.LoopItem(4, "not Rare Tonics", Indent: 3);
+                        Debug.CheckYeh(4, "not Rare Tonics", Indent: 3);
                     }
 
                     // Is the item held by a merchant, and did their roll fail?
-                    if (creatureIsMerchant && merchantBaseChance.die.Resolve() < merchantBaseChance.high)
+                    if (creatureIsMerchant)
                     {
-                        Debug.Entry(4, 
-                            $"merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}", 
-                            "NoThanks++; x/",
-                            Indent: 3);
+                        Debug.CheckNah(4, "creatureIsMerchant is True", "NoThanks++; x/", Indent: 3);
                         NoThanks++;
-                    }
-                    else if (creatureIsMerchant)
-                    {
-                        Debug.LoopItem(4, 
-                            $"merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}", 
-                            Indent: 3);
+
+                        if (merchantBaseChance.die.Resolve() >= merchantBaseChance.high)
+                        {
+                            Debug.LoopItem(4,
+                                $"but!] merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}",
+                                $"NoThanks--;",
+                                Indent: 4);
+                            NoThanks--;
+                        }
+                        else 
+                        {
+                            Debug.LoopItem(4, 
+                                $"and!] merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}",
+                                "Bummer!",
+                                Indent: 4);
+                        }
                     }
                     else
                     {
-                        Debug.LoopItem(4,
-                            $"creatureIsMerchant: False",
+                        Debug.CheckYeh(4,
+                            $"creatureIsMerchant is False",
                             Indent: 3);
                     }
 
-                        Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
+                    Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
                     if (NoThanks > 0) goto Skip;
 
                     Debug.Entry(3, $"Gigantifying {ItemName}", Indent: 2);
@@ -458,7 +465,7 @@ namespace HNPS_GigantismPlus
                 }
                 else
                 {
-                    Debug.LoopItem(4, "cannot be made gigantic x/", Indent: 3);
+                    Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 3);
                 }
             Skip:
                 Debug.Entry(3, "/x Skipping", Indent: 2);
@@ -557,7 +564,7 @@ namespace HNPS_GigantismPlus
             ModPart = Activator.CreateInstance(type) as IModification;
             if (ModPart == null)
             {
-                if (!(Activator.CreateInstance(type) is IPart))
+                if (Activator.CreateInstance(type) is not IPart)
                 {
                     MetricsManager.LogError("failed to load " + type);
                 }
@@ -591,7 +598,8 @@ namespace HNPS_GigantismPlus
             return null;
         }
 
-        public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalWeaponBase<T> ModPart, GameObject Actor) where T : IPart, IManagedDefaultNaturalWeapon, new()
+        public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalWeaponBase<T> ModPart, GameObject Actor) 
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
         {
             return obj.ApplyModification(ModPart, Actor: Actor);
         }

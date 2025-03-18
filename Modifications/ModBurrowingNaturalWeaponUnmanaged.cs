@@ -18,7 +18,8 @@ namespace XRL.World.Parts
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            AssigningPart ??= Wielder?.GetPart<BurrowingClaws>().ConvertToManaged();
+            AssigningPart ??= Wielder?.GetPart<BurrowingClaws>()?.ConvertToManaged();
+            if (AssigningPart == null) return false;
             AssigningPart.CalculateNaturalWeaponLevel(Level);
             AssigningPart.CalculateNaturalWeaponDamageDieCount(Level);
             AssigningPart.CalculateNaturalWeaponDamageDieSize(Level);

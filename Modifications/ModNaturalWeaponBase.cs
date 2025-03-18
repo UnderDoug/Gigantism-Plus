@@ -23,6 +23,7 @@ namespace XRL.World.Parts
 
         public override void Configure()
         {
+            base.Configure();
             WorksOnSelf = true;
         }
         public override bool ModificationApplicable(GameObject Object)
@@ -56,9 +57,8 @@ namespace XRL.World.Parts
             }
             set
             {
-                Type valueType = value.GetType();
-                bool typeMatch = valueType.IsEquivalentTo(typeof(T));
-                if (typeMatch)
+                Type valueType = value?.GetType();
+                if (value != null && valueType.IsEquivalentTo(typeof(T)))
                 {
                     _assigningPart = value;
                     return;
@@ -177,11 +177,11 @@ namespace XRL.World.Parts
             int CurrentNounPriority = Object.GetIntProperty(CURRENT_NOUN_PRIORITY);
             int CurrentAdjectivePriority = Object.GetIntProperty(CURRENT_ADJECTIVE_PRIORITY);
 
-            Debug.Entry(4, $"? if (NounPriority != 0 && NounPriority < CurrentPriority)", Indent: 5);
+            Debug.Entry(4, $"? if (NounPriority != 0 and NounPriority < CurrentPriority)", Indent: 5);
             if (NounPriority != 0 && NounPriority < CurrentNounPriority )
             {
                 Debug.Entry(4, 
-                    $"+ NounPriority != 0 && NounPriority ({NounPriority}) < CurrentNounPriority ({CurrentNounPriority})", 
+                    $"+ NounPriority != 0 and NounPriority ({NounPriority}) < CurrentNounPriority ({CurrentNounPriority})", 
                     Indent: 6);
 
                 Object.SetIntProperty(CURRENT_NOUN_PRIORITY, NounPriority);
@@ -225,13 +225,13 @@ namespace XRL.World.Parts
                     Indent: 6);
                 weapon.Vomit(4, "Priority, Unchanged", vomitCats, Indent: 6);
             }
-            Debug.Entry(4, $"x if (NounPriority != 0 && NounPriority < CurrentNounPriority) ?//", Indent: 5);
+            Debug.Entry(4, $"x if (NounPriority != 0 and NounPriority < CurrentNounPriority) ?//", Indent: 5);
 
-            Debug.Entry(4, $"? if (AdjectivePriority != 0 && AdjectivePriority < CurrentAdjectivePriority)", Indent: 5);
+            Debug.Entry(4, $"? if (AdjectivePriority != 0 and AdjectivePriority < CurrentAdjectivePriority)", Indent: 5);
             if (AdjectivePriority != 0 && AdjectivePriority < CurrentAdjectivePriority)
             {
                 Debug.Entry(4,
-                    $"+ AdjectivePriority != 0 && " 
+                    $"+ AdjectivePriority != 0 and " 
                     + $"CurrentAdjectivePriority AdjectivePriority ({AdjectivePriority}) < ({CurrentAdjectivePriority})",
                     Indent: 6);
 
@@ -254,7 +254,7 @@ namespace XRL.World.Parts
                     Indent: 6);
                 weapon.Vomit(4, "AdjectivePriority, Unchanged", vomitCats, Indent: 6);
             }
-            Debug.Entry(4, $"x if (AdjectivePriority != 0 && AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
+            Debug.Entry(4, $"x if (AdjectivePriority != 0 and AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
 
             Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
             return NaturalWeapon.Priority;

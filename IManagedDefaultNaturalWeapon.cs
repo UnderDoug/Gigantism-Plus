@@ -1,7 +1,8 @@
-using HNPS_GigantismPlus;
 using System;
 using System.Collections.Generic;
 using XRL.World.Parts;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World
 {
@@ -136,8 +137,8 @@ namespace XRL.World
             }
             public virtual string GetColoredAdjective()
             {
-                string colorText = "{{" + GetAdjectiveColor() + "|" + GetAdjective() + "}}";
-                return "{{" + GetAdjectiveColorFallback() + "|" + colorText + "}}";
+                if (Adjective.IsNullOrEmpty()) return null;
+                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
             }
             public string GetSwingSound()
             {

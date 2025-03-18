@@ -95,14 +95,22 @@ namespace HNPS_GigantismPlus
             Divider(Verbosity, "\u003C", 25, Indent); // <
         }
 
-        public static void LoopItem(int Verbosity, string Label, string Text, int Indent = 0)
+        public static void LoopItem(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = null)
         {
-            string output = Label + ": " + Text;
-            Entry(Verbosity, "\u005B" + output, Indent); // [
+            string good = "\u221A"; // √
+            string bad = "\u0058";  // X
+            string goodOrBad = string.Empty;
+            if (Good != null) goodOrBad = ((bool)Good ? good : bad) + "\u005D "; // ]
+            string output = Text == string.Empty ? Label + ": " + Text : Label;
+            Entry(Verbosity, "\u005B" + goodOrBad + output, Indent);
         }
-        public static void LoopItem(int Verbosity, string Text, int Indent = 0)
+        public static void CheckYeh(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = true)
         {
-            Entry(Verbosity, "\u005B" + Text, Indent); // [
+            LoopItem(Verbosity, Label, Text, Indent, Good);
+        }
+        public static void CheckNah(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = false)
+        {
+            LoopItem(Verbosity, Label, Text, Indent, Good);
         }
 
         // Class Specific Debugs

@@ -67,10 +67,6 @@ namespace XRL.World.Parts
 
                 EquipmentFrameColors = NaturalWeapon.EquipmentFrameColors;
             }
-            public override string GetColoredAdjective()
-            {
-                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
-            }
         }
 
         public INaturalWeapon NaturalWeapon = new()
@@ -82,8 +78,6 @@ namespace XRL.World.Parts
             HitBonus = 0,
 
             ModPriority = 0,
-            AdjectiveColor = "y",
-            AdjectiveColorFallback = "Y",
             ColorString = "&K",
             DetailColor = "y",
             SecondColorString = "&y",

@@ -51,11 +51,11 @@ namespace XRL.World.Parts
         }
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
-            return ("augmented").MaybeColor(AugmentAdjectiveColor, Pretty);
+            return Pretty ? NaturalWeapon.GetAdjective().OptionalColor(NaturalWeapon.GetAdjectiveColor(), NaturalWeapon.GetAdjectiveColorFallback(), Colorfulness) : NaturalWeapon.GetAdjective();
         }
         public string GetAugmentAdjective(bool Pretty = true)
         {
-            return ($"E{ ("F").MaybeColor("c", Pretty) }-{GetShortAugmentAdjective(Pretty)}").MaybeColor("Y", Pretty);
+            return Pretty ? GetNaturalWeaponColoredAdjective() : $"EF-" + GetShortAugmentAdjective(Pretty);
         }
         public virtual string GetNaturalWeaponColoredAdjective()
         {

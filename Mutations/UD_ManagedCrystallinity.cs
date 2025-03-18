@@ -48,10 +48,6 @@ namespace XRL.World.Parts.Mutation
 
                 EquipmentFrameColors = NaturalWeapon.EquipmentFrameColors;
             }
-            public override string GetColoredAdjective()
-            {
-                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
-            }
         }
 
         public INaturalWeapon NaturalWeapon = new()

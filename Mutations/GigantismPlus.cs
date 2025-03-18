@@ -225,10 +225,10 @@ namespace XRL.World.Parts.Mutation
             // Hunch over if hunched before level up.
             bool WasHunched = false;
 
-            Debug.Entry(4, "? if (IsPseudoGiganticCreature && !IsVehicleCreature)", Indent: 1);
+            Debug.Entry(4, "? if (IsPseudoGiganticCreature and !IsVehicleCreature)", Indent: 1);
             if (IsPseudoGiganticCreature && !IsVehicleCreature)
             {
-                Debug.Entry(4, "+ Creature is PsuedoGigantic && not a Vehicle", Indent: 2);
+                Debug.Entry(4, "+ Creature is PsuedoGigantic and not a Vehicle", Indent: 2);
                 Debug.Entry(4, "Sending StraightenUp (silent)", Indent: 2);
                 WasHunched = true;
                 IsHunchFree = true;
@@ -239,7 +239,7 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, $"- IsPseudoGiganticCreature: {IsPseudoGiganticCreature}", Indent: 2);
                 Debug.Entry(4, $"- !IsVehicleCreature: {!IsVehicleCreature}", Indent: 2);
             }
-            Debug.Entry(4, "x if (IsPseudoGiganticCreature && !IsVehicleCreature) ?//", Indent: 1);
+            Debug.Entry(4, "x if (IsPseudoGiganticCreature and !IsVehicleCreature) ?//", Indent: 1);
 
             Debug.Entry(4, "Start of Change Level updates", Indent: 1);
             // Start of Change Level updates.
@@ -281,7 +281,7 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, $"stunning.Distance: {stunning.Distance}", Indent: 3);
                 stunning.Level = GetStunningForceLevel(NewLevel); // Scale stunning force with mutation level
                 stunning.Distance = StunningForceDistance;
-                Debug.Entry(4, $"New values calculated &amp; assigned", Indent: 2);
+                Debug.Entry(4, $"New values calculated and assigned", Indent: 2);
                 Debug.Entry(4, $"stunning.Level: {stunning.Level}", Indent: 3);
                 Debug.Entry(4, $"stunning.Distance: {stunning.Distance}", Indent: 3);
             }
@@ -313,10 +313,10 @@ namespace XRL.World.Parts.Mutation
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             Debug.Entry(4, "End of Change Level updates", Indent: 1);
             // End of Change Level updates
-            Debug.Entry(4, "? if (WasHunched && !IsVehicleCreature)", Indent: 1);
+            Debug.Entry(4, "? if (WasHunched and !IsVehicleCreature)", Indent: 1);
             if (WasHunched && !IsVehicleCreature)
             {
-                Debug.Entry(4, "+ Creature was Hunched && not a Vehicle", Indent: 1);
+                Debug.Entry(4, "+ Creature was Hunched and not a Vehicle", Indent: 1);
                 Debug.Entry(4, "Sending HunchOver (silent)", Indent: 1);
                 IsHunchFree = true;
                 HunchOver(Message: false);
@@ -326,7 +326,7 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, $"- WasHunched: {WasHunched}", Indent: 2);
                 Debug.Entry(4, $"- !IsVehicleCreature: {!IsVehicleCreature}", Indent: 2);
             }
-            Debug.Entry(4, "x if (WasHunched && !IsVehicleCreature) ?//", Indent: 1);
+            Debug.Entry(4, "x if (WasHunched and !IsVehicleCreature) ?//", Indent: 1);
 
             Debug.Footer(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
             return base.ChangeLevel(NewLevel);

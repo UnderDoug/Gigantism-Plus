@@ -174,7 +174,7 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{gigantic|Gigantism}} ({{r|D}})";
             Type = "Physical";
 
-            NaturalWeapon = new()
+            NaturalWeaponSubpart Fists = new()
             {
                 Level = 1,
                 DamageDieCount = 1,
@@ -198,18 +198,27 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoShortDescription", 1 }
                 }
             };
+            NaturalWeaponSubparts.Add("Hand", Fists);
+        }
+        public GigantismPlus(Dictionary<string, NaturalWeaponSubpart> naturalWeaponSubparts)
+        {
+            GigantismPlus gigantism = new();
 
+            DisplayName = gigantism.DisplayName;
+            Type = gigantism.Type;
+
+            NaturalWeaponSubparts = new(naturalWeaponSubparts);
         }
 
-        public override int GetNaturalWeaponDamageDieCount(int Level = 1)
+        public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
         }
-        public override int GetNaturalWeaponDamageBonus(int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
         }
-        public override int  GetNaturalWeaponHitBonus(int Level = 1)
+        public override int  GetNaturalWeaponHitBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
         {
             return -3 + (int)Math.Floor(Level / 2.0);
         }
@@ -579,10 +588,11 @@ namespace XRL.World.Parts.Mutation
             string stunningForceDamageIncrement = StunningForce.GetDamageIncrement(1);
             if (ParentObject != null)
             {
+                NaturalWeaponSubpart NaturalWeaponSubpart = NaturalWeaponSubparts["Hand"];
                 WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
-                FistDamageDieCount = GetNaturalWeaponDamageDieCount(Level);
-                FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(Level));
-                FistHitBonus = GetNaturalWeaponHitBonus(Level);
+                FistDamageDieCount = GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart, Level);
+                FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level));
+                FistHitBonus = GetNaturalWeaponHitBonus(NaturalWeaponSubpart, Level);
                 StunningForceJumpLevel = GetStunningForceLevel(Level);
                 stunningForceDamageIncrement = StunningForce.GetDamageIncrement(StunningForceJumpLevel);
             }
@@ -766,33 +776,34 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
-            string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
-            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
+            List<string> targetPartTypes = new();
+            foreach ((string type, NaturalWeaponSubpart subpart) in NaturalWeaponSubparts)
+            {
+                targetPartTypes.Add(type);
+                Debug.Entry(4, $"targetPartType \"{type}\" added", Indent: 1);
+            }
 
-            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                   where p.Type == targetPartType
+            Debug.Entry(4, "Generating List<BodyPart> partsList", Indent: 1);
+            List<BodyPart> partsList = (from p in body.GetParts(EvenIfDismembered: true)
+                                   where targetPartTypes.Contains(p.Type) 
                                    select p).ToList();
 
             Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
-            foreach (BodyPart part in list)
+            Debug.Entry(4, "> foreach (BodyPart part in partsList)", Indent: 1);
+            foreach (BodyPart part in partsList)
             {
-                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
-                if (part.Type == "Hand")
-                {
-                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
+                Debug.DiveIn(4, $"\u00BB: {part.Description} [{part.ID}:{part.Type}]", Indent: 2);
 
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<GigantismPlus>(), Actor: ParentObject);
+                NaturalWeaponSubpart NaturalWeaponSubpart = NaturalWeaponSubparts[part.Type];
+                part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<GigantismPlus>(NaturalWeaponSubpart), Actor: ParentObject);
 
-                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
-                }
+                Debug.DiveOut(4, $"\u00AB: {part.Description} [{part.ID}:{part.Type}]", Indent: 2);
             }
-            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
+            Debug.Entry(4, "x foreach (BodyPart part in partsList) >//", Indent: 1);
 
             Exit:
             Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
-            Debug.Footer(3, $"{nameof(GigantismPlus)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
+            Debug.Footer(3, $"{nameof(GigantismPlus)}", $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
             base.OnRegenerateDefaultEquipment(body);
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 
@@ -918,13 +929,6 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
 
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            gigantism.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
-            return gigantism;
-        }
-
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
@@ -935,6 +939,15 @@ namespace XRL.World.Parts.Mutation
         {
             base.Read(Basis, Reader);
             EnableActivatedAbilityID = Reader.ReadGuid();
+        }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+            gigantism.NaturalWeaponSubparts = new(NaturalWeaponSubparts);
+            gigantism.NaturalWeaponSubpart = new(NaturalWeaponSubpart);
+            gigantism._giganticExoframe = null;
+            return gigantism;
         }
 
     } //!-- public class GigantismPlus : BaseDefaultEquipmentMutation

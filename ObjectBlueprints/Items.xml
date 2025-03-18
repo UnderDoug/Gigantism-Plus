@@ -1,298 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <objects>
-
-  <!-- Natural Weapon Bases -->
-
-  <object Name="GigantismPlusBaseNaturalWeapon" Inherits="MeleeWeapon">
-    <part Name="Armor" WornOn="Hand" />
-    <part Name="Render" DisplayName="[GigantismPlusBaseNaturalWeapon]" 
-          RenderString="F" Tile="GiganticFist_Alt.png" 
-          ColorString="&amp;y" DetailColor="K" 
-          />
-    <part Name="MeleeWeapon" 
-          BaseDamage="1d3" 
-          MaxStrengthBonus="999" 
-          Skill="Cudgel" 
-          Stat="Strength" 
-          />
-    <part Name="Commerce" Value="0" />
-    <part Name="NaturalEquipment" />
-    <part Name="NoDamage" />
-    <part Name="NoBreak" />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
-    <removepart Name="TinkerItem" />
-    <intproperty Name="Natural" Value="1" />
-    <tag Name="ExcludeFromDynamicEncounters" />
-    <tag Name="NoSparkingQuest" />
-    <tag Name="NaturalGear" />
-    <tag Name="WeaponUnarmed" />
-    <tag Name="VisibleAsDefaultBehavior" />
-    <tag Name="ShowAsPhysicalFeature" />
-    <tag Name="SwingSound" Value="Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" />
-    <tag Name="BaseObject" Value="*noinherit" />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="ElongatedBaseNaturalWeapon" Inherits="GigantismPlusBaseNaturalWeapon">
-    <part Name="Render" DisplayName="[ElongatedBaseNaturalWeapon]" 
-          RenderString="P" Tile="ElongatedPaw_Alt.png" 
-          ColorString="&amp;y" DetailColor="K" 
-          />
-    <part Name="MeleeWeapon" 
-          BaseDamage="1d4" 
-          MaxStrengthBonus="999" 
-          Skill="ShortBlades" 
-          Stat="Strength" 
-          />
-    <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" />
-    <tag Name="BaseObject" Value="*noinherit" />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="ClawBaseNaturalWeapon" Inherits="ElongatedBaseNaturalWeapon">
-    <part Name="Render" DisplayName="[ClawBaseNaturalWeapon]" 
-          RenderString="C" Tile="ElongatedBurrowingClaw.png" 
-          ColorString="&amp;y" DetailColor="K" 
-          />
-    <part Name="MeleeWeapon" 
-          BaseDamage="1d5" 
-          MaxStrengthBonus="999" 
-          Skill="ShortBlades" 
-          Stat="Strength" 
-          />
-    <tag Name="SwingSound" Value="Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" />
-    <tag Name="BaseObject" Value="*noinherit" />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <!-- End Crystalline Natural Weapons -->
-  <!-- Gigantic Natural Weapons -->
-
-  <object Name="GiganticFist" Inherits="GigantismPlusBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticFist" />
-    <part Name="Render" 
-          DisplayName="{{gigantic|gigantic}} fist" 
-          RenderString="F" Tile="GiganticFist_Alt.png" 
-          ColorString="&amp;x" DetailColor="z" 
-          />
-    <part Name="Description" 
-          Short="A {{gigantic|gigantic}} knot of muscle and sinnew wraps itself tightly around an impossibly dense assortment of bones." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  <!-- Damage Calculation for GiganticFist ********************************************************
-
-  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize} + gigantismBonus}
-
-  **********************************************************************************************-->
-
-  <object Name="GiganticElongatedPaw" Inherits="ElongatedBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticElongatedPaw" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} paw" 
-          RenderString="F" Tile="ElongatedPaw_Alt.png" 
-          ColorString="&amp;X" DetailColor="Z" 
-          />
-    <part Name="Description" 
-          Short="A {{gigantic|gigantic}}, {{giant|long}}, {{giant|slender}} paw that can wield weapons much larger than usual." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  <!-- Damage Calculation for GiganticElongatedPaw ************************************************
-
-  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + giganticBonus}
-
-  **********************************************************************************************-->
-
-  <object Name="GiganticBurrowingClaw" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticBurrowingClaw" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{W|burrowing}} claw" 
-          RenderString="F" Tile="Creatures/natural-weapon-claw.bmp" 
-          ColorString="&amp;X" DetailColor="Z" 
-          />
-    <part Name="Description" 
-          Short="{{gigantic|Gigantic}} claws come together to form an {{gigantic|immense}} {{W|spade}} designed for breaking earth and rock alike." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  <!-- Damage Calculation for GiganticBurrowingClaw ***********************************************
-
-  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{giganticBonus + burrowingBonus}
-  
-  **********************************************************************************************-->
-
-  <object Name="GiganticElongatedBurrowingClaw" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticElongatedBurrowingClaw" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} {{W|burrowing}} claw" 
-          RenderString="F" Tile="ElongatedBurrowingClaw.png" 
-          ColorString="&amp;X" DetailColor="W" 
-          />
-    <part Name="Description" 
-          Short="{{gigantic|Gigantic}}, {{giant|long}}, {{giant|slender}} {{W|spades}} designed for {{W|tearing}} through earth and rock jut from an oddly {{gigantic|immense}} paw." 
-          />
-
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object> 
-  <!-- Damage Calculation for GiganticElongatedBurrowingClaw **************************************
-
-  {gigantism.FistDamageDieCount}d{gigantism.FistDamageDieSize}+{(StatMod / 2) + 3 + burrowingBonus}
-
-  **********************************************************************************************-->
-
-  <!-- End Gigantic Natural Weapons -->
-  <!-- Elongated Natural Weapons -->
-
-  <object Name="ElongatedPaw" Inherits="ElongatedBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="ElongatedPaw" />
-    <part Name="Render" DisplayName="{{giant|elongated}} paw" 
-          RenderString="F" Tile="ElongatedPaw_Alt.png" 
-          ColorString="&amp;x" DetailColor="z" 
-          />
-    <part Name="Description" 
-          Short="A {{giant|long}}, {{giant|slender}} paw that can wield weapons larger than usual." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  <!-- Damage Calculation for ElongatedPaw ********************************************************
-
-  {1d4+{StatMod / 2}}
-
-  **********************************************************************************************-->
-
-  <object Name="ElongatedBurrowingClaw" Inherits="ElongatedBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="ElongatedBurrowingClaw" />
-    <part Name="Render" DisplayName="{{giant|elongated}} {{W|burrowing}} claw" 
-          RenderString="F" Tile="ElongatedBurrowingClaw.png" 
-          ColorString="&amp;x" DetailColor="W" 
-          />
-    <part Name="Description" 
-          Short="{{giant|Long}}, {{giant|slender}} claws designed for {{W|tearing}} through earth and rock jut from an {{giant|oddly large}} paw." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  <!-- Damage Calculation for ElongatedBurrowingClaw **********************************************
-
-  {1d{burrowingDieSize + 2}+{StatMod / 2}}
-
-  **********************************************************************************************-->
-
-  <!-- End Elongated Natural Weapons -->
-  <!-- Crystalline Natural Weapons -->
-
-  <object Name="GiganticCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticCrystallinePoint" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{crystallized|crystalline}} {{crystallized|point}}" 
-          RenderString="F" Tile="GiganticFist_Alt.png" 
-          ColorString="&amp;b" DetailColor="B" 
-          />
-    <part Name="Description" 
-          Short="{{crystallized|Crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="ElongatedCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="ElongatedCrystallinePoint" />
-    <part Name="Render" DisplayName="{{giant|elongated}} {{crystallized|crystalline}} {{crystallized|point}}"
-          RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png"
-          ColorString="&amp;b" DetailColor="B"
-          />
-    <part Name="Description"
-          Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{jewels|central jewel}}."
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="BurrowingCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="BurrowingCrystallinePoint" />
-    <part Name="Render" DisplayName="{{W|burrowing}} {{crystallized|crystalline}} {{crystallized|point}}" 
-          RenderString="F" Tile="Creatures/natural-weapon-claw.bmp" 
-          ColorString="&amp;b" DetailColor="B" 
-          />
-    <part Name="Description" 
-          Short="{{crystallized|Crystalline}} points fan out from a {{jewels|central jewel}}. The points can lock together perfectly to form a {{W|spade}} ideal for parting earth and stone." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="GiganticBurrowingCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticBurrowingCrystallinePoint" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{W|burrowing}} {{crystallized|crystalline}} {{crystallized|point}}" 
-          RenderString="F" Tile="GiganticFist_Alt.png" 
-          ColorString="&amp;m" DetailColor="W" 
-          />
-    <part Name="Description" 
-          Short="{{crystallized|Crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}. The points can lock together perfectly to form a {{W|spade}} ideal for parting earth and stone." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="ElongatedBurrowingCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="ElongatedBurrowingCrystallinePoint" />
-    <part Name="Render" DisplayName="{{giant|elongated}} {{W|burrowing}} {{crystallized|crystalline}} {{crystallized|point}}" 
-          RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png" 
-          ColorString="&amp;b" DetailColor="m" 
-          />
-    <part Name="Description" 
-          Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{jewels|central jewel}}. The points can lock together perfectly to form a {{W|spade}} ideal for parting earth and stone." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  
-  <object Name="GiganticElongatedCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticElongatedCrystallinePoint" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} {{crystallized|crystalline}} {{crystallized|point}}" 
-          RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png" 
-          ColorString="&amp;b" DetailColor="B" 
-          />
-    <part Name="Description" 
-          Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-
-  <object Name="GiganticElongatedBurrowingCrystallinePoint" Inherits="ClawBaseNaturalWeapon">
-    <tag Name="MutationEquipment" Value="GiganticElongatedBurrowingCrystallinePoint" />
-    <part Name="Render" DisplayName="{{gigantic|gigantic}} {{giant|elongated}} {{W|burrowing}} {{crystallized|crystalline}} {{crystallized|point}}" 
-          RenderString="F" Tile="ElongatedBurrowingCrystallinePoint.png" 
-          ColorString="&amp;m" DetailColor="W" 
-          />
-    <part Name="Description" 
-          Short="{{giant|Long}}, {{giant|slender}}, {{crystallized|crystalline}} points fan out from a {{gigantic|gigantic}} {{jewels|central jewel}}. The points can lock together perfectly to form a {{W|spade}} ideal for parting earth and stone." 
-          />
-    <!--tag Name="EquipmentFrameColors" Value="KKKK" /-->
-  </object>
-  
-  <!-- End Crystalline Natural Weapons -->
-  <!-- Gigantic Cybernetics -->
-
-  <!--object Name="MassiveExoframeAlpha" Inherits="BaseCyberneticsEquipment_6point">
-    <part Name="Physics" Weight="20" />
-    <part Name="Description" 
-          Short="An archaic exoframe that is so large, you'll be considered gigantic while it's implanted. It's installed directly onto the exterior of your body, linking into your very being." 
-          />
-    <part Name="Render" DisplayName="{{Y|massive exoframe alpha}}"
-          RenderString="M" Tile="Items/sw_exoskeleton.bmp" 
-          ColorString="&amp;b" DetailColor="B" 
-          />
-    <part Name="CyberneticsBaseItem" 
-          Slots="Body,Back" Cost="6" 
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed." 
-          />
-    <part Name="MassiveExoframe" />
-    <part Name="ModImprovedGigantismPlus" Tier="3" />
-    <part Name="Metal" />
-    <part Name="NoDamage" />
-    <part Name="NoRust" />
-    <tag Name="CyberneticsUsesEqSlot" />
-    <tag Name="CyberneticsOneOnly" />
-    <tag Name="StartingCybernetic:General" />
-  </object-->
-
-  <!-- Base Gigantic Cybernetics Objects -->
-  
+  <!-- 
+      
+      1: Gigantic Exoframes
+      2: Modified BaseGame Natural Weapons
+      3: Modified BaseGame "Natural" Weapons
+      4: Sultan Masks
+      5: Gigantic Modable Changes 
+      6: Weapon Elongating
+      7: Testing
+      
+  -->
+  <!-- 
+      
+      Gigantic Exoframes 
+      
+  -->
   <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
     <part Name="Physics" Weight="15" />
     <part Name="Description" Short="" />
@@ -311,58 +34,38 @@ You cannot wear equipment on your body."
     <part Name="NoRust" />
     <tag Name="CyberneticsUsesEqSlot" />
     <tag Name="CyberneticsOneOnly" />
-    <part Name="CyberneticsGiganticExoframe" 
-          Model="Alpha" 
-          AugmentAdjectiveColor="b" 
-          AugmentTile="NaturalWeapons/GiganticManipulator.png" 
-          AugmentTileColorString="&amp;c" 
-          AugmentTileDetailColor="b" 
-          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
-          AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
-          JumpDistanceBonus="0" 
-          StunningForceLevelFactor="0.5" 
+    <part Name="CyberneticsGiganticExoframe"
+          Model="Alpha"
+          AugmentAdjectiveColor="b"
+          AugmentTile="NaturalWeapons/GiganticManipulator.png"
+          AugmentTileColorString="&amp;c"
+          AugmentTileDetailColor="b"
+          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
+          AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          JumpDistanceBonus="0"
+          StunningForceLevelFactor="0.5"
           />
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <tag Name="BaseObject" Value="*noinherit" />
     <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
   </object>
-
-  <object Name="BaseGiganticExoframeManipulator" Inherits="GigantismPlusBaseNaturalWeapon">
-    <part Name="Render" DisplayName="{{Y|exo{{c|frame}} manipulator}}"
-          RenderString="M" Tile="GiganticManipulator.png"
-          ColorString="&amp;c" DetailColor="b"
-          />
-    <part Name="Description"
-          Short="The gigantic manipulator of a massive exoframe cybernetic implant."
-          />
-    <part Name="Metal" />
-    <part Name="ModGigantic" />
-    <tag Name="Tier" Value="2" />
-    <tag Name="BaseObject" Value="*noinherit" />
-  </object>
-
-  <!-- End Base Gigantic Cybernetics Objects -->
-  <!-- Gigantic Exoframes -->
+  
+  <!-- End Base -->
   
   <object Name="GiganticExoframeAlpha" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="15" />
     <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
-          />
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
     <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="b"
-          />
+          ColorString="&amp;c" DetailColor="b" />
     <part Name="Armor" 
           AV="2" 
-          DV="-5"
-          />
+          DV="-5" />
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="2"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-You cannot wear equipment on your body."
-          />
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
     <part Name="Commerce" Value="120" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Alpha" 
@@ -371,8 +74,7 @@ You cannot wear equipment on your body."
           AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
           AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
           JumpDistanceBonus="0" 
-          StunningForceLevelFactor="0.5" 
-          />
+          StunningForceLevelFactor="0.5" />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
     <tag Name="StartingCybernetic:General" />
     <tag Name="Tier" Value="2" />
@@ -381,21 +83,16 @@ You cannot wear equipment on your body."
   <object Name="GiganticExoframeDelta" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="18" />
     <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
-          />
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
     <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="K"
-          />
+          ColorString="&amp;c" DetailColor="K" />
     <part Name="Armor" 
           AV="5" 
-          DV="-4"
-          />
+          DV="-4" />
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="4"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-You cannot wear equipment on your body."
-          />
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
     <part Name="Commerce" Value="240" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Delta"
@@ -404,8 +101,7 @@ You cannot wear equipment on your body."
           AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
           AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           JumpDistanceBonus="1"
-          StunningForceLevelFactor="0.67"
-          />
+          StunningForceLevelFactor="0.67" />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
     <tag Name="Tier" Value="4" />
   </object>
@@ -413,21 +109,16 @@ You cannot wear equipment on your body."
   <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="9" />
     <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
-          />
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
     <part Name="Render" DisplayName="{{c|exoframe {{G|sigma}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="G"
-          />
+          ColorString="&amp;c" DetailColor="G" />
     <part Name="Armor" 
           AV="6" 
-          DV="-3"
-          />
+          DV="-3" />
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="8"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-You cannot wear equipment on your body."
-          />
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
     <part Name="Commerce" Value="600" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Sigma"
@@ -439,8 +130,7 @@ You cannot wear equipment on your body."
           AugmentAddProps="Flawless:1"
           AugmentEquipmentFrameColors="KGKG"
           JumpDistanceBonus="2"
-          StunningForceLevelFactor="0.75"
-          />
+          StunningForceLevelFactor="0.75" />
     <part Name="ModImprovedGigantismPlus" Tier="10" />
     <part Name="Crysteel" />
     <tag Name="Flawless" />
@@ -450,21 +140,16 @@ You cannot wear equipment on your body."
   <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="6" />
     <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute."
-          />
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
     <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="M"
-          />
+          ColorString="&amp;c" DetailColor="M" />
     <part Name="Armor" 
           AV="8" 
-          DV="-2"
-          />
+          DV="-2" />
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="16"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-You cannot wear equipment on your body."
-          />
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
     <part Name="Commerce" Value="2200" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Omega"
@@ -475,94 +160,62 @@ You cannot wear equipment on your body."
           AugmentAddParts="Zetachrome"
           AugmentEquipmentFrameColors="mCmC"
           JumpDistanceBonus="3"
-          StunningForceLevelFactor="0.8"
-          />
+          StunningForceLevelFactor="0.8" />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="Zetachrome" />
     <tag Name="Tier" Value="8" />
   </object>
-
-  <!-- End Gigantic Exoframes -->
-  <!-- Exoframe Manipulator Objects -->
   
-  <object Name="GiganticExoframeManipulatorAlpha" Inherits="BaseGiganticExoframeManipulator">
-    <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{b|alpha}} manipulator}}"
-          RenderString="M" Tile="GiganticManipulator.png" 
-          ColorString="&amp;c" DetailColor="b" 
-          />
-    <part Name="Description" 
-          Short="The {{gigantic|gigantic}} manipulator of a massive exoframe {{b|alpha}} cybernetic implant." 
-          />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="3" />
-    <tag Name="Tier" Value="2" />
-    <tag Name="SwingSound" Value="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" />
-  </object>
-
-  <object Name="GiganticExoframeManipulatorDelta" Inherits="BaseGiganticExoframeManipulator">
-    <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{K|delta}} manipulator}}"
-          RenderString="M" Tile="GiganticManipulator.png"
-          ColorString="&amp;c" DetailColor="K"
-          />
-    <part Name="Description"
-          Short="The {{gigantic|gigantic}} manipulator of a massive exoframe {{K|delta}} cybernetic implant."
-          />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="5" />
-    <tag Name="Tier" Value="4" />
-    <tag Name="SwingSound" Value="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" />
-  </object>
-
-  <object Name="GiganticExoframeManipulatorSigma" Inherits="BaseGiganticExoframeManipulator">
-    <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{G|sigma}} manipulator}}"
-          RenderString="M" Tile="GiganticManipulator.png"
-          ColorString="&amp;c" DetailColor="G"
-          />
-    <part Name="Description"
-          Short="The {{gigantic|gigantic}} manipulator of a massive exoframe {{G|sigma}} cybernetic implant."
-          />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="2" />
-    <tag Name="Tier" Value="6" />
-    <tag Name="SwingSound" Value="Sounds/Melee/cudgels/sfx_melee_cudgel_crysteel_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_crysteel_blocked" />
-  </object>
-
-  <object Name="GiganticExoframeManipulatorOmega" Inherits="BaseGiganticExoframeManipulator">
-    <part Name="Render" DisplayName="{{Y|E{{c|F}}-{{zetachrome|omega}} manipulator}}"
-          RenderString="M" Tile="GiganticManipulator.png"
-          ColorString="&amp;c" DetailColor="M"
-          />
-    <part Name="Description"
-          Short="The {{gigantic|gigantic}} manipulator of a massive exoframe {{zetachrome|omega}} cybernetic implant."
-          />
-    <part Name="Physics" Category="Natural Weapon" IsReal="false" Weight="1" />
-    <tag Name="Tier" Value="8" />
-    <tag Name="SwingSound" Value="Sounds/Melee/cudgels/sfx_melee_cudgel_onehanded_zetachrome_swing" />
-    <tag Name="BlockedSound" Value="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" />
-    <part Name="Zetachrome" />
-  </object>
-
-  <!-- Exoframe Manipulator Objects -->
-
-  <!-- End Gigantic Cybernetics -->
-  <!-- Modified BaseGame Natural Weapons -->
-
+  <!-- 
+  
+      Modified BaseGame Natural Weapons 
+      
+  -->
   <object  Name="Crystalline Point" Load="Merge">
 		<part Name="Render" DisplayName="{{crystallized|crystalline}} {{crystallized|point}}" />
 	</object>
 
-  <!-- End Modified BaseGame Natural Weapons -->
-  <!-- Modified BaseGame "Natural" Weapons -->
-  
+  <!-- 
+      
+      Modified BaseGame "Natural" Weapons 
+      
+  -->
   <object Name="Fist of the Ape God" Load="Merge">
     <part Name="Render" Tile="GiganticFist_Alt.png" />
     <tag Name="GiganticEquippable" />
   </object>
+
+  <!-- 
+      
+      Sultan Masks 
+      - Making them Gigantic Equippable since Gigantism precludes you from them.
+      - These should be reverted once we have a cool in-game method of modifying them that isn't just a tier 3 modifier.
+        
+  -->
+  <object Name="The Kesil Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Shemesh Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Earth Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Levant Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Olive Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Nil Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
   
-  <!-- End Modified BaseGame "Natural" Weapons -->
-  
-  <!-- Gigantic Modable Changes -->
-  
+  <!-- 
+      
+      Gigantic Modable Changes 
+      
+  -->
 	<object Name="LightSource" Load="Merge">
 		<tag Name="Mods" Value="Gigantify" Load="Merge" />
 	</object>
@@ -575,19 +228,24 @@ You cannot wear equipment on your body."
     <tag Name="Mods" Value="Gigantify" Load="Merge" />
   </object>
 
-  <!-- End Gigantic Modable Changes -->
-  <!-- Start Weapon Elongating -->
+  <!-- 
+      
+      Weapon Elongating 
+      
+  -->
   <object Name="MeleeWeapon" Load="Merge">
     <part Name="WeaponElongator" />
   </object>
-  <!-- End Weapon Elongating -->
 
-  <!-- Start Testing -->
+  <!-- 
+      
+      Testing 
+      
+  -->
   <!-- object Name="Gigantism Giver Axe" Inherits="Battle Axe8">
     <part Name="Render" DisplayName="{{zetachrome|zetachrome}} {{gigantic|gigantism}} giving battle axe" Tile="Items/sw_axe_7.bmp" ColorString="&amp;Z" DetailColor="y" />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <tag Name="GiganticEquippable" />
   </object-->
-  <!-- End Testing -->
   
 </objects>

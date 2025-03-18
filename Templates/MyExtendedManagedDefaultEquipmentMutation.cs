@@ -11,7 +11,7 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
     {
-        // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the INaturalWeapon Part
+        // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the NaturalWeaponSubpart Part
         [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {

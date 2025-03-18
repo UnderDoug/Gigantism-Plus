@@ -101,7 +101,7 @@ namespace HNPS_GigantismPlus
             string bad = "\u0058";  // X
             string goodOrBad = string.Empty;
             if (Good != null) goodOrBad = ((bool)Good ? good : bad) + "\u005D "; // ]
-            string output = Text == string.Empty ? Label + ": " + Text : Label;
+            string output = Text != string.Empty ? Label + ": " + Text : Label;
             Entry(Verbosity, "\u005B" + goodOrBad + output, Indent);
         }
         public static void CheckYeh(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = true)

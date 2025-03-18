@@ -71,8 +71,8 @@ namespace XRL.World.Parts
         private int _level = 1;
         public int Level => _level = NaturalWeapon?.GetLevel() != null ? NaturalWeapon.GetLevel() : _level;
 
-        private INaturalWeapon _naturalWeapon = null;
-        public INaturalWeapon NaturalWeapon => _naturalWeapon ??= AssigningPart.GetNaturalWeapon();
+        private NaturalWeaponSubpart _naturalWeapon = null;
+        public NaturalWeaponSubpart NaturalWeapon => _naturalWeapon ??= AssigningPart.GetNaturalWeapon();
 
         public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
         public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
@@ -111,9 +111,9 @@ namespace XRL.World.Parts
             return NaturalWeapon.GetHitBonus();
         }
 
-        public virtual void ApplyGenericChanges(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)
+        public virtual void ApplyGenericChanges(GameObject Object, NaturalWeaponSubpart NaturalWeapon, string InstanceDescription)
         {
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon, string InstanceDescription)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
@@ -159,12 +159,12 @@ namespace XRL.World.Parts
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
             weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
-            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object, INaturalWeapon NaturalWeapon, string InstanceDescription) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon, string InstanceDescription) *//", Indent: 4);
         }
 
-        public virtual int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon)
+        public virtual int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart NaturalWeapon)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
 
             Render render = Object.Render;
@@ -256,13 +256,13 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4, $"x if (AdjectivePriority != 0 and AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
 
-            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon) *//", Indent: 4);
             return NaturalWeapon.Priority;
         }
 
-        public virtual void ApplyPartAndPropChanges(GameObject Object, INaturalWeapon NaturalWeapon)
+        public virtual void ApplyPartAndPropChanges(GameObject Object, NaturalWeaponSubpart NaturalWeapon)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             if (NaturalWeapon.GetAddedParts() != null)
@@ -298,13 +298,21 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"x foreach (KeyValuePair<string, int> entry in NaturalWeapon.GetAddedIntProps()) >//", Indent: 5);
             }
 
-            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon) *//", Indent: 4);
         }
 
         public override void ApplyModification(GameObject Object)
         {
             Render render = Object.Render;
-            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out string tilePath)) render.Tile = tilePath;
+
+            string icyString = "{{icy|icy}}";
+            string flamingString = "{{fiery|flaming}}";
+            string displayNameOnlySansRays = ParentObject.DisplayNameOnly;
+            displayNameOnlySansRays.Replace(icyString, "");
+            displayNameOnlySansRays.Replace(flamingString, "");
+
+            if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath)) render.Tile = tilePath;
+            if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath)) render.Tile = tilePath;
             Object.SetIntProperty("ShowAsPhysicalFeature", 1);
             Object.SetIntProperty("UndesirableWeapon", 0);
             Object.SetStringProperty("TemporaryDefaultBehavior", AssigningPart.Name, false);

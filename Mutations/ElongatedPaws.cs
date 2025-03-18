@@ -21,7 +21,7 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
-            NaturalWeapon = new()
+            NaturalWeaponSubpart = new()
             {
                 Level = 1,
                 DamageDieCount = 1,
@@ -42,6 +42,19 @@ namespace XRL.World.Parts.Mutation
                 SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
                 BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"
             };
+            NaturalWeaponBodyPart = "Hand";
+        }
+
+        public ElongatedPaws(NaturalWeaponSubpart naturalWeaponSubpart)
+        {
+            ElongatedPaws elongatedPaws = new();
+
+            DisplayName = elongatedPaws.DisplayName;
+            Type = elongatedPaws.Type;
+
+            NaturalWeaponSubpart = new(naturalWeaponSubpart);
+
+            NaturalWeaponBodyPart = elongatedPaws.NaturalWeaponBodyPart;
         }
 
         private bool _HasGigantism = false;
@@ -89,7 +102,7 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public override int GetNaturalWeaponDamageDieSize(int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
         {
             int dieSize = 0;
             
@@ -99,7 +112,7 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Floor(StrengthModifier / 2.0);
         }
@@ -141,7 +154,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Body body = E.Object.Body;
 
-                CalculateNaturalWeaponDamageBonus(Level);
+                CalculateNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level);
 
                 body?.UpdateBodyParts();
 
@@ -226,7 +239,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
 
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<ElongatedPaws>(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<ElongatedPaws>(NaturalWeaponSubpart), Actor: ParentObject);
 
                     Debug.DiveOut(4, $"{part.Type}", Indent: 2);
                 }
@@ -242,7 +255,8 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            elongatedPaws.NaturalWeaponSubparts = new(NaturalWeaponSubparts);
+            elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart);
             return elongatedPaws;
         }
 

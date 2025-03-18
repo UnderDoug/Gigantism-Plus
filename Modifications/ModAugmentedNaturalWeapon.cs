@@ -18,9 +18,9 @@ namespace XRL.World.Parts
         {
         }
 
-        public override int ApplyPriorityChanges(GameObject Object, INaturalWeapon NaturalWeapon)
+        public override int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart NaturalWeapon)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
 
             Render render = Object.Render;
@@ -69,7 +69,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x if (AdjectivePriority != 0 && AdjectivePriority < CurrentNounPriority) ?//", Indent: 5);
 
             Debug.Entry(4, $"* base.{nameof(ApplyPriorityChanges)}(Object, NaturalWeapon)", Indent: 4);
-            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, INaturalWeapon NaturalWeapon) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon) *//", Indent: 4);
             return base.ApplyPriorityChanges(Object, NaturalWeapon);
         }
 

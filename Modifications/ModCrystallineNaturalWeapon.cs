@@ -26,11 +26,11 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
+            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon);
+            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
-            ApplyPartAndPropChanges(Object, NaturalWeapon);
+            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
 
             base.ApplyModification(Object);
         }
@@ -46,7 +46,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeapon.GetColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.GetAdjectivePriority());
             }
             return base.HandleEvent(E);
         }
@@ -61,7 +61,7 @@ namespace XRL.World.Parts
         {
             string text = "weapon";
             string descriptionName = !ParentObject.HasNaturalWeaponMods() ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            descriptionName += Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
                 .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has ").Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} damage die size.");

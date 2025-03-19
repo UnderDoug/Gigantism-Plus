@@ -9,7 +9,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation
+    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
@@ -42,19 +42,16 @@ namespace XRL.World.Parts.Mutation
                 SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
                 BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"
             };
-            NaturalWeaponBodyPart = "Hand";
         }
 
-        public ElongatedPaws(NaturalWeaponSubpart naturalWeaponSubpart)
+        public ElongatedPaws(NaturalWeaponSubpart<ElongatedPaws> naturalWeaponSubpart)
         {
             ElongatedPaws elongatedPaws = new();
 
             DisplayName = elongatedPaws.DisplayName;
             Type = elongatedPaws.Type;
 
-            NaturalWeaponSubpart = new(naturalWeaponSubpart);
-
-            NaturalWeaponBodyPart = elongatedPaws.NaturalWeaponBodyPart;
+            NaturalWeaponSubpart = new(naturalWeaponSubpart, this);
         }
 
         private bool _HasGigantism = false;
@@ -102,7 +99,7 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public override int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
         {
             int dieSize = 0;
             
@@ -112,7 +109,7 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Floor(StrengthModifier / 2.0);
         }
@@ -154,7 +151,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Body body = E.Object.Body;
 
-                CalculateNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level);
+                NaturalWeaponSubpart.DamageBonus = GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level);
 
                 body?.UpdateBodyParts();
 
@@ -208,7 +205,7 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            /*Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
@@ -249,14 +246,18 @@ namespace XRL.World.Parts.Mutation
             Exit:
             Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
             Debug.Footer(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            base.OnRegenerateDefaultEquipment(body);
+            base.OnRegenerateDefaultEquipment(body); */
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalWeaponSubparts = new(NaturalWeaponSubparts);
-            elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart);
+            elongatedPaws.NaturalWeaponSubparts = new();
+            foreach ((string type, NaturalWeaponSubpart<ElongatedPaws> subpart) in NaturalWeaponSubparts)
+            {
+                elongatedPaws.NaturalWeaponSubparts.Add(type, new(subpart, elongatedPaws));
+            }
+            elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart, elongatedPaws);
             return elongatedPaws;
         }
 

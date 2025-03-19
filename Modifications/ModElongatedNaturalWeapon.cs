@@ -18,11 +18,11 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
+            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon);
+            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
-            ApplyPartAndPropChanges(Object, NaturalWeapon);
+            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
 
             base.ApplyModification(Object);
         }
@@ -36,7 +36,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeapon.GetColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.GetAdjectivePriority());
             }
             return base.HandleEvent(E);
         }
@@ -44,7 +44,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
             string description = $"{descriptionName}: ";
             description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";
             if (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())

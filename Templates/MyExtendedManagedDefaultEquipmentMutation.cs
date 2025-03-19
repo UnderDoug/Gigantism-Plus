@@ -87,7 +87,7 @@ namespace XRL.World.Parts.Mutation
         // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
         public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
         }
         public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
             where T : IPart, IManagedDefaultNaturalWeapon, new()
@@ -234,7 +234,7 @@ namespace XRL.World.Parts.Mutation
         }
 
         // You'll want some variation of this to ensure that things like Temporal Fugue clones don't delete your 
-        // NaturalWeapon Part by being copied with a reference to it.
+        // NaturalWeaponSubpart Part by being copied with a reference to it.
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             MyExtendedManagedDefaultEquipmentMutation myMutation = base.DeepCopy(Parent, MapInv) as MyExtendedManagedDefaultEquipmentMutation;

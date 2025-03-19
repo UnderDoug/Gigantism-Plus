@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using XRL.World;
 using HNPS_GigantismPlus;
+using XRL.Language;
 using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class NaturalWeaponSubpart : IScribedPart
+    public class NaturalWeaponSubpart<T> : IScribedPart
+        where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
     {
+        public T ParentPart;
+
         public string Type;
         public int Level;
         public int DamageDieCount;
@@ -17,8 +20,8 @@ namespace XRL.World.Parts
         public int HitBonus;
 
         public int ModPriority;
-        private int AdjectivePriority => ModPriority;
-        private int NounPriority => -ModPriority;
+        public int AdjectivePriority => ModPriority;
+        public int NounPriority => -ModPriority;
 
         public string Adjective;
         public string AdjectiveColor;
@@ -55,8 +58,27 @@ namespace XRL.World.Parts
             SecondColorString = "&y";
             SecondDetailColor = "Y";
         }
-        public NaturalWeaponSubpart(NaturalWeaponSubpart Source)
+        public NaturalWeaponSubpart(T NewParent)
         {
+            ParentPart = NewParent;
+
+            NaturalWeaponSubpart<T> Subpart = new();
+            Level = Subpart.Level;
+            DamageDieCount = Subpart.DamageDieCount;
+            DamageDieSize = Subpart.DamageDieSize;
+            DamageBonus = Subpart.DamageBonus;
+            HitBonus = Subpart.HitBonus;
+
+            ModPriority = Subpart.ModPriority;
+            ColorString = Subpart.ColorString;
+            DetailColor = Subpart.DetailColor;
+            SecondColorString = Subpart.SecondColorString;
+            SecondDetailColor = Subpart.SecondDetailColor;
+        }
+        public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source, T NewParent)
+        {
+            ParentPart = NewParent;
+
             Type = Source.Type;
             Level = Source.Level;
             DamageDieCount = Source.DamageDieCount;
@@ -88,25 +110,21 @@ namespace XRL.World.Parts
             EquipmentFrameColors = Source.EquipmentFrameColors;
         }
 
-        public int GetLevel()
-        {
-            return Level;
-        }
-        public int GetDamageDieCount()
+        public virtual int GetDamageDieCount()
         {
             // base damage die count is 1
             // example: mutation calculates die count should be 6d
             //          this deducts 1, adding 5 to the existing 1
             return DamageDieCount - 1;
         }
-        public int GetDamageDieSize()
+        public virtual int GetDamageDieSize()
         {
             // base damage die size is 2
             // example: mutation calculates die size should be d5
             //          this deducts 2, adding 3 to the existing 2
             return DamageDieSize - 2;
         }
-        public int GetDamageBonus()
+        public virtual int GetDamageBonus()
         {
             return DamageBonus;
         }
@@ -115,65 +133,59 @@ namespace XRL.World.Parts
             return HitBonus;
         }
 
-        public int GetPriority()
-        {
-            return ModPriority;
-        }
-
-        public int GetAdjectivePriority()
-        {
-            return AdjectivePriority;
-        }
-
-        public int GetNounPriority()
-        {
-            return NounPriority;
-        }
-
-        public string GetNoun()
-        {
-            return Noun;
-        }
-        public string GetAdjective()
-        {
-            return Adjective;
-        }
-        public string GetAdjectiveColor()
+        public virtual string GetAdjectiveColor()
         {
             return AdjectiveColor ?? "Y";
         }
-        public string GetAdjectiveColorFallback()
+        public virtual string GetAdjectiveColorFallback()
         {
             return AdjectiveColorFallback ?? "y";
         }
         public virtual string GetColoredAdjective()
         {
             if (Adjective.IsNullOrEmpty()) return null;
-            return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
+            return Adjective.OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
         }
-        public string GetSwingSound()
+
+        public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
-            return SwingSound;
+            return "Mod" + Grammar.MakeTitleCase(Adjective) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
         }
-        public string GetBlockedSound()
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod()
         {
-            return BlockedSound;
+            ModNaturalWeaponBase<T> NaturalWeaponMod = GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
+            NaturalWeaponMod.NaturalWeaponSubpart = this;
+            NaturalWeaponMod.AssigningPart = ParentPart;
+            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
         }
-        public List<string> GetAddedParts()
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            return AddedParts;
+            NaturalWeaponSubpart<T> naturalWeaponSubpart = base.DeepCopy(Parent, MapInv) as NaturalWeaponSubpart<T>;
+            return naturalWeaponSubpart;
         }
-        public Dictionary<string, string> GetAddedStringProps()
+
+        public virtual bool ProcessAddedParts(string Parts)
         {
-            return AddedStringProps;
+            if (Parts == null) return false;
+            AddedParts ??= new();
+            string[] parts = Parts.Split(',');
+            foreach (string part in parts)
+            {
+                AddedParts.Add(part);
+            }
+            return true;
         }
-        public Dictionary<string, int> GetAddedIntProps()
+
+        public virtual bool ProcessAddedProps(string Props)
         {
-            return AddedIntProps;
-        }
-        public string GetEquipmentFrameColors()
-        {
-            return EquipmentFrameColors;
+            if (Props == null) return false;
+            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
+            {
+                AddedStringProps = StringProps;
+                AddedIntProps = IntProps;
+            }
+            return true;
         }
     }
 }

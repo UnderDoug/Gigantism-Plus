@@ -20,7 +20,7 @@ namespace XRL.World.Parts
 
         public override int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart NaturalWeapon)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
 
             Render render = Object.Render;
@@ -68,18 +68,18 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4, $"x if (AdjectivePriority != 0 && AdjectivePriority < CurrentNounPriority) ?//", Indent: 5);
 
-            Debug.Entry(4, $"* base.{nameof(ApplyPriorityChanges)}(Object, NaturalWeapon)", Indent: 4);
-            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeapon) *//", Indent: 4);
+            Debug.Entry(4, $"* base.{nameof(ApplyPriorityChanges)}(Object, NaturalWeaponSubpart)", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart) *//", Indent: 4);
             return base.ApplyPriorityChanges(Object, NaturalWeapon);
         }
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
+            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeapon);
+            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
-            ApplyPartAndPropChanges(Object, NaturalWeapon);
+            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
 
             base.ApplyModification(Object);
         }
@@ -93,7 +93,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(AssigningPart.GetNaturalWeaponColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
+                E.AddAdjective(AssigningPart.GetNaturalWeaponColoredAdjective(), NaturalWeaponSubpart.GetAdjectivePriority());
             }
             return base.HandleEvent(E);
         }
@@ -102,7 +102,7 @@ namespace XRL.World.Parts
         {
             string cyberneticsObject = AssigningPart.ImplantObject.ShortDisplayName;
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
             string description = $"{descriptionName}: ";
             description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";
             description += $"has some of its bonuses applied by an implanted {cyberneticsObject}.";

@@ -3,44 +3,32 @@ using System.Collections.Generic;
 using XRL.World.Parts;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalWeapon 
+    public interface IManagedDefaultNaturalWeapon<T> where T : IPart, IManagedDefaultNaturalWeapon<T>, new ()
     {
-        
-        public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart NaturalWeaponSubpart, bool Managed = true);
-        public abstract ModNaturalWeaponBase<TPart> GetNaturalWeaponMod<TPart>(NaturalWeaponSubpart NaturalWeaponSubpart)
-            where TPart : IPart, IManagedDefaultNaturalWeapon, new();
-        public abstract bool CalculateNaturalWeaponLevel(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
+        public abstract NaturalWeaponSubpart<T> GetNaturalWeaponSubpart(
+            string Type = "", 
+            GameObject RequestingObject = null, 
+            ModNaturalWeaponBase<T> RequestingNaturalWeaponMod = null);
+        public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
+        public abstract ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> Subpart);
 
-        public abstract bool CalculateNaturalWeaponDamageDieCount(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
+        public abstract bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart<T> Subpart, string Parts);
 
-        public abstract bool CalculateNaturalWeaponDamageDieSize(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
+        public abstract bool ProcessNaturalWeaponAddedProps(NaturalWeaponSubpart<T> Subpart, string Props);
 
-        public abstract bool CalculateNaturalWeaponDamageBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
+        public abstract int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<T> Subpart, int Level = 1);
 
-        public abstract bool CalculateNaturalWeaponHitBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
+        public abstract int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<T> Subpart, int Level = 1);
 
-        public abstract bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart NaturalWeaponSubpart, string Parts);
+        public abstract int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<T> Subpart, int Level = 1);
 
-        public abstract bool ProcessNaturalWeaponAddedProps(NaturalWeaponSubpart NaturalWeaponSubpart, string Props);
+        public abstract int GetNaturalWeaponHitBonus(NaturalWeaponSubpart<T> Subpart, int Level = 1);
 
-        public abstract int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
-
-        public abstract int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
-
-        public abstract int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
-
-        public abstract int GetNaturalWeaponHitBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
-
-        public abstract List<string> GetNaturalWeaponAddedParts(NaturalWeaponSubpart NaturalWeaponSubpart);
-
-        public abstract Dictionary<string, string> GetNaturalWeaponAddedStringProps(NaturalWeaponSubpart NaturalWeaponSubpart);
-
-        public abstract Dictionary<string, int> GetNaturalWeaponAddedIntProps(NaturalWeaponSubpart NaturalWeaponSubpart);
-
-        public abstract string GetNaturalWeaponEquipmentFrameColors(NaturalWeaponSubpart NaturalWeaponSubpart);
+        public abstract bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level = 1);
 
         // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
         public abstract void OnDecorateDefaultEquipment(Body body);

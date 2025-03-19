@@ -15,28 +15,14 @@ namespace XRL.World.Parts.Mutation
     public class GigantismPlus : BaseManagedDefaultEquipmentMutation<GigantismPlus>
     {
         public int AppliedJumpBonus = 0;
+
         private double _stunningForceLevelFactor = 0.5;
-        public double StunningForceLevelFactor
-        {
-            get 
-            {
-                var cybernetics = ParentObject.Body.GetBody().Cybernetics;
-                if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
-                {
-                    return exoframe.StunningForceLevelFactor;
-                }
-                return _stunningForceLevelFactor; 
-            }
-            set 
-            { 
-                _stunningForceLevelFactor = value;
-            }
-        }
+
         public int StunningForceDistance = 3;
 
-        public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
-
         public Guid EnableActivatedAbilityID = Guid.Empty;
+
+        public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
 
         public int HunchedOverAVModifier = 4;
         public int HunchedOverDVModifier = -6;
@@ -45,24 +31,8 @@ namespace XRL.World.Parts.Mutation
 
         public bool IsVehicleCreature => ParentObject.HasPart(typeof(Vehicle));
 
-        private string HunchedOverAbilityHunched
-        {
-            get
-            {
-                if (IsCyberGiant)
-                    return "Compact";
-                return "Hunched";
-            }
-        }
-        private string HunchedOverAbilityUpright
-        {
-            get
-            {
-                if (IsCyberGiant)
-                    return "Regular"; // was "Standard" but it's one too many characters
-                return "Upright";
-            }
-        }
+        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
+        private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
 
         public static int GetHunchedOverAVModifier(int Level)
         {
@@ -83,17 +53,18 @@ namespace XRL.World.Parts.Mutation
 
         public int GetJumpRangeBonus(int Level)
         {
-            int baseBonus = 1;
-            var cybernetics = ParentObject.Body.GetBody().Cybernetics;
-            if (GiganticExoframe != null)
-            {
-                return baseBonus + GiganticExoframe.JumpDistanceBonus;
-            }
-            return baseBonus;
+            return 1 + GiganticExoframe?.JumpDistanceBonus == null ? 0 : GiganticExoframe.JumpDistanceBonus;
+        }
+        public double GetStunningForceLevelFactor()
+        {
+            return _stunningForceLevelFactor = 
+                (GiganticExoframe?.StunningForceLevelFactor) == null 
+                ? _stunningForceLevelFactor 
+                : GiganticExoframe.StunningForceLevelFactor;
         }
         public int GetStunningForceLevel(int Level)
         {
-            return (int)Math.Max(Math.Floor(Level * StunningForceLevelFactor), 1);
+            return (int)Math.Max(Math.Floor(Level * GetStunningForceLevelFactor()), 1);
         }
         public int GetStunningForceDistance(int Level)
         {
@@ -104,49 +75,34 @@ namespace XRL.World.Parts.Mutation
         {
             get
             {
-                if (ParentObject == null) return false;
-                return ParentObject.IsGiganticCreature;
+                return (ParentObject?.IsGiganticCreature) != null && ParentObject.IsGiganticCreature;
             }
             private set
             {
-                ParentObject.IsGiganticCreature = value;
-                if (IsPseudoGiganticCreature == value)
-                {
-                    IsPseudoGiganticCreature = !value;
-                }
+                if (ParentObject != null) ParentObject.IsGiganticCreature = value;
+                if (IsPseudoGiganticCreature == value) IsPseudoGiganticCreature = !value;
             }
         }
         public bool IsPseudoGiganticCreature // ensures you aren't (typically) Gigantic and PseudoGigantic at the same time 
         {
             get
             {
-                if (ParentObject == null) return false;
-                return ParentObject.HasPart<PseudoGigantism>();
+                return ParentObject?.HasPart<PseudoGigantism>() != null && ParentObject.HasPart<PseudoGigantism>();
             }
             set
             {
-                if (value) ParentObject.RequirePart<PseudoGigantism>();
-                else ParentObject.RemovePart<PseudoGigantism>();
+                if (ParentObject != null && value) ParentObject.RequirePart<PseudoGigantism>();
+                else ParentObject?.RemovePart<PseudoGigantism>();
 
-                if (IsGiganticCreature == value)
-                {
-                    IsGiganticCreature = !value;
-                }
 
+                if (IsGiganticCreature == value) IsGiganticCreature = !value;
             }
         }
 
-        public bool IsCyberGiant
-        {
-            get
-            {
-                if (ParentObject == null) return false;
-                return GiganticExoframe != null;
-            }
-        }
+        public bool IsCyberGiant => GiganticExoframe != null;
 
         private CyberneticsGiganticExoframe _giganticExoframe;
-        public CyberneticsGiganticExoframe GiganticExoframe => _giganticExoframe ??= ParentObject?.Body?.GetPartByName("body").Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
+        public CyberneticsGiganticExoframe GiganticExoframe => _giganticExoframe ??= ParentObject?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
 
         public bool UnHunchImmediately = false;
 
@@ -174,8 +130,9 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{gigantic|Gigantism}} ({{r|D}})";
             Type = "Physical";
 
-            NaturalWeaponSubpart Fists = new()
+            NaturalWeaponSubpart<GigantismPlus> GiganticFist = new()
             {
+                ParentPart = this,
                 Level = 1,
                 DamageDieCount = 1,
                 DamageDieSize = 2,
@@ -198,27 +155,26 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoShortDescription", 1 }
                 }
             };
-            NaturalWeaponSubparts.Add("Hand", Fists);
+            NaturalWeaponSubparts.Add("Hand", GiganticFist);
         }
-        public GigantismPlus(Dictionary<string, NaturalWeaponSubpart> naturalWeaponSubparts)
+        public GigantismPlus(Dictionary<string, NaturalWeaponSubpart<GigantismPlus>> naturalWeaponSubparts)
+            : base(naturalWeaponSubparts)
         {
             GigantismPlus gigantism = new();
 
             DisplayName = gigantism.DisplayName;
             Type = gigantism.Type;
-
-            NaturalWeaponSubparts = new(naturalWeaponSubparts);
         }
 
-        public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
         }
-        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
         }
-        public override int  GetNaturalWeaponHitBonus(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
+        public override int  GetNaturalWeaponHitBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             return -3 + (int)Math.Floor(Level / 2.0);
         }
@@ -519,7 +475,7 @@ namespace XRL.World.Parts.Mutation
             {
                 WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
                 stunningForceDistance = StunningForceDistance;
-                stunningForceLevelFactor = StunningForceLevelFactor;
+                stunningForceLevelFactor = GetStunningForceLevelFactor();
             }
 
             string gigantismSource = (!IsCyberGiant) ? "unusually" : "cybernetically".Color("c");
@@ -588,7 +544,7 @@ namespace XRL.World.Parts.Mutation
             string stunningForceDamageIncrement = StunningForce.GetDamageIncrement(1);
             if (ParentObject != null)
             {
-                NaturalWeaponSubpart NaturalWeaponSubpart = NaturalWeaponSubparts["Hand"];
+                NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart = NaturalWeaponSubparts["Hand"];
                 WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
                 FistDamageDieCount = GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart, Level);
                 FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level));
@@ -777,7 +733,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
             List<string> targetPartTypes = new();
-            foreach ((string type, NaturalWeaponSubpart subpart) in NaturalWeaponSubparts)
+            foreach ((string type, NaturalWeaponSubpart<GigantismPlus> subpart) in NaturalWeaponSubparts)
             {
                 targetPartTypes.Add(type);
                 Debug.Entry(4, $"targetPartType \"{type}\" added", Indent: 1);
@@ -794,8 +750,8 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.DiveIn(4, $"\u00BB: {part.Description} [{part.ID}:{part.Type}]", Indent: 2);
 
-                NaturalWeaponSubpart NaturalWeaponSubpart = NaturalWeaponSubparts[part.Type];
-                part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<GigantismPlus>(NaturalWeaponSubpart), Actor: ParentObject);
+                NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart = NaturalWeaponSubparts[part.Type];
+                part.DefaultBehavior.ApplyModification(NaturalWeaponSubpart.GetNaturalWeaponMod(), Actor: ParentObject);
 
                 Debug.DiveOut(4, $"\u00AB: {part.Description} [{part.ID}:{part.Type}]", Indent: 2);
             }
@@ -944,8 +900,12 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            gigantism.NaturalWeaponSubparts = new(NaturalWeaponSubparts);
-            gigantism.NaturalWeaponSubpart = new(NaturalWeaponSubpart);
+            gigantism.NaturalWeaponSubparts = new();
+            foreach ((string type, NaturalWeaponSubpart<GigantismPlus> subpart) in NaturalWeaponSubparts)
+            {
+                gigantism.NaturalWeaponSubparts.Add(type, new(subpart, gigantism));
+            }
+            gigantism.NaturalWeaponSubpart = new(NaturalWeaponSubpart, gigantism);
             gigantism._giganticExoframe = null;
             return gigantism;
         }

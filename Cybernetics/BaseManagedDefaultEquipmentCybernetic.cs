@@ -96,7 +96,7 @@ namespace XRL.World.Parts
 
         public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
         }
         public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
             where T : IPart, IManagedDefaultNaturalWeapon, new()

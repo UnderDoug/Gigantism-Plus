@@ -48,6 +48,10 @@ namespace XRL.World.Parts.Mutation
 
                 EquipmentFrameColors = NaturalWeapon.EquipmentFrameColors;
             }
+            public override string GetColoredAdjective()
+            {
+                return GetAdjective().OptionalColor(GetAdjectiveColor(), GetAdjectiveColorFallback(), Colorfulness);
+            }
         }
 
         public INaturalWeapon NaturalWeapon = new()
@@ -84,7 +88,7 @@ namespace XRL.World.Parts.Mutation
 
         public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
         }
         public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
             where T : IPart, IManagedDefaultNaturalWeapon, new()

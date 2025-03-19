@@ -25,7 +25,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
+            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
 
             Object.RequirePart<BurrowingClawsProperties>();
 
@@ -33,9 +33,9 @@ namespace XRL.World.Parts
             burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
             burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
 
-            ApplyPriorityChanges(Object, NaturalWeapon);
+            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
-            ApplyPartAndPropChanges(Object, NaturalWeapon);
+            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
 
             base.ApplyModification(Object);
         }
@@ -49,7 +49,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeapon.GetColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.GetAdjectivePriority());
             }
             return base.HandleEvent(E);
         }
@@ -57,7 +57,7 @@ namespace XRL.World.Parts
         public new string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
             int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);

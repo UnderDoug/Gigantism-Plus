@@ -8,7 +8,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class BaseManagedDefaultEquipmentMutation : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
+    public class BaseManagedDefaultEquipmentMutation<T> : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon where T : BaseManagedDefaultEquipmentMutation<T>, new()
     {
         public Dictionary<string, NaturalWeaponSubpart> NaturalWeaponSubparts = new();
         public NaturalWeaponSubpart NaturalWeaponSubpart;
@@ -28,18 +28,30 @@ namespace XRL.World.Parts.Mutation
             NaturalWeaponSubparts = NewNaturalWeaponSubparts;
         }
 
+        public BaseManagedDefaultEquipmentMutation(Dictionary<string, NaturalWeaponSubpart> naturalWeaponSubparts, NaturalWeaponSubpart naturalWeaponSubpart)
+        {
+            Dictionary<string, NaturalWeaponSubpart> NewNaturalWeaponSubparts = new();
+            foreach ((string Part, NaturalWeaponSubpart Subpart) in naturalWeaponSubparts)
+            {
+                NewNaturalWeaponSubparts.Add(Part, Subpart);
+            }
+            NaturalWeaponSubparts = NewNaturalWeaponSubparts;
+            NaturalWeaponSubpart = new(naturalWeaponSubpart);
+        }
+
         public virtual string GetNaturalWeaponModName(NaturalWeaponSubpart NaturalWeaponSubpart, bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeaponSubpart.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>(NaturalWeaponSubpart NaturalWeaponSubpart)
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        public virtual ModNaturalWeaponBase<TPart> GetNaturalWeaponMod<TPart>(NaturalWeaponSubpart NaturalWeaponSubpart)
+            where TPart : IPart, IManagedDefaultNaturalWeapon, new()
         {
-            return GetNaturalWeaponModName(NaturalWeaponSubpart).ConvertToNaturalWeaponModification<T>();
+            return GetNaturalWeaponModName(NaturalWeaponSubpart).ConvertToNaturalWeaponModification<TPart>();
         }
 
         public virtual bool CalculateNaturalWeaponLevel(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1)
         {
+            ModNaturalWeaponBase<T> NaturalWeaponMod = GetNaturalWeaponMod<T>(NaturalWeaponSubpart);
             NaturalWeaponSubpart.Level = Level;
             return true;
         }
@@ -156,8 +168,9 @@ namespace XRL.World.Parts.Mutation
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            BaseManagedDefaultEquipmentMutation mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation;
+            BaseManagedDefaultEquipmentMutation<T> mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation<T>;
             mutation.NaturalWeaponSubparts = new(NaturalWeaponSubparts);
+            mutation.NaturalWeaponSubpart = null;
             return mutation;
         }
     }

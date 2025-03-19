@@ -12,7 +12,7 @@ using static HNPS_GigantismPlus.Extensions;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class GigantismPlus : BaseManagedDefaultEquipmentMutation
+    public class GigantismPlus : BaseManagedDefaultEquipmentMutation<GigantismPlus>
     {
         public int AppliedJumpBonus = 0;
         private double _stunningForceLevelFactor = 0.5;

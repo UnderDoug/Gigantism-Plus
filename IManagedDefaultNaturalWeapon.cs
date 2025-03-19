@@ -6,11 +6,12 @@ using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalWeapon
+    public interface IManagedDefaultNaturalWeapon 
     {
+        
         public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart NaturalWeaponSubpart, bool Managed = true);
-        public abstract ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>(NaturalWeaponSubpart NaturalWeaponSubpart)
-            where T : IPart, IManagedDefaultNaturalWeapon, new();
+        public abstract ModNaturalWeaponBase<TPart> GetNaturalWeaponMod<TPart>(NaturalWeaponSubpart NaturalWeaponSubpart)
+            where TPart : IPart, IManagedDefaultNaturalWeapon, new();
         public abstract bool CalculateNaturalWeaponLevel(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);
 
         public abstract bool CalculateNaturalWeaponDamageDieCount(NaturalWeaponSubpart NaturalWeaponSubpart, int Level = 1);

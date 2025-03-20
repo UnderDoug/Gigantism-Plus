@@ -36,7 +36,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
             }
             return base.HandleEvent(E);
         }

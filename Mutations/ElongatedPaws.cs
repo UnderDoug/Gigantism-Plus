@@ -23,10 +23,11 @@ namespace XRL.World.Parts.Mutation
 
             NaturalWeaponSubpart = new()
             {
-                Level = 1,
-                DamageDieCount = 1,
+                ParentPart = this,
+                Level = Level,
+                CosmeticOnly = false,
+                Type = "Hand",
                 DamageDieSize = 3,
-                DamageBonus = 0,
                 ModPriority = 20,
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
@@ -42,16 +43,6 @@ namespace XRL.World.Parts.Mutation
                 SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
                 BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"
             };
-        }
-
-        public ElongatedPaws(NaturalWeaponSubpart<ElongatedPaws> naturalWeaponSubpart)
-        {
-            ElongatedPaws elongatedPaws = new();
-
-            DisplayName = elongatedPaws.DisplayName;
-            Type = elongatedPaws.Type;
-
-            NaturalWeaponSubpart = new(naturalWeaponSubpart, this);
         }
 
         private bool _HasGigantism = false;

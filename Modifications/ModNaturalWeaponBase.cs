@@ -14,13 +14,19 @@ namespace XRL.World.Parts
         public ModNaturalWeaponBase()
         {
         }
-        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart)
-        {
-            NaturalWeaponSubpart = Subpart;
-        }
         public ModNaturalWeaponBase(int Tier)
             : base(Tier)
         {
+        }
+        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart)
+            : this()
+        {
+            NaturalWeaponSubpart = new(Subpart);
+        }
+        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart, int Tier)
+            : this(Tier)
+        {
+            NaturalWeaponSubpart = Subpart;
         }
 
         public override void Configure()
@@ -48,7 +54,23 @@ namespace XRL.World.Parts
         }
 
         private GameObject _wielder = null;
-        public GameObject Wielder => _wielder ??= ParentObject?.Equipped;
+        public GameObject Wielder
+        {
+            get
+            {
+                return _wielder ??= ParentObject?.Equipped;
+            }
+            set
+            {
+                Type valueType = value?.GetType();
+                if (value != null && valueType.IsEquivalentTo(typeof(GameObject)))
+                {
+                    _wielder = value;
+                    return;
+                }
+                _wielder = null;
+            }
+        }
 
         private T _assigningPart = null;
         public T AssigningPart
@@ -70,8 +92,8 @@ namespace XRL.World.Parts
         }
 
         [SerializeField]
-        private int _level = 1;
-        public int Level => _level = NaturalWeaponSubpart?.Level != null ? NaturalWeaponSubpart.Level : _level;
+        private int? _level = 1;
+        public int? Level => _level ??= NaturalWeaponSubpart?.Level;
 
         private NaturalWeaponSubpart<T> _naturalWeaponSubpart = null;
         public NaturalWeaponSubpart<T> NaturalWeaponSubpart
@@ -83,7 +105,7 @@ namespace XRL.World.Parts
             set
             {
                 Type valueType = value?.GetType();
-                if (value != null && valueType.IsEquivalentTo(typeof(T)))
+                if (value != null && valueType.IsEquivalentTo(typeof(NaturalWeaponSubpart<T>)))
                 {
                     _naturalWeaponSubpart = value;
                 }
@@ -96,9 +118,9 @@ namespace XRL.World.Parts
 
         public static ModNaturalWeaponBase<T> ClearForCopy(ModNaturalWeaponBase<T> ModNaturalWeaponBase)
         {
-            ModNaturalWeaponBase._assigningPart = null;
-            ModNaturalWeaponBase._wielder = null;
-            ModNaturalWeaponBase._naturalWeaponSubpart = null;
+            ModNaturalWeaponBase.AssigningPart = null;
+            ModNaturalWeaponBase.Wielder = null;
+            ModNaturalWeaponBase.NaturalWeaponSubpart = null;
             return ModNaturalWeaponBase;
         }
 

@@ -102,7 +102,22 @@ namespace XRL.World.Parts.Mutation
         public bool IsCyberGiant => GiganticExoframe != null;
 
         private CyberneticsGiganticExoframe _giganticExoframe;
-        public CyberneticsGiganticExoframe GiganticExoframe => _giganticExoframe ??= ParentObject?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
+        public CyberneticsGiganticExoframe GiganticExoframe
+        {
+            get
+            {
+                return _giganticExoframe ??= ParentObject?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
+            }
+            set
+            {
+                Type valueType = value?.GetType();
+                if (value != null && valueType.IsEquivalentTo(typeof(CyberneticsGiganticExoframe)))
+                {
+                    _giganticExoframe = value;
+                }
+                _giganticExoframe = null;
+            }
+        }
 
         public bool UnHunchImmediately = false;
 
@@ -133,10 +148,9 @@ namespace XRL.World.Parts.Mutation
             NaturalWeaponSubpart<GigantismPlus> GiganticFist = new()
             {
                 ParentPart = this,
-                Level = 1,
-                DamageDieCount = 1,
-                DamageDieSize = 2,
-                DamageBonus = 0,
+                Type = "Hand",
+                CosmeticOnly = false,
+                Level = Level,
                 ModPriority = 10,
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
@@ -155,15 +169,7 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoShortDescription", 1 }
                 }
             };
-            NaturalWeaponSubparts.Add("Hand", GiganticFist);
-        }
-        public GigantismPlus(Dictionary<string, NaturalWeaponSubpart<GigantismPlus>> naturalWeaponSubparts)
-            : base(naturalWeaponSubparts)
-        {
-            GigantismPlus gigantism = new();
-
-            DisplayName = gigantism.DisplayName;
-            Type = gigantism.Type;
+            NaturalWeaponSubparts.Add(GiganticFist.Type, GiganticFist);
         }
 
         public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
@@ -718,6 +724,7 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
+            /*
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
@@ -760,6 +767,7 @@ namespace XRL.World.Parts.Mutation
             Exit:
             Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
             Debug.Footer(3, $"{nameof(GigantismPlus)}", $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
+            */
             base.OnRegenerateDefaultEquipment(body);
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 
@@ -906,7 +914,7 @@ namespace XRL.World.Parts.Mutation
                 gigantism.NaturalWeaponSubparts.Add(type, new(subpart, gigantism));
             }
             gigantism.NaturalWeaponSubpart = new(NaturalWeaponSubpart, gigantism);
-            gigantism._giganticExoframe = null;
+            gigantism.GiganticExoframe = null;
             return gigantism;
         }
 

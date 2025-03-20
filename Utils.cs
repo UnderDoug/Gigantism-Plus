@@ -354,9 +354,9 @@ namespace HNPS_GigantismPlus
                 Indent: Indent);
         }
 
-        public static void ManagedVanillaMutation()
+        public static void ManagedVanillaMutationOptionHandler()
         {
-            Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutation)}()", Indent: 1);
+            Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}()", Indent: 1);
             List<(string, string, string)> MutationEntries = new List<(string Name, string Vanilla, string Managed)>
             {
                 ("Burrowing Claws", "BurrowingClaws", "UD_ManagedBurrowingClaws"),
@@ -377,7 +377,7 @@ namespace HNPS_GigantismPlus
                 }
             }
             Debug.Entry(4, $"x foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries) >//", Indent: 1);
-            Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutation)}() *//", Indent: 1);
+            Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}() *//", Indent: 1);
         }
 
     } //!-- public static class Utils

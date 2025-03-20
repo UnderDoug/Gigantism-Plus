@@ -21,24 +21,28 @@ namespace XRL.World.Parts.Mutation
         {
         }
 
-        public BaseManagedDefaultEquipmentMutation(Dictionary<string, NaturalWeaponSubpart<T>> naturalWeaponSubparts)
+        // Takes an existing NaturalWeaponSubparts Dictionary
+        public BaseManagedDefaultEquipmentMutation(Dictionary<string, NaturalWeaponSubpart<T>> naturalWeaponSubparts, T NewParent)
+            : this()
         {
             Dictionary<string, NaturalWeaponSubpart<T>> NewNaturalWeaponSubparts = new();
             foreach ((string Part, NaturalWeaponSubpart<T> Subpart) in naturalWeaponSubparts)
             {
-                NewNaturalWeaponSubparts.Add(Part, Subpart);
+                NaturalWeaponSubpart<T> subpart = new(Subpart, NewParent);
+                NewNaturalWeaponSubparts.Add(Part, subpart);
             }
             NaturalWeaponSubparts = NewNaturalWeaponSubparts;
         }
 
-        public BaseManagedDefaultEquipmentMutation(Dictionary<string, NaturalWeaponSubpart<T>> naturalWeaponSubparts, NaturalWeaponSubpart<T> naturalWeaponSubpart, T NewParent)
+        public BaseManagedDefaultEquipmentMutation(NaturalWeaponSubpart<T> naturalWeaponSubpart, T NewParent)
+            : this()
         {
-            Dictionary<string, NaturalWeaponSubpart<T>> NewNaturalWeaponSubparts = new();
-            foreach ((string Part, NaturalWeaponSubpart<T> Subpart) in naturalWeaponSubparts)
-            {
-                NewNaturalWeaponSubparts.Add(Part, Subpart);
-            }
-            NaturalWeaponSubparts = NewNaturalWeaponSubparts;
+            NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
+        }
+
+        public BaseManagedDefaultEquipmentMutation(Dictionary<string, NaturalWeaponSubpart<T>> naturalWeaponSubparts, NaturalWeaponSubpart<T> naturalWeaponSubpart, T NewParent)
+            : this(naturalWeaponSubparts, NewParent)
+        {
             NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
         }
 
@@ -142,11 +146,6 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeaponSubpart.AddedIntProps;
         }
 
-        public virtual string GetNaturalWeaponEquipmentFrameColors(NaturalWeaponSubpart<T> NaturalWeaponSubpart)
-        {
-            return NaturalWeaponSubpart.EquipmentFrameColors;
-        }
-
         public virtual bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level)
         {
             Subpart.Level = Level;
@@ -165,35 +164,50 @@ namespace XRL.World.Parts.Mutation
             if (NaturalWeaponSubpart != null) UpdateNaturalWeaponSubpart(NaturalWeaponSubpart, NewLevel);
             return base.ChangeLevel(NewLevel);
         }
-        public override void OnRegenerateDefaultEquipment(Body body)
+
+        public virtual bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false)
         {
             if (body == null) goto Skip;
             List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
             foreach (BodyPart part in partsList)
             {
                 ModNaturalWeaponBase<T> modNaturalWeapon = null;
-                if (part.Type == NaturalWeaponSubpart.Type)
+                if (NaturalWeaponSubpart != null && part.Type == NaturalWeaponSubpart.Type && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
                 {
                     modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
                 }
-                else if (NaturalWeaponSubparts[part.Type] != null)
+                else if (NaturalWeaponSubparts[part.Type] != null && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
                 {
                     modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
                 }
 
                 if (modNaturalWeapon == null) continue;
 
-                if (part.DefaultBehavior != null) 
-                { 
-                    part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject); 
+                if (part.DefaultBehavior != null)
+                {
+                    part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
                 }
                 else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
                 {
                     part.Equipped.ApplyModification(modNaturalWeapon, Actor: ParentObject);
                 }
             }
-        Skip:
+            Skip:
+            return true;
+        }
+        public override void OnRegenerateDefaultEquipment(Body body)
+        {
+            if (body == null) goto Skip;
+            ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
+            Skip:
             base.OnRegenerateDefaultEquipment(body);
+        }
+        public override void OnDecorateDefaultEquipment(Body body)
+        {
+            if (body == null) goto Skip;
+            ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
+            Skip:
+            base.OnDecorateDefaultEquipment(body);
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

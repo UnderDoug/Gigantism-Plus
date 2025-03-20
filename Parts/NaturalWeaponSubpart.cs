@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using HNPS_GigantismPlus;
 using XRL.Language;
 using static HNPS_GigantismPlus.Options;
@@ -13,6 +14,7 @@ namespace XRL.World.Parts
         public T ParentPart;
 
         public string Type;
+        public bool CosmeticOnly;
         public int Level;
         public int DamageDieCount;
         public int DamageDieSize;
@@ -46,6 +48,7 @@ namespace XRL.World.Parts
 
         public NaturalWeaponSubpart()
         {
+            CosmeticOnly = false;
             Level = 1;
             DamageDieCount = 1;
             DamageDieSize = 2;
@@ -58,28 +61,11 @@ namespace XRL.World.Parts
             SecondColorString = "&y";
             SecondDetailColor = "Y";
         }
-        public NaturalWeaponSubpart(T NewParent)
+        public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source)
+            : this()
         {
-            ParentPart = NewParent;
-
-            NaturalWeaponSubpart<T> Subpart = new();
-            Level = Subpart.Level;
-            DamageDieCount = Subpart.DamageDieCount;
-            DamageDieSize = Subpart.DamageDieSize;
-            DamageBonus = Subpart.DamageBonus;
-            HitBonus = Subpart.HitBonus;
-
-            ModPriority = Subpart.ModPriority;
-            ColorString = Subpart.ColorString;
-            DetailColor = Subpart.DetailColor;
-            SecondColorString = Subpart.SecondColorString;
-            SecondDetailColor = Subpart.SecondDetailColor;
-        }
-        public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source, T NewParent)
-        {
-            ParentPart = NewParent;
-
             Type = Source.Type;
+            CosmeticOnly = Source.CosmeticOnly;
             Level = Source.Level;
             DamageDieCount = Source.DamageDieCount;
             DamageDieSize = Source.DamageDieSize;
@@ -109,7 +95,26 @@ namespace XRL.World.Parts
 
             EquipmentFrameColors = Source.EquipmentFrameColors;
         }
+        public NaturalWeaponSubpart(T NewParent)
+            : this()
+        {
+            ParentPart = NewParent;
+        }
+        public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source, T NewParent)
+            : this(Source)
+        {
+            ParentPart = NewParent;
+        }
 
+        public virtual bool IsCosmeticOnly()
+        {
+            NaturalWeaponSubpart<T> @default = new();
+            bool SameBonusAsDefault = (DamageDieCount == @default.DamageDieCount 
+                                    && DamageDieSize == @default.DamageDieSize 
+                                    && DamageBonus == @default.DamageBonus 
+                                    && HitBonus == @default.HitBonus);
+            return SameBonusAsDefault || CosmeticOnly;
+        }
         public virtual int GetDamageDieCount()
         {
             // base damage die count is 1

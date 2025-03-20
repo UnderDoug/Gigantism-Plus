@@ -70,7 +70,7 @@ namespace HNPS_GigantismPlus
         public static bool OnOptionManagedVanilla()
         {
             Debug.Entry(4, $"@ {nameof(Options)}.{nameof(OnOptionManagedVanilla)}", Indent: 0);
-            ManagedVanillaMutation();
+            ManagedVanillaMutationOptionHandler();
             Debug.Entry(4, $"x {nameof(Options)}.{nameof(OnOptionManagedVanilla)} @//", Indent: 0);
             return true;
         }

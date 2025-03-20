@@ -4,6 +4,7 @@ using XRL.World.Parts;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using XRL.World.Anatomy;
 
 namespace XRL.World
 {
@@ -11,8 +12,8 @@ namespace XRL.World
     {
         public abstract NaturalWeaponSubpart<T> GetNaturalWeaponSubpart(
             string Type = "", 
-            GameObject RequestingObject = null, 
-            ModNaturalWeaponBase<T> RequestingNaturalWeaponMod = null);
+            GameObject RequestingObject = null,
+            BodyPart BodyPart = null);
         public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
         public abstract ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> Subpart);
 

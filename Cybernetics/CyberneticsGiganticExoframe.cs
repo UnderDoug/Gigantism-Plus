@@ -29,6 +29,7 @@ namespace XRL.World.Parts
         public double StunningForceLevelFactor = 0.5;
 
         public CyberneticsGiganticExoframe()
+            : base()
         {
             NaturalWeaponSubpart = new()
             {

@@ -1,4 +1,5 @@
-﻿using XRL.World.Parts;
+﻿using XRL.World;
+using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
@@ -120,14 +121,13 @@ namespace HNPS_GigantismPlus
             string title = Title == null ? "" : $"{Title}:";
             int indent = Indent;
             Entry(Verbosity, $"% {MeleeWeapon.ParentObject.DebugName} {title}", Indent);
-            if (Category == null)
-                Category = new string[4]
-                {
-                    "Damage",
-                    "Combat",
-                    "Render",
-                    "etc"
-                };
+            Category ??= new string[4]
+            {
+                "Damage",
+                "Combat",
+                "Render",
+                "etc"
+            };
             indent++;
             foreach (string category in Category)
             {
@@ -163,6 +163,29 @@ namespace HNPS_GigantismPlus
             }
             Divider(Verbosity, "-", 25, Indent);
             return MeleeWeapon;
+        }
+
+        public static NaturalWeaponSubpart<T> VomitT<T>(this NaturalWeaponSubpart<T> Subpart, int Verbosity, string Title = null, int Indent = 0)
+            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+        {
+            Divider(Verbosity, "-", 25, Indent);
+            string title = Title == null ? "" : $"{Title}:";
+            Entry(Verbosity, $"% {Subpart.ParentPart?.ParentObject?.DebugName} {title}", Indent: Indent);
+
+            Indent++;
+
+            LoopItem(Verbosity, "Type", $"{Subpart.Type}", Indent: Indent);
+            LoopItem(Verbosity, "CosmeticOnly", $"{Subpart.CosmeticOnly}", Indent: Indent);
+            LoopItem(Verbosity, "Managed", $"{Subpart.Managed}", Indent: Indent);
+            LoopItem(Verbosity, "", Indent: Indent);
+            LoopItem(Verbosity, "Level", $"{Subpart.Level}", Indent: Indent);
+            LoopItem(Verbosity, "DamageDieCount", $"{Subpart.DamageDieCount}", Indent: Indent);
+            LoopItem(Verbosity, "DamageDieSize", $"{Subpart.}", Indent: Indent);
+
+
+            Divider(Verbosity, "-", 25, --Indent);
+
+            return Subpart;
         }
 
     } //!-- public static class Debug

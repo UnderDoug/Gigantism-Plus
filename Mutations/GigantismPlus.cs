@@ -5,6 +5,7 @@ using System.Linq;
 using XRL.UI;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
+using SerializeField = UnityEngine.SerializeField;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Extensions;
@@ -14,62 +15,8 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class GigantismPlus : BaseManagedDefaultEquipmentMutation<GigantismPlus>
     {
-        public int AppliedJumpBonus = 0;
-
-        private double _stunningForceLevelFactor = 0.5;
-
-        public int StunningForceDistance = 3;
-
-        public Guid EnableActivatedAbilityID = Guid.Empty;
-
-        public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
-
-        public int HunchedOverAVModifier = 4;
-        public int HunchedOverDVModifier = -6;
-        public int HunchedOverQNModifier = -60;
-        public int HunchedOverMSModifier = -60;
-
+        
         public bool IsVehicleCreature => ParentObject.HasPart(typeof(Vehicle));
-
-        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
-        private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
-
-        public static int GetHunchedOverAVModifier(int Level)
-        {
-            return 4;
-        }
-        public static int GetHunchedOverDVModifier(int Level)
-        {
-            return -6;
-        }
-        public static int GetHunchedOverQNModifier(int Level)
-        {
-            return Math.Min(-70 + (int)Math.Floor(Level * 10.0), -10);
-        }
-        public static int GetHunchedOverMSModifier(int Level)
-        {
-            return Math.Min(-70 + (int)Math.Floor(Level * 10.0), -10);
-        }
-
-        public int GetJumpRangeBonus(int Level)
-        {
-            return 1 + GiganticExoframe?.JumpDistanceBonus == null ? 0 : GiganticExoframe.JumpDistanceBonus;
-        }
-        public double GetStunningForceLevelFactor()
-        {
-            return _stunningForceLevelFactor = 
-                (GiganticExoframe?.StunningForceLevelFactor) == null 
-                ? _stunningForceLevelFactor 
-                : GiganticExoframe.StunningForceLevelFactor;
-        }
-        public int GetStunningForceLevel(int Level)
-        {
-            return (int)Math.Max(Math.Floor(Level * GetStunningForceLevelFactor()), 1);
-        }
-        public int GetStunningForceDistance(int Level)
-        {
-            return StunningForceDistance;
-        }
 
         public bool IsGiganticCreature // basically a wrapper but forces you to not be PseudoGigantic at the same time 
         {
@@ -119,6 +66,17 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
+        public Guid EnableActivatedAbilityID = Guid.Empty;
+
+        public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
+
+        public int HunchedOverAVModifier = 4;
+        public int HunchedOverDVModifier = -6;
+        public int HunchedOverQNModifier = -60;
+        public int HunchedOverMSModifier = -60;
+        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
+        private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
+
         public bool UnHunchImmediately = false;
 
         public bool IsHunchFree = false;
@@ -139,6 +97,13 @@ namespace XRL.World.Parts.Mutation
                 _hunchOverEnergyCost = value;
             }
         }
+
+        [SerializeField]
+        private int AppliedJumpRangeBonus = 0;
+
+        private double _stunningForceLevelFactor = 0.5;
+
+        public int StunningForceDistance = 3;
 
         public GigantismPlus()
         {
@@ -172,6 +137,10 @@ namespace XRL.World.Parts.Mutation
             NaturalWeaponSubparts.Add(GiganticFist.Type, GiganticFist);
         }
 
+        public override bool CanLevel() { return true; }
+
+        public override bool GeneratesEquipment() { return true; }
+
         public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
@@ -185,9 +154,42 @@ namespace XRL.World.Parts.Mutation
             return -3 + (int)Math.Floor(Level / 2.0);
         }
 
-        public override bool CanLevel() { return true; } // Enable leveling
+        public static int GetHunchedOverAVModifier(int Level)
+        {
+            return 4;
+        }
+        public static int GetHunchedOverDVModifier(int Level)
+        {
+            return -6;
+        }
+        public static int GetHunchedOverQNModifier(int Level)
+        {
+            return Math.Min(-70 + (int)Math.Floor(Level * 10.0), -10);
+        }
+        public static int GetHunchedOverMSModifier(int Level)
+        {
+            return Math.Min(-70 + (int)Math.Floor(Level * 10.0), -10);
+        }
 
-        public override bool GeneratesEquipment() { return true; }
+        public int GetJumpRangeBonus(int Level)
+        {
+            return 1 + GiganticExoframe?.JumpDistanceBonus == null ? 0 : GiganticExoframe.JumpDistanceBonus;
+        }
+        public double GetStunningForceLevelFactor()
+        {
+            return _stunningForceLevelFactor =
+                (GiganticExoframe?.StunningForceLevelFactor) == null
+                ? _stunningForceLevelFactor
+                : GiganticExoframe.StunningForceLevelFactor;
+        }
+        public int GetStunningForceLevel(int Level)
+        {
+            return (int)Math.Max(Math.Floor(Level * GetStunningForceLevelFactor()), 1);
+        }
+        public int GetStunningForceDistance(int Level)
+        {
+            return StunningForceDistance;
+        }
 
         public override bool ChangeLevel(int NewLevel)
         {
@@ -218,24 +220,24 @@ namespace XRL.World.Parts.Mutation
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             Debug.Entry(4, "Jump Bonus", Indent: 1);
             // Jump Bonus
-            Debug.Entry(4, "? if (AppliedJumpBonus > 0)", Indent: 1);
-            if (AppliedJumpBonus > 0)
+            Debug.Entry(4, "? if (AppliedJumpRangeBonus > 0)", Indent: 1);
+            if (AppliedJumpRangeBonus > 0)
             {
-                Debug.Entry(4, $"+ AppliedJumpBonus: {AppliedJumpBonus}", Indent: 2);
+                Debug.Entry(4, $"+ AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
                 Debug.Entry(4, $"JumpRangeModifier: {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 2);
-                ParentObject.ModIntProperty("JumpRangeModifier", -AppliedJumpBonus);
+                ParentObject.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus);
                 Debug.Entry(4, $"JumpRangeModifier reduced to {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 2);
             }
             else
             {
-                Debug.Entry(4, $"- AppliedJumpBonus: {AppliedJumpBonus}", Indent: 2);
+                Debug.Entry(4, $"- AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
             }
-            Debug.Entry(4, "x if (AppliedJumpBonus > 0) ?//", Indent: 1);
+            Debug.Entry(4, "x if (AppliedJumpRangeBonus > 0) ?//", Indent: 1);
 
-            AppliedJumpBonus = GetJumpRangeBonus(NewLevel);
-            Debug.Entry(4, $"Calculated new AppliedJumpBonus: {AppliedJumpBonus}", Indent: 1);
+            AppliedJumpRangeBonus = GetJumpRangeBonus(NewLevel);
+            Debug.Entry(4, $"Calculated new AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 1);
             Debug.Entry(4, $"JumpRangeModifier: {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 1);
-            ParentObject.ModIntProperty("JumpRangeModifier", AppliedJumpBonus);
+            ParentObject.ModIntProperty("JumpRangeModifier", AppliedJumpRangeBonus);
             Debug.Entry(4, $"JumpRangeModifier reduced to {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 1);
             Acrobatics_Jump.SyncAbility(ParentObject);
 
@@ -662,8 +664,8 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.LoopItem(4, "+ GO not null", Indent: 2);
                 // Remove jumping properties
-                GO.ModIntProperty("JumpRangeModifier", -AppliedJumpBonus, RemoveIfZero: true);
-                AppliedJumpBonus = 0;
+                GO.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus, RemoveIfZero: true);
+                AppliedJumpRangeBonus = 0;
                 Acrobatics_Jump.SyncAbility(GO);
                 Debug.LoopItem(4, "JumpRangeModifier reverted", Indent: 2);
 
@@ -909,9 +911,9 @@ namespace XRL.World.Parts.Mutation
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
             gigantism.NaturalWeaponSubparts = new();
-            foreach ((string type, NaturalWeaponSubpart<GigantismPlus> subpart) in NaturalWeaponSubparts)
+            foreach ((_, NaturalWeaponSubpart<GigantismPlus> subpart) in NaturalWeaponSubparts)
             {
-                gigantism.NaturalWeaponSubparts.Add(type, new(subpart, gigantism));
+                gigantism.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, gigantism));
             }
             gigantism.NaturalWeaponSubpart = new(NaturalWeaponSubpart, gigantism);
             gigantism.GiganticExoframe = null;

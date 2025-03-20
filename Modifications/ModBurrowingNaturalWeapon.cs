@@ -17,12 +17,6 @@ namespace XRL.World.Parts
         {
         }
 
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            ModBurrowingNaturalWeapon modBurrowingNaturalWeapon = base.DeepCopy(Parent, MapInv) as ModBurrowingNaturalWeapon;
-            return ClearForCopy(modBurrowingNaturalWeapon);
-        }
-
         public override void ApplyModification(GameObject Object)
         {
             ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
@@ -49,7 +43,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
             }
             return base.HandleEvent(E);
         }

@@ -11,47 +11,8 @@ namespace XRL.World.Parts
     public abstract class ModNaturalWeaponBase<T> : IMeleeModification
         where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
     {
-        public ModNaturalWeaponBase()
-        {
-        }
-        public ModNaturalWeaponBase(int Tier)
-            : base(Tier)
-        {
-        }
-        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart)
-            : this()
-        {
-            NaturalWeaponSubpart = new(Subpart);
-        }
-        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart, int Tier)
-            : this(Tier)
-        {
-            NaturalWeaponSubpart = Subpart;
-        }
-
-        public override void Configure()
-        {
-            base.Configure();
-            WorksOnSelf = true;
-        }
-        public override bool ModificationApplicable(GameObject Object)
-        {
-            if (!Object.HasPart<MeleeWeapon>() && !Object.HasPart<Physics>() && Object.GetPart<Physics>().Category != "Natural Weapon")
-            {
-                return false;
-            }
-            return true;
-        }
-        public override int GetModificationSlotUsage()
-        {
-            return 0;
-        }
-
-        public override bool BeingAppliedBy(GameObject obj, GameObject who)
-        {
-            if (obj.Physics.Equipped != who) obj.Physics.Equipped = who;
-            return base.BeingAppliedBy(obj, who);
-        }
+        public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
+        public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
 
         private GameObject _wielder = null;
         public GameObject Wielder
@@ -93,14 +54,14 @@ namespace XRL.World.Parts
 
         [SerializeField]
         private int? _level = 1;
-        public int? Level => _level ??= NaturalWeaponSubpart?.Level;
+        public int Level => _level ??= (int)NaturalWeaponSubpart?.Level;
 
         private NaturalWeaponSubpart<T> _naturalWeaponSubpart = null;
         public NaturalWeaponSubpart<T> NaturalWeaponSubpart
         {
             get
-            { 
-                return _naturalWeaponSubpart ??= AssigningPart.GetNaturalWeaponSubpart(RequestingObject: ParentObject); 
+            {
+                return _naturalWeaponSubpart ??= AssigningPart.GetNaturalWeaponSubpart(RequestingObject: ParentObject);
             }
             set
             {
@@ -113,8 +74,50 @@ namespace XRL.World.Parts
             }
         }
 
-        public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
-        public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
+        public ModNaturalWeaponBase()
+        {
+        }
+        public ModNaturalWeaponBase(int Tier)
+            : base(Tier)
+        {
+        }
+        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart)
+            : this()
+        {
+            NaturalWeaponSubpart = new(Subpart);
+        }
+        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart, int Tier)
+            : this(Tier)
+        {
+            NaturalWeaponSubpart = Subpart;
+        }
+
+        public override void Configure()
+        {
+            base.Configure();
+            WorksOnSelf = true;
+        }
+        public override int GetModificationSlotUsage()
+        {
+            return 0;
+        }
+
+        public override bool ModificationApplicable(GameObject Object)
+        {
+            if (!Object.HasPart<MeleeWeapon>() && 
+                !Object.HasPart<Physics>() && 
+                !Object.HasPart<NaturalEquipment>())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool BeingAppliedBy(GameObject obj, GameObject who)
+        {
+            if (obj.Physics.Equipped != who) obj.Physics.Equipped = who;
+            return base.BeingAppliedBy(obj, who);
+        }
 
         public static ModNaturalWeaponBase<T> ClearForCopy(ModNaturalWeaponBase<T> ModNaturalWeaponBase)
         {
@@ -145,9 +148,9 @@ namespace XRL.World.Parts
             return NaturalWeaponSubpart.GetHitBonus();
         }
 
-        public virtual void ApplyGenericChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeapon, string InstanceDescription)
+        public virtual void ApplyGenericChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart, string InstanceDescription)
         {
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart, string InstanceDescription)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart, string InstanceDescription)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
@@ -165,7 +168,7 @@ namespace XRL.World.Parts
                     Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descripiptions", Indent: 6);
                 }
                 if (InstanceDescription != null && InstanceDescription != string.Empty)
-                NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeapon.Priority, InstanceDescription);
+                NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeaponSubpart.Priority, InstanceDescription);
             }
             else
             {

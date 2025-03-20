@@ -8,6 +8,7 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
+    /*
     [Serializable]
     public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
     {
@@ -249,4 +250,5 @@ namespace XRL.World.Parts.Mutation
     {
 
     }
+    */
 }

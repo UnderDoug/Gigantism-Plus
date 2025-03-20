@@ -63,7 +63,7 @@ namespace XRL.World.Parts
             if (ElongatedPaws != null)
             {
                 UnapplyElongatedBonusCap(Weapon);
-                AppliedElongatedBonusCap = ElongatedPaws.NaturalWeapon.GetDamageBonus();
+                AppliedElongatedBonusCap = ElongatedPaws.NaturalWeaponSubpart.GetDamageBonus();
                 Weapon.AdjustBonusCap(AppliedElongatedBonusCap);
                 Debug.LoopItem(4, $"New AppliedElongatedBonusCap: {AppliedElongatedBonusCap}", Indent: 4);
             }

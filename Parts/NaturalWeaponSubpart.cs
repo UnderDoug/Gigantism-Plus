@@ -15,6 +15,8 @@ namespace XRL.World.Parts
 
         public string Type;
         public bool CosmeticOnly;
+        public bool Managed = true;
+
         public int Level;
         public int DamageDieCount;
         public int DamageDieSize;
@@ -66,6 +68,8 @@ namespace XRL.World.Parts
         {
             Type = Source.Type;
             CosmeticOnly = Source.CosmeticOnly;
+            Managed = Source.Managed;
+
             Level = Source.Level;
             DamageDieCount = Source.DamageDieCount;
             DamageDieSize = Source.DamageDieSize;
@@ -154,11 +158,13 @@ namespace XRL.World.Parts
 
         public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(Adjective) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
+            string unmanaged = string.Empty;
+            if (!this.Managed && !Managed) unmanaged = "Unmanaged";
+            return "Mod" + Grammar.MakeTitleCase(Adjective) + "NaturalWeapon" + unmanaged;
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod()
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(bool Managed = true)
         {
-            ModNaturalWeaponBase<T> NaturalWeaponMod = GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
+            ModNaturalWeaponBase<T> NaturalWeaponMod = GetNaturalWeaponModName(Managed).ConvertToNaturalWeaponModification<T>();
             NaturalWeaponMod.NaturalWeaponSubpart = this;
             NaturalWeaponMod.AssigningPart = ParentPart;
             return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();

@@ -236,17 +236,18 @@ namespace XRL.World.Parts.Mutation
 
             Exit:
             Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
-            Debug.Footer(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            base.OnRegenerateDefaultEquipment(body); */
+            Debug.Footer(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)"); 
+            */
+            base.OnRegenerateDefaultEquipment(body);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
             elongatedPaws.NaturalWeaponSubparts = new();
-            foreach ((string type, NaturalWeaponSubpart<ElongatedPaws> subpart) in NaturalWeaponSubparts)
+            foreach ((_, NaturalWeaponSubpart<ElongatedPaws> subpart) in NaturalWeaponSubparts)
             {
-                elongatedPaws.NaturalWeaponSubparts.Add(type, new(subpart, elongatedPaws));
+                elongatedPaws.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, elongatedPaws));
             }
             elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart, elongatedPaws);
             return elongatedPaws;

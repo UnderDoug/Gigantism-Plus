@@ -51,38 +51,44 @@ namespace XRL.World.Parts.Mutation
             GameObject Object = null,
             BodyPart BodyPart = null)
         {
-            if (Type == "") goto CheckObject;
-
-            if (Type == NaturalWeaponSubpart.Type) return NaturalWeaponSubpart;
-            if (NaturalWeaponSubparts[Type] != null) return NaturalWeaponSubparts[Type];
-
-            CheckObject:
-            if (Object == null) goto CheckBodyPart;
-            foreach (BodyPart part in Object?.Equipped.Body.LoopParts())
+            if (Type != "")
             {
-                if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
+                if (Type == NaturalWeaponSubpart?.Type)
+                    return NaturalWeaponSubpart;
+                if (NaturalWeaponSubparts.ContainsKey(Type))
+                    return NaturalWeaponSubparts[Type];
+            }
+            if (Object != null)
+            {
+                foreach (BodyPart part in Object?.Equipped.Body.LoopParts())
                 {
-                    Type = part.Type;
-                    if (Type == NaturalWeaponSubpart.Type) return NaturalWeaponSubpart;
-                    if (NaturalWeaponSubparts[Type] != null) return NaturalWeaponSubparts[Type];
+                    if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
+                    {
+                        Type = part.Type;
+                        if (Type == NaturalWeaponSubpart?.Type)
+                            return NaturalWeaponSubpart;
+                        if (NaturalWeaponSubparts.ContainsKey(Type))
+                            return NaturalWeaponSubparts[Type];
+                    }
                 }
             }
-
-            CheckBodyPart:
-            if (BodyPart == null) return null;
-            Type = BodyPart.Type;
-            if (Type == NaturalWeaponSubpart.Type) return NaturalWeaponSubpart;
-            if (NaturalWeaponSubparts[Type] != null) return NaturalWeaponSubparts[Type];
-
+            if (BodyPart != null)
+            {
+                Type = BodyPart.Type;
+                if (Type == NaturalWeaponSubpart?.Type)
+                    return NaturalWeaponSubpart;
+                if (NaturalWeaponSubparts.ContainsKey(Type))
+                    return NaturalWeaponSubparts[Type];
+            }
             return null;
         }
         public virtual string GetNaturalWeaponModName(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
         {
             return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart)
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
         {
-            ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod();
+            ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = (T)this;
             return NaturalWeaponMod;
@@ -167,46 +173,87 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false)
         {
-            if (body == null) goto Skip;
-            List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
-            foreach (BodyPart part in partsList)
+            Debug.Entry(4, 
+                $"@ {typeof(T).Name}."
+                + $"{nameof(ProcessNaturalWeaponSubparts)}", 
+                Indent:1);
+
+            if (body != null)
             {
-                ModNaturalWeaponBase<T> modNaturalWeapon = null;
-                if (NaturalWeaponSubpart != null && part.Type == NaturalWeaponSubpart.Type && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
+                List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
+                foreach (BodyPart part in partsList)
                 {
-                    modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
-                }
-                else if (NaturalWeaponSubparts[part.Type] != null && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
-                {
-                    modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
-                }
+                    Debug.Divider(4, "-", Count: 25, Indent: 2);
+                    Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
+                    ModNaturalWeaponBase<T> modNaturalWeapon = null;
+                    if (NaturalWeaponSubpart != null 
+                        && part.Type == NaturalWeaponSubpart.Type 
+                        && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
+                    {
+                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
+                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                    }
+                    else if (NaturalWeaponSubparts.ContainsKey(part.Type) 
+                        && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
+                    {
+                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
+                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                    }
 
-                if (modNaturalWeapon == null) continue;
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
 
-                if (part.DefaultBehavior != null)
-                {
-                    part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                    if (modNaturalWeapon == null) continue;
+
+                    if (part.DefaultBehavior != null)
+                    {
+                        part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                    }
+                    else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
+                    {
+                        part.Equipped.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                    }
                 }
-                else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
-                {
-                    part.Equipped.ApplyModification(modNaturalWeapon, Actor: ParentObject);
-                }
+                Debug.Divider(4, "-", Count: 25, Indent: 2);
             }
-            Skip:
+            Debug.Entry(4, 
+                $"x {typeof(T).Name}." 
+                + $"{nameof(ProcessNaturalWeaponSubparts)} @//", 
+                Indent: 1);
             return true;
         }
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            if (body == null) goto Skip;
-            ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
-            Skip:
+            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+            if (body != null)
+                ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
+
+            Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
+            Debug.Footer(4, 
+                $"{typeof(T).Name}", 
+                $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
+
             base.OnRegenerateDefaultEquipment(body);
         }
         public override void OnDecorateDefaultEquipment(Body body)
         {
-            if (body == null) goto Skip;
-            ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
-            Skip:
+            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+            if (body != null)
+                ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
+
+            Debug.Entry(4, $"* base.{nameof(OnDecorateDefaultEquipment)}(body)", Indent: 1);
+            Debug.Footer(4,
+                $"{typeof(T).Name}",
+                $"{nameof(OnDecorateDefaultEquipment)}(body: {ParentObject.Blueprint})");
             base.OnDecorateDefaultEquipment(body);
         }
 

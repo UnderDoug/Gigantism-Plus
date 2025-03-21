@@ -34,6 +34,7 @@ namespace XRL.World.Parts
         {
             NaturalWeaponSubpart = new()
             {
+                // There'd be more here but it's all assigned upon being implanted.
                 ParentPart = this,
                 Type = "Hand",
                 CosmeticOnly = true,

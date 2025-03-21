@@ -609,5 +609,10 @@ namespace HNPS_GigantismPlus
         {
             return BodyPart.DefaultBehavior == Object;
         }
+
+        public static bool InheritsFrom(this GameObject Object, string Blueprint)
+        {
+            return Object.GetBlueprint().InheritsFrom(Blueprint);
+        }
     }
 }

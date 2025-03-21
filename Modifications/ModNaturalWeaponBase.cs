@@ -143,7 +143,7 @@ namespace XRL.World.Parts
 
         public virtual void ApplyGenericChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart, string InstanceDescription)
         {
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart, string InstanceDescription)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart, string InstanceDescription)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
@@ -160,8 +160,11 @@ namespace XRL.World.Parts
                 {
                     Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descriptions", Indent: 6);
                 }
+
                 if (InstanceDescription != null && InstanceDescription != string.Empty)
+                {
                     NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeaponSubpart.ModPriority, InstanceDescription);
+                }
             }
             else
             {
@@ -175,8 +178,9 @@ namespace XRL.World.Parts
             // 1d2-1 into 1d2+0
             if (!Object.HasNaturalWeaponMods()) weapon.AdjustDamage(1);
 
-            string[] vomitCats = new string[] { "Damage" };
+            List<string> vomitCats = new() { "Damage" };
             weapon.Vomit(4, "Generic, Before", vomitCats, Indent: 4);
+            Debug.Divider(4, "\u2500", 40, Indent: 4);
 
             Debug.Entry(4, $"NaturalWeaponSubpart Adjustments", Indent: 4);
             Debug.LoopItem(4, $"DamageDieCount", $"{GetDamageDieCount().Signed()}", Indent: 5);
@@ -188,19 +192,22 @@ namespace XRL.World.Parts
             weapon.AdjustDamageDieSize(GetDamageDieSize());
             weapon.AdjustDamage(GetDamageBonus());
             if (GetHitBonus() != 0) weapon.HitBonus += GetHitBonus();
+
+            Debug.Divider(4, "\u2500", 40, Indent: 4);
             weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
-            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart, string InstanceDescription) *//", Indent: 4);
+
+            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart, string InstanceDescription) *//", Indent: 4);
         }
 
         public virtual int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeapon)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
 
             Render render = Object.Render;
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
-            string[] vomitCats = new string[] { "Combat", "Render" };
+            List<string> vomitCats = new() { "Combat", "Render" };
 
             int NounPriority = NaturalWeapon.NounPriority;
             int AdjectivePriority = NaturalWeapon.AdjectivePriority;
@@ -217,6 +224,7 @@ namespace XRL.World.Parts
                 Object.SetIntProperty(CURRENT_NOUN_PRIORITY, NounPriority);
                 
                 weapon.Vomit(4, "NounPriority, Before", vomitCats, Indent: 6);
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
 
                 Debug.Entry(4, $"NaturalWeaponSubpart Attribute", Indent: 6);
                 Debug.LoopItem(4, $"NaturalWeaponSubpart.Skill", $"{NaturalWeapon.Skill}", Indent: 7);
@@ -246,6 +254,7 @@ namespace XRL.World.Parts
                 Object.SetSwingSound(NaturalWeapon.SwingSound);
                 Object.SetBlockedSound(NaturalWeapon.BlockedSound);
 
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
                 weapon.Vomit(4, "NounPriority, After", vomitCats, Indent: 6);
             }
             else
@@ -253,7 +262,9 @@ namespace XRL.World.Parts
                 Debug.Entry(4, 
                     $"- NounPriority == 0 || NounPriority ({NounPriority}) >= CurrentNounPriority ({CurrentNounPriority})", 
                     Indent: 6);
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
                 weapon.Vomit(4, "Priority, Unchanged", vomitCats, Indent: 6);
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
             }
             Debug.Entry(4, $"x if (NounPriority != 0 and NounPriority < CurrentNounPriority) ?//", Indent: 5);
 
@@ -268,12 +279,14 @@ namespace XRL.World.Parts
                 Object.SetIntProperty(CURRENT_ADJECTIVE_PRIORITY, AdjectivePriority);
 
                 weapon.Vomit(4, "AdjectivePriority, Before", vomitCats, Indent: 6);
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
 
                 Debug.Entry(4, $"NaturalWeaponSubpart Attribute", Indent: 6);
                 Debug.LoopItem(4, $"NaturalWeaponSubpart.EquipmentFrameColors", $"{NaturalWeapon.EquipmentFrameColors} ", Indent: 7);
 
                 Object.SetEquipmentFrameColors(NaturalWeapon.EquipmentFrameColors);
 
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
                 weapon.Vomit(4, "AdjectivePriority, After", vomitCats, Indent: 6);
             }
             else
@@ -282,23 +295,25 @@ namespace XRL.World.Parts
                     $"- AdjectivePriority == 0 || " 
                     + $"AdjectivePriority ({AdjectivePriority}) >= CurrentAdjectivePriority ({CurrentAdjectivePriority})",
                     Indent: 6);
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
                 weapon.Vomit(4, "AdjectivePriority, Unchanged", vomitCats, Indent: 6);
+                Debug.Divider(4, "\u2500", 40, Indent: 6);
             }
             Debug.Entry(4, $"x if (AdjectivePriority != 0 and AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
 
-            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart) *//", Indent: 4);
             return NaturalWeapon.ModPriority;
         }
 
-        public virtual void ApplyPartAndPropChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeapon)
+        public virtual void ApplyPartAndPropChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
-            if (NaturalWeapon.AddedParts != null)
+            if (NaturalWeaponSubpart.AddedParts != null)
             {
                 Debug.Entry(4, "> foreach (string part in NaturalWeaponSubpart.GetAddedParts())", Indent: 5);
-                foreach (string part in NaturalWeapon.AddedParts)
+                foreach (string part in NaturalWeaponSubpart.AddedParts)
                 {
                     Debug.LoopItem(4, "part", part, Indent: 6);
                     Object.RequirePart(part);
@@ -306,29 +321,29 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"x foreach (string part in NaturalWeaponSubpart.GetAddedParts()) >//", Indent: 5);
             }
 
-            if (NaturalWeapon.AddedStringProps != null)
+            if (NaturalWeaponSubpart.AddedStringProps != null)
             {
                 Debug.Entry(4, "> foreach (KeyValuePair<string, string> entry in NaturalWeaponSubpart.GetAddedStringProps())", Indent: 5);
-                foreach (KeyValuePair<string, string> entry in NaturalWeapon.AddedStringProps)
+                foreach ((string Name, string Value) in NaturalWeaponSubpart.AddedStringProps)
                 {
-                    Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
-                    Object.SetStringProperty(Name: entry.Key, Value: entry.Value, RemoveIfNull: true);
+                    Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
+                    Object.SetStringProperty(Name: Name, Value: Value, RemoveIfNull: true);
                 }
                 Debug.Entry(4, $"x foreach (KeyValuePair<string, string> entry in NaturalWeaponSubpart.GetAddedStringProps()) >//", Indent: 5);
             }
 
-            if (NaturalWeapon.AddedIntProps != null)
+            if (NaturalWeaponSubpart.AddedIntProps != null)
             {
                 Debug.Entry(4, "> foreach (KeyValuePair<string, int> entry in NaturalWeaponSubpart.GetAddedIntProps())", Indent: 5);
-                foreach (KeyValuePair<string, int> entry in NaturalWeapon.AddedIntProps)
+                foreach ((string Name, int Value) in NaturalWeaponSubpart.AddedIntProps)
                 {
-                    Debug.LoopItem(4, "entry", $"{entry.Key}, {entry.Value}", Indent: 6);
-                    Object.SetIntProperty(Name: entry.Key, Value: entry.Value, RemoveIfZero: true);
+                    Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
+                    Object.SetIntProperty(Name: Name, Value: Value, RemoveIfZero: true);
                 }
-                Debug.Entry(4, $"x foreach (KeyValuePair<string, int> entry in NaturalWeaponSubpart.GetAddedIntProps()) >//", Indent: 5);
+                Debug.Entry(4, $"x foreach ((string Name, int Value) in NaturalWeaponSubpart.GetAddedIntProps()) >//", Indent: 5);
             }
 
-            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart) *//", Indent: 4);
         }
 
         public override void ApplyModification(GameObject Object)

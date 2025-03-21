@@ -1,5 +1,7 @@
 ﻿using HNPS_GigantismPlus;
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using XRL.Language;
 using XRL.World.Parts.Mutation;
 
@@ -25,7 +27,7 @@ namespace XRL.World.Parts
             Render render = Object.Render;
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
-            string[] vomitCats = new string[] { "Render" };
+            List<string> vomitCats = new() { "Render" };
             int AdjectivePriority = NaturalWeapon.AdjectivePriority - 100;
             int CurrentNounPriority = Object.GetIntProperty(CURRENT_NOUN_PRIORITY);
 

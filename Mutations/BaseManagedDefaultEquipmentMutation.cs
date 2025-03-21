@@ -155,13 +155,18 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level)
         {
-            Subpart.Vomit(4, "UpdateNaturalWeaponSubpart Before", 2);
+            List<string> vomitCats = new() { "Meta", "Damage", "Additions", "Render" };
+            Subpart.Vomit(4, "| Before", vomitCats, Indent: 2);
+            Debug.Divider(4, "\u2500", 40, Indent: 2);
+
             Subpart.Level = Level;
-            Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level);
-            Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level);
-            Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level);
-            Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level);
-            Subpart.Vomit(4, "UpdateNaturalWeaponSubpart After", 2);
+            Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level).Vomit(4, "DamageDieCount", true, Indent: 3);
+            Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level).Vomit(4, "DamageDieSize", true, Indent: 3);
+            Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level).Vomit(4, "DamageBonus", true, Indent: 3);
+            Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level).Vomit(4, "HitBonus", true, Indent: 3);
+
+            Debug.Divider(4, "\u2500", 40, Indent: 2);
+            Subpart.Vomit(4, "|  After", vomitCats, Indent: 2);
             return true;
         }
         public override bool ChangeLevel(int NewLevel)

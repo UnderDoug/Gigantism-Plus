@@ -610,7 +610,7 @@ namespace XRL.World.Parts.Mutation
 
                 EnableActivatedAbilityID =
                     AddMyActivatedAbility(
-                        Name: "{{C|" + "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}/" + this.HunchedOverAbilityHunched + "}}",
+                        Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
                         Command: HUNCH_OVER_COMMAND_NAME,
                         Class: "Physical Mutations",
                         Description: null,
@@ -628,8 +628,8 @@ namespace XRL.World.Parts.Mutation
                 ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(EnableActivatedAbilityID);
                 abilityEntry.DisplayName = 
                     "{{C|" + 
-                    "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}\n" +
-                                this.HunchedOverAbilityHunched + "\n" +
+                    "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
+                                HunchedOverAbilityHunched + "\n" +
                        "}}";
 
                 Debug.LoopItem(4, "Activeated Ability DisplayName Changed", Indent: 2);

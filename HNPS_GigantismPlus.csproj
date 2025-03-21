@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<AssemblyName>Mods</AssemblyName>
+		<AssemblyName>GigantismPus</AssemblyName>
 		<PackageId>Mods</PackageId>
 		<Authors>hyd-n-plyn-syt, UnderDoug</Authors>
 		<TargetFramework>netstandard2.0</TargetFramework>

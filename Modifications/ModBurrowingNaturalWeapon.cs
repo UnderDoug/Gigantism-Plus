@@ -19,19 +19,21 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            /*
             ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-
-            Object.RequirePart<BurrowingClawsProperties>();
-
-            BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
-            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
-            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
 
             ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
             ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
+            */
 
             base.ApplyModification(Object);
+
+            Object.RequirePart<BurrowingClawsProperties>();
+            BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
+            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
+            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
+
         }
         public override bool WantEvent(int ID, int cascade)
         {

@@ -58,9 +58,9 @@ namespace XRL.World.Parts.Mutation
                 if (NaturalWeaponSubparts.ContainsKey(Type))
                     return NaturalWeaponSubparts[Type];
             }
-            if (Object != null)
+            if (Object?.Equipped?.Body != null)
             {
-                foreach (BodyPart part in Object?.Equipped.Body.LoopParts())
+                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
                 {
                     if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
                     {
@@ -91,6 +91,7 @@ namespace XRL.World.Parts.Mutation
             ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = (T)this;
+            NaturalWeaponMod.Wielder = ParentObject;
             return NaturalWeaponMod;
         }
 
@@ -154,11 +155,13 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level)
         {
+            Subpart.Vomit(4, "UpdateNaturalWeaponSubpart Before", 2);
             Subpart.Level = Level;
             Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level);
             Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level);
             Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level);
             Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level);
+            Subpart.Vomit(4, "UpdateNaturalWeaponSubpart After", 2);
             return true;
         }
         public override bool ChangeLevel(int NewLevel)

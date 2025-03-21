@@ -119,6 +119,7 @@ namespace XRL.World.Parts.Mutation
                 ModPriority = 10,
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
                 Noun = "fist",
                 Skill = "Cudgel",
                 Stat = "Strength",
@@ -606,8 +607,7 @@ namespace XRL.World.Parts.Mutation
             if (!GO.HasPart<Vehicle>())
             {
                 Debug.LoopItem(4, "+ Not Vehicle", Indent: 2);
-                /* AddActivatedAbility() - Full Method Arguments.
-                 * AddActivatedAbility(Name, Command, Class, Description, Icon, DisabledMessage, Toggleable, DefaultToggleState, ActiveToggle, IsAttack, IsRealityDistortionBased, IsWorldMapUsable, Silent, AIDisable, AlwaysAllowToggleOff, AffectedByWillpower, TickPerTurn, Distinct: false, Cooldown, CommandForDescription, UITileDefault, UITileToggleOn, UITileDisabled, UITileCoolingDown); */
+
                 EnableActivatedAbilityID =
                     AddMyActivatedAbility(
                         Name: "{{C|" + "{{W|[}}" + this.HunchedOverAbilityUpright + "{{W|]}}/" + this.HunchedOverAbilityHunched + "}}",
@@ -726,50 +726,6 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            /*
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, $"{nameof(GigantismPlus)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
-            if (body == null)
-            {
-                Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                goto Exit;
-            }
-
-            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
-
-            List<string> targetPartTypes = new();
-            foreach ((string type, NaturalWeaponSubpart<GigantismPlus> subpart) in NaturalWeaponSubparts)
-            {
-                targetPartTypes.Add(type);
-                Debug.Entry(4, $"targetPartType \"{type}\" added", Indent: 1);
-            }
-
-            Debug.Entry(4, "Generating List<BodyPart> partsList", Indent: 1);
-            List<BodyPart> partsList = (from p in body.GetParts(EvenIfDismembered: true)
-                                   where targetPartTypes.Contains(p.Type) 
-                                   select p).ToList();
-
-            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "> foreach (BodyPart part in partsList)", Indent: 1);
-            foreach (BodyPart part in partsList)
-            {
-                Debug.DiveIn(4, $"\u00BB: {part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-
-                NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart = NaturalWeaponSubparts[part.Type];
-                part.DefaultBehavior.ApplyModification(NaturalWeaponSubpart.GetNaturalWeaponMod(), Actor: ParentObject);
-
-                Debug.DiveOut(4, $"\u00AB: {part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-            }
-            Debug.Entry(4, "x foreach (BodyPart part in partsList) >//", Indent: 1);
-
-            Exit:
-            Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
-            Debug.Footer(3, $"{nameof(GigantismPlus)}", $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
-            */
             base.OnRegenerateDefaultEquipment(body);
         } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 

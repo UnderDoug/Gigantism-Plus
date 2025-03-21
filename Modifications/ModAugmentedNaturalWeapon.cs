@@ -74,11 +74,13 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            /*
             ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
 
             ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
             ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
+            */
 
             base.ApplyModification(Object);
         }

@@ -36,8 +36,8 @@ namespace XRL.World.Parts
             }
             set
             {
-                Type valueType = value.GetType();
-                bool typeMatch = valueType.IsEquivalentTo(typeof(ElongatedPaws));
+                Type valueType = value?.GetType();
+                bool typeMatch = (bool)valueType?.IsEquivalentTo(typeof(ElongatedPaws));
                 if (typeMatch)
                 {
                     _elongatedPaws = value;

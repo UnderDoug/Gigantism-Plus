@@ -115,9 +115,9 @@ namespace XRL.World.Parts.Mutation
                 if (NaturalWeaponSubparts.ContainsKey(Type))
                     return NaturalWeaponSubparts[Type];
             }
-            if (Object != null)
+            if (Object?.Equipped?.Body != null)
             {
-                foreach (BodyPart part in Object?.Equipped.Body.LoopParts())
+                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
                 {
                     if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
                     {
@@ -148,6 +148,7 @@ namespace XRL.World.Parts.Mutation
             ModNaturalWeaponBase<UD_ManagedCrystallinity> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = this;
+            NaturalWeaponMod.Wielder = ParentObject;
             return NaturalWeaponMod;
         }
 
@@ -313,49 +314,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (body != null)
                 ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
-
-            /*
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
-            if (body == null)
-            {
-                Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                goto Exit;
-            }
-
-            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
-
-            string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
-            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
-
-            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                   where p.Type == targetPartType
-                                   select p).ToList();
-
-            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
-            foreach (BodyPart part in list)
-            {
-                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
-                if (part.Type == "Hand")
-                {
-                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
-
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<UD_ManagedCrystallinity>(), Actor: ParentObject);
-
-                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
-                }
-            }
-            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
-
-            Exit:
-            Debug.Footer(3, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            */
+            // skip base
         }
         public override void OnDecorateDefaultEquipment(Body body)
         {

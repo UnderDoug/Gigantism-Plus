@@ -41,12 +41,11 @@ namespace XRL.World.Parts
         public string SecondDetailColor;
         public string SwingSound;
         public string BlockedSound;
+        public string EquipmentFrameColors;
 
         public List<string> AddedParts;
         public Dictionary<string, string> AddedStringProps;
         public Dictionary<string, int> AddedIntProps;
-
-        public string EquipmentFrameColors;
 
         public NaturalWeaponSubpart()
         {
@@ -92,12 +91,11 @@ namespace XRL.World.Parts
             SecondDetailColor = Source.SecondDetailColor;
             SwingSound = Source.SwingSound;
             BlockedSound = Source.BlockedSound;
+            EquipmentFrameColors = Source.EquipmentFrameColors;
 
             AddedParts = Source.AddedParts;
             AddedStringProps = Source.AddedStringProps;
             AddedIntProps = Source.AddedIntProps;
-
-            EquipmentFrameColors = Source.EquipmentFrameColors;
         }
         public NaturalWeaponSubpart(T NewParent)
             : this()

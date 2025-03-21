@@ -286,7 +286,7 @@ namespace HNPS_GigantismPlus
         public static int ExplodingDie(int Number, DieRoll DieRoll, int Step = 1, int Limit = 0, int Indent = 0)
         {
             Debug.Entry(4,
-                $"ExplodingDie(Number: {Number}, DieRoll: {DieRoll.ToString()}, Step: {Step}, Limit: {Limit})",
+                $"ExplodingDie(Number: {Number}, DieRoll: {DieRoll}, Step: {Step}, Limit: {Limit})",
                 Indent: Indent);
 
             int High = DieRoll.Max();
@@ -357,7 +357,7 @@ namespace HNPS_GigantismPlus
         public static void ManagedVanillaMutationOptionHandler()
         {
             Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}()", Indent: 1);
-            List<(string, string, string)> MutationEntries = new List<(string Name, string Vanilla, string Managed)>
+            List<(string, string, string)> MutationEntries = new()
             {
                 ("Burrowing Claws", "BurrowingClaws", "UD_ManagedBurrowingClaws"),
                 ("Crystallinity", "Crystallinity", "UD_ManagedCrystallinity")

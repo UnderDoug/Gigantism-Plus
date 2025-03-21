@@ -18,12 +18,13 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            /*
             ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
 
             ApplyPriorityChanges(Object, NaturalWeaponSubpart);
 
             ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-
+            */
             base.ApplyModification(Object);
         }
         public override bool WantEvent(int ID, int cascade)

@@ -69,6 +69,7 @@ namespace XRL.World.Parts
                 if (value != null && valueType.IsEquivalentTo(typeof(NaturalWeaponSubpart<T>)))
                 {
                     _naturalWeaponSubpart = value;
+                    return;
                 }
                 _naturalWeaponSubpart = null;
             }
@@ -119,14 +120,6 @@ namespace XRL.World.Parts
             return base.BeingAppliedBy(obj, who);
         }
 
-        public static ModNaturalWeaponBase<T> ClearForCopy(ModNaturalWeaponBase<T> ModNaturalWeaponBase)
-        {
-            ModNaturalWeaponBase.AssigningPart = null;
-            ModNaturalWeaponBase.Wielder = null;
-            ModNaturalWeaponBase.NaturalWeaponSubpart = null;
-            return ModNaturalWeaponBase;
-        }
-
         public virtual int GetDamageDieCount()
         {
             return Math.Max(0, NaturalWeaponSubpart.GetDamageDieCount());
@@ -165,10 +158,10 @@ namespace XRL.World.Parts
                 }
                 else
                 {
-                    Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descripiptions", Indent: 6);
+                    Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descriptions", Indent: 6);
                 }
                 if (InstanceDescription != null && InstanceDescription != string.Empty)
-                NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeaponSubpart.Priority, InstanceDescription);
+                    NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeaponSubpart.ModPriority, InstanceDescription);
             }
             else
             {
@@ -294,7 +287,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x if (AdjectivePriority != 0 and AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
 
             Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart) *//", Indent: 4);
-            return NaturalWeapon.Priority;
+            return NaturalWeapon.ModPriority;
         }
 
         public virtual void ApplyPartAndPropChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeapon)
@@ -340,6 +333,10 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
+            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
+            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
+
             Render render = Object.Render;
 
             string icyString = "{{icy|icy}}";
@@ -370,8 +367,7 @@ namespace XRL.World.Parts
 
         public virtual string GetInstanceDescription()
         {
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
-            return $"{descriptionName}: This weapon has been constructed by modifications.";
+            return null;
         }
 
         public override bool AllowStaticRegistration()
@@ -392,6 +388,13 @@ namespace XRL.World.Parts
         {
             ModNaturalWeaponBase<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase<T>;
             return ClearForCopy(modNaturalWeaponBase);
+        }
+        public static ModNaturalWeaponBase<T> ClearForCopy(ModNaturalWeaponBase<T> ModNaturalWeaponBase)
+        {
+            ModNaturalWeaponBase.AssigningPart = null;
+            ModNaturalWeaponBase.Wielder = null;
+            ModNaturalWeaponBase.NaturalWeaponSubpart = null;
+            return ModNaturalWeaponBase;
         }
 
     } //!-- public class ModNaturalWeaponBase<T> : IMeleeModification where T : IPart, IManagedDefaultNaturalWeapon<T>, new()

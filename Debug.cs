@@ -165,7 +165,7 @@ namespace HNPS_GigantismPlus
             return MeleeWeapon;
         }
 
-        public static NaturalWeaponSubpart<T> VomitT<T>(this NaturalWeaponSubpart<T> Subpart, int Verbosity, string Title = null, int Indent = 0)
+        public static NaturalWeaponSubpart<T> Vomit<T>(this NaturalWeaponSubpart<T> Subpart, int Verbosity, string Title = null, int Indent = 0)
             where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
         {
             Divider(Verbosity, "-", 25, Indent);
@@ -180,8 +180,69 @@ namespace HNPS_GigantismPlus
             LoopItem(Verbosity, "", Indent: Indent);
             LoopItem(Verbosity, "Level", $"{Subpart.Level}", Indent: Indent);
             LoopItem(Verbosity, "DamageDieCount", $"{Subpart.DamageDieCount}", Indent: Indent);
-            LoopItem(Verbosity, "DamageDieSize", $"{Subpart.}", Indent: Indent);
-
+            LoopItem(Verbosity, "DamageDieSize", $"{Subpart.DamageDieSize}", Indent: Indent);
+            LoopItem(Verbosity, "DamageBonus", $"{Subpart.DamageBonus}", Indent: Indent);
+            LoopItem(Verbosity, "HitBonus", $"{Subpart.HitBonus}", Indent: Indent);
+            LoopItem(Verbosity, "", Indent: Indent);
+            LoopItem(Verbosity, "ModPriority", $"{Subpart.ModPriority}", Indent: Indent);
+            LoopItem(Verbosity, "AdjectivePriority", $"{Subpart.AdjectivePriority}", Indent: Indent);
+            LoopItem(Verbosity, "NounPriority", $"{Subpart.NounPriority}", Indent: Indent);
+            LoopItem(Verbosity, "", Indent: Indent);
+            LoopItem(Verbosity, "Adjective", $"{Subpart.Adjective}", Indent: Indent);
+            LoopItem(Verbosity, "AdjectiveColor", $"{Subpart.AdjectiveColor}", Indent: Indent);
+            LoopItem(Verbosity, "AdjectiveColorFallback", $"{Subpart.AdjectiveColorFallback}", Indent: Indent);
+            LoopItem(Verbosity, "Noun", $"{Subpart.Noun}", Indent: Indent);
+            LoopItem(Verbosity, "", Indent: Indent);
+            LoopItem(Verbosity, "Skill", $"{Subpart.Skill}", Indent: Indent);
+            LoopItem(Verbosity, "Stat", $"{Subpart.Stat}", Indent: Indent);
+            LoopItem(Verbosity, "Tile", $"{Subpart.Tile}", Indent: Indent);
+            LoopItem(Verbosity, "ColorString", $"{Subpart.ColorString}", Indent: Indent);
+            LoopItem(Verbosity, "DetailColor", $"{Subpart.DetailColor}", Indent: Indent);
+            LoopItem(Verbosity, "SecondColorString", $"{Subpart.SecondColorString}", Indent: Indent);
+            LoopItem(Verbosity, "SecondDetailColor", $"{Subpart.SecondDetailColor}", Indent: Indent);
+            LoopItem(Verbosity, "SwingSound", $"{Subpart.SwingSound}", Indent: Indent);
+            LoopItem(Verbosity, "BlockedSound", $"{Subpart.BlockedSound}", Indent: Indent);
+            LoopItem(Verbosity, "EquipmentFrameColors", $"{Subpart.EquipmentFrameColors}", Indent: Indent);
+            LoopItem(Verbosity, "", Indent: Indent);
+            LoopItem(Verbosity, "AddedParts: ", Indent: Indent++);
+            if (Subpart.AddedParts != null) 
+            {
+                foreach (string part in Subpart.AddedParts)
+                {
+                    LoopItem(Verbosity, $"{part}", Indent: Indent);
+                }
+            }
+            else
+            {
+                LoopItem(Verbosity, $"AddedParts: null", Indent: Indent);
+            }
+            --Indent;
+            LoopItem(Verbosity, "AddedStringProps: ", Indent: Indent++);
+            if (Subpart.AddedStringProps != null)
+            {
+                foreach ((string prop, string value) in Subpart.AddedStringProps)
+                {
+                    LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent);
+                }
+            }
+            else
+            {
+                LoopItem(Verbosity, $"AddedStringProps: null", Indent: Indent);
+            }
+            --Indent;
+            LoopItem(Verbosity, "AddedIntProps: ", Indent: Indent++);
+            if (Subpart.AddedIntProps != null)
+            {
+                foreach ((string prop, int value) in Subpart.AddedIntProps)
+                {
+                    LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent);
+                }
+            }
+            else
+            {
+                LoopItem(Verbosity, $"AddedIntProps: null", Indent: Indent);
+            }
+            --Indent;
 
             Divider(Verbosity, "-", 25, --Indent);
 

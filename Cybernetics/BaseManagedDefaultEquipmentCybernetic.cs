@@ -79,9 +79,9 @@ namespace XRL.World.Parts
                 if (NaturalWeaponSubparts.ContainsKey(Type))
                     return NaturalWeaponSubparts[Type];
             }
-            if (Object != null)
+            if (Object?.Equipped?.Body != null)
             {
-                foreach (BodyPart part in Object?.Equipped.Body.LoopParts())
+                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
                 {
                     if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
                     {
@@ -112,6 +112,7 @@ namespace XRL.World.Parts
             ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = (T)this;
+            NaturalWeaponMod.Wielder = ParentObject;
             return NaturalWeaponMod;
         }
 
@@ -252,10 +253,9 @@ namespace XRL.World.Parts
                         Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
                     }
 
-                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
-
                     if (modNaturalWeapon == null) continue;
 
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
                     if (part.DefaultBehavior != null)
                     {
                         part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
@@ -275,33 +275,33 @@ namespace XRL.World.Parts
         }
         public virtual void OnRegenerateDefaultEquipment(Body body)
         {
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            Zone InstanceObjectZone = body.ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+            Debug.Entry(4, $"TARGET {body.ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body != null)
                 ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
+                $"{nameof(OnRegenerateDefaultEquipment)}(body: {body.ParentObject.Blueprint})");
         }
         public virtual void OnDecorateDefaultEquipment(Body body)
         {
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            Zone InstanceObjectZone = body.ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(3, $"{typeof(T).Name}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
-            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+            Debug.Entry(3, $"TARGET {body.ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body != null)
                 ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
 
             Debug.Footer(3,
                 $"{typeof(T).Name}",
-                $"{nameof(OnDecorateDefaultEquipment)}(body: {ParentObject.Blueprint})");
+                $"{nameof(OnDecorateDefaultEquipment)}(body: {body.ParentObject.Blueprint})");
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

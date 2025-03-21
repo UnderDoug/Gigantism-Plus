@@ -9,7 +9,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation
+    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
@@ -21,12 +21,13 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
-            NaturalWeapon = new()
+            NaturalWeaponSubpart = new()
             {
-                Level = 1,
-                DamageDieCount = 1,
+                ParentPart = this,
+                Level = Level,
+                CosmeticOnly = false,
+                Type = "Hand",
                 DamageDieSize = 3,
-                DamageBonus = 0,
                 ModPriority = 20,
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
@@ -89,7 +90,7 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public override int GetNaturalWeaponDamageDieSize(int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
         {
             int dieSize = 0;
             
@@ -99,7 +100,7 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Floor(StrengthModifier / 2.0);
         }
@@ -141,7 +142,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Body body = E.Object.Body;
 
-                CalculateNaturalWeaponDamageBonus(Level);
+                NaturalWeaponSubpart.DamageBonus = GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level);
 
                 body?.UpdateBodyParts();
 
@@ -195,54 +196,18 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            Debug.Entry(3, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
-            if (body == null)
-            {
-                Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                goto Exit;
-            }
-
-            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
-
-            string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
-            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
-
-            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                   where p.Type == targetPartType
-                                   select p).ToList();
-
-            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
-            foreach (BodyPart part in list)
-            {
-                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
-                if (part.Type == "Hand")
-                {
-                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
-
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<ElongatedPaws>(), Actor: ParentObject);
-
-                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
-                }
-            }
-            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
-
-            Exit:
-            Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
-            Debug.Footer(3, $"{nameof(ElongatedPaws)}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
             base.OnRegenerateDefaultEquipment(body);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            elongatedPaws.NaturalWeaponSubparts = new();
+            foreach ((_, NaturalWeaponSubpart<ElongatedPaws> subpart) in NaturalWeaponSubparts)
+            {
+                elongatedPaws.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, elongatedPaws));
+            }
+            elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart, elongatedPaws);
             return elongatedPaws;
         }
 

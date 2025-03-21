@@ -11,7 +11,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class CyberneticsGiganticExoframe : BaseManagedDefaultEquipmentCybernetic
+    public class CyberneticsGiganticExoframe : BaseManagedDefaultEquipmentCybernetic<CyberneticsGiganticExoframe>
     {
         // XML Set Properties.
         public string Model = "Alpha";
@@ -28,30 +28,28 @@ namespace XRL.World.Parts
         public int JumpDistanceBonus = 0;
         public double StunningForceLevelFactor = 0.5;
 
+        public bool AugmentAdded = false;
+
         public CyberneticsGiganticExoframe()
         {
-            NaturalWeapon = new()
+            NaturalWeaponSubpart = new()
             {
-                DamageDieCount = 1, // Default, equal to +0
-                DamageDieSize = 2,  // Default, equal to +0
+                // There'd be more here but it's all assigned upon being implanted.
+                ParentPart = this,
+                Type = "Hand",
+                CosmeticOnly = true,
+                Level = 1,
                 ModPriority = -10,  // Lower = more priority. Cosmetic, so highest priority;
                 Adjective = "augmented",
-                AdjectiveColor = "b",
-                Tile = "NaturalWeapons/GiganticManipulator.png",
-                ColorString = "&c",
-                DetailColor = "b",
-                SecondColorString = "&c",
-                SecondDetailColor = "b",
-                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked",
                 AddedParts = new(),
                 AddedStringProps = new(),
-                AddedIntProps = new()
-            };
+                AddedIntProps = new(),
+            }; 
         }
+
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
-            return Pretty ? NaturalWeapon.GetAdjective().OptionalColor(NaturalWeapon.GetAdjectiveColor(), NaturalWeapon.GetAdjectiveColorFallback(), Colorfulness) : NaturalWeapon.GetAdjective();
+            return Pretty ? NaturalWeaponSubpart.Adjective.OptionalColor(NaturalWeaponSubpart.GetAdjectiveColor(), NaturalWeaponSubpart.GetAdjectiveColorFallback(), Colorfulness) : NaturalWeaponSubpart.Adjective;
         }
         public string GetAugmentAdjective(bool Pretty = true)
         {
@@ -60,53 +58,12 @@ namespace XRL.World.Parts
         public virtual string GetNaturalWeaponColoredAdjective()
         {
             string output = $"E{"F".Color("c")}-";
-            output += NaturalWeapon.GetAdjective().OptionalColor(NaturalWeapon.GetAdjectiveColor(), NaturalWeapon.GetAdjectiveColorFallback(), Colorfulness);
+            output += NaturalWeaponSubpart.Adjective.OptionalColor(NaturalWeaponSubpart.GetAdjectiveColor(), NaturalWeaponSubpart.GetAdjectiveColorFallback(), Colorfulness);
             return output.Color("Y");
         }
 
         public override void OnDecorateDefaultEquipment(Body body)
         {
-            Zone InstanceObjectZone = Implantee.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(3, $"{nameof(CyberneticsGiganticExoframe)}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
-            Debug.Entry(3, $"TARGET {Implantee.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
-            if (body == null)
-            {
-                Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                goto Exit;
-            }
-
-            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
-
-            string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
-            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
-
-            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                   where p.Type == targetPartType
-                                   select p).ToList();
-
-            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
-            foreach (BodyPart part in list)
-            {
-                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
-                if (part.Type == "Hand")
-                {
-                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
-
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponMod<CyberneticsGiganticExoframe>(), Actor: Implantee);
-
-                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
-                }
-            }
-            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
-
-            Exit:
-            Debug.Entry(4, $"* base.{nameof(OnDecorateDefaultEquipment)}(body)", Indent: 1);
-            Debug.Footer(3, $"{nameof(CyberneticsGiganticExoframe)}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
             base.OnDecorateDefaultEquipment(body);
         }
 
@@ -114,18 +71,20 @@ namespace XRL.World.Parts
         {
             Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
 
-            // Mapping Augment properties to NaturalWeapon ones.
-            NaturalWeapon.AdjectiveColor = AugmentAdjectiveColor;
-            NaturalWeapon.Tile = AugmentTile;
-            NaturalWeapon.ColorString = AugmentTileColorString;
-            NaturalWeapon.DetailColor = AugmentTileDetailColor;
-            NaturalWeapon.SecondColorString = NaturalWeapon.ColorString;
-            NaturalWeapon.SecondDetailColor = NaturalWeapon.DetailColor;
-            NaturalWeapon.SwingSound = AugmentSwingSound;
-            NaturalWeapon.BlockedSound = AugmentBlockedSound;
-            ProcessNaturalWeaponAddedParts(AugmentAddParts);
-            ProcessNaturalWeaponAddedProps(AugmentAddProps);
-            NaturalWeapon.EquipmentFrameColors = AugmentEquipmentFrameColors;
+            // Mapping Augment properties to NaturalWeaponSubpart ones.
+            NaturalWeaponSubpart.AdjectiveColor = AugmentAdjectiveColor;
+
+            NaturalWeaponSubpart.Tile = AugmentTile;
+            NaturalWeaponSubpart.ColorString = AugmentTileColorString;
+            NaturalWeaponSubpart.DetailColor = AugmentTileDetailColor;
+            NaturalWeaponSubpart.SecondColorString = NaturalWeaponSubpart.ColorString;
+            NaturalWeaponSubpart.SecondDetailColor = NaturalWeaponSubpart.DetailColor;
+            NaturalWeaponSubpart.SwingSound = AugmentSwingSound;
+            NaturalWeaponSubpart.BlockedSound = AugmentBlockedSound;
+            NaturalWeaponSubpart.EquipmentFrameColors = AugmentEquipmentFrameColors;
+
+            NaturalWeaponSubpart.ProcessAddedParts(AugmentAddParts);
+            NaturalWeaponSubpart.ProcessAddedProps(AugmentAddProps);
 
             Become(Implantee, Model, Implant);
 
@@ -145,14 +104,12 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == CanEnterInteriorEvent.ID;
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID;
         }
-
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
             // Lets you install this cybernetic despite being a disparate size to you.
-            if (E.Object.HasPart<CyberneticsBaseItem>())
+            if (E.Object == ImplantObject && E.Object.HasPart<CyberneticsBaseItem>())
             {
                 if (!E.Actor.IsGiganticCreature && E.Object.IsGiganticEquipment)
                     E.Decreases++;
@@ -192,7 +149,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
-            exoframe.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
+            exoframe.NaturalWeaponSubpart = new(NaturalWeaponSubpart, exoframe);
             return exoframe;
         }
     }

@@ -36,8 +36,8 @@ namespace XRL.World.Parts
             }
             set
             {
-                Type valueType = value.GetType();
-                bool typeMatch = valueType.IsEquivalentTo(typeof(ElongatedPaws));
+                Type valueType = value?.GetType();
+                bool typeMatch = (bool)valueType?.IsEquivalentTo(typeof(ElongatedPaws));
                 if (typeMatch)
                 {
                     _elongatedPaws = value;
@@ -63,7 +63,7 @@ namespace XRL.World.Parts
             if (ElongatedPaws != null)
             {
                 UnapplyElongatedBonusCap(Weapon);
-                AppliedElongatedBonusCap = ElongatedPaws.NaturalWeapon.GetDamageBonus();
+                AppliedElongatedBonusCap = ElongatedPaws.NaturalWeaponSubpart.GetDamageBonus();
                 Weapon.AdjustBonusCap(AppliedElongatedBonusCap);
                 Debug.LoopItem(4, $"New AppliedElongatedBonusCap: {AppliedElongatedBonusCap}", Indent: 4);
             }

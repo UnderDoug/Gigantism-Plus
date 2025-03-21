@@ -17,27 +17,23 @@ namespace XRL.World.Parts
         {
         }
 
-        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
-        {
-            ModBurrowingNaturalWeapon modBurrowingNaturalWeapon = base.DeepCopy(Parent, MapInv) as ModBurrowingNaturalWeapon;
-            return ClearForCopy(modBurrowingNaturalWeapon);
-        }
-
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeapon, GetInstanceDescription());
+            /*
+            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
+
+            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
+
+            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
+            */
+
+            base.ApplyModification(Object);
 
             Object.RequirePart<BurrowingClawsProperties>();
-
             BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
             burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
             burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
 
-            ApplyPriorityChanges(Object, NaturalWeapon);
-
-            ApplyPartAndPropChanges(Object, NaturalWeapon);
-
-            base.ApplyModification(Object);
         }
         public override bool WantEvent(int ID, int cascade)
         {
@@ -49,7 +45,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeapon.GetColoredAdjective(), NaturalWeapon.GetAdjectivePriority());
+                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
             }
             return base.HandleEvent(E);
         }
@@ -57,7 +53,7 @@ namespace XRL.World.Parts
         public new string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeapon.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
             int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);

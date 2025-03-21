@@ -20,11 +20,6 @@ namespace XRL.World.Parts
         {
             AssigningPart ??= Wielder?.GetPart<Crystallinity>()?.ConvertToManaged();
             if (AssigningPart == null) return false;
-            AssigningPart.CalculateNaturalWeaponLevel(Level);
-            AssigningPart.CalculateNaturalWeaponDamageDieCount(Level);
-            AssigningPart.CalculateNaturalWeaponDamageDieSize(Level);
-            AssigningPart.CalculateNaturalWeaponDamageBonus(Level);
-            AssigningPart.CalculateNaturalWeaponHitBonus(Level);
             return base.BeingAppliedBy(obj, who);
         }
 

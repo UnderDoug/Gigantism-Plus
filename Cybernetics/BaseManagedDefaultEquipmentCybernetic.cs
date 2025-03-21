@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using XRL.Language;
+using XRL.World.Anatomy;
+using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
@@ -8,7 +10,8 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class BaseManagedDefaultEquipmentCybernetic : IPart, IManagedDefaultNaturalWeapon
+    public abstract class BaseManagedDefaultEquipmentCybernetic<T> : IPart, IManagedDefaultNaturalWeapon<T>
+        where T : BaseManagedDefaultEquipmentCybernetic<T>, new()
     {
         private GameObject _implantee = null;
         public GameObject Implantee
@@ -30,171 +33,155 @@ namespace XRL.World.Parts
             set => _implantObject = value == null ? null : _implantObject;
         }
 
-        [Serializable]
-        public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
+        // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
+        // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
+        public Dictionary<string, NaturalWeaponSubpart<T>> NaturalWeaponSubparts = new();
+        public NaturalWeaponSubpart<T> NaturalWeaponSubpart { get; set; }
+
+        public BaseManagedDefaultEquipmentCybernetic()
         {
-            public INaturalWeapon()
+        }
+
+        // Takes an existing NaturalWeaponSubparts Dictionary
+        public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, NaturalWeaponSubpart<T>> naturalWeaponSubparts, T NewParent)
+            : this()
+        {
+            Dictionary<string, NaturalWeaponSubpart<T>> NewNaturalWeaponSubparts = new();
+            foreach ((string Part, NaturalWeaponSubpart<T> Subpart) in naturalWeaponSubparts)
             {
+                NaturalWeaponSubpart<T> subpart = new(Subpart, NewParent);
+                NewNaturalWeaponSubparts.Add(Part, subpart);
             }
-            public INaturalWeapon(INaturalWeapon NaturalWeapon)
+            NaturalWeaponSubparts = NewNaturalWeaponSubparts;
+        }
+
+        public BaseManagedDefaultEquipmentCybernetic(NaturalWeaponSubpart<T> naturalWeaponSubpart, T NewParent)
+            : this()
+        {
+            NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
+        }
+
+        public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, NaturalWeaponSubpart<T>> naturalWeaponSubparts, NaturalWeaponSubpart<T> naturalWeaponSubpart, T NewParent)
+            : this(naturalWeaponSubparts, NewParent)
+        {
+            NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
+        }
+
+        public virtual NaturalWeaponSubpart<T> GetNaturalWeaponSubpart(
+            string Type = "",
+            GameObject Object = null,
+            BodyPart BodyPart = null)
+        {
+            if (Type != "")
             {
-                Level = NaturalWeapon.Level;
-                DamageDieCount = NaturalWeapon.DamageDieCount;
-                DamageDieSize = NaturalWeapon.DamageDieSize;
-                DamageBonus = NaturalWeapon.DamageBonus;
-                HitBonus = NaturalWeapon.HitBonus;
-
-                ModPriority = NaturalWeapon.ModPriority;
-
-                Adjective = NaturalWeapon.Adjective;
-                AdjectiveColor = NaturalWeapon.AdjectiveColor;
-                AdjectiveColorFallback = NaturalWeapon.AdjectiveColorFallback;
-                Noun = NaturalWeapon.Noun;
-
-                Skill = NaturalWeapon.Skill;
-                Stat = NaturalWeapon.Stat;
-                Tile = NaturalWeapon.Tile;
-                ColorString = NaturalWeapon.ColorString;
-                DetailColor = NaturalWeapon.DetailColor;
-                SecondColorString = NaturalWeapon.SecondColorString;
-                SecondDetailColor = NaturalWeapon.SecondDetailColor;
-                SwingSound = NaturalWeapon.SwingSound;
-                BlockedSound = NaturalWeapon.BlockedSound;
-
-                AddedParts = NaturalWeapon.AddedParts;
-                AddedStringProps = NaturalWeapon.AddedStringProps;
-                AddedIntProps = NaturalWeapon.AddedIntProps;
-
-                EquipmentFrameColors = NaturalWeapon.EquipmentFrameColors;
+                if (Type == NaturalWeaponSubpart?.Type)
+                    return NaturalWeaponSubpart;
+                if (NaturalWeaponSubparts.ContainsKey(Type))
+                    return NaturalWeaponSubparts[Type];
             }
+            if (Object?.Equipped?.Body != null)
+            {
+                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
+                {
+                    if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
+                    {
+                        Type = part.Type;
+                        if (Type == NaturalWeaponSubpart?.Type)
+                            return NaturalWeaponSubpart;
+                        if (NaturalWeaponSubparts.ContainsKey(Type))
+                            return NaturalWeaponSubparts[Type];
+                    }
+                }
+            }
+            if (BodyPart != null)
+            {
+                Type = BodyPart.Type;
+                if (Type == NaturalWeaponSubpart?.Type)
+                    return NaturalWeaponSubpart;
+                if (NaturalWeaponSubparts.ContainsKey(Type))
+                    return NaturalWeaponSubparts[Type];
+            }
+            return null;
+        }
+        public virtual string GetNaturalWeaponModName(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
+        {
+            return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
+        }
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
+        {
+            ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
+            NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
+            NaturalWeaponMod.AssigningPart = (T)this;
+            NaturalWeaponMod.Wielder = ParentObject;
+            return NaturalWeaponMod;
         }
 
-        public INaturalWeapon NaturalWeapon = new()
-        {
-            Level = 1,
-            DamageDieCount = 1,
-            DamageDieSize = 2,
-            DamageBonus = 0,
-            HitBonus = 0,
-
-            ModPriority = 0,
-            ColorString = "&K",
-            DetailColor = "y",
-            SecondColorString = "&y",
-            SecondDetailColor = "Y",
-            SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing",
-            BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked",
-            AddedParts = new(),
-            AddedStringProps = new(),
-            AddedIntProps = new()
-        };
-
-        public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
-        {
-            return NaturalWeapon;
-        }
-
-        public virtual string GetNaturalWeaponModName(bool Managed = true)
-        {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
-        }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
-        {
-            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
-        }
-
-        public virtual bool CalculateNaturalWeaponLevel(int Level = 1)
-        {
-            NaturalWeapon.Level = Level;
-            return true;
-        }
-
-        public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
-        {
-            NaturalWeapon.DamageDieCount = GetNaturalWeaponDamageDieCount(Level);
-            return true;
-        }
-
-        public virtual bool CalculateNaturalWeaponDamageDieSize(int Level = 1)
-        {
-            NaturalWeapon.DamageDieSize = GetNaturalWeaponDamageDieSize(Level);
-            return true;
-        }
-
-        public virtual bool CalculateNaturalWeaponDamageBonus(int Level = 1)
-        {
-            NaturalWeapon.DamageBonus = GetNaturalWeaponDamageBonus(Level);
-            return true;
-        }
-
-        public virtual bool CalculateNaturalWeaponHitBonus(int Level = 1)
-        {
-            NaturalWeapon.HitBonus = GetNaturalWeaponHitBonus(Level);
-            return true;
-        }
-
-        public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
+        public virtual bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart<T> NaturalWeaponSubpart, string Parts)
         {
             if (Parts == null) return false;
-            NaturalWeapon.AddedParts ??= new();
+            NaturalWeaponSubpart.AddedParts ??= new();
             string[] parts = Parts.Split(',');
             foreach (string part in parts)
             {
-                NaturalWeapon.AddedParts.Add(part);
+                NaturalWeaponSubpart.AddedParts.Add(part);
             }
             return true;
         }
 
-        public virtual bool ProcessNaturalWeaponAddedProps(string Props)
+        public virtual bool ProcessNaturalWeaponAddedProps(NaturalWeaponSubpart<T> NaturalWeaponSubpart, string Props)
         {
             if (Props == null) return false;
             if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
             {
-                NaturalWeapon.AddedStringProps = StringProps;
-                NaturalWeapon.AddedIntProps = IntProps;
+                NaturalWeaponSubpart.AddedStringProps = StringProps;
+                NaturalWeaponSubpart.AddedIntProps = IntProps;
             }
             return true;
         }
 
-        public virtual int GetNaturalWeaponDamageDieCount(int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<T> NaturalWeaponSubpart, int Level = 1)
         {
-            return NaturalWeapon.DamageDieCount;
+            return NaturalWeaponSubpart.DamageDieCount;
         }
 
-        public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<T> NaturalWeaponSubpart, int Level = 1)
         {
-            return NaturalWeapon.DamageDieSize;
+            return NaturalWeaponSubpart.DamageDieSize;
         }
 
-        public virtual int GetNaturalWeaponDamageBonus(int Level = 1)
+        public virtual int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<T> NaturalWeaponSubpart, int Level = 1)
         {
-            return NaturalWeapon.DamageBonus;
+            return NaturalWeaponSubpart.DamageBonus;
         }
 
-        public virtual int GetNaturalWeaponHitBonus(int Level = 1)
+        public virtual int GetNaturalWeaponHitBonus(NaturalWeaponSubpart<T> NaturalWeaponSubpart, int Level = 1)
         {
-            return NaturalWeapon.HitBonus;
+            return NaturalWeaponSubpart.HitBonus;
         }
 
-        public virtual List<string> GetNaturalWeaponAddedParts()
+        public virtual List<string> GetNaturalWeaponAddedParts(NaturalWeaponSubpart<T> NaturalWeaponSubpart)
         {
-            return NaturalWeapon.AddedParts;
+            return NaturalWeaponSubpart.AddedParts;
         }
 
-        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps()
+        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps(NaturalWeaponSubpart<T> NaturalWeaponSubpart)
         {
-            return NaturalWeapon.AddedStringProps;
+            return NaturalWeaponSubpart.AddedStringProps;
         }
 
-        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps()
+        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps(NaturalWeaponSubpart<T> NaturalWeaponSubpart)
         {
-            return NaturalWeapon.AddedIntProps;
+            return NaturalWeaponSubpart.AddedIntProps;
         }
 
-        public virtual string GetNaturalWeaponEquipmentFrameColors()
+        public virtual bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level)
         {
-            return NaturalWeapon.EquipmentFrameColors;
+            Subpart.Level = Level;
+            Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level);
+            Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level);
+            Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level);
+            Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level);
+            return true;
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -237,11 +224,84 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public virtual bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(ProcessNaturalWeaponSubparts)}",
+                Indent: 1);
+
+            if (body != null)
+            {
+                List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
+                foreach (BodyPart part in partsList)
+                {
+                    Debug.Divider(4, "-", Count: 25, Indent: 2);
+                    Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
+                    ModNaturalWeaponBase<T> modNaturalWeapon = null;
+                    if (NaturalWeaponSubpart != null
+                        && part.Type == NaturalWeaponSubpart.Type
+                        && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
+                    {
+                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
+                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                    }
+                    else if (NaturalWeaponSubparts.ContainsKey(part.Type)
+                        && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
+                    {
+                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
+                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                    }
+
+                    if (modNaturalWeapon == null) continue;
+
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
+                    if (part.DefaultBehavior != null)
+                    {
+                        part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                    }
+                    else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
+                    {
+                        part.Equipped.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                    }
+                }
+                Debug.Divider(4, "-", Count: 25, Indent: 2);
+            }
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(ProcessNaturalWeaponSubparts)} @//",
+                Indent: 1);
+            return true;
+        }
         public virtual void OnRegenerateDefaultEquipment(Body body)
         {
+            Zone InstanceObjectZone = body.ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
+            Debug.Entry(4, $"TARGET {body.ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+            if (body != null)
+                ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
+
+            Debug.Footer(4,
+                $"{typeof(T).Name}",
+                $"{nameof(OnRegenerateDefaultEquipment)}(body: {body.ParentObject.Blueprint})");
         }
         public virtual void OnDecorateDefaultEquipment(Body body)
         {
+            Zone InstanceObjectZone = body.ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(3, $"{typeof(T).Name}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
+            Debug.Entry(3, $"TARGET {body.ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+            if (body != null)
+                ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
+
+            Debug.Footer(3,
+                $"{typeof(T).Name}",
+                $"{nameof(OnDecorateDefaultEquipment)}(body: {body.ParentObject.Blueprint})");
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)
@@ -256,10 +316,15 @@ namespace XRL.World.Parts
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            BaseManagedDefaultEquipmentCybernetic cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic;
+            BaseManagedDefaultEquipmentCybernetic<T> cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic<T>;
+            cybernetic.NaturalWeaponSubparts = new();
+            foreach ((string type, NaturalWeaponSubpart<T> subpart) in NaturalWeaponSubparts)
+            {
+                cybernetic.NaturalWeaponSubparts.Add(type, new(subpart, (T)cybernetic));
+            }
+            cybernetic.NaturalWeaponSubpart = new(NaturalWeaponSubpart, (T)cybernetic);
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;
-            cybernetic.NaturalWeapon = new INaturalWeapon(NaturalWeapon);
             return cybernetic;
         }
     }

@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using XRL;
+using XRL.Core;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
-using XRL.Core;
-using ConsoleLib.Console;
 
 namespace HNPS_GigantismPlus
 {
@@ -152,7 +151,7 @@ namespace HNPS_GigantismPlus
                 ? EnableManagedVanillaMutations 
                 : EnableManagedVanillaMutationsCurrent;
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
-            ManagedVanillaMutation();
+            ManagedVanillaMutationOptionHandler();
             
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
@@ -201,7 +200,7 @@ namespace HNPS_GigantismPlus
                 Indent: 1);
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
 
-            ManagedVanillaMutation();
+            ManagedVanillaMutationOptionHandler();
 
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusOnPlayerLoad)}",
@@ -250,7 +249,7 @@ namespace HNPS_GigantismPlus
                 $"{The.Game.GetStringGameState("Option_GigantismPlus_ManagedVanilla")}",
                 Indent: 1);
 
-            ManagedVanillaMutation();
+            ManagedVanillaMutationOptionHandler();
 
             Debug.Footer(3,
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",

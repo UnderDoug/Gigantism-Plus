@@ -578,13 +578,14 @@ namespace HNPS_GigantismPlus
         }
 
         public static ModNaturalWeaponBase<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
+            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
         {
             IModification ModPart = ModPartName.ConvertToModification();
             return (ModNaturalWeaponBase<T>)ModPart;
         }
 
-        public static T GetNaturalWeaponCompatiblePart<T>(this GameObject Object) where T : IPart, IManagedDefaultNaturalWeapon
+        public static T GetNaturalWeaponCompatiblePart<T>(this GameObject Object) 
+            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
         {
             T part = Object?.GetPart<T>();
             if (part != null) return part;
@@ -599,9 +600,19 @@ namespace HNPS_GigantismPlus
         }
 
         public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalWeaponBase<T> ModPart, GameObject Actor) 
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
+            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
         {
             return obj.ApplyModification(ModPart, Actor: Actor);
+        }
+
+        public static bool IsDefaultEquipmentOf(this GameObject Object, BodyPart BodyPart)
+        {
+            return BodyPart.DefaultBehavior == Object;
+        }
+
+        public static bool InheritsFrom(this GameObject Object, string Blueprint)
+        {
+            return Object.GetBlueprint().InheritsFrom(Blueprint);
         }
     }
 }

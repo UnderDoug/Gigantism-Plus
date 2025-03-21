@@ -66,12 +66,26 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Header(3, $"{nameof(Crystallinity_Patches)}", $"{nameof(OnRegenerateDefaultEquipment_Prefix)}(body)");
             Debug.Entry(3, $"TARGET {actor.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
-            if (body == null)
+            bool ShouldContinue = false;
+
+            if (body != null)
             {
+                UD_ManagedCrystallinity managed = __instance.ConvertToManaged();
+                managed.HasGigantism = actor.HasPart<GigantismPlus>();
+                managed.HasElongated = actor.HasPart<ElongatedPaws>();
+                managed.HasBurrowing = actor.HasPartDescendedFrom<BurrowingClaws>();
+                managed.NaturalWeaponSubpart.Managed = false;
+                managed.UpdateNaturalWeaponSubpart(managed.NaturalWeaponSubpart, managed.Level);
+                managed.OnRegenerateDefaultEquipment(body);
+                managed.OnDecorateDefaultEquipment(body);
+            }
+            else
+            {
+                ShouldContinue = true;
                 Debug.Entry(3, "No Body. Aborting", Indent: 1);
-                goto Exit;
             }
 
+            /*
             Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
 
             string targetPartType = "Hand";
@@ -103,9 +117,11 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
 
             Exit:
-            Debug.Entry(3, "Skipping patched Method", Indent: 1);
+            */
+
+            Debug.Entry(3, $"Skipping patched Method: {!ShouldContinue}", Indent: 1);
             Debug.Footer(3, $"{nameof(Crystallinity_Patches)}", $"{nameof(OnRegenerateDefaultEquipment_Prefix)}(body)");
-            return false; // Skip the original method
+            return ShouldContinue; // Skip the the original method if we do anything.
         }
     }//!-- public static class Crystallinity_Patches
 }

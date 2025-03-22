@@ -10,10 +10,46 @@ namespace XRL.World
 {
     public interface IManagedDefaultNaturalWeapon<T> where T : IPart, IManagedDefaultNaturalWeapon<T>, new ()
     {
-        public abstract NaturalWeaponSubpart<T> GetNaturalWeaponSubpart(
-            string Type = "", 
-            GameObject RequestingObject = null,
-            BodyPart BodyPart = null);
+        public Dictionary<string, NaturalWeaponSubpart<T>> NaturalWeaponSubparts { get; set; }
+        public NaturalWeaponSubpart<T> NaturalWeaponSubpart { get; set; }
+
+        public virtual NaturalWeaponSubpart<T> GetNaturalWeaponSubpart(
+            string Type = "",
+            GameObject Object = null,
+            BodyPart BodyPart = null)
+        {
+            if (Type != "")
+            {
+                if (Type == NaturalWeaponSubpart?.Type)
+                    return NaturalWeaponSubpart;
+                if (NaturalWeaponSubparts.ContainsKey(Type))
+                    return NaturalWeaponSubparts[Type];
+            }
+            if (Object?.Equipped?.Body != null)
+            {
+                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
+                {
+                    if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
+                    {
+                        Type = part.Type;
+                        if (Type == NaturalWeaponSubpart?.Type)
+                            return NaturalWeaponSubpart;
+                        if (NaturalWeaponSubparts.ContainsKey(Type))
+                            return NaturalWeaponSubparts[Type];
+                    }
+                }
+            }
+            if (BodyPart != null)
+            {
+                Type = BodyPart.Type;
+                if (Type == NaturalWeaponSubpart?.Type)
+                    return NaturalWeaponSubpart;
+                if (NaturalWeaponSubparts.ContainsKey(Type))
+                    return NaturalWeaponSubparts[Type];
+            }
+            return null;
+        }
+
         public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
         public abstract ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
 
@@ -38,6 +74,7 @@ namespace XRL.World
         public abstract bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level = 1);
 
         public abstract bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false);
+        public abstract bool UnprocessNaturalWeaponSubparts(Body body);
 
         // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
         public abstract void OnDecorateDefaultEquipment(Body body);

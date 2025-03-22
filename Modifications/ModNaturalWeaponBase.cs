@@ -8,12 +8,9 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalWeaponBase<T> : IMeleeModification
+    public abstract class ModNaturalWeaponBase<T> : ModNaturalWeaponBase
         where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
     {
-        public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
-        public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
-
         private GameObject _wielder = null;
         public GameObject Wielder
         {
@@ -52,16 +49,12 @@ namespace XRL.World.Parts
             }
         }
 
-        [SerializeField]
-        private int? _level = 1;
-        public int Level => _level ??= (int)NaturalWeaponSubpart?.Level;
-
         private NaturalWeaponSubpart<T> _naturalWeaponSubpart = null;
         public NaturalWeaponSubpart<T> NaturalWeaponSubpart
         {
             get
             {
-                return _naturalWeaponSubpart ??= AssigningPart.GetNaturalWeaponSubpart(RequestingObject: ParentObject);
+                return _naturalWeaponSubpart ??= AssigningPart.GetNaturalWeaponSubpart(Object: ParentObject);
             }
             set
             {
@@ -74,6 +67,9 @@ namespace XRL.World.Parts
                 _naturalWeaponSubpart = null;
             }
         }
+
+        private int? _level = 1;
+        public int Level => _level ??= (int)NaturalWeaponSubpart?.Level;
 
         public ModNaturalWeaponBase()
         {
@@ -96,54 +92,46 @@ namespace XRL.World.Parts
         public override void Configure()
         {
             base.Configure();
-            WorksOnSelf = true;
         }
         public override int GetModificationSlotUsage()
         {
-            return 0;
+            return base.GetModificationSlotUsage();
         }
 
         public override bool ModificationApplicable(GameObject Object)
         {
-            if (!Object.HasPart<MeleeWeapon>() && 
-                !Object.HasPart<Physics>() && 
-                !Object.HasPart<NaturalEquipment>())
-            {
-                return false;
-            }
-            return true;
+            return base.ModificationApplicable(Object);
         }
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            if (obj.Physics.Equipped != who) obj.Physics.Equipped = who;
             return base.BeingAppliedBy(obj, who);
         }
 
-        public virtual int GetDamageDieCount()
+        public override int GetDamageDieCount()
         {
             return Math.Max(0, NaturalWeaponSubpart.GetDamageDieCount());
         }
-        public virtual int GetDamageDieSize()
+        public override int GetDamageDieSize()
         {
             return Math.Max(0, NaturalWeaponSubpart.GetDamageDieSize());
         }
 
-        public virtual int GetDamageBonus()
+        public override int GetDamageBonus()
         {
             // base damage bonus is 0
             return NaturalWeaponSubpart.GetDamageBonus();
         }
 
-        public virtual int GetHitBonus()
+        public override int GetHitBonus()
         {
             // base hit bonus is 0
             return NaturalWeaponSubpart.GetHitBonus();
         }
 
-        public virtual void ApplyGenericChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart, string InstanceDescription)
+        public virtual void ApplyGenericChanges(GameObject Object)
         {
-            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart, string InstanceDescription)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyGenericChanges)}(GameObject Object)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             Object.RequirePart<NaturalWeaponDescriber>();
@@ -161,9 +149,9 @@ namespace XRL.World.Parts
                     Debug.Entry(4, "Have NaturalWeaponMods", "Continuting to accumulate descriptions", Indent: 6);
                 }
 
-                if (InstanceDescription != null && InstanceDescription != string.Empty)
+                if (GetInstanceDescription() != null && GetInstanceDescription() != string.Empty)
                 {
-                    NaturalWeaponDescriber.AddShortDescriptionEntry(NaturalWeaponSubpart.ModPriority, InstanceDescription);
+                    NaturalWeaponDescriber.AddNaturalWeaponMod(NaturalWeaponSubpart.ModPriority, this);
                 }
             }
             else
@@ -196,12 +184,12 @@ namespace XRL.World.Parts
             Debug.Divider(4, "\u2500", 40, Indent: 4);
             weapon.Vomit(4, "Generic, After", vomitCats, Indent: 4);
 
-            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart, string InstanceDescription) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyGenericChanges)}(GameObject Object) *//", Indent: 4);
         }
 
-        public virtual int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeapon)
+        public virtual int ApplyPriorityChanges(GameObject Object)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
 
             Render render = Object.Render;
@@ -209,8 +197,8 @@ namespace XRL.World.Parts
 
             List<string> vomitCats = new() { "Combat", "Render" };
 
-            int NounPriority = NaturalWeapon.NounPriority;
-            int AdjectivePriority = NaturalWeapon.AdjectivePriority;
+            int NounPriority = NaturalWeaponSubpart.NounPriority;
+            int AdjectivePriority = NaturalWeaponSubpart.AdjectivePriority;
             int CurrentNounPriority = Object.GetIntProperty(CURRENT_NOUN_PRIORITY);
             int CurrentAdjectivePriority = Object.GetIntProperty(CURRENT_ADJECTIVE_PRIORITY);
 
@@ -227,32 +215,32 @@ namespace XRL.World.Parts
                 Debug.Divider(4, "\u2500", 40, Indent: 6);
 
                 Debug.Entry(4, $"NaturalWeaponSubpart Attribute", Indent: 6);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.Skill", $"{NaturalWeapon.Skill}", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.Noun", $"{NaturalWeapon.Noun}", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.Tile", $"{NaturalWeapon.Tile}", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.ColorString", $"{NaturalWeapon.ColorString} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.SecondColorString", $"{NaturalWeapon.SecondColorString} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.DetailColor", $"{NaturalWeapon.ColorString} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.SecondDetailColor", $"{NaturalWeapon.SecondDetailColor} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.SwingSound", $"{NaturalWeapon.SwingSound} ", Indent: 7);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.BlockedSound", $"{NaturalWeapon.BlockedSound} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.Skill", $"{NaturalWeaponSubpart.Skill}", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.Noun", $"{NaturalWeaponSubpart.Noun}", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.Tile", $"{NaturalWeaponSubpart.Tile}", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.ColorString", $"{NaturalWeaponSubpart.ColorString} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.SecondColorString", $"{NaturalWeaponSubpart.SecondColorString} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.DetailColor", $"{NaturalWeaponSubpart.ColorString} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.SecondDetailColor", $"{NaturalWeaponSubpart.SecondDetailColor} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.SwingSound", $"{NaturalWeaponSubpart.SwingSound} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.BlockedSound", $"{NaturalWeaponSubpart.BlockedSound} ", Indent: 7);
 
-                weapon.Skill = NaturalWeapon.Skill ?? weapon.Skill;
-                render.DisplayName = NaturalWeapon.Noun ?? render.DisplayName;
-                render.Tile = NaturalWeapon.Tile ?? render.Tile;
+                weapon.Skill = NaturalWeaponSubpart.Skill ?? weapon.Skill;
+                render.DisplayName = NaturalWeaponSubpart.Noun ?? render.DisplayName;
+                render.Tile = NaturalWeaponSubpart.Tile ?? render.Tile;
 
                 render.ColorString = 
-                    (render.ColorString == NaturalWeapon.ColorString) 
-                    ? NaturalWeapon.SecondColorString 
-                    : NaturalWeapon.ColorString;
+                    (render.ColorString == NaturalWeaponSubpart.ColorString) 
+                    ? NaturalWeaponSubpart.SecondColorString 
+                    : NaturalWeaponSubpart.ColorString;
 
                 render.DetailColor = 
-                    (render.DetailColor == NaturalWeapon.DetailColor) 
-                    ? NaturalWeapon.SecondDetailColor 
-                    : NaturalWeapon.DetailColor;
+                    (render.DetailColor == NaturalWeaponSubpart.DetailColor) 
+                    ? NaturalWeaponSubpart.SecondDetailColor 
+                    : NaturalWeaponSubpart.DetailColor;
 
-                Object.SetSwingSound(NaturalWeapon.SwingSound);
-                Object.SetBlockedSound(NaturalWeapon.BlockedSound);
+                Object.SetSwingSound(NaturalWeaponSubpart.SwingSound);
+                Object.SetBlockedSound(NaturalWeaponSubpart.BlockedSound);
 
                 Debug.Divider(4, "\u2500", 40, Indent: 6);
                 weapon.Vomit(4, "NounPriority, After", vomitCats, Indent: 6);
@@ -282,9 +270,9 @@ namespace XRL.World.Parts
                 Debug.Divider(4, "\u2500", 40, Indent: 6);
 
                 Debug.Entry(4, $"NaturalWeaponSubpart Attribute", Indent: 6);
-                Debug.LoopItem(4, $"NaturalWeaponSubpart.EquipmentFrameColors", $"{NaturalWeapon.EquipmentFrameColors} ", Indent: 7);
+                Debug.LoopItem(4, $"NaturalWeaponSubpart.EquipmentFrameColors", $"{NaturalWeaponSubpart.EquipmentFrameColors} ", Indent: 7);
 
-                Object.SetEquipmentFrameColors(NaturalWeapon.EquipmentFrameColors);
+                Object.SetEquipmentFrameColors(NaturalWeaponSubpart.EquipmentFrameColors);
 
                 Debug.Divider(4, "\u2500", 40, Indent: 6);
                 weapon.Vomit(4, "AdjectivePriority, After", vomitCats, Indent: 6);
@@ -301,13 +289,13 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4, $"x if (AdjectivePriority != 0 and AdjectivePriority < CurrentAdjectivePriority) ?//", Indent: 5);
 
-            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart) *//", Indent: 4);
-            return NaturalWeapon.ModPriority;
+            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object) *//", Indent: 4);
+            return NaturalWeaponSubpart.ModPriority;
         }
 
-        public virtual void ApplyPartAndPropChanges(GameObject Object, NaturalWeaponSubpart<T> NaturalWeaponSubpart)
+        public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart)", Indent: 4);
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}; Level: {Level}", Indent: 5);
 
             if (NaturalWeaponSubpart.AddedParts != null)
@@ -343,14 +331,14 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"x foreach ((string Name, int Value) in NaturalWeaponSubpart.GetAddedIntProps()) >//", Indent: 5);
             }
 
-            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object, NaturalWeaponSubpart<{typeof(T).Name}> NaturalWeaponSubpart) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4);
         }
 
         public override void ApplyModification(GameObject Object)
         {
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
+            ApplyGenericChanges(Object);
+            ApplyPriorityChanges(Object);
+            ApplyPartAndPropChanges(Object);
 
             Render render = Object.Render;
 
@@ -380,7 +368,7 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public virtual string GetInstanceDescription()
+        public override string GetInstanceDescription()
         {
             return null;
         }
@@ -409,6 +397,97 @@ namespace XRL.World.Parts
             ModNaturalWeaponBase.AssigningPart = null;
             ModNaturalWeaponBase.Wielder = null;
             ModNaturalWeaponBase.NaturalWeaponSubpart = null;
+            return ModNaturalWeaponBase;
+        }
+
+    } //!-- public class ModNaturalWeaponBase<T> : IMeleeModification where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+
+    public abstract class ModNaturalWeaponBase : IMeleeModification
+    {
+        public const string CURRENT_ADJECTIVE_PRIORITY = "CurrentNaturalWeaponAdjectivePriority";
+        public const string CURRENT_NOUN_PRIORITY = "CurrentNaturalWeaponNounPriority";
+
+        public ModNaturalWeaponBase()
+        {
+        }
+        public ModNaturalWeaponBase(int Tier)
+            : base(Tier)
+        {
+        }
+
+        public override void Configure()
+        {
+            base.Configure();
+            WorksOnSelf = true;
+        }
+        public override int GetModificationSlotUsage()
+        {
+            return 0;
+        }
+
+        public override bool ModificationApplicable(GameObject Object)
+        {
+            if (!Object.HasPart<MeleeWeapon>() &&
+                !Object.HasPart<Physics>() &&
+                !Object.HasPart<NaturalEquipment>())
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool BeingAppliedBy(GameObject obj, GameObject who)
+        {
+            if (obj.Physics.Equipped != who) obj.Physics.Equipped = who;
+            return base.BeingAppliedBy(obj, who);
+        }
+
+        public abstract int GetDamageDieCount();
+        public abstract int GetDamageDieSize();
+
+        public abstract int GetDamageBonus();
+
+        public abstract int GetHitBonus();
+
+        public override void ApplyModification(GameObject Object)
+        {
+            base.ApplyModification(Object);
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+        }
+
+        public override bool HandleEvent(GetDisplayNameEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+
+        public abstract string GetInstanceDescription();
+
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+        }
+
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+        }
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            ModNaturalWeaponBase modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase;
+            return ClearForCopy(modNaturalWeaponBase);
+        }
+        public static ModNaturalWeaponBase ClearForCopy(ModNaturalWeaponBase ModNaturalWeaponBase)
+        {
             return ModNaturalWeaponBase;
         }
 

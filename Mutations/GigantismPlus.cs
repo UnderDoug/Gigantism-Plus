@@ -9,6 +9,7 @@ using SerializeField = UnityEngine.SerializeField;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Extensions;
+using PlayFab.DataModels;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -132,10 +133,29 @@ namespace XRL.World.Parts.Mutation
                 BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block",
                 AddedIntProps = new()
                 {
-                    { "ModGiganticNoShortDescription", 1 }
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
                 }
             };
             NaturalWeaponSubparts.Add(GiganticFist.Type, GiganticFist);
+
+            NaturalWeaponSubpart<GigantismPlus> GiganticHorns = new()
+            {
+                ParentPart = this,
+                Type = "Head",
+                CosmeticOnly = false,
+                Level = Level,
+                ModPriority = 10,
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
+                AddedIntProps = new()
+                {
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
+                }
+            };
+            NaturalWeaponSubparts.Add(GiganticHorns.Type, GiganticHorns);
         }
 
         public override bool CanLevel() { return true; }
@@ -144,14 +164,17 @@ namespace XRL.World.Parts.Mutation
 
         public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
+            if (NaturalWeaponSubpart.Type == "Head") return 1;
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
         }
         public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
+            if (NaturalWeaponSubpart.Type == "Head") return 2;
             return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
         }
         public override int  GetNaturalWeaponHitBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
+            if (NaturalWeaponSubpart.Type == "Head") return 3;
             return -3 + (int)Math.Floor(Level / 2.0);
         }
 
@@ -317,58 +340,6 @@ namespace XRL.World.Parts.Mutation
             stats.Set("HunchedOverMS", HunchedOverMS);
         }
 
-        // method to swap Gigantism mutation category between Physical and PhysicalDefects
-        // - Rapid advancement checks the Physical MutationCategory Entries.
-        private void SwapMutationCategory(bool Before = true)
-        {
-            string state = Before ? "true" : "false";
-            Debug.Header(3, "GigantismPlus",$"SwapMutationCategory(Before: {state})");
-
-            // prefer this for repeated uses of strings.
-            string Physical = "Physical";
-            string PhysicalDefects = "PhysicalDefects";
-
-            // direction of swap depends on whether before or after LevelGain
-            string IntoCategory = Before ? Physical : PhysicalDefects;
-            string OutOfCategory = Before ? PhysicalDefects : Physical;
-
-            Debug.Entry(3, $"Into Category:   \"{IntoCategory}\"", Indent: 1);
-            Debug.Entry(3, $"Out Of Category: \"{OutOfCategory}\"", Indent: 1);
-
-            MutationEntry GigantismEntry = MutationFactory.GetMutationEntryByName(Name);
-
-            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1);
-            foreach (MutationCategory category in MutationFactory.GetCategories())
-            {
-                Debug.LoopItem(4, category.Name, Indent: 2);
-                if (category.Name == IntoCategory)
-                {
-                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", Indent: 2);
-
-                    Debug.Entry(3, $"Adding \"{GigantismEntry.DisplayName}\" Mutation to \"{IntoCategory}\" Category", Indent: 3);
-                    category.Add(GigantismEntry);
-                    category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
-
-                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", Indent: 3);
-                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 3);
-                    foreach (MutationEntry entry in category.Entries)
-                    {
-                        Debug.LoopItem(4, entry.DisplayName, Indent: 4);
-                    }
-                    Debug.DiveOut(3, $"x {IntoCategory} >//", Indent: 2);
-                }
-                if (category.Name == OutOfCategory)
-                {
-                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", Indent: 2);
-                    Debug.Entry(3, $"Removing \"{GigantismEntry.DisplayName}\" from \"{OutOfCategory}\" Category", Indent: 3);
-                    category.Entries.RemoveAll(r => r == GigantismEntry);
-                    Debug.DiveOut(3, $"x {OutOfCategory} >//", Indent: 2);
-                }
-            }
-            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) ]//", Indent: 1);
-            Debug.Footer(3, "GigantismPlus", $"SwapMutationCategory(Before: {state})");
-        } //!--- private void SwapMutationCategory(bool Before = true)
-
         private bool ShouldRapidAdvance(int Level, GameObject Actor)
         {
             bool IsMutant = Actor.IsMutant();
@@ -396,7 +367,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (ShouldRapidAdvance(E.Level, E.Actor))
             {
-                SwapMutationCategory(true);
+                this.SwapMutationCategory("Physical", "Physical Defect");
             }
             return base.HandleEvent(E);
         }
@@ -405,7 +376,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (ShouldRapidAdvance(E.Level, E.Actor))
             {
-                SwapMutationCategory(false);
+                this.SwapMutationCategory("Physical Defect", "Physical");
             }
             if (IsCyberGiant)
             {

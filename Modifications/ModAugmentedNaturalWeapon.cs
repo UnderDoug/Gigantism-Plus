@@ -19,7 +19,7 @@ namespace XRL.World.Parts
         {
         }
 
-        public override int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart<CyberneticsGiganticExoframe> NaturalWeapon)
+        public override int ApplyPriorityChanges(GameObject Object)
         {
             Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart)", Indent: 4);
             Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
@@ -28,7 +28,7 @@ namespace XRL.World.Parts
             MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
 
             List<string> vomitCats = new() { "Render" };
-            int AdjectivePriority = NaturalWeapon.AdjectivePriority - 100;
+            int AdjectivePriority = NaturalWeaponSubpart.AdjectivePriority - 100;
             int CurrentNounPriority = Object.GetIntProperty(CURRENT_NOUN_PRIORITY);
 
             // Debug.Entry(4, $"Using inverted Adjective Priority to force the Augmented Render changes through", Indent: 5);
@@ -42,20 +42,20 @@ namespace XRL.World.Parts
 
                 weapon.Vomit(4, "SpecialAdjectivePriority, Before", vomitCats, Indent: 6);
 
-                render.Tile = NaturalWeapon.Tile ?? render.Tile;
+                render.Tile = NaturalWeaponSubpart.Tile ?? render.Tile;
 
                 render.ColorString =
-                    (render.ColorString == NaturalWeapon.ColorString)
-                    ? NaturalWeapon.SecondColorString
-                    : NaturalWeapon.ColorString;
+                    (render.ColorString == NaturalWeaponSubpart.ColorString)
+                    ? NaturalWeaponSubpart.SecondColorString
+                    : NaturalWeaponSubpart.ColorString;
 
                 render.DetailColor =
-                    (render.DetailColor == NaturalWeapon.DetailColor)
-                    ? NaturalWeapon.SecondDetailColor
-                    : NaturalWeapon.DetailColor;
+                    (render.DetailColor == NaturalWeaponSubpart.DetailColor)
+                    ? NaturalWeaponSubpart.SecondDetailColor
+                    : NaturalWeaponSubpart.DetailColor;
 
-                Object.SetSwingSound(NaturalWeapon.SwingSound);
-                Object.SetBlockedSound(NaturalWeapon.BlockedSound);
+                Object.SetSwingSound(NaturalWeaponSubpart.SwingSound);
+                Object.SetBlockedSound(NaturalWeaponSubpart.BlockedSound);
 
                 weapon.Vomit(4, "SpecialAdjectivePriority, After", vomitCats, Indent: 6);
             }
@@ -71,7 +71,7 @@ namespace XRL.World.Parts
 
             Debug.Entry(4, $"* base.{nameof(ApplyPriorityChanges)}(Object, NaturalWeaponSubpart)", Indent: 4);
             Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart) *//", Indent: 4);
-            return base.ApplyPriorityChanges(Object, NaturalWeapon);
+            return base.ApplyPriorityChanges(Object);
         }
 
         public override void ApplyModification(GameObject Object)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using HNPS_GigantismPlus;
 using XRL.Language;
 using static HNPS_GigantismPlus.Options;

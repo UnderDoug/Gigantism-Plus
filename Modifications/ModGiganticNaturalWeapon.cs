@@ -27,6 +27,7 @@ namespace XRL.World.Parts
 
             ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
             */
+            Object.RemovePart("ModGigantic");
             base.ApplyModification(Object);
         }
 

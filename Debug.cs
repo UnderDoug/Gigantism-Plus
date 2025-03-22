@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using XRL;
 using XRL.World;
 using XRL.World.Parts;
+using static UnityEngine.GridBrushBase;
 
 namespace HNPS_GigantismPlus
 {
@@ -338,6 +340,68 @@ namespace HNPS_GigantismPlus
             if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
             else Entry(Verbosity, Output, Indent: Indent);
             return @bool;
+        }
+        public static List<T> Vomit<T>(this List<T> List, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+            where T : Type
+        {
+            string Output = Label != "" ? $"{Label}: {nameof(List)}" : $"{nameof(List)}";
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Output, Indent: Indent);
+            foreach (T item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent+1);
+                else Entry(Verbosity, item.ToString(), Indent: Indent);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<object> Vomit(this List<object> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (object item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item}", Indent: Indent);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<MutationEntry> Vomit(this List<MutationEntry> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (MutationEntry item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item}", Indent: Indent);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<MutationCategory> Vomit(this List<MutationCategory> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (MutationCategory item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item}", Indent: Indent);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<GameObject> Vomit(this List<GameObject> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (GameObject item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.DebugName}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.DebugName}", Indent: Indent);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
         }
     } //!-- public static class Debug
 }

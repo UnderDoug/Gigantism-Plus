@@ -12,6 +12,13 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalWeapon<UD_ManagedCrystallinity>
     {
+        // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
+        // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
+        public Dictionary<string, NaturalWeaponSubpart<UD_ManagedCrystallinity>> NaturalWeaponSubparts { get; set; }
+        public NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart { get; set; }
+
+        public UD_ManagedCrystallinity NaturalWeaponManager { get; set; }
+
         private bool _HasGigantism = false;
         public bool HasGigantism
         {
@@ -57,14 +64,11 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
-        public Dictionary<string, NaturalWeaponSubpart<UD_ManagedCrystallinity>> NaturalWeaponSubparts = new();
-        public NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart { get; set; }
-
         public UD_ManagedCrystallinity()
             : base()
         {
+            NaturalWeaponSubparts = new();
+
             NaturalWeaponSubpart = new()
             {
                 ParentPart = this,
@@ -103,42 +107,6 @@ namespace XRL.World.Parts.Mutation
             NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
         }
 
-        public virtual NaturalWeaponSubpart<UD_ManagedCrystallinity> GetNaturalWeaponSubpart(
-            string Type = "",
-            GameObject Object = null,
-            BodyPart BodyPart = null)
-        {
-            if (Type != "")
-            {
-                if (Type == NaturalWeaponSubpart?.Type)
-                    return NaturalWeaponSubpart;
-                if (NaturalWeaponSubparts.ContainsKey(Type))
-                    return NaturalWeaponSubparts[Type];
-            }
-            if (Object?.Equipped?.Body != null)
-            {
-                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
-                {
-                    if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
-                    {
-                        Type = part.Type;
-                        if (Type == NaturalWeaponSubpart?.Type)
-                            return NaturalWeaponSubpart;
-                        if (NaturalWeaponSubparts.ContainsKey(Type))
-                            return NaturalWeaponSubparts[Type];
-                    }
-                }
-            }
-            if (BodyPart != null)
-            {
-                Type = BodyPart.Type;
-                if (Type == NaturalWeaponSubpart?.Type)
-                    return NaturalWeaponSubpart;
-                if (NaturalWeaponSubparts.ContainsKey(Type))
-                    return NaturalWeaponSubparts[Type];
-            }
-            return null;
-        }
         public virtual string GetNaturalWeaponModName(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
         {
             return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
@@ -280,33 +248,52 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false)
         {
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(ProcessNaturalWeaponSubparts)}",
+                Indent: 1);
+
             if (body != null)
             {
                 List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
                 foreach (BodyPart part in partsList)
                 {
+                    Debug.Divider(4, "-", Count: 25, Indent: 2);
+                    Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
                     ModNaturalWeaponBase<UD_ManagedCrystallinity> modNaturalWeapon = null;
-                    if (NaturalWeaponSubpart != null && part.Type == NaturalWeaponSubpart.Type && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
+                    if (NaturalWeaponSubpart != null
+                        && part.Type == NaturalWeaponSubpart.Type
+                        && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
+                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
                     }
-                    else if (NaturalWeaponSubparts.ContainsKey(part.Type) && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
+                    else if (NaturalWeaponSubparts.ContainsKey(part.Type)
+                        && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
+                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
                     }
+
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
 
                     if (modNaturalWeapon == null) continue;
 
                     if (part.DefaultBehavior != null)
                     {
-                        part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                        part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: body.ParentObject);
                     }
                     else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
                     {
-                        part.Equipped.ApplyModification(modNaturalWeapon, Actor: ParentObject);
+                        part.Equipped.ApplyModification(modNaturalWeapon, Actor: body.ParentObject);
                     }
                 }
+                Debug.Divider(4, "-", Count: 25, Indent: 2);
             }
+            Debug.Entry(4,
+                $"x {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(ProcessNaturalWeaponSubparts)} @//",
+                Indent: 1);
             return true;
         }
 

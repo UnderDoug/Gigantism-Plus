@@ -65,7 +65,6 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-
         public UD_ManagedBurrowingClaws()
             : base()
         {
@@ -227,6 +226,7 @@ namespace XRL.World.Parts.Mutation
             if (NaturalWeaponSubpart != null) UpdateNaturalWeaponSubpart(NaturalWeaponSubpart, NewLevel);
             return base.ChangeLevel(NewLevel);
         }
+
         public virtual bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false)
         {
             Debug.Entry(4,
@@ -277,21 +277,127 @@ namespace XRL.World.Parts.Mutation
                 Indent: 1);
             return true;
         }
+        public virtual bool UnprocessNaturalWeaponSubparts(Body body)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedBurrowingClaws).Name}."
+                + $"{nameof(UnprocessNaturalWeaponSubparts)}",
+                Indent: 1);
+
+            if (body != null)
+            {
+                List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
+                foreach (BodyPart part in partsList)
+                {
+                    Debug.Divider(4, "-", Count: 25, Indent: 2);
+                    Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
+                    ModNaturalWeaponBase<UD_ManagedBurrowingClaws> modNaturalWeapon = null;
+                    if (NaturalWeaponSubpart != null
+                        && part.Type == NaturalWeaponSubpart.Type)
+                    {
+                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
+                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                    }
+                    else if (NaturalWeaponSubparts.ContainsKey(part.Type))
+                    {
+                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
+                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                    }
+
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
+
+                    if (modNaturalWeapon == null) continue;
+
+                    if (part.DefaultBehavior != null)
+                    {
+                        part.DefaultBehavior.RemovePart(modNaturalWeapon);
+                        if (part.DefaultBehavior.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
+                        {
+                            naturalWeaponDescriber.CollectNaturalWeaponMods();
+                            part.DefaultBehavior.Obliterate();
+                        }
+                    }
+                    else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
+                    {
+                        part.Equipped.RemovePart(modNaturalWeapon);
+                        if (part.Equipped.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
+                        {
+                            naturalWeaponDescriber.CollectNaturalWeaponMods();
+                            part.Equipped.Obliterate();
+                        }
+                    }
+                }
+                Debug.Divider(4, "-", Count: 25, Indent: 2);
+            }
+            Debug.Entry(4,
+                $"x {typeof(UD_ManagedBurrowingClaws).Name}."
+                + $"{nameof(UnprocessNaturalWeaponSubparts)} @//",
+                Indent: 1);
+            return true;
+        }
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
+            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(4, $"{typeof(UD_ManagedBurrowingClaws).Name}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
             if (body != null) 
                 ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
+
+            Debug.Entry(4, $"Skipping base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
+            Debug.Footer(4,
+                $"{typeof(UD_ManagedBurrowingClaws).Name}",
+                $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
             // skip base
         }
 
         public override void OnDecorateDefaultEquipment(Body body)
         {
+            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(4, $"{typeof(UD_ManagedBurrowingClaws).Name}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
             if (body != null)
                 ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
 
+
+            Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
+            Debug.Footer(4,
+                $"{typeof(UD_ManagedBurrowingClaws).Name}",
+                $"{nameof(OnDecorateDefaultEquipment)}(body: {ParentObject.Blueprint})");
             base.OnDecorateDefaultEquipment(body);
         }
+        public override void AfterUnmutate(GameObject GO)
+        {
+            UnprocessNaturalWeaponSubparts(GO.Body);
+            GO.GetPart<Mutations>().ActiveMutationList.Vomit(4, GO.Blueprint, Indent: 3);
+            foreach (BaseMutation mutation in GO.GetPart<Mutations>().ActiveMutationList)
+            {
+                if (mutation.GetMutationClass() == GetMutationClass()) continue;
+                mutation.ChangeLevel(mutation.Level);
+            }
+            base.AfterUnmutate(GO);
+        }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("MutationAdded");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "MutationAdded")
+            {
+                GameObject Actor = E.GetParameter("Object") as GameObject;
+                ProcessNaturalWeaponSubparts(Actor?.Body);
+            }
+            return base.FireEvent(E);
+        }
+
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

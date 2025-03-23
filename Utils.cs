@@ -380,6 +380,109 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}() *//", Indent: 1);
         }
 
+        /*
+        // method to swap Gigantism mutation category between Physical and PhysicalDefects
+        public static void SwapMutationCategory(MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
+        {
+            SwapMutationCategory(MutationEntry.Name, OutOfCategory, IntoCategory);
+        } //!--- public static void SwapMutationCategory(this MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
+
+        public static void SwapMutationCategory(BaseMutation Mutation, string OutOfCategory, string IntoCategory)
+        {
+            SwapMutationCategory(Mutation?.GetMutationEntry()?.Name, OutOfCategory, IntoCategory);
+        } //!--- public static void SwapMutationCategory(this MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
+
+        public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
+        {
+            if (MutationFactory.TryGetMutationEntry(MutationName, out MutationEntry MutationEntry))
+            {
+                Debug.Header(3, MutationEntry.DisplayName, $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+
+                List<MutationCategory> mutationCategories = MutationFactory.GetCategories().Vomit(4, "mutationCategories", DivAfter: Debug.HONLY, Indent: 1);
+
+                MutationCategory outOfCategory = mutationCategories.Find((x) => x.Name == OutOfCategory);
+                MutationCategory intoCategory = mutationCategories.Find((x) => x.Name == IntoCategory);
+
+                outOfCategory.Entries.Vomit(4, "outOfCategoryEntries | Before:", DivAfter: Debug.HONLY, Indent: 1);
+                intoCategory.Entries.Vomit(4, "intoCategoryEntries | Before:", Indent: 1);
+                Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
+
+                foreach (MutationCategory category in MutationFactory.GetCategories())
+                {
+                    if (category.Name == IntoCategory)
+                    {
+                        if (!category.Entries.Contains(MutationEntry))
+                        {
+                            Debug.Entry(4, $"Mutation \"{MutationEntry.DisplayName}\" not found in IntoCategory \"{intoCategory.Name}\"", Indent: 2);
+                            Debug.Entry(4, $"Adding it", Indent: 3);
+                            category.Entries.Add(MutationEntry);
+                            Debug.Entry(4, $"Attempting to Sort", Indent: 3);
+                            category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
+                            MutationEntry.Type = IntoCategory;
+                        }
+                    }
+                    if (category.Name == OutOfCategory)
+                    {
+                        if (outOfCategory.Entries.Contains(MutationEntry))
+                        {
+                            Debug.Entry(4, $"Mutation \"{MutationEntry.DisplayName}\" found in OutOfCategory \"{outOfCategory.Name}\"", Indent: 2);
+                            Debug.Entry(4, $"Removing it", Indent: 3);
+                            outOfCategory.Entries.Remove(MutationEntry);
+                        }
+                    }
+                }
+
+                Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
+                outOfCategory.Entries.Vomit(4, "outOfCategoryEntries |  After:", DivAfter: Debug.HONLY, Indent: 1);
+                intoCategory.Entries.Vomit(4, "intoCategoryEntries |  After:", Indent: 1);
+
+                Debug.Footer(3, MutationEntry.Mutation.GetMutationClass(), $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+            }
+        }
+        */
+
+        public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
+        {
+            Debug.Header(3, 
+                $"{MutationName}", 
+                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+
+            MutationEntry MutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
+
+            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1);
+            foreach (MutationCategory category in MutationFactory.GetCategories())
+            {
+                Debug.LoopItem(4, category.Name, Indent: 2);
+                if (category.Name == IntoCategory)
+                {
+                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", Indent: 2);
+
+                    Debug.Entry(3, $"Adding \"{MutationEntry.DisplayName}\" Mutation to \"{IntoCategory}\" Category", Indent: 3);
+                    category.Add(MutationEntry);
+                    category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
+
+                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", Indent: 3);
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 3);
+                    foreach (MutationEntry entry in category.Entries)
+                    {
+                        Debug.LoopItem(4, entry.DisplayName, Indent: 4);
+                    }
+                    Debug.DiveOut(3, $"x {IntoCategory} //", Indent: 2);
+                }
+                if (category.Name == OutOfCategory)
+                {
+                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", Indent: 2);
+                    Debug.Entry(3, $"Removing \"{MutationEntry.DisplayName}\" from \"{OutOfCategory}\" Category", Indent: 3);
+                    category.Entries.RemoveAll(r => r == MutationEntry);
+                    Debug.DiveOut(3, $"x {OutOfCategory} //", Indent: 2);
+                }
+            }
+            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) >//", Indent: 1);
+            Debug.Footer(3, 
+                $"{MutationName}", 
+                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+        } //!--- private void SwapMutationCategory(bool Before = true)
+
     } //!-- public static class Utils
 
 } //!-- namespace HNPS_GigantismPlus

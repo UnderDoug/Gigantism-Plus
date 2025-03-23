@@ -15,40 +15,6 @@ namespace HNPS_GigantismPlus
 {
     public static class Extensions
     {
-        // method to swap Gigantism mutation category between Physical and PhysicalDefects
-        // - Rapid advancement checks the Physical MutationCategory Entries.
-        public static BaseMutation SwapMutationCategory(this BaseMutation Mutation, string OutOfCategory, string IntoCategory)
-        {
-            Debug.Header(3, Mutation.Name, $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
-
-            MutationEntry MutationEntry = MutationFactory.GetMutationEntryByName(Mutation.Name);
-
-            List<MutationCategory> mutationCategories = new(MutationFactory.GetCategories().Vomit(4, "mutationCategories", Indent: 1));
-
-            MutationCategory outOfCategory = mutationCategories.Find((x) => x.DisplayName == OutOfCategory);
-            MutationCategory intoCategory = mutationCategories.Find((x) => x.DisplayName == IntoCategory);
-            List<MutationEntry> outOfCategoryEntries = new(outOfCategory.Entries.Vomit(4, "outOfCategoryEntries", Indent: 1));
-            List<MutationEntry> intoCategoryEntries = new(intoCategory.Entries.Vomit(4, "intoCategoryEntries", DivAfter: Debug.HONLY, Indent: 1));
-
-            Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
-            if (outOfCategoryEntries.Contains(MutationEntry).Vomit(4, "? outOfCategoryEntries.Contains(MutationEntry)", Indent:2))
-            {
-                outOfCategoryEntries.Remove(MutationEntry);
-            }
-            if (!intoCategoryEntries.Contains(MutationEntry).Vomit(4, "? !intoCategoryEntries.Contains(MutationEntry)", Indent: 2))
-            {
-                intoCategoryEntries.Add(MutationEntry);
-                intoCategoryEntries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
-            }
-            Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
-
-            outOfCategory.Entries = outOfCategoryEntries.Vomit(4, "outOfCategoryEntries", DivAfter: Debug.HONLY, Indent: 1);
-            intoCategory.Entries = intoCategoryEntries.Vomit(4, "intoCategoryEntries", Indent: 1);
-
-            Debug.Footer(3, Mutation.Name, $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
-            return Mutation;
-        } //!--- private void SwapMutationCategory(bool Before = true)
-
         // checks if part is managed externally
         public static bool IsExternallyManagedLimb(this BodyPart part)  // Renamed method
         {
@@ -90,17 +56,17 @@ namespace HNPS_GigantismPlus
             DieRoll dieRoll = new(DieRoll);
             return dieRoll.AdjustDieCount(Amount).ToString();
         }
-        public static bool AdjustDieCount(this MeleeWeapon MeleeWeapon, int Amount)
+        public static bool AdjustDamageDieCount(this MeleeWeapon MeleeWeapon, int Amount)
         {
             MeleeWeapon.BaseDamage = MeleeWeapon.BaseDamage.AdjustDieCount(Amount);
             return true;
         }
-        public static bool AdjustDieCount(this ThrownWeapon ThrownWeapon, int Amount)
+        public static bool AdjustDamageDieCount(this ThrownWeapon ThrownWeapon, int Amount)
         {
             ThrownWeapon.Damage = ThrownWeapon.Damage.AdjustDieCount(Amount);
             return true;
         }
-        public static bool AdjustDieCount(this Projectile Projectile, int Amount)
+        public static bool AdjustDamageDieCount(this Projectile Projectile, int Amount)
         {
             Projectile.BaseDamage = Projectile.BaseDamage.AdjustDieCount(Amount);
             return true;

@@ -14,15 +14,16 @@ namespace XRL.World.Parts
         public SortedDictionary<int, string> ShortDescriptions = new();
 
         [SerializeField]
-        private string _shortDescriptionCache = string.Empty;
+        private string _shortDescriptionCache = null;
 
+        [NonSerialized]
         public SortedDictionary<int, ModNaturalWeaponBase> NaturalWeaponMods = new();
 
         public string ProcessDescription(SortedDictionary<int, string> Descriptions, bool IsShort = true)
         {
             StringBuilder StringBuilder = Event.NewStringBuilder();
 
-            if (NaturalWeaponMods.IsNullOrEmpty()) CollectNaturalWeaponMods();
+            CollectNaturalWeaponMods();
 
             ProcessNaturalWeaponModsShortDescriptions();
 
@@ -45,20 +46,21 @@ namespace XRL.World.Parts
                 $"@ {nameof(NaturalWeaponDescriber)}."
                 + $"{nameof(AddShortDescriptionEntry)}(int Priority: {Priority}, string Description)",
                 Indent: 7);
+
             ShortDescriptions[Priority] = Description;
         }
 
         public void ClearShortDescriptionCache()
         {
-            _shortDescriptionCache = string.Empty;
+            _shortDescriptionCache = null;
         }
         public void ClearShortDescriptions()
         {
-            ShortDescriptions.Clear();
+            ShortDescriptions = new();
         }
         public void ClearNaturalWeaponMods()
         {
-            NaturalWeaponMods.Clear();
+            NaturalWeaponMods = new();
         }
         public void ResetShortDescription()
         {
@@ -71,8 +73,9 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalWeaponDescriber)}."
-                + $"{nameof(AddShortDescriptionEntry)}(int Priority: {Priority}, string Description)",
+                + $"{nameof(AddNaturalWeaponMod)}(Priority: {Priority}, NaturalWeaponMod: {NaturalWeaponMod.Name})",
                 Indent: 7);
+
             NaturalWeaponMods[Priority] = NaturalWeaponMod;
         }
 
@@ -88,14 +91,12 @@ namespace XRL.World.Parts
 
         public void CollectNaturalWeaponMods()
         {
-            SortedDictionary<int, ModNaturalWeaponBase> newList = new();
+            ResetShortDescription();
 
             foreach (ModNaturalWeaponBase naturalWeaponMod in ParentObject.GetPartsDescendedFrom<ModNaturalWeaponBase>())
             {
-                newList[naturalWeaponMod.Priority] = naturalWeaponMod;
+                AddNaturalWeaponMod(naturalWeaponMod.GetDescriptionPriority(), naturalWeaponMod);
             }
-
-            NaturalWeaponMods = newList;
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -110,9 +111,10 @@ namespace XRL.World.Parts
                 $"@ {nameof(NaturalWeaponDescriber)}."
                 + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.ShortDisplayName})",
                 Indent: 0);
+
             if(E.Object.HasPartDescendedFrom<ModNaturalWeaponBase>())
             {
-                _shortDescriptionCache = _shortDescriptionCache == "" ? ProcessDescription(ShortDescriptions) : _shortDescriptionCache;
+                _shortDescriptionCache ??= ProcessDescription(ShortDescriptions);
                 E.Postfix.AppendRules(_shortDescriptionCache);
             }
 
@@ -136,6 +138,7 @@ namespace XRL.World.Parts
             NaturalWeaponDescriber naturalWeaponDescriber = base.DeepCopy(Parent, MapInv) as NaturalWeaponDescriber;
             naturalWeaponDescriber.ShortDescriptions = null;
             naturalWeaponDescriber._shortDescriptionCache = null;
+            naturalWeaponDescriber.NaturalWeaponMods = null;
             return naturalWeaponDescriber;
         }
 

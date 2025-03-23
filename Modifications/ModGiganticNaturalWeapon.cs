@@ -20,13 +20,6 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
-
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-            */
             Object.RemovePart("ModGigantic");
             base.ApplyModification(Object);
         }
@@ -72,7 +65,7 @@ namespace XRL.World.Parts
         {
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
             string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
-            int damageBonus = 3 + GetDamageBonus();
+            int damageBonus = GetDamageBonus();
             List<List<string>> list = new();
             string text = "weapon";
             if (part != null && ParentObject.HasTagOrProperty("ShowMeleeWeaponStats"))
@@ -80,7 +73,7 @@ namespace XRL.World.Parts
                 list.Add(new List<string> { "have", $"{damageBonus.Signed()} damage" });
                 if (GetDamageDieCount() != 0)
                 {
-                    list.Add(new List<string> { "have", $"{GetDamageDieCount().Signed()} to {ParentObject.theirs} damage die count" });
+                    list.Add(new List<string> { "have", $"{GetDamageDieCount().Signed()} damage die count" });
                 }
                 if (GetHitBonus() != 0)
                 {

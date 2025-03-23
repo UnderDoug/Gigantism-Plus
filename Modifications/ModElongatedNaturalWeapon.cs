@@ -46,19 +46,24 @@ namespace XRL.World.Parts
         {
             string text = "weapon";
             string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
+            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
+            int dieSizeIncrease = 2 + GetDamageDieSize();
+            int damageBonusIncrease = 1 + GetDamageBonus();
             string description = $"{descriptionName}: ";
-            description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";
+            description += ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " have ")
+                        : ("This " + text + " has ");
             if (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())
             {
-                description += $"has {GetDamageDieSize().Signed()} to {ParentObject.theirs} damage die size, and ";
+                description += $"{dieSizeIncrease.Signed()} to {pluralPossessive} damage die size, and ";
             }
-            if (GetDamageBonus() == 0)
+            if (damageBonusIncrease == 0)
             {
-                description += $"adds half {ParentObject.theirs} wielder's Strength Modifier damage.";
+                description += $"half {pluralPossessive} wielder's Strength Modifier damage.";
             }
             else
             {
-                description += $"has {GetDamageBonus().Signed()} damage (Strength Modifier/2).";
+                description += $"{damageBonusIncrease.Signed()} damage (Strength Modifier/2).";
             }
             return description;
         }

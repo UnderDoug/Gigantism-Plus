@@ -8,6 +8,7 @@ using XRL.World.Parts.Skill;
 using SerializeField = UnityEngine.SerializeField;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Extensions;
 using PlayFab.DataModels;
 
@@ -117,13 +118,20 @@ namespace XRL.World.Parts.Mutation
                 Type = "Hand",
                 CosmeticOnly = false,
                 Level = Level,
+
                 ModPriority = 10,
+
+                // Combat
+                Skill = "Cudgel",
+                Stat = "Strength",
+
+                // Grammar
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
                 Noun = "fist",
-                Skill = "Cudgel",
-                Stat = "Strength",
+
+                // Render
                 Tile = "NaturalWeapons/GiganticFist.png",
                 ColorString = "&x",
                 DetailColor = "z",
@@ -131,6 +139,7 @@ namespace XRL.World.Parts.Mutation
                 SecondDetailColor = "Z",
                 SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing",
                 BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block",
+
                 AddedIntProps = new()
                 {
                     { "ModGiganticNoShortDescription", 1 },
@@ -139,7 +148,8 @@ namespace XRL.World.Parts.Mutation
             };
             NaturalWeaponSubparts.Add(GiganticFist.Type, GiganticFist);
 
-            NaturalWeaponSubpart<GigantismPlus> GiganticHorns = new()
+            /*
+            NaturalWeaponSubpart<GigantismPlus> GiganticHead = new()
             {
                 ParentPart = this,
                 Type = "Head",
@@ -149,13 +159,36 @@ namespace XRL.World.Parts.Mutation
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
+                DetailColor = "Z",
+                SecondDetailColor = "x",
                 AddedIntProps = new()
                 {
                     { "ModGiganticNoShortDescription", 1 },
                     { "ModGiganticNoDisplayName", 1 }
                 }
             };
-            NaturalWeaponSubparts.Add(GiganticHorns.Type, GiganticHorns);
+            NaturalWeaponSubparts.Add(GiganticHead.Type, GiganticHead);
+
+            NaturalWeaponSubpart<GigantismPlus> GiganticBody = new()
+            {
+                ParentPart = this,
+                Type = "Body",
+                CosmeticOnly = true,
+                Level = Level,
+                ModPriority = 10,
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
+                DetailColor = "Z",
+                SecondDetailColor = "x",
+                AddedIntProps = new()
+                {
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
+                }
+            };
+            NaturalWeaponSubparts.Add(GiganticBody.Type, GiganticBody);
+            */
         }
 
         public override bool CanLevel() { return true; }
@@ -164,12 +197,12 @@ namespace XRL.World.Parts.Mutation
 
         public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
-            if (NaturalWeaponSubpart.Type == "Head") return 1;
+            if (NaturalWeaponSubpart.Type == "Head") return 2;
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
         }
         public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
-            if (NaturalWeaponSubpart.Type == "Head") return 2;
+            if (NaturalWeaponSubpart.Type == "Head") return 5;
             return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
         }
         public override int  GetNaturalWeaponHitBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
@@ -367,7 +400,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (ShouldRapidAdvance(E.Level, E.Actor))
             {
-                this.SwapMutationCategory("Physical", "Physical Defect");
+                SwapMutationCategory(nameof(GigantismPlus), "PhysicalDefects", "Physical");
             }
             return base.HandleEvent(E);
         }
@@ -376,7 +409,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (ShouldRapidAdvance(E.Level, E.Actor))
             {
-                this.SwapMutationCategory("Physical Defect", "Physical");
+                SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
             }
             if (IsCyberGiant)
             {

@@ -29,7 +29,7 @@ namespace XRL.World.Parts.Mutation
                 Type = "Hand",
                 DamageDieSize = 3,
                 ModPriority = 20,
-                Adjective = "elongated",
+                Adjective = ("elongated", 20),
                 AdjectiveColor = "giant",
                 AdjectiveColorFallback = "w",
                 Noun = "paw",

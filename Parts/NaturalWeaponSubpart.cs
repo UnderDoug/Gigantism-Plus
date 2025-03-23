@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using HNPS_GigantismPlus;
+using Sheeter;
 using XRL.Language;
 using static HNPS_GigantismPlus.Options;
 
@@ -10,29 +11,43 @@ namespace XRL.World.Parts
     public class NaturalWeaponSubpart<T> : IScribedPart
         where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
     {
+        public const string DAMAGE_CATEGORY_NAME = "Damage";
+        public const string COMBAT_CATEGORY_NAME = "Combat";
+        public const string GRAMMAR_CATEGORY_NAME = "Grammar";
+        public const string RENDER_CATEGORY_NAME = "Render";
+
         public T ParentPart;
 
         public string Type;
         public bool CosmeticOnly;
         public bool Managed = true;
-
+        public string ModName;
         public int Level;
+
+        public int ModPriority;
+
         public int DamageDieCount;
         public int DamageDieSize;
         public int DamageBonus;
         public int HitBonus;
 
-        public int ModPriority;
-        public int AdjectivePriority => ModPriority;
-        public int NounPriority => -ModPriority;
+        public int? CombatPriority;
+        public string Skill;
+        public string Stat;
 
+        public int? SkillPriority;
+        public int? StatPriority;
+
+        public int? GrammarPriority;
         public string Adjective;
         public string AdjectiveColor;
         public string AdjectiveColorFallback;
         public string Noun;
 
-        public string Skill;
-        public string Stat;
+        public int? AdjectivePriority;
+        public int? NounPriority;
+
+        public int? RenderPriority;
         public string Tile;
         public string ColorString;
         public string DetailColor;
@@ -42,24 +57,53 @@ namespace XRL.World.Parts
         public string BlockedSound;
         public string EquipmentFrameColors;
 
+        public int? TilePriority;
+        public int? ColorStringPriority;
+        public int? DetailColorPriority;
+        public int? SecondColorStringPriority;
+        public int? SecondDetailColorPriority;
+        public int? SwingSoundPriority;
+        public int? BlockedSoundPriority;
+        public int? EquipmentFrameColorsPriority;
+
         public List<string> AddedParts;
         public Dictionary<string, string> AddedStringProps;
         public Dictionary<string, int> AddedIntProps;
+
+        public static Dictionary<string, string> PropertyCategories = new()
+        {
+            // Damage
+            { nameof(DamageDieCount), DAMAGE_CATEGORY_NAME },
+            { nameof(DamageDieSize), DAMAGE_CATEGORY_NAME },
+            { nameof(DamageBonus), DAMAGE_CATEGORY_NAME },
+            { nameof(HitBonus), DAMAGE_CATEGORY_NAME },
+
+            // Combat
+            { nameof(Skill), COMBAT_CATEGORY_NAME },
+            { nameof(Stat), COMBAT_CATEGORY_NAME },
+
+            //Grammar
+            { nameof(Adjective), GRAMMAR_CATEGORY_NAME },
+            { nameof(Noun), GRAMMAR_CATEGORY_NAME },
+            
+            // Render
+            { nameof(Tile), RENDER_CATEGORY_NAME },
+            { nameof(ColorString), RENDER_CATEGORY_NAME },
+            { nameof(DetailColor), RENDER_CATEGORY_NAME },
+            { nameof(SecondColorString), RENDER_CATEGORY_NAME },
+            { nameof(SecondDetailColor), RENDER_CATEGORY_NAME },
+            { nameof(SwingSound), RENDER_CATEGORY_NAME },
+            { nameof(BlockedSound), RENDER_CATEGORY_NAME },
+            { nameof(EquipmentFrameColors), RENDER_CATEGORY_NAME },
+        };
+
+        public Dictionary<string, int?> CategoryPriorities = new();
+        public Dictionary<string, int?> PropertyPriorities = new();
 
         public NaturalWeaponSubpart()
         {
             CosmeticOnly = false;
             Level = 1;
-            DamageDieCount = 1;
-            DamageDieSize = 2;
-            DamageBonus = 0;
-            HitBonus = 0;
-
-            ModPriority = 0;
-            ColorString = "&K";
-            DetailColor = "y";
-            SecondColorString = "&y";
-            SecondDetailColor = "Y";
         }
         public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source)
             : this()
@@ -67,22 +111,33 @@ namespace XRL.World.Parts
             Type = Source.Type;
             CosmeticOnly = Source.CosmeticOnly;
             Managed = Source.Managed;
-
+            ModName = Source.ModName;
             Level = Source.Level;
+
+            ModPriority = Source.ModPriority;
+
             DamageDieCount = Source.DamageDieCount;
             DamageDieSize = Source.DamageDieSize;
             DamageBonus = Source.DamageBonus;
             HitBonus = Source.HitBonus;
 
-            ModPriority = Source.ModPriority;
+            CombatPriority = Source.CombatPriority;
+            Skill = Source.Skill;
+            Stat = Source.Stat;
 
+            SkillPriority = Source.SkillPriority;
+            StatPriority = Source.StatPriority;
+
+            GrammarPriority = Source.GrammarPriority;
             Adjective = Source.Adjective;
             AdjectiveColor = Source.AdjectiveColor;
             AdjectiveColorFallback = Source.AdjectiveColorFallback;
             Noun = Source.Noun;
 
-            Skill = Source.Skill;
-            Stat = Source.Stat;
+            AdjectivePriority = Source.AdjectivePriority;
+            NounPriority = Source.NounPriority;
+
+            RenderPriority = Source.RenderPriority;
             Tile = Source.Tile;
             ColorString = Source.ColorString;
             DetailColor = Source.DetailColor;
@@ -92,9 +147,21 @@ namespace XRL.World.Parts
             BlockedSound = Source.BlockedSound;
             EquipmentFrameColors = Source.EquipmentFrameColors;
 
-            AddedParts = Source.AddedParts;
-            AddedStringProps = Source.AddedStringProps;
-            AddedIntProps = Source.AddedIntProps;
+            TilePriority = Source.TilePriority;
+            ColorStringPriority = Source.ColorStringPriority;
+            DetailColorPriority = Source.DetailColorPriority;
+            SecondColorStringPriority = Source.SecondColorStringPriority;
+            SecondDetailColorPriority = Source.SecondDetailColorPriority;
+            SwingSoundPriority = Source.SwingSoundPriority;
+            BlockedSoundPriority = Source.BlockedSoundPriority;
+            EquipmentFrameColorsPriority = Source.EquipmentFrameColorsPriority;
+
+            AddedParts = new List<string>(Source.AddedParts);
+            AddedStringProps = new Dictionary<string, string>(Source.AddedStringProps);
+            AddedIntProps = new Dictionary<string, int>(Source.AddedIntProps);
+
+            CategoryPriorities = new Dictionary<string, int?>(CategoryPriorities);
+            PropertyPriorities = new Dictionary<string, int?>(PropertyPriorities);
         }
         public NaturalWeaponSubpart(T NewParent)
             : this()
@@ -110,33 +177,13 @@ namespace XRL.World.Parts
         public virtual bool IsCosmeticOnly()
         {
             NaturalWeaponSubpart<T> @default = new();
-            bool SameBonusAsDefault = (DamageDieCount == @default.DamageDieCount 
-                                    && DamageDieSize == @default.DamageDieSize 
-                                    && DamageBonus == @default.DamageBonus 
-                                    && HitBonus == @default.HitBonus);
+            bool SameBonusAsDefault = (DamageDieCount == @default.DamageDieCount
+                                    && DamageDieSize == @default.DamageDieSize
+                                    && DamageBonus == @default.DamageBonus
+                                    && HitBonus == @default.HitBonus
+                                    && Skill == @default.Skill
+                                    && Stat == @default.Stat);
             return SameBonusAsDefault || CosmeticOnly;
-        }
-        public virtual int GetDamageDieCount()
-        {
-            // base damage die count is 1
-            // example: mutation calculates die count should be 6d
-            //          this deducts 1, adding 5 to the existing 1
-            return DamageDieCount - 1;
-        }
-        public virtual int GetDamageDieSize()
-        {
-            // base damage die size is 2
-            // example: mutation calculates die size should be d5
-            //          this deducts 2, adding 3 to the existing 2
-            return DamageDieSize - 2;
-        }
-        public virtual int GetDamageBonus()
-        {
-            return DamageBonus;
-        }
-        public int GetHitBonus()
-        {
-            return HitBonus;
         }
 
         public virtual string GetAdjectiveColor()
@@ -155,6 +202,7 @@ namespace XRL.World.Parts
 
         public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
+            if (ModName != null && ModName != "") return ModName;
             string unmanaged = string.Empty;
             if (!this.Managed && !Managed) unmanaged = "Unmanaged";
             return "Mod" + Grammar.MakeTitleCase(Adjective) + "NaturalWeapon" + unmanaged;
@@ -194,6 +242,56 @@ namespace XRL.World.Parts
                 AddedIntProps = IntProps;
             }
             return true;
+        }
+
+        public virtual void InitializeCategoryPriorities()
+        {
+            if (!CategoryPriorities.IsNullOrEmpty()) return;
+            CategoryPriorities[COMBAT_CATEGORY_NAME] = CombatPriority;
+            CategoryPriorities[GRAMMAR_CATEGORY_NAME] = GrammarPriority;
+            CategoryPriorities[RENDER_CATEGORY_NAME] = RenderPriority;
+        }
+        public virtual void InitializePropertyPriorities()
+        {
+            if (!PropertyPriorities.IsNullOrEmpty()) return;
+
+            PropertyPriorities[nameof(Skill)] = SkillPriority;
+            PropertyPriorities[nameof(Stat)] = StatPriority;
+
+            PropertyPriorities[nameof(Adjective)] = AdjectivePriority;
+            PropertyPriorities[nameof(Noun)] = NounPriority;
+
+            PropertyPriorities[nameof(Tile)] = TilePriority;
+            PropertyPriorities[nameof(ColorString)] = ColorStringPriority;
+            PropertyPriorities[nameof(DetailColor)] = DetailColorPriority;
+            PropertyPriorities[nameof(SecondColorString)] = SecondColorStringPriority;
+            PropertyPriorities[nameof(SecondDetailColor)] = SecondDetailColorPriority;
+            PropertyPriorities[nameof(SwingSound)] = SwingSoundPriority;
+            PropertyPriorities[nameof(BlockedSound)] = BlockedSoundPriority;
+            PropertyPriorities[nameof(EquipmentFrameColors)] = EquipmentFrameColorsPriority;
+        }
+
+        public virtual int? GetCategoryPriority(string Category)
+        {
+            InitializeCategoryPriorities();
+
+            // category has priority? return it.
+            if (CategoryPriorities[Category] != null )
+                return CategoryPriorities[Category];
+            // otherwise...
+
+            return ModPriority;
+        }
+
+        public virtual int? GetPropertyPriority(string Property)
+        {
+            InitializePropertyPriorities();
+
+            // property has priority? return it.
+            if (PropertyPriorities[Property] != null) 
+                return PropertyPriorities[Property];
+            // otherwise...
+            return GetCategoryPriority(PropertyCategories[Property]);;
         }
     }
 }

@@ -5,8 +5,7 @@ using XRL.World;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using XRL.World.Anatomy;
-using System.EnterpriseServices.Internal;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -127,17 +126,20 @@ namespace XRL.World.Parts.Mutation
             Debug.Divider(4, "\u2500", 40, Indent: 2);
 
             Subpart.Level = Level;
-            Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level).Vomit(4, "DamageDieCount", true, Indent: 3);
-            Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level).Vomit(4, "DamageDieSize", true, Indent: 3);
-            Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level).Vomit(4, "DamageBonus", true, Indent: 3);
-            Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level).Vomit(4, "HitBonus", true, Indent: 3);
-
+            if (!Subpart.CosmeticOnly)
+            {
+                Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level).Vomit(4, "DamageDieCount", true, Indent: 3);
+                Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level).Vomit(4, "DamageDieSize", true, Indent: 3);
+                Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level).Vomit(4, "DamageBonus", true, Indent: 3);
+                Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level).Vomit(4, "HitBonus", true, Indent: 3);
+            }
             Debug.Divider(4, "\u2500", 40, Indent: 2);
             Subpart.Vomit(4, "|  After", vomitCats, Indent: 2);
             return true;
         }
         public override bool ChangeLevel(int NewLevel)
         {
+            UnprocessNaturalWeaponSubparts(ParentObject.Body);
             foreach ((_, NaturalWeaponSubpart<T> Subpart) in NaturalWeaponSubparts)
             {
                 UpdateNaturalWeaponSubpart(Subpart, NewLevel);
@@ -163,28 +165,44 @@ namespace XRL.World.Parts.Mutation
                     ModNaturalWeaponBase<T> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type
-                        && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
+                        && NaturalWeaponSubpart.CosmeticOnly == CosmeticOnly)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
-                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                        Debug.Entry(4, $"NaturalWeaponSubpart for this BodyPart contained in Property", Indent: 3);
                     }
-                    else if (NaturalWeaponSubparts.ContainsKey(part.Type)
-                        && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
+                    else if (NaturalWeaponSubparts.ContainsKey(part.Type) 
+                             && NaturalWeaponSubparts[part.Type].CosmeticOnly == CosmeticOnly)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
-                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                        Debug.Entry(4, $"NaturalWeaponSubpart for this BodyPart contained in Dictionary", Indent: 3);
                     }
-
-                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
+                    else
+                    {
+                        Debug.Entry(4, $"No NaturalWeaponSubpart for this BodyPart", Indent: 3);
+                    }
 
                     if (modNaturalWeapon == null) continue;
 
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
+
                     if (part.DefaultBehavior != null)
                     {
+                        Debug.Entry(4, $"{part.DefaultBehavior.ShortDisplayNameStripped} is DefaultBehavior", Indent: 3);
+                        if (part.DefaultBehavior.HasPart(modNaturalWeapon.Name))
+                        {
+                            Debug.Entry(4, $"{part.DefaultBehavior.ShortDisplayName} alreadry has {modNaturalWeapon.Name}", Indent: 3);
+                            continue;
+                        }
                         part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: body.ParentObject);
                     }
                     else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
                     {
+                        Debug.Entry(4, $"{part.Equipped.ShortDisplayNameStripped} is Equipped", Indent: 3);
+                        if (part.Equipped.HasPart(modNaturalWeapon.Name))
+                        {
+                            Debug.Entry(4, $"{part.Equipped.ShortDisplayName} alreadry has {modNaturalWeapon.Name}", Indent: 3);
+                            continue;
+                        }
                         part.Equipped.ApplyModification(modNaturalWeapon, Actor: body.ParentObject);
                     }
                 }
@@ -205,45 +223,42 @@ namespace XRL.World.Parts.Mutation
 
             if (body != null)
             {
+                GameObject GO = body.ParentObject;
                 List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
                 foreach (BodyPart part in partsList)
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
-                    Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
+                    Debug.LoopItem(4, $"BodyPart", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
                     ModNaturalWeaponBase<T> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
-                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                        Debug.Entry(4, $"NaturalWeaponSubpart for this BodyPart contained in Property", Indent: 3);
                     }
                     else if (NaturalWeaponSubparts.ContainsKey(part.Type))
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
-                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                        Debug.Entry(4, $"NaturalWeaponSubpart for this BodyPart contained in Dictionary", Indent: 3);
                     }
-
-                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
+                    else
+                    {
+                        Debug.Entry(4, $"No NaturalWeaponSubpart for this BodyPart", Indent: 3);
+                    }
 
                     if (modNaturalWeapon == null) continue;
 
+                    Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
+
                     if (part.DefaultBehavior != null)
                     {
-                        part.DefaultBehavior.RemovePart(modNaturalWeapon);
-                        if (part.DefaultBehavior.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
-                        {
-                            naturalWeaponDescriber.ResetShortDescription();
-                            naturalWeaponDescriber.CollectNaturalWeaponMods();
-                        }
+                        Debug.Entry(4, $"{part.DefaultBehavior.ShortDisplayNameStripped} is DefaultBehavior", Indent: 3);
+                        part.DefaultBehavior.Obliterate();
                     }
                     else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
                     {
-                        part.Equipped.RemovePart(modNaturalWeapon);
-                        if (part.Equipped.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
-                        {
-                            naturalWeaponDescriber.ResetShortDescription();
-                            naturalWeaponDescriber.CollectNaturalWeaponMods();
-                        }
+                        Debug.Entry(4, $"{part.Equipped.ShortDisplayNameStripped} is Equipped", Indent: 3);
+                        part.Equipped.Obliterate();
                     }
                 }
                 Debug.Divider(4, "-", Count: 25, Indent: 2);
@@ -293,8 +308,51 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Unmutate(GameObject GO)
         {
-            UnprocessNaturalWeaponSubparts(GO.Body);
             return base.Unmutate(GO);
+        }
+        public override void AfterUnmutate(GameObject GO)
+        {
+            UnprocessNaturalWeaponSubparts(GO.Body);
+
+            GO.GetPart<Mutations>().ActiveMutationList.Vomit(4, $"{GO.Blueprint}'s Active Mutations", Indent: 3);
+            foreach (BaseMutation mutation in GO.GetPart<Mutations>().ActiveMutationList)
+            {
+                if (mutation.GetMutationClass() == GetMutationClass()) continue;
+                BaseManagedDefaultEquipmentMutation<T> castMutation = mutation as BaseManagedDefaultEquipmentMutation<T>;
+                if (castMutation?.NaturalWeaponSubpart != null || castMutation?.NaturalWeaponSubparts != null && castMutation.NaturalWeaponSubparts.IsNullOrEmpty()) continue;
+                mutation.ChangeLevel(mutation.Level);
+            }
+
+            base.AfterUnmutate(GO);
+        }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforeMutationAdded");
+            Registrar.Register("MutationAdded");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "BeforeMutationAdded")
+            {
+                GameObject Actor = E.GetParameter("Object") as GameObject;
+                string Mutation = E.GetParameter("Mutation") as string;
+                if (Actor == ParentObject)
+                {
+                    // Do Code?
+                }
+            }
+            else if (E.ID == "MutationAdded")
+            {
+                GameObject Actor = E.GetParameter("Object") as GameObject;
+                string Mutation = E.GetParameter("Mutation") as string;
+                if (Actor == ParentObject)
+                {
+                    ProcessNaturalWeaponSubparts(Actor?.Body);
+                }
+            }
+            return base.FireEvent(E);
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

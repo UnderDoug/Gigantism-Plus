@@ -275,7 +275,6 @@ namespace XRL.World.Parts
                         part.DefaultBehavior.RemovePart(modNaturalWeapon);
                         if (part.DefaultBehavior.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
                         {
-                            naturalWeaponDescriber.ResetShortDescription();
                             naturalWeaponDescriber.CollectNaturalWeaponMods();
                         }
                     }
@@ -284,7 +283,6 @@ namespace XRL.World.Parts
                         part.Equipped.RemovePart(modNaturalWeapon);
                         if (part.Equipped.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
                         {
-                            naturalWeaponDescriber.ResetShortDescription();
                             naturalWeaponDescriber.CollectNaturalWeaponMods();
                         }
                     }

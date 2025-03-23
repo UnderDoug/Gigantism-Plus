@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
 using static UnityEngine.GridBrushBase;
 
 namespace HNPS_GigantismPlus
@@ -350,7 +351,7 @@ namespace HNPS_GigantismPlus
             foreach (T item in List)
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent+1);
-                else Entry(Verbosity, item.ToString(), Indent: Indent);
+                else Entry(Verbosity, item.ToString(), Indent: Indent + 1);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;
@@ -362,7 +363,7 @@ namespace HNPS_GigantismPlus
             foreach (object item in List)
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item}", Indent: Indent);
+                else Entry(Verbosity, $"{item}", Indent: Indent + 1);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;
@@ -373,8 +374,8 @@ namespace HNPS_GigantismPlus
             else Entry(Verbosity, Label, Indent: Indent);
             foreach (MutationEntry item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item}", Indent: Indent);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Mutation.Name}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.Mutation.Name}", Indent: Indent + 1);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;
@@ -385,8 +386,8 @@ namespace HNPS_GigantismPlus
             else Entry(Verbosity, Label, Indent: Indent);
             foreach (MutationCategory item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item}", Indent: Indent);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Name}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.Name}", Indent: Indent + 1);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;
@@ -398,7 +399,19 @@ namespace HNPS_GigantismPlus
             foreach (GameObject item in List)
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, $"{item.DebugName}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item.DebugName}", Indent: Indent);
+                else Entry(Verbosity, $"{item.DebugName}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (BaseMutation item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;

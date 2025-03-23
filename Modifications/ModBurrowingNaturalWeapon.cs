@@ -19,14 +19,6 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
-
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-            */
-
             base.ApplyModification(Object);
 
             Object.RequirePart<BurrowingClawsProperties>();
@@ -50,20 +42,22 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public new string GetInstanceDescription()
+        public override string GetInstanceDescription()
         {
             string text = "weapon";
             string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
             int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);
-
+            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has ");
+                .Append(ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " have ")
+                        : ("This " + text + " has "));
 
             if (dieSizeIncrease > 0)
             {
-                stringBuilder.Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} damage die size").Append(wallHitsRequired > 0 ? ", " : " and ");
+                stringBuilder.Append(dieSizeIncrease.Signed()).Append($" to {pluralPossessive} damage die size").Append(wallHitsRequired > 0 ? ", " : " and ");
             }
             stringBuilder.Append(wallBonusPenetration).Append(" penetration vs. walls").Append(dieSizeIncrease > 0 ? ", " : " ")
                 .Append(wallHitsRequired > 0 ? "and " : ".");

@@ -16,14 +16,7 @@ namespace XRL.World.Parts
             }
             set
             {
-                Type valueType = value.GetType();
-                bool typeMatch = valueType.IsEquivalentTo(typeof(GameObject));
-                if (typeMatch)
-                {
-                    _wielder = value;
-                    return;
-                }
-                _wielder = null;
+                _wielder = value;
             }
         }
 
@@ -36,14 +29,8 @@ namespace XRL.World.Parts
             }
             set
             {
-                Type valueType = value?.GetType();
-                bool typeMatch = (bool)valueType?.IsEquivalentTo(typeof(ElongatedPaws));
-                if (typeMatch)
-                {
-                    _elongatedPaws = value;
-                    return;
-                }
-                _elongatedPaws = null;
+                _elongatedPaws = value;
+                if (Wielder == null) _elongatedPaws = null;
             }
         } 
 
@@ -87,12 +74,19 @@ namespace XRL.World.Parts
             GameObject item = E.Item;
             if (item == ParentObject)
             {
-                if (ElongatedPaws != null)
+                if (!item.HasPart<NaturalEquipment>())
                 {
-                    Debug.Entry(4, $"* {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(EquippedEvent)} E)", Indent: 2);
-                    Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
-                    ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
-                    Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(EquippedEvent)} E) *//", Indent: 2);
+                    if (ElongatedPaws != null)
+                    {
+                        Debug.Entry(4, $"* {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(EquippedEvent)} E)", Indent: 2);
+                        Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                        ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
+                        Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(EquippedEvent)} E) *//", Indent: 2);
+                    }
+                }
+                else
+                {
+                    item.RemovePart(this);
                 }
             }
             return base.HandleEvent(E);

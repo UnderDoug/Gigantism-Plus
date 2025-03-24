@@ -9,7 +9,7 @@ namespace XRL.World.Parts
 {
     [Serializable]
     public class NaturalWeaponSubpart<T> : IScribedPart
-        where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+        where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
     {
         public const string DAMAGE_CATEGORY_NAME = "Damage";
         public const string COMBAT_CATEGORY_NAME = "Combat";
@@ -207,9 +207,9 @@ namespace XRL.World.Parts
             if (!this.Managed && !Managed) unmanaged = "Unmanaged";
             return "Mod" + Grammar.MakeTitleCase(Adjective) + "NaturalWeapon" + unmanaged;
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(bool Managed = true)
+        public virtual ModNaturalEquipment<T> GetNaturalWeaponMod(bool Managed = true)
         {
-            ModNaturalWeaponBase<T> NaturalWeaponMod = GetNaturalWeaponModName(Managed).ConvertToNaturalWeaponModification<T>();
+            ModNaturalEquipment<T> NaturalWeaponMod = GetNaturalWeaponModName(Managed).ConvertToNaturalWeaponModification<T>();
             NaturalWeaponMod.NaturalWeaponSubpart = this;
             NaturalWeaponMod.AssigningPart = ParentPart;
             return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();

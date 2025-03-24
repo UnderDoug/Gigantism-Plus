@@ -8,7 +8,7 @@ using XRL.World.Parts.Mutation;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalWeapon<T> where T : IPart, IManagedDefaultNaturalWeapon<T>, new ()
+    public interface IManagedDefaultNaturalEquipment<T> where T : IPart, IManagedDefaultNaturalEquipment<T>, new ()
     {
         public Dictionary<string, NaturalWeaponSubpart<T>> NaturalWeaponSubparts { get; set; }
         public NaturalWeaponSubpart<T> NaturalWeaponSubpart { get; set; }
@@ -51,7 +51,7 @@ namespace XRL.World
         }
 
         public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
-        public abstract ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
+        public abstract ModNaturalEquipment<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
 
         public abstract bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart<T> Subpart, string Parts);
 

@@ -10,8 +10,8 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentCybernetic<T> : IPart, IManagedDefaultNaturalWeapon<T>
-        where T : BaseManagedDefaultEquipmentCybernetic<T>, IManagedDefaultNaturalWeapon<T>, new()
+    public abstract class BaseManagedDefaultEquipmentCybernetic<T> : IPart, IManagedDefaultNaturalEquipment<T>
+        where T : BaseManagedDefaultEquipmentCybernetic<T>, IManagedDefaultNaturalEquipment<T>, new()
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
@@ -72,9 +72,9 @@ namespace XRL.World.Parts
         {
             return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
+        public virtual ModNaturalEquipment<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
         {
-            ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
+            ModNaturalEquipment<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = (T)this;
             NaturalWeaponMod.Wielder = ParentObject;
@@ -203,7 +203,7 @@ namespace XRL.World.Parts
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-                    ModNaturalWeaponBase<T> modNaturalWeapon = null;
+                    ModNaturalEquipment<T> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type
                         && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
@@ -253,7 +253,7 @@ namespace XRL.World.Parts
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-                    ModNaturalWeaponBase<T> modNaturalWeapon = null;
+                    ModNaturalEquipment<T> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type)
                     {
@@ -273,7 +273,7 @@ namespace XRL.World.Parts
                     if (part.DefaultBehavior != null)
                     {
                         part.DefaultBehavior.RemovePart(modNaturalWeapon);
-                        if (part.DefaultBehavior.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
+                        if (part.DefaultBehavior.TryGetPart(out NaturalEquipmentManager naturalWeaponDescriber))
                         {
                             naturalWeaponDescriber.CollectNaturalWeaponMods();
                         }
@@ -281,7 +281,7 @@ namespace XRL.World.Parts
                     else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
                     {
                         part.Equipped.RemovePart(modNaturalWeapon);
-                        if (part.Equipped.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
+                        if (part.Equipped.TryGetPart(out NaturalEquipmentManager naturalWeaponDescriber))
                         {
                             naturalWeaponDescriber.CollectNaturalWeaponMods();
                         }

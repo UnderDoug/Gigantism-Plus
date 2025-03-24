@@ -5,7 +5,7 @@ using XRL.World.Parts.Mutation;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
+    public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
     {
         public ModElongatedNaturalWeapon()
         {
@@ -67,5 +67,5 @@ namespace XRL.World.Parts
             }
             return description;
         }
-    } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
+    } //!-- public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
 }

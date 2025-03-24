@@ -214,7 +214,7 @@ namespace HNPS_GigantismPlus
         }
 
         public static NaturalWeaponSubpart<T> Vomit<T>(this NaturalWeaponSubpart<T> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
-            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             string title = Title == null ? "" : $"{Title}:";
             GameObject Creature = Subpart.ParentPart?.ParentObject;

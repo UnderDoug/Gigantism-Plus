@@ -8,13 +8,12 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
-    /*
     [Serializable]
-    public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
+    public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalEquipment
     {
-        // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the NaturalWeaponSubpart Part
+        // Required by IManagedDefaultNaturalEquipment to ensure the implementation of the INaturalWeapon Part
         [Serializable]
-        public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
+        public class INaturalWeapon : IManagedDefaultNaturalEquipment.INaturalWeapon
         {
             public INaturalWeapon()
             {
@@ -79,19 +78,19 @@ namespace XRL.World.Parts.Mutation
             SecondDetailColor = "R",  // If the tile is already the above color, this get used instead
         };
 
-        // Required by IManagedDefaultNaturalWeapon and allows the Modification to get the above part from the mutation.
-        public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
+        // Required by IManagedDefaultNaturalEquipment and allows the Modification to get the above part from the mutation.
+        public virtual IManagedDefaultNaturalEquipment.INaturalWeapon GetNaturalWeapon()
         {
             return NaturalWeapon;
         }
 
-        // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
+        // Required by IManagedDefaultNaturalEquipment and can be used further down to easily reference the Modification.
         public virtual string GetNaturalWeaponModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        public virtual ModNaturalEquipment<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalEquipment, new()
         {
             return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
         }
@@ -111,7 +110,7 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        // Required by IManagedDefaultNaturalWeapon and is used to assign the relevant damage component
+        // Required by IManagedDefaultNaturalEquipment and is used to assign the relevant damage component
         public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
             NaturalWeapon.DamageDieCount = GetNaturalWeaponDamageDieCount(Level);
@@ -153,7 +152,7 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        // Required by IManagedDefaultNaturalWeapon and is used to calculate the relevant damage component
+        // Required by IManagedDefaultNaturalEquipment and is used to calculate the relevant damage component
         // Can be altered as below to be as simple or complex as you like 
         public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
         {
@@ -235,7 +234,7 @@ namespace XRL.World.Parts.Mutation
         }
 
         // You'll want some variation of this to ensure that things like Temporal Fugue clones don't delete your 
-        // NaturalWeaponSubpart Part by being copied with a reference to it.
+        // NaturalWeapon Part by being copied with a reference to it.
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             MyExtendedManagedDefaultEquipmentMutation myMutation = base.DeepCopy(Parent, MapInv) as MyExtendedManagedDefaultEquipmentMutation;
@@ -250,5 +249,4 @@ namespace XRL.World.Parts.Mutation
     {
 
     }
-    */
 }

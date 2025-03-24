@@ -78,7 +78,7 @@ namespace HNPS_GigantismPlus
         }
         public static bool HasNaturalWeaponMods(this GameObject GO)
         {
-            return GO.HasPartDescendedFrom<ModNaturalWeaponBase>();
+            return GO.HasPartDescendedFrom<ModNaturalEquipmentBase>();
         }
 
         public static string BonusOrPenalty(this int Int) 
@@ -577,15 +577,15 @@ namespace HNPS_GigantismPlus
             return ModPart;
         }
 
-        public static ModNaturalWeaponBase<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
-            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+        public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             IModification ModPart = ModPartName.ConvertToModification();
-            return (ModNaturalWeaponBase<T>)ModPart;
+            return (ModNaturalEquipment<T>)ModPart;
         }
 
         public static T GetNaturalWeaponCompatiblePart<T>(this GameObject Object) 
-            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             T part = Object?.GetPart<T>();
             if (part != null) return part;
@@ -599,8 +599,8 @@ namespace HNPS_GigantismPlus
             return null;
         }
 
-        public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalWeaponBase<T> ModPart, GameObject Actor) 
-            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+        public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalEquipment<T> ModPart, GameObject Actor) 
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             return obj.ApplyModification(ModPart, Actor: Actor);
         }

@@ -8,7 +8,7 @@ using XRL.World.Parts.Mutation;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>
+    public class ModAugmentedNaturalWeapon : ModNaturalEquipment<CyberneticsGiganticExoframe>
     {
         public ModAugmentedNaturalWeapon()
         {
@@ -111,5 +111,5 @@ namespace XRL.World.Parts
             description += $"has some of its bonuses applied by an implanted {cyberneticsObject}.";
             return description;
         }
-    } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
+    } //!-- public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
 }

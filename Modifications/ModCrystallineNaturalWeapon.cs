@@ -7,7 +7,7 @@ using HNPS_GigantismPlus;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
+    public class ModCrystallineNaturalWeapon : ModNaturalEquipment<UD_ManagedCrystallinity>
     {
         public ModCrystallineNaturalWeapon()
         {
@@ -46,5 +46,5 @@ namespace XRL.World.Parts
                 .Append(dieSizeIncrease.Signed()).Append($" to {pluralPossessive} damage die size.");
             return Event.FinalizeString(stringBuilder);
         }
-    } //!-- public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
+    } //!-- public class ModCrystallineNaturalWeapon : ModNaturalEquipment<UD_ManagedCrystallinity>
 }

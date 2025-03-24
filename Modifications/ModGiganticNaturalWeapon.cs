@@ -7,7 +7,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
+    public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
     {
         public ModGiganticNaturalWeapon()
         {
@@ -104,5 +104,5 @@ namespace XRL.World.Parts
             return $"{descriptionName}: " + (ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text)) + " " + Grammar.MakeAndList(list2) + ".";
         }
 
-    } //!-- public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<HNPS_GigantismPlus>
+    } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<HNPS_GigantismPlus>
 }

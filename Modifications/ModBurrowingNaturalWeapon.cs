@@ -6,7 +6,7 @@ using System.Text;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
+    public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
     {
         public ModBurrowingNaturalWeapon()
         {
@@ -68,5 +68,5 @@ namespace XRL.World.Parts
             }
             return Event.FinalizeString(stringBuilder);
         }
-    } //!-- public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
+    } //!-- public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
 }

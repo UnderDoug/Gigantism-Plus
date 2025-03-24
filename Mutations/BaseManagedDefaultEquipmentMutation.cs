@@ -10,8 +10,8 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentMutation<T> : BaseDefaultEquipmentMutation, IManagedDefaultNaturalWeapon<T> 
-        where T : BaseManagedDefaultEquipmentMutation<T>, IManagedDefaultNaturalWeapon<T>, new()
+    public abstract class BaseManagedDefaultEquipmentMutation<T> : BaseDefaultEquipmentMutation, IManagedDefaultNaturalEquipment<T> 
+        where T : BaseManagedDefaultEquipmentMutation<T>, IManagedDefaultNaturalEquipment<T>, new()
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
@@ -52,9 +52,9 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
+        public virtual ModNaturalEquipment<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> NaturalWeaponSubpart, bool Managed = true)
         {
-            ModNaturalWeaponBase<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
+            ModNaturalEquipment<T> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = (T)this;
             NaturalWeaponMod.Wielder = ParentObject;
@@ -162,7 +162,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-                    ModNaturalWeaponBase<T> modNaturalWeapon = null;
+                    ModNaturalEquipment<T> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type
                         && NaturalWeaponSubpart.CosmeticOnly == CosmeticOnly)
@@ -229,7 +229,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"BodyPart", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-                    ModNaturalWeaponBase<T> modNaturalWeapon = null;
+                    ModNaturalEquipment<T> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type)
                     {

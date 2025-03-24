@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using XRL.Rules;
 using XRL.World.Parts.Mutation;
 using SerializeField = UnityEngine.SerializeField;
 using HNPS_GigantismPlus;
@@ -8,8 +9,26 @@ using HNPS_GigantismPlus;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class NaturalWeaponDescriber : IScribedPart
+    public class NaturalEquipmentManager : IScribedPart
     {
+        private GameObject _wielder = null;
+        public GameObject Wielder => _wielder ??= ParentObject?.Equipped;
+
+        public GameObjectBlueprint OriginalNaturalEquipment => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
+        public int DamageDieSize;
+        public int DamageDieCount;
+        public int DamageBonus;
+        public int HitBonus;
+
+        private MeleeWeapon _parentWeapon = null;
+        public MeleeWeapon ParentWeapon => _parentWeapon ??= ParentObject?.GetPart<MeleeWeapon>();
+
+        private Armor _parentArmor = null;
+        public Armor ParentArmor => _parentArmor ??= ParentObject?.GetPart<Armor>();
+
+        private Render _parentRender = null;
+        public Render ParentRender => _parentRender ??= ParentObject?.GetPart<Render>();
+
         [NonSerialized]
         public SortedDictionary<int, string> ShortDescriptions = new();
 
@@ -17,7 +36,12 @@ namespace XRL.World.Parts
         private string _shortDescriptionCache = null;
 
         [NonSerialized]
-        public SortedDictionary<int, ModNaturalWeaponBase> NaturalWeaponMods = new();
+        public SortedDictionary<int, ModNaturalEquipmentBase> NaturalWeaponMods = new();
+
+        public override void Attach()
+        {
+
+        }
 
         public string ProcessDescription(SortedDictionary<int, string> Descriptions, bool IsShort = true)
         {
@@ -43,7 +67,7 @@ namespace XRL.World.Parts
         public void AddShortDescriptionEntry(int Priority, string Description)
         {
             Debug.Entry(4,
-                $"@ {nameof(NaturalWeaponDescriber)}."
+                $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddShortDescriptionEntry)}(int Priority: {Priority}, string Description)",
                 Indent: 7);
 
@@ -69,10 +93,10 @@ namespace XRL.World.Parts
             ClearNaturalWeaponMods();
         }
 
-        public void AddNaturalWeaponMod(int Priority, ModNaturalWeaponBase NaturalWeaponMod)
+        public void AddNaturalWeaponMod(int Priority, ModNaturalEquipmentBase NaturalWeaponMod)
         {
             Debug.Entry(4,
-                $"@ {nameof(NaturalWeaponDescriber)}."
+                $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddNaturalWeaponMod)}(Priority: {Priority}, NaturalWeaponMod: {NaturalWeaponMod.Name})",
                 Indent: 7);
 
@@ -83,7 +107,7 @@ namespace XRL.World.Parts
         {
             if (NaturalWeaponMods.IsNullOrEmpty()) return;
 
-            foreach ((int priority, ModNaturalWeaponBase weaponMod) in NaturalWeaponMods)
+            foreach ((int priority, ModNaturalEquipmentBase weaponMod) in NaturalWeaponMods)
             {
                 AddShortDescriptionEntry(priority, weaponMod.GetInstanceDescription());
             }
@@ -93,10 +117,15 @@ namespace XRL.World.Parts
         {
             ResetShortDescription();
 
-            foreach (ModNaturalWeaponBase naturalWeaponMod in ParentObject.GetPartsDescendedFrom<ModNaturalWeaponBase>())
+            foreach (ModNaturalEquipmentBase naturalWeaponMod in ParentObject.GetPartsDescendedFrom<ModNaturalEquipmentBase>())
             {
                 AddNaturalWeaponMod(naturalWeaponMod.GetDescriptionPriority(), naturalWeaponMod);
             }
+        }
+
+        public void ManageNaturalEquipment()
+        {
+            Debug.Entry(4, $"* {typeof(NaturalEquipmentManager).Name}.{nameof(ManageNaturalEquipment)}()", Indent: 0);
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -108,11 +137,11 @@ namespace XRL.World.Parts
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
             Debug.Entry(4,
-                $"@ {nameof(NaturalWeaponDescriber)}."
+                $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.ShortDisplayName})",
                 Indent: 0);
 
-            if(E.Object.HasPartDescendedFrom<ModNaturalWeaponBase>())
+            if(E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
             {
                 _shortDescriptionCache ??= ProcessDescription(ShortDescriptions);
                 E.Postfix.AppendRules(_shortDescriptionCache);
@@ -120,6 +149,21 @@ namespace XRL.World.Parts
 
             return base.HandleEvent(E);
         }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BodypartsUpdated");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "BodypartsUpdated")
+            {
+                ManageNaturalEquipment();
+            }
+            return base.FireEvent(E);
+        }
+
 
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
@@ -131,11 +175,11 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
             ShortDescriptions = new SortedDictionary<int, string>(Reader.ReadDictionary<int, string>());
-            NaturalWeaponMods = new SortedDictionary<int, ModNaturalWeaponBase>(Reader.ReadDictionary<int, ModNaturalWeaponBase>());
+            NaturalWeaponMods = new SortedDictionary<int, ModNaturalEquipmentBase>(Reader.ReadDictionary<int, ModNaturalEquipmentBase>());
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            NaturalWeaponDescriber naturalWeaponDescriber = base.DeepCopy(Parent, MapInv) as NaturalWeaponDescriber;
+            NaturalEquipmentManager naturalWeaponDescriber = base.DeepCopy(Parent, MapInv) as NaturalEquipmentManager;
             naturalWeaponDescriber.ShortDescriptions = null;
             naturalWeaponDescriber._shortDescriptionCache = null;
             naturalWeaponDescriber.NaturalWeaponMods = null;

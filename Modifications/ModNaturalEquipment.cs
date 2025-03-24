@@ -8,8 +8,8 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalWeaponBase<T> : ModNaturalWeaponBase
-        where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+    public class ModNaturalEquipment<T> : ModNaturalEquipmentBase
+        where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
     {
         public const string CURRENT_PRIORITY = "CurrentPriority";
 
@@ -73,19 +73,19 @@ namespace XRL.World.Parts
         private int? _level = 1;
         public int Level => _level ??= (int)NaturalWeaponSubpart?.Level;
 
-        public ModNaturalWeaponBase()
+        public ModNaturalEquipment()
         {
         }
-        public ModNaturalWeaponBase(int Tier)
+        public ModNaturalEquipment(int Tier)
             : base(Tier)
         {
         }
-        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart)
+        public ModNaturalEquipment(NaturalWeaponSubpart<T> Subpart)
             : this()
         {
             NaturalWeaponSubpart = new(Subpart);
         }
-        public ModNaturalWeaponBase(NaturalWeaponSubpart<T> Subpart, int Tier)
+        public ModNaturalEquipment(NaturalWeaponSubpart<T> Subpart, int Tier)
             : this(Tier)
         {
             NaturalWeaponSubpart = Subpart;
@@ -401,9 +401,9 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);
-            Object.RequirePart<NaturalWeaponDescriber>();
+            Object.RequirePart<NaturalEquipmentManager>();
             Debug.Entry(4, "? if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 4);
-            if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))
+            if (Object.TryGetPart(out NaturalEquipmentManager NaturalWeaponDescriber))
             {
                 Debug.Entry(4, "+ NaturalWeaponDescriber is Present", Indent: 5);
                 NaturalWeaponDescriber.AddNaturalWeaponMod(NaturalWeaponSubpart.ModPriority, this);
@@ -484,10 +484,10 @@ namespace XRL.World.Parts
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            ModNaturalWeaponBase<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase<T>;
+            ModNaturalEquipment<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;
             return ClearForCopy(modNaturalWeaponBase);
         }
-        public static ModNaturalWeaponBase<T> ClearForCopy(ModNaturalWeaponBase<T> ModNaturalWeaponBase)
+        public static ModNaturalEquipment<T> ClearForCopy(ModNaturalEquipment<T> ModNaturalWeaponBase)
         {
             ModNaturalWeaponBase.AssigningPart = null;
             ModNaturalWeaponBase.Wielder = null;
@@ -495,14 +495,14 @@ namespace XRL.World.Parts
             return ModNaturalWeaponBase;
         }
 
-    } //!-- public class ModNaturalWeaponBase<T> : IMeleeModification where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+    } //!-- public class ModNaturalEquipment<T> : IMeleeModification where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
 
-    public abstract class ModNaturalWeaponBase : IMeleeModification
+    public abstract class ModNaturalEquipmentBase : IMeleeModification
     {
-        public ModNaturalWeaponBase()
+        public ModNaturalEquipmentBase()
         {
         }
-        public ModNaturalWeaponBase(int Tier)
+        public ModNaturalEquipmentBase(int Tier)
             : base(Tier)
         {
         }
@@ -588,13 +588,13 @@ namespace XRL.World.Parts
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            ModNaturalWeaponBase modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalWeaponBase;
+            ModNaturalEquipmentBase modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalEquipmentBase;
             return ClearForCopy(modNaturalWeaponBase);
         }
-        public static ModNaturalWeaponBase ClearForCopy(ModNaturalWeaponBase ModNaturalWeaponBase)
+        public static ModNaturalEquipmentBase ClearForCopy(ModNaturalEquipmentBase ModNaturalWeaponBase)
         {
             return ModNaturalWeaponBase;
         }
 
-    } //!-- public class ModNaturalWeaponBase<T> : IMeleeModification where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+    } //!-- public class ModNaturalEquipment<T> : IMeleeModification where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
 }

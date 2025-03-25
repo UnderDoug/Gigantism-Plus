@@ -477,8 +477,8 @@ namespace HNPS_GigantismPlus
 
             // Now equip all items that should be equipped
 
-            Debug.LoopItem(3, "Creature.WantToReequip()", Indent: 1);
-            Creature.WantToReequip();
+            Debug.LoopItem(3, "Creature.Brain?.PerformReequip(Silent: true, Initial: true)", Indent: 1);
+            Creature.Brain?.PerformReequip(Silent: true, Initial: true);
 
             Debug.Divider(3, Indent: 1);
             Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", Indent: 1);
@@ -504,33 +504,36 @@ namespace HNPS_GigantismPlus
 
         public static void CheckAffectedEquipmentSlots(this GameObject Actor)
         {
+            Debug.Entry(3, $"* {nameof(CheckAffectedEquipmentSlots)}(this GameObject Actor: {Actor.DebugName})");
             Body Body = Actor?.Body;
-            Debug.Entry(3, $"* CheckAffectedEquipmentSlots(this GameObject Actor: {Actor.ShortDisplayName})");
-            if (Actor == null || Body == null)
+            if (Body != null)
             {
-                Debug.Entry(3, "x (Actor == null || Body == null)");
-                return;
-            }
-
-            List<GameObject> list = Event.NewGameObjectList();
-            Debug.Entry(3, "* foreach (BodyPart bodyPart in Body.LoopParts())");
-            foreach (BodyPart bodyPart in Body.LoopParts())
-            {
-                GameObject equipped = bodyPart.Equipped;
-                if (equipped != null && !list.Contains(equipped))
+                List<GameObject> list = Event.NewGameObjectList();
+                Debug.Entry(3, "> foreach (BodyPart bodyPart in Body.LoopParts())");
+                foreach (BodyPart bodyPart in Body.LoopParts())
                 {
-                    Debug.Entry(3, "- Part", equipped.DebugName);
-                    list.Add(equipped);
-                    int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
-                    int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
-                    if (partCountEquippedOn != slotsRequiredFor && bodyPart.TryUnequip(true, true, false, false) && partCountEquippedOn > slotsRequiredFor)
+                    Debug.Entry(3, "bodyPart", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Name}]", Indent: 1);
+                    GameObject equipped = bodyPart.Equipped;
+                    if (equipped != null && !list.Contains(equipped))
                     {
-                        equipped.SplitFromStack();
-                        bodyPart.Equip(equipped, new int?(0), true, false, false, true);
+                        Debug.LoopItem(3, "equipped", $"[{equipped.ID}:{equipped.ShortDisplayName}]", Indent: 2);
+                        list.Add(equipped);
+                        int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
+                        int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
+                        if (partCountEquippedOn != slotsRequiredFor && bodyPart.TryUnequip(true, true, false, false) && partCountEquippedOn > slotsRequiredFor)
+                        {
+                            equipped.SplitFromStack();
+                            bodyPart.Equip(equipped, new int?(0), true, false, false, true);
+                        }
                     }
                 }
+                Debug.Entry(3, "x foreach (BodyPart bodyPart in Body.LoopParts()) >//");
             }
-            Debug.Entry(3, $"x CheckAffectedEquipmentSlots(this GameObject Actor: {Actor.ShortDisplayName}) *//");
+            else
+            {
+                Debug.Entry(4, $"no body on which to perform check, aborting ");
+            }
+            Debug.Entry(3, $"x {nameof(CheckAffectedEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//");
         }
 
         public static IPart RequirePart(this GameObject Object, string Part, bool DoRegistration = true, bool Creation = false)

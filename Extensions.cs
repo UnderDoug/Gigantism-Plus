@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using XRL;
 using XRL.Rules;
@@ -558,7 +559,7 @@ namespace HNPS_GigantismPlus
             Type type = ModManager.ResolveType("XRL.World.Parts." + ModPartName);
             if (type == null)
             {
-                MetricsManager.LogError("ConvertToModification", "Couldn't resolve unknown mod part: " + ModPartName);
+                MetricsManager.LogError("ConvertToModification", "Couldn'type resolve unknown mod part: " + ModPartName);
                 return null;
             }
             ModPart = Activator.CreateInstance(type) as IModification;
@@ -584,7 +585,7 @@ namespace HNPS_GigantismPlus
             return (ModNaturalEquipment<T>)ModPart;
         }
 
-        public static T GetNaturalWeaponCompatiblePart<T>(this GameObject Object) 
+        public static T GetManagedNaturalEquipmentCompatiblePart<T>(this GameObject Object) 
             where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             T part = Object?.GetPart<T>();
@@ -613,6 +614,27 @@ namespace HNPS_GigantismPlus
         public static bool InheritsFrom(this GameObject Object, string Blueprint)
         {
             return Object.GetBlueprint().InheritsFrom(Blueprint);
+        }
+
+        // https://stackoverflow.com/a/32184652
+        public static bool SetPropertyValue(this object @object, string PropertyName, object Value)
+        {
+            PropertyInfo property = @object.GetType().GetProperty(PropertyName);
+            Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            object safeValue = (Value == null) ? null : Convert.ChangeType(Value, type);
+
+            property.SetValue(@object, safeValue, null);
+            return property.GetValue(@object, null) != null;
+        }
+        // https://stackoverflow.com/a/1965659
+        public static bool SetFieldValue(this object @object, string FieldName, object Value)
+        {
+            FieldInfo field = @object.GetType().GetField(FieldName);
+            Type type = Nullable.GetUnderlyingType(field.FieldType) ?? field.FieldType;
+            object safeValue = (Value == null) ? null : Convert.ChangeType(Value, type);
+
+            field.SetValue(@object, safeValue);
+            return field.GetValue(@object) != null;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
-            NaturalWeaponSubpart = new()
+            NaturalEquipmentMod = new()
             {
                 ParentPart = this,
                 Level = Level,
@@ -90,7 +90,7 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public override int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(NaturalEquipmentSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
         {
             int dieSize = 0;
             
@@ -100,7 +100,7 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(NaturalEquipmentSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
         {
             return (int)Math.Floor(StrengthModifier / 2.0);
         }
@@ -142,7 +142,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Body body = E.Object.Body;
 
-                NaturalWeaponSubpart.DamageBonus = GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level);
+                NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
 
                 body?.UpdateBodyParts();
 
@@ -202,12 +202,12 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalWeaponSubparts = new();
-            foreach ((_, NaturalWeaponSubpart<ElongatedPaws> subpart) in NaturalWeaponSubparts)
+            elongatedPaws.NaturalEquipmentMods = new();
+            foreach ((_, NaturalEquipmentSubpart<ElongatedPaws> subpart) in NaturalEquipmentMods)
             {
-                elongatedPaws.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, elongatedPaws));
+                elongatedPaws.NaturalEquipmentMods.Add(subpart.Type, new(subpart, elongatedPaws));
             }
-            elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart, elongatedPaws);
+            elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
             return elongatedPaws;
         }
 

@@ -90,15 +90,17 @@ namespace HNPS_GigantismPlus
 
         public static void Header(int Verbosity, string ClassName, string MethodName)
         {
-            Divider(Verbosity);
+            string divider = "\u2550"; // ═ (box drawing, double horizontal)
+            Divider(Verbosity, divider);
             string output = "@START: " + ClassName + "." + MethodName;
             Entry(Verbosity, output);
         }
         public static void Footer(int Verbosity, string ClassName, string MethodName)
         {
+            string divider = "\u2550"; // ═ (box drawing, double horizontal)
             string output = "///END: " + ClassName + "." + MethodName + " !//";
             Entry(Verbosity, output);
-            Divider(Verbosity);
+            Divider(Verbosity, divider);
         }
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0)
@@ -213,12 +215,12 @@ namespace HNPS_GigantismPlus
             return MeleeWeapon;
         }
 
-        public static NaturalWeaponSubpart<T> Vomit<T>(this NaturalWeaponSubpart<T> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
+        public static NaturalEquipmentSubpart<T> Vomit<T>(this NaturalEquipmentSubpart<T> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
             where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             string title = Title == null ? "" : $"{Title}:";
             GameObject Creature = Subpart.ParentPart?.ParentObject;
-            Entry(Verbosity, $"% Vomit: NaturalWeaponSubpart<{typeof(T).Name}> of {Creature?.Blueprint} {title}", Indent: Indent);
+            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(T).Name}> of {Creature?.Blueprint} {title}", Indent: Indent);
             List<string> @default = new()
             {
                 "Meta",

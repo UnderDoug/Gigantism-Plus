@@ -113,7 +113,7 @@ namespace HNPS_GigantismPlus
 
         public static Random RndGP = Stat.GetSeededRandomGenerator("HNPS_GigantismPlus");
 
-        // !! This is currently not firing from any of the NaturalWeaponSubpart Mutations but it has code that will make implementing the cybernetics adjustments easier.
+        // !! This is currently not firing from any of the NaturalEquipmentMod Mutations but it has code that will make implementing the cybernetics adjustments easier.
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)

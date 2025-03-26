@@ -71,7 +71,7 @@ namespace XRL.World.Parts
         {
             Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
 
-            // Mapping Augment properties to NaturalWeaponSubpart ones.
+            // Mapping Augment properties to NaturalEquipmentMod ones.
             NaturalWeaponSubpart.AdjectiveColor = AugmentAdjectiveColor;
 
             NaturalWeaponSubpart.Tile = AugmentTile;

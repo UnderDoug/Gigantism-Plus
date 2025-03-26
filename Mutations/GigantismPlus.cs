@@ -10,7 +10,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Extensions;
-using PlayFab.DataModels;
+using static XRL.World.Parts.NaturalEquipmentManager;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -112,64 +112,103 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{gigantic|Gigantism}} ({{r|D}})";
             Type = "Physical";
 
-            NaturalWeaponSubpart<GigantismPlus> GiganticFist = new()
+            ModNaturalEquipment<GigantismPlus> GiganticFist = new()
             {
-                ParentPart = this,
-                Type = "Hand",
-                CosmeticOnly = false,
-                Level = Level,
+                AssigningPart = this,
+                BodyPartType = "Hand",
 
                 ModPriority = 10,
+                DescriptionPriority = 10,
 
-                // Combat
-                Skill = "Cudgel",
-                Stat = "Strength",
-
-                // Grammar
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
-                Noun = "fist",
 
-                // Render
-                Tile = "NaturalWeapons/GiganticFist.png",
-                ColorString = "&x",
-                DetailColor = "z",
-                SecondColorString = "&X",
-                SecondDetailColor = "Z",
-                SwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block",
+                Adjustments = new(),
 
                 AddedIntProps = new()
                 {
                     { "ModGiganticNoShortDescription", 1 },
                     { "ModGiganticNoDisplayName", 1 }
-                }
+                },
+                AddedStringProps = new()
+                {
+                    { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
+                },
             };
-            NaturalWeaponSubparts.Add(GiganticFist.Type, GiganticFist);
+            GiganticFist.AddAdjustment(GAMEOBJECT, "Skill", "Cudgel");
+            GiganticFist.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+
+            GiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", true);
+
+            GiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", true);
+            GiganticFist.AddAdjustment(RENDER, "ColorString", "&x", true);
+            GiganticFist.AddAdjustment(RENDER, "TileColor", "&x", true);
+            GiganticFist.AddAdjustment(RENDER, "DetailColor", "z", true);
+
+            NaturalEquipmentMods.Add(GiganticFist.BodyPartType, GiganticFist); 
+            
+            ModNaturalEquipment<GigantismPlus> GiganticNoggin = new()
+            {
+                AssigningPart = this,
+                BodyPartType = "Head",
+
+                ModPriority = 10,
+                DescriptionPriority = 10,
+
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
+
+                Adjustments = new(),
+
+                AddedIntProps = new()
+                {
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
+                },
+            };
+            GiganticNoggin.AddAdjustment(GAMEOBJECT, "Skill", "Cudgel", true);
+            GiganticNoggin.AddAdjustment(GAMEOBJECT, "Stat", "Strength", true);
+
+            GiganticNoggin.AddAdjustment(RENDER, "ColorString", "&x", true);
+            GiganticNoggin.AddAdjustment(RENDER, "TileColor", "&x", true);
+            GiganticNoggin.AddAdjustment(RENDER, "DetailColor", "z", true);
+
+            NaturalEquipmentMods.Add(GiganticNoggin.BodyPartType, GiganticNoggin);
+
+            ModNaturalEquipment<GigantismPlus> GiganticBod = new()
+            {
+                AssigningPart = this,
+                BodyPartType = "Head",
+
+                ModPriority = 10,
+                DescriptionPriority = 10,
+
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
+
+                Adjustments = new(),
+
+                AddedIntProps = new()
+                {
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
+                },
+            };
+            GiganticBod.AddAdjustment(GAMEOBJECT, "Skill", "Cudgel", true);
+            GiganticBod.AddAdjustment(GAMEOBJECT, "Stat", "Strength", true);
+
+            GiganticBod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            GiganticBod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            GiganticBod.AddAdjustment(RENDER, "DetailColor", "z", true);
+
+            NaturalEquipmentMods.Add(GiganticBod.BodyPartType, GiganticBod);
 
             /*
-            NaturalWeaponSubpart<GigantismPlus> GiganticHead = new()
-            {
-                ParentPart = this,
-                Type = "Head",
-                CosmeticOnly = false,
-                Level = Level,
-                ModPriority = 10,
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
-                DetailColor = "Z",
-                SecondDetailColor = "x",
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                }
-            };
-            NaturalWeaponSubparts.Add(GiganticHead.Type, GiganticHead);
-
-            NaturalWeaponSubpart<GigantismPlus> GiganticBody = new()
+            NaturalEquipmentMod<GigantismPlus> GiganticBody = new()
             {
                 ParentPart = this,
                 Type = "Body",
@@ -187,7 +226,7 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 }
             };
-            NaturalWeaponSubparts.Add(GiganticBody.Type, GiganticBody);
+            NaturalEquipmentMods.Add(GiganticBody.Type, GiganticBody);
             */
         }
 
@@ -195,17 +234,17 @@ namespace XRL.World.Parts.Mutation
 
         public override bool GeneratesEquipment() { return true; }
 
-        public override int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieCount(NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             if (NaturalWeaponSubpart.Type == "Head") return 2;
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
         }
-        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageBonus(NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             if (NaturalWeaponSubpart.Type == "Head") return 5;
             return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
         }
-        public override int  GetNaturalWeaponHitBonus(NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public virtual int  GetNaturalWeaponHitBonus(NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             if (NaturalWeaponSubpart.Type == "Head") return 3;
             return -3 + (int)Math.Floor(Level / 2.0);
@@ -557,9 +596,9 @@ namespace XRL.World.Parts.Mutation
             string stunningForceDamageIncrement = StunningForce.GetDamageIncrement(1);
             if (ParentObject != null)
             {
-                NaturalWeaponSubpart<GigantismPlus> NaturalWeaponSubpart = NaturalWeaponSubparts["Hand"];
+                NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart = NaturalEquipmentMods["Hand"];
                 WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
-                FistDamageDieCount = GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart, Level);
+                FistDamageDieCount = GetNaturalEquipmentDamageDieCount(NaturalWeaponSubpart, Level);
                 FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level));
                 FistHitBonus = GetNaturalWeaponHitBonus(NaturalWeaponSubpart, Level);
                 StunningForceJumpLevel = GetStunningForceLevel(Level);
@@ -870,12 +909,12 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            gigantism.NaturalWeaponSubparts = new();
-            foreach ((_, NaturalWeaponSubpart<GigantismPlus> subpart) in NaturalWeaponSubparts)
+            gigantism.NaturalEquipmentMods = new();
+            foreach ((_, NaturalEquipmentSubpart<GigantismPlus> subpart) in NaturalEquipmentMods)
             {
-                gigantism.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, gigantism));
+                gigantism.NaturalEquipmentMods.Add(subpart.Type, new(subpart, gigantism));
             }
-            gigantism.NaturalWeaponSubpart = new(NaturalWeaponSubpart, gigantism);
+            gigantism.NaturalEquipmentMod = new(NaturalEquipmentMod, gigantism);
             gigantism.GiganticExoframe = null;
             return gigantism;
         }

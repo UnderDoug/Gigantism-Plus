@@ -6,7 +6,7 @@ using System.Text;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
+    public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
     {
         public ModBurrowingNaturalWeapon()
         {
@@ -37,7 +37,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
+                E.AddAdjective(NaturalEquipmentSubpart.GetColoredAdjective(), NaturalEquipmentSubpart.AdjectivePriority);
             }
             return base.HandleEvent(E);
         }
@@ -45,7 +45,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalEquipmentSubpart.GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
             int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);
@@ -68,5 +68,5 @@ namespace XRL.World.Parts
             }
             return Event.FinalizeString(stringBuilder);
         }
-    } //!-- public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
+    } //!-- public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
 }

@@ -10,12 +10,12 @@ using XRL.Rules;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>
+    public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalWeapon<UD_ManagedCrystallinity>
     {
-        // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
-        public Dictionary<string, NaturalWeaponSubpart<UD_ManagedCrystallinity>> NaturalWeaponSubparts { get; set; }
-        public NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart { get; set; }
+        // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
+        // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
+        public Dictionary<string, NaturalEquipmentSubpart<UD_ManagedCrystallinity>> NaturalWeaponSubparts { get; set; }
+        public NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart { get; set; }
 
         public UD_ManagedCrystallinity NaturalWeaponManager { get; set; }
 
@@ -101,26 +101,26 @@ namespace XRL.World.Parts.Mutation
             };
         }
 
-        public UD_ManagedCrystallinity(NaturalWeaponSubpart<UD_ManagedCrystallinity> naturalWeaponSubpart, UD_ManagedCrystallinity NewParent)
+        public UD_ManagedCrystallinity(NaturalEquipmentSubpart<UD_ManagedCrystallinity> naturalWeaponSubpart, UD_ManagedCrystallinity NewParent)
             : this()
         {
             NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
         }
 
-        public virtual string GetNaturalWeaponModName(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
+        public virtual string GetNaturalWeaponModName(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
         {
             return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
         }
-        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> GetNaturalWeaponMod(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
+        public virtual ModNaturalWeaponBase<UD_ManagedCrystallinity> GetNaturalWeaponMod(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
         {
-            ModNaturalEquipment<UD_ManagedCrystallinity> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
+            ModNaturalWeaponBase<UD_ManagedCrystallinity> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
             NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
             NaturalWeaponMod.AssigningPart = this;
             NaturalWeaponMod.Wielder = ParentObject;
             return NaturalWeaponMod;
         }
 
-        public virtual bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, string Parts)
+        public virtual bool ProcessNaturalWeaponAddedParts(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, string Parts)
         {
             if (Parts == null) return false;
             NaturalWeaponSubpart.AddedParts ??= new();
@@ -132,7 +132,7 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        public virtual bool ProcessNaturalWeaponAddedProps(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, string Props)
+        public virtual bool ProcessNaturalWeaponAddedProps(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, string Props)
         {
             if (Props == null) return false;
             if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
@@ -166,19 +166,19 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        public virtual int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieCount(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
         {
             return NaturalWeaponSubpart.DamageDieCount;
         }
 
-        public virtual int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieSize(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasBurrowing))
                 return 0;
             return 1;
         }
 
-        public virtual int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageBonus(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasBurrowing))
             {
@@ -187,22 +187,22 @@ namespace XRL.World.Parts.Mutation
             return 0;
         }
 
-        public virtual int GetNaturalWeaponHitBonus(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponHitBonus(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
         {
             return NaturalWeaponSubpart.HitBonus;
         }
 
-        public virtual List<string> GetNaturalWeaponAddedParts(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
+        public virtual List<string> GetNaturalWeaponAddedParts(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
         {
             return NaturalWeaponSubpart.AddedParts;
         }
 
-        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
+        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
         {
             return NaturalWeaponSubpart.AddedStringProps;
         }
 
-        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
+        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps(NaturalEquipmentSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
         {
             return NaturalWeaponSubpart.AddedIntProps;
         }
@@ -227,7 +227,7 @@ namespace XRL.World.Parts.Mutation
             return NaturalWeaponSubpart.EquipmentFrameColors;
         }
 
-        public virtual bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<UD_ManagedCrystallinity> Subpart, int Level)
+        public virtual bool UpdateNaturalWeaponSubpart(NaturalEquipmentSubpart<UD_ManagedCrystallinity> Subpart, int Level)
         {
             Subpart.Level = Level;
             Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level);
@@ -239,7 +239,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool ChangeLevel(int NewLevel)
         {
-            foreach ((_, NaturalWeaponSubpart<UD_ManagedCrystallinity> Subpart) in NaturalWeaponSubparts)
+            foreach ((_, NaturalEquipmentSubpart<UD_ManagedCrystallinity> Subpart) in NaturalWeaponSubparts)
             {
                 UpdateNaturalWeaponSubpart(Subpart, NewLevel);
             }
@@ -261,19 +261,19 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-                    ModNaturalEquipment<UD_ManagedCrystallinity> modNaturalWeapon = null;
+                    ModNaturalWeaponBase<UD_ManagedCrystallinity> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type
                         && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
-                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                        Debug.Entry(4, $"NaturalEquipmentMod", Indent: 3);
                     }
                     else if (NaturalWeaponSubparts.ContainsKey(part.Type)
                         && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
-                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                        Debug.Entry(4, $"NaturalEquipmentMods", Indent: 3);
                     }
 
                     Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
@@ -311,17 +311,17 @@ namespace XRL.World.Parts.Mutation
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 2);
-                    ModNaturalEquipment<UD_ManagedCrystallinity> modNaturalWeapon = null;
+                    ModNaturalWeaponBase<UD_ManagedCrystallinity> modNaturalWeapon = null;
                     if (NaturalWeaponSubpart != null
                         && part.Type == NaturalWeaponSubpart.Type)
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
-                        Debug.Entry(4, $"NaturalWeaponSubpart", Indent: 3);
+                        Debug.Entry(4, $"NaturalEquipmentMod", Indent: 3);
                     }
                     else if (NaturalWeaponSubparts.ContainsKey(part.Type))
                     {
                         modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
-                        Debug.Entry(4, $"NaturalWeaponSubparts", Indent: 3);
+                        Debug.Entry(4, $"NaturalEquipmentMods", Indent: 3);
                     }
 
                     Debug.Entry(4, $"modNaturalWeapon: {modNaturalWeapon?.Name}", Indent: 3);
@@ -331,7 +331,7 @@ namespace XRL.World.Parts.Mutation
                     if (part.DefaultBehavior != null)
                     {
                         part.DefaultBehavior.RemovePart(modNaturalWeapon);
-                        if (part.DefaultBehavior.TryGetPart(out NaturalEquipmentManager naturalWeaponDescriber))
+                        if (part.DefaultBehavior.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
                         {
                             naturalWeaponDescriber.ResetShortDescription();
                             naturalWeaponDescriber.CollectNaturalWeaponMods();
@@ -341,7 +341,7 @@ namespace XRL.World.Parts.Mutation
                     else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
                     {
                         part.Equipped.RemovePart(modNaturalWeapon);
-                        if (part.Equipped.TryGetPart(out NaturalEquipmentManager naturalWeaponDescriber))
+                        if (part.Equipped.TryGetPart(out NaturalWeaponDescriber naturalWeaponDescriber))
                         {
                             naturalWeaponDescriber.ResetShortDescription();
                             naturalWeaponDescriber.CollectNaturalWeaponMods();
@@ -424,7 +424,7 @@ namespace XRL.World.Parts.Mutation
         {
             UD_ManagedCrystallinity managedCrystallinity = base.DeepCopy(Parent, MapInv) as UD_ManagedCrystallinity;
             managedCrystallinity.NaturalWeaponSubparts = new();
-            foreach ((_, NaturalWeaponSubpart<UD_ManagedCrystallinity> subpart) in NaturalWeaponSubparts)
+            foreach ((_, NaturalEquipmentSubpart<UD_ManagedCrystallinity> subpart) in NaturalWeaponSubparts)
             {
                 managedCrystallinity.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, managedCrystallinity));
             }

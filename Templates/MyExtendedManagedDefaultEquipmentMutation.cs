@@ -8,12 +8,13 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
+    /*
     [Serializable]
-    public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalEquipment
+    public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
     {
-        // Required by IManagedDefaultNaturalEquipment to ensure the implementation of the INaturalWeapon Part
+        // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the NaturalEquipmentMod Part
         [Serializable]
-        public class INaturalWeapon : IManagedDefaultNaturalEquipment.INaturalWeapon
+        public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
             public INaturalWeapon()
             {
@@ -78,21 +79,21 @@ namespace XRL.World.Parts.Mutation
             SecondDetailColor = "R",  // If the tile is already the above color, this get used instead
         };
 
-        // Required by IManagedDefaultNaturalEquipment and allows the Modification to get the above part from the mutation.
-        public virtual IManagedDefaultNaturalEquipment.INaturalWeapon GetNaturalWeapon()
+        // Required by IManagedDefaultNaturalWeapon and allows the Modification to get the above part from the mutation.
+        public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
         {
             return NaturalWeapon;
         }
 
-        // Required by IManagedDefaultNaturalEquipment and can be used further down to easily reference the Modification.
-        public virtual string GetNaturalWeaponModName(bool Managed = true)
+        // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
+        public virtual string GetNaturalEquipmentModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeapon" + (!Managed ? "Unmanaged" : "");
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalEquipmentMod" + (!Managed ? "Unmanaged" : "");
         }
-        public virtual ModNaturalEquipment<T> GetNaturalWeaponMod<T>()
-            where T : IPart, IManagedDefaultNaturalEquipment, new()
+        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
+            where T : IPart, IManagedDefaultNaturalWeapon, new()
         {
-            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
+            return GetNaturalEquipmentModName().ConvertToNaturalWeaponModification<T>();
         }
 
         // Optional: allows you to easily check the presence of another mutation if you wanted to adjust any calculations on that basis
@@ -110,7 +111,7 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        // Required by IManagedDefaultNaturalEquipment and is used to assign the relevant damage component
+        // Required by IManagedDefaultNaturalWeapon and is used to assign the relevant damage component
         public virtual bool CalculateNaturalWeaponDamageDieCount(int Level = 1)
         {
             NaturalWeapon.DamageDieCount = GetNaturalWeaponDamageDieCount(Level);
@@ -152,7 +153,7 @@ namespace XRL.World.Parts.Mutation
             return true;
         }
 
-        // Required by IManagedDefaultNaturalEquipment and is used to calculate the relevant damage component
+        // Required by IManagedDefaultNaturalWeapon and is used to calculate the relevant damage component
         // Can be altered as below to be as simple or complex as you like 
         public virtual int GetNaturalWeaponDamageDieSize(int Level = 1)
         {
@@ -228,13 +229,13 @@ namespace XRL.World.Parts.Mutation
                     // This is the important part, and is how the modification gets applied.
                     // the process will fail if there's no default behavior (Hand parts always have them), so you may want to 
                     // do a (part.DefaultBehavior != null) check first and add a default behavior to Modify.
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponModName(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalEquipmentModName(), Actor: ParentObject);
                 }
             }
         }
 
         // You'll want some variation of this to ensure that things like Temporal Fugue clones don't delete your 
-        // NaturalWeapon Part by being copied with a reference to it.
+        // NaturalEquipmentMod Part by being copied with a reference to it.
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             MyExtendedManagedDefaultEquipmentMutation myMutation = base.DeepCopy(Parent, MapInv) as MyExtendedManagedDefaultEquipmentMutation;
@@ -249,4 +250,5 @@ namespace XRL.World.Parts.Mutation
     {
 
     }
+    */
 }

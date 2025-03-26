@@ -7,7 +7,7 @@ using HNPS_GigantismPlus;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModCrystallineNaturalWeapon : ModNaturalEquipment<UD_ManagedCrystallinity>
+    public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
     {
         public ModCrystallineNaturalWeapon()
         {
@@ -27,7 +27,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
+                E.AddAdjective(NaturalEquipmentSubpart.GetColoredAdjective(), NaturalEquipmentSubpart.AdjectivePriority);
             }
             return base.HandleEvent(E);
         }
@@ -36,7 +36,7 @@ namespace XRL.World.Parts
         {
             string text = "weapon";
             string descriptionName = !ParentObject.HasNaturalWeaponMods() ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
+            descriptionName += Grammar.MakeTitleCase(NaturalEquipmentSubpart.GetColoredAdjective());
             int dieSizeIncrease = 2 + GetDamageDieSize();
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
@@ -46,5 +46,5 @@ namespace XRL.World.Parts
                 .Append(dieSizeIncrease.Signed()).Append($" to {pluralPossessive} damage die size.");
             return Event.FinalizeString(stringBuilder);
         }
-    } //!-- public class ModCrystallineNaturalWeapon : ModNaturalEquipment<UD_ManagedCrystallinity>
+    } //!-- public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
 }

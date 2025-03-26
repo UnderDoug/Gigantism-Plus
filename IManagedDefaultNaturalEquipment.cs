@@ -10,71 +10,34 @@ namespace XRL.World
 {
     public interface IManagedDefaultNaturalEquipment<T> where T : IPart, IManagedDefaultNaturalEquipment<T>, new ()
     {
-        public Dictionary<string, NaturalWeaponSubpart<T>> NaturalWeaponSubparts { get; set; }
-        public NaturalWeaponSubpart<T> NaturalWeaponSubpart { get; set; }
+        public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
+        public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
 
-        public virtual NaturalWeaponSubpart<T> GetNaturalWeaponSubpart(
-            string Type = "",
-            GameObject Object = null,
-            BodyPart BodyPart = null)
-        {
-            if (Type != "")
-            {
-                if (Type == NaturalWeaponSubpart?.Type)
-                    return NaturalWeaponSubpart;
-                if (NaturalWeaponSubparts.ContainsKey(Type))
-                    return NaturalWeaponSubparts[Type];
-            }
-            if (Object?.Equipped?.Body != null)
-            {
-                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
-                {
-                    if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
-                    {
-                        Type = part.Type;
-                        if (Type == NaturalWeaponSubpart?.Type)
-                            return NaturalWeaponSubpart;
-                        if (NaturalWeaponSubparts.ContainsKey(Type))
-                            return NaturalWeaponSubparts[Type];
-                    }
-                }
-            }
-            if (BodyPart != null)
-            {
-                Type = BodyPart.Type;
-                if (Type == NaturalWeaponSubpart?.Type)
-                    return NaturalWeaponSubpart;
-                if (NaturalWeaponSubparts.ContainsKey(Type))
-                    return NaturalWeaponSubparts[Type];
-            }
-            return null;
-        }
+        public int Level { get; set; }
 
-        public abstract string GetNaturalWeaponModName(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
-        public abstract ModNaturalEquipment<T> GetNaturalWeaponMod(NaturalWeaponSubpart<T> Subpart, bool Managed = true);
+        public abstract bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts);
 
-        public abstract bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart<T> Subpart, string Parts);
+        public abstract bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props);
 
-        public abstract bool ProcessNaturalWeaponAddedProps(NaturalWeaponSubpart<T> Subpart, string Props);
+        public abstract int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
-        public abstract int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<T> Subpart, int Level = 1);
+        public abstract int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
-        public abstract int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<T> Subpart, int Level = 1);
+        public abstract int GetNaturalWeaponDamageBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
-        public abstract int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<T> Subpart, int Level = 1);
+        public abstract int GetNaturalWeaponHitBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
-        public abstract int GetNaturalWeaponHitBonus(NaturalWeaponSubpart<T> Subpart, int Level = 1);
+        public abstract int GetNaturalWeaponPenBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
-        public abstract List<string> GetNaturalWeaponAddedParts(NaturalWeaponSubpart<T> NaturalWeaponSubpart);
+        public abstract List<string> GetNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod);
 
-        public abstract Dictionary<string, string> GetNaturalWeaponAddedStringProps(NaturalWeaponSubpart<T> NaturalWeaponSubpart);
+        public abstract Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<T> NaturalEquipmentMod);
 
-        public abstract Dictionary<string, int> GetNaturalWeaponAddedIntProps(NaturalWeaponSubpart<T> NaturalWeaponSubpart);
+        public abstract Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod);
 
-        public abstract bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<T> Subpart, int Level = 1);
+        public abstract bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
-        public abstract bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false);
-        public abstract bool UnprocessNaturalWeaponSubparts(Body body);
+        public abstract bool ProcessNaturalEquipment(Body body);
 
         // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
         public abstract void OnDecorateDefaultEquipment(Body body);

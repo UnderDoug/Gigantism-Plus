@@ -8,7 +8,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class NaturalWeaponSubpart<T> : IScribedPart
+    public class NaturalEquipmentSubpart<T> : IScribedPart
         where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
     {
         public const string DAMAGE_CATEGORY_NAME = "Damage";
@@ -100,12 +100,12 @@ namespace XRL.World.Parts
         public Dictionary<string, int?> CategoryPriorities = new();
         public Dictionary<string, int?> PropertyPriorities = new();
 
-        public NaturalWeaponSubpart()
+        public NaturalEquipmentSubpart()
         {
             CosmeticOnly = false;
             Level = 1;
         }
-        public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source)
+        public NaturalEquipmentSubpart(NaturalEquipmentSubpart<T> Source)
             : this()
         {
             Type = Source.Type;
@@ -163,12 +163,12 @@ namespace XRL.World.Parts
             CategoryPriorities = new Dictionary<string, int?>(CategoryPriorities);
             PropertyPriorities = new Dictionary<string, int?>(PropertyPriorities);
         }
-        public NaturalWeaponSubpart(T NewParent)
+        public NaturalEquipmentSubpart(T NewParent)
             : this()
         {
             ParentPart = NewParent;
         }
-        public NaturalWeaponSubpart(NaturalWeaponSubpart<T> Source, T NewParent)
+        public NaturalEquipmentSubpart(NaturalEquipmentSubpart<T> Source, T NewParent)
             : this(Source)
         {
             ParentPart = NewParent;
@@ -176,7 +176,7 @@ namespace XRL.World.Parts
 
         public virtual bool IsCosmeticOnly()
         {
-            NaturalWeaponSubpart<T> @default = new();
+            NaturalEquipmentSubpart<T> @default = new();
             bool SameBonusAsDefault = (DamageDieCount == @default.DamageDieCount
                                     && DamageDieSize == @default.DamageDieSize
                                     && DamageBonus == @default.DamageBonus
@@ -217,7 +217,7 @@ namespace XRL.World.Parts
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            NaturalWeaponSubpart<T> naturalWeaponSubpart = base.DeepCopy(Parent, MapInv) as NaturalWeaponSubpart<T>;
+            NaturalEquipmentSubpart<T> naturalWeaponSubpart = base.DeepCopy(Parent, MapInv) as NaturalEquipmentSubpart<T>;
             return naturalWeaponSubpart;
         }
 

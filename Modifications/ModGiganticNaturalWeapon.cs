@@ -7,7 +7,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
+    public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
     {
         public ModGiganticNaturalWeapon()
         {
@@ -55,7 +55,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
+                E.AddAdjective(NaturalEquipmentSubpart.GetColoredAdjective(), NaturalEquipmentSubpart.AdjectivePriority);
             }
 
             return base.HandleEvent(E);
@@ -64,7 +64,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription()
         {
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalEquipmentSubpart.GetColoredAdjective());
             int damageBonus = GetDamageBonus();
             List<List<string>> list = new();
             string text = "weapon";
@@ -104,5 +104,5 @@ namespace XRL.World.Parts
             return $"{descriptionName}: " + (ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text)) + " " + Grammar.MakeAndList(list2) + ".";
         }
 
-    } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<HNPS_GigantismPlus>
+    } //!-- public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<HNPS_GigantismPlus>
 }

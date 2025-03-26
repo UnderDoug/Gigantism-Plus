@@ -5,7 +5,7 @@ using XRL.World.Parts.Mutation;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
+    public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
     {
         public ModElongatedNaturalWeapon()
         {
@@ -19,11 +19,11 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
+            ApplyGenericChanges(Object, NaturalEquipmentMod, GetInstanceDescription());
 
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
+            ApplyPriorityChanges(Object, NaturalEquipmentMod);
 
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
+            ApplyPartAndPropChanges(Object, NaturalEquipmentMod);
             */
             base.ApplyModification(Object);
         }
@@ -37,7 +37,7 @@ namespace XRL.World.Parts
         {
             if (!E.Object.HasProperName)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
+                E.AddAdjective(NaturalEquipmentSubpart.GetColoredAdjective(), NaturalEquipmentSubpart.AdjectivePriority);
             }
             return base.HandleEvent(E);
         }
@@ -45,7 +45,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(NaturalEquipmentSubpart.GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             int dieSizeIncrease = 2 + GetDamageDieSize();
             int damageBonusIncrease = 1 + GetDamageBonus();
@@ -67,5 +67,5 @@ namespace XRL.World.Parts
             }
             return description;
         }
-    } //!-- public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
+    } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
 }

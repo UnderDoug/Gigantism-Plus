@@ -33,6 +33,27 @@ namespace HNPS_GigantismPlus
             return false;
         } //!-- public static bool IsExternallyManagedLimb(BodyPart part)
 
+        public static int GetDieCount(this DieRoll DieRoll)
+        {
+            if (DieRoll == null)
+            {
+                return 0;
+            }
+            if (DieRoll.LeftValue > 0)
+            {
+                return DieRoll.LeftValue;
+            }
+            else
+            {
+                return DieRoll.Left.GetDieCount();
+            }
+        }
+        public static int GetDieCount(this string DieRoll)
+        {
+            DieRoll dieRoll = new(DieRoll);
+            return dieRoll.GetDieCount();
+        }
+
         public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
         {
             if (DieRoll == null)
@@ -497,9 +518,9 @@ namespace HNPS_GigantismPlus
             if (Path != null && Path != "")
                 Object.SetStringProperty("BlockedSound", Path);
         }
-        public static void SetEquipmentFrameColors(this GameObject Object, string Path = null)
+        public static void SetEquipmentFrameColors(this GameObject Object, string TopLeft_Left_Right_BottomRight = null)
         {
-            Object.SetStringProperty("EquipmentFrameColors", Path, true);
+            Object.SetStringProperty("EquipmentFrameColors", TopLeft_Left_Right_BottomRight, true);
         }
 
         public static void CheckAffectedEquipmentSlots(this GameObject Actor)
@@ -603,8 +624,7 @@ namespace HNPS_GigantismPlus
             return null;
         }
 
-        public static bool ApplyNaturalWeaponModification<T>(this GameObject obj, ModNaturalEquipment<T> ModPart, GameObject Actor) 
-            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
+        public static bool ApplyNaturalEquipmentModification(this GameObject obj, ModNaturalEquipmentBase ModPart, GameObject Actor) 
         {
             return obj.ApplyModification(ModPart, Actor: Actor);
         }
@@ -612,6 +632,24 @@ namespace HNPS_GigantismPlus
         public static bool IsDefaultEquipmentOf(this GameObject Object, BodyPart BodyPart)
         {
             return BodyPart.DefaultBehavior == Object;
+        }
+
+        public static BodyPart EquippingPart(this GameObject Object)
+        {
+            Body body = Object?.Equipped?.Body;
+            if (body != null)
+            {
+                foreach (BodyPart part in body.LoopParts())
+                {
+                    if (part.DefaultBehavior == Object)
+                        return part;
+                    if (part.Equipped == Object)
+                        return part;
+                    if (part.Cybernetics == Object)
+                        return part;
+                }
+            }
+            return null;
         }
 
         public static bool InheritsFrom(this GameObject Object, string Blueprint)

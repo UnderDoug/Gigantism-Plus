@@ -7,14 +7,18 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
+using HNPS_GigantismPlus.Events.Handlers;
 
 namespace HNPS_GigantismPlus
 {
+    /*
     [PlayerMutator]
     public class GigantifyStartingLoadout : IPlayerMutator
     {
         public void mutate(GameObject player)
         {
+            AfterModGiganticAppliedHandler.Register();
+
             GameObject GO = player;
             Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
 
@@ -23,8 +27,9 @@ namespace HNPS_GigantismPlus
             Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
         }
     }
+    */
 
-    public class GiganticModifierAdjustments
+    public class Gigantic_ModEntry_Adjustments
     {
         public static void AdjustGiganticModifier()
         {
@@ -120,7 +125,7 @@ namespace HNPS_GigantismPlus
             Exit:
             Debug.Entry(3, "x GiganticModifierAdjustments.AdjustGiganticModifier() @//", Indent: 1);
         }
-    } //!--- public class GiganticModifierAdjustments
+    } //!--- public class Gigantic_ModEntry_Adjustments
 
     [HasModSensitiveStaticCache]
     public static class GigantismPlusModBasedInitialiser
@@ -130,7 +135,7 @@ namespace HNPS_GigantismPlus
         {
             // Called at game startup and whenever mod configuration changes
         }
-    }
+    } //!-- public static class GigantismPlusModBasedInitialiser
 
     [HasGameBasedStaticCache]
     public static class GigantismPlusGameBasedInitialiser
@@ -138,11 +143,10 @@ namespace HNPS_GigantismPlus
         [GameBasedCacheInit]
         public static void AdditionalSetup()
         {
+            // Called once when world is first generated.
             Debug.Header(3, 
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
                 $"{nameof(AdditionalSetup)}()");
-            
-            GiganticModifierAdjustments.AdjustGiganticModifier();
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -157,16 +161,22 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
                 $"{nameof(AdditionalSetup)}()");
         }
-    }
+    } //!-- public static class GigantismPlusGameBasedInitialiser
 
     [PlayerMutator]
     public class GigantismPlusOnPlayerLoad : IPlayerMutator
     {
         public void mutate(GameObject player)
         {
+            // Gets called once when the player is first generated
             Debug.Header(3, 
                 $"{nameof(GigantismPlusOnPlayerLoad)}", 
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
+
+
+            Debug.Entry(3, $"Registering XRLGame Event Handlers", Indent: 1);
+            AfterModGiganticAppliedHandler.Register();
+            BeforeDescribeModGiganticHandler.Register();
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -206,7 +216,7 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnPlayerLoad)}",
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
         }
-    } //!--- public class OnPlayerLoad : IPlayerMutator
+    } //!-- public class GigantismPlusOnPlayerLoad : IPlayerMutator
 
     [HasCallAfterGameLoaded]
     public class GigantismPlusOnLoadGameHandler
@@ -214,9 +224,14 @@ namespace HNPS_GigantismPlus
         [CallAfterGameLoaded]
         public static void OnLoadGameCallback()
         {
+            // Gets called every time the game is loaded but not during generation
             Debug.Header(3,
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",
                 $"{nameof(OnLoadGameCallback)}()");
+
+            Debug.Entry(3, $"Registering XRLGame Event Handlers", Indent: 1);
+            AfterModGiganticAppliedHandler.Register();
+            BeforeDescribeModGiganticHandler.Register();
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -255,5 +270,5 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",
                 $"{nameof(OnLoadGameCallback)}()");
         }
-    } //!--- public class OnLoadGameHandler
+    } //!-- public class GigantismPlusOnLoadGameHandler
 }

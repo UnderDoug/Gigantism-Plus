@@ -13,8 +13,6 @@ namespace XRL.World
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
 
-        public int Level { get; set; }
-
         public abstract bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts);
 
         public abstract bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props);
@@ -39,8 +37,13 @@ namespace XRL.World
 
         public abstract bool ProcessNaturalEquipment(Body body);
 
-        // These should allow a base cybernetics part to be wrappered into having natural weapon modifiers included
-        public abstract void OnDecorateDefaultEquipment(Body body);
-        public abstract void OnRegenerateDefaultEquipment(Body body);
+        public virtual bool WantEvent(int ID, int cascade)
+        {
+            return ID == BodyPartsUpdatedEvent.ID;
+        }
+
+        public abstract bool HandEvent(BodyPartsUpdatedEvent E);
+        public abstract void OnBodyPartsUpdated(Body body);
+
     }
 }

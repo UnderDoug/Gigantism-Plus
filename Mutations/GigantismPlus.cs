@@ -112,7 +112,7 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{gigantic|Gigantism}} ({{r|D}})";
             Type = "Physical";
 
-            ModNaturalEquipment<GigantismPlus> GiganticFist = new()
+            ModGiganticNaturalWeapon GiganticFist = new()
             {
                 AssigningPart = this,
                 BodyPartType = "Hand",
@@ -149,7 +149,7 @@ namespace XRL.World.Parts.Mutation
 
             NaturalEquipmentMods.Add(GiganticFist.BodyPartType, GiganticFist); 
             
-            ModNaturalEquipment<GigantismPlus> GiganticNoggin = new()
+            ModGiganticNaturalWeapon GiganticNoggin = new()
             {
                 AssigningPart = this,
                 BodyPartType = "Head",
@@ -169,7 +169,6 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            GiganticNoggin.AddAdjustment(GAMEOBJECT, "Skill", "Cudgel", true);
             GiganticNoggin.AddAdjustment(GAMEOBJECT, "Stat", "Strength", true);
 
             GiganticNoggin.AddAdjustment(RENDER, "ColorString", "&x", true);
@@ -181,7 +180,7 @@ namespace XRL.World.Parts.Mutation
             ModNaturalEquipment<GigantismPlus> GiganticBod = new()
             {
                 AssigningPart = this,
-                BodyPartType = "Head",
+                BodyPartType = "Body",
 
                 ModPriority = 10,
                 DescriptionPriority = 10,
@@ -198,55 +197,30 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            GiganticBod.AddAdjustment(GAMEOBJECT, "Skill", "Cudgel", true);
-            GiganticBod.AddAdjustment(GAMEOBJECT, "Stat", "Strength", true);
-
             GiganticBod.AddAdjustment(RENDER, "ColorString", "&x", true);
             GiganticBod.AddAdjustment(RENDER, "TileColor", "&x", true);
             GiganticBod.AddAdjustment(RENDER, "DetailColor", "z", true);
 
             NaturalEquipmentMods.Add(GiganticBod.BodyPartType, GiganticBod);
-
-            /*
-            NaturalEquipmentMod<GigantismPlus> GiganticBody = new()
-            {
-                ParentPart = this,
-                Type = "Body",
-                CosmeticOnly = true,
-                Level = Level,
-                ModPriority = 10,
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
-                DetailColor = "Z",
-                SecondDetailColor = "x",
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                }
-            };
-            NaturalEquipmentMods.Add(GiganticBody.Type, GiganticBody);
-            */
         }
 
         public override bool CanLevel() { return true; }
 
         public override bool GeneratesEquipment() { return true; }
 
-        public virtual int GetNaturalWeaponDamageDieCount(NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
-            if (NaturalWeaponSubpart.Type == "Head") return 2;
+            if (NaturalWeaponSubpart.BodyPartType == "Head") return 2;
             return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
         }
-        public virtual int GetNaturalWeaponDamageBonus(NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
-            if (NaturalWeaponSubpart.Type == "Head") return 5;
+            if (NaturalWeaponSubpart.BodyPartType == "Head") return 5;
             return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
         }
-        public virtual int  GetNaturalWeaponHitBonus(NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
-            if (NaturalWeaponSubpart.Type == "Head") return 3;
+            if (NaturalWeaponSubpart.BodyPartType == "Head") return 3;
             return -3 + (int)Math.Floor(Level / 2.0);
         }
 
@@ -596,11 +570,11 @@ namespace XRL.World.Parts.Mutation
             string stunningForceDamageIncrement = StunningForce.GetDamageIncrement(1);
             if (ParentObject != null)
             {
-                NaturalEquipmentSubpart<GigantismPlus> NaturalWeaponSubpart = NaturalEquipmentMods["Hand"];
+                ModNaturalEquipment<GigantismPlus> naturalEquipmentMod = NaturalEquipmentMods["Hand"];
                 WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
-                FistDamageDieCount = GetNaturalEquipmentDamageDieCount(NaturalWeaponSubpart, Level);
-                FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level));
-                FistHitBonus = GetNaturalWeaponHitBonus(NaturalWeaponSubpart, Level);
+                FistDamageDieCount = GetNaturalWeaponDamageDieCount(naturalEquipmentMod, Level);
+                FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(naturalEquipmentMod, Level));
+                FistHitBonus = GetNaturalWeaponHitBonus(naturalEquipmentMod, Level);
                 StunningForceJumpLevel = GetStunningForceLevel(Level);
                 stunningForceDamageIncrement = StunningForce.GetDamageIncrement(StunningForceJumpLevel);
             }
@@ -752,7 +726,7 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, "x if (EnableActivatedAbilityID != Guid.Empty) ?//", Indent: 2);
 
                 Debug.Entry(4, "GO.WantToReequip()", Indent: 2);
-                GO.WantToReequip();
+                GO.Brain.PerformReequip();
                 Debug.Entry(4, "GO.CheckAffectedEquipmentSlots()", Indent: 2);
                 GO.CheckAffectedEquipmentSlots();
             }
@@ -766,11 +740,6 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})");
             return base.Unmutate(GO);
         }
-
-        public override void OnRegenerateDefaultEquipment(Body body)
-        {
-            base.OnRegenerateDefaultEquipment(body);
-        } //!--- public override void OnRegenerateDefaultEquipment(Body body)
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
@@ -910,9 +879,9 @@ namespace XRL.World.Parts.Mutation
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
             gigantism.NaturalEquipmentMods = new();
-            foreach ((_, NaturalEquipmentSubpart<GigantismPlus> subpart) in NaturalEquipmentMods)
+            foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                gigantism.NaturalEquipmentMods.Add(subpart.Type, new(subpart, gigantism));
+                gigantism.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, gigantism));
             }
             gigantism.NaturalEquipmentMod = new(NaturalEquipmentMod, gigantism);
             gigantism.GiganticExoframe = null;

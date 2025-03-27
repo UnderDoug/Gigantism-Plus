@@ -133,29 +133,9 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);
-            Object.RequirePart<NaturalEquipmentManager>();
             Debug.Entry(4, "? if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 4);
-            if (Object.TryGetPart(out NaturalEquipmentManager NaturalWeaponDescriber))
-            {
-                Debug.Entry(4, "+ NaturalWeaponDescriber is Present", Indent: 5);
-                NaturalWeaponDescriber.AddNaturalWeaponMod(ModPriority, this);
-                NaturalWeaponDescriber.ProcessNaturalWeaponModsShortDescriptions();
-            }
-            else
-            {
-                Debug.Entry(4, "- NaturalWeaponDescriber not Present, this is an abnormal state", Indent: 5);
-            }
-            Debug.Entry(4, $"x if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber)) ?//", Indent: 4);
-
-            ApplyGenericChanges(Object);
-            ApplyPriorityChanges(Object);
-            ApplyPartAndPropChanges(Object);
-
-            Render render = Object.Render;
-
             
-            Object.ModIntProperty("ModNaturalWeaponCount", 1);
-
+            ApplyPartAndPropChanges(Object);
 
             Debug.Entry(4, $"x {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", Indent: 3);
             base.ApplyModification(Object);
@@ -169,6 +149,11 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
+
+            if (!E.Object.HasProperName)
+            {
+                E.AddAdjective(GetColoredAdjective(), ModPriority);
+            }
             return base.HandleEvent(E);
         }
 
@@ -176,12 +161,6 @@ namespace XRL.World.Parts
         {
             return null;
         }
-
-        public override int GetDescriptionPriority()
-        {
-            return NaturalWeaponSubpart.ModPriority;
-        }
-
 
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {

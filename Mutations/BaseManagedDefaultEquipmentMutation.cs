@@ -133,7 +133,6 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool ChangeLevel(int NewLevel)
         {
-            // UnprocessNaturalEquipment(ParentObject.Body);
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
@@ -176,25 +175,15 @@ namespace XRL.World.Parts.Mutation
 
                     Debug.Entry(4, $"modNaturalWeapon: {naturalEquipmentMod?.Name}", Indent: 3);
 
-                    if (bodyPart.DefaultBehavior != null)
+                    GameObject equipment = bodyPart.DefaultBehavior ?? bodyPart.Equipped;
+                    if (equipment != null && equipment.TryGetPart(out NaturalEquipmentManager manager))
                     {
-                        Debug.Entry(4, $"{bodyPart.DefaultBehavior.ShortDisplayNameStripped} is DefaultBehavior", Indent: 3);
-                        if (bodyPart.DefaultBehavior.HasPart(naturalEquipmentMod.Name))
-                        {
-                            Debug.Entry(4, $"{bodyPart.DefaultBehavior.ShortDisplayName} already has {naturalEquipmentMod.Name}", Indent: 3);
-                            continue;
-                        }
-                        bodyPart.DefaultBehavior.ApplyModification(naturalEquipmentMod, Actor: body.ParentObject);
+                        Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
+                        manager.AddNaturalEquipmentMod(naturalEquipmentMod);
                     }
-                    else if (bodyPart.Equipped != null && bodyPart.Equipped.HasPart<NaturalEquipment>())
+                    else if (equipment != null)
                     {
-                        Debug.Entry(4, $"{bodyPart.Equipped.ShortDisplayNameStripped} is Equipped", Indent: 3);
-                        if (bodyPart.Equipped.HasPart(naturalEquipmentMod.Name))
-                        {
-                            Debug.Entry(4, $"{bodyPart.Equipped.ShortDisplayName} alreadry has {naturalEquipmentMod.Name}", Indent: 3);
-                            continue;
-                        }
-                        bodyPart.Equipped.ApplyModification(naturalEquipmentMod, Actor: body.ParentObject);
+                        Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
                     }
                 }
                 Debug.Divider(4, "-", Count: 25, Indent: 2);
@@ -208,58 +197,31 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnRegenerateDefaultEquipment)}(body)");
-            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
-            if (body != null)
-                ProcessNaturalEquipment(body);
-
-            Debug.Entry(4, $"* base.{nameof(OnRegenerateDefaultEquipment)}(body)", Indent: 1);
-            Debug.Footer(4, 
-                $"{typeof(T).Name}", 
-                $"{nameof(OnRegenerateDefaultEquipment)}(body: {ParentObject.Blueprint})");
-
             base.OnRegenerateDefaultEquipment(body);
         }
         public override void OnDecorateDefaultEquipment(Body body)
         {
+            base.OnDecorateDefaultEquipment(body);
+        }
+        public virtual void OnBodyPartsUpdated(Body body)
+        {
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnDecorateDefaultEquipment)}(body)");
+            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnBodyPartsUpdated)}(body)");
             Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body != null)
                 ProcessNaturalEquipment(body);
 
-            Debug.Entry(4, $"* base.{nameof(OnDecorateDefaultEquipment)}(body)", Indent: 1);
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnDecorateDefaultEquipment)}(body: {ParentObject.Blueprint})");
-            base.OnDecorateDefaultEquipment(body);
+                $"{nameof(OnBodyPartsUpdated)}(body: {ParentObject.Blueprint})");
         }
 
         public override bool Unmutate(GameObject GO)
         {
             return base.Unmutate(GO);
-        }
-        public override void AfterUnmutate(GameObject GO)
-        {
-            UnprocessNaturalEquipment(GO.Body);
-
-            GO.GetPart<Mutations>().ActiveMutationList.Vomit(4, $"{GO.Blueprint}'s Active Mutations", Indent: 3);
-            foreach (BaseMutation mutation in GO.GetPart<Mutations>().ActiveMutationList)
-            {
-                if (mutation.GetMutationClass() == GetMutationClass()) continue;
-                BaseManagedDefaultEquipmentMutation<T> castMutation = mutation as BaseManagedDefaultEquipmentMutation<T>;
-                if (castMutation?.NaturalEquipmentMod != null || castMutation?.NaturalEquipmentMods != null && castMutation.NaturalEquipmentMods.IsNullOrEmpty()) continue;
-                mutation.ChangeLevel(mutation.Level);
-            }
-
-            base.AfterUnmutate(GO);
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -289,6 +251,18 @@ namespace XRL.World.Parts.Mutation
                 }
             }
             return base.FireEvent(E);
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == BodyPartsUpdatedEvent.ID;
+        }
+
+        public virtual bool HandEvent(BodyPartsUpdatedEvent E)
+        {
+            OnBodyPartsUpdated(E.Object.Body);
+            return base.HandleEvent(E);
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

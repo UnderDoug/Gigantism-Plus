@@ -32,8 +32,8 @@ namespace HNPS_GigantismPlus.Harmony
                 managed.HasGigantism = actor.HasPart<GigantismPlus>();
                 managed.HasElongated = actor.HasPart<ElongatedPaws>();
                 managed.HasCrystallinity = actor.HasPartDescendedFrom<Crystallinity>();
-                managed.NaturalWeaponSubpart.Managed = false;
-                managed.UpdateNaturalWeaponSubpart(managed.NaturalWeaponSubpart, managed.Level);
+                managed.NaturalEquipmentMod.Managed = false;
+                managed.UpdateNaturalWeaponSubpart(managed.NaturalEquipmentMod, managed.Level);
                 managed.OnRegenerateDefaultEquipment(body);
                 managed.OnDecorateDefaultEquipment(body);
             }

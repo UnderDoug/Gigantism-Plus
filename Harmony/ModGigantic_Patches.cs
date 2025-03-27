@@ -32,7 +32,7 @@ namespace HNPS_GigantismPlus.Harmony
                 // possibly due to the item being displayed in the UI (bottom right)
                 // Any form of output here will completely clog up the logs.
 
-                E.DB.SizeAdjective = Adjective.MaybeColor("gigantic");
+                E.DB.SizeAdjective = Adjective.OptionalColorGigantic(Colorfulness);
             }
         }
 
@@ -41,27 +41,14 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(ModGigantic.ApplyModification))]
         static void ApplyModification_AdditionalEffects_Postfix(ModGigantic __instance, GameObject Object)
         {
-            LightSource lightSource = Object.GetPart<LightSource>();
-            if (lightSource != null)
-            {
-                lightSource.Radius *= 2;
-            }
-            Backpack backpack = Object.GetPart<Backpack>();
-            if (backpack != null)
-            {
-                backpack.WeightWhenWorn = (int)(backpack.WeightWhenWorn * 2.5f);
-            }
-            Armor Armor = Object.GetPart<Armor>();
-            if (Armor != null && Armor.CarryBonus > 0)
-            {
-                Armor.CarryBonus = (int)(Armor.CarryBonus * 1.25f);
-            }
+            ModGigantic @this = __instance;
+            AfterModGiganticAppliedEvent.Send(Object, @this);
         }
 
         // overwrites the entire GetDescrption method (it's not super to target specific locations throughout) to include the above additions
         [HarmonyPrefix]
         [HarmonyPatch(nameof(ModGigantic.GetDescription))]
-        public static bool GetDescription_AdditionalEffects_Prefix(ref int Tier, ref GameObject Object, ref string __Result, ref ModGigantic __Instance)
+        public static bool GetDescription_AdditionalEffects_Prefix(ref int Tier, ref GameObject Object, ref string __Result, ref ModGigantic __instance)
         {
             if (Object == null)
             {
@@ -69,7 +56,7 @@ namespace HNPS_GigantismPlus.Harmony
                 return true;
             }
 
-            ModGigantic @this = __Instance;
+            ModGigantic @this = __instance;
             string objectNoun = "item";
             List<List<string>> weaponDescriptions = new List<List<string>>();
             List<List<string>> generalDescriptions = new List<List<string>>();
@@ -138,13 +125,9 @@ namespace HNPS_GigantismPlus.Harmony
                 {
                     objectNoun = Object.HasPart<Armor>() ? "armor" : "shield";
                 }
-
-                if (Object.GetPart<Armor>().CarryBonus > 0)
-                {
-                    generalDescriptions.Add(new List<string> { "have", "a quarter more carry capcity" });
-                }
                 // end addition
 
+                // moved duplicate code to isDefaultBehaviorOrFloatingHandler
             }
             // end adjustment
 
@@ -167,17 +150,6 @@ namespace HNPS_GigantismPlus.Harmony
             }
 
             // start addition
-            if (Object.HasPart<Backpack>())
-            {
-                generalDescriptions.Add(new List<string> { "support", "twice and a half as much weight" });
-            }
-            if (Object.HasPart<LightSource>())
-            {
-                generalDescriptions.Add(new List<string> { "illuminate", "twice as far" });
-            }
-            // end addition
-
-            // start addition
             BeforeDescribeModGiganticEvent.Send(Object, @this, objectNoun, generalDescriptions, weaponDescriptions);
             // end addition
 
@@ -190,7 +162,7 @@ namespace HNPS_GigantismPlus.Harmony
                 }
 
                 // added colour to output
-                __Result = "Gigantic".OptionalColor("gigantic", "w", Colorfulness) + ": " + (Object.IsPlural ? ("These " + Grammar.Pluralize(objectNoun)) : ("This " + objectNoun)) + " " + Grammar.MakeAndList(processedGeneralDescription) + ".";
+                __Result = "Gigantic".OptionalColorGigantic(Colorfulness) + ": " + (Object.IsPlural ? ("These " + Grammar.Pluralize(objectNoun)) : ("This " + objectNoun)) + " " + Grammar.MakeAndList(processedGeneralDescription) + ".";
                 return false;
             }
             List<string> processedCombinedWeaponDescription = new();
@@ -205,7 +177,7 @@ namespace HNPS_GigantismPlus.Harmony
             }
 
             // added colour to output
-            __Result = "Gigantic".OptionalColor("gigantic", "w", Colorfulness) + ": " + (Object.IsPlural ? ("These " + Grammar.Pluralize(objectNoun)) : ("This " + objectNoun)) + " " + Grammar.MakeAndList(processedCombinedWeaponDescription) + ". " + Grammar.MakeAndList(processedCombinedGeneralDescription) + ".";
+            __Result = "Gigantic".OptionalColorGigantic(Colorfulness) + ": " + (Object.IsPlural ? ("These " + Grammar.Pluralize(objectNoun)) : ("This " + objectNoun)) + " " + Grammar.MakeAndList(processedCombinedWeaponDescription) + ". " + Grammar.MakeAndList(processedCombinedGeneralDescription) + ".";
             return false;
         }
         // the below is included to assist the above. The original method is private.

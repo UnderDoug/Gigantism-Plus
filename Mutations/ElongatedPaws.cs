@@ -5,6 +5,7 @@ using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
+using static XRL.World.Parts.NaturalEquipmentManager;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -21,28 +22,37 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
-            NaturalEquipmentMod = new()
+            ModNaturalEquipment<ElongatedPaws> ElongatedPaw = new()
             {
-                ParentPart = this,
-                Level = Level,
-                CosmeticOnly = false,
-                Type = "Hand",
-                DamageDieSize = 3,
+                AssigningPart = this,
+                BodyPartType = "Hand",
+
                 ModPriority = 20,
-                Adjective = ("elongated", 20),
+                DescriptionPriority = 20,
+
+                Adjective = "elongated",
                 AdjectiveColor = "giant",
                 AdjectiveColorFallback = "w",
-                Noun = "paw",
-                Skill = "ShortBlades",
-                Stat = "Strength",
-                Tile = "NaturalWeapons/ElongatedPaw.png",
-                ColorString = "&x",
-                DetailColor = "z",
-                SecondColorString = "&X",
-                SecondDetailColor = "Z",
-                SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"
+
+                Adjustments = new(),
+
+                AddedStringProps = new()
+                {
+                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
+                },
             };
+            ElongatedPaw.AddAdjustment(GAMEOBJECT, "Skill", "ShortBlades");
+            ElongatedPaw.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+
+            ElongatedPaw.AddAdjustment(RENDER, "DisplayName", "paw", true);
+
+            ElongatedPaw.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
+            ElongatedPaw.AddAdjustment(RENDER, "ColorString", "&x", true);
+            ElongatedPaw.AddAdjustment(RENDER, "TileColor", "&x", true);
+            ElongatedPaw.AddAdjustment(RENDER, "DetailColor", "z", true);
+
+            NaturalEquipmentMods.Add(ElongatedPaw.BodyPartType, ElongatedPaw);
         }
 
         private bool _HasGigantism = false;
@@ -90,7 +100,7 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public override int GetNaturalWeaponDamageDieSize(NaturalEquipmentSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
             int dieSize = 0;
             
@@ -100,9 +110,9 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(NaturalEquipmentSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponPenBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
-            return (int)Math.Floor(StrengthModifier / 2.0);
+            return (int)Math.Floor(AgilityModifier / 2.0);
         }
 
         public override bool CanLevel() { return false; }
@@ -203,9 +213,9 @@ namespace XRL.World.Parts.Mutation
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
             elongatedPaws.NaturalEquipmentMods = new();
-            foreach ((_, NaturalEquipmentSubpart<ElongatedPaws> subpart) in NaturalEquipmentMods)
+            foreach ((_, ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                elongatedPaws.NaturalEquipmentMods.Add(subpart.Type, new(subpart, elongatedPaws));
+                elongatedPaws.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, elongatedPaws));
             }
             elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
             return elongatedPaws;

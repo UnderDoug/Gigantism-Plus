@@ -12,7 +12,7 @@ public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefa
 
     public NaturalEquipmentManager Manager;
 
-    public BodyPart Part;
+    public BodyPart BodyPart;
 
     public override int GetCascadeLevel()
     {
@@ -29,28 +29,28 @@ public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefa
         base.Reset();
         Object = null;
         Manager = null;
-        Part = null;
+        BodyPart = null;
     }
 
-    public static void Send(GameObject Object, NaturalEquipmentManager Manager,  BodyPart Part)
+    public static void Send(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
     {
         bool flag = true;
-        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeManageDefaultEquipmentEvent"))
-        {
-            Event @event = Event.New("BeforeManageDefaultEquipmentEvent");
-            @event.SetParameter("Object", Object);
-            @event.SetParameter("Manager", Manager);
-            @event.SetParameter("Body", Part);
-            flag = (Object.FireEvent(@event) || Part.FireEvent(@event));
-        }
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
             BeforeManageDefaultEquipmentEvent E = FromPool();
             E.Object = Object;
             E.Manager = Manager;
-            E.Part = Part;
-            Object.HandleEvent(E);
-            Part.HandleEvent(E);
+            E.BodyPart = BodyPart;
+            flag = BodyPart.HandleEvent(E) || Object.HandleEvent(E);
+        }
+        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeManageDefaultEquipmentEvent"))
+        {
+            Event @event = Event.New("BeforeManageDefaultEquipmentEvent");
+            @event.SetParameter("Object", Object);
+            @event.SetParameter("Manager", Manager);
+            @event.SetParameter("BodyPart", BodyPart);
+            BodyPart.FireEvent(@event);
+            Object.FireEvent(@event);
         }
     }
 }

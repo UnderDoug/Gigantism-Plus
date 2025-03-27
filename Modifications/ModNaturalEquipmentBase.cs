@@ -6,6 +6,7 @@ using XRL.World.Anatomy;
 using static XRL.World.Statistic;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts
 {public abstract class ModNaturalEquipmentBase : IMeleeModification
@@ -146,7 +147,17 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public virtual string GetAdjective()
+        {
+            return Adjective;
+        }
+        public virtual string GetColoredAdjective()
+        {
+            return Adjective.OptionalColor(AdjectiveColor, AdjectiveColorFallback, Colorfulness);
+        }
+
         public abstract string GetInstanceDescription();
+
         public virtual int GetDescriptionPriority()
         {
             return DescriptionPriority;

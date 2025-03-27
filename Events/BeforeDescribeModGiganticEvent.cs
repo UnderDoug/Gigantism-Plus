@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using XRL;
 using XRL.World;
-using XRL.World.Anatomy;
 using XRL.World.Parts;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
@@ -11,7 +10,7 @@ public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGi
 
     public GameObject Object;
 
-    public ModGigantic ModPart;
+    public ModGigantic Modification;
 
     public string ObjectNoun;
 
@@ -34,29 +33,29 @@ public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGi
         base.Reset();
         Object = null;
         ObjectNoun = null;
-        ModPart = null;
+        Modification = null;
         WeaponDescriptions = null;
         GeneralDescriptions = null;
     }
 
-    public static void Send(GameObject Object, ModGigantic ModPart, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
+    public static void Send(GameObject Object, ModGigantic Modification, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
     {
         bool flag = true;
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
             BeforeDescribeModGiganticEvent E = FromPool();
             E.Object = Object;
-            E.ModPart = ModPart;
+            E.Modification = Modification;
             E.ObjectNoun = ObjectNoun;
             E.WeaponDescriptions = WeaponDescriptions;
             E.GeneralDescriptions = GeneralDescriptions;
-            flag = (Object.HandleEvent(E) || The.Game.HandleEvent(E));
+            flag = The.Game.HandleEvent(E) || Object.HandleEvent(E);
         }
         if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeDescribeModGiganticEvent"))
         {
             Event @event = Event.New("BeforeDescribeModGiganticEvent");
             @event.SetParameter("Object", Object);
-            @event.SetParameter("ModPart", ModPart);
+            @event.SetParameter("ModPart", Modification);
             @event.SetParameter("ObjectNoun", ObjectNoun);
             @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
             @event.SetParameter("GeneralDescriptions", GeneralDescriptions);

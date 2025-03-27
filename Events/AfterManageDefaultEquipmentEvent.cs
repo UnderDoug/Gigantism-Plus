@@ -3,10 +3,10 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
 
-[GameEvent(Cascade = 17, Cache = Cache.Pool)]
+[GameEvent(Cascade = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaultEquipmentEvent>
 {
-    public new static readonly int CascadeLevel = 17;
+    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON;
 
     public GameObject Object;
 
@@ -41,7 +41,7 @@ public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaul
             @event.SetParameter("Object", Object);
             @event.SetParameter("Manager", Manager);
             @event.SetParameter("Body", Part);
-            flag = Object.FireEvent(@event);
+            flag = (Object.FireEvent(@event) || Part.FireEvent(@event));
         }
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
@@ -49,7 +49,8 @@ public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaul
             afterManageDefaultEquipmentEvent.Object = Object;
             afterManageDefaultEquipmentEvent.Manager = Manager;
             afterManageDefaultEquipmentEvent.Part = Part;
-            flag = Object.HandleEvent(afterManageDefaultEquipmentEvent);
+            Object.HandleEvent(afterManageDefaultEquipmentEvent);
+            Part.HandleEvent(afterManageDefaultEquipmentEvent);
         }
     }
 }

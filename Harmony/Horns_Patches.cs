@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using XRL.World;
+using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
 namespace HNPS_GigantismPlus.Harmony
@@ -17,6 +15,17 @@ namespace HNPS_GigantismPlus.Harmony
             Force = true;
             ___HornsObject = GameObject.Create(___Variant);
             return true;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(nameof(Horns.RegrowHorns))]
+        static void RegrowHorns_MaxStrengthBonus_Postfix(ref GameObject ___HornsObject)
+        {
+            MeleeWeapon HornsWeapon = ___HornsObject.GetPart<MeleeWeapon>();
+            if (HornsWeapon != null)
+            {
+                HornsWeapon.MaxStrengthBonus = MeleeWeapon.BONUS_CAP_UNLIMITED;
+            }
         }
     }
 }

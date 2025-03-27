@@ -42,16 +42,6 @@ public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGi
     public static void Send(GameObject Object, ModGigantic ModPart, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
     {
         bool flag = true;
-        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeDescribeModGiganticEvent"))
-        {
-            Event @event = Event.New("BeforeDescribeModGiganticEvent");
-            @event.SetParameter("Object", Object);
-            @event.SetParameter("ModPart", ModPart);
-            @event.SetParameter("ObjectNoun", ObjectNoun);
-            @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
-            @event.SetParameter("GeneralDescriptions", GeneralDescriptions);
-            flag = Object.FireEvent(@event);
-        }
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
             BeforeDescribeModGiganticEvent E = FromPool();
@@ -60,8 +50,17 @@ public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGi
             E.ObjectNoun = ObjectNoun;
             E.WeaponDescriptions = WeaponDescriptions;
             E.GeneralDescriptions = GeneralDescriptions;
-            Object.HandleEvent(E);
-            The.Game.HandleEvent(E);
+            flag = (Object.HandleEvent(E) || The.Game.HandleEvent(E));
+        }
+        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeDescribeModGiganticEvent"))
+        {
+            Event @event = Event.New("BeforeDescribeModGiganticEvent");
+            @event.SetParameter("Object", Object);
+            @event.SetParameter("ModPart", ModPart);
+            @event.SetParameter("ObjectNoun", ObjectNoun);
+            @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
+            @event.SetParameter("GeneralDescriptions", GeneralDescriptions);
+            Object.FireEvent(@event);
         }
     }
 }

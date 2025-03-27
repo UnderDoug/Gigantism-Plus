@@ -54,13 +54,14 @@ public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGi
         }
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
-            BeforeDescribeModGiganticEvent beforeDescribeModGiganticEvent = FromPool();
-            beforeDescribeModGiganticEvent.Object = Object;
-            beforeDescribeModGiganticEvent.ModPart = ModPart;
-            beforeDescribeModGiganticEvent.ObjectNoun = ObjectNoun;
-            beforeDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions;
-            beforeDescribeModGiganticEvent.GeneralDescriptions = GeneralDescriptions;
-            Object.HandleEvent(beforeDescribeModGiganticEvent);
+            BeforeDescribeModGiganticEvent E = FromPool();
+            E.Object = Object;
+            E.ModPart = ModPart;
+            E.ObjectNoun = ObjectNoun;
+            E.WeaponDescriptions = WeaponDescriptions;
+            E.GeneralDescriptions = GeneralDescriptions;
+            Object.HandleEvent(E);
+            The.Game.HandleEvent(E);
         }
     }
 }

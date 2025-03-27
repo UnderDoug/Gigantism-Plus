@@ -45,12 +45,12 @@ public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefa
         }
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
-            BeforeManageDefaultEquipmentEvent beforeManageDefaultEquipmentEvent = FromPool();
-            beforeManageDefaultEquipmentEvent.Object = Object;
-            beforeManageDefaultEquipmentEvent.Manager = Manager;
-            beforeManageDefaultEquipmentEvent.Part = Part;
-            Object.HandleEvent(beforeManageDefaultEquipmentEvent);
-            Part.HandleEvent(beforeManageDefaultEquipmentEvent);
+            BeforeManageDefaultEquipmentEvent E = FromPool();
+            E.Object = Object;
+            E.Manager = Manager;
+            E.Part = Part;
+            Object.HandleEvent(E);
+            Part.HandleEvent(E);
         }
     }
 }

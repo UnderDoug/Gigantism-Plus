@@ -45,12 +45,12 @@ public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaul
         }
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
-            AfterManageDefaultEquipmentEvent afterManageDefaultEquipmentEvent = FromPool();
-            afterManageDefaultEquipmentEvent.Object = Object;
-            afterManageDefaultEquipmentEvent.Manager = Manager;
-            afterManageDefaultEquipmentEvent.Part = Part;
-            Object.HandleEvent(afterManageDefaultEquipmentEvent);
-            Part.HandleEvent(afterManageDefaultEquipmentEvent);
+            AfterManageDefaultEquipmentEvent E = FromPool();
+            E.Object = Object;
+            E.Manager = Manager;
+            E.Part = Part;
+            Object.HandleEvent(E);
+            Part.HandleEvent(E);
         }
     }
 }

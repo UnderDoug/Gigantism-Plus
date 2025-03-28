@@ -5,7 +5,6 @@ using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
-using static XRL.World.Parts.NaturalEquipmentManager;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -22,7 +21,7 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
-            ModNaturalEquipment<ElongatedPaws> ElongatedPaw = new()
+            NaturalEquipmentMod = new ModElongatedNaturalWeapon()
             {
                 AssigningPart = this,
                 BodyPartType = "Hand",
@@ -42,17 +41,15 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
                 },
             };
-            ElongatedPaw.AddAdjustment(GAMEOBJECT, "Skill", "ShortBlades");
-            ElongatedPaw.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Skill", "ShortBlades");
+            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
 
-            ElongatedPaw.AddAdjustment(RENDER, "DisplayName", "paw", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
 
-            ElongatedPaw.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
-            ElongatedPaw.AddAdjustment(RENDER, "ColorString", "&x", true);
-            ElongatedPaw.AddAdjustment(RENDER, "TileColor", "&x", true);
-            ElongatedPaw.AddAdjustment(RENDER, "DetailColor", "z", true);
-
-            NaturalEquipmentMods.Add(ElongatedPaw.BodyPartType, ElongatedPaw);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "z", true);
         }
 
         private bool _HasGigantism = false;
@@ -122,9 +119,9 @@ namespace XRL.World.Parts.Mutation
         public override string GetDescription()
         {
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
-                 + "You have {{giant|elongated paws}}, which are unusually large and end in spindly fingers.\n"
-                 + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons {{gigantic|a size bigger}} than you are as though they were your size."
-                 + "\n\nYour {{giant|elongated paws}} count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|(StrMod/2)}}"
+                 + "You have " + "elongated paws".OptionalColorGiant(Colorfulness) + ", which are unusually large and end in spindly fingers.\n"
+                 + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons " + "size bigger".OptionalColorGiant(Colorfulness) + " than you are as though they were your size."
+                 + "\n\nYour " + "elongated paws".OptionalColorGiant(Colorfulness) + " count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|(StrMod/2)}}"
                  + "\n\n+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 

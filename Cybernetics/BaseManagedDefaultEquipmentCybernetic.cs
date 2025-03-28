@@ -17,6 +17,7 @@ namespace XRL.World.Parts
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+        public int Level { get; set; }
 
         private GameObject _implantee = null;
         public GameObject Implantee
@@ -40,18 +41,19 @@ namespace XRL.World.Parts
 
         public BaseManagedDefaultEquipmentCybernetic()
         {
+            Level = 1;
             NaturalEquipmentMods = new();
         }
-        
+
         // Takes an existing NaturalEquipmentMods Dictionary
         public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, T NewParent)
             : this()
         {
             Dictionary<string, ModNaturalEquipment<T>> NewNaturalEquipmentMods = new();
-            foreach ((string Part, ModNaturalEquipment<T> Subpart) in naturalEquipmentMods)
+            foreach ((string BodyPartType, ModNaturalEquipment<T> NaturalEquipmentMod) in naturalEquipmentMods)
             {
-                ModNaturalEquipment<T> subpart = new(Subpart, NewParent);
-                NewNaturalEquipmentMods.Add(Part, subpart);
+                ModNaturalEquipment<T> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+                NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
             }
             NaturalEquipmentMods = NewNaturalEquipmentMods;
         }
@@ -65,7 +67,7 @@ namespace XRL.World.Parts
         public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, ModNaturalEquipment<T> naturalEquipmentMod, T NewParent)
             : this(naturalEquipmentMods, NewParent)
         {
-            NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
+            NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
@@ -186,16 +188,21 @@ namespace XRL.World.Parts
                     if (naturalEquipmentMod == null) continue;
 
                     Debug.Entry(4, $"modNaturalWeapon: {naturalEquipmentMod?.Name}", Indent: 3);
-
                     GameObject equipment = bodyPart.DefaultBehavior ?? bodyPart.Equipped;
-                    if (equipment != null && equipment.TryGetPart(out NaturalEquipmentManager manager))
+                    if (equipment != null && equipment.HasPart<NaturalEquipment>())
                     {
-                        Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
-                        manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                    }
-                    else if (equipment != null)
-                    {
-                        Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
+                        if (equipment.TryGetPart(out NaturalEquipmentManager manager))
+                        {
+                            Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
+                        }
+                        else
+                        {
+                            Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
+                            manager = equipment.AddPart<NaturalEquipmentManager>();
+                        }
+                        manager.WantToManage = true;
+                        ModNaturalEquipment<T> newNaturalEquipmentMod = new(naturalEquipmentMod);
+                        manager.AddNaturalEquipmentMod(newNaturalEquipmentMod);
                     }
                 }
                 Debug.Divider(4, "-", Count: 25, Indent: 2);

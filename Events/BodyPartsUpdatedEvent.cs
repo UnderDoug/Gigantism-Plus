@@ -1,10 +1,11 @@
 ﻿using XRL;
 using XRL.World;
+using HNPS_GigantismPlus;
 
-[GameEvent(Cascade = CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
+[GameEvent(Cascade = CASCADE_DESIRED_OBJECT, Cache = Cache.Pool)]
 public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
 {
-    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
+    public new static readonly int CascadeLevel = CASCADE_DESIRED_OBJECT; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
 
     public GameObject Object;
 
@@ -26,6 +27,7 @@ public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
 
     public static void Send(GameObject Object)
     {
+        Debug.Entry(4, $"{typeof(BodyPartsUpdatedEvent).Name}.{nameof(Send)}(GameObject Object: {Object?.DebugName})", Indent: 0);
         bool flag = true;
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {
@@ -33,9 +35,9 @@ public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
             E.Object = Object;
             flag = Object.HandleEvent(E);
         }
-        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeFireEventOnBodypartsEvent"))
+        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BodyPartsUpdatedEvent"))
         {
-            Event @event = Event.New("BeforeFireEventOnBodypartsEvent");
+            Event @event = Event.New("BodyPartsUpdatedEvent");
             @event.SetParameter("Object", Object);
             Object.FireEvent(@event);
         }

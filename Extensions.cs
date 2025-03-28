@@ -96,7 +96,7 @@ namespace HNPS_GigantismPlus
 
         public static int GetNaturalWeaponModsCount(this GameObject GO)
         {
-            List<ModNaturalEquipmentBase> naturalEquipmentMods = GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>()
+            List<ModNaturalEquipmentBase> naturalEquipmentMods = GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
             return naturalEquipmentMods.Count;
         }
         public static bool HasNaturalWeaponMods(this GameObject GO)
@@ -254,8 +254,12 @@ namespace HNPS_GigantismPlus
         {
             UD_ManagedBurrowingClaws managedBurrowingClaws = new()
             {
-                Level = burrowingClaws.Level
+                Level = burrowingClaws.Level,
+                DigUpActivatedAbilityID = burrowingClaws.DigUpActivatedAbilityID,
+                DigDownActivatedAbilityID = burrowingClaws.DigDownActivatedAbilityID,
+                EnableActivatedAbilityID = burrowingClaws.EnableActivatedAbilityID,
             };
+
 
             return managedBurrowingClaws;
         }
@@ -499,8 +503,8 @@ namespace HNPS_GigantismPlus
 
             // Now equip all items that should be equipped
 
-            Debug.LoopItem(3, "Creature.Brain?.PerformReequip(Silent: true, Initial: true)", Indent: 1);
-            Creature.Brain?.PerformReequip(Silent: true, Initial: true);
+            Debug.Entry(3, "Creature.WantToReequip()", Indent: 1);
+            Creature.WantToReequip();
 
             Debug.Divider(3, Indent: 1);
             Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", Indent: 1);

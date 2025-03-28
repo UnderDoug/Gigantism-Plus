@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using HNPS_GigantismPlus;
+using System.Collections.Generic;
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
@@ -40,6 +41,7 @@ public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGi
 
     public static void Send(GameObject Object, ModGigantic Modification, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
     {
+        Debug.Entry(4, $"{typeof(BeforeDescribeModGiganticEvent).Name}.{nameof(Send)}()", Indent: 0);
         bool flag = true;
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {

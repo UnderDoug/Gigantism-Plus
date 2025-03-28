@@ -2,6 +2,7 @@
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
+using HNPS_GigantismPlus;
 
 [GameEvent(Cascade = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefaultEquipmentEvent>
@@ -34,6 +35,10 @@ public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefa
 
     public static void Send(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
     {
+        Debug.Entry(4, 
+            $"{typeof(BeforeManageDefaultEquipmentEvent).Name}." + 
+            $"{nameof(Send)}(GameObject Object: {Object.ShortDisplayNameStripped}, NaturalEquipmentManager Manager, BodyPart BodyPart: [{BodyPart.ID}:{BodyPart.Type}])",
+            Indent: 0);
         bool flag = true;
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {

@@ -67,9 +67,9 @@ namespace XRL.World.Parts
         public string AdjectiveColor;
         public string AdjectiveColorFallback;
 
-        public List<string> AddedParts;
-        public Dictionary<string, string> AddedStringProps;
-        public Dictionary<string, int> AddedIntProps;
+        public List<string> AddedParts = new();
+        public Dictionary<string, string> AddedStringProps = new();
+        public Dictionary<string, int> AddedIntProps = new();
 
         public ModNaturalEquipmentBase()
         {

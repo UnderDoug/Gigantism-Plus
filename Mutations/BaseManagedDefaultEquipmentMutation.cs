@@ -111,33 +111,32 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
         {
-            // List<string> vomitCats = new() { "Meta", "Damage", "Additions", "Render" };
-            // NaturalEquipmentMod.Vomit(4, "| Before", vomitCats, Indent: 2);
-            Debug.Divider(4, "\u2500", 40, Indent: 2);
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMod: {NaturalEquipmentMod.Name}, int Level: {Level})",
+                Indent: 2);
 
-            //NaturalEquipmentMod.Level = Level;
-            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageDieCount", true, Indent: 3);
-            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageDieSize", true, Indent: 3);
-            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageBonus", true, Indent: 3);
-            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "HitBonus", true, Indent: 3);
-            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "PenBonus", true, Indent: 3);
+            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
-            Debug.Divider(4, "\u2500", 40, Indent: 2);
-            // NaturalEquipmentMod.Vomit(4, "|  After", vomitCats, Indent: 2);
             return true;
         }
         public override bool ChangeLevel(int NewLevel)
         {
+            Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}");
+
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
             }
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+
+            Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}");
             return base.ChangeLevel(NewLevel);
         }
 
@@ -174,16 +173,26 @@ namespace XRL.World.Parts.Mutation
                     if (naturalEquipmentMod == null) continue;
 
                     Debug.Entry(4, $"modNaturalWeapon: {naturalEquipmentMod?.Name}", Indent: 3);
-
                     GameObject equipment = bodyPart.DefaultBehavior ?? bodyPart.Equipped;
-                    if (equipment != null && equipment.TryGetPart(out NaturalEquipmentManager manager))
+                    if (equipment != null && equipment.HasPart<NaturalEquipment>())
                     {
-                        Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
-                        manager.AddNaturalEquipmentMod(naturalEquipmentMod);
+                        if (equipment.TryGetPart(out NaturalEquipmentManager manager))
+                        {
+                            Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
+                        }
+                        else
+                        {
+                            Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
+                            manager = equipment.AddPart<NaturalEquipmentManager>();
+                        }
+                        manager.WantToManage = true;
+                        ModNaturalEquipment<T> newNaturalEquipmentMod = new(naturalEquipmentMod);
+                        manager.AddNaturalEquipmentMod(newNaturalEquipmentMod);
+                        Debug.Entry(4, $"{manager.Name}.WantToManage = {manager.WantToManage}", Indent: 3);
                     }
-                    else if (equipment != null)
+                    else
                     {
-                        Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
+                        Debug.Entry(4, $"equipment: was null or lacked NaturalEquipment part", Indent: 3);
                     }
                 }
                 Debug.Divider(4, "-", Count: 25, Indent: 2);
@@ -212,8 +221,11 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             if (body != null)
+            {
+                Debug.Divider(4, "-", Count: 25, Indent: 1);
                 ProcessNaturalEquipment(body);
-
+                Debug.Divider(4, "-", Count: 25, Indent: 1);
+            }
             Debug.Footer(4,
                 $"{typeof(T).Name}",
                 $"{nameof(OnBodyPartsUpdated)}(body: {ParentObject.Blueprint})");

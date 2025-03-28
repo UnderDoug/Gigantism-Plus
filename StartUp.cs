@@ -11,14 +11,11 @@ using HNPS_GigantismPlus.Events.Handlers;
 
 namespace HNPS_GigantismPlus
 {
-    /*
     [PlayerMutator]
     public class GigantifyStartingLoadout : IPlayerMutator
     {
         public void mutate(GameObject player)
         {
-            AfterModGiganticAppliedHandler.Register();
-
             GameObject GO = player;
             Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
 
@@ -27,7 +24,6 @@ namespace HNPS_GigantismPlus
             Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
         }
     }
-    */
 
     public class Gigantic_ModEntry_Adjustments
     {
@@ -173,10 +169,11 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnPlayerLoad)}", 
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
 
-
             Debug.Entry(3, $"Registering XRLGame Event Handlers", Indent: 1);
             AfterModGiganticAppliedHandler.Register();
             BeforeDescribeModGiganticHandler.Register();
+            AfterObjectCreatedHandler.Register();
+            Debug.Entry(3, $"Event Handlers Registered", Indent: 1);
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -232,6 +229,8 @@ namespace HNPS_GigantismPlus
             Debug.Entry(3, $"Registering XRLGame Event Handlers", Indent: 1);
             AfterModGiganticAppliedHandler.Register();
             BeforeDescribeModGiganticHandler.Register();
+            AfterObjectCreatedHandler.Register();
+            Debug.Entry(3, $"Event Handlers Registered", Indent: 1);
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);

@@ -25,7 +25,7 @@ namespace HNPS_GigantismPlus
             foreach (BodyPart part in Object.Body.LoopParts())
             {
                 Debug.Divider(4, "-", Count: 25, Indent: 1);
-                Debug.Entry(4, $"part", $"{part.Description} [Type: {part.Type}, ID: {part.ID}]", Indent: 1);
+                Debug.Entry(4, $"part", $"{part.Description} [{part.ID}:{part.Type}]", Indent: 1);
 
                 GameObject cybernetics = part.Cybernetics;
                 if (cybernetics != null) Debug.LoopItem(4, $"cybernetics", $"{cybernetics.ShortDisplayName}", Indent: 2);

@@ -20,6 +20,7 @@ namespace HNPS_GigantismPlus.Events.Handlers
 
         public bool HandleEvent(AfterModGiganticAppliedEvent E)
         {
+            Debug.Entry(4, $"{typeof(AfterModGiganticAppliedHandler).Name}.{nameof(HandleEvent)}({typeof(AfterModGiganticAppliedEvent).Name} E)", Indent: 0);
             GameObject Object = E.Object;
 
             LightSource lightSource = Object.GetPart<LightSource>();

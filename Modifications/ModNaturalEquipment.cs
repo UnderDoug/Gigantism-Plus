@@ -17,7 +17,7 @@ namespace XRL.World.Parts
 
         public T AssigningPart
         {
-            get => _assigningPart ??= ParentObject?.GetManagedNaturalEquipmentCompatiblePart<T>();
+            get => _assigningPart ??= ParentObject?.Equipped?.GetManagedNaturalEquipmentCompatiblePart<T>();
             set => _assigningPart = null;
         }
 
@@ -54,8 +54,6 @@ namespace XRL.World.Parts
             Adjustment item = adjustment;
 
             Adjustments ??= new List<Adjustment>(1);
-
-            Debug.Entry(4, $"\u263C New NaturalEquipment Adjustmnt: {typeof(T).Name} wants to adjust {ParentObject.DisplayNameOnly}'s {item.Target}.{item.Field} to {item.Value} with a priority of {item.Priority}", Indent: 0);
 
             Adjustments.Add(item);
             return guid;
@@ -133,7 +131,6 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);
-            Debug.Entry(4, "? if (Object.TryGetPart(out NaturalWeaponDescriber NaturalWeaponDescriber))", Indent: 4);
             
             ApplyPartAndPropChanges(Object);
 
@@ -149,7 +146,6 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-
             if (!E.Object.HasProperName)
             {
                 E.AddAdjective(GetColoredAdjective(), ModPriority);

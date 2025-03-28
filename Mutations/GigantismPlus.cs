@@ -10,7 +10,6 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Extensions;
-using static XRL.World.Parts.NaturalEquipmentManager;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -211,12 +210,14 @@ namespace XRL.World.Parts.Mutation
         public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             if (NaturalWeaponSubpart.BodyPartType == "Head") return 2;
-            return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
+            if (NaturalWeaponSubpart.BodyPartType == "Hand") return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
+            return 0;
         }
         public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             if (NaturalWeaponSubpart.BodyPartType == "Head") return 5;
-            return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
+            if (NaturalWeaponSubpart.BodyPartType == "Hand") return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
+            return 0;
         }
         public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {

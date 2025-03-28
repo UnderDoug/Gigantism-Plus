@@ -8,10 +8,12 @@ using XRL.World.Parts.Mutation;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalEquipment<T> where T : IPart, IManagedDefaultNaturalEquipment<T>, new ()
+    public interface IManagedDefaultNaturalEquipment<T> 
+        where T : IPart, IManagedDefaultNaturalEquipment<T>, new ()
     {
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+        public int Level { get; set; }
 
         public abstract bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts);
 
@@ -36,11 +38,6 @@ namespace XRL.World
         public abstract bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
         public abstract bool ProcessNaturalEquipment(Body body);
-
-        public virtual bool WantEvent(int ID, int cascade)
-        {
-            return ID == BodyPartsUpdatedEvent.ID;
-        }
 
         public abstract bool HandEvent(BodyPartsUpdatedEvent E);
         public abstract void OnBodyPartsUpdated(Body body);

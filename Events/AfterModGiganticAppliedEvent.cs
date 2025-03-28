@@ -1,6 +1,7 @@
 ﻿using XRL;
 using XRL.World;
 using XRL.World.Parts;
+using HNPS_GigantismPlus;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
 public class AfterModGiganticAppliedEvent : ModPooledEvent<AfterModGiganticAppliedEvent>
@@ -30,6 +31,7 @@ public class AfterModGiganticAppliedEvent : ModPooledEvent<AfterModGiganticAppli
 
     public static void Send(GameObject Object, ModGigantic Modification)
     {
+        Debug.Entry(4, $"{typeof(AfterModGiganticAppliedEvent).Name}.{nameof(Send)}(GameObject Object: {Object.ShortDisplayNameStripped}, ModGigantic Modification)", Indent: 0);
         bool flag = true;
         if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
         {

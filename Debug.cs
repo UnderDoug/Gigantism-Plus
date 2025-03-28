@@ -215,6 +215,7 @@ namespace HNPS_GigantismPlus
             return MeleeWeapon;
         }
 
+        /*
         public static NaturalEquipmentSubpart<T> Vomit<T>(this NaturalEquipmentSubpart<T> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
             where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
@@ -323,6 +324,7 @@ namespace HNPS_GigantismPlus
             }
             return Subpart;
         }
+        */
         public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)
         {
             string Output = Label != "" ? $"{Label}: {@string}" : @string;

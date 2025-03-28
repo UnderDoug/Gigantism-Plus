@@ -6,7 +6,7 @@ using System.Text;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
+    public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
     {
         public ModBurrowingNaturalWeapon()
         {
@@ -23,8 +23,8 @@ namespace XRL.World.Parts
 
             Object.RequirePart<BurrowingClawsProperties>();
             BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
-            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
-            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
+            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(AssigningPart.Level);
 
         }
         public override bool WantEvent(int ID, int cascade)
@@ -35,18 +35,15 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            if (!E.Object.HasProperName)
-            {
-                E.AddAdjective(NaturalEquipmentSubpart.GetColoredAdjective(), NaturalEquipmentSubpart.AdjectivePriority);
-            }
             return base.HandleEvent(E);
         }
 
         public override string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalEquipmentSubpart.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
+            int Level = AssigningPart.Level;
             string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
             int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";

@@ -17,6 +17,11 @@ namespace HNPS_GigantismPlus
 {
     public static class Utils
     {
+        public const string GAMEOBJECT = "GameObject";
+        public const string RENDER = "Render";
+        public const string MELEEWEAPON = "MeleeWeapon";
+        public const string ARMOR = "Armor";
+
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]
         private static Dictionary<string, string> _TilePathCache = new();
         private static readonly List<string> TileSubfolders = new()

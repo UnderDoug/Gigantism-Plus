@@ -5,7 +5,7 @@ using XRL.World.Parts.Mutation;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
+    public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
     {
         public ModElongatedNaturalWeapon()
         {
@@ -18,15 +18,9 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            /*
-            ApplyGenericChanges(Object, NaturalEquipmentMod, GetInstanceDescription());
-
-            ApplyPriorityChanges(Object, NaturalEquipmentMod);
-
-            ApplyPartAndPropChanges(Object, NaturalEquipmentMod);
-            */
             base.ApplyModification(Object);
         }
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -35,17 +29,13 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            if (!E.Object.HasProperName)
-            {
-                E.AddAdjective(NaturalEquipmentSubpart.GetColoredAdjective(), NaturalEquipmentSubpart.AdjectivePriority);
-            }
             return base.HandleEvent(E);
         }
 
         public override string GetInstanceDescription()
         {
             string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalEquipmentSubpart.GetColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             int dieSizeIncrease = 2 + GetDamageDieSize();
             int damageBonusIncrease = 1 + GetDamageBonus();

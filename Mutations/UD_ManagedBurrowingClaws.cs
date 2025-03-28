@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using XRL.Language;
 using XRL.Rules;
+using XRL.World.Parts;
 using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
-using  static HNPS_GigantismPlus.Options;
-using XRL.World.Parts;
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -70,36 +71,63 @@ namespace XRL.World.Parts.Mutation
         {
             NaturalEquipmentMods = new();
 
-            NaturalEquipmentMod = new()
+            NaturalEquipmentMod = new ModBurrowingNaturalWeapon()
             {
-                ParentPart = this,
-                Level = Level,
-                CosmeticOnly = false,
-                Type = "Hand",
+                AssigningPart = this,
+                BodyPartType = "Hand",
+
                 ModPriority = 30,
-                Skill = "ShortBlades",
+                DescriptionPriority = 30,
+
                 Adjective = "burrowing",
                 AdjectiveColor = "W",
                 AdjectiveColorFallback = "y",
-                Noun = "claw",
-                Tile = "Creatures/natural-weapon-claw.bmp",
-                ColorString = "&w",
-                DetailColor = "W",
-                SecondColorString = "&w",
-                SecondDetailColor = "W",
-                SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked",
+
+                Adjustments = new(),
+                
                 AddedParts = new()
                 {
                     "DiggingTool"
-                }
-            };
-        }
+                },
 
-        public UD_ManagedBurrowingClaws(ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalWeaponSubpart, UD_ManagedBurrowingClaws NewParent)
+                AddedStringProps = new()
+                {
+                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" }
+                },
+            };
+            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Skill", "ShortBlades");
+            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "claw", true);
+
+            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "Creatures/natural-weapon-claw.bmp", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&w", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&w", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "W", true);
+        }
+        public UD_ManagedBurrowingClaws(Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentMods, UD_ManagedBurrowingClaws NewParent)
             : this()
         {
-            NaturalEquipmentMod = new(naturalWeaponSubpart, NewParent);
+            Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> NewNaturalEquipmentMods = new();
+            foreach ((string BodyPartType, ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod) in naturalEquipmentMods)
+            {
+                ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+                NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
+            }
+            NaturalEquipmentMods = NewNaturalEquipmentMods;
+        }
+
+        public UD_ManagedBurrowingClaws(ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod, UD_ManagedBurrowingClaws NewParent)
+            : this()
+        {
+            NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
+        }
+
+        public UD_ManagedBurrowingClaws(Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentMods, ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod, UD_ManagedBurrowingClaws NewParent)
+            : this(naturalEquipmentMods, NewParent)
+        {
+            NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, string Parts)
@@ -127,7 +155,7 @@ namespace XRL.World.Parts.Mutation
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalWeaponSubpart, int Level = 1)
         {
-            return NaturalWeaponSubpart.DamageDieCount;
+            return 0;
         }
 
         public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalWeaponSubpart, int Level = 1)
@@ -240,16 +268,21 @@ namespace XRL.World.Parts.Mutation
                     if (naturalEquipmentMod == null) continue;
 
                     Debug.Entry(4, $"modNaturalWeapon: {naturalEquipmentMod?.Name}", Indent: 3);
-
                     GameObject equipment = bodyPart.DefaultBehavior ?? bodyPart.Equipped;
-                    if (equipment != null && equipment.TryGetPart(out NaturalEquipmentManager manager))
+                    if (equipment != null && equipment.HasPart<NaturalEquipment>())
                     {
-                        Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
-                        manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                    }
-                    else if (equipment != null)
-                    {
-                        Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
+                        if (equipment.TryGetPart(out NaturalEquipmentManager manager))
+                        {
+                            Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
+                        }
+                        else
+                        {
+                            Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
+                            manager = equipment.AddPart<NaturalEquipmentManager>();
+                        }
+                        manager.WantToManage = true;
+                        ModNaturalEquipment<UD_ManagedBurrowingClaws> newNaturalEquipmentMod = new(naturalEquipmentMod);
+                        manager.AddNaturalEquipmentMod(newNaturalEquipmentMod);
                     }
                 }
                 Debug.Divider(4, "-", Count: 25, Indent: 2);

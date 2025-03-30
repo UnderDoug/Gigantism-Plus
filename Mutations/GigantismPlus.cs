@@ -136,8 +136,8 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
                 },
             };
-            GiganticFist.AddAdjustment(GAMEOBJECT, "Skill", "Cudgel");
-            GiganticFist.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+            GiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
+            GiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
             GiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", true);
 
@@ -168,7 +168,7 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            GiganticNoggin.AddAdjustment(GAMEOBJECT, "Stat", "Strength", true);
+            GiganticNoggin.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
             GiganticNoggin.AddAdjustment(RENDER, "ColorString", "&x", true);
             GiganticNoggin.AddAdjustment(RENDER, "TileColor", "&x", true);

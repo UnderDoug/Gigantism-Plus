@@ -90,10 +90,10 @@ namespace XRL.World.Parts.Mutation
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalEquipmentMod" + (!Managed ? "Unmanaged" : "");
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        public virtual ModNaturalWeaponBase<E> GetNaturalWeaponMod<E>()
+            where E : IPart, IManagedDefaultNaturalWeapon, new()
         {
-            return GetNaturalEquipmentModName().ConvertToNaturalWeaponModification<T>();
+            return GetNaturalEquipmentModName().ConvertToNaturalWeaponModification<E>();
         }
 
         // Optional: allows you to easily check the presence of another mutation if you wanted to adjust any calculations on that basis

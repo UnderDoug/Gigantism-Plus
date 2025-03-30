@@ -7,7 +7,6 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
-using HNPS_GigantismPlus.Events.Handlers;
 
 namespace HNPS_GigantismPlus
 {
@@ -136,6 +135,8 @@ namespace HNPS_GigantismPlus
     [HasGameBasedStaticCache]
     public static class GigantismPlusGameBasedInitialiser
     {
+        public static bool GameLevelEventsRegistered = false;
+
         [GameBasedCacheInit]
         public static void AdditionalSetup()
         {
@@ -152,7 +153,12 @@ namespace HNPS_GigantismPlus
                 : EnableManagedVanillaMutationsCurrent;
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             ManagedVanillaMutationOptionHandler();
-            
+
+            if (!GameLevelEventsRegistered)
+            {
+                GameLevelEventsRegistered = RegisterGameLevelEventHandlers();
+            }
+
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
                 $"{nameof(AdditionalSetup)}()");
@@ -168,12 +174,6 @@ namespace HNPS_GigantismPlus
             Debug.Header(3, 
                 $"{nameof(GigantismPlusOnPlayerLoad)}", 
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
-
-            Debug.Entry(3, $"Registering XRLGame Event Handlers", Indent: 1);
-            AfterModGiganticAppliedHandler.Register();
-            BeforeDescribeModGiganticHandler.Register();
-            AfterObjectCreatedHandler.Register();
-            Debug.Entry(3, $"Event Handlers Registered", Indent: 1);
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -226,11 +226,10 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",
                 $"{nameof(OnLoadGameCallback)}()");
 
-            Debug.Entry(3, $"Registering XRLGame Event Handlers", Indent: 1);
-            AfterModGiganticAppliedHandler.Register();
-            BeforeDescribeModGiganticHandler.Register();
-            AfterObjectCreatedHandler.Register();
-            Debug.Entry(3, $"Event Handlers Registered", Indent: 1);
+            if (!GigantismPlusGameBasedInitialiser.GameLevelEventsRegistered)
+            {
+                RegisterGameLevelEventHandlers();
+            }
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);

@@ -40,8 +40,8 @@ You cannot wear equipment on your body."
           AugmentTile="NaturalWeapons/GiganticManipulator.png"
           AugmentTileColorString="&amp;c"
           AugmentTileDetailColor="b"
-          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
-          AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           JumpDistanceBonus="0"
           StunningForceLevelFactor="0.5"
           />
@@ -71,8 +71,8 @@ You cannot wear equipment on your body."
           Model="Alpha" 
           AugmentAdjectiveColor="b" 
           AugmentTileDetailColor="b" 
-          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
-          AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
           JumpDistanceBonus="0" 
           StunningForceLevelFactor="0.5" />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
@@ -98,8 +98,8 @@ You cannot wear equipment on your body."
           Model="Delta"
           AugmentAdjectiveColor="K"
           AugmentTileDetailColor="K"
-          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
-          AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           JumpDistanceBonus="1"
           StunningForceLevelFactor="0.67" />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
@@ -124,8 +124,8 @@ You cannot wear equipment on your body."
           Model="Sigma"
           AugmentAdjectiveColor="crysteel"
           AugmentTileDetailColor="G"
-          AugmentedSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_crysteel_swing"
-          AugmentedBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_crysteel_blocked"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_crysteel_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_crysteel_blocked"
           AugmentAddParts="Crysteel"
           AugmentAddProps="Flawless:1"
           AugmentEquipmentFrameColors="KGKG"
@@ -164,6 +164,58 @@ You cannot wear equipment on your body."
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="Zetachrome" />
     <tag Name="Tier" Value="8" />
+  </object>
+
+  <!-- 
+  
+      Modified BaseGame Improvised Weapons 
+      
+  -->
+
+  <object  Name="Item" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+  </object>
+
+  <object  Name="NaturalWeapon" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+    <removetag Name="IsImprovisedMelee" />
+  </object>
+  
+  <object  Name="MeleeWeapon" Load="Merge">
+    <removetag Name="IsImprovisedMelee" />
+  </object>
+  
+  <object  Name="BaseDagger" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="Vibro Dagger" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="Gaslight Dagger" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="BaseThrownWeapon" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="Geomagnetic Disc" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="ThrowingAxe" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="CastNet" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object  Name="BaseStone" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
   </object>
   
   <!-- 

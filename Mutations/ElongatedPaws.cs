@@ -41,8 +41,8 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
                 },
             };
-            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Skill", "ShortBlades");
-            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
             NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
 

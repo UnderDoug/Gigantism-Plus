@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using XRL;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
+using XRL.World.Capabilities;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
@@ -665,22 +667,366 @@ namespace HNPS_GigantismPlus
         // https://stackoverflow.com/a/32184652
         public static bool SetPropertyValue(this object @object, string PropertyName, object Value)
         {
-            PropertyInfo property = @object.GetType().GetProperty(PropertyName);
+            PropertyInfo property = @object?.GetType()?.GetProperty(PropertyName);
+            if (property == null) return false;
             Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
             object safeValue = (Value == null) ? null : Convert.ChangeType(Value, type);
 
             property.SetValue(@object, safeValue, null);
-            return property.GetValue(@object, null) != null;
+            return property?.GetValue(@object, null) != null;
         }
         // https://stackoverflow.com/a/1965659
         public static bool SetFieldValue(this object @object, string FieldName, object Value)
         {
-            FieldInfo field = @object.GetType().GetField(FieldName);
+            FieldInfo field = @object?.GetType()?.GetField(FieldName);
+            if (field == null) return false;
             Type type = Nullable.GetUnderlyingType(field.FieldType) ?? field.FieldType;
             object safeValue = (Value == null) ? null : Convert.ChangeType(Value, type);
 
             field.SetValue(@object, safeValue);
-            return field.GetValue(@object) != null;
+            return field?.GetValue(@object) != null;
+        }
+
+        public static string NearDemonstrative(this GameObject Object)
+        {
+            return Object.IsPlural ? "these" : "this";
+        }
+        public static string FarDemonstrative(this GameObject Object)
+        {
+            return Object.IsPlural ? "those" : "that";
+        }
+
+        public static string GetProcessedItem(this List<string> item, bool second, List<List<string>> items, GameObject obj)
+        {
+            if (item[0] == "")
+            {
+                if (second && item == items[0])
+                {
+                    return obj.It + " " + item[1];
+                }
+                return item[1];
+            }
+            if (item[0] == null)
+            {
+                if (second && item == items[0])
+                {
+                    return obj.Itis + " " + item[1];
+                }
+                if (item != items[0])
+                {
+                    bool flag = true;
+                    foreach (List<string> item2 in items)
+                    {
+                        if (item2[0] != null)
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        return item[1];
+                    }
+                }
+                return obj.GetVerb("are", PrependSpace: false) + " " + item[1];
+            }
+            if (second && item == items[0])
+            {
+                return obj.It + obj.GetVerb(item[0]) + " " + item[1];
+            }
+            return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
+        }
+
+        public static string GetObjectNoun(this GameObject Object)
+        {
+            if (!Object.Understood())
+            {
+                return "artifact";
+            }
+            if (Object.IsCreature)
+            {
+                return "creature";
+            }
+            if (Object.HasPart<CyberneticsBaseItem>())
+            {
+                return "implant";
+            }
+            if (Object.InheritsFrom("Tonic"))
+            {
+                return "tonic";
+            }
+            if (Object.HasPart<Medication>())
+            {
+                return "medication";
+            }
+            if (Object.InheritsFrom("Energy Cell"))
+            {
+                return "energy cell";
+            }
+            if (Object.InheritsFrom("LightSource"))
+            {
+                return "light source";
+            }
+            if (Object.InheritsFrom("Tool"))
+            {
+                return "tool";
+            }
+            if (Object.InheritsFrom("BaseRecoiler"))
+            {
+                return "recoiler";
+            }
+            if (Object.InheritsFrom("BaseNugget"))
+            {
+                return "nugget";
+            }
+            if (Object.InheritsFrom("Gemstone"))
+            {
+                return "gemstone";
+            }
+            if (Object.InheritsFrom("Random Figurine"))
+            {
+                return "figurine";
+            }
+            if (Object.HasPart<Applicator>())
+            {
+                return "applicator";
+            }
+            if (Object.HasPart<Chair>())
+            {
+                return "chair";
+            }
+            if (Object.TryGetPart(out MissileWeapon missileWeapon))
+            {
+                if (missileWeapon.Skill.Contains("Shotgun") 
+                    || Object.InheritsFrom("BaseShotgun") 
+                    || (Object.TryGetPart(out MagazineAmmoLoader loader) && loader.AmmoPart == "AmmoShotgunShell"))
+                {
+                    return "shotgun";
+                }
+                if (Object.InheritsFrom("BaseHeavyWeapon"))
+                {
+                    return "heavy weapon";
+                }
+                if (Object.InheritsFrom("BaseBow"))
+                {
+                    return "bow";
+                }
+                if (Object.InheritsFrom("BaseRifle"))
+                {
+                    return "rifle";
+                }
+                if (Object.InheritsFrom("BasePistol"))
+                {
+                    return "pistol";
+                }
+                return "missile weapon";
+            }
+            if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
+            {
+                if (Object.InheritsFrom("BaseBoulder"))
+                {
+                    return "boulder";
+                }
+                if (Object.InheritsFrom("BaseStone"))
+                {
+                    return "stone";
+                }
+                if (Object.InheritsFrom("Grenade"))
+                {
+                    return "grenade";
+                }
+                if (Object.InheritsFrom("BaseDagger"))
+                {
+                    return "dagger";
+                }
+                return "thrown weapon";
+            }
+            if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
+            {
+                if (Object.HasPart<NaturalEquipmentManager>())
+                {
+                    return Object.Render.DisplayName;
+                }
+                if (Object.InheritsFrom("BaseCudgel"))
+                {
+                    return "cudgel";
+                }
+                if (Object.InheritsFrom("BaseAxe"))
+                {
+                    return "axe";
+                }
+                if (Object.InheritsFrom("BaseLongBlade"))
+                {
+                    return "long blade";
+                }
+                if (Object.InheritsFrom("BaseDagger"))
+                {
+                    return "short blade";
+                }
+                return "weapon";
+            }
+            if (Object.TryGetPart(out Armor armor))
+            {
+                if (!Object.IsPluralIfKnown)
+                {
+                    if (armor.WornOn == "Back")
+                    {
+                        if (Object.Blueprint == "Gas Tumbler")
+                        {
+                            return "tumbler";
+                        }
+                        if (armor.CarryBonus > 0 || Object.Blueprint == "Gyrocopter Backpack" || Object.Blueprint == "SkybearJetpack")
+                        {
+                            return "pack";
+                        }
+                        return "cloak";
+                    }
+                    if (armor.WornOn == "Head")
+                    {
+                        return "helmet";
+                    }
+                    if (armor.WornOn == "Face")
+                    {
+                        if (Object.InheritsFrom("BaseMask"))
+                        {
+                            return "mask";
+                        }
+                    }
+                    if (armor.WornOn == "Body")
+                    {
+                        if (Object.Blueprint.Contains("Plate"))
+                        {
+                            return "plate";
+                        }
+                        if (armor.AV > 2)
+                        {
+                            return "suit";
+                        }
+                        return "vest";
+                    }
+                    if (armor.WornOn == "Arm")
+                    {
+                        if (Object.InheritsFrom("BaseUtilityBracelet"))
+                        {
+                            return "utility bracelet";
+                        }
+                        if (Object.InheritsFrom("BaseBracelet"))
+                        {
+                            return "bracelet";
+                        }
+                        if (Object.InheritsFrom("BaseArmlet"))
+                        {
+                            return "armlet";
+                        }
+                    }
+                    return "armor";
+                }
+                if (armor.WornOn == "Back")
+                {
+                    if (Object.Blueprint == "Mechanical Wings")
+                    {
+                        return "wings";
+                    }
+                }
+                if (armor.WornOn == "Face")
+                {
+                    if (Object.HasPart<Spectacles>())
+                    {
+                        return "spectacle";
+                    }
+                    if (Object.InheritsFrom("BaseEyewear"))
+                    {
+                        return "goggle";
+                    }
+                    if (Object.InheritsFrom("BaseFaceJewelry"))
+                    {
+                        return "jewelry";
+                    }
+                    if (Object.Blueprint == "VISAGE")
+                    {
+                        return "scanner";
+                    }
+                }
+                if (armor.WornOn == "Hands")
+                {
+                    if (Object.HasPart<Metal>())
+                    {
+                        return "gauntlet";
+                    }
+                    return "glove";
+                }
+                if (armor.WornOn == "Feet")
+                {
+                    if (Object.InheritsFrom("BaseBoot"))
+                    {
+                        if (Object.HasPart<Metal>())
+                        {
+                            return "sabaton";
+                        }
+                        return "boot";
+                    }
+                    return "shoe";
+                }
+            }
+            if (Object.HasPart<LiquidVolume>())
+            {
+                return "container";
+            }
+            switch (Scanning.GetScanTypeFor(Object))
+            {
+                case Scanning.Scan.Tech:
+                    return "artifact";
+                case Scanning.Scan.Bio:
+                    return "organism";
+                default:
+                    if (Object.HasPart<Shield>() && !Object.IsPluralIfKnown)
+                    {
+                        return "shield";
+                    }
+                    if (!Object.Takeable)
+                    {
+                        return "object";
+                    }
+                    return "item";
+            }
+        }
+
+        public static bool IsImprovised(this ThrownWeapon ThrownWeapon)
+        {
+            bool hasImprovisedProp =
+                ThrownWeapon.ParentObject.HasTagOrStringProperty("IsImprovisedThrown")
+             && ThrownWeapon.ParentObject.GetStringProperty("IsImprovisedThrown") != "false";
+
+            ThrownWeapon @default = new();
+            return ThrownWeapon.SameAs(@default)
+                || ThrownWeapon.ParentObject.GetIntProperty("IsImprovisedThrown") > 0
+                || hasImprovisedProp;
+        }
+
+        public static bool IsImprovised(this MeleeWeapon MeleeWeapon)
+        {
+            bool isImprovisedButGigantic = MeleeWeapon.ParentObject.HasPart<ModGigantic>()
+             && MeleeWeapon.MaxStrengthBonus == 0 
+             && MeleeWeapon.PenBonus == 0 
+             && MeleeWeapon.HitBonus == 0 
+             && (MeleeWeapon.BaseDamage == "1d2" || MeleeWeapon.BaseDamage == "1d2+3") 
+             && MeleeWeapon.Ego == 0 
+             && MeleeWeapon.Skill == "Cudgel" 
+             && MeleeWeapon.Stat == "Strength" 
+             && MeleeWeapon.Slot == "Hand" 
+             && MeleeWeapon.Attributes.IsNullOrEmpty();
+
+            bool hasImprovisedProp = 
+                MeleeWeapon.ParentObject.HasTagOrStringProperty("IsImprovisedMelee") 
+             && MeleeWeapon.ParentObject.GetStringProperty("IsImprovisedMelee") != "false";
+
+            MeleeWeapon @default = new();
+
+            return MeleeWeapon.SameAs(@default) 
+                || MeleeWeapon.IsImprovisedWeapon() 
+                || isImprovisedButGigantic 
+                || MeleeWeapon.ParentObject.GetIntProperty("IsImprovisedMelee") > 0
+                || hasImprovisedProp;
         }
     }
 }

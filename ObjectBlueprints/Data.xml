@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+  
+  <!-- DataBuckets are just data stores; don't instantiate these objects -->
+  <object Name="GigantismPlusModGiganticDescriptions" Inherits="DataBucket">
+    <!-- 
+        Name="TargetEvent::TargetList::ConditionalPart::YourModName"
+        Value="verb;description of adjustment"
+        The below tag
+        - is included immediately after the BeforeDescribeModGiganticEvent
+        - adds its description elements to the GeneralDescriptions list
+        - is added to /any/ object on the condition the modified object has the LightSource part
+        - prints to the player log "WARN [GigantismPlus]: some debug info" if the targeted list is invalid
+        - results in "illuminates twice as far" being added to the item's description
+    -->
+    <tag Name="Before::General::LightSource::GigantismPlus" Value="illuminate;twice as far" />
+  </object>
+  
+</objects>

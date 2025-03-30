@@ -63,21 +63,6 @@ namespace XRL.World.Parts
 
         public NaturalEquipmentManager()
         {
-            AdjustmentTargets = new()
-            {
-                { GAMEOBJECT, 
-                    ( ParentObject, new() ) 
-                },
-                { RENDER, 
-                    ( ParentRender, new() ) 
-                },
-                { MELEEWEAPON, 
-                    ( ParentMeleeWeapon, new() ) 
-                },
-                { ARMOR, 
-                    ( ParentArmor, new() ) 
-                },
-            };
             NaturalEquipmentMods = new();
         }
 
@@ -94,10 +79,6 @@ namespace XRL.World.Parts
         public string ProcessDescription(SortedDictionary<int, string> Descriptions, bool IsShort = true)
         {
             StringBuilder StringBuilder = Event.NewStringBuilder();
-
-            CollectAppliedNaturalWeaponMods();
-
-            ProcessNaturalWeaponModsShortDescriptions();
 
             foreach ((_, string description) in Descriptions)
             {
@@ -119,6 +100,7 @@ namespace XRL.World.Parts
                 + $"{nameof(AddShortDescriptionEntry)}(int Priority: {Priority}, string Description)",
                 Indent: 7);
 
+            ShortDescriptions ??= new();
             ShortDescriptions[Priority] = Description;
         }
 
@@ -165,7 +147,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, 
                 $"* {nameof(RaplacedBasedOnPriority)}" + 
                 $"(Dictionary<string, (int Priority: {Adjustment.Priority}, string Value: {Adjustment.Value})> Dictionary, " + 
-                $"Adjustment Adjustment: {Adjustment.ID})",
+                $"Adjustment Adjustment)",
                 Indent: 4);
 
             bool flag = false;
@@ -173,18 +155,18 @@ namespace XRL.World.Parts
             (int Priority, string Value) entry = (Adjustment.Priority, Adjustment.Value);
 
             // does an entry for this field exist or, if it does, is its priority beat?
-            Debug.Entry(4, $"Dictionary[@field].Priority {(Dictionary.ContainsKey(@field) ? Dictionary[@field].Priority : "no entry")} | entry.Priority: {entry.Priority}", Indent: 5);
+            Debug.Entry(4, $"Existing: {(Dictionary.ContainsKey(@field) ? Dictionary[@field].Priority : "no entry")} | Proposed: {entry.Priority}", Indent: 5);
             if (!Dictionary.ContainsKey(@field) || Dictionary[@field].Priority > entry.Priority)
             {
                 Dictionary[@field] = entry;
                 flag = true;
             }
-            Debug.Entry(4, $"Replaced = {flag}", Indent: 5);
+            Debug.LoopItem(4, $"{(flag ? "" : "Not ")}Replaced", Indent: 5, Good: flag);
 
             Debug.Entry(4,
                 $"x {nameof(RaplacedBasedOnPriority)}" +
                 $"(Dictionary<string, (int Priority: {Adjustment.Priority}, string Value: {Adjustment.Value})> Dictionary, " +
-                $"Adjustment Adjustment: {Adjustment.ID}) *//",
+                $"Adjustment Adjustment) *//",
                 Indent: 4);
             return flag;
         }
@@ -217,12 +199,13 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name}) *//", Indent: 1);
         }
 
-        public void ProcessNaturalWeaponModsShortDescriptions()
+        public void ProcessNaturalEquipmentModsShortDescriptions()
         {
             if (NaturalEquipmentMods.IsNullOrEmpty()) return;
 
             foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
             {
+                Debug.Entry(4, $"naturalEquipmentMod Type: {naturalEquipmentMod.GetType()}, Name: {nameof(naturalEquipmentMod)}", Indent: 3);
                 AddShortDescriptionEntry(naturalEquipmentMod.DescriptionPriority, naturalEquipmentMod.GetInstanceDescription());
             }
         }
@@ -270,14 +253,27 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(AccumulateMeleeWeaponBonuses)}() *//", Indent: 1);
         }
 
-        public virtual void ManageNaturalEquipment()
+        public virtual NaturalEquipmentManager ManageNaturalEquipment()
         {
             Debug.Header(4, 
                 $"{typeof(NaturalEquipmentManager).Name}",
                 $"{nameof(ManageNaturalEquipment)}()");
 
-            // 
-            // CollectAppliedNaturalWeaponMods();
+            AdjustmentTargets = new()
+            {
+                { GAMEOBJECT,
+                    ( ParentObject, new() )
+                },
+                { RENDER,
+                    ( ParentRender, new() )
+                },
+                { MELEEWEAPON,
+                    ( ParentMeleeWeapon, new() )
+                },
+                { ARMOR,
+                    ( ParentArmor, new() )
+                },
+            };
 
             // Cycle the NaturalEquipmentMods to prepare the final set of adjustments to make
             Debug.Entry(4, $"> foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)", Indent: 1);
@@ -294,7 +290,6 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1);
             if (ParentMeleeWeapon != null)
             {
-
                 OriginalNaturalEquipmentCopy = ParentObject.DeepCopy();
                 MeleeWeapon originalWeapon = OriginalNaturalEquipmentCopy.GetPart<MeleeWeapon>();
                 DamageDie = new(originalWeapon.BaseDamage);
@@ -332,19 +327,17 @@ namespace XRL.World.Parts
             foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)
             {
                 Debug.Entry(4, $"Target: {Target}", Indent: 2);
-                Debug.Entry(4, $"> foreach ((string Field, (int Priority, string Value)) in Entries)", Indent: 2);
                 foreach ((string Field, (int Priority, string Value)) in Entries)
                 {
-                    Debug.Entry(4, $"Field: {Field}, Value: {Value}", Indent: 3);
+                    Debug.Entry(4, $"{Target}.{Field}, Value: {Value}", Indent: 3);
                     if (TargetObject.SetPropertyValue(Field, Value) || TargetObject.SetFieldValue(Field, Value))
                         continue;
                     Debug.Entry(4,
                         $"WARN: {typeof(NaturalEquipmentManager).Name}." +
                         $"{nameof(ManageNaturalEquipment)}()",
                         $"failed find Property or Field \"{Field}\" in {Target}",
-                        Indent: 2);
+                        Indent: 4);
                 }
-                Debug.Entry(4, $"x foreach ((string Field, (int Priority, string Value)) in Entries) >//", Indent: 2);
             }
             Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1);
 
@@ -359,8 +352,11 @@ namespace XRL.World.Parts
             displayNameOnlySansRays.Replace(icyString, "");
             displayNameOnlySansRays.Replace(flamingString, "");
 
+            Debug.Divider(4, "-", 25, Indent: 2);
             if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath)) ParentRender.Tile = tilePath;
+            Debug.Divider(4, "-", 25, Indent: 2);
             if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath)) ParentRender.Tile = tilePath;
+            Debug.Divider(4, "-", 25, Indent: 2);
 
             // We want these sick as, modified Natural Equipments to show up as a physical feature.
             // The check for a weapon being undesirable unfortunately targets tags, but we set the IntProp to 0 just in case it changes
@@ -369,9 +365,14 @@ namespace XRL.World.Parts
             ParentObject.SetIntProperty("UndesirableWeapon", 0);
             ParentObject.SetStringProperty("TemporaryDefaultBehavior", "NaturalEquipmentManager", false);
 
+            ShortDescriptions ??= new();
+            ProcessNaturalEquipmentModsShortDescriptions();
+
             Debug.Footer(4,
                 $"{typeof(NaturalEquipmentManager).Name}",
                 $"{nameof(ManageNaturalEquipment)}()");
+
+            return this;
         }
 
         public virtual void ApplyNaturalEquipmentMods()
@@ -388,8 +389,8 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == GetShortDescriptionEvent.ID;
-             // || ID == BodyPartsUpdatedEvent.ID;
+                || ID == GetShortDescriptionEvent.ID
+                || ID == PooledEvent<BodyPartsUpdatedEvent>.ID;
         }
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
@@ -401,6 +402,7 @@ namespace XRL.World.Parts
 
             if(E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
             {
+                ShortDescriptions ??= new();
                 _shortDescriptionCache ??= ProcessDescription(ShortDescriptions);
                 E.Postfix.AppendRules(_shortDescriptionCache);
             }
@@ -422,15 +424,12 @@ namespace XRL.World.Parts
                 + $"{nameof(FireEvent)}(Event E.ID: {E.ID})",
                 Indent: 0);
 
-                if (WantToManage && NaturalEquipmentMods != null)
+                if (WantToManage)
                 {
                     BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
-                    ManageNaturalEquipment();
-                    AfterManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
-                }
-                else if (WantToManage)
-                {
-                    Debug.Entry(4, $"No NaturalEquipmentMods, nothing to manage", Indent: 1);
+                    ManageDefaultEquipmentEvent manageDefaultEquipmentEvent = new(ParentObject, Wielder, this, ParentLimb);
+                    AfterManageDefaultEquipmentEvent afterManageDefaultEquipmentEvent = AfterManageDefaultEquipmentEvent
+                        .Send(manageDefaultEquipmentEvent.Send(), ParentObject, this, ParentLimb);
                 }
                 else
                 {

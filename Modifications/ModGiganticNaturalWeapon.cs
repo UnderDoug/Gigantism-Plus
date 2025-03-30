@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using XRL.World.Parts.Mutation;
 using XRL.Language;
 using static HNPS_GigantismPlus.Utils;
+using HNPS_GigantismPlus;
 
 namespace XRL.World.Parts
 {
@@ -58,6 +59,7 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
+            Debug.Entry(4, $"{typeof(ModGiganticNaturalWeapon).Name}.{nameof(GetInstanceDescription)}()");
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             int damageBonus = GetDamageBonus();

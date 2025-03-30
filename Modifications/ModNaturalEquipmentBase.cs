@@ -24,7 +24,25 @@ namespace XRL.World.Parts
 
             public string Value; // Value of the adjustment.
 
-            public void Write(SerializationWriter Writer)
+            public override readonly string ToString()
+            {
+                string output = string.Empty;
+                output += $"({(Priority != 0 ? Priority : "PriorityUnset")})";
+                output += $"{Target ?? "NoTarget?"}.";
+                output += $"{Field ?? "NoField?"}=";
+                output += Value ?? "null?";
+                return output;
+            }
+            public readonly string ToString(bool ShowID)
+            {
+                string output = string.Empty;
+                if (ShowID)
+                    output += $"[{(ID != null ? ID : "No ID")}]";
+                output += ToString();
+                return output;
+            }
+
+            public readonly void Write(SerializationWriter Writer)
             {
                 Writer.Write(ID);
                 Writer.Write(Target);

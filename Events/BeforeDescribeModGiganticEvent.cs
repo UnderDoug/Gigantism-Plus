@@ -1,67 +1,102 @@
-﻿using HNPS_GigantismPlus;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text;
 using XRL;
+using XRL.Language;
 using XRL.World;
 using XRL.World.Parts;
+using static HNPS_GigantismPlus.Options;
 
-[GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGiganticEvent>
+namespace HNPS_GigantismPlus
 {
-    public new static readonly int CascadeLevel = CASCADE_ALL;
-
-    public GameObject Object;
-
-    public ModGigantic Modification;
-
-    public string ObjectNoun;
-
-    public List<List<string>> WeaponDescriptions;
-
-    public List<List<string>> GeneralDescriptions;
-
-    public override int GetCascadeLevel()
+    public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGiganticEvent>
     {
-        return CascadeLevel;
-    }
+        public new static readonly int CascadeLevel = CASCADE_ALL;
 
-    public override bool Dispatch(IEventHandler Handler)
-    {
-        return Handler.HandleEvent(this);
-    }
+        public GameObject Object;
 
-    public override void Reset()
-    {
-        base.Reset();
-        Object = null;
-        ObjectNoun = null;
-        Modification = null;
-        WeaponDescriptions = null;
-        GeneralDescriptions = null;
-    }
+        public string ObjectNoun;
 
-    public static void Send(GameObject Object, ModGigantic Modification, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
-    {
-        Debug.Entry(4, $"{typeof(BeforeDescribeModGiganticEvent).Name}.{nameof(Send)}()", Indent: 0);
-        bool flag = true;
-        if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
+        public List<List<string>> WeaponDescriptions;
+
+        public List<List<string>> GeneralDescriptions;
+
+        public BeforeDescribeModGiganticEvent()
         {
-            BeforeDescribeModGiganticEvent E = FromPool();
-            E.Object = Object;
-            E.Modification = Modification;
-            E.ObjectNoun = ObjectNoun;
-            E.WeaponDescriptions = WeaponDescriptions;
-            E.GeneralDescriptions = GeneralDescriptions;
-            flag = The.Game.HandleEvent(E) || Object.HandleEvent(E);
         }
-        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BeforeDescribeModGiganticEvent"))
+
+        public BeforeDescribeModGiganticEvent(GameObject Object, string ObjectNoun)
+            : this()
         {
-            Event @event = Event.New("BeforeDescribeModGiganticEvent");
-            @event.SetParameter("Object", Object);
-            @event.SetParameter("ModPart", Modification);
-            @event.SetParameter("ObjectNoun", ObjectNoun);
-            @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
-            @event.SetParameter("GeneralDescriptions", GeneralDescriptions);
-            Object.FireEvent(@event);
+            BeforeDescribeModGiganticEvent @new = FromPool(Object, ObjectNoun, new(), new());
+            this.Object = @new.Object;
+            this.ObjectNoun = @new.ObjectNoun;
+            WeaponDescriptions = @new.WeaponDescriptions;
+            GeneralDescriptions = @new.GeneralDescriptions;
+        }
+
+        public BeforeDescribeModGiganticEvent(
+            GameObject Object,
+            string ObjectNoun,
+            List<List<string>> WeaponDescriptions,
+            List<List<string>> GeneralDescriptions)
+            : this(Object, ObjectNoun)
+        {
+            this.WeaponDescriptions = WeaponDescriptions;
+            this.GeneralDescriptions = GeneralDescriptions;
+        }
+        public BeforeDescribeModGiganticEvent(BeforeDescribeModGiganticEvent Source)
+            : this()
+        {
+            Object = Source.Object;
+            ObjectNoun = Source.ObjectNoun;
+            WeaponDescriptions = Source.WeaponDescriptions;
+            GeneralDescriptions = Source.GeneralDescriptions;
+        }
+
+        public override int GetCascadeLevel()
+        {
+            return CascadeLevel;
+        }
+
+        public virtual string GetRegisteredEventID()
+        {
+            return $"{typeof(BeforeDescribeModGiganticEvent).Name}";
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            Object = null;
+            ObjectNoun = null;
+            WeaponDescriptions = null;
+            GeneralDescriptions = null;
+        }
+
+        public BeforeDescribeModGiganticEvent Send()
+        {
+            bool flag = The.Game.HandleEvent(this) || Object.HandleEvent(this);
+            
+            if (flag && Object.HasRegisteredEvent(GetRegisteredEventID()))
+            {
+                Event @event = Event.New(GetRegisteredEventID());
+                @event.SetParameter("Object", Object);
+                @event.SetParameter("ObjectNoun", ObjectNoun);
+                @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
+                @event.SetParameter("GeneralDescriptions", GeneralDescriptions);
+                Object.FireEvent(@event);
+            }
+
+            return this;
+        }
+
+        public static BeforeDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
+        {
+            BeforeDescribeModGiganticEvent beforeDescribeModGiganticEvent = FromPool();
+            beforeDescribeModGiganticEvent.Object = Object;
+            beforeDescribeModGiganticEvent.ObjectNoun = ObjectNoun;
+            beforeDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions;
+            beforeDescribeModGiganticEvent.GeneralDescriptions = GeneralDescriptions;
+            return beforeDescribeModGiganticEvent;
         }
     }
 }

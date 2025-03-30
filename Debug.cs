@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
@@ -216,12 +217,12 @@ namespace HNPS_GigantismPlus
         }
 
         /*
-        public static NaturalEquipmentSubpart<T> Vomit<T>(this NaturalEquipmentSubpart<T> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
-            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
+        public static NaturalEquipmentSubpart<E> Vomit<E>(this NaturalEquipmentSubpart<E> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
+            where E : IPart, IManagedDefaultNaturalEquipment<E>, new()
         {
             string title = Title == null ? "" : $"{Title}:";
             GameObject Creature = Subpart.ParentPart?.ParentObject;
-            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(T).Name}> of {Creature?.Blueprint} {title}", Indent: Indent);
+            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.Blueprint} {title}", Indent: Indent);
             List<string> @default = new()
             {
                 "Meta",
@@ -325,6 +326,28 @@ namespace HNPS_GigantismPlus
             return Subpart;
         }
         */
+
+        public static bool WasEventRegistered<H,E>(this XRLGame Game, int ID)
+            where H : IEventHandler, IModEventHandler<E>
+            where E : MinEvent, new()
+        {
+            bool flag = false;
+            if (Game != null && Game.RegisteredEvents.ContainsKey(ID))
+            {
+                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {ID})", Indent: 2);
+                flag = true;
+            }
+            else if (Game != null)
+            {
+                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {ID})", Indent: 2);
+            }
+            else
+            {
+                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {ID})", Indent: 2);
+            }
+            return flag;
+        }
+
         public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)
         {
             string Output = Label != "" ? $"{Label}: {@string}" : @string;

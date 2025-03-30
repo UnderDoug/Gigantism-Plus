@@ -155,7 +155,7 @@ namespace XRL.World.Parts
             return true;
         }
 
-        public virtual bool ProcessNaturalEquipment(Body body)
+        public virtual bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
@@ -221,20 +221,21 @@ namespace XRL.World.Parts
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
         } //!--- public override void OnUnimplanted(GameObject Object)
-        public virtual void OnBodyPartsUpdated(Body body)
+        public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = Implantee.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnBodyPartsUpdated)}(body)");
+            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
             Debug.Entry(4, $"TARGET {Implantee.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-
+            
+            Body body = Implantee.Body;
             if (body != null)
-                ProcessNaturalEquipment(body);
+                ProcessNaturalEquipment(Manager, TargetBodyPart);
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnBodyPartsUpdated)}(body: {Implantee.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body: {Implantee.Blueprint})");
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -288,7 +289,7 @@ namespace XRL.World.Parts
         }
         public virtual bool HandEvent(BodyPartsUpdatedEvent E)
         {
-            OnBodyPartsUpdated(E.Object.Body);
+            OnManageNaturalEquipment(E.Object.Body);
             return base.HandleEvent(E);
         }
 

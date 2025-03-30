@@ -4,7 +4,6 @@ using XRL.World.Parts;
 using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
 
-[GameEvent(Cascade = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefaultEquipmentEvent>
 {
     public new static readonly int CascadeLevel = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON;
@@ -18,11 +17,6 @@ public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefa
     public override int GetCascadeLevel()
     {
         return CascadeLevel;
-    }
-
-    public override bool Dispatch(IEventHandler Handler)
-    {
-        return Handler.HandleEvent(this);
     }
 
     public override void Reset()

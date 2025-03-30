@@ -96,8 +96,8 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" }
                 },
             };
-            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Skill", "ShortBlades");
-            NaturalEquipmentMod.AddAdjustment(GAMEOBJECT, "Stat", "Strength");
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength");
 
             NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "claw", true);
 
@@ -302,20 +302,21 @@ namespace XRL.World.Parts.Mutation
         {
             base.OnDecorateDefaultEquipment(body);
         }
-        public virtual void OnBodyPartsUpdated(Body body)
+        public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart BodyPart)
         {
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(UD_ManagedBurrowingClaws).Name}", $"{nameof(OnBodyPartsUpdated)}(body)");
+            Debug.Header(4, $"{typeof(UD_ManagedBurrowingClaws).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
             Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
+            Body body = ParentObject.Body;
             if (body != null)
                 ProcessNaturalEquipment(body);
 
             Debug.Footer(4,
                 $"{typeof(UD_ManagedBurrowingClaws).Name}",
-                $"{nameof(OnBodyPartsUpdated)}(body: {ParentObject.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body: {ParentObject.Blueprint})");
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -355,7 +356,7 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool HandEvent(BodyPartsUpdatedEvent E)
         {
-            OnBodyPartsUpdated(E.Object.Body);
+            OnManageNaturalEquipment(E.Object.Body);
             return base.HandleEvent(E);
         }
 

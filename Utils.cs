@@ -22,6 +22,33 @@ namespace HNPS_GigantismPlus
         public const string MELEEWEAPON = "MeleeWeapon";
         public const string ARMOR = "Armor";
 
+        public const string NATEQUIPMANAGER_STRINGPROP_PRIORITY = "NaturalEquipmentManager::StringProp:Priority";
+        public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentManager::IntProp:Priority";
+
+        public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
+
+        public static bool RegisterGameLevelEventHandlers()
+        {
+            Debug.Entry(1, $"Registering XRLGame Event Handlers...", Indent: 1);
+            bool flag = The.Game != null;
+            if (flag)
+            {
+                BeforeModGiganticAppliedHandler.Register();
+                AfterModGiganticAppliedHandler.Register();
+                BeforeDescribeModGiganticHandler.Register();
+                AfterDescribeModGiganticHandler.Register();
+                MeleeWeapon_AfterObjectCreatedHandler.Register();
+                ExampleHandler.Register();
+            }
+            else
+            {
+                Debug.Entry(2, $"The.Game is null, unable to register any events.", Indent: 2);
+
+            }
+            Debug.LoopItem(1, $"Event Handler Registration Finished", Indent: 1, Good: flag);
+            return flag;
+        }
+
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]
         private static Dictionary<string, string> _TilePathCache = new();
         private static readonly List<string> TileSubfolders = new()
@@ -43,60 +70,58 @@ namespace HNPS_GigantismPlus
         }
         public static bool TryGetTilePath(string TileName, out string TilePath)
         {
-            Debug.Divider(3, Count: 40, Indent: 4);
-            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 5);
+            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
 
             bool found = false;
-            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 5);
-            if (_TilePathCache.TryGetValue(TileName, out TilePath))
+            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2);
+            if (!_TilePathCache.TryGetValue(TileName, out TilePath))
             {
-                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 6);
-                goto Exit;
-            }
-            Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 6);
-            Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 5);
 
-            Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 6);
-            if (!_TilePathCache.TryAdd(TileName, TilePath)) 
-                Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 6);
+                Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3);
+                Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2);
 
-            Debug.Entry(4, $"Listing subfolders", Indent: 5);
-            Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 5);
-            foreach (string subfolder in TileSubfolders)
-            {
-                Debug.LoopItem(4, $"{subfolder}", Indent: 6);
-            }
-            Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 5);
+                Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 3);
+                if (!found && !_TilePathCache.TryAdd(TileName, TilePath))
+                    Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 3);
 
-            Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 5);
-            Debug.Divider(3, "-", Count: 25, Indent: 5);
-            foreach (string subfolder in TileSubfolders)
-            {
-                string path = subfolder;
-                if (path != "") path += "/";
-                path += TileName;
-                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent: 6);
-                if (SpriteManager.HasTextureInfo(path))
+                Debug.Entry(4, $"Listing subfolders", Indent: 2);
+                Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2);
+                foreach (string subfolder in TileSubfolders)
                 {
-                    Debug.DiveIn(4, $"Yes.", Indent: 7);
-                    Debug.Entry(3, $"out Tile = {path}", Indent: 7);
-                    TilePath = path;
-                    _TilePathCache[TileName] = TilePath;
-                    Debug.Entry(3, $"Added entry to _TilePathCache", Indent: 7);
-                    Debug.DiveOut(4, "TilePath Exists", Indent: 6);
-                    break;
+                    Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3);
                 }
-                Debug.Entry(4, $"No.", Indent: 7);
+                Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2);
+
+                Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 2);
+                Debug.Divider(3, "-", Count: 25, Indent: 2);
+                foreach (string subfolder in TileSubfolders)
+                {
+                    string path = subfolder;
+                    if (path != "") path += "/";
+                    path += TileName;
+                    if (SpriteManager.HasTextureInfo(path))
+                    {
+                        TilePath = path;
+                        _TilePathCache[TileName] = TilePath;
+                        Debug.CheckYeh(4, $"Tile: \"{path}\", Added entry to _TilePathCache", Indent: 3);
+                    }
+                    else
+                    {
+                        Debug.CheckNah(4, $"Tile: \"{path}\"", Indent: 3);
+                    }
+                }
+                Debug.Divider(3, "-", Count: 25, Indent: 2);
+                Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 2);
             }
-            Debug.Divider(3, "-", Count: 25, Indent: 5);
-            Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 5);
+            else
+            {
+                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3);
+            }
 
-            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 5);
+            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 2);
 
-            Exit:
             found = TilePath != null;
-            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 5);
-            Debug.Divider(3, Count: 40, Indent: 4);
+            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2);
             return found;
         }
 

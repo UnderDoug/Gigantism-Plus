@@ -5,22 +5,27 @@ using XRL.World;
 using XRL;
 using XRL.World.Parts;
 
-namespace HNPS_GigantismPlus.Events.Handlers
+namespace HNPS_GigantismPlus
 {
-    public class AfterObjectCreatedHandler : IEventHandler, IModEventHandler<AfterObjectCreatedEvent>
+    public class MeleeWeapon_AfterObjectCreatedHandler : IEventHandler, IModEventHandler<AfterObjectCreatedEvent>
     {
 
-        private static readonly AfterObjectCreatedHandler Handler = new();
+        private static readonly MeleeWeapon_AfterObjectCreatedHandler Handler = new();
 
-        public static void Register()
+        public static bool Register()
         {
-            The.Game.RegisterEvent(Handler, AfterObjectCreatedEvent.ID);
-            Debug.Entry(3, $"Registered", $"The.Game.RegisterEvent(Handler, {nameof(AfterObjectCreatedHandler)}.ID: {AfterObjectCreatedEvent.ID})", Indent: 2);
+            The.Game?.RegisterEvent(Handler, AfterObjectCreatedEvent.ID);
+            
+            return (bool)The.Game?.WasEventRegistered<MeleeWeapon_AfterObjectCreatedHandler, AfterObjectCreatedEvent>(AfterObjectCreatedEvent.ID);
         }
 
         public bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            Debug.Entry(4, $"{typeof(AfterObjectCreatedHandler).Name}.{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} E)", Indent: 0);
+            Debug.Entry(4, 
+                $"{typeof(MeleeWeapon_AfterObjectCreatedHandler).Name}." + 
+                $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} E)", 
+                Indent: 0);
+
             GameObject Object = E.Object;
             if (Object.TryGetPart(out MeleeWeapon weapon) && weapon.MaxStrengthBonus > MeleeWeapon.BONUS_CAP_UNLIMITED)
             {
@@ -29,5 +34,5 @@ namespace HNPS_GigantismPlus.Events.Handlers
             }
             return true;
         }
-    } //!-- public class AfterObjectCreatedHandler : IEventHandler, IModEventHandler<AfterObjectCreatedHandler>
+    } //!-- public class MeleeWeapon_AfterObjectCreatedHandler : IEventHandler, IModEventHandler<MeleeWeapon_AfterObjectCreatedHandler>
 }

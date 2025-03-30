@@ -60,7 +60,7 @@ namespace XRL.World.Parts
         }
         public override Guid AddAdjustment(string Target, string Field, string Value, bool FlipPriority = false)
         {
-            int modPriority = FlipPriority ? ModPriority : -ModPriority;
+            int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddAdjustment(Target, Field, Value, modPriority);
         }
 
@@ -105,24 +105,60 @@ namespace XRL.World.Parts
 
             if (AddedStringProps != null)
             {
-                Debug.Entry(4, "> foreach (KeyValuePair<string, string> entry in NaturalEquipmentMod.GetAddedStringProps())", Indent: 5);
-                foreach ((string Name, string Value) in AddedStringProps)
+                bool priorityPropExists = Object.HasIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY);
+                int priorityPropValue = Object.GetIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY);
+                bool priorityPropBeaten = priorityPropValue > -ModPriority;
+                if (!priorityPropExists || priorityPropBeaten)
                 {
-                    Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
-                    Object.SetStringProperty(Name: Name, Value: Value, RemoveIfNull: true);
+                    Object.SetIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY, -ModPriority);
+
+                    Debug.Entry(4, "> foreach ((string Name, string Value) in AddedStringProps)", Indent: 5);
+                    foreach ((string Name, string Value) in AddedStringProps)
+                    {
+                        Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
+                        Object.SetStringProperty(Name: Name, Value: Value, RemoveIfNull: true);
+                    }
+                    Debug.Entry(4, $"x foreach ((string Name, string Value) in AddedStringProps) >//", Indent: 5);
                 }
-                Debug.Entry(4, $"x foreach (KeyValuePair<string, string> entry in NaturalEquipmentMod.GetAddedStringProps()) >//", Indent: 5);
+                else
+                {
+                    Debug.CheckNah(4,
+                        $"{NATEQUIPMANAGER_STRINGPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}",
+                        Indent: 5);
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No StringProps", Indent: 5);
             }
 
             if (AddedIntProps != null)
             {
-                Debug.Entry(4, "> foreach (KeyValuePair<string, int> entry in NaturalEquipmentMod.GetAddedIntProps())", Indent: 5);
-                foreach ((string Name, int Value) in AddedIntProps)
+                bool priorityPropExists = Object.HasIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY);
+                int priorityPropValue = Object.GetIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY);
+                bool priorityPropBeaten = priorityPropValue > -ModPriority;
+                if (!priorityPropExists || priorityPropBeaten)
                 {
-                    Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
-                    Object.SetIntProperty(Name: Name, Value: Value, RemoveIfZero: true);
+                    Object.SetIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY, -ModPriority);
+
+                    Debug.Entry(4, $"> foreach ((string Name, int Value) in AddedIntProps", Indent: 5);
+                    foreach ((string Name, int Value) in AddedIntProps)
+                    {
+                        Debug.CheckYeh(4, $"{Name}", $"{Value}", Indent: 6);
+                        Object.SetIntProperty(Name: Name, Value: Value, RemoveIfZero: true);
+                    }
+                    Debug.Entry(4, $"x foreach ((string Name, int Value) in AddedIntProps) >//", Indent: 5);
                 }
-                Debug.Entry(4, $"x foreach ((string Name, int Value) in NaturalEquipmentMod.GetAddedIntProps()) >//", Indent: 5);
+                else
+                {
+                    Debug.CheckNah(4, 
+                        $"{NATEQUIPMANAGER_INTPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}", 
+                        Indent: 5);
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No IntProps", Indent: 5);
             }
 
             Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4);
@@ -131,7 +167,8 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);
-            
+
+            Object.GetPart<NaturalEquipmentManager>().AddShortDescriptionEntry(GetDescriptionPriority(), GetInstanceDescription());
             ApplyPartAndPropChanges(Object);
 
             Debug.Entry(4, $"x {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", Indent: 3);
@@ -155,6 +192,7 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
+            Debug.Entry(4, $"ModNaturalEquipment<{typeof(T).Name}>.{nameof(GetInstanceDescription)}()");
             return null;
         }
 
@@ -178,5 +216,5 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod;
         }
 
-    } //!-- public class ModNaturalEquipment<T> : ModNaturalEquipmentBase where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
+    } //!-- public class ModNaturalEquipment<E> : ModNaturalEquipmentBase where E : IPart, IManagedDefaultNaturalEquipment<E>, new()
 }

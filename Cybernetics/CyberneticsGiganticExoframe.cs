@@ -39,8 +39,8 @@ namespace XRL.World.Parts
                 AssigningPart = this,
                 BodyPartType = "Hand",
 
-                ModPriority = -10,
-                DescriptionPriority = -10,
+                ModPriority = -500,
+                DescriptionPriority = -500,
 
                 Adjective = "augmented",
                 AdjectiveColor = "gigantic",
@@ -48,8 +48,7 @@ namespace XRL.World.Parts
 
                 Adjustments = new(),
             };
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "fist", true);
-
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "fist");
         }
 
         public string GetShortAugmentAdjective(bool Pretty = true)
@@ -86,7 +85,7 @@ namespace XRL.World.Parts
 
             Become(Implantee, Model, Implant);
 
-            OnBodyPartsUpdated(Implantee.Body);
+            OnManageNaturalEquipment(Implantee.Body);
 
             Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
         } //!--- public override void OnImplanted(GameObject Object)

@@ -36,7 +36,7 @@ namespace HNPS_GigantismPlus.Harmony
                 managed.HasCrystallinity = actor.HasPartDescendedFrom<Crystallinity>();
                 managed.NaturalEquipmentMod = naturalEquipmentMod;
                 managed.ChangeLevel(level);
-                managed.OnBodyPartsUpdated(body);
+                managed.OnManageNaturalEquipment(body);
             }
             else
             {

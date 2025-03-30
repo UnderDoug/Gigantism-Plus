@@ -23,13 +23,12 @@ namespace HNPS_GigantismPlus.Harmony
 
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
-        static bool RegenerateDefaultEquipment_SendBodyPartsUpdatedEvent_Prefix(ref Body __instance)
+        static void RegenerateDefaultEquipment_SendBodyPartsUpdatedEvent_Prefix(ref Body __instance)
         {
             Body @this = __instance;
             Debug.Entry(4, $"{typeof(Body_Patches).Name}.{nameof(RegenerateDefaultEquipment_SendBodyPartsUpdatedEvent_Prefix)}(ref Body __instance)", Indent: 0);
             Debug.Entry(4, $"Object is {@this.ParentObject?.DebugName}", Indent: 1);
             BodyPartsUpdatedEvent.Send(@this.ParentObject);
-            return true;
         }
     }
 }

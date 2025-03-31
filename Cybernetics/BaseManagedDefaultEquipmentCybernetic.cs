@@ -10,8 +10,15 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentCybernetic<T> : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>
-        where T : BaseManagedDefaultEquipmentCybernetic<T>, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
+    public abstract class BaseManagedDefaultEquipmentCybernetic<T> 
+        : IPart
+        , IModEventHandler<ManageDefaultEquipmentEvent>
+        , IManagedDefaultNaturalEquipment<T>
+        where T 
+        : BaseManagedDefaultEquipmentCybernetic<T>
+        , IModEventHandler<ManageDefaultEquipmentEvent>
+        , IManagedDefaultNaturalEquipment<T>
+        , new()
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
@@ -206,6 +213,7 @@ namespace XRL.World.Parts
 
         public virtual void OnImplanted(GameObject Implantee, GameObject Implant)
         {
+            Implantee.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
             Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
@@ -217,6 +225,7 @@ namespace XRL.World.Parts
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
+            Implantee.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
         } //!--- public override void OnUnimplanted(GameObject Object)
         public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
@@ -253,7 +262,7 @@ namespace XRL.World.Parts
             OnUnimplanted(E.Implantee, E.Item);
             return base.HandleEvent(E);
         }
-        public virtual bool HandEvent(ManageDefaultEquipmentEvent E)
+        public bool HandEvent(ManageDefaultEquipmentEvent E)
         {
             if (E.Wielder == Implantee)
             {

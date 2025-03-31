@@ -712,7 +712,6 @@ namespace XRL.World.Parts.Mutation
                 GO.IsGiganticCreature = false; // Revert the Gigantic flag
                 Debug.Entry(4, "IsGiganticCreature = false", Indent: 2);
 
-
                 Debug.Entry(4, "? if (EnableActivatedAbilityID != Guid.Empty)", Indent: 2);
                 if (EnableActivatedAbilityID != Guid.Empty)
                 {

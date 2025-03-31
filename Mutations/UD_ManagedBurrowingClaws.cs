@@ -12,7 +12,10 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class UD_ManagedBurrowingClaws : BurrowingClaws, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<UD_ManagedBurrowingClaws>
+    public class UD_ManagedBurrowingClaws 
+        : BurrowingClaws
+        , IModEventHandler<ManageDefaultEquipmentEvent>
+        , IManagedDefaultNaturalEquipment<UD_ManagedBurrowingClaws>
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
@@ -203,6 +206,17 @@ namespace XRL.World.Parts.Mutation
             return NaturalEquipmentMod.AddedIntProps;
         }
 
+        public override bool Mutate(GameObject GO, int Level)
+        {
+            GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
+            return base.Mutate(GO, Level);
+        }
+        public override bool Unmutate(GameObject GO)
+        {
+            GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
+            return base.Unmutate(GO);
+        }
+
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level)
         {
             // List<string> vomitCats = new() { "Meta", "Damage", "Additions", "Render" };
@@ -312,7 +326,7 @@ namespace XRL.World.Parts.Mutation
             return base.WantEvent(ID, cascade)
                 || ID == ManageDefaultEquipmentEvent.ID;
         }
-        public virtual bool HandEvent(ManageDefaultEquipmentEvent E)
+        public bool HandEvent(ManageDefaultEquipmentEvent E)
         {
             if (E.Wielder == ParentObject)
             {

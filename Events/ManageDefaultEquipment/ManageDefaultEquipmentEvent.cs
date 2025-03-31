@@ -3,12 +3,14 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
 using System.Collections.Generic;
+using System;
 
 namespace HNPS_GigantismPlus
 {
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class ManageDefaultEquipmentEvent : ModPooledEvent<ManageDefaultEquipmentEvent>
     {
-        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
+        public new static readonly int CascadeLevel = CASCADE_ALL;
 
         public GameObject Object;
 
@@ -39,12 +41,8 @@ namespace HNPS_GigantismPlus
         {
         }
         public ManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent Source)
-            : this()
+            : this(Source.Object, Source.Wielder, Source.Manager, Source.BodyPart)
         {
-            Object = Source.Object;
-            Wielder = Source.Wielder;
-            Manager = Source.Manager;
-            BodyPart = Source.BodyPart;
         }
         public override int GetCascadeLevel()
         {
@@ -74,6 +72,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"Wielder", Wielder != null ? Wielder.ShortDisplayNameStripped : "[null]", Indent: 1);
             
             ManageDefaultEquipmentEvent E = new(BeforeManageDefaultEquipmentEvent, Wielder);
+            BeforeManageDefaultEquipmentEvent.Reset();
 
             bool flag = true;
             if (GameObject.Validate(ref E.Wielder) && GameObject.Validate(ref E.Object) )

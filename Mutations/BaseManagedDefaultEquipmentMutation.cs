@@ -2,16 +2,22 @@
 using System.Collections.Generic;
 using XRL.Language;
 using XRL.World;
+using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
-using XRL.World.Anatomy;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentMutation<T> : BaseDefaultEquipmentMutation, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T> 
-        where T : BaseManagedDefaultEquipmentMutation<T>, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
+    public abstract class BaseManagedDefaultEquipmentMutation<T> 
+        : BaseDefaultEquipmentMutation
+        , IModEventHandler<ManageDefaultEquipmentEvent>
+        , IManagedDefaultNaturalEquipment<T> 
+        where T 
+        : BaseManagedDefaultEquipmentMutation<T>
+        , IModEventHandler<ManageDefaultEquipmentEvent>
+        , IManagedDefaultNaturalEquipment<T>
+        , new()
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
@@ -108,6 +114,15 @@ namespace XRL.World.Parts.Mutation
         public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedIntProps;
+        }
+        
+        public override bool Mutate(GameObject GO, int Level)
+        {
+            return base.Mutate(GO, Level);
+        }
+        public override bool Unmutate(GameObject GO)
+        {
+            return base.Unmutate(GO);
         }
 
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
@@ -211,26 +226,30 @@ namespace XRL.World.Parts.Mutation
                 $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})");
         }
 
-        public override bool Unmutate(GameObject GO)
-        {
-            return base.Unmutate(GO);
-        }
-
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == ManageDefaultEquipmentEvent.ID;
         }
-        public virtual bool HandEvent(ManageDefaultEquipmentEvent E)
+        public bool HandEvent(ManageDefaultEquipmentEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
                 Indent: 1);
+
             if (E.Wielder == ParentObject)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
             }
+            return base.HandleEvent(E);
+        }
+        public bool HandEvent(ExampleEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandEvent)}({typeof(ExampleEvent).Name} E)",
+                Indent: 1);
             return base.HandleEvent(E);
         }
 

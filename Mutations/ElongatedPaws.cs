@@ -125,8 +125,6 @@ namespace XRL.World.Parts.Mutation
                  + "\n\n+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 
-        public override string GetLevelText(int Level) { return ""; }
-
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)

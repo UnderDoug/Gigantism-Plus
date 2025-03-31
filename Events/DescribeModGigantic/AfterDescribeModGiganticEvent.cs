@@ -39,14 +39,9 @@ namespace HNPS_GigantismPlus
             BeforeDescribeModGiganticEvent = @new.BeforeDescribeModGiganticEvent;
         }
         public AfterDescribeModGiganticEvent(GameObject Object, string ObjectNoun, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
-            : this()
+            : this(Object, ObjectNoun)
         {
-            AfterDescribeModGiganticEvent @new = FromPool(Object, ObjectNoun, new(), new(), BeforeDescribeModGiganticEvent);
-            this.Object = @new.Object;
-            this.ObjectNoun = @new.ObjectNoun;
-            WeaponDescriptions = @new.WeaponDescriptions;
-            GeneralDescriptions = @new.GeneralDescriptions;
-            this.BeforeDescribeModGiganticEvent = @new.BeforeDescribeModGiganticEvent;
+            this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
         }
 
         public AfterDescribeModGiganticEvent(
@@ -79,7 +74,7 @@ namespace HNPS_GigantismPlus
             BeforeDescribeModGiganticEvent = Source.BeforeDescribeModGiganticEvent;
         }
         public AfterDescribeModGiganticEvent(BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
-            : this()
+            : this(BeforeDescribeModGiganticEvent.Object, BeforeDescribeModGiganticEvent.ObjectNoun)
         {
             this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
         }

@@ -6,7 +6,7 @@ namespace HNPS_GigantismPlus
     public class ExampleEvent : ModPooledEvent<ExampleEvent>
     {
 
-        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
+        public new static readonly int CascadeLevel = CASCADE_ALL;
 
         public string Value;
 
@@ -14,7 +14,7 @@ namespace HNPS_GigantismPlus
         // this isn't strictly necessary but is how the game prefers to organize it
         public static string GetFor(GameObject Object)
         {
-            var E = FromPool();
+            ExampleEvent E = FromPool();
             Object.HandleEvent(E);
             The.Game.HandleEvent(E);
             return E.Value;

@@ -2,108 +2,104 @@
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
-using HNPS_GigantismPlus;
+using System.Collections.Generic;
+using System;
 
-public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaultEquipmentEvent>
+namespace HNPS_GigantismPlus
 {
-    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
-
-    public ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent;
-
-    public GameObject Object;
-
-    public NaturalEquipmentManager Manager;
-
-    public BodyPart BodyPart;
-
-    public AfterManageDefaultEquipmentEvent()
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
+    public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaultEquipmentEvent>
     {
-    }
+        public new static readonly int CascadeLevel = CASCADE_ALL;
 
-    public AfterManageDefaultEquipmentEvent(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
-        : this()
-    {
-        AfterManageDefaultEquipmentEvent @new = FromPool(new(), Object, Manager, BodyPart);
-        this.ManageDefaultEquipmentEvent = @new.ManageDefaultEquipmentEvent;
-        this.Object = @new.Object;
-        this.Manager = @new.Manager;
-        this.BodyPart = @new.BodyPart;
-    }
-    public AfterManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
-        : this(ManageDefaultEquipmentEvent.Object, ManageDefaultEquipmentEvent.Manager, ManageDefaultEquipmentEvent.BodyPart)
-    {
-        this.ManageDefaultEquipmentEvent = ManageDefaultEquipmentEvent;
-    }
-    public AfterManageDefaultEquipmentEvent(AfterManageDefaultEquipmentEvent Source)
-        : this()
-    {
-        ManageDefaultEquipmentEvent = Source.ManageDefaultEquipmentEvent;
-        Object = Source.Object;
-        Manager = Source.Manager;
-        BodyPart = Source.BodyPart;
-    }
-    public override int GetCascadeLevel()
-    {
-        return CascadeLevel;
-    }
+        public GameObject Object;
 
-    public virtual string GetRegisteredEventID()
-    {
-        return $"{typeof(AfterManageDefaultEquipmentEvent).Name}";
-    }
+        public NaturalEquipmentManager Manager;
 
-    public override void Reset()
-    {
-        base.Reset();
-        ManageDefaultEquipmentEvent = null;
-        Object = null;
-        Manager = null;
-        BodyPart = null;
-    }
+        public BodyPart BodyPart;
 
-    public static void Send(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
-    {
-        Debug.Entry(4,
-            $"{typeof(AfterManageDefaultEquipmentEvent).Name}." +
-            $"{nameof(Send)}(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)",
-            Indent: 0);
+        public AfterManageDefaultEquipmentEvent()
+        {
+        }
 
-        AfterManageDefaultEquipmentEvent E = new(ManageDefaultEquipmentEvent);
+        public AfterManageDefaultEquipmentEvent(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
+            : this()
+        {
+            AfterManageDefaultEquipmentEvent @new = FromPool(Object, Manager, BodyPart);
+            this.Object = @new.Object;
+            this.Manager = @new.Manager;
+            this.BodyPart = @new.BodyPart;
+        }
+        public AfterManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
+            : this(ManageDefaultEquipmentEvent.Object, ManageDefaultEquipmentEvent.Manager, ManageDefaultEquipmentEvent.BodyPart)
+        {
+        }
+        public AfterManageDefaultEquipmentEvent(AfterManageDefaultEquipmentEvent Source)
+            : this(Source.Object, Source.Manager, Source.BodyPart)
+        {
+        }
+        public override int GetCascadeLevel()
+        {
+            return CascadeLevel;
+        }
 
-        Debug.Entry(4, $"Wielder", E.Object?.Equipped != null ? E.Object.Equipped.ShortDisplayNameStripped : "[null]", Indent: 1);
+        public virtual string GetRegisteredEventID()
+        {
+            return $"{typeof(AfterManageDefaultEquipmentEvent).Name}";
+        }
 
-        bool flag = true;
-        if (E.BodyPart != null && GameObject.Validate(ref E.Object))
+        public override void Reset()
+        {
+            base.Reset();
+            Object = null;
+            Manager = null;
+            BodyPart = null;
+        }
+
+        public static void Send(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
+        {
+            Debug.Entry(4,
+                $"{typeof(AfterManageDefaultEquipmentEvent).Name}." +
+                $"{nameof(Send)}({typeof(ManageDefaultEquipmentEvent).Name} {typeof(ManageDefaultEquipmentEvent).Name})",
+                Indent: 0);
+
+            AfterManageDefaultEquipmentEvent E = new(ManageDefaultEquipmentEvent);
+            ManageDefaultEquipmentEvent.Reset();
+
+            Debug.Entry(4, $"Wielder", E.Object?.Equipped != null ? E.Object.Equipped.ShortDisplayNameStripped : "[null]", Indent: 1);
+
+            bool flag = true;
+            if (E.BodyPart != null && GameObject.Validate(ref E.Object))
+            {
+
+                Debug.Entry(4, $"flag = Object.HandleEvent(E)", Indent: 2);
+                flag = E.Object.HandleEvent(E);
+                Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
+                if (flag && E.Object.HasRegisteredEvent(E.GetRegisteredEventID()))
+                {
+                    Event @event = Event.New(E.GetRegisteredEventID());
+                    @event.SetParameter("Object", E.Object);
+                    @event.SetParameter("Manager", E.Manager);
+                    @event.SetParameter("BodyPart", E.BodyPart);
+                    E.Object.FireEvent(@event);
+                }
+            }
+            E.Reset();
+        }
+
+        public static AfterManageDefaultEquipmentEvent FromPool(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
+        {
+            AfterManageDefaultEquipmentEvent afterManageDefaultEquipmentEvent = FromPool();
+            afterManageDefaultEquipmentEvent.Object = Object;
+            afterManageDefaultEquipmentEvent.Manager = Manager;
+            afterManageDefaultEquipmentEvent.BodyPart = BodyPart;
+            return afterManageDefaultEquipmentEvent;
+        }
+
+        public bool ManageDefaultEquipment()
         {
 
-            Debug.Entry(4, $"flag = Object.HandleEvent(E)", Indent: 2);
-            flag = E.Object.HandleEvent(E);
-            Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
-            if (flag && E.Object.HasRegisteredEvent(E.GetRegisteredEventID()))
-            {
-                Event @event = Event.New(E.GetRegisteredEventID());
-                @event.SetParameter("ManageDefaultEquipmentEvent", E.ManageDefaultEquipmentEvent);
-                @event.SetParameter("Object", E.Object);
-                @event.SetParameter("Manager", E.Manager);
-                @event.SetParameter("BodyPart", E.BodyPart);
-                E.Object.FireEvent(@event);
-            }
+            return true;
         }
-    }
-
-    public static AfterManageDefaultEquipmentEvent FromPool(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent, GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
-    {
-        AfterManageDefaultEquipmentEvent afterManageDefaultEquipmentEvent = FromPool();
-        afterManageDefaultEquipmentEvent.ManageDefaultEquipmentEvent = ManageDefaultEquipmentEvent;
-        afterManageDefaultEquipmentEvent.Object = Object;
-        afterManageDefaultEquipmentEvent.Manager = Manager;
-        afterManageDefaultEquipmentEvent.BodyPart = BodyPart;
-        return afterManageDefaultEquipmentEvent;
-    }
-
-    public bool ManageDefaultEquipment()
-    {
-
-        return true;
     }
 }

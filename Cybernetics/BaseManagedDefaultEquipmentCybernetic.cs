@@ -10,14 +10,15 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentCybernetic<T> : IPart, IManagedDefaultNaturalEquipment<T>
-        where T : BaseManagedDefaultEquipmentCybernetic<T>, IManagedDefaultNaturalEquipment<T>, new()
+    public abstract class BaseManagedDefaultEquipmentCybernetic<T> : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>
+        where T : BaseManagedDefaultEquipmentCybernetic<T>, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
         public int Level { get; set; }
+        public List<string> BodyPartTypesWantingManaged { get; set; }
 
         private GameObject _implantee = null;
         public GameObject Implantee
@@ -42,6 +43,7 @@ namespace XRL.World.Parts
         public BaseManagedDefaultEquipmentCybernetic()
         {
             Level = 1;
+            BodyPartTypesWantingManaged = new();
             NaturalEquipmentMods = new();
         }
 
@@ -162,22 +164,24 @@ namespace XRL.World.Parts
                 + $"{nameof(ProcessNaturalEquipment)}",
                 Indent: 1);
 
+            Body body = Implantee?.Body;
             if (body != null)
             {
-                List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
-                foreach (BodyPart bodyPart in partsList)
+                string targetType = TargetBodyPart.Type;
+                foreach (BodyPart bodyPart in body.LoopPart(targetType))
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Type}]", Indent: 2);
+
                     ModNaturalEquipment<T> naturalEquipmentMod = null;
-                    if (NaturalEquipmentMod != null && bodyPart.Type == NaturalEquipmentMod.BodyPartType)
+                    if (NaturalEquipmentMod != null)
                     {
                         naturalEquipmentMod = new(NaturalEquipmentMod);
                         Debug.Entry(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 3);
                     }
-                    else if (NaturalEquipmentMods.ContainsKey(bodyPart.Type))
+                    else if (NaturalEquipmentMods.ContainsKey(targetType))
                     {
-                        naturalEquipmentMod = NaturalEquipmentMods[bodyPart.Type];
+                        naturalEquipmentMod = new(NaturalEquipmentMods[targetType]);
                         Debug.Entry(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
                     }
                     else
@@ -188,22 +192,8 @@ namespace XRL.World.Parts
                     if (naturalEquipmentMod == null) continue;
 
                     Debug.Entry(4, $"modNaturalWeapon: {naturalEquipmentMod?.Name}", Indent: 3);
-                    GameObject equipment = bodyPart.DefaultBehavior ?? bodyPart.Equipped;
-                    if (equipment != null && equipment.HasPart<NaturalEquipment>())
-                    {
-                        if (equipment.TryGetPart(out NaturalEquipmentManager manager))
-                        {
-                            Debug.Entry(4, $"Equipment: {equipment.ShortDisplayNameStripped}", Indent: 3);
-                        }
-                        else
-                        {
-                            Debug.Entry(4, $"WARN: {equipment.ShortDisplayNameStripped} is missing NaturalEquipmentManager", Indent: 3);
-                            manager = equipment.AddPart<NaturalEquipmentManager>();
-                        }
-                        manager.WantToManage = true;
-                        ModNaturalEquipment<T> newNaturalEquipmentMod = new(naturalEquipmentMod);
-                        manager.AddNaturalEquipmentMod(newNaturalEquipmentMod);
-                    }
+
+                    Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
                 }
                 Debug.Divider(4, "-", Count: 25, Indent: 2);
             }
@@ -216,6 +206,13 @@ namespace XRL.World.Parts
 
         public virtual void OnImplanted(GameObject Implantee, GameObject Implant)
         {
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
+            {
+                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            }
+            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
         } //!--- public override void OnImplanted(GameObject Object)
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
@@ -236,6 +233,33 @@ namespace XRL.World.Parts
             Debug.Footer(4,
                 $"{typeof(T).Name}",
                 $"{nameof(OnManageNaturalEquipment)}(body: {Implantee.Blueprint})");
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return ID == ImplantedEvent.ID
+                || ID == UnimplantedEvent.ID
+                || ID == ManageDefaultEquipmentEvent.ID;
+        }
+        public override bool HandleEvent(ImplantedEvent E)
+        {
+            Implantee = E.Implantee;
+            ImplantObject = E.Item;
+            OnImplanted(Implantee, ImplantObject);
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(UnimplantedEvent E)
+        {
+            OnUnimplanted(E.Implantee, E.Item);
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandEvent(ManageDefaultEquipmentEvent E)
+        {
+            if (E.Wielder == Implantee)
+            {
+                OnManageNaturalEquipment(E.Manager, E.BodyPart);
+            }
+            return base.HandleEvent(E);
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -261,36 +285,10 @@ namespace XRL.World.Parts
                 string Mutation = E.GetParameter("Mutation") as string;
                 if (Actor == ParentObject)
                 {
-                    ProcessNaturalEquipment(Actor?.Body);
+                    // ProcessNaturalEquipment(Actor?.Body);
                 }
             }
             return base.FireEvent(E);
-        }
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return ID == ImplantedEvent.ID
-                || ID == UnimplantedEvent.ID
-                || ID == PooledEvent<BodyPartsUpdatedEvent>.ID;
-        }
-
-        public override bool HandleEvent(ImplantedEvent E)
-        {
-            Implantee = E.Implantee;
-            ImplantObject = E.Item;
-            OnImplanted(Implantee, ImplantObject);
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(UnimplantedEvent E)
-        {
-            OnUnimplanted(E.Implantee, E.Item);
-            return base.HandleEvent(E);
-        }
-        public virtual bool HandEvent(BodyPartsUpdatedEvent E)
-        {
-            OnManageNaturalEquipment(E.Object.Body);
-            return base.HandleEvent(E);
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

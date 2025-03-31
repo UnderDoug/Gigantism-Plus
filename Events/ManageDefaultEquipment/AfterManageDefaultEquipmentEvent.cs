@@ -6,7 +6,7 @@ using HNPS_GigantismPlus;
 
 public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaultEquipmentEvent>
 {
-    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON;
+    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
 
     public ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent;
 
@@ -29,8 +29,8 @@ public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaul
         this.Manager = @new.Manager;
         this.BodyPart = @new.BodyPart;
     }
-    public AfterManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent, GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
-        : this(Object, Manager, BodyPart)
+    public AfterManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
+        : this(ManageDefaultEquipmentEvent.Object, ManageDefaultEquipmentEvent.Manager, ManageDefaultEquipmentEvent.BodyPart)
     {
         this.ManageDefaultEquipmentEvent = ManageDefaultEquipmentEvent;
     }
@@ -61,41 +61,34 @@ public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaul
         BodyPart = null;
     }
 
-    public static AfterManageDefaultEquipmentEvent Send(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent, GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
+    public static void Send(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
     {
         Debug.Entry(4,
             $"{typeof(AfterManageDefaultEquipmentEvent).Name}." +
-            $"{nameof(Send)}(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent, GameObject Object: {Object.ShortDisplayNameStripped}, NaturalEquipmentManager Manager, BodyPart BodyPart: [{BodyPart.ID}:{BodyPart.Type}])",
+            $"{nameof(Send)}(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)",
             Indent: 0);
-        
+
+        AfterManageDefaultEquipmentEvent E = new(ManageDefaultEquipmentEvent);
+
+        Debug.Entry(4, $"Wielder", E.Object?.Equipped != null ? E.Object.Equipped.ShortDisplayNameStripped : "[null]", Indent: 1);
+
         bool flag = true;
-        if (GameObject.Validate(ref Object))
+        if (E.BodyPart != null && GameObject.Validate(ref E.Object))
         {
-            AfterManageDefaultEquipmentEvent E = new(ManageDefaultEquipmentEvent, Object, Manager, BodyPart);
 
-            Manager = Manager.ManageNaturalEquipment();
-
-            if (Object.WantEvent(ID, CascadeLevel))
-            {
-                flag = Object.HandleEvent(E);
-            }
-            if (flag && Object.HasRegisteredEvent(E.GetRegisteredEventID()))
+            Debug.Entry(4, $"flag = Object.HandleEvent(E)", Indent: 2);
+            flag = E.Object.HandleEvent(E);
+            Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
+            if (flag && E.Object.HasRegisteredEvent(E.GetRegisteredEventID()))
             {
                 Event @event = Event.New(E.GetRegisteredEventID());
                 @event.SetParameter("ManageDefaultEquipmentEvent", E.ManageDefaultEquipmentEvent);
                 @event.SetParameter("Object", E.Object);
                 @event.SetParameter("Manager", E.Manager);
                 @event.SetParameter("BodyPart", E.BodyPart);
-                Object.FireEvent(@event);
-
-                E.ManageDefaultEquipmentEvent = @event.GetParameter("ManageDefaultEquipmentEvent") as ManageDefaultEquipmentEvent;
-                E.Object = @event.GetParameter("Object") as GameObject;
-                E.Manager = @event.GetParameter("NaturalEquipmentManager") as NaturalEquipmentManager;
-                E.BodyPart = @event.GetParameter("BodyPart") as BodyPart;
+                E.Object.FireEvent(@event);
             }
-            return E;
         }
-        return null;
     }
 
     public static AfterManageDefaultEquipmentEvent FromPool(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent, GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)

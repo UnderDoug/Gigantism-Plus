@@ -74,7 +74,7 @@ namespace HNPS_GigantismPlus
 
         public BeforeDescribeModGiganticEvent Send()
         {
-            bool flag = The.Game.HandleEvent(this) || Object.HandleEvent(this);
+            bool flag = The.Game.HandleEvent(this) && Object.HandleEvent(this);
             
             if (flag && Object.HasRegisteredEvent(GetRegisteredEventID()))
             {

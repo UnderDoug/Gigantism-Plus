@@ -11,7 +11,7 @@ namespace XRL.World.Parts
 {
     [Serializable]
     public class ModNaturalEquipment<T> : ModNaturalEquipmentBase
-        where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
+        where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
     {
         private T _assigningPart = null;
 

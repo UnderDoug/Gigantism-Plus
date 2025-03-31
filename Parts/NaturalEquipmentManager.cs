@@ -253,7 +253,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(AccumulateMeleeWeaponBonuses)}() *//", Indent: 1);
         }
 
-        public virtual NaturalEquipmentManager ManageNaturalEquipment()
+        public virtual void ManageNaturalEquipment()
         {
             Debug.Header(4, 
                 $"{typeof(NaturalEquipmentManager).Name}",
@@ -275,6 +275,7 @@ namespace XRL.World.Parts
                 },
             };
 
+            Debug.Entry(4, $"Cycling NaturalEquipmentMods for PrepareNaturalEquipmentModAdjustments(naturalEquipmentMod)", Indent: 1);
             // Cycle the NaturalEquipmentMods to prepare the final set of adjustments to make
             Debug.Entry(4, $"> foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)", Indent: 1);
             foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
@@ -320,6 +321,8 @@ namespace XRL.World.Parts
             // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
             ApplyNaturalEquipmentMods();
 
+
+            Debug.Entry(4, $"Cycling Adjustments, Applying where applicable", Indent: 1);
             // Cycle through the AdjustmentTargets (GameObject, Render, MeleeWeapon, Armor)
             // |__ Cycle through each Target's set of adjustments, applying them if possible 
             //     |__ Where not possible, output a warning.
@@ -341,6 +344,8 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1);
 
+
+            Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1);
             // This lets us check whether there's a Tile been provided anywhere in a fairly sizeable list of locations
             // named "AdjectiveAdjectiveAdjectiveNoun", allowing for tiles to be added for an arbitrary set of combinations
             // provided the order of the adjectives is consistent (which should definitely be the case with this mod.
@@ -371,8 +376,6 @@ namespace XRL.World.Parts
             Debug.Footer(4,
                 $"{typeof(NaturalEquipmentManager).Name}",
                 $"{nameof(ManageNaturalEquipment)}()");
-
-            return this;
         }
 
         public virtual void ApplyNaturalEquipmentMods()
@@ -389,8 +392,7 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == GetShortDescriptionEvent.ID
-                || ID == PooledEvent<BodyPartsUpdatedEvent>.ID;
+                || ID == GetShortDescriptionEvent.ID;
         }
 
         public override bool HandleEvent(GetShortDescriptionEvent E)
@@ -424,17 +426,10 @@ namespace XRL.World.Parts
                 + $"{nameof(FireEvent)}(Event E.ID: {E.ID})",
                 Indent: 0);
 
-                if (WantToManage)
-                {
-                    BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
-                    ManageDefaultEquipmentEvent manageDefaultEquipmentEvent = new(ParentObject, Wielder, this, ParentLimb);
-                    AfterManageDefaultEquipmentEvent afterManageDefaultEquipmentEvent = AfterManageDefaultEquipmentEvent
-                        .Send(manageDefaultEquipmentEvent.Send(), ParentObject, this, ParentLimb);
-                }
-                else
-                {
-                    Debug.Entry(4, $"Don't want to manage", Indent: 1);
-                }
+                BeforeManageDefaultEquipmentEvent beforeEvent = BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
+                ManageDefaultEquipmentEvent manageEvent = ManageDefaultEquipmentEvent.Manage(beforeEvent, Wielder);
+                AfterManageDefaultEquipmentEvent.Send(manageEvent);
+
                 Debug.Entry(4,
                     $"x {nameof(NaturalEquipmentManager)}."
                     + $"{nameof(FireEvent)}(Event E.ID: {E.ID}) @//",

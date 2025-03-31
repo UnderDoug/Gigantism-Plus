@@ -27,7 +27,6 @@ namespace HNPS_GigantismPlus
 
         public static BeforeModGiganticAppliedEvent FromPool(GameObject Object, ModGigantic Modification)
         {
-            Debug.Entry(4, $"{typeof(BeforeModGiganticAppliedEvent).Name}.{nameof(FromPool)}(Object: {Object?.DebugName})", Indent: 0);
             BeforeModGiganticAppliedEvent beforeModGiganticAppliedEvent = FromPool();
             beforeModGiganticAppliedEvent.Object = Object;
             beforeModGiganticAppliedEvent.Modification = Modification;
@@ -35,16 +34,9 @@ namespace HNPS_GigantismPlus
         }
         public static void Send(GameObject Object, ModGigantic Modification)
         {
-            Debug.Entry(4,
-                $"{typeof(BeforeModGiganticAppliedEvent).Name}." +
-                $"{nameof(Send)}(Object: {Object?.ShortDisplayNameStripped}, ModGigantic Modification)",
-                Indent: 0);
-
             BeforeModGiganticAppliedEvent beforeModGiganticAppliedEvent = FromPool(Object, Modification);
 
-            bool flag = The.Game.HandleEvent(beforeModGiganticAppliedEvent) || Object.HandleEvent(beforeModGiganticAppliedEvent);
-            
-            ResetTo(ref beforeModGiganticAppliedEvent);
+            bool flag = The.Game.HandleEvent(beforeModGiganticAppliedEvent) && Object.HandleEvent(beforeModGiganticAppliedEvent);
 
             if (flag && Object.HasRegisteredEvent(typeof(BeforeModGiganticAppliedEvent).Name))
             {

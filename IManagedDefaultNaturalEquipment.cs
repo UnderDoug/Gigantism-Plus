@@ -8,8 +8,8 @@ using XRL.World.Parts.Mutation;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalEquipment<T> : IManagedDefaultNaturalEquipment
-        where T : IPart, IManagedDefaultNaturalEquipment<T>, new ()
+    public interface IManagedDefaultNaturalEquipment<T> : IManagedDefaultNaturalEquipment, IModEventHandler<ManageDefaultEquipmentEvent>
+        where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new ()
     {
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }

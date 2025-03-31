@@ -85,7 +85,7 @@ namespace XRL.World.Parts
 
             Become(Implantee, Model, Implant);
 
-            OnManageNaturalEquipment(Implantee.Body);
+            Implantee.Body.UpdateBodyParts();
 
             Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
         } //!--- public override void OnImplanted(GameObject Object)

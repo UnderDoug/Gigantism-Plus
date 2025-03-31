@@ -310,7 +310,7 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
+        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false, bool Wish = false)
         {
             string creatureBlueprint = Creature.Blueprint;
 
@@ -321,9 +321,9 @@ namespace HNPS_GigantismPlus
             (DieRoll die, int high) merchantTonics = (new("1d4"), 4);
             (DieRoll die, int high) merchantRareTonics = (new("1d10"), 10);
 
-            if (!Option) goto Exit; // skip if Option disabled
-            if (!Creature.IsCreature) goto Exit; // skip non-creatures
-            if (Creature.Inventory == null) goto Exit; // skip objects without inventoryalready been gigantified.
+            if (!Option) return; // skip if Option disabled
+            if (!Creature.IsCreature) return; // skip non-creatures
+            if (Creature.Inventory == null) return; // skip creatures without inventory
 
             Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption})", Indent: 1);
             Debug.Divider(3, Indent: 1);
@@ -482,37 +482,39 @@ namespace HNPS_GigantismPlus
                     }
 
                     Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
-                    if (NoThanks > 0) goto Skip;
-
-                    Debug.Entry(3, $"Gigantifying {ItemName}", Indent: 2);
+                    if (NoThanks > 0 && !Wish)
+                    {
+                        Debug.Entry(3, "/x Skipping", Indent: 2);
+                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
+                        continue;
+                    }
+                    string byWish = Wish ? ", by Wish!" : "";
+                    Debug.Entry(3, $"Gigantifying {ItemName}{byWish}", Indent: 2);
                     item.ApplyModification("ModGigantic");
                     if (!item.HasPart<ModGigantic>()) Debug.Entry(3, ItemName, "<!!> Gigantification Failed", Indent: 2);
                     else Debug.Entry(3, ItemName, "has been Gigantified", Indent: 2);
 
                     Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
-                    continue;
                 }
                 else
                 {
                     Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 3);
+                    Debug.Entry(3, "/x Skipping", Indent: 2);
+                    Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
                 }
-            Skip:
-                Debug.Entry(3, "/x Skipping", Indent: 2);
-                Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
             }
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             Debug.Entry(4, "x foreach (GameObject item in itemsToProcess) >//", Indent: 1);
 
             // Now equip all items that should be equipped
-
-            Debug.Entry(3, "Creature.WantToReequip()", Indent: 1);
-            Creature.WantToReequip();
+            if (!Wish)
+            {
+                Debug.Entry(3, "Creature.WantToReequip()", Indent: 1);
+                Creature.WantToReequip();
+            }
 
             Debug.Divider(3, Indent: 1);
             Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", Indent: 1);
-            
-            Exit:
-            return;
         } //!-- public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
         
         public static void SetSwingSound(this GameObject Object, string Path)
@@ -610,14 +612,14 @@ namespace HNPS_GigantismPlus
         }
 
         public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
-            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
+            where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
         {
             IModification ModPart = ModPartName.ConvertToModification();
             return (ModNaturalEquipment<T>)ModPart;
         }
 
         public static T GetManagedNaturalEquipmentCompatiblePart<T>(this GameObject Object) 
-            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
+            where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
         {
             T part = Object?.GetPart<T>();
             if (part != null) return part;

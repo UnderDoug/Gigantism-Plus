@@ -8,7 +8,7 @@ namespace HNPS_GigantismPlus
 {
     public class ManageDefaultEquipmentEvent : ModPooledEvent<ManageDefaultEquipmentEvent>
     {
-        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT + CASCADE_EXCEPT_THROWN_WEAPON;
+        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
 
         public GameObject Object;
 
@@ -30,6 +30,13 @@ namespace HNPS_GigantismPlus
             this.Wielder = @new.Wielder;
             this.Manager = @new.Manager;
             this.BodyPart = @new.BodyPart;
+        }
+        public ManageDefaultEquipmentEvent(BeforeManageDefaultEquipmentEvent beforeManageDefaultEquipmentEvent, GameObject Wielder)
+            : this(beforeManageDefaultEquipmentEvent.Object, 
+                  Wielder, 
+                  beforeManageDefaultEquipmentEvent.Manager, 
+                  beforeManageDefaultEquipmentEvent.BodyPart)
+        {
         }
         public ManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent Source)
             : this()
@@ -58,33 +65,36 @@ namespace HNPS_GigantismPlus
             BodyPart = null;
         }
 
-        public ManageDefaultEquipmentEvent Send()
+        public static ManageDefaultEquipmentEvent Manage(BeforeManageDefaultEquipmentEvent BeforeManageDefaultEquipmentEvent, GameObject Wielder)
         {
-            Debug.Entry(4, 
-                $"{typeof(ManageDefaultEquipmentEvent).Name}." + 
-                $"{nameof(Send)}(GameObject Object: {Object.ShortDisplayNameStripped}, NaturalEquipmentManager Manager, BodyPart BodyPart: [{BodyPart.ID}:{BodyPart.Type}])",
+            Debug.Entry(4,
+                $"{typeof(ManageDefaultEquipmentEvent).Name}." +
+                $"{nameof(Manage)}()",
                 Indent: 0);
+            Debug.Entry(4, $"Wielder", Wielder != null ? Wielder.ShortDisplayNameStripped : "[null]", Indent: 1);
+            
+            ManageDefaultEquipmentEvent E = new(BeforeManageDefaultEquipmentEvent, Wielder);
 
             bool flag = true;
-            if (GameObject.Validate(ref Object) && Wielder.WantEvent(ID, CascadeLevel))
+            if (GameObject.Validate(ref E.Wielder) && GameObject.Validate(ref E.Object) )
             {
-                ManageDefaultEquipmentEvent manageDefaultEquipmentEvent = FromPool();
-                manageDefaultEquipmentEvent.Object = Object;
-                manageDefaultEquipmentEvent.Wielder = Wielder;
-                manageDefaultEquipmentEvent.Manager = Manager;
-                manageDefaultEquipmentEvent.BodyPart = BodyPart;
-                flag = Wielder.HandleEvent(manageDefaultEquipmentEvent);
+                Debug.Entry(4, $"flag = E.Wielder.HandleEvent(E) && E.Object.HandleEvent(E)", Indent: 2);
+                flag = E.Wielder.HandleEvent(E) && E.Object.HandleEvent(E);
+                Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
+                if (flag && (E.Wielder.HasRegisteredEvent(E.GetRegisteredEventID()) || E.Object.HasRegisteredEvent(E.GetRegisteredEventID())))
+                {
+                    Debug.Entry(4, $"(flag and (Wielder.HasRegisteredEvent(E.GetRegisteredEventID()) || Object.HasRegisteredEvent(E.GetRegisteredEventID())))", Indent: 2);
+                    Event @event = Event.New(E.GetRegisteredEventID());
+                    @event.SetParameter("Object", E.Object);
+                    @event.SetParameter("Wielder", E.Wielder);
+                    @event.SetParameter("Manager", E.Manager);
+                    @event.SetParameter("BodyPart", E.BodyPart);
+                    E.Wielder.FireEvent(@event);
+                    E.Object.FireEvent(@event);
+                }
             }
-            if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent(GetRegisteredEventID()))
-            {
-                Event @event = Event.New(GetRegisteredEventID());
-                @event.SetParameter("Object", Object);
-                @event.SetParameter("Wielder", Wielder);
-                @event.SetParameter("Manager", Manager);
-                @event.SetParameter("BodyPart", BodyPart);
-                Wielder.FireEvent(@event);
-            }
-            return this;
+            E.Manager.ManageNaturalEquipment();
+            return E;
         }
 
         public static ManageDefaultEquipmentEvent FromPool(GameObject Object, GameObject Wielder, NaturalEquipmentManager Manager, BodyPart BodyPart)

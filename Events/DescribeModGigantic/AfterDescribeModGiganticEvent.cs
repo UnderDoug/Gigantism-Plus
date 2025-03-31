@@ -106,7 +106,7 @@ namespace HNPS_GigantismPlus
 
         public AfterDescribeModGiganticEvent Send()
         {
-            bool flag = The.Game.HandleEvent(this) || Object.HandleEvent(this);
+            bool flag = The.Game.HandleEvent(this) && Object.HandleEvent(this);
 
             if (flag && Object.HasRegisteredEvent(GetRegisteredEventID()))
             {
@@ -215,15 +215,19 @@ namespace HNPS_GigantismPlus
             {
                 generalDescriptions.Add(new List<string> { null, "much heavier than usual" });
             }
+            else
+            {
+                generalDescriptions.Add(new List<string> { null, "unusually large" });
+            }
 
-            MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
+                MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
             bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
             if (meleeWeapon != null && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 weaponDescriptions.Add(new List<string> { "have", "+3 damage" });
                 if (meleeWeapon.Skill == "Cudgel")
                 {
-                    weaponDescriptions.Add(new List<string> { null, "twice as effective targetEvent you Slam with " + Object.them });
+                    weaponDescriptions.Add(new List<string> { null, "twice as effective when you Slam with " + Object.them });
                 }
                 else if (meleeWeapon.Skill == "Axe")
                 {
@@ -303,9 +307,9 @@ namespace HNPS_GigantismPlus
             {
                 SB.Append(Grammar.MakeAndList(processedGeneralDescription) + ".");
             }
-            else
+            else if (weaponDescriptions.Count == 0)
             {
-                SB.Append("thing is really big. Like, massive!");
+                SB.Append(", really big. Like, massive!");
             }
 
             return Event.FinalizeString(SB);

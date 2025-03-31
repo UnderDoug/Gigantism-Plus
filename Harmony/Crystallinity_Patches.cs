@@ -78,7 +78,12 @@ namespace HNPS_GigantismPlus.Harmony
                 managed.HasBurrowing = actor.HasPartDescendedFrom<BurrowingClaws>();
                 managed.NaturalEquipmentMod = naturalEquipmentMod;
                 managed.ChangeLevel(level);
-                managed.OnManageNaturalEquipment(body);
+
+                foreach (BodyPart bodyPart in body.LoopPart(managed.NaturalEquipmentMod.BodyPartType))
+                {
+                    NaturalEquipmentManager manager = bodyPart.DefaultBehavior?.GetPart<NaturalEquipmentManager>() ?? bodyPart.Equipped?.GetPart<NaturalEquipmentManager>();
+                    if (manager != null) managed.OnManageNaturalEquipment(manager, bodyPart);
+                }
             }
             else
             {

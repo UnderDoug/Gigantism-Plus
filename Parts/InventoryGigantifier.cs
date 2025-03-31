@@ -1,5 +1,6 @@
 ﻿using System;
 using HNPS_GigantismPlus;
+using XRL.Wish;
 using XRL.World.Parts.Mutation;
 using static HNPS_GigantismPlus.Options;
 
@@ -49,4 +50,15 @@ namespace XRL.World.Parts
         }
 
     } // public class InventoryGigantifier : IScribedPart
+
+    [HasWishCommand]
+    public class GigantifyInventoryWishHandler
+    {
+        [WishCommand(Command = "HNPS_GigantifyInventory")]
+        public static void GigantifyInventory()
+        {
+            GameObject player = The.Player;
+            player.GigantifyInventory(true, true);
+        }
+    }
 }

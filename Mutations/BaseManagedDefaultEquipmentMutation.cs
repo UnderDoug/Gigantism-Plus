@@ -5,12 +5,13 @@ using XRL.World;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using XRL.World.Anatomy;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentMutation<T> : BaseDefaultEquipmentMutation, IManagedDefaultNaturalEquipment<T> 
-        where T : BaseManagedDefaultEquipmentMutation<T>, IManagedDefaultNaturalEquipment<T>, new()
+    public abstract class BaseManagedDefaultEquipmentMutation<T> : BaseDefaultEquipmentMutation, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T> 
+        where T : BaseManagedDefaultEquipmentMutation<T>, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
@@ -127,34 +128,13 @@ namespace XRL.World.Parts.Mutation
         public override bool ChangeLevel(int NewLevel)
         {
             Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}");
-
-            List<string> bodyPartTypesWantingManaged = new();
             Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
-                if (!bodyPartTypesWantingManaged.Contains(NaturalEquipmentMod.BodyPartType))
-                {
-                    Debug.Entry(4, $"{typeof(T).Name} added \"{NaturalEquipmentMod.BodyPartType}\" to WantingManaged list.", Indent: 2);
-                    bodyPartTypesWantingManaged.Add(NaturalEquipmentMod.BodyPartType);
-                }
             }
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
             Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
-            Debug.Entry(4, $"> foreach (BodyPart bodyPart in ParentObject.Body.LoopParts())", Indent: 1);
-            foreach (BodyPart bodyPart in ParentObject.Body.LoopParts())
-            {
-                if (bodyPartTypesWantingManaged.Contains(bodyPart.Type))
-                {
-                    NaturalEquipmentManager manager = bodyPart.DefaultBehavior?.GetPart<NaturalEquipmentManager>();
-                    if (manager != null)
-                    {
-                        Debug.Entry(4, $"[{bodyPart.DefaultBehavior.ID}:{bodyPart.DefaultBehavior.Render.DisplayName}] {typeof(NaturalEquipmentManager).Name} told it WantsToManage", Indent: 2);
-                        manager.WantToManage = true;
-                    }
-                }
-            }
-            Debug.Entry(4, $"x foreach (BodyPart bodyPart in ParentObject.Body.LoopParts()) >//", Indent: 1);
             Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}");
             return base.ChangeLevel(NewLevel);
         }
@@ -170,13 +150,10 @@ namespace XRL.World.Parts.Mutation
             if (body != null)
             {
                 string targetType = TargetBodyPart.Type;
-                List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
-                foreach (BodyPart bodyPart in partsList)
+                foreach (BodyPart bodyPart in body.LoopPart(targetType))
                 {
                     Debug.Divider(4, "-", Count: 25, Indent: 2);
                     Debug.LoopItem(4, $"part", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Type}]", Indent: 2);
-
-                    if (bodyPart.Type != targetType) continue;
 
                     ModNaturalEquipment<T> naturalEquipmentMod = null;
                     if (NaturalEquipmentMod != null)
@@ -231,12 +208,30 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageNaturalEquipment)}(body: {ParentObject.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})");
         }
 
         public override bool Unmutate(GameObject GO)
         {
             return base.Unmutate(GO);
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == ManageDefaultEquipmentEvent.ID;
+        }
+        public virtual bool HandEvent(ManageDefaultEquipmentEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                Indent: 1);
+            if (E.Wielder == ParentObject)
+            {
+                OnManageNaturalEquipment(E.Manager, E.BodyPart);
+            }
+            return base.HandleEvent(E);
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -266,20 +261,6 @@ namespace XRL.World.Parts.Mutation
                 }
             }
             return base.FireEvent(E);
-        }
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<ManageDefaultEquipmentEvent>.ID;
-        }
-        public virtual bool HandEvent(ManageDefaultEquipmentEvent E)
-        {
-            if (E.Wielder == ParentObject)
-            {
-                OnManageNaturalEquipment(E.Manager, E.BodyPart);
-            }
-            return base.HandleEvent(E);
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

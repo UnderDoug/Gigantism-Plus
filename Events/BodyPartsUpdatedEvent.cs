@@ -7,39 +7,42 @@ public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
 {
     public new static readonly int CascadeLevel = CASCADE_DESIRED_OBJECT; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
 
-    public GameObject Object;
+    public GameObject Actor;
 
     public override int GetCascadeLevel()
     {
         return CascadeLevel;
     }
 
-    public override bool Dispatch(IEventHandler Handler)
+    public virtual string GetRegisteredEventID()
     {
-        return Handler.HandleEvent(this);
+        return $"{typeof(BodyPartsUpdatedEvent).Name}";
     }
 
     public override void Reset()
     {
         base.Reset();
-        Object = null;
+        Actor = null;
     }
 
-    public static void Send(GameObject Object)
+    public static void Send(GameObject Actor)
     {
-        Debug.Entry(4, $"{typeof(BodyPartsUpdatedEvent).Name}.{nameof(Send)}(GameObject Object: {Object?.DebugName})", Indent: 0);
+        Debug.Entry(4, $"{typeof(BodyPartsUpdatedEvent).Name}.{nameof(Send)}(GameObject Object: {Actor?.DebugName})", Indent: 0);
         bool flag = true;
-        if (flag && GameObject.Validate(ref Object) && Object.WantEvent(ID, CascadeLevel))
+        BodyPartsUpdatedEvent E = FromPool();
+        if (GameObject.Validate(ref Actor))
         {
-            BodyPartsUpdatedEvent E = FromPool();
-            E.Object = Object;
-            flag = Object.HandleEvent(E);
-        }
-        if (flag && GameObject.Validate(ref Object) && Object.HasRegisteredEvent("BodyPartsUpdatedEvent"))
-        {
-            Event @event = Event.New("BodyPartsUpdatedEvent");
-            @event.SetParameter("Object", Object);
-            Object.FireEvent(@event);
+            if (Actor.WantEvent(ID, CascadeLevel))
+            {
+                E.Actor = Actor;
+                flag = Actor.HandleEvent(E);
+            }
+            if (flag && Actor.HasRegisteredEvent(E.GetRegisteredEventID()))
+            {
+                Event @event = Event.New(E.GetRegisteredEventID());
+                @event.SetParameter("Object", Actor);
+                Actor.FireEvent(@event);
+            }
         }
     }
 }

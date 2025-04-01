@@ -216,7 +216,7 @@ namespace XRL.World.Parts.Mutation
         public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
         {
             if (NaturalWeaponSubpart.BodyPartType == "Head") return 5;
-            if (NaturalWeaponSubpart.BodyPartType == "Hand") return (int)Math.Max(0, Math.Floor((Level - 9) / 3.0));
+            if (NaturalWeaponSubpart.BodyPartType == "Hand") return (int)Math.Max(1, Math.Floor((Level - 9) / 3.0));
             return 0;
         }
         public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)

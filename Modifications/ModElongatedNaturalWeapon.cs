@@ -1,7 +1,8 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using XRL.Language;
 using XRL.World.Parts.Mutation;
+using HNPS_GigantismPlus;
 
 namespace XRL.World.Parts
 {
@@ -38,25 +39,29 @@ namespace XRL.World.Parts
             string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            int dieSizeIncrease = 2 + GetDamageDieSize();
-            int damageBonusIncrease = 1 + GetDamageBonus();
+            int dieSize = GetDamageDieSize();
+            int damageBonus = GetDamageBonus();
             string description = $"{descriptionName}: ";
             description += ParentObject.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " have ")
-                        : ("This " + text + " has ");
-            if (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
+
+            List<List<string>> descriptions = new();
+            if (dieSize > 0 && (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())) descriptions
+                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+
+            if (damageBonus != 0) descriptions
+                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
+            descriptions
+                    .Add(new() { "", $"{pluralPossessive} bonus damage scales by half {pluralPossessive} wielder's Strength Modifier" });
+
+            List<string> processedDescriptions = new();
+            foreach(List<string> entry in descriptions)
             {
-                description += $"{dieSizeIncrease.Signed()} to {pluralPossessive} damage die size, and ";
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
             }
-            if (damageBonusIncrease == 0)
-            {
-                description += $"half {pluralPossessive} wielder's Strength Modifier damage.";
-            }
-            else
-            {
-                description += $"{damageBonusIncrease.Signed()} damage (Strength Modifier/2).";
-            }
-            return description;
+
+            return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
     } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
 }

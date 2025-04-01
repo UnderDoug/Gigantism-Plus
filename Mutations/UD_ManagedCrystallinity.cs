@@ -13,7 +13,6 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class UD_ManagedCrystallinity 
         : Crystallinity
-        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>
     {
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
@@ -75,8 +74,6 @@ namespace XRL.World.Parts.Mutation
             {
                 AssigningPart = this,
                 BodyPartType = "Hand",
-
-                DamageDieSize = 1,
 
                 ModPriority = 40,
                 DescriptionPriority = 40,
@@ -162,8 +159,8 @@ namespace XRL.World.Parts.Mutation
         public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasBurrowing))
-                return 0;
-            return 1;
+                return 1;
+            return 2;
         }
 
         public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
@@ -294,13 +291,13 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, $"{typeof(UD_ManagedCrystallinity).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
             Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
-            Body body = ParentObject.Body;
-            if (body != null)
-                ProcessNaturalEquipment(Manager, TargetBodyPart);
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            ProcessNaturalEquipment(Manager, TargetBodyPart);
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
 
             Debug.Footer(4,
                 $"{typeof(UD_ManagedCrystallinity).Name}",
-                $"{nameof(OnManageNaturalEquipment)}(body: {ParentObject.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})");
         }
 
         public override bool WantEvent(int ID, int cascade)

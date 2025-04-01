@@ -207,6 +207,8 @@ namespace XRL.World.Parts
             }
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
             Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+
+            Implantee.Body.UpdateBodyParts();
         } //!--- public override void OnImplanted(GameObject Object)
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
@@ -219,20 +221,21 @@ namespace XRL.World.Parts
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
             Debug.Entry(4, $"TARGET {Implantee.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
-            
-            Body body = Implantee.Body;
-            if (body != null)
-                ProcessNaturalEquipment(Manager, TargetBodyPart);
+
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            ProcessNaturalEquipment(Manager, TargetBodyPart);
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageNaturalEquipment)}(body: {Implantee.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body of: {Implantee.Blueprint})");
         }
 
         public override bool WantEvent(int ID, int cascade)
         {
             return ID == ImplantedEvent.ID
                 || ID == UnimplantedEvent.ID
+                || ID == BodyPartsUpdatedEvent.ID
                 || ID == ManageDefaultEquipmentEvent.ID;
         }
         public override bool HandleEvent(ImplantedEvent E)
@@ -255,6 +258,20 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
+        public bool HandleEvent(BodyPartsUpdatedEvent E)
+        {
+            if (E.Actor == Implantee)
+            {
+                Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+                foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+                }
+                if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+                Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+            }
+            return base.HandleEvent(E);
+        }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
@@ -268,18 +285,24 @@ namespace XRL.World.Parts
             {
                 GameObject Actor = E.GetParameter("Object") as GameObject;
                 string Mutation = E.GetParameter("Mutation") as string;
-                if (Actor == ParentObject)
+                if (Actor == Implantee)
                 {
-                    // Do Code?
+                    Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+                    foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
+                    {
+                        UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+                    }
+                    if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+                    Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
                 }
             }
             else if (E.ID == "MutationAdded")
             {
                 GameObject Actor = E.GetParameter("Object") as GameObject;
                 string Mutation = E.GetParameter("Mutation") as string;
-                if (Actor == ParentObject)
+                if (Actor == Implantee)
                 {
-                    // ProcessNaturalEquipment(Actor?.Body);
+                    // do code?
                 }
             }
             return base.FireEvent(E);

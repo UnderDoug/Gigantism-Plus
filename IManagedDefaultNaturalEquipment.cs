@@ -13,7 +13,7 @@ namespace XRL.World
         where T 
         : IPart
         , IManagedDefaultNaturalEquipment<T>
-        , new ()
+        , new()
     {
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
@@ -41,7 +41,11 @@ namespace XRL.World
         public abstract bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
     }
 
-    public interface IManagedDefaultNaturalEquipment : IModEventHandler<ManageDefaultEquipmentEvent>
+    public interface IManagedDefaultNaturalEquipment 
+        : IModEventHandler<ManageDefaultEquipmentEvent>
+        , IModEventHandler<BeforeManageDefaultEquipmentEvent>
+        , IModEventHandler<AfterManageDefaultEquipmentEvent>
+        , IModEventHandler<BodyPartsUpdatedEvent>
     {
         public int Level { get; set; }
 

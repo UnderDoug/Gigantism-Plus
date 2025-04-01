@@ -2,10 +2,10 @@
 using XRL.World;
 using HNPS_GigantismPlus;
 
-[GameEvent(Cascade = CASCADE_DESIRED_OBJECT, Cache = Cache.Pool)]
+[GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
 public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
 {
-    public new static readonly int CascadeLevel = CASCADE_DESIRED_OBJECT; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
+    public new static readonly int CascadeLevel = CASCADE_ALL; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
 
     public GameObject Actor;
 

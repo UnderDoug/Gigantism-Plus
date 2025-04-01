@@ -10,7 +10,7 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    public class AfterDescribeModGiganticEvent : ModPooledEvent<AfterDescribeModGiganticEvent>
+    public class DescribeModGiganticEvent : ModPooledEvent<DescribeModGiganticEvent>
     {
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
@@ -24,27 +24,27 @@ namespace HNPS_GigantismPlus
 
         private BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent;
 
-        public AfterDescribeModGiganticEvent()
+        public DescribeModGiganticEvent()
         {
         }
 
-        public AfterDescribeModGiganticEvent(GameObject Object, string ObjectNoun)
+        public DescribeModGiganticEvent(GameObject Object, string ObjectNoun)
             : this()
         {
-            AfterDescribeModGiganticEvent @new = FromPool(Object, ObjectNoun, new(), new(), new());
+            DescribeModGiganticEvent @new = FromPool(Object, ObjectNoun, new(), new(), new());
             this.Object = @new.Object;
             this.ObjectNoun = @new.ObjectNoun;
             WeaponDescriptions = @new.WeaponDescriptions;
             GeneralDescriptions = @new.GeneralDescriptions;
             BeforeDescribeModGiganticEvent = @new.BeforeDescribeModGiganticEvent;
         }
-        public AfterDescribeModGiganticEvent(GameObject Object, string ObjectNoun, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
+        public DescribeModGiganticEvent(GameObject Object, string ObjectNoun, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
             : this(Object, ObjectNoun)
         {
             this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
         }
 
-        public AfterDescribeModGiganticEvent(
+        public DescribeModGiganticEvent(
             GameObject Object,
             string ObjectNoun,
             List<List<string>> WeaponDescriptions,
@@ -54,7 +54,7 @@ namespace HNPS_GigantismPlus
             this.WeaponDescriptions = WeaponDescriptions;
             this.GeneralDescriptions = GeneralDescriptions;
         }
-        public AfterDescribeModGiganticEvent(
+        public DescribeModGiganticEvent(
             GameObject Object,
             string ObjectNoun,
             List<List<string>> WeaponDescriptions,
@@ -64,7 +64,7 @@ namespace HNPS_GigantismPlus
         {
             this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
         }
-        public AfterDescribeModGiganticEvent(AfterDescribeModGiganticEvent Source)
+        public DescribeModGiganticEvent(DescribeModGiganticEvent Source)
             : this()
         {
             Object = Source.Object;
@@ -73,7 +73,7 @@ namespace HNPS_GigantismPlus
             GeneralDescriptions = Source.GeneralDescriptions;
             BeforeDescribeModGiganticEvent = Source.BeforeDescribeModGiganticEvent;
         }
-        public AfterDescribeModGiganticEvent(BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
+        public DescribeModGiganticEvent(BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
             : this(BeforeDescribeModGiganticEvent.Object, BeforeDescribeModGiganticEvent.ObjectNoun)
         {
             this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
@@ -86,7 +86,7 @@ namespace HNPS_GigantismPlus
 
         public virtual string GetRegisteredEventID()
         {
-            return $"{typeof(AfterDescribeModGiganticEvent).Name}";
+            return $"{typeof(DescribeModGiganticEvent).Name}";
         }
 
         public override void Reset()
@@ -99,7 +99,7 @@ namespace HNPS_GigantismPlus
             BeforeDescribeModGiganticEvent = null;
         }
 
-        public AfterDescribeModGiganticEvent Send()
+        public DescribeModGiganticEvent Send()
         {
             bool flag = The.Game.HandleEvent(this) && Object.HandleEvent(this);
 
@@ -116,9 +116,9 @@ namespace HNPS_GigantismPlus
             return this;
         }
 
-        public static AfterDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
+        public static DescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
         {
-            AfterDescribeModGiganticEvent afterDescribeModGiganticEvent = FromPool();
+            DescribeModGiganticEvent afterDescribeModGiganticEvent = FromPool();
             afterDescribeModGiganticEvent.Object = Object;
             afterDescribeModGiganticEvent.ObjectNoun = ObjectNoun;
             afterDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions;
@@ -183,87 +183,6 @@ namespace HNPS_GigantismPlus
             GameObjectBlueprint GigantismPlusModGiganticDescriptions = GameObjectFactory.Factory.GetBlueprint(MODGIGANTIC_DESCRIPTIONBUCKET);
             weaponDescriptions.AddRange(IterateDataBucketTags(GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
             generalDescriptions.AddRange(IterateDataBucketTags(GigantismPlusModGiganticDescriptions, "Before", "General"));
-
-            if (Object.LiquidVolume != null)
-            {
-                generalDescriptions.Add(new List<string> { "hold", "twice as much liquid" });
-            }
-            if (Object.HasPart<EnergyCell>())
-            {
-                generalDescriptions.Add(new List<string> { "have", "twice the energy capacity" });
-            }
-            if (Object.HasPartDescendedFrom<IGrenade>())
-            {
-                generalDescriptions.Add(new List<string> { "have", "twice as large a radius of effect" });
-            }
-            if (Object.HasPart<Tonic>())
-            {
-                generalDescriptions.Add(new List<string> { "contain", "double the tonic dosage" });
-            }
-            if (Object.GetIntProperty("Currency") > 0)
-            {
-                generalDescriptions.Add(new List<string> { null, "much more valuable" });
-            }
-            
-            bool isDefaultBehavior = Object.EquipAsDefaultBehavior();
-            if (!isDefaultBehavior)
-            {
-                generalDescriptions.Add(new List<string> { null, "much heavier than usual" });
-            }
-            else
-            {
-                generalDescriptions.Add(new List<string> { null, "unusually large" });
-            }
-
-                MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
-            bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
-            if (meleeWeapon != null && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
-            {
-                weaponDescriptions.Add(new List<string> { "have", "+3 damage" });
-                if (meleeWeapon.Skill == "Cudgel")
-                {
-                    weaponDescriptions.Add(new List<string> { null, "twice as effective when you Slam with " + Object.them });
-                }
-                else if (meleeWeapon.Skill == "Axe")
-                {
-                    weaponDescriptions.Add(new List<string> { "cleave", "for -3 AV" });
-                }
-            }
-            else if (Object.HasPart<MissileWeapon>())
-            {
-                weaponDescriptions.Add(new List<string> { "have", "+3 damage" });
-            }
-            else if (Object.HasPart<ThrownWeapon>())
-            {
-                if (!Object.HasPartDescendedFrom<IGrenade>())
-                {
-                    weaponDescriptions.Add(new List<string> { "have", "+3 damage" });
-                }
-            }
-
-            bool improvisedMelee = false;
-            if (meleeWeapon != null && meleeWeapon.IsImprovised()) improvisedMelee = true;
-
-            if (!isDefaultBehaviorOrFloating)
-            {
-                if (Object.UsesSlots == null && 
-                    (!improvisedMelee
-                    || (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
-                    || Object.HasPart<MissileWeapon>()
-                    || Object.HasPart<Shield>()))
-                {
-                    generalDescriptions.Add(new List<string> { "", Object.it + " must be wielded " + (Object.UsesTwoSlots ? "four" : "two") + "-handed by non-gigantic creatures" });
-                }
-                else
-                {
-                    generalDescriptions.Add(new List<string> { "", "can only be equipped by gigantic creatures" });
-                }
-            }
-
-            if (Object.HasPart<DiggingTool>() || Object.HasPart<Drill>())
-            {
-                weaponDescriptions.Add(new List<string> { "dig", "twice as fast" });
-            }
 
             weaponDescriptions.AddRange(WeaponDescriptions);
             generalDescriptions.AddRange(GeneralDescriptions);

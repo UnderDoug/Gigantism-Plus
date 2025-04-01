@@ -30,11 +30,9 @@ namespace XRL.World.Parts
         public int JumpDistanceBonus = 0;
         public double StunningForceLevelFactor = 0.5;
 
-        public bool AugmentAdded = false;
-
         public CyberneticsGiganticExoframe()
         {
-            NaturalEquipmentMod = new()
+            NaturalEquipmentMod = new ModAugmentedNaturalWeapon()
             {
                 AssigningPart = this,
                 BodyPartType = "Hand",
@@ -43,12 +41,12 @@ namespace XRL.World.Parts
                 DescriptionPriority = -500,
 
                 Adjective = "augmented",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
+                AdjectiveColor = "C",
+                AdjectiveColorFallback = "c",
 
                 Adjustments = new(),
             };
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "fist");
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "manipulator", true);
         }
 
         public string GetShortAugmentAdjective(bool Pretty = true)
@@ -79,14 +77,13 @@ namespace XRL.World.Parts
 
             ProcessNaturalEquipmentAddedParts(NaturalEquipmentMod, AugmentAddParts);
             ProcessNaturalEquipmentAddedProps(NaturalEquipmentMod, AugmentAddProps);
-            NaturalEquipmentMod.AddedStringProps.Add("SwingSound", AugmentSwingSound);
-            NaturalEquipmentMod.AddedStringProps.Add("BlockedSound", AugmentBlockedSound);
-            NaturalEquipmentMod.AddedStringProps.Add("EquipmentFrameColors", AugmentEquipmentFrameColors);
+            NaturalEquipmentMod.AddedStringProps["SwingSound"] = AugmentSwingSound;
+            NaturalEquipmentMod.AddedStringProps["BlockedSound"] = AugmentBlockedSound;
+            NaturalEquipmentMod.AddedStringProps["EquipmentFrameColors"] = AugmentEquipmentFrameColors;
 
             Become(Implantee, Model, Implant);
 
-            Implantee.Body.UpdateBodyParts();
-
+            base.OnImplanted(Implantee, Implant);
             Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
         } //!--- public override void OnImplanted(GameObject Object)
 

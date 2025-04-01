@@ -3,6 +3,7 @@ using XRL.World.Parts.Mutation;
 using XRL.Language;
 using System.Text;
 using HNPS_GigantismPlus;
+using System.Collections.Generic;
 
 namespace XRL.World.Parts
 {
@@ -43,28 +44,30 @@ namespace XRL.World.Parts
         {
             string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            int dieSizeIncrease = GetDamageDieSize();
-            int Level = AssigningPart.Level;
-            string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
-            int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append(ParentObject.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " have ")
-                        : ("This " + text + " has "));
+            int dieSize = GetDamageDieSize(); 
+            int wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
+            string description = $"{descriptionName}: ";
+            description += ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
 
-            if (dieSizeIncrease > 0)
-            {
-                stringBuilder.Append(dieSizeIncrease.Signed()).Append($" to {pluralPossessive} damage die size").Append(wallHitsRequired > 0 ? ", " : " and ");
-            }
-            stringBuilder.Append(wallBonusPenetration).Append(" penetration vs. walls").Append(dieSizeIncrease > 0 ? ", " : " ")
-                .Append(wallHitsRequired > 0 ? "and " : ".");
+            List<List<string>> descriptions = new();
+            if (dieSize != 0) descriptions
+                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+            if (wallBonusPenetration != 0) descriptions
+                    .Add(new() { "get", $"{wallBonusPenetration.Signed()} penetration vs. walls" });
+            if (wallHitsRequired != 0) descriptions
+                    .Add(new() { "destroy", $"walls after {wallHitsRequired} penetrating hits" });
 
-            if (wallHitsRequired > 0)
+            List<string> processedDescriptions = new();
+            foreach (List<string> entry in descriptions)
             {
-                stringBuilder.Append("destroys walls after ").Append(wallHitsRequired).Append(" penetrating hits.");
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
             }
-            return Event.FinalizeString(stringBuilder);
+
+            return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
     } //!-- public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
 }

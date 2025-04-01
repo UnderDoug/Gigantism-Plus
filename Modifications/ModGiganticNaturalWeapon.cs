@@ -8,7 +8,10 @@ using HNPS_GigantismPlus;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
+    public class ModGiganticNaturalWeapon 
+        : ModNaturalEquipment<GigantismPlus>
+        , IModEventHandler<BeforeDescribeModGiganticEvent>
+        , IModEventHandler<DescribeModGiganticEvent>
     {
         public ModGiganticNaturalWeapon()
         {
@@ -28,7 +31,9 @@ namespace XRL.World.Parts
         {
             return base.WantEvent(ID, cascade)
                 || ID == GetCleaveAmountEvent.ID
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+                || ID == PooledEvent<GetDisplayNameEvent>.ID
+                || ID == BeforeDescribeModGiganticEvent.ID
+                || ID == DescribeModGiganticEvent.ID;
         }
 
         public override bool HandleEvent(GetCleaveAmountEvent E)
@@ -56,8 +61,52 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public bool HandleEvent(BeforeDescribeModGiganticEvent E)
+        {
+            if (E.Object == ParentObject)
+            {
+                int dieCount = GetDamageDieCount();
+                int damageBonus = 2+ GetDamageBonus();
+                int hitBonus = GetHitBonus();
+
+                if (dieCount > 0) E.WeaponDescriptions
+                        .Add(new() { "gain", $"{dieCount} additional damage die" });
+
+                if (damageBonus != 0) E.WeaponDescriptions
+                        .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
+
+                if (hitBonus != 0) E.WeaponDescriptions
+                        .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
+            }
+            return base.HandleEvent(E);
+        }
+
+        public bool HandleEvent(DescribeModGiganticEvent E)
+        {
+            if (E.Object == ParentObject)
+            {
+                List<string> elementToRemove = new() { "have", "+3 damage" };
+                int indexToRemove = 0;
+                foreach (List<string> entry in E.WeaponDescriptions)
+                {
+                    if (entry[0] == elementToRemove[0] && entry[1] == elementToRemove[1])
+                        break;
+                    indexToRemove++;
+                }
+                if (indexToRemove < E.WeaponDescriptions.Count)
+                    E.WeaponDescriptions.RemoveAt(indexToRemove);
+            }
+            return base.HandleEvent(E);
+        }
+
         public override string GetInstanceDescription()
         {
+            BeforeDescribeModGiganticEvent beforeEvent = new(ParentObject, null);
+            beforeEvent.Send();
+            DescribeModGiganticEvent afterEvent = new(ParentObject, null, beforeEvent);
+
+            return afterEvent.Send().Process();
+
             Debug.Entry(4, $"{typeof(ModGiganticNaturalWeapon).Name}.{nameof(GetInstanceDescription)}()");
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());

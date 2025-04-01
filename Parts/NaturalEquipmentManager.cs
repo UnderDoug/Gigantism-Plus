@@ -26,6 +26,8 @@ namespace XRL.World.Parts
         public int AccumulatedHitBonus;
         public int AccumulatedPenBonus;
 
+        public bool DoDynamicTile = true;
+
         private BodyPart _parentLimb = null;
 
         public BodyPart ParentLimb => _parentLimb ??= ParentObject?.EquippingPart();
@@ -124,7 +126,17 @@ namespace XRL.World.Parts
                 Indent: 4);
 
             NaturalEquipmentMods ??= new();
-            NaturalEquipmentMods.Add(NaturalEquipmentMod.ModPriority, NaturalEquipmentMod);
+            if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
+            {
+                Debug.Entry(2,
+                    $"WARN: {typeof(NaturalEquipmentManager).Name}." +
+                    $"{nameof(AddNaturalEquipmentMod)}()",
+                    $"Key:{NaturalEquipmentMod.ModPriority} " + 
+                    $"Value:{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " + 
+                    $"in {nameof(NaturalEquipmentMods)} overwritten. Same ModPriority",
+                    Indent: 2);
+            }
+            NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = NaturalEquipmentMod;
             Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 5);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
@@ -201,7 +213,7 @@ namespace XRL.World.Parts
                     }
                     else
                     {
-                        Debug.Entry(4,
+                        Debug.Entry(2,
                             $"WARN: {typeof(NaturalEquipmentManager).Name}."+
                             $"{nameof(PrepareNaturalEquipmentModAdjustments)}()",
                             $"failed to find Target \"{target}\" in {nameof(AdjustmentTargets)}",
@@ -288,7 +300,7 @@ namespace XRL.World.Parts
                 }
                 Debug.Entry(4, $"x foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
 
-                // Collect the "starting" values for damage if the NaturalEquipment is a weapon
+                // Collect the "starting" values for damage if the NaturalEquipment is a defaultFistWeapon
                 // Accumulate bonuses from NaturalEquipmentMods
                 // Apply the finalised values over the top
 
@@ -300,6 +312,17 @@ namespace XRL.World.Parts
                     DamageDie = new(originalWeapon.BaseDamage);
                     DamageDie.ToString()
                         .Vomit(4, "DamageDie", Indent: 2);
+                    if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
+                    {
+                        Debug.Entry(4, $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, attempting to adjust DamageDie", Indent: 3);
+                        GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
+                        if (defaultFist.TryGetPart(out MeleeWeapon defaultFistWeapon))
+                        {
+                            DamageDie = new(defaultFistWeapon.BaseDamage);
+                            DamageDie.ToString()
+                                .Vomit(4, "DamageDie", Indent: 2);
+                        }
+                    }
                     AccumulatedDamageDie.Count = DamageDie.GetDieCount()
                         .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
                     AccumulatedDamageDie.Size = (DamageDie.LeftValue > 0 ? DamageDie.RightValue : DamageDie.Left.RightValue)
@@ -350,7 +373,7 @@ namespace XRL.World.Parts
                         Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3);
                         if (TargetObject.SetPropertyOrFieldValue(Field, Value))
                             continue;
-                        Debug.Entry(4,
+                        Debug.Entry(2,
                             $"WARN: {typeof(NaturalEquipmentManager).Name}." +
                             $"{nameof(ManageNaturalEquipment)}()",
                             $"failed set Property or Field \"{Field}\" in {Target} to {Value}",
@@ -359,27 +382,33 @@ namespace XRL.World.Parts
                 }
                 Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1);
 
+                if (DoDynamicTile)
+                {
+                    Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1);
+                    // This lets us check whether there's a Tile been provided anywhere in a fairly sizeable list of locations
+                    // named "AdjectiveAdjectiveAdjectiveNoun", allowing for tiles to be added for an arbitrary set of combinations
+                    // provided the order of the adjectives is consistent (which should definitely be the case with this mod.
+                    //  - "icy" and "flaming" were breaking it when the player also has flaming or freezing ray, so this will
+                    //    check without them first, applying that, then checking with them for the edge-case it's been included
+                    string icyString = "{{icy|icy}}";
+                    string flamingString = "{{fiery|flaming}}";
+                    string displayNameOnlySansRays = ParentObject.DisplayNameOnly;
+                    displayNameOnlySansRays.Replace(icyString, "");
+                    displayNameOnlySansRays.Replace(flamingString, "");
 
-                Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1);
-                // This lets us check whether there's a Tile been provided anywhere in a fairly sizeable list of locations
-                // named "AdjectiveAdjectiveAdjectiveNoun", allowing for tiles to be added for an arbitrary set of combinations
-                // provided the order of the adjectives is consistent (which should definitely be the case with this mod.
-                //  - "icy" and "flaming" were breaking it when the player also has flaming or freezing ray, so this will
-                //    check without them first, applying that, then checking with them for the edge-case it's been included
-                string icyString = "{{icy|icy}}";
-                string flamingString = "{{fiery|flaming}}";
-                string displayNameOnlySansRays = ParentObject.DisplayNameOnly;
-                displayNameOnlySansRays.Replace(icyString, "");
-                displayNameOnlySansRays.Replace(flamingString, "");
-
-                Debug.Divider(4, "-", 25, Indent: 2);
-                if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath)) ParentRender.Tile = tilePath;
-                Debug.Divider(4, "-", 25, Indent: 2);
-                if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath)) ParentRender.Tile = tilePath;
-                Debug.Divider(4, "-", 25, Indent: 2);
+                    Debug.Divider(4, "-", 25, Indent: 2);
+                    if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath)) ParentRender.Tile = tilePath;
+                    Debug.Divider(4, "-", 25, Indent: 2);
+                    if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath)) ParentRender.Tile = tilePath;
+                    Debug.Divider(4, "-", 25, Indent: 2);
+                }
+                else
+                {
+                    Debug.Entry(4, "DynamicTile search/application overriden", Indent: 2);
+                }
 
                 // We want these sick as, modified Natural Equipments to show up as a physical feature.
-                // The check for a weapon being undesirable unfortunately targets tags, but we set the IntProp to 0 just in case it changes
+                // The check for a defaultFistWeapon being undesirable unfortunately targets tags, but we set the IntProp to 0 just in case it changes
                 // These are always temporary DefaultBehaviors and should be completely refreshed any time something would normally
                 ParentObject.SetIntProperty("ShowAsPhysicalFeature", 1);
                 ParentObject.SetIntProperty("UndesirableWeapon", 0);

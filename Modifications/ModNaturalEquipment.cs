@@ -18,12 +18,13 @@ namespace XRL.World.Parts
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
+        [SerializeField]
         private T _assigningPart = null;
 
         public T AssigningPart
         {
             get => _assigningPart ??= ParentObject?.Equipped?.GetManagedNaturalEquipmentCompatiblePart<T>();
-            set => _assigningPart = null;
+            set => _assigningPart = value;
         }
 
         public ModNaturalEquipment()
@@ -206,42 +207,38 @@ namespace XRL.World.Parts
             string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            int dieCountIncrease = GetDamageDieCount();
-            int dieSizeIncrease = GetDamageDieSize();
-            int damageBonusIncrease = GetDamageBonus();
-            int hitBonusIncrease = GetHitBonus();
-            int penBonusIncrease = GetPenBonus();
+            int dieCount = GetDamageDieCount();
+            int dieSize = GetDamageDieSize();
+            int damageBonus = GetDamageBonus();
+            int hitBonus = GetHitBonus();
+            int penBonus = GetPenBonus();
             string description = $"{descriptionName}: ";
             description += ParentObject.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " have ")
-                        : ("This " + text + " has ");
-            List<string> increases = new();
-            if (dieCountIncrease != 0)
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
+            
+            List<List<string>> descriptions = new();
+            if (dieCount != 0) descriptions
+                    .Add(new() { "gain", $"{dieCount} additional damage die" });
+            if (dieSize != 0) descriptions
+                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+            if (damageBonus != 0) descriptions
+                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
+            if (hitBonus != 0) descriptions
+                    .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
+            if (penBonus != 0) descriptions
+                    .Add(new() { "have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}" });
+            if (descriptions.IsNullOrEmpty()) descriptions
+                    .Add(new() { "gain", "some manner of adjustments" });
+
+
+            List<string> processedDescriptions = new();
+            foreach (List<string> entry in descriptions)
             {
-                increases.Add($"{dieCountIncrease.Signed()} to {pluralPossessive} damage die count");
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
             }
-            if (dieSizeIncrease != 0)
-            {
-                increases.Add($"{dieSizeIncrease.Signed()} to {pluralPossessive} damage die size");
-            }
-            if (damageBonusIncrease != 0)
-            {
-                increases.Add($"{damageBonusIncrease.Signed()} damage {damageBonusIncrease.Signed().BonusOrPenalty()}");
-            }
-            if (hitBonusIncrease != 0)
-            {
-                increases.Add($"{hitBonusIncrease.Signed()} Hit {hitBonusIncrease.Signed().BonusOrPenalty()}");
-            }
-            if (penBonusIncrease != 0)
-            {
-                increases.Add($"{penBonusIncrease.Signed()} Penetration {penBonusIncrease.Signed().BonusOrPenalty()}");
-            }
-            if (increases.IsNullOrEmpty())
-            {
-                increases.Add("some manner of adjustments");
-            }
-            description += Grammar.MakeAndList(increases) + ".";
-            return description;
+
+            return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

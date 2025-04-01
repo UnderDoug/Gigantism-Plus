@@ -3,6 +3,7 @@ using System.Text;
 using XRL.Language;
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
+using System.Collections.Generic;
 
 namespace XRL.World.Parts
 {
@@ -30,17 +31,34 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
+
             string text = ParentObject.GetObjectNoun();
-            string descriptionName = !ParentObject.HasNaturalWeaponMods() ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(GetColoredAdjective());
-            int dieSizeIncrease = 2 + GetDamageDieSize();
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append(ParentObject.IsPlural 
-                        ? ("These " + Grammar.Pluralize(text) + " have ") 
-                        : ("This " + text + " has "))
-                .Append(dieSizeIncrease.Signed()).Append($" to {pluralPossessive} damage die size.");
-            return Event.FinalizeString(stringBuilder);
+            int dieSize = GetDamageDieSize();
+            int damageBonus = GetDamageBonus();
+            string description = $"{descriptionName}: ";
+            description += ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
+
+            List<List<string>> descriptions = new();
+            if (dieSize > 0) descriptions
+                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+
+            if (damageBonus != 0) descriptions
+                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" }); 
+            
+            descriptions
+                    .Add(new() { null, $"inorganic" });
+
+            List<string> processedDescriptions = new();
+            foreach (List<string> entry in descriptions)
+            {
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
+            }
+
+            return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
     } //!-- public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
 }

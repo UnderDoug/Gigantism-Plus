@@ -20,6 +20,8 @@ namespace HNPS_GigantismPlus
 
         public BodyPart BodyPart;
 
+        public string target;
+
         public ManageDefaultEquipmentEvent()
         {
         }
@@ -61,6 +63,7 @@ namespace HNPS_GigantismPlus
             Wielder = null;
             Manager = null;
             BodyPart = null;
+            target = null;
         }
 
         public static ManageDefaultEquipmentEvent Manage(BeforeManageDefaultEquipmentEvent BeforeManageDefaultEquipmentEvent, GameObject Wielder)
@@ -77,7 +80,11 @@ namespace HNPS_GigantismPlus
             bool flag = true;
             if (GameObject.Validate(ref E.Wielder) && GameObject.Validate(ref E.Object) )
             {
-                flag = E.Wielder.HandleEvent(E) && E.Object.HandleEvent(E);
+                E.target = "wielder";
+                bool wielder = E.Wielder.HandleEvent(E);
+                E.target = "object";
+                bool @object = E.Object.HandleEvent(E);
+                flag = wielder && @object;
                 if (flag && (E.Wielder.HasRegisteredEvent(E.GetRegisteredEventID()) || E.Object.HasRegisteredEvent(E.GetRegisteredEventID())))
                 {
                     Event @event = Event.New(E.GetRegisteredEventID());
@@ -100,6 +107,7 @@ namespace HNPS_GigantismPlus
             manageDefaultEquipmentEvent.Wielder = Wielder;
             manageDefaultEquipmentEvent.Manager = Manager;
             manageDefaultEquipmentEvent.BodyPart = BodyPart;
+            manageDefaultEquipmentEvent.target = "";
             return manageDefaultEquipmentEvent;
         }
     }

@@ -21,6 +21,10 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            if(ParentObject.TryGetPart(out NaturalEquipmentManager manager))
+            {
+                manager.DoDynamicTile = false;
+            }
             base.ApplyModification(Object);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -35,8 +39,8 @@ namespace XRL.World.Parts
             string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalWeaponColoredAdjective());
             string description = $"{descriptionName}: ";
-            description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";
-            description += $"has some of its bonuses applied by an implanted {cyberneticsObject}.";
+            description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text) + " have ") : ("This " + text + " has "))} ";
+            description += $"some of its bonuses applied by an implanted {cyberneticsObject}.";
             return description;
         }
     } //!-- public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>

@@ -619,7 +619,10 @@ namespace HNPS_GigantismPlus
         }
 
         public static T GetManagedNaturalEquipmentCompatiblePart<T>(this GameObject Object) 
-            where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
+            where T 
+            : IPart
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
         {
             T part = Object?.GetPart<T>();
             if (part != null) return part;
@@ -666,7 +669,7 @@ namespace HNPS_GigantismPlus
             return Object.GetBlueprint().InheritsFrom(Blueprint);
         }
 
-        // https://stackoverflow.com/a/32184652
+        // partially repurposed from https://stackoverflow.com/a/32184652
         public static bool SetPropertyValue(this object @object, string PropertyName, object Value)
         {
             PropertyInfo property = @object?.GetType()?.GetProperty(PropertyName);
@@ -677,7 +680,7 @@ namespace HNPS_GigantismPlus
             property.SetValue(@object, safeValue, null);
             return property?.GetValue(@object, null) != null;
         }
-        // https://stackoverflow.com/a/1965659
+        // partially repurposed from https://stackoverflow.com/a/1965659
         public static bool SetFieldValue(this object @object, string FieldName, object Value)
         {
             FieldInfo field = @object?.GetType()?.GetField(FieldName);
@@ -687,6 +690,10 @@ namespace HNPS_GigantismPlus
 
             field.SetValue(@object, safeValue);
             return field?.GetValue(@object) != null;
+        }
+        public static bool SetPropertyOrFieldValue(this object @object, string PropertyOrField, object Value)
+        {
+            return @object.SetPropertyValue(PropertyOrField, Value) || @object.SetFieldValue(PropertyOrField, Value);
         }
 
         public static string NearDemonstrative(this GameObject Object)

@@ -20,7 +20,7 @@ namespace HNPS_GigantismPlus.Harmony
             return true;
         }
         */
-
+        /*
         [HarmonyPostfix]
         [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
         static void RegenerateDefaultEquipment_SendBodyPartsUpdatedEvent_Prefix(ref Body __instance)
@@ -30,5 +30,6 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, $"Object is {@this.ParentObject?.DebugName}", Indent: 1);
             BodyPartsUpdatedEvent.Send(@this.ParentObject);
         }
+        */
     }
 }

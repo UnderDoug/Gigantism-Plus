@@ -21,7 +21,6 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            Object.RemovePart("ModGigantic");
             base.ApplyModification(Object);
         }
 
@@ -64,7 +63,7 @@ namespace XRL.World.Parts
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             int damageBonus = GetDamageBonus();
             List<List<string>> list = new();
-            string text = "weapon";
+            string text = ParentObject.GetObjectNoun();
             if (part != null && ParentObject.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 list.Add(new List<string> { "have", $"{damageBonus.Signed()} damage" });

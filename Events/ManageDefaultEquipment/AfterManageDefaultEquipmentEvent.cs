@@ -58,23 +58,20 @@ namespace HNPS_GigantismPlus
 
         public static void Send(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
         {
+            GameObject Wielder = ManageDefaultEquipmentEvent.Wielder;
+            GameObject Object = ManageDefaultEquipmentEvent.Object;
             Debug.Entry(4,
-                $"{typeof(AfterManageDefaultEquipmentEvent).Name}." +
-                $"{nameof(Send)}({typeof(ManageDefaultEquipmentEvent).Name} {typeof(ManageDefaultEquipmentEvent).Name})",
+                $"! {typeof(AfterManageDefaultEquipmentEvent).Name}." +
+                $"{nameof(Send)}({typeof(ManageDefaultEquipmentEvent).Name}) for {Wielder.ID}:{Wielder.ShortDisplayNameStripped}'s {Object.ShortDisplayNameStripped}",
                 Indent: 0);
 
             AfterManageDefaultEquipmentEvent E = new(ManageDefaultEquipmentEvent);
             ManageDefaultEquipmentEvent.Reset();
 
-            Debug.Entry(4, $"Wielder", E.Object?.Equipped != null ? E.Object.Equipped.ShortDisplayNameStripped : "[null]", Indent: 1);
-
             bool flag = true;
             if (E.BodyPart != null && GameObject.Validate(ref E.Object))
             {
-
-                Debug.Entry(4, $"flag = Object.HandleEvent(E)", Indent: 2);
                 flag = E.Object.HandleEvent(E);
-                Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
                 if (flag && E.Object.HasRegisteredEvent(E.GetRegisteredEventID()))
                 {
                     Event @event = Event.New(E.GetRegisteredEventID());

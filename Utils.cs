@@ -38,7 +38,7 @@ namespace HNPS_GigantismPlus
                 BeforeDescribeModGiganticHandler.Register();
                 AfterDescribeModGiganticHandler.Register();
                 MeleeWeapon_AfterObjectCreatedHandler.Register();
-                //ExampleHandler.Register();
+                // ExampleHandler.Register();
             }
             else
             {

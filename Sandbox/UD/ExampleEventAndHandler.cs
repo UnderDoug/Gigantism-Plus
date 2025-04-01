@@ -15,8 +15,8 @@ namespace HNPS_GigantismPlus
         public static string GetFor(GameObject Object)
         {
             ExampleEvent E = FromPool();
-            Object.HandleEvent(E);
-            The.Game.HandleEvent(E);
+            // Object.HandleEvent(E);
+            // The.Game.HandleEvent(E);
             return E.Value;
         }
 
@@ -42,7 +42,7 @@ namespace HNPS_GigantismPlus
 
         public static void Register()
         {
-            The.Game.RegisterEvent(Instance, ExampleEvent.ID);
+            // The.Game.RegisterEvent(Instance, ExampleEvent.ID);
         }
 
         public bool HandleEvent(ExampleEvent E)

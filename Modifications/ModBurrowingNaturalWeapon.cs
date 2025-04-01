@@ -2,6 +2,7 @@
 using XRL.World.Parts.Mutation;
 using XRL.Language;
 using System.Text;
+using HNPS_GigantismPlus;
 
 namespace XRL.World.Parts
 {
@@ -40,7 +41,7 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
-            string text = "weapon";
+            string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             int dieSizeIncrease = GetDamageDieSize();
             int Level = AssigningPart.Level;

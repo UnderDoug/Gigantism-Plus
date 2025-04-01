@@ -35,6 +35,7 @@ namespace HNPS_GigantismPlus.Harmony
                 managed.HasElongated = actor.HasPart<ElongatedPaws>();
                 managed.HasCrystallinity = actor.HasPartDescendedFrom<Crystallinity>();
                 managed.NaturalEquipmentMod = naturalEquipmentMod;
+                managed.NaturalEquipmentMod.AssigningPart = managed;
                 managed.ChangeLevel(level);
 
                 foreach (BodyPart bodyPart in body.LoopPart(managed.NaturalEquipmentMod.BodyPartType))

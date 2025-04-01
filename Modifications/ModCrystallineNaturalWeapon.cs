@@ -30,7 +30,7 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
-            string text = "weapon";
+            string text = ParentObject.GetObjectNoun();
             string descriptionName = !ParentObject.HasNaturalWeaponMods() ? "\n" : "";
             descriptionName += Grammar.MakeTitleCase(GetColoredAdjective());
             int dieSizeIncrease = 2 + GetDamageDieSize();

@@ -66,10 +66,10 @@ namespace HNPS_GigantismPlus
         public static ManageDefaultEquipmentEvent Manage(BeforeManageDefaultEquipmentEvent BeforeManageDefaultEquipmentEvent, GameObject Wielder)
         {
             Debug.Entry(4,
-                $"{typeof(ManageDefaultEquipmentEvent).Name}." +
-                $"{nameof(Manage)}()",
+                $"! {typeof(ManageDefaultEquipmentEvent).Name}." +
+                $"{nameof(Manage)}({typeof(BeforeManageDefaultEquipmentEvent).Name}) " + 
+                $"for {Wielder?.ID}:{Wielder?.ShortDisplayNameStripped}",
                 Indent: 0);
-            Debug.Entry(4, $"Wielder", Wielder != null ? Wielder.ShortDisplayNameStripped : "[null]", Indent: 1);
             
             ManageDefaultEquipmentEvent E = new(BeforeManageDefaultEquipmentEvent, Wielder);
             BeforeManageDefaultEquipmentEvent.Reset();
@@ -77,12 +77,9 @@ namespace HNPS_GigantismPlus
             bool flag = true;
             if (GameObject.Validate(ref E.Wielder) && GameObject.Validate(ref E.Object) )
             {
-                Debug.Entry(4, $"flag = E.Wielder.HandleEvent(E) && E.Object.HandleEvent(E)", Indent: 2);
                 flag = E.Wielder.HandleEvent(E) && E.Object.HandleEvent(E);
-                Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
                 if (flag && (E.Wielder.HasRegisteredEvent(E.GetRegisteredEventID()) || E.Object.HasRegisteredEvent(E.GetRegisteredEventID())))
                 {
-                    Debug.Entry(4, $"(flag and (Wielder.HasRegisteredEvent(E.GetRegisteredEventID()) || Object.HasRegisteredEvent(E.GetRegisteredEventID())))", Indent: 2);
                     Event @event = Event.New(E.GetRegisteredEventID());
                     @event.SetParameter("Object", E.Object);
                     @event.SetParameter("Wielder", E.Wielder);

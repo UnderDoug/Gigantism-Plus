@@ -6,12 +6,17 @@ using XRL.World.Anatomy;
 using static XRL.World.Statistic;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using XRL.World.Parts.Mutation;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModNaturalEquipment<T> : ModNaturalEquipmentBase
-        where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
+    public class ModNaturalEquipment<T> 
+        : ModNaturalEquipmentBase
+        where T 
+        : IPart
+        , IManagedDefaultNaturalEquipment<T>
+        , new()
     {
         private T _assigningPart = null;
 
@@ -90,7 +95,7 @@ namespace XRL.World.Parts
         public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
             Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4);
-            Debug.Entry(4, $"{AssigningPart.Name}; Level: {AssigningPart.Level}", Indent: 5);
+            Debug.Entry(4, $"{AssigningPart?.Name}; Level: {AssigningPart?.Level}", Indent: 5);
 
             if (AddedParts != null)
             {
@@ -168,11 +173,17 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);
 
-            Object.GetPart<NaturalEquipmentManager>().AddShortDescriptionEntry(GetDescriptionPriority(), GetInstanceDescription());
+            Object.GetPart<NaturalEquipmentManager>()
+                .AddShortDescriptionEntry(this);
+            
             ApplyPartAndPropChanges(Object);
 
             Debug.Entry(4, $"x {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", Indent: 3);
             base.ApplyModification(Object);
+        }
+        public override string GetSource()
+        {
+            return typeof(T).Name;
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -192,8 +203,45 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
-            Debug.Entry(4, $"ModNaturalEquipment<{typeof(T).Name}>.{nameof(GetInstanceDescription)}()");
-            return null;
+            string text = ParentObject.GetObjectNoun();
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
+            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
+            int dieCountIncrease = GetDamageDieCount();
+            int dieSizeIncrease = GetDamageDieSize();
+            int damageBonusIncrease = GetDamageBonus();
+            int hitBonusIncrease = GetHitBonus();
+            int penBonusIncrease = GetPenBonus();
+            string description = $"{descriptionName}: ";
+            description += ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " have ")
+                        : ("This " + text + " has ");
+            List<string> increases = new();
+            if (dieCountIncrease != 0)
+            {
+                increases.Add($"{dieCountIncrease.Signed()} to {pluralPossessive} damage die count");
+            }
+            if (dieSizeIncrease != 0)
+            {
+                increases.Add($"{dieSizeIncrease.Signed()} to {pluralPossessive} damage die size");
+            }
+            if (damageBonusIncrease != 0)
+            {
+                increases.Add($"{damageBonusIncrease.Signed()} damage {damageBonusIncrease.Signed().BonusOrPenalty()}");
+            }
+            if (hitBonusIncrease != 0)
+            {
+                increases.Add($"{hitBonusIncrease.Signed()} Hit {hitBonusIncrease.Signed().BonusOrPenalty()}");
+            }
+            if (penBonusIncrease != 0)
+            {
+                increases.Add($"{penBonusIncrease.Signed()} Penetration {penBonusIncrease.Signed().BonusOrPenalty()}");
+            }
+            if (increases.IsNullOrEmpty())
+            {
+                increases.Add("some manner of adjustments");
+            }
+            description += Grammar.MakeAndList(increases) + ".";
+            return description;
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

@@ -32,7 +32,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription()
         {
             string cyberneticsObject = AssigningPart.ImplantObject.ShortDisplayName;
-            string text = "weapon";
+            string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalWeaponColoredAdjective());
             string description = $"{descriptionName}: ";
             description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";

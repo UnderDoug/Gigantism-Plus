@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using XRL.Language;
 using XRL.World.Parts.Mutation;
 
@@ -34,7 +35,7 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
-            string text = "weapon";
+            string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             int dieSizeIncrease = 2 + GetDamageDieSize();

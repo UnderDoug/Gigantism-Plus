@@ -11,11 +11,9 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public abstract class BaseManagedDefaultEquipmentMutation<T> 
         : BaseDefaultEquipmentMutation
-        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IManagedDefaultNaturalEquipment<T> 
         where T 
         : BaseManagedDefaultEquipmentMutation<T>
-        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
@@ -161,38 +159,27 @@ namespace XRL.World.Parts.Mutation
                 + $"{nameof(ProcessNaturalEquipment)}",
                 Indent: 1);
 
-            Body body = ParentObject?.Body;
-            if (body != null)
+            string targetType = TargetBodyPart.Type;
+            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2);
+            ModNaturalEquipment<T> naturalEquipmentMod = null;
+            if (NaturalEquipmentMod != null)
             {
-                string targetType = TargetBodyPart.Type;
-                foreach (BodyPart bodyPart in body.LoopPart(targetType))
-                {
-                    Debug.Divider(4, "-", Count: 25, Indent: 2);
-                    Debug.LoopItem(4, $"part", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Type}]", Indent: 2);
-
-                    ModNaturalEquipment<T> naturalEquipmentMod = null;
-                    if (NaturalEquipmentMod != null)
-                    {
-                        naturalEquipmentMod = new(NaturalEquipmentMod);
-                        Debug.Entry(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 3);
-                    }
-                    else if (NaturalEquipmentMods.ContainsKey(targetType))
-                    {
-                        naturalEquipmentMod = new(NaturalEquipmentMods[targetType]);
-                        Debug.Entry(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
-                    }
-                    else
-                    {
-                        Debug.Entry(4, $"No NaturalEquipmentMod for this BodyPart", Indent: 3);
-                    }
-
-                    if (naturalEquipmentMod == null) continue;
-
-                    Debug.Entry(4, $"modNaturalWeapon: {naturalEquipmentMod?.Name}", Indent: 3);
-                    
-                    Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                }
-                Debug.Divider(4, "-", Count: 25, Indent: 2);
+                naturalEquipmentMod = NaturalEquipmentMod;
+                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 3);
+            }
+            else if (NaturalEquipmentMods.ContainsKey(targetType))
+            {
+                naturalEquipmentMod = NaturalEquipmentMods[targetType];
+                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No NaturalEquipmentMod for this BodyPart", Indent: 3);
+            }
+            if (naturalEquipmentMod != null)
+            {
+                Debug.Entry(4, $"NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2);
+                Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
             }
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
@@ -231,25 +218,17 @@ namespace XRL.World.Parts.Mutation
             return base.WantEvent(ID, cascade)
                 || ID == ManageDefaultEquipmentEvent.ID;
         }
-        public bool HandEvent(ManageDefaultEquipmentEvent E)
+        public bool HandleEvent(ManageDefaultEquipmentEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
                 Indent: 1);
 
             if (E.Wielder == ParentObject)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
             }
-            return base.HandleEvent(E);
-        }
-        public bool HandEvent(ExampleEvent E)
-        {
-            Debug.Entry(4,
-                $"@ {typeof(T).Name}."
-                + $"{nameof(HandEvent)}({typeof(ExampleEvent).Name} E)",
-                Indent: 1);
             return base.HandleEvent(E);
         }
 

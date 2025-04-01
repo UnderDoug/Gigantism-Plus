@@ -12,7 +12,6 @@ namespace XRL.World
         : IManagedDefaultNaturalEquipment
         where T 
         : IPart
-        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IManagedDefaultNaturalEquipment<T>
         , new ()
     {
@@ -42,7 +41,7 @@ namespace XRL.World
         public abstract bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
     }
 
-    public interface IManagedDefaultNaturalEquipment
+    public interface IManagedDefaultNaturalEquipment : IModEventHandler<ManageDefaultEquipmentEvent>
     {
         public int Level { get; set; }
 

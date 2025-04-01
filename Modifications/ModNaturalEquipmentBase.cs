@@ -153,6 +153,7 @@ namespace XRL.World.Parts
         {
             base.ApplyModification(Object);
         }
+        public abstract string GetSource();
 
         public override bool WantEvent(int ID, int cascade)
         {

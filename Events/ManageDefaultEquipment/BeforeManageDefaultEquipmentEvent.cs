@@ -56,18 +56,17 @@ namespace HNPS_GigantismPlus
         public static BeforeManageDefaultEquipmentEvent Send(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
         {
             Debug.Entry(4,
-                $"{typeof(BeforeManageDefaultEquipmentEvent).Name}." +
-                $"{nameof(Send)}(GameObject Object: {Object?.ShortDisplayNameStripped}, NaturalEquipmentManager Manager, BodyPart BodyPart: [{BodyPart?.ID}:{BodyPart?.Type}])",
+                $"! {typeof(BeforeManageDefaultEquipmentEvent).Name}." +
+                $"{nameof(Send)}(Object: {Manager.Wielder.ID}:{Manager.Wielder.ShortDisplayNameStripped}'s " + 
+                $"{Object?.ShortDisplayNameStripped}, Manager, BodyPart: [{BodyPart?.ID}:{BodyPart?.Type}])",
                 Indent: 0);
-            Debug.Entry(4, $"Wielder", Object?.Equipped != null ? Object.Equipped.ShortDisplayNameStripped : "[null]", Indent: 1);
 
             bool flag = true;
             BeforeManageDefaultEquipmentEvent E = new(Object, Manager, BodyPart);
             if (GameObject.Validate(ref Object) && BodyPart != null)
             {
-                Debug.Entry(4, $"flag = Object.HandleEvent(E)", Indent: 2);
                 flag = Object.HandleEvent(E);
-                Debug.LoopItem(4, $"flag = {flag}", Indent: 2, Good: flag);
+
                 if (flag && Object.HasRegisteredEvent(E.GetRegisteredEventID()))
                 {
                     Event @event = Event.New(E.GetRegisteredEventID());

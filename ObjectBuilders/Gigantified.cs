@@ -4,8 +4,8 @@ using ConsoleLib.Console;
 using XRL.Rules;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
-using HNPS_GigantismPlus;
 using XRL.Wish;
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
 

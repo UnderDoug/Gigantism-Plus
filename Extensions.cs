@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,7 @@ using XRL.World.Capabilities;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -345,16 +345,16 @@ namespace HNPS_GigantismPlus
                 // Can the item have the gigantic modifier applied?
                 if (ItemModding.ModificationApplicable("ModGigantic", item))
                 {
-                    Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 3);
+                    Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 2);
                     // Is the item already gigantic? Don't attempt to apply it again.
                     if (item.HasPart<ModGigantic>())
                     {
-                        Debug.CheckNah(4, "already gigantic", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "already gigantic", "NoThanks++; x/", Indent: 2);
                         NoThanks++;
                     }
                     else
                     {
-                        Debug.CheckYeh(4, "not already gigantic", Indent: 3);
+                        Debug.CheckYeh(4, "not already gigantic", Indent: 2);
                     }
 
                     // Is the item a grenade, and is the option not set to include them?
@@ -364,12 +364,12 @@ namespace HNPS_GigantismPlus
                         {
                             if (!GrenadeOption)
                             { 
-                                Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 3); 
+                                Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 2); 
                                 NoThanks++; 
                             }
                             if (creatureIsMerchant) 
                             { 
-                                Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 3); 
+                                Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 2); 
                                 NoThanks++; 
                             }
 
@@ -378,24 +378,24 @@ namespace HNPS_GigantismPlus
                                 Debug.LoopItem(4,
                                     $"but!] merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
                                     $"NoThanks--;",
-                                    Indent: 4);
+                                    Indent: 2);
                                 NoThanks--;
                             }
                         }
                         else if (GrenadeOption)
                         {
-                            Debug.CheckYeh(4, "grenade (included)", Indent: 3);
+                            Debug.CheckYeh(4, "grenade (included)", Indent: 2);
                         }
                     }
                     else
                     {
-                        Debug.CheckYeh(4, "not grenade", Indent: 3);
+                        Debug.CheckYeh(4, "not grenade", Indent: 2);
                     }
 
                     // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
                     if (item.HasTag("DynamicObjectsTable:TradeGoods"))
                     {
-                        Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 2);
                         NoThanks++;
 
                         if (creatureIsMerchant && merchantTradeGoods.die.Resolve() >= merchantTradeGoods.high)
@@ -403,19 +403,19 @@ namespace HNPS_GigantismPlus
                             Debug.LoopItem(4,
                                 $"but!] merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
                                 $"NoThanks--;",
-                                Indent: 4);
+                                Indent: 2);
                             NoThanks--;
                         }
                     }
                     else
                     {
-                        Debug.CheckYeh(4, "not TradeGoods", Indent: 3);
+                        Debug.CheckYeh(4, "not TradeGoods", Indent: 2);
                     }
 
                     // Is the item a non-rare tonic? Double doses are basically useless in the early game
                     if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
                     {
-                        Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 2);
                         NoThanks++;
 
                         if (creatureIsMerchant && merchantTonics.die.Resolve() >= merchantTonics.high)
@@ -423,19 +423,19 @@ namespace HNPS_GigantismPlus
                             Debug.LoopItem(4,
                                 $"but!] merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
                                 $"NoThanks--;",
-                                Indent: 4);
+                                Indent: 2);
                             NoThanks--;
                         }
                     }
                     else
                     {
-                        Debug.CheckYeh(4, "not Tonics_NonRare", Indent: 3);
+                        Debug.CheckYeh(4, "not Tonics_NonRare", Indent: 2);
                     }
 
                     // Is the item a rare tonic? Double doses are basically useless in the early game
                     if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
                     {
-                        Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 2);
                         NoThanks++;
 
                         if (creatureIsMerchant && merchantRareTonics.die.Resolve() >= merchantRareTonics.high)
@@ -443,19 +443,19 @@ namespace HNPS_GigantismPlus
                             Debug.LoopItem(4,
                                 $"but!] merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
                                 $"NoThanks--;",
-                                Indent: 4);
+                                Indent: 2);
                             NoThanks--;
                         }
                     }
                     else
                     {
-                        Debug.CheckYeh(4, "not Rare Tonics", Indent: 3);
+                        Debug.CheckYeh(4, "not Rare Tonics", Indent: 2);
                     }
 
                     // Is the item held by a merchant, and did their roll fail?
                     if (creatureIsMerchant)
                     {
-                        Debug.CheckNah(4, "creatureIsMerchant is True", "NoThanks++; x/", Indent: 3);
+                        Debug.CheckNah(4, "creatureIsMerchant is True", "NoThanks++; x/", Indent: 2);
                         NoThanks++;
 
                         if (merchantBaseChance.die.Resolve() >= merchantBaseChance.high)
@@ -463,7 +463,7 @@ namespace HNPS_GigantismPlus
                             Debug.LoopItem(4,
                                 $"but!] merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}",
                                 $"NoThanks--;",
-                                Indent: 4);
+                                Indent: 2);
                             NoThanks--;
                         }
                         else 
@@ -471,14 +471,14 @@ namespace HNPS_GigantismPlus
                             Debug.LoopItem(4, 
                                 $"and!] merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}",
                                 "Bummer!",
-                                Indent: 4);
+                                Indent: 2);
                         }
                     }
                     else
                     {
                         Debug.CheckYeh(4,
                             $"creatureIsMerchant is False",
-                            Indent: 3);
+                            Indent: 2);
                     }
 
                     Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
@@ -498,7 +498,7 @@ namespace HNPS_GigantismPlus
                 }
                 else
                 {
-                    Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 3);
+                    Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 2);
                     Debug.Entry(3, "/x Skipping", Indent: 2);
                     Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
                 }
@@ -705,6 +705,28 @@ namespace HNPS_GigantismPlus
             return Object.IsPlural ? "those" : "that";
         }
 
+        public static bool Is(this string @this, string @string)
+        {
+            return @this == @string;
+        }
+        public static bool Is(this int @this, int @int)
+        {
+            return @this == @int;
+        }
+        public static bool Is(this float @this, float @float)
+        {
+            return @this == @float;
+        }
+        public static bool Is(this double @this, double @double)
+        {
+            return @this == @double;
+        }
+        public static bool Is<T>(this T @this, T @object)
+            where T : class
+        {
+            return @this == @object;
+        }
+
         public static string GetProcessedItem(this List<string> item, bool second, List<List<string>> items, GameObject obj)
         {
             if (item[0] == "")
@@ -808,7 +830,7 @@ namespace HNPS_GigantismPlus
             {
                 if (missileWeapon.Skill.Contains("Shotgun") 
                     || Object.InheritsFrom("BaseShotgun") 
-                    || (Object.TryGetPart(out MagazineAmmoLoader loader) && loader.AmmoPart == "AmmoShotgunShell"))
+                    || (Object.TryGetPart(out MagazineAmmoLoader loader) && loader.AmmoPart.Is("AmmoShotgunShell")))
                 {
                     return "shotgun";
                 }
@@ -878,30 +900,30 @@ namespace HNPS_GigantismPlus
             {
                 if (!Object.IsPluralIfKnown)
                 {
-                    if (armor.WornOn == "Back")
+                    if (armor.WornOn.Is("Back"))
                     {
-                        if (Object.Blueprint == "Gas Tumbler")
+                        if (Object.Blueprint.Is("Gas Tumbler"))
                         {
                             return "tumbler";
                         }
-                        if (armor.CarryBonus > 0 || Object.Blueprint == "Gyrocopter Backpack" || Object.Blueprint == "SkybearJetpack")
+                        if (armor.CarryBonus > 0 || Object.Blueprint.Is("Gyrocopter Backpack") || Object.Blueprint.Is("SkybearJetpack"))
                         {
                             return "pack";
                         }
                         return "cloak";
                     }
-                    if (armor.WornOn == "Head")
+                    if (armor.WornOn.Is("Head"))
                     {
                         return "helmet";
                     }
-                    if (armor.WornOn == "Face")
+                    if (armor.WornOn.Is("Face"))
                     {
                         if (Object.InheritsFrom("BaseMask"))
                         {
                             return "mask";
                         }
                     }
-                    if (armor.WornOn == "Body")
+                    if (armor.WornOn.Is("Body"))
                     {
                         if (Object.Blueprint.Contains("Plate"))
                         {
@@ -913,7 +935,7 @@ namespace HNPS_GigantismPlus
                         }
                         return "vest";
                     }
-                    if (armor.WornOn == "Arm")
+                    if (armor.WornOn.Is("Arm"))
                     {
                         if (Object.InheritsFrom("BaseUtilityBracelet"))
                         {
@@ -930,14 +952,14 @@ namespace HNPS_GigantismPlus
                     }
                     return "armor";
                 }
-                if (armor.WornOn == "Back")
+                if (armor.WornOn.Is("Back"))
                 {
-                    if (Object.Blueprint == "Mechanical Wings")
+                    if (Object.Blueprint.Is("Mechanical Wings"))
                     {
                         return "wings";
                     }
                 }
-                if (armor.WornOn == "Face")
+                if (armor.WornOn.Is("Face"))
                 {
                     if (Object.HasPart<Spectacles>())
                     {
@@ -951,12 +973,12 @@ namespace HNPS_GigantismPlus
                     {
                         return "jewelry";
                     }
-                    if (Object.Blueprint == "VISAGE")
+                    if (Object.Blueprint.Is("VISAGE"))
                     {
                         return "scanner";
                     }
                 }
-                if (armor.WornOn == "Hands")
+                if (armor.WornOn.Is("Hands"))
                 {
                     if (Object.HasPart<Metal>())
                     {
@@ -964,7 +986,7 @@ namespace HNPS_GigantismPlus
                     }
                     return "glove";
                 }
-                if (armor.WornOn == "Feet")
+                if (armor.WornOn.Is("Feet"))
                 {
                     if (Object.InheritsFrom("BaseBoot"))
                     {
@@ -1018,16 +1040,16 @@ namespace HNPS_GigantismPlus
              && MeleeWeapon.MaxStrengthBonus == 0 
              && MeleeWeapon.PenBonus == 0 
              && MeleeWeapon.HitBonus == 0 
-             && (MeleeWeapon.BaseDamage == "1d2" || MeleeWeapon.BaseDamage == "1d2+3") 
+             && (MeleeWeapon.BaseDamage.Is("1d2") || MeleeWeapon.BaseDamage.Is("1d2+3")) 
              && MeleeWeapon.Ego == 0 
-             && MeleeWeapon.Skill == "Cudgel" 
-             && MeleeWeapon.Stat == "Strength" 
-             && MeleeWeapon.Slot == "Hand" 
+             && MeleeWeapon.Skill.Is("Cudgel") 
+             && MeleeWeapon.Stat.Is("Strength") 
+             && MeleeWeapon.Slot.Is("Hand") 
              && MeleeWeapon.Attributes.IsNullOrEmpty();
 
             bool hasImprovisedProp = 
                 MeleeWeapon.ParentObject.HasTagOrStringProperty("IsImprovisedMelee") 
-             && MeleeWeapon.ParentObject.GetStringProperty("IsImprovisedMelee") != "false";
+             && !MeleeWeapon.ParentObject.GetStringProperty("IsImprovisedMelee").Is("false");
 
             MeleeWeapon @default = new();
 

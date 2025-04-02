@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using SerializeField = UnityEngine.SerializeField;
 using XRL.Language;
 using XRL.World.Anatomy;
-using static XRL.World.Statistic;
+using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
-using XRL.World.Parts.Mutation;
 
 namespace XRL.World.Parts
 {
@@ -96,7 +95,7 @@ namespace XRL.World.Parts
         public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
             Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4);
-            Debug.Entry(4, $"{AssigningPart?.Name}; Level: {AssigningPart?.Level}", Indent: 5);
+            Debug.Entry(4, $"{AssigningPart.Name}; Level: {AssigningPart.Level}", Indent: 5);
 
             if (AddedParts != null)
             {
@@ -170,6 +169,25 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4);
         }
 
+
+        public override bool BeingAppliedBy(GameObject obj, GameObject who)
+        {
+            if(AssigningPart.Is(null))
+            {
+               AssigningPart = who.GetPart<T>();
+            }
+            if(AssigningPart.Is(null))
+            {
+                Debug.Entry(2,
+                    $"WARN",
+                    $"{typeof(ModNaturalEquipment<T>).Name}<{typeof(T).Name}>.{nameof(BeingAppliedBy)} (" +
+                    $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
+                    $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " +
+                    $"Failed to assign {typeof(T).Name} as AssigningPart",
+                    Indent: 0);
+            }
+            return base.BeingAppliedBy(obj, who);
+        }
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);

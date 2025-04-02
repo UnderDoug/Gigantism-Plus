@@ -4,6 +4,7 @@ using XRL.UI;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
 {

@@ -1,9 +1,10 @@
 ﻿using XRL;
 using XRL.World;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
+public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEvent>
 {
     public new static readonly int CascadeLevel = CASCADE_ALL; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
 
@@ -16,7 +17,7 @@ public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(BodyPartsUpdatedEvent).Name}";
+        return $"{typeof(AfterBodyPartsUpdatedEvent).Name}";
     }
 
     public override void Reset()
@@ -27,9 +28,9 @@ public class BodyPartsUpdatedEvent : ModPooledEvent<BodyPartsUpdatedEvent>
 
     public static void Send(GameObject Actor)
     {
-        Debug.Entry(4, $"{typeof(BodyPartsUpdatedEvent).Name}.{nameof(Send)}(GameObject Object: {Actor?.DebugName})", Indent: 0);
+        Debug.Entry(4, $"{typeof(AfterBodyPartsUpdatedEvent).Name}.{nameof(Send)}(GameObject Object: {Actor?.DebugName})", Indent: 0);
         bool flag = true;
-        BodyPartsUpdatedEvent E = FromPool();
+        AfterBodyPartsUpdatedEvent E = FromPool();
         if (GameObject.Validate(ref Actor))
         {
             if (Actor.WantEvent(ID, CascadeLevel))

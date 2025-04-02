@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConsoleLib.Console;
@@ -17,6 +17,17 @@ namespace HNPS_GigantismPlus
 {
     public static class Utils
     {
+        public const string VANDR = "\u251C"; // ├
+        public const string VONLY = "\u2502"; // │
+        public const string TANDR = "\u2514"; // └
+        public const string HONLY = "\u2500"; // ─
+        public const string SPACE = "\u0020"; //" "
+
+        public const string ITEM = VANDR + HONLY + HONLY + SPACE; // "├── "
+        public const string BRAN = VONLY + SPACE + SPACE + SPACE; // "│   "
+        public const string LAST = TANDR + HONLY + HONLY + SPACE; // "└── "
+        public const string DIST = SPACE + SPACE + SPACE + SPACE; // "    "
+
         public const string GAMEOBJECT = "GameObject";
         public const string RENDER = "Render";
         public const string MELEEWEAPON = "MeleeWeapon";
@@ -511,8 +522,8 @@ namespace HNPS_GigantismPlus
             Debug.Footer(3, 
                 $"{MutationName}", 
                 $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
-        } //!--- private void SwapMutationCategory(bool Before = true)
+        } //!-- private void SwapMutationCategory(bool Before = true)
 
     } //!-- public static class Utils
 
-} //!-- namespace HNPS_GigantismPlus
+}

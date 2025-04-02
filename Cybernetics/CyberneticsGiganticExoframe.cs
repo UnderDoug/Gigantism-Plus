@@ -4,11 +4,11 @@ using System.Linq;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
+using static XRL.World.Parts.NaturalEquipmentManager;
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Secrets;
 using static HNPS_GigantismPlus.Options;
-using static XRL.World.Parts.NaturalEquipmentManager;
-using UnityEngine.Tilemaps;
 
 namespace XRL.World.Parts
 {
@@ -46,7 +46,7 @@ namespace XRL.World.Parts
 
                 Adjustments = new(),
             };
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "manipulator", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "manipulator");
         }
 
         public string GetShortAugmentAdjective(bool Pretty = true)
@@ -64,11 +64,8 @@ namespace XRL.World.Parts
             return output.Color("Y");
         }
 
-        public override void OnImplanted(GameObject Implantee, GameObject Implant)
+        public virtual void MapAugmentAdjustments()
         {
-            Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
-
-            // Mapping Augment properties to NaturalEquipmentMod ones.
             NaturalEquipmentMod.AdjectiveColor = AugmentAdjectiveColor;
 
             NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", AugmentTile);
@@ -80,6 +77,17 @@ namespace XRL.World.Parts
             NaturalEquipmentMod.AddedStringProps["SwingSound"] = AugmentSwingSound;
             NaturalEquipmentMod.AddedStringProps["BlockedSound"] = AugmentBlockedSound;
             NaturalEquipmentMod.AddedStringProps["EquipmentFrameColors"] = AugmentEquipmentFrameColors;
+        }
+
+        public override void Attach()
+        {
+            MapAugmentAdjustments();
+            base.Attach();
+        }
+
+        public override void OnImplanted(GameObject Implantee, GameObject Implant)
+        {
+            Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
 
             Become(Implantee, Model, Implant);
 

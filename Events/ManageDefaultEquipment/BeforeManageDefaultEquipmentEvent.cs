@@ -1,9 +1,10 @@
-﻿using XRL;
+﻿using System.Collections.Generic;
+using System;
+using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
-using System.Collections.Generic;
-using System;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {

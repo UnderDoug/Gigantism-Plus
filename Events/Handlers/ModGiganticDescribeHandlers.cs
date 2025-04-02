@@ -4,6 +4,7 @@ using System.Text;
 using XRL.World;
 using XRL;
 using XRL.World.Parts;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -15,7 +16,7 @@ namespace HNPS_GigantismPlus
         {
             The.Game?.RegisterEvent(Handler, BeforeDescribeModGiganticEvent.ID);
 
-            return (bool)The.Game?.WasEventRegistered<BeforeDescribeModGiganticHandler, BeforeDescribeModGiganticEvent>(BeforeDescribeModGiganticEvent.ID);
+            return (bool)The.Game?.WasModEventHandlerRegistered<BeforeDescribeModGiganticHandler, BeforeDescribeModGiganticEvent>();
         }
 
         public bool HandleEvent(BeforeDescribeModGiganticEvent E)
@@ -42,7 +43,7 @@ namespace HNPS_GigantismPlus
         {
             The.Game?.RegisterEvent(Handler, DescribeModGiganticEvent.ID);
 
-            return (bool)The.Game?.WasEventRegistered<DescribeModGiganticHandler, DescribeModGiganticEvent>(DescribeModGiganticEvent.ID);
+            return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModGiganticEvent>();
         }
 
         public bool HandleEvent(DescribeModGiganticEvent E)

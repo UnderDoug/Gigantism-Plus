@@ -1,6 +1,7 @@
 ﻿using System;
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {
@@ -94,7 +95,7 @@ namespace XRL.World.Parts
         public override bool HandleEvent(UnequippedEvent E)
         {
             GameObject item = E.Item;
-            if (item == ParentObject && Wielder != null && ElongatedPaws != null)
+            if (item.Is(ParentObject) && !Wielder.Is(null) && !ElongatedPaws.Is(null))
             {
                 Debug.Entry(4, $"@ {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(UnequippedEvent)} E)", Indent: 2);
                 Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
@@ -109,7 +110,7 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(StatChangeEvent E)
         {
-            if (E.Object == Wielder && ElongatedPaws != null && E.Name == "Strength")
+            if (E.Object.Is(Wielder) && !ElongatedPaws.Is(null) && E.Name.Is("Strength"))
             {
                 Debug.Entry(4, $"@ {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(StatChangeEvent)} E: {E.Name})", Indent: 2);
                 Debug.LoopItem(4, $" E.Object: \"{E.Object.ShortDisplayNameStripped}\"", Indent: 2);

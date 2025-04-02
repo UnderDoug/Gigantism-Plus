@@ -1,9 +1,9 @@
-﻿using HNPS_GigantismPlus;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using XRL.Language;
 using XRL.World.Parts.Mutation;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {

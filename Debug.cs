@@ -5,23 +5,12 @@ using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
-using static UnityEngine.GridBrushBase;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
     public static class Debug
     {
-        public const string VANDR = "\u251C"; // ├
-        public const string VONLY = "\u2502"; // │
-        public const string TANDR = "\u2514"; // └
-        public const string HONLY = "\u2500"; // ─
-        public const string SPACE = "\u0020"; //" "
-
-        public const string ITEM = VANDR + HONLY + HONLY + SPACE; // "├── "
-        public const string BRAN = VONLY + SPACE + SPACE + SPACE; // "│   "
-        public const string LAST = TANDR + HONLY + HONLY + SPACE; // "└── "
-        public const string DIST = SPACE + SPACE + SPACE + SPACE; // "    "
-
         private static int VerbosityOption => Options.DebugVerbosity;
         // Verbosity translates in roughly the following way:
         // 0 : Critical. Use sparingly, if at all, as they show up without the option. Move these to 1 when pushing to main.
@@ -327,25 +316,32 @@ namespace HNPS_GigantismPlus
         }
         */
 
-        public static bool WasEventRegistered<H,E>(this XRLGame Game, int ID)
-            where H : IEventHandler, IModEventHandler<E>
+        public static bool WasEventHandlerRegistered<H, E>(this XRLGame Game)
+            where H : IEventHandler
             where E : MinEvent, new()
         {
             bool flag = false;
-            if (Game != null && Game.RegisteredEvents.ContainsKey(ID))
+            E e = new();
+            if (Game != null && Game.RegisteredEvents.ContainsKey(e.ID))
             {
-                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {ID})", Indent: 2);
+                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
                 flag = true;
             }
             else if (Game != null)
             {
-                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {ID})", Indent: 2);
+                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
             }
             else
             {
-                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {ID})", Indent: 2);
+                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
             }
             return flag;
+        }
+        public static bool WasModEventHandlerRegistered<H, E>(this XRLGame Game)
+            where H : IEventHandler, IModEventHandler<E>
+            where E : MinEvent, new()
+        {
+            return Game.WasEventHandlerRegistered<H, E>();
         }
 
         public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)

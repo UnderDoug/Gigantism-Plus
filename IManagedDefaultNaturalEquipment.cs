@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using XRL.World.Parts;
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Options;
-using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
+using XRL.World.Anatomy;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World
 {
@@ -45,7 +46,7 @@ namespace XRL.World
         : IModEventHandler<ManageDefaultEquipmentEvent>
         , IModEventHandler<BeforeManageDefaultEquipmentEvent>
         , IModEventHandler<AfterManageDefaultEquipmentEvent>
-        , IModEventHandler<BodyPartsUpdatedEvent>
+        , IModEventHandler<AfterBodyPartsUpdatedEvent>
     {
         public int Level { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {
@@ -19,7 +20,17 @@ namespace XRL.World.Parts
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
             AssigningPart ??= Wielder?.GetPart<BurrowingClaws>()?.ConvertToManaged();
-            if (AssigningPart == null) return false;
+            if (AssigningPart == null)
+            {
+                Debug.Entry(2, 
+                    $"WARN",
+                    $"{typeof(ModBurrowingNaturalWeaponUnmanaged).Name}.{nameof(BeingAppliedBy)} (" + 
+                    $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
+                    $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " + 
+                    $"Failed to assign converted {typeof(BurrowingClaws).Name} as AssigningPart",
+                    Indent: 0);
+                return false; 
+            }
             return base.BeingAppliedBy(obj, who);
         }
     } //!-- public class ModBurrowingNaturalWeaponUnmanaged : ModBurrowingNaturalWeapon

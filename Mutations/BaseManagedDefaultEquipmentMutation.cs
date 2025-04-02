@@ -4,6 +4,7 @@ using XRL.Language;
 using XRL.World;
 using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
@@ -204,9 +205,9 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
             Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1);
             ProcessNaturalEquipment(Manager, TargetBodyPart);
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1);
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
@@ -223,7 +224,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
-                Indent: 1);
+                Indent: 0);
 
             if (E.Wielder == ParentObject)
             {

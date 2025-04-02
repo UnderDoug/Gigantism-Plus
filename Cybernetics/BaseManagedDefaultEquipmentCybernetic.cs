@@ -23,7 +23,6 @@ namespace XRL.World.Parts
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
         public int Level { get; set; }
-        public List<string> BodyPartTypesWantingManaged { get; set; }
 
         private GameObject _implantee = null;
         public GameObject Implantee
@@ -48,7 +47,6 @@ namespace XRL.World.Parts
         public BaseManagedDefaultEquipmentCybernetic()
         {
             Level = 1;
-            BodyPartTypesWantingManaged = new();
             NaturalEquipmentMods = new();
         }
 
@@ -74,7 +72,7 @@ namespace XRL.World.Parts
         public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, ModNaturalEquipment<T> naturalEquipmentMod, T NewParent)
             : this(naturalEquipmentMods, NewParent)
         {
-            NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+            NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
@@ -230,12 +228,22 @@ namespace XRL.World.Parts
                 $"{typeof(T).Name}",
                 $"{nameof(OnManageNaturalEquipment)}(body of: {Implantee.Blueprint})");
         }
+        public virtual void OnBodyPartsUpdated()
+        {
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
+            {
+                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            }
+            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+        }
 
         public override bool WantEvent(int ID, int cascade)
         {
             return ID == ImplantedEvent.ID
                 || ID == UnimplantedEvent.ID
-                || ID == BodyPartsUpdatedEvent.ID
+                || ID == AfterBodyPartsUpdatedEvent.ID
                 || ID == ManageDefaultEquipmentEvent.ID;
         }
         public override bool HandleEvent(ImplantedEvent E)
@@ -252,23 +260,22 @@ namespace XRL.World.Parts
         }
         public bool HandleEvent(ManageDefaultEquipmentEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                Indent: 0);
+
             if (E.Wielder == Implantee)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
             }
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(BodyPartsUpdatedEvent E)
+        public bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
             if (E.Actor == Implantee)
             {
-                Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
-                foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-                }
-                if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-                Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+                OnBodyPartsUpdated();
             }
             return base.HandleEvent(E);
         }

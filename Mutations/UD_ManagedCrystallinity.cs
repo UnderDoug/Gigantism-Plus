@@ -5,8 +5,8 @@ using XRL.Rules;
 using XRL.Language;
 using XRL.World.Anatomy;
 using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {

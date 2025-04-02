@@ -1,4 +1,6 @@
 ﻿using System;
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {
@@ -16,10 +18,12 @@ namespace XRL.World.Parts
             if (!E.Actor.IsGiganticCreature)
             {
                 E.Decreases++;
-                if (!E.Object.IsGiganticEquipment && E.SlotType != "Floating Nearby" && !E.Object.HasPart<CyberneticsBaseItem>() && !E.Object.HasTagOrProperty("GiganticEquippable"))
-                {
-                    E.CanBeTooSmall = true;
-                }
+                
+                E.CanBeTooSmall = 
+                    !E.Object.IsGiganticEquipment 
+                 && !E.SlotType.Is("Floating Nearby")
+                 && !E.Object.HasPart<CyberneticsBaseItem>() 
+                 && !E.Object.HasTagOrProperty("GiganticEquippable");
             }
 
             return base.HandleEvent(E);

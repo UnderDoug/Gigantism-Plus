@@ -4,10 +4,11 @@ using System.Text;
 using XRL.World;
 using XRL;
 using XRL.World.Parts;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    public class MeleeWeapon_AfterObjectCreatedHandler : IEventHandler, IModEventHandler<AfterObjectCreatedEvent>
+    public class MeleeWeapon_AfterObjectCreatedHandler : IEventHandler
     {
 
         private static readonly MeleeWeapon_AfterObjectCreatedHandler Handler = new();
@@ -16,7 +17,7 @@ namespace HNPS_GigantismPlus
         {
             The.Game?.RegisterEvent(Handler, AfterObjectCreatedEvent.ID);
             
-            return (bool)The.Game?.WasEventRegistered<MeleeWeapon_AfterObjectCreatedHandler, AfterObjectCreatedEvent>(AfterObjectCreatedEvent.ID);
+            return (bool)The.Game?.WasEventHandlerRegistered<MeleeWeapon_AfterObjectCreatedHandler, AfterObjectCreatedEvent>();
         }
 
         public bool HandleEvent(AfterObjectCreatedEvent E)
@@ -34,5 +35,5 @@ namespace HNPS_GigantismPlus
             }
             return true;
         }
-    } //!-- public class MeleeWeapon_AfterObjectCreatedHandler : IEventHandler, IModEventHandler<MeleeWeapon_AfterObjectCreatedHandler>
+    } //!-- public class MeleeWeapon_AfterObjectCreatedHandler : IEventHandler
 }

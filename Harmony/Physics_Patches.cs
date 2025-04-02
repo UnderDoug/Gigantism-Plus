@@ -2,6 +2,7 @@
 using System;
 using XRL.World;
 using XRL.World.Parts;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
 {

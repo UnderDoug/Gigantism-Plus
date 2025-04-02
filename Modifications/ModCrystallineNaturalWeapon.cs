@@ -4,6 +4,7 @@ using XRL.Language;
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
 using System.Collections.Generic;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {

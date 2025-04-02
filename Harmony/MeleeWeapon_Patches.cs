@@ -1,7 +1,8 @@
 using HarmonyLib;
 using XRL.World.Parts;
+using static HNPS_GigantismPlus.Utils;
 
-namespace HNPS_GigantismPlus
+namespace HNPS_GigantismPlus.Harmony
 {
     [HarmonyPatch(typeof(MeleeWeapon))]
     public static class MaxStrengthBonus_Display_Patches

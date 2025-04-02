@@ -2,14 +2,14 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using SerializeField = UnityEngine.SerializeField;
 using XRL.UI;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
-using SerializeField = UnityEngine.SerializeField;
 using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Extensions;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {

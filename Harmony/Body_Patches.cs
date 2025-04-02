@@ -2,6 +2,7 @@
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -18,7 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
                 ? $"{@this.ParentObject?.ID}:{@this.ParentObject?.ShortDisplayNameStripped}" 
                 : "[null]";
             Debug.Entry(4, $"Object is {objectDesc}", Indent: 1);
-            BodyPartsUpdatedEvent.Send(@this.ParentObject);
+            AfterBodyPartsUpdatedEvent.Send(@this.ParentObject);
             return true;
         }
         /*
@@ -29,7 +30,7 @@ namespace HNPS_GigantismPlus.Harmony
             Body @this = __instance;
             Debug.Entry(4, $"{typeof(Body_Patches).Name}.{nameof(RegenerateDefaultEquipment_SendBodyPartsUpdatedEvent_Prefix)}(ref Body __instance)", Indent: 0);
             Debug.Entry(4, $"Object is {@this.ParentObject?.DebugName}", Indent: 1);
-            BodyPartsUpdatedEvent.Send(@this.ParentObject);
+            AfterBodyPartsUpdatedEvent.Send(@this.ParentObject);
         }
         */
     }

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using XRL.World.Parts.Mutation;
 using XRL.Language;
-using System.Text;
 using HNPS_GigantismPlus;
-using System.Collections.Generic;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {

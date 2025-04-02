@@ -5,6 +5,7 @@ using XRL.Language;
 using XRL.World;
 using XRL.World.Parts;
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony

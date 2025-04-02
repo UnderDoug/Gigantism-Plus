@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SerializeField = UnityEngine.SerializeField;
 using XRL.Language;
 using XRL.World.Anatomy;
-using static XRL.World.Statistic;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Options;

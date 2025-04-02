@@ -2,8 +2,9 @@ using HarmonyLib;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Skill;
+using static HNPS_GigantismPlus.Utils;
 
-namespace HNPS_GigantismPlus
+namespace HNPS_GigantismPlus.Harmony
 {
     // Stops natural equipment and cybernetics from being able to be disassembled if they happen to have mods.
     [HarmonyPatch(typeof(Tinkering_Disassemble))]

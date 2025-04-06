@@ -4,7 +4,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEvent>
+public class UpdateNaturalEquipmentModsEvent : ModPooledEvent<UpdateNaturalEquipmentModsEvent>
 {
     public new static readonly int CascadeLevel = CASCADE_ALL; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
 
@@ -17,7 +17,7 @@ public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEv
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(AfterBodyPartsUpdatedEvent).Name}";
+        return $"{typeof(UpdateNaturalEquipmentModsEvent).Name}";
     }
 
     public override void Reset()
@@ -28,9 +28,9 @@ public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEv
 
     public static void Send(GameObject Actor)
     {
-        Debug.Entry(4, $"{typeof(AfterBodyPartsUpdatedEvent).Name}.{nameof(Send)}(GameObject Object: {Actor?.DebugName})", Indent: 0);
+        Debug.Entry(4, $"{typeof(UpdateNaturalEquipmentModsEvent).Name}.{nameof(Send)}(GameObject Object: {Actor?.DebugName})", Indent: 0);
         bool flag = true;
-        AfterBodyPartsUpdatedEvent E = FromPool();
+        UpdateNaturalEquipmentModsEvent E = FromPool();
         if (GameObject.Validate(ref Actor))
         {
             if (Actor.WantEvent(ID, CascadeLevel))
@@ -41,7 +41,7 @@ public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEv
             if (flag && Actor.HasRegisteredEvent(E.GetRegisteredEventID()))
             {
                 Event @event = Event.New(E.GetRegisteredEventID());
-                @event.SetParameter("Object", Actor);
+                @event.SetParameter("Actor", Actor);
                 Actor.FireEvent(@event);
             }
         }

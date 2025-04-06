@@ -7,6 +7,18 @@ namespace XRL.World.Parts
     [Serializable]
     public class PseudoGigantism : IScribedPart
     {
+        public override void Attach()
+        {
+            base.Attach();
+            ParentObject.CheckEquipmentSlots();
+        }
+
+        public override void Remove()
+        {
+            ParentObject.CheckEquipmentSlots();
+            base.Remove();
+        }
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)

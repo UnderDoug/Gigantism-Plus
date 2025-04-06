@@ -19,6 +19,49 @@ namespace XRL.World.Parts
             : base(Tier)
         {
         }
+        public ModCrystallineNaturalWeapon(ModNaturalEquipmentBase Conversion)
+            : this()
+        {
+            Wielder = Conversion.Wielder;
+
+            Adjustments = new();
+            foreach (Adjustment adjustment in Conversion.Adjustments)
+            {
+                Adjustments.Add(adjustment);
+            }
+
+            BodyPartType = Conversion.BodyPartType;
+
+            ModPriority = Conversion.ModPriority;
+            DescriptionPriority = Conversion.DescriptionPriority;
+
+            DamageDieCount = Conversion.DamageDieCount;
+            DamageDieSize = Conversion.DamageDieSize;
+            DamageBonus = Conversion.DamageBonus;
+            HitBonus = Conversion.HitBonus;
+            PenBonus = Conversion.PenBonus;
+
+            Adjective = Conversion.Adjective;
+            AdjectiveColor = Conversion.AdjectiveColor;
+            AdjectiveColorFallback = Conversion.AdjectiveColorFallback;
+
+            AddedParts = new();
+            foreach (string addedPart in Conversion.AddedParts)
+            {
+                AddedParts.Add(addedPart);
+            }
+            AddedStringProps = new();
+            foreach ((string prop, string value) in Conversion.AddedStringProps)
+            {
+                AddedStringProps[prop] = value;
+            }
+            AddedIntProps = new();
+            foreach ((string prop, int value) in Conversion.AddedIntProps)
+            {
+                AddedIntProps[prop] = value;
+            }
+        }
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)

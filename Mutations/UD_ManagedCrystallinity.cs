@@ -105,28 +105,42 @@ namespace XRL.World.Parts.Mutation
             NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&b", true);
             NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "B", true);
         }
-        public UD_ManagedCrystallinity(Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> naturalEquipmentMods, UD_ManagedCrystallinity NewParent)
+        public UD_ManagedCrystallinity(
+            Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods, 
+            UD_ManagedCrystallinity NewParent)
             : this()
         {
             Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NewNaturalEquipmentMods = new();
-            foreach ((string BodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in naturalEquipmentMods)
+            foreach ((string BodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
                 NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
             }
-            NaturalEquipmentMods = NewNaturalEquipmentMods;
+            this.NaturalEquipmentMods = NewNaturalEquipmentMods;
         }
 
-        public UD_ManagedCrystallinity(ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod, UD_ManagedCrystallinity NewParent)
+        public UD_ManagedCrystallinity(
+            ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, 
+            UD_ManagedCrystallinity NewParent)
             : this()
         {
-            NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
+            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
-        public UD_ManagedCrystallinity(Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> naturalEquipmentMods, ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod, UD_ManagedCrystallinity NewParent)
-            : this(naturalEquipmentMods, NewParent)
+        public UD_ManagedCrystallinity(
+            Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods,
+            ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, 
+            UD_ManagedCrystallinity NewParent)
+            : this(NaturalEquipmentMods, NewParent)
         {
-            NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+        }
+
+        public UD_ManagedCrystallinity(Crystallinity Crystallinity)
+            : this()
+        {
+            Level = Crystallinity.Level;
+            RefractAdded = Crystallinity.RefractAdded;
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Parts)
@@ -140,7 +154,6 @@ namespace XRL.World.Parts.Mutation
             }
             return true;
         }
-
         public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
@@ -162,7 +175,6 @@ namespace XRL.World.Parts.Mutation
                 return 1;
             return 2;
         }
-
         public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasBurrowing))
@@ -171,7 +183,6 @@ namespace XRL.World.Parts.Mutation
             }
             return 0;
         }
-
         public virtual int GetNaturalWeaponHitBonus(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
@@ -185,12 +196,10 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedParts;
         }
-
         public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedStringProps;
         }
-
         public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedIntProps;
@@ -231,11 +240,6 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool ChangeLevel(int NewLevel)
         {
-            foreach ((_, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
-            }
-            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
             return base.ChangeLevel(NewLevel);
         }
 
@@ -285,11 +289,11 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
-            Zone InstanceObjectZone = ParentObject.GetCurrentZone();
+            Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(4, $"{typeof(UD_ManagedCrystallinity).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
-            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             ProcessNaturalEquipment(Manager, TargetBodyPart);
@@ -297,19 +301,48 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Footer(4,
                 $"{typeof(UD_ManagedCrystallinity).Name}",
-                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject?.Blueprint})");
+        }
+        public virtual void OnUpdateNaturalEquipmentMods()
+        {
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            foreach ((_, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in NaturalEquipmentMods)
+            {
+                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            }
+            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
         }
 
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == ManageDefaultEquipmentEvent.ID;
+                || ID == ManageDefaultEquipmentEvent.ID
+                || ID == UpdateNaturalEquipmentModsEvent.ID;
         }
         public bool HandleEvent(ManageDefaultEquipmentEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                Indent: 0);
+
             if (E.Wielder == ParentObject)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
+            }
+            return base.HandleEvent(E);
+        }
+        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E)",
+                Indent: 0);
+
+            if (E.Actor == ParentObject)
+            {
+                OnUpdateNaturalEquipmentMods();
             }
             return base.HandleEvent(E);
         }
@@ -337,7 +370,7 @@ namespace XRL.World.Parts.Mutation
                 string Mutation = E.GetParameter("Mutation") as string;
                 if (Actor == ParentObject)
                 {
-                    // ProcessNaturalEquipment(Actor?.Body);
+                    // ProcessNaturalEquipment(Actor?.Actor);
                 }
             }
             return base.FireEvent(E);

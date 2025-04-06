@@ -2,6 +2,7 @@
 using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using System.Collections.Generic;
 
 namespace XRL.World.Parts
 {
@@ -16,10 +17,14 @@ namespace XRL.World.Parts
             : base(Tier)
         {
         }
+        public ModBurrowingNaturalWeaponUnmanaged(ModBurrowingNaturalWeapon Conversion)
+            : base(Conversion)
+        {
+        }
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            AssigningPart ??= Wielder?.GetPart<BurrowingClaws>()?.ConvertToManaged();
+            AssigningPart ??= !Wielder.Is(null) ? new(Wielder.GetPart<BurrowingClaws>()) : null;
             if (AssigningPart == null)
             {
                 Debug.Entry(2, 

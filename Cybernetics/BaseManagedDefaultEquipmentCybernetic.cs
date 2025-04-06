@@ -18,8 +18,8 @@ namespace XRL.World.Parts
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
+        // Dictionary holds a BodyPart.Type string as Key, and naturalEquipmentMod for that BodyPart.
+        // Property is for easier access if the mutation has only a single type (via naturalEquipmentMod.Type).
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
         public int Level { get; set; }
@@ -51,25 +51,32 @@ namespace XRL.World.Parts
         }
 
         // Takes an existing NaturalEquipmentMods Dictionary
-        public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, T NewParent)
+        public BaseManagedDefaultEquipmentCybernetic(
+            Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, 
+            T NewParent)
             : this()
         {
-            Dictionary<string, ModNaturalEquipment<T>> NewNaturalEquipmentMods = new();
-            foreach ((string BodyPartType, ModNaturalEquipment<T> NaturalEquipmentMod) in naturalEquipmentMods)
+            Dictionary<string, ModNaturalEquipment<T>> newNaturalEquipmentMods = new();
+            foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in naturalEquipmentMods)
             {
-                ModNaturalEquipment<T> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
-                NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
+                ModNaturalEquipment<T> newNaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
+                newNaturalEquipmentMods.Add(bodyPartType, newNaturalEquipmentMod);
             }
-            NaturalEquipmentMods = NewNaturalEquipmentMods;
+            NaturalEquipmentMods = newNaturalEquipmentMods;
         }
 
-        public BaseManagedDefaultEquipmentCybernetic(ModNaturalEquipment<T> naturalEquipmentMod, T NewParent)
+        public BaseManagedDefaultEquipmentCybernetic(
+            ModNaturalEquipment<T> naturalEquipmentMod, 
+            T NewParent)
             : this()
         {
             NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
         }
 
-        public BaseManagedDefaultEquipmentCybernetic(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, ModNaturalEquipment<T> naturalEquipmentMod, T NewParent)
+        public BaseManagedDefaultEquipmentCybernetic(
+            Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, 
+            ModNaturalEquipment<T> naturalEquipmentMod, 
+            T NewParent)
             : this(naturalEquipmentMods, NewParent)
         {
             NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
@@ -86,7 +93,6 @@ namespace XRL.World.Parts
             }
             return true;
         }
-
         public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
@@ -102,17 +108,14 @@ namespace XRL.World.Parts
         {
             return 0;
         }
-
         public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
         }
-
         public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
         }
-
         public virtual int GetNaturalWeaponHitBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
@@ -126,12 +129,10 @@ namespace XRL.World.Parts
         {
             return NaturalEquipmentMod.AddedParts;
         }
-
         public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedStringProps;
         }
-
         public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedIntProps;
@@ -139,24 +140,16 @@ namespace XRL.World.Parts
 
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
         {
-            // List<string> vomitCats = new() { "Meta", "Damage", "Additions", "Render" };
-            // NaturalEquipmentMod.Vomit(4, "| Before", vomitCats, Indent: 2);
-            Debug.Divider(4, "\u2500", 40, Indent: 2);
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMod: {NaturalEquipmentMod.Name}, int Level: {Level})",
+                Indent: 2);
 
-            //NaturalEquipmentMod.Level = Level;
-            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageDieCount", true, Indent: 3);
-            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageDieSize", true, Indent: 3);
-            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageBonus", true, Indent: 3);
-            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "HitBonus", true, Indent: 3);
-            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "PenBonus", true, Indent: 3);
-
-            Debug.Divider(4, "\u2500", 40, Indent: 2);
-            // NaturalEquipmentMod.Vomit(4, "|  After", vomitCats, Indent: 2);
+            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
             return true;
         }
 
@@ -173,16 +166,16 @@ namespace XRL.World.Parts
             if (NaturalEquipmentMod != null)
             {
                 naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 3);
+                Debug.CheckYeh(4, $"naturalEquipmentMod for this BodyPart contained in Property", Indent: 2);
             }
             else if (NaturalEquipmentMods.ContainsKey(targetType))
             {
                 naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
+                Debug.CheckYeh(4, $"naturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 2);
             }
             else
             {
-                Debug.CheckNah(4, $"No NaturalEquipmentMod for this BodyPart", Indent: 3);
+                Debug.CheckNah(4, $"No naturalEquipmentMod for this BodyPart", Indent: 3);
             }
             if (naturalEquipmentMod != null)
             {
@@ -198,20 +191,14 @@ namespace XRL.World.Parts
 
         public virtual void OnImplanted(GameObject Implantee, GameObject Implant)
         {
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
-            foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            }
-            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
-
             Implantee.Body.UpdateBodyParts();
-        } //!--- public override void OnImplanted(GameObject Object)
+        } //!-- public override void OnImplanted(GameObject Object)
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
-        } //!--- public override void OnUnimplanted(GameObject Object)
+            Implantee.Body.UpdateBodyParts();
+        } //!-- public override void OnUnimplanted(GameObject Object)
+
         public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = Implantee.GetCurrentZone();
@@ -227,23 +214,23 @@ namespace XRL.World.Parts
             Debug.Footer(4,
                 $"{typeof(T).Name}",
                 $"{nameof(OnManageNaturalEquipment)}(body of: {Implantee.Blueprint})");
-        }
-        public virtual void OnBodyPartsUpdated()
+        } //!-- public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
+        public virtual void OnUpdateNaturalEquipmentMods()
         {
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
             }
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
-        }
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+        } //!-- public virtual void OnUpdateNaturalEquipmentMods()
 
         public override bool WantEvent(int ID, int cascade)
         {
             return ID == ImplantedEvent.ID
                 || ID == UnimplantedEvent.ID
-                || ID == AfterBodyPartsUpdatedEvent.ID
+                || ID == UpdateNaturalEquipmentModsEvent.ID
                 || ID == ManageDefaultEquipmentEvent.ID;
         }
         public override bool HandleEvent(ImplantedEvent E)
@@ -265,17 +252,22 @@ namespace XRL.World.Parts
                 + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
                 Indent: 0);
 
-            if (E.Wielder == Implantee)
+            if (E.Wielder.Is(Implantee) && E.Object.HasPart<NaturalEquipmentManager>())
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
             }
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(AfterBodyPartsUpdatedEvent E)
+        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E)",
+                Indent: 0);
+
             if (E.Actor == Implantee)
             {
-                OnBodyPartsUpdated();
+                OnUpdateNaturalEquipmentMods();
             }
             return base.HandleEvent(E);
         }
@@ -294,13 +286,13 @@ namespace XRL.World.Parts
                 string Mutation = E.GetParameter("Mutation") as string;
                 if (Actor == Implantee)
                 {
-                    Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+                    Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
                     foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
                     {
-                        UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+                        // UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
                     }
-                    if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-                    Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+                    if (NaturalEquipmentMod != null) // UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+                    Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
                 }
             }
             else if (E.ID == "MutationAdded")
@@ -319,12 +311,10 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
         }
-
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
         }
-
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentCybernetic<T> cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic<T>;

@@ -262,7 +262,6 @@ namespace HNPS_GigantismPlus
                 EnableActivatedAbilityID = burrowingClaws.EnableActivatedAbilityID,
             };
 
-
             return managedBurrowingClaws;
         }
         public static UD_ManagedCrystallinity ConvertToManaged(this Crystallinity crystallinity)
@@ -270,7 +269,7 @@ namespace HNPS_GigantismPlus
             UD_ManagedCrystallinity managedCrystallinity = new()
             {
                 Level = crystallinity.Level,
-                RefractAdded = crystallinity.RefractAdded
+                RefractAdded = crystallinity.RefractAdded,
             };
 
             return managedCrystallinity;
@@ -532,14 +531,14 @@ namespace HNPS_GigantismPlus
             Object.SetStringProperty("EquipmentFrameColors", TopLeft_Left_Right_BottomRight, true);
         }
 
-        public static void CheckAffectedEquipmentSlots(this GameObject Actor)
+        public static void CheckEquipmentSlots(this GameObject Actor)
         {
-            Debug.Entry(3, $"* {nameof(CheckAffectedEquipmentSlots)}(this GameObject Actor: {Actor.DebugName})");
+            Debug.Entry(3, $"* {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName})");
             Body Body = Actor?.Body;
             if (Body != null)
             {
                 List<GameObject> list = Event.NewGameObjectList();
-                Debug.Entry(3, "> foreach (BodyPart bodyPart in Body.LoopParts())");
+                Debug.Entry(3, "> foreach (BodyPart bodyPart in Actor.LoopParts())");
                 foreach (BodyPart bodyPart in Body.LoopParts())
                 {
                     Debug.Entry(3, "bodyPart", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Name}]", Indent: 1);
@@ -550,20 +549,22 @@ namespace HNPS_GigantismPlus
                         list.Add(equipped);
                         int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
                         int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
-                        if (partCountEquippedOn != slotsRequiredFor && bodyPart.TryUnequip(true, true, false, false) && partCountEquippedOn > slotsRequiredFor)
+                        if (!partCountEquippedOn.Is(slotsRequiredFor) 
+                            && bodyPart.TryUnequip(true, true, false, false) 
+                            && partCountEquippedOn > slotsRequiredFor)
                         {
                             equipped.SplitFromStack();
                             bodyPart.Equip(equipped, new int?(0), true, false, false, true);
                         }
                     }
                 }
-                Debug.Entry(3, "x foreach (BodyPart bodyPart in Body.LoopParts()) >//");
+                Debug.Entry(3, "x foreach (BodyPart bodyPart in Actor.LoopParts()) >//");
             }
             else
             {
                 Debug.Entry(4, $"no body on which to perform check, aborting ");
             }
-            Debug.Entry(3, $"x {nameof(CheckAffectedEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//");
+            Debug.Entry(3, $"x {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//");
         }
 
         public static IPart RequirePart(this GameObject Object, string Part, bool DoRegistration = true, bool Creation = false)
@@ -923,7 +924,7 @@ namespace HNPS_GigantismPlus
                             return "mask";
                         }
                     }
-                    if (armor.WornOn.Is("Body"))
+                    if (armor.WornOn.Is("Actor"))
                     {
                         if (Object.Blueprint.Contains("Plate"))
                         {
@@ -1058,6 +1059,12 @@ namespace HNPS_GigantismPlus
                 || isImprovisedButGigantic 
                 || MeleeWeapon.ParentObject.GetIntProperty("IsImprovisedMelee") > 0
                 || hasImprovisedProp;
+        }
+
+        public static List<GameObject> GetNaturalEquipment(this Body Body)
+        {
+            static bool filter(GameObject GO) { return GO.HasPart<NaturalEquipment>() || GO.HasTag("NaturalGear"); }
+            return Body.GetEquippedObjects(filter);
         }
     }
 }

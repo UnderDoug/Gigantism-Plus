@@ -16,18 +16,22 @@ namespace XRL.World.Parts
             : base(Tier)
         {
         }
+        public ModCrystallineNaturalWeaponUnmanaged(ModCrystallineNaturalWeapon Conversion)
+            : base(Conversion)
+        {
+        }
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            AssigningPart ??= Wielder?.GetPart<Crystallinity>()?.ConvertToManaged();
+            AssigningPart ??= !Wielder.Is(null) ? new(Wielder.GetPart<Crystallinity>()) : null;
             if (AssigningPart == null)
             {
                 Debug.Entry(2,
                     $"WARN",
-                    $"{typeof(ModBurrowingNaturalWeaponUnmanaged).Name}.{nameof(BeingAppliedBy)} (" +
+                    $"{typeof(ModCrystallineNaturalWeaponUnmanaged).Name}.{nameof(BeingAppliedBy)} (" +
                     $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
                     $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " +
-                    $"Failed to assign converted {typeof(BurrowingClaws).Name} as AssigningPart",
+                    $"Failed to assign converted {typeof(Crystallinity).Name} as AssigningPart",
                     Indent: 0);
                 return false;
             }

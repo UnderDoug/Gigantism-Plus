@@ -29,28 +29,35 @@ namespace XRL.World.Parts.Mutation
         }
 
         // Takes an existing NaturalEquipmentMods Dictionary
-        public BaseManagedDefaultEquipmentMutation(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, T NewParent)
+        public BaseManagedDefaultEquipmentMutation(
+            Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods, 
+            T NewParent)
             : this()
         {
             Dictionary<string, ModNaturalEquipment<T>> NewNaturalEquipmentMods = new();
-            foreach ((string BodyPartType, ModNaturalEquipment<T> NaturalEquipmentMod) in naturalEquipmentMods)
+            foreach ((string BodyPartType, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 ModNaturalEquipment<T> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
                 NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
             }
-            NaturalEquipmentMods = NewNaturalEquipmentMods;
+            this.NaturalEquipmentMods = NewNaturalEquipmentMods;
         }
 
-        public BaseManagedDefaultEquipmentMutation(ModNaturalEquipment<T> naturalEquipmentMod, T NewParent)
+        public BaseManagedDefaultEquipmentMutation(
+            ModNaturalEquipment<T> NaturalEquipmentMod, 
+            T NewParent)
             : this()
         {
-            NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
+            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
-        public BaseManagedDefaultEquipmentMutation(Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, ModNaturalEquipment<T> naturalEquipmentMod, T NewParent)
-            : this(naturalEquipmentMods, NewParent)
+        public BaseManagedDefaultEquipmentMutation(
+            Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods, 
+            ModNaturalEquipment<T> naturalEquipmentMod, 
+            T NewParent)
+            : this(NaturalEquipmentMods, NewParent)
         {
-            NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+            NaturalEquipmentMod = new(naturalEquipmentMod, NewParent);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
@@ -64,7 +71,6 @@ namespace XRL.World.Parts.Mutation
             }
             return true;
         }
-
         public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
@@ -80,17 +86,14 @@ namespace XRL.World.Parts.Mutation
         {
             return 0;
         }
-
         public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
         }
-
         public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
         }
-
         public virtual int GetNaturalWeaponHitBonus(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
         {
             return 0;
@@ -104,12 +107,10 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedParts;
         }
-
         public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedStringProps;
         }
-
         public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedIntProps;
@@ -141,6 +142,7 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool ChangeLevel(int NewLevel)
         {
+            /*
             Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}");
             Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
@@ -150,6 +152,7 @@ namespace XRL.World.Parts.Mutation
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
             Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
             Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}");
+            */
             return base.ChangeLevel(NewLevel);
         }
 
@@ -166,16 +169,16 @@ namespace XRL.World.Parts.Mutation
             if (NaturalEquipmentMod != null)
             {
                 naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 3);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 2);
             }
             else if (NaturalEquipmentMods.ContainsKey(targetType))
             {
                 naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 2);
             }
             else
             {
-                Debug.CheckNah(4, $"No NaturalEquipmentMod for this BodyPart", Indent: 3);
+                Debug.CheckNah(4, $"No NaturalEquipmentMod for this BodyPart", Indent: 2);
             }
             if (naturalEquipmentMod != null)
             {
@@ -213,11 +216,22 @@ namespace XRL.World.Parts.Mutation
                 $"{typeof(T).Name}",
                 $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})");
         }
+        public virtual void OnUpdateNaturalEquipmentMods()
+        {
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
+            {
+                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            }
+            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+        }
 
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == ManageDefaultEquipmentEvent.ID;
+                || ID == ManageDefaultEquipmentEvent.ID
+                || ID == UpdateNaturalEquipmentModsEvent.ID;
         }
         public bool HandleEvent(ManageDefaultEquipmentEvent E)
         {
@@ -229,6 +243,19 @@ namespace XRL.World.Parts.Mutation
             if (E.Wielder == ParentObject)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
+            }
+            return base.HandleEvent(E);
+        }
+        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E )",
+                Indent: 0);
+
+            if (E.Actor == ParentObject)
+            {
+                OnUpdateNaturalEquipmentMods();
             }
             return base.HandleEvent(E);
         }
@@ -256,7 +283,7 @@ namespace XRL.World.Parts.Mutation
                 string Mutation = E.GetParameter("Mutation") as string;
                 if (Actor == ParentObject)
                 {
-                    // ProcessNaturalEquipment(Actor?.Body);
+                    // ProcessNaturalEquipment(Actor?.Actor);
                 }
             }
             return base.FireEvent(E);
@@ -266,12 +293,10 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
         }
-
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
         }
-
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentMutation<T> mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation<T>;

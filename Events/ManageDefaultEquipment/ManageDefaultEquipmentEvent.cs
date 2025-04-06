@@ -8,10 +8,10 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
+    [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
     public class ManageDefaultEquipmentEvent : ModPooledEvent<ManageDefaultEquipmentEvent>
     {
-        public new static readonly int CascadeLevel = CASCADE_ALL;
+        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 
         public GameObject Object;
 
@@ -20,8 +20,6 @@ namespace HNPS_GigantismPlus
         public NaturalEquipmentManager Manager;
 
         public BodyPart BodyPart;
-
-        public string target;
 
         public ManageDefaultEquipmentEvent()
         {
@@ -64,7 +62,6 @@ namespace HNPS_GigantismPlus
             Wielder = null;
             Manager = null;
             BodyPart = null;
-            target = null;
         }
 
         public static ManageDefaultEquipmentEvent Manage(BeforeManageDefaultEquipmentEvent BeforeManageDefaultEquipmentEvent, GameObject Wielder)
@@ -81,12 +78,13 @@ namespace HNPS_GigantismPlus
             bool flag = true;
             if (GameObject.Validate(ref E.Wielder) && GameObject.Validate(ref E.Object) )
             {
-                E.target = "wielder";
                 bool wielder = E.Wielder.HandleEvent(E);
-                E.target = "object";
                 bool @object = E.Object.HandleEvent(E);
                 flag = wielder && @object;
-                if (flag && (E.Wielder.HasRegisteredEvent(E.GetRegisteredEventID()) || E.Object.HasRegisteredEvent(E.GetRegisteredEventID())))
+
+                bool wielderRegistered = E.Wielder.HasRegisteredEvent(E.GetRegisteredEventID());
+                bool objectRegistered = E.Object.HasRegisteredEvent(E.GetRegisteredEventID());
+                if (wielderRegistered || objectRegistered)
                 {
                     Event @event = Event.New(E.GetRegisteredEventID());
                     @event.SetParameter("Object", E.Object);
@@ -108,7 +106,6 @@ namespace HNPS_GigantismPlus
             manageDefaultEquipmentEvent.Wielder = Wielder;
             manageDefaultEquipmentEvent.Manager = Manager;
             manageDefaultEquipmentEvent.BodyPart = BodyPart;
-            manageDefaultEquipmentEvent.target = "";
             return manageDefaultEquipmentEvent;
         }
     }

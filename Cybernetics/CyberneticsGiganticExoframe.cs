@@ -66,6 +66,8 @@ namespace XRL.World.Parts
 
         public virtual void MapAugmentAdjustments()
         {
+            Debug.Entry(4, $"* {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}()", Indent: 1);
+            
             NaturalEquipmentMod.AdjectiveColor = AugmentAdjectiveColor;
 
             NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", AugmentTile);
@@ -77,17 +79,22 @@ namespace XRL.World.Parts
             NaturalEquipmentMod.AddedStringProps["SwingSound"] = AugmentSwingSound;
             NaturalEquipmentMod.AddedStringProps["BlockedSound"] = AugmentBlockedSound;
             NaturalEquipmentMod.AddedStringProps["EquipmentFrameColors"] = AugmentEquipmentFrameColors;
+
+            NaturalEquipmentMod.Adjustments.Vomit(4, $"{ImplantObject?.DebugName} Adjustments", LoopItem: true, Indent:1);
+
+            Debug.Entry(4, $"x {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}() *//", Indent: 1);
         }
 
         public override void Attach()
         {
-            MapAugmentAdjustments();
             base.Attach();
         }
 
         public override void OnImplanted(GameObject Implantee, GameObject Implant)
         {
             Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
+
+            MapAugmentAdjustments();
 
             Become(Implantee, Model, Implant);
 
@@ -99,7 +106,7 @@ namespace XRL.World.Parts
         {
             Debug.Entry(3, $"* OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
 
-            Implantee.CheckAffectedEquipmentSlots();
+            // Implantee.CheckEquipmentSlots();
 
             Unbecome(Implantee, Model, ImplantObject);
             Debug.Entry(3, $"x OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");

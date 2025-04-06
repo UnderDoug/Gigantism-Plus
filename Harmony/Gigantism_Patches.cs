@@ -100,7 +100,7 @@ namespace HNPS_GigantismPlus.Harmony
             {
                 // is the GameObject PseudoGigantic but not Gigantic
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
-                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic not Gigantic");
+                Debug.Entry(3, "Actor.RegenerateDefaultEquipment() > PseudoGigantic not Gigantic");
                 __state.IsGiganticCreature = true; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
                 Debug.Entry(2, "Trying to generate gigantic natural equipment while PseudoGigantic\n");
             }
@@ -115,7 +115,7 @@ namespace HNPS_GigantismPlus.Harmony
             {
                 // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
-                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic and Gigantic");
+                Debug.Entry(3, "Actor.RegenerateDefaultEquipment() > PseudoGigantic and Gigantic");
                 __state.IsGiganticCreature = false; // make the GameObject not Gigantic 
                 Debug.Entry(3, "Should have generated gigantic natural equipment while PseudoGigantic\n");
             }

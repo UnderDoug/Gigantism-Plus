@@ -16,7 +16,9 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class GigantismPlus : BaseManagedDefaultEquipmentMutation<GigantismPlus>
     {
-        
+        private static int MaxDamageDieIncrease => 7;
+        private static int MinDamageBonusIncrease => 3;
+
         public bool IsVehicleCreature => ParentObject.HasPart(typeof(Vehicle));
 
         public bool IsGiganticCreature // basically a wrapper but forces you to not be PseudoGigantic at the same time 
@@ -52,22 +54,11 @@ namespace XRL.World.Parts.Mutation
         private CyberneticsGiganticExoframe _giganticExoframe;
         public CyberneticsGiganticExoframe GiganticExoframe
         {
-            get
-            {
-                return _giganticExoframe ??= ParentObject?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
-            }
-            set
-            {
-                Type valueType = value?.GetType();
-                if (value != null && valueType.IsEquivalentTo(typeof(CyberneticsGiganticExoframe)))
-                {
-                    _giganticExoframe = value;
-                }
-                _giganticExoframe = null;
-            }
+            get => _giganticExoframe ??= ParentObject?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
+            set => _giganticExoframe = value;
         }
 
-        public Guid EnableActivatedAbilityID = Guid.Empty;
+        public Guid HunchOverActivatedAbilityID = Guid.Empty;
 
         public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
 
@@ -179,7 +170,7 @@ namespace XRL.World.Parts.Mutation
             ModNaturalEquipment<GigantismPlus> GiganticBod = new()
             {
                 AssigningPart = this,
-                BodyPartType = "Body",
+                BodyPartType = "Actor",
 
                 ModPriority = 10,
                 DescriptionPriority = 10,
@@ -207,21 +198,23 @@ namespace XRL.World.Parts.Mutation
 
         public override bool GeneratesEquipment() { return true; }
 
-        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
-            if (NaturalWeaponSubpart.BodyPartType == "Head") return 2;
-            if (NaturalWeaponSubpart.BodyPartType == "Hand") return (int)Math.Min(1 + Math.Floor(Level / 3.0), 8);
+            if (NaturalEquipmentMod.BodyPartType == "Head") return 2;
+            if (NaturalEquipmentMod.BodyPartType == "Hand") return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
             return 0;
         }
-        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
-            if (NaturalWeaponSubpart.BodyPartType == "Head") return 5;
-            if (NaturalWeaponSubpart.BodyPartType == "Hand") return (int)Math.Max(1, Math.Floor((Level - 9) / 3.0));
+            double perLevel = 3.0;
+            int levelOffset = MinDamageBonusIncrease * (int)perLevel;
+            if (NaturalEquipmentMod.BodyPartType == "Head") return 5;
+            if (NaturalEquipmentMod.BodyPartType == "Hand") return (int)Math.Max(1, Math.Floor((Level - levelOffset) / perLevel));
             return 0;
         }
-        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalWeaponSubpart, int Level = 1)
+        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
-            if (NaturalWeaponSubpart.BodyPartType == "Head") return 3;
+            if (NaturalEquipmentMod.BodyPartType == "Head") return 3;
             return -3 + (int)Math.Floor(Level / 2.0);
         }
 
@@ -489,7 +482,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
-            // DescribeMyActivatedAbility(EnableActivatedAbilityID, CollectStats);
+            // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
             return base.HandleEvent(E);
         }
 
@@ -509,6 +502,9 @@ namespace XRL.World.Parts.Mutation
             string exoframeName = string.Empty;
             if (IsCyberGiant) exoframeName = GiganticExoframe.ImplantObject.ShortDisplayName;
 
+            string MaxDamageDie = $" (Max: {MaxDamageDieIncrease.Signed()})";
+            string MinDamageBonus = $" (Min: {MinDamageBonusIncrease.Signed()})";
+
             StringBuilder SB = Event.NewStringBuilder();
             
             SB.Append($"You are {gigantismSource} large, ").Append("will ").AppendRule("struggle to enter small spaces")
@@ -520,7 +516,7 @@ namespace XRL.World.Parts.Mutation
                 .Append("all of your natural weapons are ").AppendGigantic("gigantic").Append(".")
                 .AppendLine().AppendLine();
 
-            SB.Append("You you cause a ").AppendRule("shockwave").Append(" where you land ")
+            SB.Append("You create a ").AppendRule("shockwave").Append(" where you land ")
                 .Append("after jumping at least ").AppendRule($"{stunningForceDistance}").Append(" tiles.").AppendLine()
                 .Append("Your shockwave's ").AppendRule("damage").Append(" and ").AppendRule("force")
                 .Append(" increases every ").AppendRule($"{(int)(1 / stunningForceLevelFactor)} levels");
@@ -529,9 +525,9 @@ namespace XRL.World.Parts.Mutation
             SB.AppendLine().AppendLine();
 
             SB.Append("Your ").AppendGigantic("gigantic").Append($" {WeaponNoun.Pluralize()} gain:").AppendLine()
-                .AppendRule("1d").Append(" damage every ").AppendRule($"{3} levels").Append(" (Max 8)").AppendLine()
-                .AppendRule("+1").Append(" damage every ").AppendRule($"{3} levels").Append(" (Min 3)").AppendLine()
-                .AppendRule("+1").Append(" to hit every ").AppendRule($"{2} levels").AppendLine();
+                .AppendRule("1d").Append(" damage every ").AppendRule($"{3} levels").Append(MaxDamageDie).AppendLine()
+                .AppendRule("+1").Append(" damage every ").AppendRule($"{3} levels").Append(MinDamageBonus).AppendLine()
+                .AppendRule("+1").Append(" to hit every ").AppendRule($"{2} levels");
             
 
             return Event.FinalizeString(SB);
@@ -581,7 +577,7 @@ namespace XRL.World.Parts.Mutation
             }
             StringBuilder SB = Event.NewStringBuilder();
 
-            SB.Append($"Shockwave is Stunning Force level ").AppendRule($"{StunningForceJumpLevel}").AppendLine()
+            SB.Append($"Shockwave is Stunning Force (").AppendRule($"{StunningForceJumpLevel}").AppendLine(")")
                 .Append($"Force damage increment: ").AppendRule($"{stunningForceDamageIncrement}").AppendLine();
 
             SB.AppendGigantic("Gigantic").Append($" modifier gives your natural {WeaponNoun} weapons:").AppendLine()
@@ -607,7 +603,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "? if (body != null)", Indent: 1);
             if (body != null)
             {
-                Debug.LoopItem(4, "+ Have Body", Indent: 2);
+                Debug.CheckYeh(4, "Have Body", Indent: 2);
                 GO.RemovePart<Gigantism>();
                 Debug.LoopItem(4, "RemovePart<Gigantism>()", Indent: 2);
                 IsGiganticCreature = true; // Enable the Gigantic flag
@@ -617,16 +613,16 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.LoopItem(4, "- Haven't Body", Indent: 2);
+                Debug.CheckNah(4, "Haven't Body", Indent: 2);
             }
             Debug.Entry(4, "x if (body != null) ?//", Indent: 1);
 
             Debug.Entry(4, "? if (!GO.HasPart<Vehicle>())", Indent: 1);
             if (!GO.HasPart<Vehicle>())
             {
-                Debug.LoopItem(4, "+ Not Vehicle", Indent: 2);
+                Debug.CheckYeh(4, "Not Vehicle", Indent: 2);
 
-                EnableActivatedAbilityID =
+                HunchOverActivatedAbilityID =
                     AddMyActivatedAbility(
                         Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
                         Command: HUNCH_OVER_COMMAND_NAME,
@@ -642,15 +638,15 @@ namespace XRL.World.Parts.Mutation
                         IsWorldMapUsable: false
                         );
 
-                Debug.LoopItem(4, "Activeated Ability Assigned", Indent: 2);
-                ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(EnableActivatedAbilityID);
+                Debug.LoopItem(4, "Activated Ability Assigned", Indent: 2);
+                ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(HunchOverActivatedAbilityID);
                 abilityEntry.DisplayName = 
                     "{{C|" + 
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 HunchedOverAbilityHunched + "\n" +
                        "}}";
 
-                Debug.LoopItem(4, "Activeated Ability DisplayName Changed", Indent: 2);
+                Debug.LoopItem(4, "Activated Ability DisplayName Changed", Indent: 2);
                 /* This causes a village generation crash.
                  * 
                 if (this.IsCyberGiant)
@@ -664,7 +660,7 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.LoopItem(4, "- Is Vehicle", Indent: 2);
+                Debug.CheckNah(4, "Is Vehicle", Indent: 2);
             }
             Debug.Entry(4, "x if (!GO.HasPart<Vehicle>()) ?//", Indent: 1);
 
@@ -680,7 +676,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "? if (GO != null)", Indent: 1);
             if (GO != null)
             {
-                Debug.LoopItem(4, "+ GO not null", Indent: 2);
+                Debug.CheckYeh(4, "GO not null", Indent: 2);
                 // Remove jumping properties
                 GO.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus, RemoveIfZero: true);
                 AppliedJumpRangeBonus = 0;
@@ -692,15 +688,15 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, "? if (GO.HasPart<StunningForceOnJump>())", Indent: 2);
                 if (GO.HasPart<StunningForceOnJump>())
                 {
-                    Debug.LoopItem(4, "+ StunningForceOnJump part found", Indent: 3);
+                    Debug.CheckYeh(4, "StunningForceOnJump part found", Indent: 3);
                     var stunning = GO.GetPart<StunningForceOnJump>();
-                    Debug.LoopItem(4, $"- Found StunningForceOnJump: Level={stunning.Level}, Distance={stunning.Distance}", Indent: 3);
+                    Debug.LoopItem(4, $"Found StunningForceOnJump: Level={stunning.Level}, Distance={stunning.Distance}", Indent: 3);
                     GO.RemovePart<StunningForceOnJump>();
-                    Debug.Entry(4, "StunningForceOnJump removed", Indent: 3);
+                    Debug.LoopItem(4, $"StunningForceOnJump removed", Indent: 3);
                 }
                 else
                 {
-                    Debug.LoopItem(4, "- No StunningForceOnJump part", Indent: 3);
+                    Debug.CheckNah(4, "No StunningForceOnJump part", Indent: 3);
                 }
                 Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2);
 
@@ -712,27 +708,27 @@ namespace XRL.World.Parts.Mutation
                 GO.IsGiganticCreature = false; // Revert the Gigantic flag
                 Debug.Entry(4, "IsGiganticCreature = false", Indent: 2);
 
-                Debug.Entry(4, "? if (EnableActivatedAbilityID != Guid.Empty)", Indent: 2);
-                if (EnableActivatedAbilityID != Guid.Empty)
+                Debug.Entry(4, "? if (HunchOverActivatedAbilityID != Guid.Empty)", Indent: 2);
+                if (HunchOverActivatedAbilityID != Guid.Empty)
                 {
-                    Debug.LoopItem(4, "+ EnableActivatedAbilityID not Empty", Indent: 3);
-                    RemoveMyActivatedAbility(ref EnableActivatedAbilityID);
-                    Debug.LoopItem(4, "RemoveMyActivatedAbility(ref EnableActivatedAbilityID)", Indent: 3);
+                    Debug.CheckYeh(4, "HunchOverActivatedAbilityID not Empty", Indent: 3);
+                    RemoveMyActivatedAbility(ref HunchOverActivatedAbilityID);
+                    Debug.LoopItem(4, "RemoveMyActivatedAbility(ref HunchOverActivatedAbilityID)", Indent: 3);
                 }
                 else
                 {
-                    Debug.LoopItem(4, "- EnableActivatedAbilityID was Empty", Indent: 3);
+                    Debug.CheckNah(4, "HunchOverActivatedAbilityID was Empty", Indent: 3);
                 }
-                Debug.Entry(4, "x if (EnableActivatedAbilityID != Guid.Empty) ?//", Indent: 2);
+                Debug.Entry(4, "x if (HunchOverActivatedAbilityID != Guid.Empty) ?//", Indent: 2);
 
-                Debug.Entry(4, "GO.WantToReequip()", Indent: 2);
-                GO.Brain.PerformReequip();
-                Debug.Entry(4, "GO.CheckAffectedEquipmentSlots()", Indent: 2);
-                GO.CheckAffectedEquipmentSlots();
+                Debug.LoopItem(4, "GO.WantToReequip()", Indent: 2);
+                GO.WantToReequip();
+                Debug.LoopItem(4, "GO.CheckEquipmentSlots()", Indent: 2);
+                GO.CheckEquipmentSlots();
             }
             else
             {
-                Debug.LoopItem(4, "- GO is null", Indent: 2);
+                Debug.CheckNah(4, "GO is null", Indent: 2);
             }
             Debug.Entry(4, "x if (GO != null) ?//", Indent: 1);
 
@@ -766,11 +762,11 @@ namespace XRL.World.Parts.Mutation
                 }
 
                 // Not prevented from taking action
-                ToggleMyActivatedAbility(EnableActivatedAbilityID, null, Silent: true, null);
+                ToggleMyActivatedAbility(HunchOverActivatedAbilityID, null, Silent: true, null);
                 Debug.Entry(3, "Hunch Ability Toggled");
 
                 Debug.Entry(3, "Proceeding to Hunch Ability Effects");
-                if (IsMyActivatedAbilityToggledOn(EnableActivatedAbilityID))
+                if (IsMyActivatedAbilityToggledOn(HunchOverActivatedAbilityID))
                     HunchOver(true); // Hunch
                 else
                     StraightenUp(true); // Stand upright
@@ -811,7 +807,7 @@ namespace XRL.World.Parts.Mutation
                     Popup.Show("You hunch over, allowing you access to smaller spaces.");
                 }
 
-                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
+                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
                 abilityEntry.DisplayName =
                     "{{C|" + 
                                 HunchedOverAbilityUpright + "\n" +
@@ -820,7 +816,7 @@ namespace XRL.World.Parts.Mutation
 
             }
             Debug.Entry(1, "Should be Hunched Over");
-        } //!--- public void HunchOver(bool Message = false)
+        } //!-- public void HunchOver(bool Message = false)
 
         // Want to move the bulk of the Active Ability here.
         public void StraightenUp(bool Message = false)
@@ -851,28 +847,26 @@ namespace XRL.World.Parts.Mutation
                     Popup.Show("You stand tall, relaxing into your immense stature.");
                 }
 
-                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(EnableActivatedAbilityID);
+                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
                 abilityEntry.DisplayName =
                     "{{C|" +
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 HunchedOverAbilityHunched + "\n" +
                        "}}";
             }
-
-            actor.CheckAffectedEquipmentSlots();
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
 
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-            Writer.Write(EnableActivatedAbilityID);
+            Writer.Write(HunchOverActivatedAbilityID);
         }
 
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            EnableActivatedAbilityID = Reader.ReadGuid();
+            HunchOverActivatedAbilityID = Reader.ReadGuid();
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

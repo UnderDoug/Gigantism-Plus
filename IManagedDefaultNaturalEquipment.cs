@@ -43,15 +43,17 @@ namespace XRL.World
     }
 
     public interface IManagedDefaultNaturalEquipment 
-        : IModEventHandler<ManageDefaultEquipmentEvent>
+        : IModEventHandler<BeforeBodyPartsUpdatedEvent>
+        , IModEventHandler<UpdateNaturalEquipmentModsEvent>
+        , IModEventHandler<AfterBodyPartsUpdatedEvent>
+        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IModEventHandler<BeforeManageDefaultEquipmentEvent>
         , IModEventHandler<AfterManageDefaultEquipmentEvent>
-        , IModEventHandler<AfterBodyPartsUpdatedEvent>
     {
         public int Level { get; set; }
 
         public abstract bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart);
-
         public abstract void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart);
+        public abstract void OnUpdateNaturalEquipmentMods();
     }
 }

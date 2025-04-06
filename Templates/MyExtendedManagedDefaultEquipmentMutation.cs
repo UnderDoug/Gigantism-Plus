@@ -208,7 +208,7 @@ namespace XRL.World.Parts.Mutation
         // The call is after the base default fists have been destroyed and recreated.
         // While reliable in catching all Hand and Hand variants, the code below is optional and simply serves as an example
         // of how you might loop through parts and apply the modification.
-        public override void OnRegenerateDefaultEquipment(Body body)
+        public override void OnRegenerateDefaultEquipment(Actor body)
         {
             if (body == null)
             {

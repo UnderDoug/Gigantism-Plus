@@ -13,9 +13,11 @@ using static HNPS_GigantismPlus.Extensions;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class NaturalEquipmentManager : IScribedPart
+    public class NaturalEquipmentManager 
+        : IScribedPart
+        , IModEventHandler<BeforeBodyPartsUpdatedEvent>
+        , IModEventHandler<AfterBodyPartsUpdatedEvent>
     {
-        public bool WantToManage = false;
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
 
@@ -51,12 +53,18 @@ namespace XRL.World.Parts
 
         public SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods;
 
-        // Disctionary key is the Target, the Value Dictionary key is the field
+        public Dictionary<string, SortedDictionary<int, ModNaturalEquipmentBase>> NaturalEquipmentModsByPart;
+
+        // Dictionary key is the Target, the Value Dictionary key is the field
         public Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entry)> AdjustmentTargets;
         // AdjustmentTargets: Dictionary,
         //      Key: string (name of target object)
         //      Value: Tuple( TargetObject, Entry ),
-        //          TargetObject: per Adjustment struct: GameObject (the equipment itself), Render, MeleeWeapon, MissileWeapon, Armor
+        //          TargetObject: per Adjustment struct:
+        //              GameObject (the equipment itself),
+        //              Render,
+        //              MeleeWeapon,
+        //              Armor
         //          Entry: Dictionary,
         //              Key: string (field/property being targeted)
         //              Value: Tuple( Priority, Value ),
@@ -66,6 +74,7 @@ namespace XRL.World.Parts
         public NaturalEquipmentManager()
         {
             NaturalEquipmentMods = new();
+            NaturalEquipmentModsByPart = new();
         }
 
         public override void Initialize()
@@ -110,10 +119,17 @@ namespace XRL.World.Parts
         }
         public void ClearNaturalWeaponMods()
         {
+            Debug.Entry(4, $"* {nameof(ClearNaturalWeaponMods)}()", Indent: 1);
             NaturalEquipmentMods = new();
+        }
+        public void ClearAdjustmentTargets()
+        {
+            Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: 1);
+            AdjustmentTargets = new();
         }
         public void ResetShortDescriptions()
         {
+            Debug.Entry(4, $"* {nameof(ResetShortDescriptions)}()", Indent: 1);
             ClearShortDescriptionCache();
             ClearShortDescriptions();
         }
@@ -123,7 +139,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddNaturalEquipmentMod)}(NaturalWeaponMod: {NaturalEquipmentMod.Name})",
-                Indent: 4);
+                Indent: 3);
 
             NaturalEquipmentMods ??= new();
             if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
@@ -131,21 +147,21 @@ namespace XRL.World.Parts
                 Debug.Entry(2,
                     $"WARN: {typeof(NaturalEquipmentManager).Name}." +
                     $"{nameof(AddNaturalEquipmentMod)}()",
-                    $"Key:{NaturalEquipmentMod.ModPriority} " + 
-                    $"Value:{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " + 
-                    $"in {nameof(NaturalEquipmentMods)} overwritten. Same ModPriority",
-                    Indent: 2);
+                    $"[{NaturalEquipmentMod.ModPriority}]" + 
+                    $"{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " + 
+                    $"in {nameof(NaturalEquipmentMods)} overwritten: Same ModPriority",
+                    Indent: 4);
             }
             NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = NaturalEquipmentMod;
-            Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 5);
+            Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 4);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}", Indent: 6);
+                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}", Indent: 4);
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddNaturalEquipmentMod)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}) @//",
-                Indent: 4);
+                Indent: 3);
         }
 
         public void AddShortDescriptionEntry(ModNaturalEquipmentBase NaturalEquipmentMod)
@@ -160,7 +176,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"ShortDescriptions:", Indent: 5);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}", Indent: 6);
+                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}", Indent: 5);
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
@@ -182,7 +198,7 @@ namespace XRL.World.Parts
 
             // does an entry for this field exist or, if it does, is its priority beat?
             Debug.Entry(4, $"Existing: {(Dictionary.ContainsKey(@field) ? Dictionary[@field].Priority : "no entry")} | Proposed: {entry.Priority}", Indent: 5);
-            if (!Dictionary.ContainsKey(@field) || Dictionary[@field].Priority > entry.Priority)
+            if (!Dictionary.ContainsKey(@field) || Dictionary[@field].Priority >= entry.Priority)
             {
                 Dictionary[@field] = entry;
                 flag = true;
@@ -217,19 +233,6 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"x foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments) >//", Indent: 2);
             }
             Debug.Entry(4, $"x {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name}) *//", Indent: 1);
-        }
-
-        public virtual void CollectAppliedNaturalWeaponMods()
-        {
-            List<ModNaturalEquipmentBase> appliedNaturalEquipmentMods = ParentObject.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
-            if (!appliedNaturalEquipmentMods.IsNullOrEmpty())
-            {
-                ClearNaturalWeaponMods();
-                foreach (ModNaturalEquipmentBase naturalEquipmentMod in appliedNaturalEquipmentMods)
-                {
-                    AddNaturalEquipmentMod(naturalEquipmentMod);
-                }
-            }            
         }
 
         public virtual void AccumulateMeleeWeaponBonuses()
@@ -267,6 +270,22 @@ namespace XRL.World.Parts
             Debug.Header(4, 
                 $"{typeof(NaturalEquipmentManager).Name}",
                 $"{nameof(ManageNaturalEquipment)}()");
+
+            string wielderString = 
+                Wielder != null 
+                ? Wielder.DebugName 
+                : $"[null]";
+            string parentLimbString = 
+                ParentLimb != null 
+                ? $"[{ ParentLimb?.ID}:{ ParentLimb?.Type}] { ParentLimb?.Description}" 
+                : $"[null]";
+
+            Debug.LoopItem(4, 
+                $" Wielder: {wielderString}", 
+                Indent: 0);
+            Debug.LoopItem(4, 
+                $" ParentLimb: {parentLimbString}", 
+                Indent: 0);
 
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
@@ -433,9 +452,10 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
+                || ID == BeforeBodyPartsUpdatedEvent.ID
+                || ID == AfterBodyPartsUpdatedEvent.ID
                 || ID == GetShortDescriptionEvent.ID;
         }
-
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
             Debug.Entry(4,
@@ -452,14 +472,50 @@ namespace XRL.World.Parts
 
             return base.HandleEvent(E);
         }
+        public bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E.Actor.ShortDisplayName}))",
+                Indent: 0);
+            Debug.Entry(4,
+                $"Actor:{E.Actor.ShortDisplayName} | Limb: [{ParentLimb.ID}:{ParentLimb.Type}] {ParentLimb.Description}",
+                Indent: 0);
+
+            if (E.Actor == Wielder)
+            {
+                ClearNaturalWeaponMods();
+                ClearAdjustmentTargets();
+                ResetShortDescriptions();
+            }
+
+            return base.HandleEvent(E);
+        }
+        public bool HandleEvent(AfterBodyPartsUpdatedEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E (Actor:{E.Actor.ShortDisplayName}))",
+                Indent: 0);
+
+            if (E.Actor == Wielder)
+            {
+                BeforeManageDefaultEquipmentEvent beforeEvent = BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
+                ManageDefaultEquipmentEvent manageEvent = ManageDefaultEquipmentEvent.Manage(beforeEvent, Wielder);
+                AfterManageDefaultEquipmentEvent.Send(manageEvent);
+            }
+
+            return base.HandleEvent(E);
+        }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register("BodypartsUpdated");
+            // Registrar.Register("BodypartsUpdated");
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {
+            /*
             if (E.ID == "BodypartsUpdated")
             {
                 Debug.Entry(4,
@@ -476,6 +532,7 @@ namespace XRL.World.Parts
                     + $"{nameof(FireEvent)}(Event E.ID: \"{E.ID}\") @//",
                     Indent: 0);
             }
+            */
             return base.FireEvent(E);
         }
 

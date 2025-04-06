@@ -28,8 +28,9 @@ namespace XRL.World.Parts
                 string output = string.Empty;
                 output += $"({(Priority != 0 ? Priority : "PriorityUnset")})";
                 output += $"{Target ?? "NoTarget?"}.";
-                output += $"{Field ?? "NoField?"}=";
+                output += $"{Field ?? "NoField?"} = \"";
                 output += Value ?? "null?";
+                output += "\"";
                 return output;
             }
             public readonly string ToString(bool ShowID)

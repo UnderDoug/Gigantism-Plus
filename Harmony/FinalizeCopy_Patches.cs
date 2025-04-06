@@ -22,7 +22,7 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Divider(4, HONLY, Count: 40, Indent: 0);
             Debug.Entry(4, $"# {nameof(GameObject_DeepCopy_Patches)}.{nameof(FinalizeCopy_Postfix)}(GameObject __instance: {Object.DebugName})", Indent: 0);
 
-            Debug.Entry(4, $"> foreach (BodyPart part in Object.Body.LoopParts())", Indent: 1);
+            Debug.Entry(4, $"> foreach (BodyPart part in Object.Actor.LoopParts())", Indent: 1);
             foreach (BodyPart part in Object.Body.LoopParts())
             {
                 Debug.Divider(4, HONLY, Count: 25, Indent: 2);
@@ -90,7 +90,7 @@ namespace HNPS_GigantismPlus.Harmony
                 }
             }
             Debug.Divider(4, HONLY, Count: 25, Indent: 2);
-            Debug.Entry(4, $"x foreach (BodyPart part in Object.Body.LoopParts()) >//", Indent: 1);
+            Debug.Entry(4, $"x foreach (BodyPart part in Object.Actor.LoopParts()) >//", Indent: 1);
             Debug.Entry(4, $"x {nameof(GameObject_DeepCopy_Patches)}.{nameof(FinalizeCopy_Postfix)}(GameObject __instance: {Object.DebugName}) #//", Indent: 0);
             Debug.Divider(4, HONLY, Count: 40, Indent: 0);
         }

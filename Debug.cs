@@ -6,6 +6,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using static HNPS_GigantismPlus.Utils;
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 namespace HNPS_GigantismPlus
 {
@@ -435,6 +436,18 @@ namespace HNPS_GigantismPlus
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1);
                 else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<Adjustment> Vomit(this List<Adjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (Adjustment item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item}", Indent: Indent + 1);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;

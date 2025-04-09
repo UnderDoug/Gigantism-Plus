@@ -20,6 +20,9 @@
     <tag Name="HeroStrBoost" Value="8" />
     <tag Name="HeroTouBoost" Value="8" />
     <tag Name="HeroNameColor" Value="yuge" />
+    <tag Name="HeroColorString" Value="&amp;Z" />
+    <tag Name="HeroTileColor" Value="&amp;Z" />
+    <tag Name="HeroSelfPreservationThreshold" Value="20" />
     <tag Name="HeroMinLevel" Value="38" />
   </object>
   

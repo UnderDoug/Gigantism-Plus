@@ -102,7 +102,7 @@ namespace HNPS_GigantismPlus
                     // - only works if you flush it first since the "get" function checks if the _list is empty first
                     //   and if it isn't just returns it.
                     // - it's probably NOT good, and could pose compatability issues with other mods if they do things
-                    //   post Blueprint pre-load, but I'm not nearly experienced enough to know what issues exactly.
+                    //   post HandsBlueprint pre-load, but I'm not nearly experienced enough to know what issues exactly.
                     TinkerData._TinkerRecipes.RemoveAll(r => r != null); 
                     Debug.Entry(2, "TinkerData._TinkerRecipes.RemoveAll(r => r != null);", Indent: 5);
 

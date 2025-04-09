@@ -110,7 +110,7 @@ namespace XRL.World.ObjectBuilders
                 GameObject exoframeObject = GameObjectFactory.create(exoframe);
                 CyberneticsGiganticExoframe exoframeCybernetic = exoframeObject.GetPart<CyberneticsGiganticExoframe>();
 
-                NamePrefix = exoframeCybernetic.GetShortAugmentAdjective();
+                NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
 
                 Render render = Object.Render;
                 string tileColor = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor; ;

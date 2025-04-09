@@ -58,9 +58,9 @@ namespace XRL.World.Parts
         }
         public string GetAugmentAdjective(bool Pretty = true)
         {
-            return Pretty ? GetNaturalWeaponColoredAdjective() : $"EF-" + GetShortAugmentAdjective(Pretty);
+            return Pretty ? GetNaturalEquipmentColoredAdjective() : $"EF-" + GetShortAugmentAdjective(Pretty);
         }
-        public virtual string GetNaturalWeaponColoredAdjective()
+        public virtual string GetNaturalEquipmentColoredAdjective()
         {
             string output = $"E{"F".Color("c")}-";
             output += NaturalEquipmentMod.Adjective.OptionalColor(NaturalEquipmentMod.AdjectiveColor, NaturalEquipmentMod.AdjectiveColorFallback, Colorfulness);

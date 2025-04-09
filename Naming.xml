@@ -1,37 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <naming>
   <namestyles>
-    <namestyle Name="Giant" HyphenationChance="25" TwoNameChance="100" Format="TitleCase">
+    <namestyle Name="Giant" HyphenationChance="25" TwoNameChance="50" Format="TitleCase">
       <scopes>
         <!--scope Name="Subtype1" Subtype="Artifex" Priority="100" Combine="false" /-->
         <scope Name="Culture" Culture="Giant" Priority="100" Combine="false" />
         <scope Name="Special" Special="Giant" Priority="100" Combine="false" />
       </scopes>
-      <prefixes Amount="0-2">
-        <prefix Name="om" Weight="3" />
-        <prefix Name="ob" />
-        <prefix Name="wo" />
+      <prefixes Amount="1-3">
+        <prefix Name="om" Weight="5" />
+        <prefix Name="um" />
+        <prefix Name="ob" Weight="2" />
+        <prefix Name="ub" />
+        <prefix Name="wo" Weight="2" />
         <prefix Name="wa" />
-        <prefix Name="mo" />
+        <prefix Name="wu" Weight="3" />
+        <prefix Name="mo" Weight="2" />
+        <prefix Name="mu" />
       </prefixes>
       <infixes Amount="0-2">
         <infix Name="h" />
         <infix Name="gh" />
-        <infix Name="g" />
+        <infix Name="ghl" />
+        <infix Name="ghu" />
+        <infix Name="ghlu" />
         <infix Name="oh" />
+        <infix Name="uh" />
+        <infix Name="uhl" />
         <infix Name="l" />
         <infix Name="la" />
+        <infix Name="lu" />
+        <infix Name="luh" />
         <infix Name="lh" />
+        <infix Name="lhu" />
         <infix Name="hl" />
+        <infix Name="hlu" />
       </infixes>
       <postfixes Amount="1">
         <postfix Name="an" />
-        <postfix Name="ah" />
-        <postfix Name="ag" />
-        <postfix Name="agh" />
-        <postfix Name="hmm" />
+        <postfix Name="un" Weight="2" />
+        <postfix Name="ah" Weight="2" />
+        <postfix Name="ag" Weight="2" />
+        <postfix Name="ug" />
+        <postfix Name="agh" Weight="5" />
+        <postfix Name="hmm"/>
         <postfix Name="hm" />
-        <postfix Name="mh" />
+        <postfix Name="mh" Weight="3" />
       </postfixes>
     </namestyle>
   </namestyles>

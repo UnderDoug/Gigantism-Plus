@@ -312,7 +312,7 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false, bool Wish = false)
+        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false, bool Wish = false, bool Force = false)
         {
             string creatureBlueprint = Creature.Blueprint;
 
@@ -323,12 +323,19 @@ namespace HNPS_GigantismPlus
             (DieRoll die, int high) merchantTonics = (new("1d4"), 4);
             (DieRoll die, int high) merchantRareTonics = (new("1d10"), 10);
 
-            if (!Option) return; // skip if Option disabled
-            if (!Creature.IsCreature) return; // skip non-creatures
+            if (Creature.ID.Is("1") && !Creature.HasPart<GigantismPlus>() && !Force) return; // redundancy, just in case.
+            if (!Option && !Force) return; // skip if Option disabled
+            if (!Creature.IsCreature && !Force) return; // skip non-creatures
             if (Creature.Inventory == null) return; // skip creatures without inventory
 
-            Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption})", Indent: 1);
+            Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}, Force: {Force})", Indent: 1);
             Debug.Divider(3, Indent: 1);
+
+            if (Force)
+            {
+                Option = Force;
+                GrenadeOption = Force;
+            }
 
             Debug.Entry(3, "Making inventory items gigantic for creature", creatureBlueprint, Indent: 1);
             Debug.Entry(3, $"Creature is merchant", creatureIsMerchant ? "Yeh" : "Nah", Indent: 1);

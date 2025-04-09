@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <mutations>
     <category Name="Physical">
         <mutation Name="Elongated Paws" Cost="4" MaxSelected="1" Class="ElongatedPaws" Exclusions="" BearerDescription="those with elongated paws" Tile="Mutations/ElongatedPaws.png" Hidden="false" ExcludeFromPool="false" />

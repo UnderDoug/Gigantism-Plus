@@ -41,23 +41,13 @@ namespace HNPS_GigantismPlus
 
             ZoneManager zoneManager = The.ZoneManager;
 
-            zoneManager.AddZoneBuilder(zoneID, ZoneBuilderPriority.NORMAL, nameof(Odditorium));
+            zoneManager.AddZoneBuilder(zoneID, ZoneBuilderPriority.NORMAL, nameof(Connecter));
+            zoneManager.AddZoneBuilder(zoneID, ZoneBuilderPriority.MID, nameof(RoadBuilder));
+            zoneManager.AddZoneBuilder(zoneID, ZoneBuilderPriority.LATE, nameof(OverlandRuins));
 
-            ZoneBuilderBlueprint fortMaker = ZoneBuilderBlueprint.Get(
-                Class: nameof(FortMaker),
-                Key1: "Z", Value1: zoneID,
-                Key2: "ClearCombatObjectsFirst", Value2: true,
-                Key3: "WallObject", Value3: "limestone",
-                Key4: "ZoneTable", Value4: null,
-                Key5: "Widgets", Value5: "Trashy,SecretRevealWidget");
-
-            zoneManager.RequireBuilderCollection(zoneID).Add(fortMaker, ZoneBuilderPriority.MID);
-
-            zoneManager.AddZoneBuilder(zoneID, ZoneBuilderPriority.LATE, nameof(Ruiner));
-
-            zoneManager.RemoveZoneBuilders(zoneID, nameof(PopTableZoneBuilder));
-            zoneManager.RemoveZoneBuilders(zoneID, nameof(Population));
-            zoneManager.RemoveZoneBuilders(zoneID, nameof(FactionEncounters));
+            // zoneManager.RemoveZoneBuilders(zoneID, nameof(PopTableZoneBuilder));
+            // zoneManager.RemoveZoneBuilders(zoneID, nameof(Population));
+            // zoneManager.RemoveZoneBuilders(zoneID, nameof(FactionEncounters));
 
             GameObjectBlueprint gameObjectBlueprint = EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
                 => EncountersAPI.IsEligibleForDynamicEncounters(blueprint)
@@ -89,7 +79,13 @@ namespace HNPS_GigantismPlus
 
             if (creature.TryGetPart(out GigantismPlus gigantism))
             {
-                gigantism.Level += 16;
+                int starting = gigantism.Level;
+                if (starting > 10)
+                {
+                    starting -= 10;
+                }
+                gigantism.Level = 10;
+                gigantism.SetRapidLevelAmount((int)Math.Ceiling(starting / 3.0));
             }
             creature.Brain.Mobile = true;
             creature.Brain.Factions = "";
@@ -101,6 +97,7 @@ namespace HNPS_GigantismPlus
             SecretRevealer secretRevealer = creature.RequirePart<SecretRevealer>();
             secretRevealer.id = SECRET_GIANTRECIPE;
             secretRevealer.text = "the location of the giant who knows how to cook";
+            secretRevealer.message = $"You have discovered {secretRevealer.text}!";
             secretRevealer.category = "Oddities";
             secretRevealer.adjectives = string.Join(",", new[] { "giant", "humanoid", "settlement", "mountains", "recipe", "oddity" });
 

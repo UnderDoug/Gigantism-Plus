@@ -21,13 +21,11 @@
     <part Name="Description" Short="" />
     <part Name="Render" DisplayName="{{c|massive exoframe}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="r"
-          />
+          ColorString="&amp;c" DetailColor="r" />
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="2"
           BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
-You cannot wear equipment on your body."
-          />
+You cannot wear equipment on your body." />
     <removepart Name="TinkerItem" />
     <part Name="Metal" />
     <part Name="NoDamage" />
@@ -43,8 +41,7 @@ You cannot wear equipment on your body."
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
           AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           JumpDistanceBonus="0"
-          StunningForceLevelFactor="0.5"
-          />
+          StunningForceLevelFactor="0.5"/>
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <tag Name="BaseObject" Value="*noinherit" />

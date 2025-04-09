@@ -36,11 +36,16 @@ namespace XRL.World.Parts
                 || ID == PooledEvent<GetDisplayNameEvent>.ID;
         }
 
+        public override string GetColoredAdjective()
+        {
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
+        }
+
         public override string GetInstanceDescription()
         {
             string cyberneticsObject = AssigningPart.ImplantObject.ShortDisplayName;
             string text = ParentObject.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalWeaponColoredAdjective());
+            string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalEquipmentColoredAdjective());
             string description = $"{descriptionName}: ";
             description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text) + " have ") : ("This " + text + " has "))} ";
             description += $"some of its bonuses applied by an implanted {cyberneticsObject}.";

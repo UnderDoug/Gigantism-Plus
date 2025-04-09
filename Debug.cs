@@ -214,7 +214,7 @@ namespace HNPS_GigantismPlus
         {
             string title = Title == null ? "" : $"{Title}:";
             GameObject Creature = Subpart.ParentPart?.ParentObject;
-            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.Blueprint} {title}", Indent: Indent);
+            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.HandsBlueprint} {title}", Indent: Indent);
             List<string> @default = new()
             {
                 "Meta",

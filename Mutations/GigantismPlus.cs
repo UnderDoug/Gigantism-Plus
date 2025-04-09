@@ -497,7 +497,7 @@ namespace XRL.World.Parts.Mutation
             double stunningForceLevelFactor = 0.5;
             if (ParentObject != null)
             {
-                WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
+                WeaponNoun = ParentObject?.Body?.GetFirstPart("Hand")?.DefaultBehavior?.Render?.DisplayName ?? WeaponNoun;
                 stunningForceDistance = StunningForceDistance;
                 stunningForceLevelFactor = GetStunningForceLevelFactor();
             }

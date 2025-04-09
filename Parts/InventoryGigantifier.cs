@@ -26,7 +26,7 @@ namespace XRL.World.Parts
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
             GameObject GO = E.Object;
-            if (GO != null && GO == ParentObject)
+            if (GO != null && GO == ParentObject && GO.HasPart<GigantismPlus>())
             {
                 Debug.Header(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)");
                 Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
@@ -62,7 +62,7 @@ namespace XRL.World.Parts
         public static void GigantifyInventory()
         {
             GameObject player = The.Player;
-            player.GigantifyInventory(true, true);
+            player.GigantifyInventory(Force: true);
         }
     }
 }

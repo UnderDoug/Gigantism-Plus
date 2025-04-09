@@ -1,8 +1,11 @@
 ﻿using System;
-using HNPS_GigantismPlus;
+
 using XRL.Wish;
 using XRL.World.Parts.Mutation;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts

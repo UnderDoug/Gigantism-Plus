@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SerializeField = UnityEngine.SerializeField;
+
 using XRL.Rules;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
+
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {

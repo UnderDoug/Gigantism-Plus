@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using SerializeField = UnityEngine.SerializeField;
+
 using XRL.Language;
 using XRL.World.Anatomy;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {public abstract class ModNaturalEquipmentBase : IMeleeModification
@@ -100,7 +104,7 @@ namespace XRL.World.Parts
         public ModNaturalEquipmentBase(ModNaturalEquipmentBase Source)
             : this()
         {
-            Adjustments = new List<Adjustment>(Source.Adjustments);
+            Adjustments = new List<Adjustment>(Source.Adjustments ??= new());
 
             BodyPartType = Source.BodyPartType;
 
@@ -168,11 +172,11 @@ namespace XRL.World.Parts
 
         public virtual string GetAdjective()
         {
-            return Adjective;
+            return Adjective ?? "adjective?";
         }
         public virtual string GetColoredAdjective()
         {
-            return Adjective.OptionalColor(AdjectiveColor, AdjectiveColorFallback, Colorfulness);
+            return GetAdjective().OptionalColor(AdjectiveColor, AdjectiveColorFallback, Colorfulness);
         }
 
         public abstract string GetInstanceDescription();

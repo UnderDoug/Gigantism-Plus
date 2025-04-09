@@ -1,7 +1,9 @@
 ﻿using XRL;
 using XRL.World;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
 public class UpdateNaturalEquipmentModsEvent : ModPooledEvent<UpdateNaturalEquipmentModsEvent>

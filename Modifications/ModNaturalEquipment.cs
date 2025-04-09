@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using SerializeField = UnityEngine.SerializeField;
+
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
+
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
@@ -220,6 +224,10 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public override string GetAdjective()
+        {
+            return Adjective ?? typeof(T).Name;
+        }
         public override string GetInstanceDescription()
         {
             string text = ParentObject.GetObjectNoun();

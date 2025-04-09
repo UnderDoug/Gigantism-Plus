@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
+
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 namespace HNPS_GigantismPlus

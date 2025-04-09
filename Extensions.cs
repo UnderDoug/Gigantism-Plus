@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+
 using XRL;
 using XRL.Rules;
 using XRL.World;
@@ -12,7 +13,9 @@ using XRL.World.Capabilities;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {

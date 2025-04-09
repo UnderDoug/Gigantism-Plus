@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts
@@ -323,6 +326,7 @@ namespace XRL.World.Parts
             {
                 cybernetic.NaturalEquipmentMods.Add(type, new(subpart, (T)cybernetic));
             }
+            NaturalEquipmentMod ??= new();
             cybernetic.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)cybernetic);
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;

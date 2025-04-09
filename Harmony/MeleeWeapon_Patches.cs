@@ -1,6 +1,9 @@
 using HarmonyLib;
+
 using XRL.World.Parts;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {

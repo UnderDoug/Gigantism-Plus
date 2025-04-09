@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using XRL.Language;
 using XRL.World;
 using XRL.World.Anatomy;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
@@ -305,6 +308,7 @@ namespace XRL.World.Parts.Mutation
             {
                 mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, (T)mutation));
             }
+            NaturalEquipmentMod ??= new();
             mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)mutation);
             return mutation;
         }

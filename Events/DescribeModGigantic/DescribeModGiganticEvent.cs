@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL;
 using XRL.Language;
 using XRL.World;
 using XRL.World.Parts;
-using static HNPS_GigantismPlus.Options;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {

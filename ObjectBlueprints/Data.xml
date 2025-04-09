@@ -15,5 +15,12 @@
     -->
     <tag Name="Before::General::LightSource::GigantismPlus" Value="illuminate;twice as far" />
   </object>
+
+  <object Name="HNPS_SpecialHeroTemplate_SecretGiant" Inherits="DataBucket">
+    <tag Name="HeroStrBoost" Value="8" />
+    <tag Name="HeroTouBoost" Value="8" />
+    <tag Name="HeroNameColor" Value="yuge" />
+    <tag Name="HeroMinLevel" Value="38" />
+  </object>
   
 </objects>

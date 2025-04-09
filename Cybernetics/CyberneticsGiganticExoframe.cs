@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
-using HNPS_GigantismPlus;
 using static XRL.World.Parts.NaturalEquipmentManager;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Secrets;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.SecretGiganticExoframe;
 
 namespace XRL.World.Parts
 {

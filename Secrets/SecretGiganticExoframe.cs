@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+
 using XRL;
 using XRL.UI;
 using XRL.Core;
@@ -12,13 +13,15 @@ using XRL.World.Anatomy;
 using XRL.World.Capabilities;
 using XRL.World.Parts.Mutation;
 using XRL.Liquids;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public static class Secrets
+    public static class SecretGiganticExoframe
     {
         private static List<string> BecomingStrings = new()
         {

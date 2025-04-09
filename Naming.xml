@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<naming>
+  <namestyles>
+    <namestyle Name="Giant" HyphenationChance="25" TwoNameChance="100" Format="TitleCase">
+      <scopes>
+        <!--scope Name="Subtype1" Subtype="Artifex" Priority="100" Combine="false" /-->
+        <scope Name="Culture" Culture="Giant" Priority="100" Combine="false" />
+        <scope Name="Special" Special="Giant" Priority="100" Combine="false" />
+      </scopes>
+      <prefixes Amount="0-2">
+        <prefix Name="om" Weight="3" />
+        <prefix Name="ob" />
+        <prefix Name="wo" />
+        <prefix Name="wa" />
+        <prefix Name="mo" />
+      </prefixes>
+      <infixes Amount="0-2">
+        <infix Name="h" />
+        <infix Name="gh" />
+        <infix Name="g" />
+        <infix Name="oh" />
+        <infix Name="l" />
+        <infix Name="la" />
+        <infix Name="lh" />
+        <infix Name="hl" />
+      </infixes>
+      <postfixes Amount="1">
+        <postfix Name="an" />
+        <postfix Name="ah" />
+        <postfix Name="ag" />
+        <postfix Name="agh" />
+        <postfix Name="hmm" />
+        <postfix Name="hm" />
+        <postfix Name="mh" />
+      </postfixes>
+    </namestyle>
+  </namestyles>
+</naming>

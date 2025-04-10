@@ -23,7 +23,7 @@
     <tag Name="HeroColorString" Value="&amp;Z" />
     <tag Name="HeroTileColor" Value="&amp;Z" />
     <tag Name="HeroSelfPreservationThreshold" Value="20" />
-    <tag Name="HeroMinLevel" Value="38" />
+    <tag Name="HeroMinLevel" Value="41" />
   </object>
   
 </objects>

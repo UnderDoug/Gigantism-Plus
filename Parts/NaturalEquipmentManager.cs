@@ -464,7 +464,7 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.ShortDisplayName})",
+                + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.DebugName})",
                 Indent: 0);
 
             if(E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
@@ -480,10 +480,10 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E.Actor.ShortDisplayName}))",
+                + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E.Actor.DebugName}))",
                 Indent: 0);
             Debug.Entry(4,
-                $"Actor:{E.Actor.ShortDisplayName} | Limb: [{ParentLimb.ID}:{ParentLimb.Type}] {ParentLimb.Description}",
+                $" Actor:{E.Actor.ShortDisplayName} | Limb: [{ParentLimb.ID}:{ParentLimb.Type}] {ParentLimb.Description}",
                 Indent: 0);
 
             if (E.Actor == Wielder)
@@ -499,7 +499,7 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E (Actor:{E.Actor.ShortDisplayName}))",
+                + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E (Actor:{E.Actor.DebugName}))",
                 Indent: 0);
 
             if (E.Actor == Wielder)

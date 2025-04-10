@@ -72,7 +72,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"! {typeof(ManageDefaultEquipmentEvent).Name}." +
                 $"{nameof(Manage)}({typeof(BeforeManageDefaultEquipmentEvent).Name}) " + 
-                $"for {Wielder?.ID}:{Wielder?.ShortDisplayNameStripped}",
+                $"for {Wielder?.DebugName ?? "null Wielder"}",
                 Indent: 0);
             
             ManageDefaultEquipmentEvent E = new(BeforeManageDefaultEquipmentEvent, Wielder);

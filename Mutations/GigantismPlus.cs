@@ -572,7 +572,7 @@ namespace XRL.World.Parts.Mutation
             if (ParentObject != null)
             {
                 ModNaturalEquipment<GigantismPlus> naturalEquipmentMod = NaturalEquipmentMods["Hand"];
-                WeaponNoun = ParentObject.Body.GetFirstPart("Hand").DefaultBehavior.Render.DisplayName;
+                WeaponNoun = ParentObject?.Body?.GetFirstPart("Hand")?.DefaultBehavior?.Render?.DisplayName ?? WeaponNoun;
                 FistDamageDieCount = GetNaturalWeaponDamageDieCount(naturalEquipmentMod, Level);
                 FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(naturalEquipmentMod, Level));
                 FistHitBonus = GetNaturalWeaponHitBonus(naturalEquipmentMod, Level);

@@ -16,6 +16,7 @@ using XRL.World.Tinkering;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using XRL.World.ObjectBuilders;
 
 namespace HNPS_GigantismPlus
 {
@@ -1075,6 +1076,22 @@ namespace HNPS_GigantismPlus
         {
             static bool filter(GameObject GO) { return GO.HasPart<NaturalEquipment>() || GO.HasTag("NaturalGear"); }
             return Body.GetEquippedObjects(filter);
+        }
+
+        public static T DrawRandomElement<T>(this List<T> Bag)
+            where T : class
+        {
+            if (Bag.IsNullOrEmpty()) return null;
+            T output = Bag.GetRandomElement();
+            Bag.Remove(output);
+            return output;
+        }
+
+        public static void Gigantify(this GameObject Object, string Context = "")
+        {
+            Gigantified gigantified = new();
+            gigantified.Initialize();
+            gigantified.Apply(Object, Context);
         }
     }
 }

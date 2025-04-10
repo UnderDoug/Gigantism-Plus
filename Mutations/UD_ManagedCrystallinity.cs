@@ -89,13 +89,14 @@ namespace XRL.World.Parts.Mutation
 
                 AddedParts = new()
                 {
-                    "Inorganic"
+                    "Inorganic",
+                    "Stone",
                 },
 
                 AddedStringProps = new()
                 {
                     { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" }
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
                 },
             };
             NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");

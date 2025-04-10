@@ -13,8 +13,8 @@
     PositiveSound="Sounds/Reputation/sfx_reputation_cragmensch_positive"
     NegativeSound="Sounds/Reputation/sfx_reputation_cragmensch_negative"
     EmblemTile="Mutations/GigantismPlus.png"
-    EmblemTileColor="x"
-    EmblemDetailColor="Z"
+    EmblemTileColor="z"
+    EmblemDetailColor="X"
   >
     <partreputation About="GigantismPlus" Value="200" />
     <feeling About="*" Value="0" />
@@ -23,9 +23,12 @@
     <feeling About="Girsh" Value="150" />
     <feeling About="Templar" Value="-300" />
     <feeling About="GiantTemplar" Value="-700" />
+    <waterritual
+      BuyMostValuableItem="true"
+    />
     <interests 
       BuyDescription=" interested in good food and good company: "
-      SellDescription=" warning others about existential threats: "
+      SellDescription=" interested in warning others about existential threats: "
       >
       <interest Tags="recipe" WillBuy="true" WillSell="false" />
       <interest Tags="templar,lair" WillBuy="false" WillSell="true" />
@@ -56,6 +59,9 @@
     <partreputation About="GigantismPlus" Value="-200" />
     <feeling About="Giants" Value="-1200" />
     <feeling About="Templar" Value="1200" />
+    <waterritual
+      BuyMostValuableItem="true"
+    />
     <interests BuyDescription=" interested in the location of imminently dangerous mutants: " >
       <interest Tags="giant,settlement" WillBuy="true" WillSell="false" />
       <interest Tags="giant,lair" WillBuy="true" WillSell="false" />

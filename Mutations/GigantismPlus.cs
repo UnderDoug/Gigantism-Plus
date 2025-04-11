@@ -18,7 +18,8 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class GigantismPlus : BaseManagedDefaultEquipmentMutation<GigantismPlus>
+    public class GigantismPlus 
+        : BaseManagedDefaultEquipmentMutation<GigantismPlus>
     {
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
@@ -169,12 +170,40 @@ namespace XRL.World.Parts.Mutation
             GiganticNoggin.AddAdjustment(RENDER, "TileColor", "&x", true);
             GiganticNoggin.AddAdjustment(RENDER, "DetailColor", "z", true);
 
-            NaturalEquipmentMods.Add(GiganticNoggin.BodyPartType, GiganticNoggin);
+            NaturalEquipmentMods.Add(GiganticNoggin.BodyPartType, GiganticNoggin); 
+            
+            ModGiganticNaturalWeapon GiganticMug = new()
+            {
+                AssigningPart = this,
+                BodyPartType = "Face",
+
+                ModPriority = 10,
+                DescriptionPriority = 10,
+
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
+
+                Adjustments = new(),
+
+                AddedIntProps = new()
+                {
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
+                },
+            };
+            GiganticNoggin.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+
+            GiganticNoggin.AddAdjustment(RENDER, "ColorString", "&x", true);
+            GiganticNoggin.AddAdjustment(RENDER, "TileColor", "&x", true);
+            GiganticNoggin.AddAdjustment(RENDER, "DetailColor", "z", true);
+
+            NaturalEquipmentMods.Add(GiganticMug.BodyPartType, GiganticMug);
 
             ModNaturalEquipment<GigantismPlus> GiganticBod = new()
             {
                 AssigningPart = this,
-                BodyPartType = "Actor",
+                BodyPartType = "Body",
 
                 ModPriority = 10,
                 DescriptionPriority = 10,
@@ -269,7 +298,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "? if (IsPseudoGiganticCreature and !IsVehicleCreature)", Indent: 1);
             if (IsPseudoGiganticCreature && !IsVehicleCreature)
             {
-                Debug.Entry(4, "+ Creature is PsuedoGigantic and not a Vehicle", Indent: 2);
+                Debug.CheckYeh(4, "Creature is PsuedoGigantic and not a Vehicle", Indent: 2);
                 Debug.Entry(4, "Sending StraightenUp (silent)", Indent: 2);
                 WasHunched = true;
                 IsHunchFree = true;
@@ -277,8 +306,8 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.Entry(4, $"- IsPseudoGiganticCreature: {IsPseudoGiganticCreature}", Indent: 2);
-                Debug.Entry(4, $"- !IsVehicleCreature: {!IsVehicleCreature}", Indent: 2);
+                Debug.LoopItem(4, $"IsPseudoGiganticCreature: {IsPseudoGiganticCreature}", Good: IsPseudoGiganticCreature, Indent: 2);
+                Debug.LoopItem(4, $"!IsVehicleCreature: {!IsVehicleCreature}", Good: !IsVehicleCreature, Indent: 2);
             }
             Debug.Entry(4, "x if (IsPseudoGiganticCreature and !IsVehicleCreature) ?//", Indent: 1);
 
@@ -291,14 +320,14 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "? if (AppliedJumpRangeBonus > 0)", Indent: 1);
             if (AppliedJumpRangeBonus > 0)
             {
-                Debug.Entry(4, $"+ AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
+                Debug.CheckYeh(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
                 Debug.Entry(4, $"JumpRangeModifier: {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 2);
                 ParentObject.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus);
                 Debug.Entry(4, $"JumpRangeModifier reduced to {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 2);
             }
             else
             {
-                Debug.Entry(4, $"- AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
+                Debug.CheckNah(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
             }
             Debug.Entry(4, "x if (AppliedJumpRangeBonus > 0) ?//", Indent: 1);
 
@@ -317,7 +346,7 @@ namespace XRL.World.Parts.Mutation
             CheckStunningForceOnJump:
             if (ParentObject.TryGetPart(out StunningForceOnJump stunning))
             {
-                Debug.Entry(4, $"+ Have StunningForceOnJump part", Indent: 2);
+                Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 2);
                 Debug.Entry(4, $"stunning.Level: {stunning.Level}", Indent: 3);
                 Debug.Entry(4, $"stunning.Distance: {stunning.Distance}", Indent: 3);
                 stunning.Level = GetStunningForceLevel(NewLevel); // Scale stunning force with mutation level
@@ -328,7 +357,7 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.Entry(4, $"- No StunningForceOnJump part", Indent: 2);
+                Debug.CheckNah(4, $"No StunningForceOnJump part", Indent: 2);
                 ParentObject.RequirePart<StunningForceOnJump>();
                 Debug.Entry(4, $"ParentObject.RequirePart<StunningForceOnJump>()", Indent: 3);
                 Debug.Entry(4, $"goto CheckStunningForceOnJump", Indent: 2);
@@ -357,15 +386,15 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "? if (WasHunched and !IsVehicleCreature)", Indent: 1);
             if (WasHunched && !IsVehicleCreature)
             {
-                Debug.Entry(4, "+ Creature was Hunched and not a Vehicle", Indent: 1);
+                Debug.CheckYeh(4, "Creature was Hunched and not a Vehicle", Indent: 1);
                 Debug.Entry(4, "Sending HunchOver (silent)", Indent: 1);
                 IsHunchFree = true;
                 HunchOver(Message: false);
             }
             else
             {
-                Debug.Entry(4, $"- WasHunched: {WasHunched}", Indent: 2);
-                Debug.Entry(4, $"- !IsVehicleCreature: {!IsVehicleCreature}", Indent: 2);
+                Debug.LoopItem(4, $"WasHunched: {WasHunched}", Good: WasHunched, Indent: 2);
+                Debug.LoopItem(4, $"!IsVehicleCreature: {!IsVehicleCreature}", Good: !IsVehicleCreature, Indent: 2);
             }
             Debug.Entry(4, "x if (WasHunched and !IsVehicleCreature) ?//", Indent: 1);
 
@@ -382,112 +411,6 @@ namespace XRL.World.Parts.Mutation
             stats.Set("HunchedOverAV", "+" + HunchedOverAV);
             stats.Set("HunchedOverDV", HunchedOverDV);
             stats.Set("HunchedOverMS", HunchedOverMS);
-        }
-
-        private bool ShouldRapidAdvance(int Level, GameObject Actor)
-        {
-            bool IsMutant = Actor.IsMutant();
-            bool RapidAdvancement = IsMutant
-                                 && (Level + 5) % 10 == 0
-                                 && !Actor.IsEsper()
-                                 && EnableGigantismRapidAdvance;
-
-            return RapidAdvancement;
-        } //!--- private bool ShouldRapidAdvance(int Level, GameObject Actor)
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
-            return base.WantEvent(ID, cascade)
-                || ID == BeforeLevelGainedEvent.ID
-                || ID == AfterLevelGainedEvent.ID
-                || ID == CanEnterInteriorEvent.ID
-                || ID == GetExtraPhysicalFeaturesEvent.ID
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == InventoryActionEvent.ID;
-        }
-
-        public override bool HandleEvent(BeforeLevelGainedEvent E)
-        {
-            if (ShouldRapidAdvance(E.Level, E.Actor))
-            {
-                SwapMutationCategory(nameof(GigantismPlus), "PhysicalDefects", "Physical");
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(AfterLevelGainedEvent E)
-        {
-            if (ShouldRapidAdvance(E.Level, E.Actor))
-            {
-                SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
-            }
-            if (IsCyberGiant)
-            {
-                Body body = E.Actor.Body;
-                body?.UpdateBodyParts();
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
-        {
-            E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(GetSlotsRequiredEvent E)
-        {
-            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
-            // exceptions are 
-            if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment && E.Object.HasTagOrProperty("GiganticEquippable"))
-            {
-                E.Decreases++;
-                if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
-                {
-                    E.CanBeTooSmall = true;
-                }
-            }
-
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(CanEnterInteriorEvent E)
-        {
-            Debug.Entry(1,"Checking CanEnterInteriorEvent");
-            if (ParentObject == E.Object)
-            {
-                // This check is necessary because both the enterer and enteree handle this event.
-                Debug.Entry(1,"Parent Object is the Target of Entry, Skip to base CanEnterInteriorEvent");
-                return base.HandleEvent(E);
-            }
-            GameObject actor = E.Actor;
-            if (actor != null && actor.IsGiganticCreature && !IsVehicleCreature)
-            {
-                Debug.Entry(2,"We are big, gonna HunchOver");
-                IsHunchFree = true;
-                CommandEvent.Send(actor, HUNCH_OVER_COMMAND_NAME);
-                Debug.Entry(3, "HunchOver Sent for CanEnterInteriorEvent");
-                bool check = CanEnterInteriorEvent.Check(E.Actor, E.Object, E.Interior, ref E.Status, ref E.Action, ref E.ShowMessage);
-                E.Status = check ? 0 : E.Status;
-                string status = "";
-                status += E.Status;
-                Debug.Entry(3, "E.Status", status);
-
-                Popup.Show("You try to squeeze into the space.");
-            }
-            else
-            {
-                Debug.Entry(2, "CanEnterInteriorEvent - We aren't big.");
-            }
-            Debug.Entry(1, "Sending to base CanEnterInteriorEvent");
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
-        {
-            // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
-            return base.HandleEvent(E);
         }
 
         public override string GetDescription()
@@ -739,6 +662,113 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "deferring to base.Unmutate(GO, Level)", Indent: 0);
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})");
             return base.Unmutate(GO);
+        }
+
+        private bool ShouldRapidAdvance(int Level, GameObject Actor)
+        {
+            bool IsMutant = Actor.IsMutant();
+            bool RapidAdvancement = IsMutant
+                                 && (Level + 5) % 10 == 0
+                                 && !Actor.IsEsper()
+                                 && EnableGigantismRapidAdvance;
+
+            return RapidAdvancement;
+        } //!--- private bool ShouldRapidAdvance(int Level, GameObject Actor)
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
+            return base.WantEvent(ID, cascade)
+                || ID == BeforeRapidAdvancementEvent.ID
+                || ID == AfterRapidAdvancementEvent.ID
+                || ID == AfterLevelGainedEvent.ID
+                || ID == CanEnterInteriorEvent.ID
+                || ID == GetExtraPhysicalFeaturesEvent.ID
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == InventoryActionEvent.ID;
+        }
+
+        public override bool HandleEvent(BeforeRapidAdvancementEvent E)
+        {
+            if (!E.Amount.Is(0))
+                SwapMutationCategory(nameof(GigantismPlus), "PhysicalDefects", "Physical");
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(AfterRapidAdvancementEvent E)
+        {
+            if (!E.Amount.Is(0))
+                SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(AfterLevelGainedEvent E)
+        {
+            if (IsCyberGiant)
+            {
+                Body body = E.Actor.Body;
+                body?.UpdateBodyParts();
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
+        {
+            E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
+            // exceptions are 
+            if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment && E.Object.HasTagOrProperty("GiganticEquippable"))
+            {
+                E.Decreases++;
+                if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
+                {
+                    E.CanBeTooSmall = true;
+                }
+            }
+
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(CanEnterInteriorEvent E)
+        {
+            Debug.Entry(1, "Checking CanEnterInteriorEvent");
+            if (ParentObject == E.Object)
+            {
+                // This check is necessary because both the enterer and enteree handle this event.
+                Debug.Entry(1, "Parent Object is the Target of Entry, Skip to base CanEnterInteriorEvent");
+                return base.HandleEvent(E);
+            }
+            GameObject actor = E.Actor;
+            if (actor != null && actor.IsGiganticCreature && !IsVehicleCreature)
+            {
+                Debug.Entry(2, "We are big, gonna HunchOver");
+                IsHunchFree = true;
+                CommandEvent.Send(actor, HUNCH_OVER_COMMAND_NAME);
+                Debug.Entry(3, "HunchOver Sent for CanEnterInteriorEvent");
+                bool check = CanEnterInteriorEvent.Check(E.Actor, E.Object, E.Interior, ref E.Status, ref E.Action, ref E.ShowMessage);
+                E.Status = check ? 0 : E.Status;
+                string status = "";
+                status += E.Status;
+                Debug.Entry(3, "E.Status", status);
+
+                Popup.Show("You try to squeeze into the space.");
+            }
+            else
+            {
+                Debug.Entry(2, "CanEnterInteriorEvent - We aren't big.");
+            }
+            Debug.Entry(1, "Sending to base CanEnterInteriorEvent");
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
+        {
+            // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
+            return base.HandleEvent(E);
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)

@@ -16,7 +16,8 @@ using static HNPS_GigantismPlus.SecretGiganticExoframe;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class CyberneticsGiganticExoframe : BaseManagedDefaultEquipmentCybernetic<CyberneticsGiganticExoframe>
+    public class CyberneticsGiganticExoframe 
+        : BaseManagedDefaultEquipmentCybernetic<CyberneticsGiganticExoframe>
     {
         // XML Set Properties.
         public string Model = "Alpha";

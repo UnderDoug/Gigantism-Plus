@@ -49,9 +49,11 @@ namespace XRL.World
         : IModEventHandler<BeforeBodyPartsUpdatedEvent>
         , IModEventHandler<UpdateNaturalEquipmentModsEvent>
         , IModEventHandler<AfterBodyPartsUpdatedEvent>
-        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IModEventHandler<BeforeManageDefaultEquipmentEvent>
+        , IModEventHandler<ManageDefaultEquipmentEvent>
         , IModEventHandler<AfterManageDefaultEquipmentEvent>
+        , IModEventHandler<BeforeRapidAdvancementEvent>
+        , IModEventHandler<AfterRapidAdvancementEvent>
     {
         public int Level { get; set; }
 

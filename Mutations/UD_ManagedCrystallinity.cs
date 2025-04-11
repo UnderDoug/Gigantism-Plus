@@ -222,24 +222,16 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level)
         {
-            // List<string> vomitCats = new() { "Meta", "Damage", "Additions", "Render" };
-            // NaturalEquipmentMod.Vomit(4, "| Before", vomitCats, Indent: 2);
-            Debug.Divider(4, "\u2500", 40, Indent: 2);
+            Debug.Entry(4,
+                $"* {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(UD_ManagedCrystallinity).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
+                Indent: 2);
 
-            //NaturalEquipmentMod.Level = Level;
-            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageDieCount", true, Indent: 3);
-            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageDieSize", true, Indent: 3);
-            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "DamageBonus", true, Indent: 3);
-            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "HitBonus", true, Indent: 3);
-            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level)
-                .Vomit(4, "PenBonus", true, Indent: 3);
-
-            Debug.Divider(4, "\u2500", 40, Indent: 2);
-            // NaturalEquipmentMod.Vomit(4, "|  After", vomitCats, Indent: 2);
+            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
             return true;
         }
         public override bool ChangeLevel(int NewLevel)
@@ -257,14 +249,14 @@ namespace XRL.World.Parts.Mutation
             string targetType = TargetBodyPart.Type;
             Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2);
             ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = null;
-            if (NaturalEquipmentMod != null)
+            if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
             {
-                naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 3);
+                naturalEquipmentMod = new(NaturalEquipmentMod);
+                Debug.CheckYeh(4, $"naturalEquipmentMod for this BodyPart contained in Property", Indent: 2);
             }
-            else if (NaturalEquipmentMods.ContainsKey(targetType))
+            else if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
             {
-                naturalEquipmentMod = NaturalEquipmentMods[targetType];
+                naturalEquipmentMod = new(NaturalEquipmentMods[targetType]);
                 Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
             }
             else

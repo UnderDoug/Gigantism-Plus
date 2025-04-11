@@ -14,7 +14,7 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(MutationBGoneWishHandler))]
+    [HarmonyPatch]
     public static class MutationBGoneWishHandler_Patches
     {
         [HarmonyPrefix]
@@ -25,6 +25,11 @@ namespace HNPS_GigantismPlus.Harmony
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         static bool MutationBGone_WorkOnEntryName_Prefix(string argument)
         {
+            Debug.Entry(4,
+                $"# {nameof(MutationBGoneWishHandler_Patches)}." +
+                $"{nameof(MutationBGone_WorkOnEntryName_Prefix)}(string argument: {argument})",
+                Indent: 0);
+
             Mutations mutations = The.Player.GetPart<Mutations>();
             BaseMutation mutation = mutations.GetMutationByName(argument);
             if (mutation != null)

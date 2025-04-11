@@ -12,7 +12,8 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
+    public class ElongatedPaws 
+        : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 

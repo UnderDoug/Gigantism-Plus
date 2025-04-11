@@ -172,7 +172,7 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name})",
+                + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.GetAdjective()}])",
                 Indent: 4);
 
             ShortDescriptions ??= new();
@@ -180,11 +180,11 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"ShortDescriptions:", Indent: 5);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}", Indent: 5);
+                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 5);
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}) @//",
+                + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.GetAdjective()}]) @//",
                 Indent: 4);
         }
 
@@ -253,7 +253,7 @@ namespace XRL.World.Parts
                 AccumulatedHitBonus += naturalEquipmentMod.GetHitBonus();
                 AccumulatedPenBonus += naturalEquipmentMod.GetPenBonus();
 
-                Debug.Entry(4, $"{naturalEquipmentMod.Name}", Indent: 4);
+                Debug.Entry(4, $"{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 4);
                 Debug.CheckYeh(4, $"DamageDieCount", $"{naturalEquipmentMod.GetDamageDieCount().Signed()}", Indent: 4);
                 Debug.CheckYeh(4, $"DamageDiesize", $" {naturalEquipmentMod.GetDamageDieSize().Signed()}", Indent: 4);
                 Debug.CheckYeh(4, $"DamageBonus", $"   {naturalEquipmentMod.GetDamageBonus().Signed()}", Indent: 4);
@@ -281,7 +281,7 @@ namespace XRL.World.Parts
                 : $"[null]";
             string parentLimbString = 
                 ParentLimb != null 
-                ? $"[{ ParentLimb?.ID}:{ ParentLimb?.Type}] { ParentLimb?.Description}" 
+                ? $"[{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description}" 
                 : $"[null]";
 
             Debug.LoopItem(4, 
@@ -327,32 +327,41 @@ namespace XRL.World.Parts
                     OriginalNaturalEquipmentCopy = ParentObject.DeepCopy();
                     MeleeWeapon originalWeapon = OriginalNaturalEquipmentCopy.GetPart<MeleeWeapon>();
                     DamageDie = new(originalWeapon.BaseDamage);
-                    DamageDie.ToString()
-                        .Vomit(4, "DamageDie", Indent: 2);
-                    if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
+                    DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2);
+
+                    if (!int.TryParse(DamageDie.ToString(), out int damageDieValue))
                     {
-                        Debug.Entry(4, $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, attempting to adjust DamageDie", Indent: 3);
-                        GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
-                        if (defaultFist.TryGetPart(out MeleeWeapon defaultFistWeapon))
+                        if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
                         {
-                            DamageDie = new(defaultFistWeapon.BaseDamage);
-                            DamageDie.ToString()
-                                .Vomit(4, "DamageDie", Indent: 2);
+                            Debug.Entry(4, $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, attempting to adjust DamageDie", Indent: 3);
+                            GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
+                            if (defaultFist.TryGetPart(out MeleeWeapon defaultFistWeapon))
+                            {
+                                DamageDie = new(defaultFistWeapon.BaseDamage);
+                                DamageDie.ToString()
+                                    .Vomit(4, "DamageDie", Indent: 2);
+                            }
                         }
+                        AccumulatedDamageDie.Count = DamageDie.GetDieCount()
+                            .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
+                        AccumulatedDamageDie.Size = (DamageDie.LeftValue > 0 ? DamageDie.RightValue : DamageDie.Left.RightValue)
+                            .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2);
+
+                        bool dieBonusIsPenalty = DamageDie.FindTypeWithConstantRight(5) != null;
+                        int dieBonus = (DamageDie.LeftValue > 0 ? 0 : DamageDie.RightValue);
+                        if (dieBonus != 0 && dieBonusIsPenalty) dieBonus = -dieBonus;
+                        AccumulatedDamageDie.Bonus = dieBonus
+                                    .Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2);
                     }
-                    AccumulatedDamageDie.Count = DamageDie.GetDieCount()
-                        .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
-                    AccumulatedDamageDie.Size = (DamageDie.LeftValue > 0 ? DamageDie.RightValue : DamageDie.Left.RightValue)
-                        .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2);
-                    
-                    bool dieBonusIsPenalty = DamageDie.FindTypeWithConstantRight(5) != null;
-                    int dieBonus = (DamageDie.LeftValue > 0 ? 0 : DamageDie.RightValue);
-                    if (dieBonus != 0 && dieBonusIsPenalty) dieBonus = -dieBonus;
-                    AccumulatedDamageDie.Bonus = dieBonus
-                                .Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2);
+                    else
+                    {
+                        AccumulatedDamageDie.Count = 0.Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
+                        AccumulatedDamageDie.Size = 0.Vomit(4, "AccumulatedDamageDie.Size", Indent: 2);
+                        AccumulatedDamageDie.Bonus = damageDieValue.Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2);
+                    }
 
                     AccumulatedHitBonus = originalWeapon.HitBonus
-                        .Vomit(4, "AccumulatedHitBonus", Indent: 2);
+                            .Vomit(4, "AccumulatedHitBonus", Indent: 2);
                     AccumulatedPenBonus = originalWeapon.PenBonus
                         .Vomit(4, "AccumulatedPenBonus", Indent: 2);
 

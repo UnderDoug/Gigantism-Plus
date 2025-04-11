@@ -9,12 +9,13 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
-[GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
-public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEvent>
+[GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
+public class BeforeRapidAdvancementEvent : ModPooledEvent<BeforeRapidAdvancementEvent>
 {
-    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
+    public new static readonly int CascadeLevel = CASCADE_ALL;
 
     public GameObject Actor;
+    public int Amount;
 
     public override int GetCascadeLevel()
     {
@@ -23,33 +24,36 @@ public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEv
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(AfterBodyPartsUpdatedEvent).Name}";
+        return $"{typeof(BeforeRapidAdvancementEvent).Name}";
     }
 
     public override void Reset()
     {
         base.Reset();
         Actor = null;
+        Amount = 0;
     }
 
-    public static void Send(GameObject Actor)
+    public static void Send(int Amount, GameObject Actor)
     {
         Debug.Entry(4, 
-            $"{typeof(AfterBodyPartsUpdatedEvent).Name}." + 
-            $"{nameof(Send)}(GameObject Actor: {Actor?.DebugName})", 
+            $"{typeof(BeforeRapidAdvancementEvent).Name}." + 
+            $"{nameof(Send)}(int Amount: {Amount}, GameObject Actor: {Actor?.DebugName})", 
             Indent: 0);
-        
-        AfterBodyPartsUpdatedEvent E = FromPool();
+
+        BeforeRapidAdvancementEvent E = FromPool();
 
         bool flag = true;
-        if (Actor.WantEvent(ID, CascadeLevel))
+        if (Actor.WantEvent(ID, E.GetCascadeLevel()))
         {
+            E.Amount = Amount;
             E.Actor = Actor;
             flag = Actor.HandleEvent(E);
         }
         if (flag && Actor.HasRegisteredEvent(E.GetRegisteredEventID()))
         {
             Event @event = Event.New(E.GetRegisteredEventID());
+            @event.SetParameter(nameof(Amount), Amount);
             @event.SetParameter(nameof(Actor), Actor);
             Actor.FireEvent(@event);
         }

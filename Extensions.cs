@@ -1093,5 +1093,15 @@ namespace HNPS_GigantismPlus
             gigantified.Initialize();
             gigantified.Apply(Object, Context);
         }
+
+        public static GameObjectBlueprint GetGameObjectBlueprint(this GameObject GameObject)
+        {
+            return Utils.GetGameObjectBlueprint(GameObject?.Blueprint);
+        }
+        public static bool TryGetGameObjectBlueprint(this GameObject GameObject, out GameObjectBlueprint GameObjectBlueprint)
+        {
+            GameObjectBlueprint = GameObject.GetGameObjectBlueprint();
+            return !GameObjectBlueprint.Is(null);
+        }
     }
 }

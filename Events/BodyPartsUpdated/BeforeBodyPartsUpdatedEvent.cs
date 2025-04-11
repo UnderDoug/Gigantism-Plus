@@ -36,7 +36,7 @@ public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdated
     {
         Debug.Entry(4, 
             $"{typeof(BeforeBodyPartsUpdatedEvent).Name}." + 
-            $"{nameof(Send)}(GameObject Object: {Actor?.DebugName})", 
+            $"{nameof(Send)}(GameObject Actor: {Actor?.DebugName})", 
             Indent: 0);
         
         BeforeBodyPartsUpdatedEvent E = FromPool();

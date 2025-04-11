@@ -508,6 +508,17 @@ namespace HNPS_GigantismPlus
                 $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
         } //!-- private void SwapMutationCategory(bool Before = true)
 
+        public static GameObjectBlueprint GetGameObjectBlueprint(string Blueprint)
+        {
+            GameObjectFactory.Factory.Blueprints.TryGetValue(Blueprint, out GameObjectBlueprint GameObjectBlueprint);
+            return GameObjectBlueprint;
+        }
+        public static bool TryGetGameObjectBlueprint(string Blueprint, out GameObjectBlueprint GameObjectBlueprint)
+        {
+            GameObjectBlueprint = GetGameObjectBlueprint(Blueprint);
+            return !GameObjectBlueprint.Is(null);
+        }
+
     } //!-- public static class Utils
 
 }

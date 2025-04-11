@@ -200,18 +200,6 @@ namespace HNPS_GigantismPlus
                 displayNameAdjectives.RemoveAdjective(Gigantified.GetNamePrefix());
             }
 
-            /* 
-            creature.SetIntProperty("SuppressSimpleConversation", 1);
-            string adventurer = HistoricStringExpander.ExpandString("<spice.commonPhrases.adventurer.!random>");
-            string simpleConversation = $"Greetings {adventurer}. Can you smell what th- I am cooking?";
-            ConversationsAPI.addSimpleConversationToObject(
-                Object: creature,
-                Text: simpleConversation, 
-                Goodbye: "Live and drink.",
-                Filter: null, FilterExtras: null, Append: null,
-                ClearLost: true);
-            */
-
             if (!creature.TryGetPart(out ConversationScript conversationScript))
             {
                 conversationScript = creature.RequirePart<ConversationScript>();

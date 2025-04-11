@@ -48,13 +48,13 @@ namespace HNPS_GigantismPlus.Harmony
                         {
                             if (itemBlueprint.HasPart("NaturalEquipment") || itemBlueprint.HasTagOrProperty("NaturalGear"))
                             {
-                                Debug.CheckYeh(4, $"NaturalEquipment or NaturalGear", Indent: 4);
+                                Debug.CheckYeh(4, $"Item has NaturalEquipment or NaturalGear", Indent: 4);
                                 ParentObject.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(itemBlueprint));
                                 doReequip = true;
                             }
                             else
                             {
-                                Debug.CheckNah(4, $"NaturalEquipment or NaturalGear", Indent: 4);
+                                Debug.CheckNah(4, $"Item has neither NaturalEquipment or NaturalGear", Indent: 4);
                             }
                         }
                     }

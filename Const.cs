@@ -26,9 +26,10 @@ namespace HNPS_GigantismPlus
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
 
         public const string SECRET_GIANTID = "$HNPS_Giant_KnowsHowToCook";
+        public const string SECRET_GIANT_STATE = "HNPS_Giant_KnowsHowToCook_State";
         public const string SECRET_GIANTLOCATION_TEXT = "the location of the {{yuge|giant}} who knows how to cook";
         public const string SECRET_GIANTLOCATION_CATEGORY = "Oddities";
-        public const string SECRET_GIANTCONVSCRIPT_ID = "HNPS_Giant_KnowsHowToCook";
+        public const string SECRET_GIANTCONVSCRIPT_ID = "HNPS_Giant_KnowsHowToCook_Convo";
         public const string SECRET_GIANTPREDESC_REPLACE = "::CREATURE::";
         public const string SECRET_GIANTPREDESC = "A creature of immensity mounts the upper eyeline. Deep sonorous tones reverberate gently off the very ground and ring subsonically from every improvised antenna jutting crudely out of it. Amidst the rumbling, a sonnet emerges in a language old as life, of home-sick stones traversing mountain-ranges, of oceans whittling shorelines, and of ancient wood giving way to time's inevitable arrival. As distance dwindles, the behemoth's shape begins to resolve... A " + SECRET_GIANTPREDESC_REPLACE + ", in every way, except an order of magnitude greater in size...\n\n";
         public const string SECRET_GIANTRECIPE = "SeriouslyThickStew";

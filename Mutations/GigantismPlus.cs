@@ -14,6 +14,7 @@ using static HNPS_GigantismPlus.Extensions;
 using static HNPS_GigantismPlus.Options;
 
 using SerializeField = UnityEngine.SerializeField;
+using XRL.Core;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -21,6 +22,12 @@ namespace XRL.World.Parts.Mutation
     public class GigantismPlus 
         : BaseManagedDefaultEquipmentMutation<GigantismPlus>
     {
+
+        public static readonly int ICON_COLOR_PRIORITY = 81;
+        public static readonly string ICON_COLOR = "&z";
+
+        private bool MutationColor = XRL.UI.Options.MutationColor;
+
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
 
@@ -687,7 +694,19 @@ namespace XRL.World.Parts.Mutation
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
                 || ID == InventoryActionEvent.ID;
         }
-
+        public override bool Render(RenderEvent E)
+        {
+            bool flag = true;
+            if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+            {
+                flag = MutationColor = UI.Options.MutationColor;
+            }
+            if (flag && !IsCyberGiant)
+            {
+                E.ApplyColors(ICON_COLOR, ICON_COLOR_PRIORITY);
+            }
+            return base.Render(E);
+        }
         public override bool HandleEvent(BeforeRapidAdvancementEvent E)
         {
             if (!E.Amount.Is(0))

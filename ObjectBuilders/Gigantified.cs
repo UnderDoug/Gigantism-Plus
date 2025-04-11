@@ -30,6 +30,13 @@ namespace XRL.World.ObjectBuilders
             DieRoll = "1d3";
         }
 
+        public static string GetNamePrefix()
+        {
+            Gigantified gigantified = new();
+            gigantified.Initialize();
+            return gigantified.NamePrefix;
+        }
+
         public override void Apply(GameObject Object, string Context = "")
         {
             int Level = ExplodingDie(1, DieRoll, Step: 2, Limit: 16, Indent: 2);
@@ -59,14 +66,6 @@ namespace XRL.World.ObjectBuilders
 
                 mutations.AddMutation(new GigantismPlus(), Level);
 
-                Render render = Object.Render;
-                string color = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor;
-                render.ColorString = "&z";
-                render.TileColor = "&z";
-                if (render.DetailColor == "z")
-                {
-                    render.DetailColor = ColorUtility.FindLastForeground(color)?.ToString() ?? Crayons.GetRandomColor();
-                }
                 if (!NamePrefix.IsNullOrEmpty())
                 {
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
@@ -131,36 +130,6 @@ namespace XRL.World.ObjectBuilders
                 $"{nameof(Gigantified)}", 
                 $"{nameof(Gigantify)}(Object: {Object.DebugName}, Level: {Level}, Tier: {Tier})"
                 );
-        }
-
-
-        [Serializable]
-        public class GigantifiedColor : IPart
-        {
-            public static readonly int ICON_COLOR_PRIORITY = 81;
-
-            private bool MutationColor = XRL.UI.Options.MutationColor;
-
-            public override bool Render(RenderEvent E)
-            {
-                bool flag = true;
-                if (ParentObject.IsPlayerControlled())
-                {
-                    if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
-                    {
-                        MutationColor = XRL.UI.Options.MutationColor;
-                    }
-                    if (!MutationColor)
-                    {
-                        flag = false;
-                    }
-                }
-                if (flag)
-                {
-                    E.ApplyColors("&z", ICON_COLOR_PRIORITY);
-                }
-                return base.Render(E);
-            }
         }
 
         [WishCommand("gigantic", null)]

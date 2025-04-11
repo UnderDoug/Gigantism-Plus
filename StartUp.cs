@@ -18,12 +18,14 @@ namespace HNPS_GigantismPlus
     {
         public void mutate(GameObject player)
         {
-            GameObject GO = player;
-            Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
+            Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {player.DebugName})");
 
-            GO.GigantifyInventory(EnableGiganticStartingGear, EnableGiganticStartingGear_Grenades);
+            if (player.HasPart<GigantismPlus>())
+            {
+                player.GigantifyInventory(EnableGiganticStartingGear, EnableGiganticStartingGear_Grenades);
+            }
 
-            Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
+            Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {player.DebugName})");
         }
     }
 

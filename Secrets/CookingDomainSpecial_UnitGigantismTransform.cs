@@ -55,10 +55,12 @@ namespace XRL.World.Effects
             $"<spice.instancesOf.inYear.!random.capitalize> =year=, " + 
             $"<spice.instancesOf.afterTumultuousYears.!random>, {Grammar.MakePossessive(PlayerName)} counselors suggested " + 
             $"{The.Player.GetPronounProvider().Subjective} <spice.instancesOf.abdicate.!random> as sultan. " +
-            $"Instead, {The.Player.GetPronounProvider().Subjective} ";
+            $"Instead, {The.Player.GetPronounProvider().Subjective} ate a meal and ";
         public static List<string> JournalGospelSuffixs = new()
         {
-            $"ate a meal and achieved massive gains.",
+            $"achieved massive gains.",
+            $"got swole.",
+            $"satisfied a serious hankering.",
         };
         public override string GetDescription()
         {
@@ -125,7 +127,6 @@ namespace XRL.World.Effects
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
                 }
             }
-            Object.RequirePart<Gigantified.GigantifiedColor>();
         }
     } //!-- public class CookingDomainSpecial_UnitGigantismTransform : ProceduralCookingEffectUnit
 }

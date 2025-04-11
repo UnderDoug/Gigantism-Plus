@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <naming>
   <namestyles>
-    <namestyle Name="Giant" HyphenationChance="25" TwoNameChance="50" Format="TitleCase">
+    <namestyle Name="Giant" HyphenationChance="25" TwoNameChance="75" Format="TitleCase">
       <scopes>
         <!--scope Name="Subtype1" Subtype="Artifex" Priority="100" Combine="false" /-->
         <scope Name="Culture" Culture="Giant" Priority="100" Combine="false" />
@@ -12,13 +12,18 @@
         <prefix Name="um" />
         <prefix Name="ob" Weight="2" />
         <prefix Name="ub" />
+        <prefix Name="ur" />
+        <prefix Name="ohr" Weight="3" />
         <prefix Name="wo" Weight="2" />
         <prefix Name="wa" />
         <prefix Name="wu" Weight="3" />
         <prefix Name="mo" Weight="2" />
         <prefix Name="mu" />
+        <prefix Name="ru" />
+        <prefix Name="ro" Weight="3" />
+        <prefix Name="roh" />
       </prefixes>
-      <infixes Amount="0-2">
+      <infixes Amount="0-1">
         <infix Name="h" />
         <infix Name="gh" />
         <infix Name="ghl" />
@@ -27,6 +32,8 @@
         <infix Name="oh" />
         <infix Name="uh" />
         <infix Name="uhl" />
+        <infix Name="rh" />
+        <infix Name="rhl" />
         <infix Name="l" />
         <infix Name="la" />
         <infix Name="lu" />
@@ -35,14 +42,21 @@
         <infix Name="lhu" />
         <infix Name="hl" />
         <infix Name="hlu" />
+        <infix Name="lr" />
+        <infix Name="lru" />
+        <infix Name="rl" />
+        <infix Name="rlu" />
       </infixes>
       <postfixes Amount="1">
         <postfix Name="an" />
         <postfix Name="un" Weight="2" />
+        <postfix Name="uhr" Weight="2" />
+        <postfix Name="urh" Weight="2" />
         <postfix Name="ah" Weight="2" />
         <postfix Name="ag" Weight="2" />
         <postfix Name="ug" />
         <postfix Name="agh" Weight="5" />
+        <postfix Name="rgh" Weight="2" />
         <postfix Name="hmm"/>
         <postfix Name="hm" />
         <postfix Name="mh" Weight="3" />

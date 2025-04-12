@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <objects>
     <!-- 
+       Add NaturalEquipmentManager to Item
+     -->
+    <object Name="NaturalWeapon" Load="Merge">
+      <part Name="NaturalEquipmentManager" />
+    </object>
+  
+    <!-- 
         Make select creatures Gigantic: 
         - give mutation "GigantismPlus"
         - remove tag "Gigantic" 

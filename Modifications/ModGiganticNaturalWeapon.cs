@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using XRL.World.Parts.Mutation;
 using XRL.Language;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<GigantismPlus>
+    public class ModGiganticNaturalWeapon 
+        : ModNaturalEquipment<GigantismPlus>
+        , IModEventHandler<BeforeDescribeModGiganticEvent>
+        , IModEventHandler<DescribeModGiganticEvent>
     {
         public ModGiganticNaturalWeapon()
         {
@@ -20,13 +27,6 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
-
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-            */
             base.ApplyModification(Object);
         }
 
@@ -34,7 +34,9 @@ namespace XRL.World.Parts
         {
             return base.WantEvent(ID, cascade)
                 || ID == GetCleaveAmountEvent.ID
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+                || ID == PooledEvent<GetDisplayNameEvent>.ID
+                || ID == BeforeDescribeModGiganticEvent.ID
+                || ID == DescribeModGiganticEvent.ID;
         }
 
         public override bool HandleEvent(GetCleaveAmountEvent E)
@@ -59,27 +61,67 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            if (!E.Object.HasProperName)
-            {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
-            }
+            return base.HandleEvent(E);
+        }
 
+        public bool HandleEvent(BeforeDescribeModGiganticEvent E)
+        {
+            if (E.Object == ParentObject)
+            {
+                int dieCount = GetDamageDieCount();
+                int damageBonus = 2+ GetDamageBonus();
+                int hitBonus = GetHitBonus();
+
+                if (dieCount > 0) E.WeaponDescriptions
+                        .Add(new() { "gain", $"{dieCount} additional damage die" });
+
+                if (damageBonus != 0) E.WeaponDescriptions
+                        .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
+
+                if (hitBonus != 0) E.WeaponDescriptions
+                        .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
+            }
+            return base.HandleEvent(E);
+        }
+
+        public bool HandleEvent(DescribeModGiganticEvent E)
+        {
+            if (E.Object == ParentObject)
+            {
+                List<string> elementToRemove = new() { "have", "+3 damage" };
+                int indexToRemove = 0;
+                foreach (List<string> entry in E.WeaponDescriptions)
+                {
+                    if (entry[0] == elementToRemove[0] && entry[1] == elementToRemove[1])
+                        break;
+                    indexToRemove++;
+                }
+                if (indexToRemove < E.WeaponDescriptions.Count)
+                    E.WeaponDescriptions.RemoveAt(indexToRemove);
+            }
             return base.HandleEvent(E);
         }
 
         public override string GetInstanceDescription()
         {
+            BeforeDescribeModGiganticEvent beforeEvent = new(ParentObject, null);
+            beforeEvent.Send();
+            DescribeModGiganticEvent afterEvent = new(ParentObject, null, beforeEvent);
+
+            return afterEvent.Send().Process();
+
+            Debug.Entry(4, $"{typeof(ModGiganticNaturalWeapon).Name}.{nameof(GetInstanceDescription)}()");
             MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
-            int damageBonus = 3 + GetDamageBonus();
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
+            int damageBonus = GetDamageBonus();
             List<List<string>> list = new();
-            string text = "weapon";
+            string text = ParentObject.GetObjectNoun();
             if (part != null && ParentObject.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 list.Add(new List<string> { "have", $"{damageBonus.Signed()} damage" });
                 if (GetDamageDieCount() != 0)
                 {
-                    list.Add(new List<string> { "have", $"{GetDamageDieCount().Signed()} to {ParentObject.theirs} damage die count" });
+                    list.Add(new List<string> { "have", $"{GetDamageDieCount().Signed()} damage die count" });
                 }
                 if (GetHitBonus() != 0)
                 {
@@ -110,5 +152,5 @@ namespace XRL.World.Parts
             return $"{descriptionName}: " + (ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text)) + " " + Grammar.MakeAndList(list2) + ".";
         }
 
-    } //!-- public class ModGiganticNaturalWeapon : ModNaturalWeaponBase<HNPS_GigantismPlus>
+    } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
 }

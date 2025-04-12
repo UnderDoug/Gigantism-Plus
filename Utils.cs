@@ -1,8 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using ConsoleLib.Console;
+
 using Kobold;
+
 using XRL;
 using XRL.Rules;
 using XRL.World;
@@ -11,12 +14,54 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
+using XRL.World.Text.Delegates;
+using XRL.World.Text.Attributes;
+
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
+    [HasVariableReplacer]
     public static class Utils
     {
+        [VariableReplacer]
+        public static string nbsp(DelegateContext Context)
+        {
+            string nbsp = "\xFF";
+            string output = nbsp;
+            if (!Context.Parameters.IsNullOrEmpty() && int.TryParse(Context.Parameters[0], out int count))
+            {
+                for (int i = 1; i < count; i++)
+                {
+                    output += nbsp;
+                }
+            }
+            return output;
+        }
+
+        public static bool RegisterGameLevelEventHandlers()
+        {
+            Debug.Entry(1, $"Registering XRLGame Event Handlers...", Indent: 1);
+            bool flag = The.Game != null;
+            if (flag)
+            {
+                BeforeModGiganticAppliedHandler.Register();
+                AfterModGiganticAppliedHandler.Register();
+                BeforeDescribeModGiganticHandler.Register();
+                DescribeModGiganticHandler.Register();
+                MeleeWeapon_AfterObjectCreatedHandler.Register();
+                // ExampleHandler.Register();
+            }
+            else
+            {
+                Debug.Entry(2, $"The.Game is null, unable to register any events.", Indent: 2);
+
+            }
+            Debug.LoopItem(1, $"Event Handler Registration Finished", Indent: 1, Good: flag);
+            return flag;
+        }
+
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]
         private static Dictionary<string, string> _TilePathCache = new();
         private static readonly List<string> TileSubfolders = new()
@@ -38,60 +83,58 @@ namespace HNPS_GigantismPlus
         }
         public static bool TryGetTilePath(string TileName, out string TilePath)
         {
-            Debug.Divider(3, Count: 40, Indent: 4);
-            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 5);
+            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
 
             bool found = false;
-            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 5);
-            if (_TilePathCache.TryGetValue(TileName, out TilePath))
+            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2);
+            if (!_TilePathCache.TryGetValue(TileName, out TilePath))
             {
-                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 6);
-                goto Exit;
-            }
-            Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 6);
-            Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 5);
 
-            Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 6);
-            if (!_TilePathCache.TryAdd(TileName, TilePath)) 
-                Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 6);
+                Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3);
+                Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2);
 
-            Debug.Entry(4, $"Listing subfolders", Indent: 5);
-            Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 5);
-            foreach (string subfolder in TileSubfolders)
-            {
-                Debug.LoopItem(4, $"{subfolder}", Indent: 6);
-            }
-            Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 5);
+                Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 3);
+                if (!found && !_TilePathCache.TryAdd(TileName, TilePath))
+                    Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 3);
 
-            Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 5);
-            Debug.Divider(3, "-", Count: 25, Indent: 5);
-            foreach (string subfolder in TileSubfolders)
-            {
-                string path = subfolder;
-                if (path != "") path += "/";
-                path += TileName;
-                Debug.Entry(4, $"Does Tile: \"{path}\" exist?", Indent: 6);
-                if (SpriteManager.HasTextureInfo(path))
+                Debug.Entry(4, $"Listing subfolders", Indent: 2);
+                Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2);
+                foreach (string subfolder in TileSubfolders)
                 {
-                    Debug.DiveIn(4, $"Yes.", Indent: 7);
-                    Debug.Entry(3, $"out Tile = {path}", Indent: 7);
-                    TilePath = path;
-                    _TilePathCache[TileName] = TilePath;
-                    Debug.Entry(3, $"Added entry to _TilePathCache", Indent: 7);
-                    Debug.DiveOut(4, "TilePath Exists", Indent: 6);
-                    break;
+                    Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3);
                 }
-                Debug.Entry(4, $"No.", Indent: 7);
+                Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2);
+
+                Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 2);
+                Debug.Divider(3, "-", Count: 25, Indent: 2);
+                foreach (string subfolder in TileSubfolders)
+                {
+                    string path = subfolder;
+                    if (path != "") path += "/";
+                    path += TileName;
+                    if (SpriteManager.HasTextureInfo(path))
+                    {
+                        TilePath = path;
+                        _TilePathCache[TileName] = TilePath;
+                        Debug.CheckYeh(4, $"Tile: \"{path}\", Added entry to _TilePathCache", Indent: 3);
+                    }
+                    else
+                    {
+                        Debug.CheckNah(4, $"Tile: \"{path}\"", Indent: 3);
+                    }
+                }
+                Debug.Divider(3, "-", Count: 25, Indent: 2);
+                Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 2);
             }
-            Debug.Divider(3, "-", Count: 25, Indent: 5);
-            Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 5);
+            else
+            {
+                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3);
+            }
 
-            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 5);
+            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 2);
 
-            Exit:
             found = TilePath != null;
-            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 5);
-            Debug.Divider(3, Count: 40, Indent: 4);
+            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2);
             return found;
         }
 
@@ -113,7 +156,7 @@ namespace HNPS_GigantismPlus
 
         public static Random RndGP = Stat.GetSeededRandomGenerator("HNPS_GigantismPlus");
 
-        // !! This is currently not firing from any of the NaturalWeaponSubpart Mutations but it has code that will make implementing the cybernetics adjustments easier.
+        // !! This is currently not firing from any of the NaturalEquipmentMod Mutations but it has code that will make implementing the cybernetics adjustments easier.
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)
@@ -380,6 +423,120 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}() *//", Indent: 1);
         }
 
+        /*
+        // method to swap Gigantism mutation category between Physical and PhysicalDefects
+        public static void SwapMutationCategory(MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
+        {
+            SwapMutationCategory(MutationEntry.Name, OutOfCategory, IntoCategory);
+        } //!--- public static void SwapMutationCategory(this MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
+
+        public static void SwapMutationCategory(BaseMutation Mutation, string OutOfCategory, string IntoCategory)
+        {
+            SwapMutationCategory(Mutation?.GetMutationEntry()?.Name, OutOfCategory, IntoCategory);
+        } //!--- public static void SwapMutationCategory(this MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
+
+        public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
+        {
+            if (MutationFactory.TryGetMutationEntry(MutationName, out MutationEntry MutationEntry))
+            {
+                Debug.Header(3, MutationEntry.DisplayName, $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+
+                List<MutationCategory> mutationCategories = MutationFactory.GetCategories().Vomit(4, "mutationCategories", DivAfter: Debug.HONLY, Indent: 1);
+
+                MutationCategory outOfCategory = mutationCategories.Find((x) => x.Name == OutOfCategory);
+                MutationCategory intoCategory = mutationCategories.Find((x) => x.Name == IntoCategory);
+
+                outOfCategory.Entries.Vomit(4, "outOfCategoryEntries | Before:", DivAfter: Debug.HONLY, Indent: 1);
+                intoCategory.Entries.Vomit(4, "intoCategoryEntries | Before:", Indent: 1);
+                Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
+
+                foreach (MutationCategory category in MutationFactory.GetCategories())
+                {
+                    if (category.Name == IntoCategory)
+                    {
+                        if (!category.Entries.Contains(MutationEntry))
+                        {
+                            Debug.Entry(4, $"Mutation \"{MutationEntry.DisplayName}\" not found in IntoCategory \"{intoCategory.Name}\"", Indent: 2);
+                            Debug.Entry(4, $"Adding it", Indent: 3);
+                            category.Entries.Add(MutationEntry);
+                            Debug.Entry(4, $"Attempting to Sort", Indent: 3);
+                            category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
+                            MutationEntry.Type = IntoCategory;
+                        }
+                    }
+                    if (category.Name == OutOfCategory)
+                    {
+                        if (outOfCategory.Entries.Contains(MutationEntry))
+                        {
+                            Debug.Entry(4, $"Mutation \"{MutationEntry.DisplayName}\" found in OutOfCategory \"{outOfCategory.Name}\"", Indent: 2);
+                            Debug.Entry(4, $"Removing it", Indent: 3);
+                            outOfCategory.Entries.Remove(MutationEntry);
+                        }
+                    }
+                }
+
+                Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
+                outOfCategory.Entries.Vomit(4, "outOfCategoryEntries |  After:", DivAfter: Debug.HONLY, Indent: 1);
+                intoCategory.Entries.Vomit(4, "intoCategoryEntries |  After:", Indent: 1);
+
+                Debug.Footer(3, MutationEntry.Mutation.GetMutationClass(), $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+            }
+        }
+        */
+
+        public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
+        {
+            Debug.Header(3, 
+                $"{MutationName}", 
+                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+
+            MutationEntry MutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
+
+            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1);
+            foreach (MutationCategory category in MutationFactory.GetCategories())
+            {
+                Debug.LoopItem(4, category.Name, Indent: 2);
+                if (category.Name == IntoCategory)
+                {
+                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", Indent: 2);
+
+                    Debug.Entry(3, $"Adding \"{MutationEntry.DisplayName}\" Mutation to \"{IntoCategory}\" Category", Indent: 3);
+                    category.Add(MutationEntry);
+                    category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
+
+                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", Indent: 3);
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 3);
+                    foreach (MutationEntry entry in category.Entries)
+                    {
+                        Debug.LoopItem(4, entry.DisplayName, Indent: 4);
+                    }
+                    Debug.DiveOut(3, $"x {IntoCategory} //", Indent: 2);
+                }
+                if (category.Name == OutOfCategory)
+                {
+                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", Indent: 2);
+                    Debug.Entry(3, $"Removing \"{MutationEntry.DisplayName}\" from \"{OutOfCategory}\" Category", Indent: 3);
+                    category.Entries.RemoveAll(r => r == MutationEntry);
+                    Debug.DiveOut(3, $"x {OutOfCategory} //", Indent: 2);
+                }
+            }
+            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) >//", Indent: 1);
+            Debug.Footer(3, 
+                $"{MutationName}", 
+                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+        } //!-- private void SwapMutationCategory(bool Before = true)
+
+        public static GameObjectBlueprint GetGameObjectBlueprint(string Blueprint)
+        {
+            GameObjectFactory.Factory.Blueprints.TryGetValue(Blueprint, out GameObjectBlueprint GameObjectBlueprint);
+            return GameObjectBlueprint;
+        }
+        public static bool TryGetGameObjectBlueprint(string Blueprint, out GameObjectBlueprint GameObjectBlueprint)
+        {
+            GameObjectBlueprint = GetGameObjectBlueprint(Blueprint);
+            return !GameObjectBlueprint.Is(null);
+        }
+
     } //!-- public static class Utils
 
-} //!-- namespace HNPS_GigantismPlus
+}

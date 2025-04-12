@@ -1,20 +1,27 @@
 ﻿using HarmonyLib;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using XRL;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(Crystallinity))]
+    [HarmonyPatch]
     public static class Crystallinity_Patches
     {
         // Increase the chance to refract light-based attacks from 25% to 35% when GigantismPlus is present
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Crystallinity.Mutate))]
+        [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.Mutate))]
         static void Mutate_Prefix(Crystallinity __instance, GameObject GO)
         {
             if (GO.HasPart<GigantismPlus>())
@@ -26,7 +33,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(Crystallinity.Mutate))]
+        [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.Mutate))]
         static void Mutate_Postfix(Crystallinity __instance, GameObject GO)
         {
             if (GO.HasPart<GigantismPlus>() && __instance.RefractAdded)
@@ -41,7 +48,7 @@ namespace HNPS_GigantismPlus.Harmony
 
         // Modify the Crystallinity mutation level text to include the GigantismPlus bonus
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(Crystallinity.GetLevelText))]
+        [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.GetLevelText))]
         static void GetLevelText_Postfix(Crystallinity __instance, ref string __result)
         {
             if (__instance.ParentObject.HasPart<GigantismPlus>())
@@ -55,73 +62,101 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Crystallinity.OnRegenerateDefaultEquipment))]
+        [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.OnRegenerateDefaultEquipment))]
         static bool OnRegenerateDefaultEquipment_Prefix(Crystallinity __instance, Body body)
         {
             if ((bool)EnableManagedVanillaMutations) return true;
-            GameObject actor = __instance.ParentObject;
+            /*GameObject actor = __instance.ParentObject;
             Zone InstanceObjectZone = actor.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(3, $"{nameof(Crystallinity_Patches)}", $"{nameof(OnRegenerateDefaultEquipment_Prefix)}(body)");
-            Debug.Entry(3, $"TARGET {actor.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+            Debug.Entry(3, $"TARGET {actor.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);*/
 
             bool ShouldContinue = false;
 
-            if (body != null)
+            /*if (body != null)
             {
-                UD_ManagedCrystallinity managed = __instance.ConvertToManaged();
+                UD_ManagedCrystallinity managed = new(__instance);
+                int level = managed.Level;
+                ModCrystallineNaturalWeaponUnmanaged naturalEquipmentMod = 
+                    new((ModCrystallineNaturalWeapon)managed.NaturalEquipmentMod);
                 managed.HasGigantism = actor.HasPart<GigantismPlus>();
                 managed.HasElongated = actor.HasPart<ElongatedPaws>();
                 managed.HasBurrowing = actor.HasPartDescendedFrom<BurrowingClaws>();
-                managed.NaturalWeaponSubpart.Managed = false;
-                managed.UpdateNaturalWeaponSubpart(managed.NaturalWeaponSubpart, managed.Level);
-                managed.OnRegenerateDefaultEquipment(body);
-                managed.OnDecorateDefaultEquipment(body);
+                managed.NaturalEquipmentMod = naturalEquipmentMod;
+                managed.NaturalEquipmentMod.AssigningPart = managed;
+                managed.ChangeLevel(level);
+
+                foreach (BodyPart bodyPart in body.LoopPart(managed.NaturalEquipmentMod.BodyPartType))
+                {
+                    NaturalEquipmentManager manager = bodyPart.DefaultBehavior?.GetPart<NaturalEquipmentManager>() ?? bodyPart.Equipped?.GetPart<NaturalEquipmentManager>();
+                    if (manager != null) managed.OnManageNaturalEquipment(manager, bodyPart);
+                }
             }
             else
             {
                 ShouldContinue = true;
-                Debug.Entry(3, "No Body. Aborting", Indent: 1);
+                Debug.Entry(3, "No Actor. Aborting", Indent: 1);
             }
+            Debug.Entry(3, $"Skipping patched Method: {!ShouldContinue}", Indent: 1);
+            Debug.Footer(3, $"{nameof(Crystallinity_Patches)}", $"{nameof(OnRegenerateDefaultEquipment_Prefix)}(body)");*/
+            return ShouldContinue; // Skip the the original method if we do anything.
+        }
 
-            /*
-            Debug.Entry(3, "Performing application of behavior to parts", Indent: 1);
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.Register))]
+        static bool Register_AdditionalEvents_Prefix(IEventRegistrar Registrar)
+        {
+            Debug.Entry(3, 
+                $"{nameof(Crystallinity_Patches)}." + 
+                $"{nameof(Register_AdditionalEvents_Prefix)}(IEventRegistrar Registrar)", 
+                Indent: 0);
 
-            string targetPartType = "Hand";
-            Debug.Entry(4, $"targetPartType is \"{targetPartType}\"", Indent: 1);
-            Debug.Entry(4, "Generating List<BodyPart> list", Indent: 1);
+            Registrar.Register(typeof(ManageDefaultEquipmentEvent).Name);
+            Registrar.Register(typeof(UpdateNaturalEquipmentModsEvent).Name);
+            return true;
+        }
 
-            List<BodyPart> list = (from p in body.GetParts(EvenIfDismembered: true)
-                                   where p.Type == targetPartType
-                                   select p).ToList();
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.FireEvent))]
+        static bool FireEvent_AdditionalEvents_Prefix(ref Crystallinity __instance, Event E)
+        {
+            Debug.Entry(3,
+                $"{nameof(Crystallinity_Patches)}." +
+                $"{nameof(FireEvent_AdditionalEvents_Prefix)}(ref Crystallinity __instance, Event E)",
+                Indent: 0);
 
-            Debug.Entry(4, "Checking list of parts for expected entries", Indent: 1);
-            Debug.Entry(4, "> foreach (BodyPart part in list)", Indent: 1);
-            foreach (BodyPart part in list)
+            Crystallinity @this = __instance;
+            if (E.ID == typeof(ManageDefaultEquipmentEvent).Name)
             {
-                Debug.LoopItem(4, $"{part.Type}", Indent: 2);
-                if (part.Type == "Hand")
+                Debug.Entry(3, $"! E.ID == {typeof(ManageDefaultEquipmentEvent).Name}", Indent: 1);
+
+                if (E.GetGameObjectParameter("Wielder") == @this.ParentObject)
                 {
-                    Debug.DiveIn(4, $"{part.Type} Found", Indent: 2);
+                    GameObject @object = E.GetGameObjectParameter("Object");
+                    NaturalEquipmentManager manager = E.GetParameter("Manager") as NaturalEquipmentManager;
+                    BodyPart bodyPart = E.GetParameter("BodyPart") as BodyPart;
 
-                    UD_ManagedCrystallinity managedCrystallinity = __instance.ConvertToManaged();
-                    managedCrystallinity.HasGigantism = actor.HasPart<GigantismPlus>();
-                    managedCrystallinity.HasElongated = actor.HasPart<ElongatedPaws>();
-                    managedCrystallinity.HasBurrowing = actor.HasPartDescendedFrom<BurrowingClaws>();
-                    part.DefaultBehavior.ApplyModification(managedCrystallinity.GetNaturalWeaponModName(Managed: false), Actor: actor);
+                    GameObject actor = E.GetGameObjectParameter("Wielder");
+                    UD_ManagedCrystallinity managed = new(@this);
+                    ModCrystallineNaturalWeaponUnmanaged naturalEquipmentMod =
+                        new((ModCrystallineNaturalWeapon)managed.NaturalEquipmentMod);
+                    managed.HasGigantism = actor.HasPart<GigantismPlus>();
+                    managed.HasElongated = actor.HasPart<ElongatedPaws>();
+                    managed.HasBurrowing = actor.HasPartDescendedFrom<BurrowingClaws>();
+                    managed.NaturalEquipmentMod = naturalEquipmentMod;
+                    managed.NaturalEquipmentMod.AssigningPart = managed;
 
-                    Debug.DiveOut(4, $"{part.Type}", Indent: 2);
+                    managed.OnUpdateNaturalEquipmentMods();
+
+                    managed.OnManageNaturalEquipment(manager, bodyPart);
                 }
             }
-            Debug.Entry(4, "x foreach (BodyPart part in list) >//", Indent: 1);
-
-            Exit:
-            */
-
-            Debug.Entry(3, $"Skipping patched Method: {!ShouldContinue}", Indent: 1);
-            Debug.Footer(3, $"{nameof(Crystallinity_Patches)}", $"{nameof(OnRegenerateDefaultEquipment_Prefix)}(body)");
-            return ShouldContinue; // Skip the the original method if we do anything.
+            if (E.ID == typeof(UpdateNaturalEquipmentModsEvent).Name)
+            {
+            }
+            return true;
         }
     }//!-- public static class Crystallinity_Patches
 }

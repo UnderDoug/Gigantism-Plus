@@ -1,14 +1,17 @@
-﻿using HNPS_GigantismPlus;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
 using XRL.Language;
 using XRL.World.Parts.Mutation;
+
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>
+    public class ModAugmentedNaturalWeapon : ModNaturalEquipment<CyberneticsGiganticExoframe>
     {
         public ModAugmentedNaturalWeapon()
         {
@@ -19,71 +22,12 @@ namespace XRL.World.Parts
         {
         }
 
-        public override int ApplyPriorityChanges(GameObject Object, NaturalWeaponSubpart<CyberneticsGiganticExoframe> NaturalWeapon)
-        {
-            Debug.Entry(4, $"* {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart)", Indent: 4);
-            Debug.Entry(4, $"{AssigningPart.Name}", Indent: 5);
-
-            Render render = Object.Render;
-            MeleeWeapon weapon = Object.GetPart<MeleeWeapon>();
-
-            List<string> vomitCats = new() { "Render" };
-            int AdjectivePriority = NaturalWeapon.AdjectivePriority - 100;
-            int CurrentNounPriority = Object.GetIntProperty(CURRENT_NOUN_PRIORITY);
-
-            // Debug.Entry(4, $"Using inverted Adjective Priority to force the Augmented Render changes through", Indent: 5);
-            Debug.Entry(4, $"? if (AdjectivePriority != 0 && CurrentNounPriority > AdjectivePriority)", Indent: 5);
-            if (AdjectivePriority != 0 && AdjectivePriority < CurrentNounPriority)
-            {
-                Debug.Entry(4,
-                    $"+ AdjectivePriority != 0 && "
-                    + $"CurrentNounPriority AdjectivePriority ({AdjectivePriority}) < ({CurrentNounPriority})",
-                    Indent: 6);
-
-                weapon.Vomit(4, "SpecialAdjectivePriority, Before", vomitCats, Indent: 6);
-
-                render.Tile = NaturalWeapon.Tile ?? render.Tile;
-
-                render.ColorString =
-                    (render.ColorString == NaturalWeapon.ColorString)
-                    ? NaturalWeapon.SecondColorString
-                    : NaturalWeapon.ColorString;
-
-                render.DetailColor =
-                    (render.DetailColor == NaturalWeapon.DetailColor)
-                    ? NaturalWeapon.SecondDetailColor
-                    : NaturalWeapon.DetailColor;
-
-                Object.SetSwingSound(NaturalWeapon.SwingSound);
-                Object.SetBlockedSound(NaturalWeapon.BlockedSound);
-
-                weapon.Vomit(4, "SpecialAdjectivePriority, After", vomitCats, Indent: 6);
-            }
-            else
-            {
-                Debug.Entry(4,
-                    $"- AdjectivePriority == 0 || "
-                    + $"AdjectivePriority ({AdjectivePriority}) >= CurrentNounPriority ({CurrentNounPriority})",
-                    Indent: 6);
-                weapon.Vomit(4, "AdjectivePriority, Unchanged", vomitCats, Indent: 6);
-            }
-            Debug.Entry(4, $"x if (AdjectivePriority != 0 && AdjectivePriority < CurrentNounPriority) ?//", Indent: 5);
-
-            Debug.Entry(4, $"* base.{nameof(ApplyPriorityChanges)}(Object, NaturalWeaponSubpart)", Indent: 4);
-            Debug.Entry(4, $"x {nameof(ApplyPriorityChanges)}(GameObject Object, NaturalWeaponSubpart NaturalWeaponSubpart) *//", Indent: 4);
-            return base.ApplyPriorityChanges(Object, NaturalWeapon);
-        }
-
         public override void ApplyModification(GameObject Object)
         {
-            /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
-
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-            */
-
+            if(ParentObject.TryGetPart(out NaturalEquipmentManager manager))
+            {
+                manager.DoDynamicTile = false;
+            }
             base.ApplyModification(Object);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -92,24 +36,20 @@ namespace XRL.World.Parts
                 || ID == PooledEvent<GetDisplayNameEvent>.ID;
         }
 
-        public override bool HandleEvent(GetDisplayNameEvent E)
+        public override string GetColoredAdjective()
         {
-            if (!E.Object.HasProperName)
-            {
-                E.AddAdjective(AssigningPart.GetNaturalWeaponColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
-            }
-            return base.HandleEvent(E);
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
         }
 
         public override string GetInstanceDescription()
         {
             string cyberneticsObject = AssigningPart.ImplantObject.ShortDisplayName;
-            string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalWeaponColoredAdjective());
+            string text = ParentObject.GetObjectNoun();
+            string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalEquipmentColoredAdjective());
             string description = $"{descriptionName}: ";
-            description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} ";
-            description += $"has some of its bonuses applied by an implanted {cyberneticsObject}.";
+            description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text) + " have ") : ("This " + text + " has "))} ";
+            description += $"some of its bonuses applied by an implanted {cyberneticsObject}.";
             return description;
         }
-    } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
+    } //!-- public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>
 }

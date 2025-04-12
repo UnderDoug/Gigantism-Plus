@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using XRL.World.Anatomy;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
+    public class ElongatedPaws 
+        : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
@@ -21,28 +25,35 @@ namespace XRL.World.Parts.Mutation
             DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
-            NaturalWeaponSubpart = new()
+            NaturalEquipmentMod = new ModElongatedNaturalWeapon()
             {
-                ParentPart = this,
-                Level = Level,
-                CosmeticOnly = false,
-                Type = "Hand",
-                DamageDieSize = 3,
+                AssigningPart = this,
+                BodyPartType = "Hand",
+
                 ModPriority = 20,
+                DescriptionPriority = 20,
+
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
                 AdjectiveColorFallback = "w",
-                Noun = "paw",
-                Skill = "ShortBlades",
-                Stat = "Strength",
-                Tile = "NaturalWeapons/ElongatedPaw.png",
-                ColorString = "&x",
-                DetailColor = "z",
-                SecondColorString = "&X",
-                SecondDetailColor = "Z",
-                SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"
+
+                Adjustments = new(),
+
+                AddedStringProps = new()
+                {
+                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
+                },
             };
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
+
+            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "z", true);
         }
 
         private bool _HasGigantism = false;
@@ -90,7 +101,7 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public override int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
             int dieSize = 0;
             
@@ -100,9 +111,9 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<ElongatedPaws> NaturalWeaponSubpart, int Level = 1)
+        public override int GetNaturalWeaponPenBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
-            return (int)Math.Floor(StrengthModifier / 2.0);
+            return (int)Math.Floor(AgilityModifier / 2.0);
         }
 
         public override bool CanLevel() { return false; }
@@ -112,13 +123,11 @@ namespace XRL.World.Parts.Mutation
         public override string GetDescription()
         {
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
-                 + "You have {{giant|elongated paws}}, which are unusually large and end in spindly fingers.\n"
-                 + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons {{gigantic|a size bigger}} than you are as though they were your size."
-                 + "\n\nYour {{giant|elongated paws}} count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|(StrMod/2)}}"
+                 + "You have " + "elongated paws".OptionalColorGiant(Colorfulness) + ", which are unusually large and end in spindly fingers.\n"
+                 + "Their odd shape and size allow you to {{rules|equip}} equipment {{rules|on your hands}} and {{rules|wield}} melee and missile weapons " + "size bigger".OptionalColorGiant(Colorfulness) + " than you are as though they were your size."
+                 + "\n\nYour " + "elongated paws".OptionalColorGiant(Colorfulness) + " count as natural short blades {{rules|\x1A}}{{rules|4}}{{k|/\xEC}} {{r|\x03}}{{z|1}}{{w|d}}{{z|4}}{{w|+}}{{rules|(StrMod/2)}}"
                  + "\n\n+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
-
-        public override string GetLevelText(int Level) { return ""; }
 
         public override bool WantEvent(int ID, int cascade)
         {
@@ -142,7 +151,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Body body = E.Object.Body;
 
-                NaturalWeaponSubpart.DamageBonus = GetNaturalWeaponDamageBonus(NaturalWeaponSubpart, Level);
+                NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
 
                 body?.UpdateBodyParts();
 
@@ -161,7 +170,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
-            GO.CheckAffectedEquipmentSlots();
+            GO.CheckEquipmentSlots();
             
             return base.Mutate(GO, Level);
         }
@@ -189,7 +198,7 @@ namespace XRL.World.Parts.Mutation
                 }
             }
 
-            GO.CheckAffectedEquipmentSlots();
+            GO.CheckEquipmentSlots();
 
             return base.Unmutate(GO);
         }
@@ -202,12 +211,12 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalWeaponSubparts = new();
-            foreach ((_, NaturalWeaponSubpart<ElongatedPaws> subpart) in NaturalWeaponSubparts)
+            elongatedPaws.NaturalEquipmentMods = new();
+            foreach ((_, ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                elongatedPaws.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, elongatedPaws));
+                elongatedPaws.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, elongatedPaws));
             }
-            elongatedPaws.NaturalWeaponSubpart = new(NaturalWeaponSubpart, elongatedPaws);
+            elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
             return elongatedPaws;
         }
 

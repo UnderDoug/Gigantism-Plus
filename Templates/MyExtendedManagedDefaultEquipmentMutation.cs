@@ -12,7 +12,7 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class MyExtendedManagedDefaultEquipmentMutation : MyDefaultEquipmentMutation, IManagedDefaultNaturalWeapon
     {
-        // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the NaturalWeaponSubpart Part
+        // Required by IManagedDefaultNaturalWeapon to ensure the implementation of the NaturalEquipmentMod Part
         [Serializable]
         public class INaturalWeapon : IManagedDefaultNaturalWeapon.INaturalWeapon
         {
@@ -86,14 +86,14 @@ namespace XRL.World.Parts.Mutation
         }
 
         // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
-        public virtual string GetNaturalWeaponModName(bool Managed = true)
+        public virtual string GetNaturalEquipmentModName(bool Managed = true)
         {
-            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalWeaponSubpart" + (!Managed ? "Unmanaged" : "");
+            return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalEquipmentMod" + (!Managed ? "Unmanaged" : "");
         }
-        public virtual ModNaturalWeaponBase<T> GetNaturalWeaponMod<T>()
-            where T : IPart, IManagedDefaultNaturalWeapon, new()
+        public virtual ModNaturalWeaponBase<E> GetNaturalWeaponMod<E>()
+            where E : IPart, IManagedDefaultNaturalWeapon, new()
         {
-            return GetNaturalWeaponModName().ConvertToNaturalWeaponModification<T>();
+            return GetNaturalEquipmentModName().ConvertToNaturalWeaponModification<E>();
         }
 
         // Optional: allows you to easily check the presence of another mutation if you wanted to adjust any calculations on that basis
@@ -208,7 +208,7 @@ namespace XRL.World.Parts.Mutation
         // The call is after the base default fists have been destroyed and recreated.
         // While reliable in catching all Hand and Hand variants, the code below is optional and simply serves as an example
         // of how you might loop through parts and apply the modification.
-        public override void OnRegenerateDefaultEquipment(Body body)
+        public override void OnRegenerateDefaultEquipment(Actor body)
         {
             if (body == null)
             {
@@ -229,13 +229,13 @@ namespace XRL.World.Parts.Mutation
                     // This is the important part, and is how the modification gets applied.
                     // the process will fail if there's no default behavior (Hand parts always have them), so you may want to 
                     // do a (part.DefaultBehavior != null) check first and add a default behavior to Modify.
-                    part.DefaultBehavior.ApplyModification(GetNaturalWeaponModName(), Actor: ParentObject);
+                    part.DefaultBehavior.ApplyModification(GetNaturalEquipmentModName(), Actor: ParentObject);
                 }
             }
         }
 
         // You'll want some variation of this to ensure that things like Temporal Fugue clones don't delete your 
-        // NaturalWeaponSubpart Part by being copied with a reference to it.
+        // NaturalEquipmentMod Part by being copied with a reference to it.
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             MyExtendedManagedDefaultEquipmentMutation myMutation = base.DeepCopy(Parent, MapInv) as MyExtendedManagedDefaultEquipmentMutation;

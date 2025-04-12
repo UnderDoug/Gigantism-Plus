@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
+
 using XRL.Language;
 using XRL.World.Parts.Mutation;
+
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
+    public class ModCrystallineNaturalWeapon : ModNaturalEquipment<UD_ManagedCrystallinity>
     {
         public ModCrystallineNaturalWeapon()
         {
@@ -17,50 +22,90 @@ namespace XRL.World.Parts
             : base(Tier)
         {
         }
-
-        public override void ApplyModification(GameObject Object)
+        public ModCrystallineNaturalWeapon(ModNaturalEquipmentBase Conversion)
+            : this()
         {
-            /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
+            Wielder = Conversion.Wielder;
 
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
+            Adjustments = new();
+            foreach (Adjustment adjustment in Conversion.Adjustments)
+            {
+                Adjustments.Add(adjustment);
+            }
 
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-            */
-            base.ApplyModification(Object);
+            BodyPartType = Conversion.BodyPartType;
+
+            ModPriority = Conversion.ModPriority;
+            DescriptionPriority = Conversion.DescriptionPriority;
+
+            DamageDieCount = Conversion.DamageDieCount;
+            DamageDieSize = Conversion.DamageDieSize;
+            DamageBonus = Conversion.DamageBonus;
+            HitBonus = Conversion.HitBonus;
+            PenBonus = Conversion.PenBonus;
+
+            Adjective = Conversion.Adjective;
+            AdjectiveColor = Conversion.AdjectiveColor;
+            AdjectiveColorFallback = Conversion.AdjectiveColorFallback;
+
+            AddedParts = new();
+            foreach (string addedPart in Conversion.AddedParts)
+            {
+                AddedParts.Add(addedPart);
+            }
+            AddedStringProps = new();
+            foreach ((string prop, string value) in Conversion.AddedStringProps)
+            {
+                AddedStringProps[prop] = value;
+            }
+            AddedIntProps = new();
+            foreach ((string prop, int value) in Conversion.AddedIntProps)
+            {
+                AddedIntProps[prop] = value;
+            }
         }
 
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == GetShortDescriptionEvent.ID
                 || ID == PooledEvent<GetDisplayNameEvent>.ID;
         }
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            if (!E.Object.HasProperName)
+            return base.HandleEvent(E);
+        }
+
+        public override string GetInstanceDescription()
+        {
+
+            string text = ParentObject.GetObjectNoun();
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
+            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
+            int dieSize = GetDamageDieSize();
+            int damageBonus = GetDamageBonus();
+            string description = $"{descriptionName}: ";
+            description += ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
+
+            List<List<string>> descriptions = new();
+            if (dieSize > 0) descriptions
+                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+
+            if (damageBonus != 0) descriptions
+                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" }); 
+            
+            descriptions
+                    .Add(new() { null, $"inorganic" });
+
+            List<string> processedDescriptions = new();
+            foreach (List<string> entry in descriptions)
             {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
             }
-            return base.HandleEvent(E);
-        }
 
-        public override bool HandleEvent(GetShortDescriptionEvent E)
-        {
-            // E.Postfix.AppendRules(GetInstanceDescription(), GetEventSensitiveAddStatusSummary(E));
-            return base.HandleEvent(E);
-        }
-
-        public new string GetInstanceDescription()
-        {
-            string text = "weapon";
-            string descriptionName = !ParentObject.HasNaturalWeaponMods() ? "\n" : "";
-            descriptionName += Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
-            int dieSizeIncrease = GetDamageDieSize();
-            StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has ").Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} damage die size.");
-            return Event.FinalizeString(stringBuilder);
+            return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
     } //!-- public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>
 }

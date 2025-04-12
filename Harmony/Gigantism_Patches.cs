@@ -1,6 +1,10 @@
 ﻿using HarmonyLib;
+
 using XRL.World;
 using XRL.World.Parts;
+
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -8,14 +12,10 @@ namespace HNPS_GigantismPlus.Harmony
     public static class PseudoGiganticCreature_GameObject_Patches
     {
         // Goal is to simulate being Gigantic for the purposes of calculating body weight, if the GameObject in question is PseudoGigantic
-
         [HarmonyPrefix]
         [HarmonyPatch(nameof(GameObject.GetBodyWeight))]
         static void GetBodyWeightPrefix(ref GameObject __state, GameObject __instance)
         {
-            // --instance gives you the instantiated object on which the original method call is happening,
-            // __state lets you keep stuff between Pre- and Postfixes
-
             __state = __instance; // make the transferable object the current instance.
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
             if (IsPretendBig && !__state.IsGiganticCreature)
@@ -46,13 +46,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
     } //!-- public static class PseudoGiganticCreature_GameObject_Patches
 
-
-    // Why harmony for this one when it's an available event?
-    // -- in the event that this hard-coded element is adjusted (such as the increase amount),
-    //    this just ensures the "vanilla" behaviour is preserved by "masking" as Gigantic for the check.
-
     // Goal is to simulate being Gigantic for the purposes of calculating carry capacity, if the GameObject in question is PseudoGigantic
-
     [HarmonyPatch(typeof(GetMaxCarriedWeightEvent))]
     public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
     {
@@ -61,9 +55,6 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(GetMaxCarriedWeightEvent.GetFor))]
         static void GetMaxCarryWeightPrefix(ref GameObject Object, ref GameObject __state)
         {
-            // Object matches the paramater of the original,
-            // __state lets you keep stuff between Pre- and Postfixes
-
             __state = Object;
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
             if (IsPretendBig && !__state.IsGiganticCreature)
@@ -95,6 +86,9 @@ namespace HNPS_GigantismPlus.Harmony
 
     } //!-- public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
 
+
+    // Goal is to ensure that NaturalEquipment generated while having Gigantism actually get the gigantic modifier
+    // including when the creature is PsuedoGigantic
     [HarmonyPatch(typeof(Body))]
     public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
     {
@@ -103,16 +97,13 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
         static void RegenerateDefaultEquipmentPrefix(ref GameObject __state, Body __instance)
         {
-            // Object matches the paramater of the original,
-            // __state lets you keep stuff between Pre- and Postfixes
-
             __state = __instance.ParentObject;
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
             if (IsPretendBig && !__state.IsGiganticCreature)
             {
                 // is the GameObject PseudoGigantic but not Gigantic
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPrefix]");
-                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic not Gigantic");
+                Debug.Entry(3, "Actor.RegenerateDefaultEquipment() > PseudoGigantic not Gigantic");
                 __state.IsGiganticCreature = true; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
                 Debug.Entry(2, "Trying to generate gigantic natural equipment while PseudoGigantic\n");
             }
@@ -122,14 +113,12 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(Body.RegenerateDefaultEquipment))]
         static void RegenerateDefaultEquipmentPostfix(GameObject __state)
         {
-            // only need __state this time, since it holds the __instance anyway.
-
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
             if (IsPretendBig && __state.IsGiganticCreature)
             {
                 // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
                 Debug.Entry(4, "HarmonyPatches.cs | [HarmonyPostfix]");
-                Debug.Entry(3, "Body.RegenerateDefaultEquipment() > PseudoGigantic and Gigantic");
+                Debug.Entry(3, "Actor.RegenerateDefaultEquipment() > PseudoGigantic and Gigantic");
                 __state.IsGiganticCreature = false; // make the GameObject not Gigantic 
                 Debug.Entry(3, "Should have generated gigantic natural equipment while PseudoGigantic\n");
             }

@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+
 using XRL;
 using XRL.UI;
 using XRL.Core;
@@ -12,13 +13,15 @@ using XRL.World.Anatomy;
 using XRL.World.Capabilities;
 using XRL.World.Parts.Mutation;
 using XRL.Liquids;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public static class Secrets
+    public static class SecretGiganticExoframe
     {
         private static List<string> BecomingStrings = new()
         {
@@ -73,7 +76,7 @@ namespace HNPS_GigantismPlus
                 {
                     string preach = "{{SECRETGOLDEN|I AM BECOME GOLDEN, SHINER OF {{GOLDENSECRET|" + User?.GetCurrentZone()?.ZoneID + "}}!!}}";
                     preacher.Lines = new string[1] { preach };
-                    preacher.Prefix = "=subject.T= =verb:yell= {{SECRETGOLDEN|'";
+                    preacher.Prefix = "=subject.E= =verb:yell= {{SECRETGOLDEN|'";
                     preacher.PreacherHomily(User, false);
                     preacher.Lines = Array.Empty<string>();
 

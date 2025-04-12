@@ -1,17 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using XRL.Rules;
 using XRL.Language;
 using XRL.World.Anatomy;
+
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.Rules;
 
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalWeapon<UD_ManagedCrystallinity>
+    public class UD_ManagedCrystallinity 
+        : Crystallinity
+        , IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>
     {
+        // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
+        // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
+        public Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods { get; set; }
+        public ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod { get; set; }
+
         private bool _HasGigantism = false;
         public bool HasGigantism
         {
@@ -57,160 +68,118 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        // Dictionary holds a BodyPart.Type string as Key, and NaturalWeaponSubpart for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via NaturalWeaponSubpart.Type).
-        public Dictionary<string, NaturalWeaponSubpart<UD_ManagedCrystallinity>> NaturalWeaponSubparts = new();
-        public NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart { get; set; }
-
         public UD_ManagedCrystallinity()
             : base()
         {
-            NaturalWeaponSubpart = new()
-            {
-                ParentPart = this,
-                Level = 1,
-                CosmeticOnly = false,
-                Type = "Hand",
+            NaturalEquipmentMods = new();
 
-                DamageDieSize = 1,
-                DamageBonus = -1, // this is to force the default "InorganicManipulator" to match the default fist.
+            NaturalEquipmentMod = new ModCrystallineNaturalWeapon()
+            {
+                AssigningPart = this,
+                BodyPartType = "Hand",
 
                 ModPriority = 40,
-                Skill = "ShortBlades",
+                DescriptionPriority = 40,
+
                 Adjective = "crystalline",
                 AdjectiveColor = "crystallized",
                 AdjectiveColorFallback = "M",
-                Noun = "point",
 
-                Tile = "Creatures/natural-weapon-claw.bmp",
-                ColorString = "&b",
-                DetailColor = "B",
-                SecondColorString = "&B",
-                SecondDetailColor = "m",
-                SwingSound = "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing",
-                BlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked",
+                Adjustments = new(),
 
                 AddedParts = new()
                 {
-                    "Inorganic"
-                }
-            };
-        }
+                    "Inorganic",
+                    "Stone",
+                },
 
-        public UD_ManagedCrystallinity(NaturalWeaponSubpart<UD_ManagedCrystallinity> naturalWeaponSubpart, UD_ManagedCrystallinity NewParent)
+                AddedStringProps = new()
+                {
+                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
+                },
+            };
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
+            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength");
+
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "point", true);
+
+            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "Creatures/natural-weapon-claw.bmp", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&b", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&b", true);
+            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "B", true);
+        }
+        public UD_ManagedCrystallinity(
+            Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods, 
+            UD_ManagedCrystallinity NewParent)
             : this()
         {
-            NaturalWeaponSubpart = new(naturalWeaponSubpart, NewParent);
+            Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NewNaturalEquipmentMods = new();
+            foreach ((string BodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in NaturalEquipmentMods)
+            {
+                ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+                NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
+            }
+            this.NaturalEquipmentMods = NewNaturalEquipmentMods;
         }
 
-        public virtual NaturalWeaponSubpart<UD_ManagedCrystallinity> GetNaturalWeaponSubpart(
-            string Type = "",
-            GameObject Object = null,
-            BodyPart BodyPart = null)
+        public UD_ManagedCrystallinity(
+            ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, 
+            UD_ManagedCrystallinity NewParent)
+            : this()
         {
-            if (Type != "")
-            {
-                if (Type == NaturalWeaponSubpart?.Type)
-                    return NaturalWeaponSubpart;
-                if (NaturalWeaponSubparts.ContainsKey(Type))
-                    return NaturalWeaponSubparts[Type];
-            }
-            if (Object?.Equipped?.Body != null)
-            {
-                foreach (BodyPart part in Object.Equipped.Body.LoopParts())
-                {
-                    if (Object.IsDefaultEquipmentOf(part) || (part.Equipped == Object && Object.HasPart<NaturalEquipment>()))
-                    {
-                        Type = part.Type;
-                        if (Type == NaturalWeaponSubpart?.Type)
-                            return NaturalWeaponSubpart;
-                        if (NaturalWeaponSubparts.ContainsKey(Type))
-                            return NaturalWeaponSubparts[Type];
-                    }
-                }
-            }
-            if (BodyPart != null)
-            {
-                Type = BodyPart.Type;
-                if (Type == NaturalWeaponSubpart?.Type)
-                    return NaturalWeaponSubpart;
-                if (NaturalWeaponSubparts.ContainsKey(Type))
-                    return NaturalWeaponSubparts[Type];
-            }
-            return null;
-        }
-        public virtual string GetNaturalWeaponModName(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
-        {
-            return NaturalWeaponSubpart.GetNaturalWeaponModName(Managed);
-        }
-        public virtual ModNaturalWeaponBase<UD_ManagedCrystallinity> GetNaturalWeaponMod(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, bool Managed = true)
-        {
-            ModNaturalWeaponBase<UD_ManagedCrystallinity> NaturalWeaponMod = NaturalWeaponSubpart.GetNaturalWeaponMod(Managed);
-            NaturalWeaponMod.NaturalWeaponSubpart = NaturalWeaponSubpart;
-            NaturalWeaponMod.AssigningPart = this;
-            NaturalWeaponMod.Wielder = ParentObject;
-            return NaturalWeaponMod;
+            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
-        public virtual bool ProcessNaturalWeaponAddedParts(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, string Parts)
+        public UD_ManagedCrystallinity(
+            Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods,
+            ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, 
+            UD_ManagedCrystallinity NewParent)
+            : this(NaturalEquipmentMods, NewParent)
+        {
+            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
+        }
+
+        public UD_ManagedCrystallinity(Crystallinity Crystallinity)
+            : this()
+        {
+            Level = Crystallinity.Level;
+            RefractAdded = Crystallinity.RefractAdded;
+        }
+
+        public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Parts)
         {
             if (Parts == null) return false;
-            NaturalWeaponSubpart.AddedParts ??= new();
+            NaturalEquipmentMod.AddedParts ??= new();
             string[] parts = Parts.Split(',');
             foreach (string part in parts)
             {
-                NaturalWeaponSubpart.AddedParts.Add(part);
+                NaturalEquipmentMod.AddedParts.Add(part);
             }
             return true;
         }
-
-        public virtual bool ProcessNaturalWeaponAddedProps(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, string Props)
+        public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
             if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
             {
-                NaturalWeaponSubpart.AddedStringProps = StringProps;
-                NaturalWeaponSubpart.AddedIntProps = IntProps;
+                NaturalEquipmentMod.AddedStringProps = StringProps;
+                NaturalEquipmentMod.AddedIntProps = IntProps;
             }
             return true;
         }
 
-        public virtual bool ProcessNaturalWeaponAddedParts(string Parts)
+        public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
         {
-            if (Parts == null) return false;
-            NaturalWeaponSubpart.AddedParts ??= new();
-            string[] parts = Parts.Split(',');
-            foreach (string part in parts)
-            {
-                NaturalWeaponSubpart.AddedParts.Add(part);
-            }
-            return true;
+            return 0;
         }
-
-        public virtual bool ProcessNaturalWeaponAddedProps(string Props)
-        {
-            if (Props == null) return false;
-            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
-            {
-                NaturalWeaponSubpart.AddedStringProps = StringProps;
-                NaturalWeaponSubpart.AddedIntProps = IntProps;
-            }
-            return true;
-        }
-
-        public virtual int GetNaturalWeaponDamageDieCount(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
-        {
-            return NaturalWeaponSubpart.DamageDieCount;
-        }
-
-        public virtual int GetNaturalWeaponDamageDieSize(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasBurrowing))
-                return 0;
-            return 1;
+                return 1;
+            return 2;
         }
-
-        public virtual int GetNaturalWeaponDamageBonus(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasBurrowing))
             {
@@ -218,122 +187,201 @@ namespace XRL.World.Parts.Mutation
             }
             return 0;
         }
-
-        public virtual int GetNaturalWeaponHitBonus(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponHitBonus(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
         {
-            return NaturalWeaponSubpart.HitBonus;
+            return 0;
+        }
+        public virtual int GetNaturalWeaponPenBonus(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level = 1)
+        {
+            return 0;
         }
 
-        public virtual List<string> GetNaturalWeaponAddedParts(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
+        public virtual List<string> GetNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
         {
-            return NaturalWeaponSubpart.AddedParts;
+            return NaturalEquipmentMod.AddedParts;
+        }
+        public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
+        {
+            return NaturalEquipmentMod.AddedStringProps;
+        }
+        public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
+        {
+            return NaturalEquipmentMod.AddedIntProps;
         }
 
-        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
+        public override bool Mutate(GameObject GO, int Level)
         {
-            return NaturalWeaponSubpart.AddedStringProps;
+            GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
+            return base.Mutate(GO, Level);
+        }
+        public override bool Unmutate(GameObject GO)
+        {
+            GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
+            return base.Unmutate(GO);
         }
 
-        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps(NaturalWeaponSubpart<UD_ManagedCrystallinity> NaturalWeaponSubpart)
+        public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level)
         {
-            return NaturalWeaponSubpart.AddedIntProps;
-        }
+            Debug.Entry(4,
+                $"* {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(UD_ManagedCrystallinity).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
+                Indent: 2);
 
-        public virtual List<string> GetNaturalWeaponAddedParts()
-        {
-            return NaturalWeaponSubpart.AddedParts;
-        }
-
-        public virtual Dictionary<string, string> GetNaturalWeaponAddedStringProps()
-        {
-            return NaturalWeaponSubpart.AddedStringProps;
-        }
-
-        public virtual Dictionary<string, int> GetNaturalWeaponAddedIntProps()
-        {
-            return NaturalWeaponSubpart.AddedIntProps;
-        }
-
-        public virtual string GetNaturalWeaponEquipmentFrameColors()
-        {
-            return NaturalWeaponSubpart.EquipmentFrameColors;
-        }
-
-        public virtual bool UpdateNaturalWeaponSubpart(NaturalWeaponSubpart<UD_ManagedCrystallinity> Subpart, int Level)
-        {
-            Subpart.Level = Level;
-            Subpart.DamageDieCount = GetNaturalWeaponDamageDieCount(Subpart, Level);
-            Subpart.DamageDieSize = GetNaturalWeaponDamageDieSize(Subpart, Level);
-            Subpart.DamageBonus = GetNaturalWeaponDamageBonus(Subpart, Level);
-            Subpart.HitBonus = GetNaturalWeaponHitBonus(Subpart, Level);
+            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
+            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
             return true;
         }
-
         public override bool ChangeLevel(int NewLevel)
         {
-            foreach ((_, NaturalWeaponSubpart<UD_ManagedCrystallinity> Subpart) in NaturalWeaponSubparts)
-            {
-                UpdateNaturalWeaponSubpart(Subpart, NewLevel);
-            }
-            if (NaturalWeaponSubpart != null) UpdateNaturalWeaponSubpart(NaturalWeaponSubpart, NewLevel);
             return base.ChangeLevel(NewLevel);
         }
-        public virtual bool ProcessNaturalWeaponSubparts(Body body, bool CosmeticOnly = false)
+
+        public virtual bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
-            if (body != null)
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(ProcessNaturalEquipment)}",
+                Indent: 1);
+
+            string targetType = TargetBodyPart.Type;
+            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2);
+            ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = null;
+            if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
             {
-                List<BodyPart> partsList = body.GetParts(EvenIfDismembered: true);
-                foreach (BodyPart part in partsList)
-                {
-                    ModNaturalWeaponBase<UD_ManagedCrystallinity> modNaturalWeapon = null;
-                    if (NaturalWeaponSubpart != null && part.Type == NaturalWeaponSubpart.Type && NaturalWeaponSubpart.IsCosmeticOnly() == CosmeticOnly)
-                    {
-                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubpart);
-                    }
-                    else if (NaturalWeaponSubparts.ContainsKey(part.Type) && NaturalWeaponSubparts[part.Type].IsCosmeticOnly() == CosmeticOnly)
-                    {
-                        modNaturalWeapon = GetNaturalWeaponMod(NaturalWeaponSubparts[part.Type]);
-                    }
-
-                    if (modNaturalWeapon == null) continue;
-
-                    if (part.DefaultBehavior != null)
-                    {
-                        part.DefaultBehavior.ApplyModification(modNaturalWeapon, Actor: ParentObject);
-                    }
-                    else if (part.Equipped != null && part.Equipped.HasPart<NaturalEquipment>())
-                    {
-                        part.Equipped.ApplyModification(modNaturalWeapon, Actor: ParentObject);
-                    }
-                }
+                naturalEquipmentMod = new(NaturalEquipmentMod);
+                Debug.CheckYeh(4, $"naturalEquipmentMod for this BodyPart contained in Property", Indent: 2);
             }
+            else if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
+            {
+                naturalEquipmentMod = new(NaturalEquipmentMods[targetType]);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No NaturalEquipmentMod for this BodyPart", Indent: 3);
+            }
+            if (naturalEquipmentMod != null)
+            {
+                Debug.Entry(4, $"NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2);
+                Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
+            }
+            Debug.Entry(4,
+                $"x {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(ProcessNaturalEquipment)} @//",
+                Indent: 1);
             return true;
         }
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            if (body != null)
-                ProcessNaturalWeaponSubparts(body, CosmeticOnly: false);
-            // skip base
+            // base.OnRegenerateDefaultEquipment(body);
         }
         public override void OnDecorateDefaultEquipment(Body body)
         {
-            if (body != null)
-                ProcessNaturalWeaponSubparts(body, CosmeticOnly: true);
-
             base.OnDecorateDefaultEquipment(body);
+        }
+        public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
+        {
+            Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
+            string InstanceObjectZoneID = "[Pre-build]";
+            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
+            Debug.Header(4, $"{typeof(UD_ManagedCrystallinity).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
+            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            ProcessNaturalEquipment(Manager, TargetBodyPart);
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+
+            Debug.Footer(4,
+                $"{typeof(UD_ManagedCrystallinity).Name}",
+                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject?.Blueprint})");
+        }
+        public virtual void OnUpdateNaturalEquipmentMods()
+        {
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            foreach ((_, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in NaturalEquipmentMods)
+            {
+                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            }
+            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == ManageDefaultEquipmentEvent.ID
+                || ID == UpdateNaturalEquipmentModsEvent.ID;
+        }
+        public bool HandleEvent(ManageDefaultEquipmentEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                Indent: 0);
+
+            if (E.Wielder == ParentObject)
+            {
+                OnManageNaturalEquipment(E.Manager, E.BodyPart);
+            }
+            return base.HandleEvent(E);
+        }
+        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E)",
+                Indent: 0);
+
+            if (E.Actor == ParentObject)
+            {
+                OnUpdateNaturalEquipmentMods();
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforeMutationAdded");
+            Registrar.Register("MutationAdded");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "BeforeMutationAdded")
+            {
+                GameObject Actor = E.GetParameter("Object") as GameObject;
+                string Mutation = E.GetParameter("Mutation") as string;
+                if (Actor == ParentObject)
+                {
+                    // Do Code?
+                }
+            }
+            else if (E.ID == "MutationAdded")
+            {
+                GameObject Actor = E.GetParameter("Object") as GameObject;
+                string Mutation = E.GetParameter("Mutation") as string;
+                if (Actor == ParentObject)
+                {
+                    // ProcessNaturalEquipment(Actor?.Actor);
+                }
+            }
+            return base.FireEvent(E);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            UD_ManagedCrystallinity managedCrystallinity = base.DeepCopy(Parent, MapInv) as UD_ManagedCrystallinity;
-            managedCrystallinity.NaturalWeaponSubparts = new();
-            foreach ((_, NaturalWeaponSubpart<UD_ManagedCrystallinity> subpart) in NaturalWeaponSubparts)
+            UD_ManagedCrystallinity mutation = base.DeepCopy(Parent, MapInv) as UD_ManagedCrystallinity;
+            mutation.NaturalEquipmentMods = new();
+            foreach ((string bodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                managedCrystallinity.NaturalWeaponSubparts.Add(subpart.Type, new(subpart, managedCrystallinity));
+                mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, mutation));
             }
-            managedCrystallinity.NaturalWeaponSubpart = new(NaturalWeaponSubpart, managedCrystallinity);
-            return managedCrystallinity;
+            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, mutation);
+            return mutation;
         }
-    }
+    } //!-- public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>
 }

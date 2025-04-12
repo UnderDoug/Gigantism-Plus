@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
 using XRL.World.Parts.Mutation;
 using XRL.Language;
-using System.Text;
+
+using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
+    public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
     {
         public ModBurrowingNaturalWeapon()
         {
@@ -16,23 +22,57 @@ namespace XRL.World.Parts
             : base(Tier)
         {
         }
+        public ModBurrowingNaturalWeapon(ModNaturalEquipmentBase Conversion)
+            : this()
+        {
+            Wielder = Conversion.Wielder;
+
+            Adjustments = new();
+            foreach (Adjustment adjustment in Conversion.Adjustments)
+            {
+                Adjustments.Add(adjustment);
+            }
+
+            BodyPartType = Conversion.BodyPartType;
+
+            ModPriority = Conversion.ModPriority;
+            DescriptionPriority = Conversion.DescriptionPriority;
+
+            DamageDieCount = Conversion.DamageDieCount;
+            DamageDieSize = Conversion.DamageDieSize;
+            DamageBonus = Conversion.DamageBonus;
+            HitBonus = Conversion.HitBonus;
+            PenBonus = Conversion.PenBonus;
+
+            Adjective = Conversion.Adjective;
+            AdjectiveColor = Conversion.AdjectiveColor;
+            AdjectiveColorFallback = Conversion.AdjectiveColorFallback;
+
+            AddedParts = new();
+            foreach (string addedPart in Conversion.AddedParts)
+            {
+                AddedParts.Add(addedPart);
+            }
+            AddedStringProps = new();
+            foreach ((string prop, string value) in Conversion.AddedStringProps)
+            {
+                AddedStringProps[prop] = value;
+            }
+            AddedIntProps = new();
+            foreach ((string prop, int value) in Conversion.AddedIntProps)
+            {
+                AddedIntProps[prop] = value;
+            }
+        }
 
         public override void ApplyModification(GameObject Object)
         {
-            /*
-            ApplyGenericChanges(Object, NaturalWeaponSubpart, GetInstanceDescription());
-
-            ApplyPriorityChanges(Object, NaturalWeaponSubpart);
-
-            ApplyPartAndPropChanges(Object, NaturalWeaponSubpart);
-            */
-
             base.ApplyModification(Object);
 
             Object.RequirePart<BurrowingClawsProperties>();
             BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
-            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level);
-            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(Level);
+            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(AssigningPart.Level);
 
         }
         public override bool WantEvent(int ID, int cascade)
@@ -43,36 +83,37 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            if (!E.Object.HasProperName)
-            {
-                E.AddAdjective(NaturalWeaponSubpart.GetColoredAdjective(), NaturalWeaponSubpart.AdjectivePriority);
-            }
             return base.HandleEvent(E);
         }
 
-        public new string GetInstanceDescription()
+        public override string GetInstanceDescription()
         {
-            string text = "weapon";
-            string descriptionName = Grammar.MakeTitleCase(NaturalWeaponSubpart.GetColoredAdjective());
-            int dieSizeIncrease = GetDamageDieSize();
-            string wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(Level).Signed();
-            int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(Level, Wielder);
+            string text = ParentObject.GetObjectNoun();
+            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
+            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
+            int dieSize = GetDamageDieSize(); 
+            int wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
+            string description = $"{descriptionName}: ";
+            description += ParentObject.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
 
-            StringBuilder stringBuilder = Event.NewStringBuilder().Append(descriptionName).Append(": ")
-                .Append($"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has ");
+            List<List<string>> descriptions = new();
+            if (dieSize != 0) descriptions
+                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+            if (wallBonusPenetration != 0) descriptions
+                    .Add(new() { "get", $"{wallBonusPenetration.Signed()} penetration vs. walls" });
+            if (wallHitsRequired != 0) descriptions
+                    .Add(new() { "destroy", $"walls after {wallHitsRequired} penetrating hits" });
 
-            if (dieSizeIncrease > 0)
+            List<string> processedDescriptions = new();
+            foreach (List<string> entry in descriptions)
             {
-                stringBuilder.Append(dieSizeIncrease.Signed()).Append($" to {ParentObject.theirs} damage die size").Append(wallHitsRequired > 0 ? ", " : " and ");
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
             }
-            stringBuilder.Append(wallBonusPenetration).Append(" penetration vs. walls").Append(dieSizeIncrease > 0 ? ", " : " ")
-                .Append(wallHitsRequired > 0 ? "and " : ".");
 
-            if (wallHitsRequired > 0)
-            {
-                stringBuilder.Append("destroys walls after ").Append(wallHitsRequired).Append(" penetrating hits.");
-            }
-            return Event.FinalizeString(stringBuilder);
+            return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
     } //!-- public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>
 }

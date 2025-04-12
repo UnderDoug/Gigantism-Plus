@@ -1,23 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using XRL;
 using XRL.World;
 using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+
+using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 namespace HNPS_GigantismPlus
 {
     public static class Debug
     {
-        public const string VANDR = "\u251C"; // ├
-        public const string VONLY = "\u2502"; // │
-        public const string TANDR = "\u2514"; // └
-        public const string HONLY = "\u2500"; // ─
-        public const string SPACE = "\u0020"; //" "
-
-        public const string ITEM = VANDR + HONLY + HONLY + SPACE; // "├── "
-        public const string BRAN = VONLY + SPACE + SPACE + SPACE; // "│   "
-        public const string LAST = TANDR + HONLY + HONLY + SPACE; // "└── "
-        public const string DIST = SPACE + SPACE + SPACE + SPACE; // "    "
-
         private static int VerbosityOption => Options.DebugVerbosity;
         // Verbosity translates in roughly the following way:
         // 0 : Critical. Use sparingly, if at all, as they show up without the option. Move these to 1 when pushing to main.
@@ -87,15 +83,17 @@ namespace HNPS_GigantismPlus
 
         public static void Header(int Verbosity, string ClassName, string MethodName)
         {
-            Divider(Verbosity);
+            string divider = "\u2550"; // ═ (box drawing, double horizontal)
+            Divider(Verbosity, divider);
             string output = "@START: " + ClassName + "." + MethodName;
             Entry(Verbosity, output);
         }
         public static void Footer(int Verbosity, string ClassName, string MethodName)
         {
+            string divider = "\u2550"; // ═ (box drawing, double horizontal)
             string output = "///END: " + ClassName + "." + MethodName + " !//";
             Entry(Verbosity, output);
-            Divider(Verbosity);
+            Divider(Verbosity, divider);
         }
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0)
@@ -210,12 +208,13 @@ namespace HNPS_GigantismPlus
             return MeleeWeapon;
         }
 
-        public static NaturalWeaponSubpart<T> Vomit<T>(this NaturalWeaponSubpart<T> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
-            where T : IPart, IManagedDefaultNaturalWeapon<T>, new()
+        /*
+        public static NaturalEquipmentSubpart<E> Vomit<E>(this NaturalEquipmentSubpart<E> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
+            where E : IPart, IManagedDefaultNaturalEquipment<E>, new()
         {
             string title = Title == null ? "" : $"{Title}:";
             GameObject Creature = Subpart.ParentPart?.ParentObject;
-            Entry(Verbosity, $"% Vomit: NaturalWeaponSubpart<{typeof(T).Name}> of {Creature?.Blueprint} {title}", Indent: Indent);
+            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.HandsBlueprint} {title}", Indent: Indent);
             List<string> @default = new()
             {
                 "Meta",
@@ -318,6 +317,36 @@ namespace HNPS_GigantismPlus
             }
             return Subpart;
         }
+        */
+
+        public static bool WasEventHandlerRegistered<H, E>(this XRLGame Game)
+            where H : IEventHandler
+            where E : MinEvent, new()
+        {
+            bool flag = false;
+            E e = new();
+            if (Game != null && Game.RegisteredEvents.ContainsKey(e.ID))
+            {
+                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
+                flag = true;
+            }
+            else if (Game != null)
+            {
+                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
+            }
+            else
+            {
+                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
+            }
+            return flag;
+        }
+        public static bool WasModEventHandlerRegistered<H, E>(this XRLGame Game)
+            where H : IEventHandler, IModEventHandler<E>
+            where E : MinEvent, new()
+        {
+            return Game.WasEventHandlerRegistered<H, E>();
+        }
+
         public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)
         {
             string Output = Label != "" ? $"{Label}: {@string}" : @string;
@@ -338,6 +367,92 @@ namespace HNPS_GigantismPlus
             if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
             else Entry(Verbosity, Output, Indent: Indent);
             return @bool;
+        }
+        public static List<T> Vomit<T>(this List<T> List, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+            where T : Type
+        {
+            string Output = Label != "" ? $"{Label}: {nameof(List)}" : $"{nameof(List)}";
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Output, Indent: Indent);
+            foreach (T item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent+1);
+                else Entry(Verbosity, item.ToString(), Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<object> Vomit(this List<object> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (object item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<MutationEntry> Vomit(this List<MutationEntry> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (MutationEntry item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Mutation.Name}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.Mutation.Name}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<MutationCategory> Vomit(this List<MutationCategory> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (MutationCategory item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Name}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.Name}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<GameObject> Vomit(this List<GameObject> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (GameObject item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.DebugName}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.DebugName}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (BaseMutation item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
+        }
+        public static List<Adjustment> Vomit(this List<Adjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
+            else Entry(Verbosity, Label, Indent: Indent);
+            foreach (Adjustment item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
+                else Entry(Verbosity, $"{item}", Indent: Indent + 1);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            return List;
         }
     } //!-- public static class Debug
 }

@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using ConsoleLib.Console;
+
 using XRL.Rules;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
-using HNPS_GigantismPlus;
 using XRL.Wish;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using XRL.World.Skills.Cooking;
+using XRL.Core;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -24,15 +30,22 @@ namespace XRL.World.ObjectBuilders
             DieRoll = "1d3";
         }
 
-        public override void Apply(GameObject Object, string Context)
+        public static string GetNamePrefix()
+        {
+            Gigantified gigantified = new();
+            gigantified.Initialize();
+            return gigantified.NamePrefix;
+        }
+
+        public override void Apply(GameObject Object, string Context = "")
         {
             int Level = ExplodingDie(1, DieRoll, Step: 2, Limit: 16, Indent: 2);
             int objectTier = (int)Math.Floor(Object.GetBlueprint().Stat("Level") / 5.0);
             int Tier = ExplodingDie(objectTier, DieRoll, Step: 1, Limit: 8, Indent: 2);
-            Gigantify(Object, Level, Tier, NamePrefix);
+            Gigantify(Object, Level, Tier, NamePrefix, Context);
         }
 
-        public static void Gigantify(GameObject Object, int Level = 1, int Tier = 1, string NamePrefix = "")
+        public static void Gigantify(GameObject Object, int Level = 1, int Tier = 1, string NamePrefix = "", string Context = "")
         {
             Debug.Header(4, 
                 $"{nameof(Gigantified)}", 
@@ -53,14 +66,6 @@ namespace XRL.World.ObjectBuilders
 
                 mutations.AddMutation(new GigantismPlus(), Level);
 
-                Render render = Object.Render;
-                string text = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor;
-                render.ColorString = "&z";
-                render.TileColor = "&z";
-                if (render.DetailColor == "z")
-                {
-                    render.DetailColor = ColorUtility.FindLastForeground(text)?.ToString() ?? Crayons.GetRandomColor();
-                }
                 if (!NamePrefix.IsNullOrEmpty())
                 {
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
@@ -106,7 +111,7 @@ namespace XRL.World.ObjectBuilders
                 GameObject exoframeObject = GameObjectFactory.create(exoframe);
                 CyberneticsGiganticExoframe exoframeCybernetic = exoframeObject.GetPart<CyberneticsGiganticExoframe>();
 
-                NamePrefix = exoframeCybernetic.GetShortAugmentAdjective();
+                NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
 
                 Render render = Object.Render;
                 string tileColor = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor; ;

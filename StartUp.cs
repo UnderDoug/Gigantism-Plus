@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
+
 using XRL;
 using XRL.Core;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
@@ -15,16 +18,18 @@ namespace HNPS_GigantismPlus
     {
         public void mutate(GameObject player)
         {
-            GameObject GO = player;
-            Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
+            Debug.Header(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {player.DebugName})");
 
-            GO.GigantifyInventory(EnableGiganticStartingGear, EnableGiganticStartingGear_Grenades);
+            if (player.HasPart<GigantismPlus>())
+            {
+                player.GigantifyInventory(EnableGiganticStartingGear, EnableGiganticStartingGear_Grenades);
+            }
 
-            Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {GO.DebugName})");
+            Debug.Footer(3, "GigantifyStartingLoadout", $"mutate(GameObject player: {player.DebugName})");
         }
     }
 
-    public class GiganticModifierAdjustments
+    public class Gigantic_ModEntry_Adjustments
     {
         public static void AdjustGiganticModifier()
         {
@@ -99,7 +104,7 @@ namespace HNPS_GigantismPlus
                     // - only works if you flush it first since the "get" function checks if the _list is empty first
                     //   and if it isn't just returns it.
                     // - it's probably NOT good, and could pose compatability issues with other mods if they do things
-                    //   post Blueprint pre-load, but I'm not nearly experienced enough to know what issues exactly.
+                    //   post HandsBlueprint pre-load, but I'm not nearly experienced enough to know what issues exactly.
                     TinkerData._TinkerRecipes.RemoveAll(r => r != null); 
                     Debug.Entry(2, "TinkerData._TinkerRecipes.RemoveAll(r => r != null);", Indent: 5);
 
@@ -120,7 +125,7 @@ namespace HNPS_GigantismPlus
             Exit:
             Debug.Entry(3, "x GiganticModifierAdjustments.AdjustGiganticModifier() @//", Indent: 1);
         }
-    } //!--- public class GiganticModifierAdjustments
+    } //!--- public class Gigantic_ModEntry_Adjustments
 
     [HasModSensitiveStaticCache]
     public static class GigantismPlusModBasedInitialiser
@@ -130,19 +135,20 @@ namespace HNPS_GigantismPlus
         {
             // Called at game startup and whenever mod configuration changes
         }
-    }
+    } //!-- public static class GigantismPlusModBasedInitialiser
 
     [HasGameBasedStaticCache]
     public static class GigantismPlusGameBasedInitialiser
     {
+        public static bool GameLevelEventsRegistered = false;
+
         [GameBasedCacheInit]
         public static void AdditionalSetup()
         {
+            // Called once when world is first generated.
             Debug.Header(3, 
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
                 $"{nameof(AdditionalSetup)}()");
-            
-            GiganticModifierAdjustments.AdjustGiganticModifier();
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -152,18 +158,24 @@ namespace HNPS_GigantismPlus
                 : EnableManagedVanillaMutationsCurrent;
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             ManagedVanillaMutationOptionHandler();
-            
+
+            if (!GameLevelEventsRegistered)
+            {
+                GameLevelEventsRegistered = RegisterGameLevelEventHandlers();
+            }
+
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
                 $"{nameof(AdditionalSetup)}()");
         }
-    }
+    } //!-- public static class GigantismPlusGameBasedInitialiser
 
     [PlayerMutator]
     public class GigantismPlusOnPlayerLoad : IPlayerMutator
     {
         public void mutate(GameObject player)
         {
+            // Gets called once when the player is first generated
             Debug.Header(3, 
                 $"{nameof(GigantismPlusOnPlayerLoad)}", 
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
@@ -206,7 +218,7 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnPlayerLoad)}",
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
         }
-    } //!--- public class OnPlayerLoad : IPlayerMutator
+    } //!-- public class GigantismPlusOnPlayerLoad : IPlayerMutator
 
     [HasCallAfterGameLoaded]
     public class GigantismPlusOnLoadGameHandler
@@ -214,9 +226,15 @@ namespace HNPS_GigantismPlus
         [CallAfterGameLoaded]
         public static void OnLoadGameCallback()
         {
+            // Gets called every time the game is loaded but not during generation
             Debug.Header(3,
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",
                 $"{nameof(OnLoadGameCallback)}()");
+
+            if (!GigantismPlusGameBasedInitialiser.GameLevelEventsRegistered)
+            {
+                RegisterGameLevelEventHandlers();
+            }
 
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
@@ -255,5 +273,5 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",
                 $"{nameof(OnLoadGameCallback)}()");
         }
-    } //!--- public class OnLoadGameHandler
+    } //!-- public class GigantismPlusOnLoadGameHandler
 }

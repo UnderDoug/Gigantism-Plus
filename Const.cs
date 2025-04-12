@@ -31,7 +31,7 @@ namespace HNPS_GigantismPlus
         public const string SECRET_GIANTLOCATION_CATEGORY = "Oddities";
         public const string SECRET_GIANTCONVSCRIPT_ID = "HNPS_Giant_KnowsHowToCook_Convo";
         public const string SECRET_GIANTPREDESC_REPLACE = "::CREATURE::";
-        public const string SECRET_GIANTPREDESC = "A creature of immensity mounts the upper eyeline. Deep sonorous tones reverberate gently off the very ground and ring subsonically from every improvised antenna jutting crudely out of it. Amidst the rumbling, a sonnet emerges in a language old as life, of home-sick stones traversing mountain-ranges, of oceans whittling shorelines, and of ancient wood giving way to time's inevitable arrival. As distance dwindles, the behemoth's shape begins to resolve... A " + SECRET_GIANTPREDESC_REPLACE + ", in every way, except an order of magnitude greater in size...\n\n";
+        public const string SECRET_GIANTPREDESC = "A creature of immensity mounts the upper eyeline. Deep sonorous tones reverberate gently off the very ground and ring subsonically from every improvised antenna jutting crudely out of it. Amidst the rumbling, a sonnet emerges in a language old as life, of home-sick stones traversing mountain-ranges, of oceans whittling shorelines, and of ancient wood giving way to time's inevitable arrival. As distance dwindles, the behemoth's shape begins to resolve... " + SECRET_GIANTPREDESC_REPLACE + ", in every way, except an order of magnitude greater in size...\n\n";
         public const string SECRET_GIANTRECIPE = "SeriouslyThickStew";
         
         // Absent from such enormity is the deep, primal desire to flee such boundless heft is prone to inspire in "; 

@@ -7,6 +7,7 @@ using XRL.World.Parts.Mutation;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using System.Collections.Generic;
+using XRL.World.Anatomy;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -46,15 +47,21 @@ namespace HNPS_GigantismPlus.Harmony
                         Debug.LoopItem(4, $"inventoryObject.Blueprint", $"{inventoryObject.Blueprint}", Indent: 4);
                         if (TryGetGameObjectBlueprint(inventoryObject.Blueprint, out GameObjectBlueprint itemBlueprint))
                         {
-                            if (itemBlueprint.HasPart("NaturalEquipment") || itemBlueprint.HasTagOrProperty("NaturalGear"))
+                            if (itemBlueprint.IsNatural())
                             {
-                                Debug.CheckYeh(4, $"Item has NaturalEquipment or NaturalGear", Indent: 4);
+                                Debug.CheckYeh(4, $"Item is Natural", Indent: 4);
+                                List<BodyPart> bodyParts = new();
+                                string targetType = itemBlueprint.GetPartParameter<string>(nameof(Armor), "WornOn") ?? itemBlueprint.GetPartParameter<string>(nameof(MeleeWeapon), "Slot");
+                                foreach (BodyPart part in @this.LoopPart(targetType))
+                                {
+                                    if (!part.Equipped.Is(null) && part.Equipped.IsNatural());
+                                }
                                 ParentObject.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(itemBlueprint));
                                 doReequip = true;
                             }
                             else
                             {
-                                Debug.CheckNah(4, $"Item has neither NaturalEquipment or NaturalGear", Indent: 4);
+                                Debug.CheckNah(4, $"Item is not Natural", Indent: 4);
                             }
                         }
                     }

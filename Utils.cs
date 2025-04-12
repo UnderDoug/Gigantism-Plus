@@ -14,14 +14,32 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.Language;
+using XRL.World.Text.Delegates;
+using XRL.World.Text.Attributes;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
+    [HasVariableReplacer]
     public static class Utils
     {
+        [VariableReplacer]
+        public static string nbsp(DelegateContext Context)
+        {
+            string nbsp = "\xFF";
+            string output = nbsp;
+            if (!Context.Parameters.IsNullOrEmpty() && int.TryParse(Context.Parameters[0], out int count))
+            {
+                for (int i = 1; i < count; i++)
+                {
+                    output += nbsp;
+                }
+            }
+            return output;
+        }
+
         public static bool RegisterGameLevelEventHandlers()
         {
             Debug.Entry(1, $"Registering XRLGame Event Handlers...", Indent: 1);

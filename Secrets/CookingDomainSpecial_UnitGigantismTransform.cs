@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using ConsoleLib.Console;
 
 using XRL;
+using XRL.UI;
 using XRL.World;
 using XRL.World.WorldBuilders;
 using XRL.World.ZoneBuilders;
@@ -11,16 +13,14 @@ using static XRL.World.ZoneBuilderPriority;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.Language;
 using XRL.Names;
 using Qud.API;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.Language;
-using XRL.UI;
 using HNPS_GigantismPlus;
-using ConsoleLib.Console;
 
 namespace XRL.World.Effects
 {
@@ -50,12 +50,11 @@ namespace XRL.World.Effects
             ", =name= ate, and ate, and ate, satisfying a serious hankering.",
         };
 
-        public static string PlayerName = The.Player.BaseDisplayNameStripped;
         public static string JournalGospelInfix =
             $"<spice.instancesOf.inYear.!random.capitalize> =year=, " + 
-            $"<spice.instancesOf.afterTumultuousYears.!random>, {Grammar.MakePossessive(PlayerName)} counselors suggested " + 
-            $"{The.Player.GetPronounProvider().Subjective} <spice.instancesOf.abdicate.!random> as sultan. " +
-            $"Instead, {The.Player.GetPronounProvider().Subjective} ate a meal and ";
+            $"<spice.instancesOf.afterTumultuousYears.!random>, =player.possessive= counselors suggested " + 
+            $"=player.subjective= <spice.instancesOf.abdicate.!random> as sultan. " +
+            $"Instead, =player.subjective= ate a meal and ";
         public static List<string> JournalGospelSuffixs = new()
         {
             $"achieved massive gains.",

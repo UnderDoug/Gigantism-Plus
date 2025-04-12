@@ -21,6 +21,9 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using XRL.World.Capabilities;
+using XRL.World.Skills.Cooking;
+using XRL.Language;
+using XRL.World.Conversations;
 
 namespace HNPS_GigantismPlus
 {
@@ -39,7 +42,7 @@ namespace HNPS_GigantismPlus
 
             string giantName = NameStyles.Generate(Culture: "Giant");
 
-            Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: false);
+            Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
             SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
 
             if (JournalAPI.GetMapNote(SECRET_GIANTID).Is(null))
@@ -58,9 +61,10 @@ namespace HNPS_GigantismPlus
             ZoneManager zoneManager = The.ZoneManager;
 
             zoneManager.AddZoneBuilder(SecretZoneId, NORMAL, nameof(Connecter));
+            // zoneManager.AddZoneBuilder(SecretZoneId, NORMAL + ADJUST_MEDIUM, nameof(Weald));
             zoneManager.AddZoneBuilder(SecretZoneId, MID, nameof(RoadBuilder));
-            zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(OverlandRuins));
-            zoneManager.AddZoneBuilder(SecretZoneId, LATE + ADJUST_MEDIUM, nameof(Connecter));
+            zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(AbandonedSettlementUnder));
+            // zoneManager.AddZoneBuilder(SecretZoneId, LATE + ADJUST_MEDIUM, nameof(Connecter));
 
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(PopTableZoneBuilder));
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(Population));
@@ -70,8 +74,9 @@ namespace HNPS_GigantismPlus
                 => EncountersAPI.IsLegendaryEligible(blueprint)
                 && (blueprint.HasPart("Body") || blueprint.HasTagOrProperty("BodySubstitute"))
                 && (blueprint.HasPart("Combat") || blueprint.HasTagOrProperty("BodySubstitute"))
-                && !blueprint.HasPart("NoLibrarian")
-                && !blueprint.HasPart("ExcludeFromVillagePopulations")
+                && new Faction(blueprint.GetPrimaryFaction()).Old
+                && !blueprint.HasTag("NoLibrarian")
+                && !blueprint.HasTag("ExcludeFromVillagePopulations")
                 && !blueprint.DescendsFrom("BaseTrueKin")
                 && !(blueprint.TryGetTag("Species", out string species) && species.Is("mecha")));
 
@@ -94,29 +99,30 @@ namespace HNPS_GigantismPlus
             if (creatureBlueprint.Tags.ContainsKey("staticFaction3")) creatureBlueprint.Tags.Remove("staticFaction3");
 
             if (!creatureBlueprint.Tags.ContainsKey("SharesRecipe")) creatureBlueprint.Tags.Add("SharesRecipe", "");
-            if (!creatureBlueprint.Tags.ContainsKey("SharesRecipeText")) creatureBlueprint.Tags.Add("SharesRecipeText", "");
-            if (!creatureBlueprint.Tags.ContainsKey("SharesRecipeWithTrueKin")) creatureBlueprint.Tags.Add("SharesRecipeWithTrueKin", "");
+            // if (!creatureBlueprint.Tags.ContainsKey("SharesRecipeText")) creatureBlueprint.Tags.Add("SharesRecipeText", "");
+            // if (!creatureBlueprint.Tags.ContainsKey("SharesRecipeWithTrueKin")) creatureBlueprint.Tags.Add("SharesRecipeWithTrueKin", "");
 
+            /*
             List<string> giantRecipeAsk = new()
             {
                 $"I've got a serious hankering for that stew, {giantName}.\n",
                 $"Please, {giantName}, I need to know how you got swole!\n",
                 $"Impressive gains, {giantName}. What's the secret?\n",
             };
-            creatureBlueprint.Tags["SharesRecipe"] = SECRET_GIANTRECIPE;
-            creatureBlueprint.Tags["SharesRecipeText"] = giantRecipeAsk.GetRandomElement();
-            creatureBlueprint.Tags["SharesRecipeWithTrueKin"] = "false";
+            */
 
+            creatureBlueprint.RemovePart(typeof(HasGuards).Name);
+            creatureBlueprint.RemovePart(typeof(HasThralls).Name);
+            creatureBlueprint.RemovePart(typeof(HasSlaves).Name);
+            creatureBlueprint.RemovePart(typeof(Followers).Name);
             // Could possibly look at gigantifying them instead...
+            /*
             creatureBlueprint.Parts.RemoveAll((KeyValuePair<string, GamePartBlueprint> entry)
                 => entry.Key == typeof(HasGuards).Name
                 || entry.Key == typeof(HasThralls).Name
-                || entry.Key == typeof(HasSlaves).Name);
-
-            if (!creatureBlueprint.Parts.ContainsKey(typeof(SpawnBlocker).Name))
-            {
-                creatureBlueprint.Parts.Add(typeof(SpawnBlocker).Name, new(typeof(SpawnBlocker).Name));
-            }
+                || entry.Key == typeof(HasSlaves).Name
+                || entry.Key == typeof(Followers).Name);
+            */
 
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,
@@ -128,6 +134,10 @@ namespace HNPS_GigantismPlus
                     Context: null,
                     ProvideInventory: null);
 
+            creature.SetStringProperty("SharesRecipe", SECRET_GIANTRECIPE);
+            creature.SetStringProperty("SharesRecipeWithTrueKin", "false");
+            // creature.SetStringProperty("SharesRecipeText", "");
+
             if (creature.TryGetPart(out GameUnique gameUnique))
             {
                 creature.RemovePart(gameUnique);
@@ -136,6 +146,7 @@ namespace HNPS_GigantismPlus
             gameUnique.State = SECRET_GIANT_STATE;
 
             creature.RequirePart<Calming>();
+
             if (!creature.TryGetPart(out GivesRep givesRep))
             {
                 givesRep = creature.RequirePart<GivesRep>();
@@ -185,7 +196,7 @@ namespace HNPS_GigantismPlus
             {
                 description = creature.RequirePart<Description>();
             }
-            string preDesc = SECRET_GIANTPREDESC.Replace(SECRET_GIANTPREDESC_REPLACE, creature.Blueprint);
+            string preDesc = SECRET_GIANTPREDESC.Replace(SECRET_GIANTPREDESC_REPLACE, $"{creature.A} {creature.Blueprint}");
             description.Short = preDesc + description._Short;
 
             List<string> epithetsBag = new()
@@ -238,7 +249,7 @@ namespace HNPS_GigantismPlus
             creature.GiveProperName(giantName);
             creature = HeroMaker.MakeHero(creature, "HNPS_SpecialHeroTemplate_SecretGiant", 8, "Giant");
 
-            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(AddObjectBuilder), "Object", zoneManager.CacheObject(creature));
+            zoneManager.AddZoneBuilder(SecretZoneId, LATE + ADJUST_LARGE, nameof(AddObjectBuilder), "Object", zoneManager.CacheObject(creature));
 
             zoneManager.SetZoneName(SecretZoneId, SECRET_GIANTLOCATION_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneId, false);

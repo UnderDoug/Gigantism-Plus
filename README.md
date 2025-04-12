@@ -21,7 +21,7 @@ This mod enhances greatly and enables for character creation, the physical defec
 ### Modular
 - In the options menu, you can toggle several features of the mod, custom tailoring it a bit to your own personal taste.
 
-## File and Class Guide
+# File and Class Guide
 This section provides an overview of the key files and classes in the `Gigantism-Plus` mod, explaining their purpose and functionality.
 
 ### Core Files
@@ -87,6 +87,10 @@ Located in the `Textures/` folder, these files provide visual assets for abiliti
 - **`workshop.json`**: Configuration for publishing the mod to the Steam Workshop.
 
 This guide should help you navigate the mod's structure and understand the purpose of its components. Feel free to explore and modify the files to suit your needs!
+
+## To-Do List
+- Settle on damage for the natural weapons.
+- Finish secret events and objects.
 
 ## Contributing
 

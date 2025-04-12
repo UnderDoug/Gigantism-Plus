@@ -1,24 +1,96 @@
 # Gigantism Plus
-
-## Description
-
-This mod enhances greatly and enables for character creation, the physical defect Gigantism, retaining its base game functionality while introducing new mechanics. With this mod, Gigantism can be improved with mutation points as you level up, making it a unique defect that can be ranked up to offset its drawbacks and become useful.
+This mod enhances greatly and enables for character creation, the physical defect Gigantism. It retains it's base game functionality while introducing MANY new mechanics. With this mod, Gigantism can be improved with mutation points and rapid advanced, and interacts with base game mutations and everything added by this mod in various ways.
 
 ## Updates
-
-**If you were playing with Gigantism Plus before the most recent updates, the class of the mutation and several other things have changed, resulting in a harmless error on reload of your game. If the Defect is no longer present on your player, wish for: *mutation:GigantismPlus* to restore it as a defect. Unfortunately, you will lose whatever points you've put into it, but you can recompensate yourself with *stat:MP:amount* to set it back to where it was with the new changes. My apologies, but it needed to be done for future mod compatibility.**
+**Total refactoring of the entire mod. Damage scaling, class names, and almost every feature of this mod has been redone, with a massive list of new additions and outright changes.**
 
 ## Features
 
-- **Gigantic Fists:** A scaling natural weapon considered a cudgel and fully compatible with the cudgel skill line. These fists spawn on all your arms as hands, regardless of their number from mutations and chimeric arms. They act like standard fists but are gigantic weapons, providing an automatic +3 to damage from the start. They scale with the Gigantism defect, increasing from 1d3 damage by d1 every 3 ranks and 1d every 5 ranks. At rank 10, they deal 3d6 damage with no maximum penetration cap, allowing unlimited utilization of your strength. While powerful, they are still outclassed by gigantic-sized melee weapons, which you can now wield as if they were standard weapons. They also start at a -3 to hit, which raises by 1 every 2 ranks.
-- **Gigantic Gear Only:** As per the standard game rules, you cannot wear or wield anything that lacks the gigantic mod, making gear hunting a challenge. You will, however, spawn with gigantic gear, despite your calling if you choose gigantic as a defect. The only items currently not included are the torches. You can also toggle the ability to tinker gigantic items, and the rarity of gigantic items spawning in the world in the options menu. All changes to the options require a new character and reload of the game. All natural weapons will also turn into gigantic weapons, gaining +3 damage.
-- **Weight and Furniture Interaction:** With Gigantism, you weigh more and can break non-gigantic chairs, beds, and other furniture. Be mindful where you park your gigantic butt! You can also carry much more weight by default in the base game, which will be great for carrying around all your newly tinkered gigantic items.
-- **Endgame Softlock Fixed:** In the base game, you are not allowed to enter small spaces as a gigantic creature, which essentially breaks an important endgame quest line. We've added in **Hunch** and **Straighten Up**, two new active abilities that toggle being hunched over, allowing you to squeeze into small spaces. Doing so will lower your QN, MV, and DV, but temporarily give you a bit more AV due to being in a more compressed position. Added compatibility with mods that add small spaces, like [Hearthpyre](https://steamcommunity.com/sharedfiles/filedetails/?id=1683847053) (unaware of any others at the time, but should work great!).
-- **Modular:** In the options menu, you can toggle several features of the mod. Tinkering the gigantic mod on to items, for yourself and for NPCs. The rarity of the gigantic mod on objects in the world. Allowing Rapid Advancement of the mutation as you would any other mutation. Toggling starting with gigantic gear if you're a gigantic character, and toggling on and off whether grenades are affected by this. Most of the options require a restart of the game, and a new character to take full effect.
+### Gigantism
+- The ability to tinker objects to be Gigantic. Natural weapons that scale with Gigantism's rank. New bonuses from Gigantism in addition to the ones from the base game. The ability to fit into smaller spaces!
+
+### Elongated Paws
+- A new mutation that allows you to use gigantic weapons items, without being gigantic yourself. If you're already gigantic, allows you to wield two-handed weapons one-handed.
+
+### New and Altered Cybernetics
+- Exoframes that give you ranks of Gigantism depending upon their Tier. New interactions with hand replacement cybernetics.
+
+### Altered Vanilla Mutations
+- Causes a few mutations to interact in new ways, like Crystallinity and Burrowing Claws. Perhaps even adding a few new features to them!
+
+### Modular
+- In the options menu, you can toggle several features of the mod, custom tailoring it a bit to your own personal taste.
+
+## File and Class Guide
+This section provides an overview of the key files and classes in the `Gigantism-Plus` mod, explaining their purpose and functionality.
+
+### Core Files
+- **`StartUp.cs`**: Handles the initialization of the mod, setting up necessary hooks and configurations for the Gigantism-Plus mod.
+- **`Options.cs` and `Options.xml`**: Define and manage configurable options for the mod. These include toggling features like tinkering gigantic items, adjusting item rarity, and enabling or disabling specific mechanics.
+- **`Const.cs`**: Contains constants used throughout the mod, such as default values for scaling damage or mutation ranks.
+- **`Utils.cs`**: Provides utility functions and helpers used across various parts of the mod, such as common calculations or data transformations.
+
+### Modifications
+Located in the `Modifications/` folder, these files define specific modifications applied to natural weapons and equipment:
+- **`ModGiganticNaturalWeapon.cs`**: Implements the behavior of gigantic natural weapons, including scaling damage, hit penalties, and other effects.
+- **`ModNaturalEquipmentBase.cs`**: Serves as the base class for managing natural equipment modifications, providing shared functionality for other modification classes.
+- **`ModImprovedGigantismPlus.cs`**: Enhances the core functionality of the Gigantism mutation, adding new mechanics and interactions.
+- **Other Files**: Includes additional modifications for specific natural weapons, such as `ModBurrowingNaturalWeapon.cs` and `ModCrystallineNaturalWeapon.cs`, which add unique effects to these weapon types.
+
+### Mutations
+Located in the `Mutations/` folder, these files define new or modified mutations:
+- **`GigantismPlus.cs`**: Implements the core functionality of the Gigantism mutation, including scaling effects, interactions with other mechanics, and rank-based bonuses.
+- **`ElongatedPaws.cs`**: Adds a mutation for elongated paws, allowing characters to wield gigantic weapons without being gigantic themselves.
+- **`BaseManagedDefaultEquipmentMutation.cs`**: Serves as a base class for mutations that manage default equipment, providing shared functionality for other mutation classes.
+- **Other Files**: Includes additional mutations, such as `UD_ManagedBurrowingClaws.cs` and `UD_ManagedCrystallinity.cs`, which add unique abilities and interactions.
+
+### Harmony Patches
+Located in the `Harmony/` folder, these files modify or extend the behavior of the base game using Harmony:
+- **`Gigantism_Patches.cs`**: Contains patches related to the Gigantism mutation, such as adjusting character size, weight, and interactions with the environment.
+- **`MeleeWeapon_Patches.cs`**: Modifies melee weapon behavior to support gigantic weapons, including damage scaling and hit penalties.
+- **`Body_Patches.cs`**: Adjusts body-related mechanics to accommodate gigantic characters, such as furniture interactions and movement restrictions.
+- **Other Files**: Includes patches for specific mechanics, such as `Tinkering_Disassemble_Patches.cs` for tinkering interactions and `Physics_Patches.cs` for weight and collision adjustments.
+
+### Events
+Located in the `Events/` folder, these files handle specific events triggered during gameplay:
+- **`UpdateNaturalEquipmentModsEvent.cs`**: Manages updates to natural equipment modifications, ensuring they remain consistent with the character's current state.
+- **`BodyPartsUpdated/`**: Contains event handlers for body part updates, such as adding or removing natural weapons.
+- **`DescribeModGigantic/`**: Handles descriptions and tooltips for the Gigantism mod, providing detailed information to the player.
+- **Other Subfolders**: Includes additional event handlers for specific mechanics, such as `ManageDefaultEquipment/` and `RapidAdvancement/`.
+
+### Cybernetics
+Located in the `Cybernetics/` folder, these files define cybernetic enhancements:
+- **`CyberneticsGiganticExoframe.cs`**: Implements a cybernetic exoframe designed for gigantic characters, providing bonuses based on its tier.
+- **`BaseManagedDefaultEquipmentCybernetic.cs`**: Serves as a base class for cybernetic equipment management, providing shared functionality for other cybernetic classes.
+
+### Secrets
+Located in the `Secrets/` folder, these files add hidden content and lore:
+- **`SecretGiganticExoframe.cs`**: Introduces a secret cybernetic exoframe, providing unique bonuses and interactions.
+- **`SeriouslyThickStew.cs`**: Adds a unique recipe related to gigantic characters, offering special effects when consumed.
+- **Other Files**: Includes additional secrets, such as `Books.xml` for hidden lore and `Conversations.xml` for unique dialogue options.
+
+### Object Builders and Blueprints
+- **`ObjectBuilders/`**: Contains logic for constructing objects, such as `Gigantified.cs` for creating gigantic items and equipment.
+- **`ObjectBlueprints/`**: Defines XML blueprints for creatures, items, and data used in the mod, such as `Creatures.xml` and `Items.xml`.
+
+### Textures
+Located in the `Textures/` folder, these files provide visual assets for abilities, creatures, items, mutations, and natural weapons. Subfolders include:
+- **`Abilities/`**: Icons and visuals for new abilities added by the mod.
+- **`Creatures/`**: Sprites for new or modified creatures.
+- **`Items/`**: Visuals for gigantic items and equipment.
+- **`Mutations/`**: Icons for new mutations, such as Gigantism and Elongated Paws.
+- **`NaturalWeapons/`**: Visuals for natural weapons, such as gigantic fists and claws.
+
+### Miscellaneous
+- **`manifest.json`**: Metadata for the mod, including its name, version, and dependencies.
+- **`README.md`**: Documentation for the mod, including features, file guides, and contribution guidelines.
+- **`workshop.json`**: Configuration for publishing the mod to the Steam Workshop.
+
+This guide should help you navigate the mod's structure and understand the purpose of its components. Feel free to explore and modify the files to suit your needs!
 
 ## Contributing
 
-If you have any ideas to improve the mod, or want to [contribute](https://github.com/hyd-n-plyn-syt/Gigantism-Plus), feel free to let me know or make a request! This mod has primarily been tested by myself and UnderDoug, so please report any issues, and we'll work to resolve them!
+If you have any ideas to improve the mod, or want to contribute to the [experimental branch](https://https://github.com/hyd-n-plyn-syt/Gigantism-Plus/tree/experimental), feel free to let me know or make a request! This mod has primarily been tested by myself and UnderDoug, so please report any issues, and we'll work to resolve them!
 
 **Enjoy your adventure with your gigantic mutants, and have fun!**
 

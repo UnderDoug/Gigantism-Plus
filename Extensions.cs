@@ -153,6 +153,10 @@ namespace HNPS_GigantismPlus
         {
             return Text.OptionalColor(Color: "gigantic", FallbackColor: "w", Option);
         }
+        public static string OptionalColorYuge(this string Text, int Option = 3)
+        {
+            return Text.OptionalColor(Color: "yuge", FallbackColor: "w", Option);
+        }
         public static string OptionalColorGiant(this string Text, int Option = 3)
         {
             return Text.OptionalColor(Color: "giant", FallbackColor: "w", Option);
@@ -585,6 +589,7 @@ namespace HNPS_GigantismPlus
                 return Object.GetPart(Part);
             }
             GamePartBlueprint gamePartBlueprint = new(Part);
+            if (gamePartBlueprint == null) return null;
             IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
             part.ParentObject = Object;
             gamePartBlueprint.InitializePartInstance(part);
@@ -1102,6 +1107,11 @@ namespace HNPS_GigantismPlus
         {
             GameObjectBlueprint = GameObject.GetGameObjectBlueprint();
             return !GameObjectBlueprint.Is(null);
+        }
+
+        public static string DebugName(this BodyPart BodyPart)
+        {
+            return $"[{BodyPart.ID}:{BodyPart.Name}]::{BodyPart.Description}";
         }
     }
 }

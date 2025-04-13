@@ -25,6 +25,7 @@ namespace XRL.World.Parts.Mutation
 
         public static readonly int ICON_COLOR_PRIORITY = 81;
         public static readonly string ICON_COLOR = "&z";
+        public static readonly string ICON_COLOR_FALLBACK = "&w";
 
         private bool MutationColor = XRL.UI.Options.MutationColor;
 
@@ -696,14 +697,18 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool Render(RenderEvent E)
         {
-            bool flag = true;
-            if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+            if (ParentObject.GetPropertyOrTag("GigantismPlusColorChange", "true").Is("true"))
             {
-                flag = MutationColor = UI.Options.MutationColor;
-            }
-            if (flag && !IsCyberGiant)
-            {
-                E.ApplyColors(ICON_COLOR, ICON_COLOR_PRIORITY);
+                bool flag = true;
+                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+                {
+                    flag = MutationColor = UI.Options.MutationColor;
+                }
+                if (flag && !IsCyberGiant)
+                {
+                    string newColor = Colorfulness > 2 ? ICON_COLOR : ICON_COLOR_FALLBACK;
+                    E.ApplyColors(newColor, ICON_COLOR_PRIORITY);
+                }
             }
             return base.Render(E);
         }

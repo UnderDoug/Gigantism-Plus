@@ -40,6 +40,9 @@ namespace HNPS_GigantismPlus.Harmony
                 if (ParentObject.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint))
                 {
                     if (Blueprint.Inventory.Is(null)) Blueprint.Inventory = new();
+
+                    Debug.Entry(4, $"Getting list of blueprintItemBlueprints that are Natural", Indent: 3);
+                    Dictionary<string, int> blueprintItemBlueprints = new();
                     Debug.Entry(4, $"> foreach (InventoryObject inventoryObject in Blueprint.Inventory)", Indent: 3);
                     foreach (InventoryObject inventoryObject in Blueprint.Inventory)
                     {
@@ -50,14 +53,56 @@ namespace HNPS_GigantismPlus.Harmony
                             if (itemBlueprint.IsNatural())
                             {
                                 Debug.CheckYeh(4, $"Item is Natural", Indent: 4);
-                                List<BodyPart> bodyParts = new();
+                                if (blueprintItemBlueprints.ContainsKey(inventoryObject.Blueprint))
+                                {
+                                    blueprintItemBlueprints[inventoryObject.Blueprint]++;
+                                    continue;
+                                }
+                                blueprintItemBlueprints.Add(inventoryObject.Blueprint, int.Parse(inventoryObject.Number));
+                                /*
                                 string targetType = itemBlueprint.GetPartParameter<string>(nameof(Armor), "WornOn") ?? itemBlueprint.GetPartParameter<string>(nameof(MeleeWeapon), "Slot");
+                                bool freeSlot = false;
+                                Debug.Entry(4, $"> foreach (BodyPart part in @this.LoopPart(targetType))", Indent: 4);
                                 foreach (BodyPart part in @this.LoopPart(targetType))
                                 {
-                                    if (!part.Equipped.Is(null) && part.Equipped.IsNatural());
+                                    Debug.Divider(4, HONLY, Count: 25, Indent: 4);
+
+                                    Debug.Entry(4, $"part", $"{part.DebugName()}", Indent: 5);
+                                    Debug.Divider(4, HONLY, Count: 15, Indent: 5);
+                                    bool naturalEquipped 
+                                      = !part.Equipped.Is(null) 
+                                     && !part.Equipped.IsNatural();
+                                    Debug.LoopItem(4, $"naturalEquipped", Good: naturalEquipped, Indent: 5);
+
+                                    bool defaultBehavior 
+                                      = !part.DefaultBehavior.Is(null) 
+                                     && part.DefaultBehavior.IsNatural();
+                                    Debug.LoopItem(4, $"defaultBehavior", Good: defaultBehavior, Indent: 5);
+
+                                    bool permanentCybernetic 
+                                      = !part.Cybernetics.Is(null) 
+                                     && part.Cybernetics.HasTag("CyberneticsUsesEqSlot") 
+                                     && part.Cybernetics.HasTag("CyberneticsNoRemove");
+                                    Debug.LoopItem(4, $"permanentCybernetic", Good: permanentCybernetic, Indent: 5);
+                                    Debug.Divider(4, HONLY, Count: 15, Indent: 5);
+
+                                    freeSlot = !naturalEquipped && !defaultBehavior && !permanentCybernetic;
+                                    Debug.LoopItem(4, $"freeSlot", Good: freeSlot, Indent: 5);
+                                    if (freeSlot) break;
                                 }
-                                ParentObject.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(itemBlueprint));
-                                doReequip = true;
+                                Debug.Divider(4, HONLY, Count: 25, Indent: 4);
+                                Debug.Entry(4, $"x foreach (BodyPart part in @this.LoopPart(targetType)) >//", Indent: 4);
+
+                                if (freeSlot)
+                                {
+                                    Debug.Entry(4, 
+                                        $"Have a Free Slot, creating {itemBlueprint.Name} and placing in inventory", 
+                                        Indent: 4);
+                                    ParentObject.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(itemBlueprint));
+                                    doReequip = true;
+                                    Debug.LoopItem(4, $"doReequip", Good: doReequip, Indent: 4);
+                                }
+                                */
                             }
                             else
                             {
@@ -67,6 +112,72 @@ namespace HNPS_GigantismPlus.Harmony
                     }
                     Debug.Divider(4, HONLY, Count: 25, Indent: 3);
                     Debug.Entry(4, $"x foreach (InventoryObject inventoryObject in Blueprint.Inventory) >//", Indent: 3);
+
+                    Debug.Entry(4, $"Getting list of currentItemBlueprints that are Natural", Indent: 3);
+                    Dictionary<string, int> currentItemBlueprints = new();
+                    Debug.Entry(4, $"> foreach (GameObject item in ParentObject.GetEquippedObjects())", Indent: 3);
+                    foreach (GameObject item in ParentObject.GetEquippedObjects())
+                    {
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 3);
+                        Debug.LoopItem(4, $"item.Blueprint", $"{item.Blueprint}", Indent: 4);
+                        if (item.IsNatural())
+                        {
+                            Debug.CheckYeh(4, $"Item is Natural", Indent: 4);
+                            if (currentItemBlueprints.ContainsKey(item.Blueprint))
+                            {
+                                currentItemBlueprints[item.Blueprint]++;
+                            }
+                            else
+                            {
+                                currentItemBlueprints.Add(item.Blueprint, 1);
+                            }
+                            Debug.Entry(4, $"{item.Blueprint}, {currentItemBlueprints[item.Blueprint]}", Indent: 5);
+                        }
+                        else
+                        {
+                            Debug.CheckNah(4, $"Item is not Natural", Indent: 4);
+                        }
+                    }
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 3);
+                    Debug.Entry(4, $"x foreach (GameObject item in ParentObject.GetEquippedObjects()) >//", Indent: 3);
+
+                    Debug.Entry(4, $"Reducing blueprintItemBlueprint counts by number of equivalent currentItemBlueprints", Indent: 3);
+                    Debug.Entry(4, $"> foreach ((string blueprint, int number) in currentItemBlueprints)", Indent: 3);
+                    foreach ((string blueprint, int number) in currentItemBlueprints)
+                    {
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 3);
+                        if (blueprintItemBlueprints.ContainsKey(blueprint))
+                        {
+                            Debug.Entry(4, $"Before: {blueprint}, {number}", Indent: 4);
+                            blueprintItemBlueprints[blueprint] -= number;
+                            if (blueprintItemBlueprints[blueprint] < 1) blueprintItemBlueprints.Remove(blueprint);
+                            Debug.Entry(4, $" After: {blueprint}, {number}", Indent: 4);
+                        }
+                    }
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 3);
+                    Debug.Entry(4, $"x foreach ((string blueprint, int number) in currentItemBlueprints) >//", Indent: 3);
+
+                    doReequip = !blueprintItemBlueprints.IsNullOrEmpty();
+
+                    Debug.Entry(4, $"? if (doReequip)", Indent: 3);
+                    Debug.LoopItem(4, $"doReequip", Indent: 4,
+                        Good: doReequip);
+                    if (doReequip)
+                    {
+                        Debug.Entry(4, $"> foreach ((string blueprint, int number) in blueprintItemBlueprints)", Indent: 4);
+                        foreach ((string blueprint, int number) in blueprintItemBlueprints)
+                        {
+                            Debug.Divider(4, HONLY, Count: 25, Indent: 4);
+                            for (int i = 0; i < blueprintItemBlueprints.Count; i++)
+                            {
+                                Debug.CheckYeh(4, $"{blueprint} added to inventory", Indent: 5);
+                                ParentObject.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(blueprint));
+                            }
+                        }
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 4);
+                        Debug.Entry(4, $"x foreach ((string blueprint, int number) in blueprintItemBlueprints) >//", Indent: 4);
+                    }
+                    Debug.Entry(4, $"x if (doReequip) ?//", Indent: 3);
                 }
                 else
                 {

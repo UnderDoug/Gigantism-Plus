@@ -86,10 +86,10 @@ namespace HNPS_GigantismPlus
             Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
 
             bool found = false;
+            bool cache = false;
             Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2);
-            if (!_TilePathCache.TryGetValue(TileName, out TilePath))
+            if (cache = !_TilePathCache.TryGetValue(TileName, out TilePath))
             {
-
                 Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3);
                 Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2);
 
@@ -131,7 +131,8 @@ namespace HNPS_GigantismPlus
                 Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3);
             }
 
-            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 2);
+            string foundLocation = cache ? "_TilePathCache" : "supplied subfolders";
+            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in {foundLocation}", Indent: 2);
 
             found = TilePath != null;
             Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2);

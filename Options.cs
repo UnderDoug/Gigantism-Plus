@@ -41,7 +41,7 @@ namespace HNPS_GigantismPlus
         public static bool EnableGiganticNPCGear => GetOption("Option_GigantismPlus_EnableGiganticNPCGear").EqualsNoCase("Yes");
         public static bool EnableGiganticNPCGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticNPCGear_Grenades").EqualsNoCase("Yes");
 
-        public static bool EnableManagedVanillaMutationsCurrent => GetOption("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
+        public static bool EnableManagedVanillaMutationsCurrent => true; // GetOption("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
         public static bool? EnableManagedVanillaMutations = null;
 
         // Debug Settings

@@ -25,5 +25,15 @@
     <tag Name="HeroSelfPreservationThreshold" Value="20" />
     <tag Name="HeroMinLevel" Value="41" />
   </object>
+
+  <object Name="HNPS_SpecialHeroTemplate_Giant" Inherits="DataBucket">
+    <tag Name="HeroStrBoost" Value="4" />
+    <tag Name="HeroTouBoost" Value="4" />
+    <tag Name="HeroNameColor" Value="gigantic" />
+    <tag Name="HeroColorString" Value="&amp;Z" />
+    <tag Name="HeroTileColor" Value="&amp;Z" />
+    <tag Name="HeroSelfPreservationThreshold" Value="30" />
+    <tag Name="HeroMinLevel" Value="25" />
+  </object>
   
 </objects>

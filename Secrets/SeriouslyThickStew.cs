@@ -65,11 +65,21 @@ namespace XRL.World.Skills.Cooking
             return true;
         }
 
-        [WishCommand(Command = "SeriouslyThickStew")]
-        public static void Wish()
+        [WishCommand(Command = SECRET_GIANTRECIPE)]
+        public static void WishSeriouslyThickStew()
         {
             SeriouslyThickStew stew = new();
             stew.ApplyEffectsTo(The.Player);
+        }
+        [WishCommand(Command = "gains")]
+        public static void WishGains()
+        {
+            WishSeriouslyThickStew();
+        }
+        [WishCommand(Command = "thicc")]
+        public static void WishThicc()
+        {
+            WishSeriouslyThickStew();
         }
     } //!-- public class SeriouslyThickStew : CookingRecipe
 }

@@ -14,6 +14,7 @@ using XRL.UI;
 using XRL.Language;
 using XRL.World.Capabilities;
 using XRL.World.Skills.Cooking;
+using XRL.Messages;
 
 namespace XRL.World.Parts
 {
@@ -57,11 +58,16 @@ namespace XRL.World.Parts
 
         public Guid mutationMod = Guid.Empty;
 
+        public bool Grumble;
+        public int TurnsTillGrumble;
+
         public StewBelly()
         { 
             Stews = 0;
             Gains = 0;
             Hankering = 2;
+            Grumble = false;
+            TurnsTillGrumble = GetTurnsTillGrumble();
         }
 
         public int GetNextHankering()
@@ -147,6 +153,31 @@ namespace XRL.World.Parts
         public void EatStew()
         {
             Stews++;
+        }
+
+        public int GetTurnsTillGrumble()
+        {
+            return RndGP.Next(1200, 8000);
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == EndTurnEvent.ID;
+        }
+        public override bool HandleEvent(EndTurnEvent E)
+        {
+            if (Grumble)
+            {
+                DidX("a serious hankering", "got", "!");
+                Grumble = false;
+                TurnsTillGrumble = GetTurnsTillGrumble();
+            }
+            else
+            {
+                if (--TurnsTillGrumble == 0) Grumble = true;
+            }
+            return base.HandleEvent(E);
         }
 
         public void Slap()

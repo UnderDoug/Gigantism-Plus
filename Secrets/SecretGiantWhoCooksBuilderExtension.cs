@@ -140,8 +140,9 @@ namespace HNPS_GigantismPlus
                 && oldFactions.Contains(blueprint.GetPrimaryFaction())
                 && !blueprint.HasTag("BaseObject")
                 && !blueprint.HasTag("NoLibrarian")
-                && !blueprint.HasPart(nameof(Burrowing))
-                && !blueprint.HasPart(nameof(WallWalker))
+                && !blueprint.Mutations.ContainsKey(nameof(Burrowing))
+                && !blueprint.Mutations.ContainsKey(nameof(WallWalker))
+                && !blueprint.HasTagOrProperty("StartInLiquid")
                 && !blueprint.HasProperName()
                 && !blueprint.DescendsFrom("BaseTrueKin")
                 && !blueprint.DescendsFrom("BasePlant")
@@ -175,6 +176,7 @@ namespace HNPS_GigantismPlus
             // Could possibly look at gigantifying them instead...
             creatureBlueprint.Parts.RemoveAll((KeyValuePair<string, GamePartBlueprint> entry)
                 => entry.Key == typeof(DromadCaravan).Name
+                || entry.Key == typeof(EyelessKingCrabSkuttle1).Name
                 || entry.Key == typeof(HasGuards).Name
                 || entry.Key == typeof(HasThralls).Name
                 || entry.Key == typeof(HasSlaves).Name
@@ -319,6 +321,7 @@ namespace HNPS_GigantismPlus
             if (creature.TryGetPart(out HasMakersMark hasMakersMark)) creature.RemovePart(hasMakersMark);
 
             if (creature.TryGetPart(out DromadCaravan dromadCaravan)) creature.RemovePart(dromadCaravan);
+            if (creature.TryGetPart(out EyelessKingCrabSkuttle1 eyelessKingCrabSkuttle1)) creature.RemovePart(eyelessKingCrabSkuttle1);
             if (creature.TryGetPart(out HasGuards hasGuards)) creature.RemovePart(hasGuards);
             if (creature.TryGetPart(out HasThralls hasThralls)) creature.RemovePart(hasThralls);
             if (creature.TryGetPart(out HasSlaves hasSlaves)) creature.RemovePart(hasSlaves);

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+  
+  <!-- 
+      
+      Zone mutators, Tile mutators, Multi-tile presets, Quest triggers, UI widgets
+      
+   -->
+
+  <object Name="RandomBoulderOrDebrisBase" Inherits="Widget">
+    <part Name="Render" DisplayName=""
+          RenderString="B" Tile="Tiles2/sw_rubble_1.bmp"
+          ColorString="&amp;y" DetailColor="K"/>
+  </object>
+  
+  <object Name="RandomWhiteBoulderOrDebris" Inherits="RandomBoulderOrDebrisBase">
+    <part Name="RandomBoulderOrDebris" TileColor="&amp;Y" DetailColor="y" />
+  </object>
+  
+  <object Name="RandomBlackBoulderOrDebris" Inherits="RandomBoulderOrDebrisBase">
+    <part Name="RandomBoulderOrDebris" TileColor="&amp;w" DetailColor="K" />
+  </object>
+
+  <object Name="RandomTreeBase" Inherits="Widget">
+    <part Name="Render" DisplayName=""
+          RenderString="T" Tile="terrain/sw_fattree1.bmp"
+          ColorString="&amp;K" DetailColor="y"/>
+    <tag Name="BaseObject" Value="*noinherit" />
+  </object>
+  
+  <object Name="RandomTreeNearby" Inherits="RandomTreeBase">
+    <part Name="RandomTree" Nearby="true" />
+  </object>
+
+  <object Name="RandomCoupleTreesNearby" Inherits="RandomTreeBase">
+    <part Name="RandomTree" Nearby="true" Count="2" Persist="true" />
+  </object>
+
+  <object Name="RandomFewTreesNearby" Inherits="RandomTreeBase">
+    <part Name="RandomTree" Nearby="true" Count="3" Persist="true" />
+  </object>
+
+  <object Name="RandomFewTreesNearbyMaybe" Inherits="RandomTreeBase">
+    <part Name="RandomTree" Nearby="true" Count="3" Persist="true" ChancePer="50"/>
+  </object>
+  
+</objects>

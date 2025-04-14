@@ -122,9 +122,26 @@ namespace XRL.World.Effects
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
                 }
             }
-            if (stewBelly.Stews > 0 && Object.IsPlayer())
+            if (Object.IsPlayer())
             {
-                Popup.Show("{{emote|*chew* *chew*}} That is one " + "Seriously Thick Stew".OptionalColorYuge(Colorfulness) + "! That'll help with the hankering!");
+                if (stewBelly.Stews > 0)
+                {
+                    int breakpoint = (int)Math.Floor(stewBelly.GetLastHankering() / 2.0);
+                    int hankering = stewBelly.Hankering;
+                    Popup.Show("{{emote|*chew* *chew*}} That is one " + "Seriously Thick Stew".OptionalColorYuge(Colorfulness) + "!");
+                    if (hankering == 1)
+                    {
+                        Popup.Show("That one hit the spot!");
+                    }
+                    if (hankering > 1 && hankering < breakpoint)
+                    {
+                        Popup.Show("Almost full!");
+                    }
+                    else
+                    {
+                        Popup.Show("Still got a serious hankering!");
+                    }
+                }
             }
             stewBelly.EatStew();
         }

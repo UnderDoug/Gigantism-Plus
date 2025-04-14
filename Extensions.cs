@@ -1113,5 +1113,18 @@ namespace HNPS_GigantismPlus
         {
             return $"[{BodyPart.ID}:{BodyPart.Name}]::{BodyPart.Description}";
         }
+
+        public static int Between(this int @int, int Min, int Max)
+        {
+            return Math.Min(Math.Max(@int, Min), Max);
+        }
+        public static double Between(this double @double, double Min, double Max)
+        {
+            return Math.Min(Math.Max(@double, Min), Max);
+        }
+        public static float Between(this float @float, float Min, float Max)
+        {
+            return Math.Min(Math.Max(@float, Min), Max);
+        }
     }
 }

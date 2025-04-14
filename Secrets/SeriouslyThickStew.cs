@@ -65,21 +65,33 @@ namespace XRL.World.Skills.Cooking
             return true;
         }
 
-        [WishCommand(Command = SECRET_GIANTRECIPE)]
-        public static void WishSeriouslyThickStew()
+        [WishCommand(SECRET_GIANTRECIPE, @":?(\d*?):?(shh)?")]
+        public static void WishSeriouslyThickStew(System.Text.RegularExpressions.Match match = null)
         {
+            int count = int.Parse(match?.Groups[0]?.Value);
+            bool shh = match?.Groups[1]?.Value != null;
             SeriouslyThickStew stew = new();
-            stew.ApplyEffectsTo(The.Player);
+            if (count != 0)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    stew.ApplyEffectsTo(The.Player, !shh);
+                }
+            }
+            else
+            {
+                stew.ApplyEffectsTo(The.Player, !shh);
+            }
         }
-        [WishCommand(Command = "gains")]
-        public static void WishGains()
+        [WishCommand("gains", @":?(\d*?):?(shh)?")]
+        public static void WishGains(System.Text.RegularExpressions.Match match = null)
         {
-            WishSeriouslyThickStew();
+            WishSeriouslyThickStew(match);
         }
-        [WishCommand(Command = "thicc")]
-        public static void WishThicc()
+        [WishCommand("thicc", @":?(\d*?):?(shh)?")]
+        public static void WishThicc(System.Text.RegularExpressions.Match match = null)
         {
-            WishSeriouslyThickStew();
+            WishSeriouslyThickStew(match);
         }
     } //!-- public class SeriouslyThickStew : CookingRecipe
 }

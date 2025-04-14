@@ -4,6 +4,7 @@ namespace HNPS_GigantismPlus
 {
     public static class Const
     {
+        public const string MOD_ID = "gigantism_Plus";
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
         public const string TANDR = "\u2514"; // └

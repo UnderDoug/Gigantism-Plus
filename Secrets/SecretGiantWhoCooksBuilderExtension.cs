@@ -92,60 +92,30 @@ namespace HNPS_GigantismPlus
 
             ZoneManager zoneManager = The.ZoneManager;
 
-            zoneManager.ClearZoneBuilders(SecretZoneId);
-            zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(CreateGiantCrater));
-            // zoneManager.AddZoneBuilder(SecretZoneId, LATE + ADJUST_MEDIUM, nameof(Ruiner));
-            // zoneManager.AddZoneBuilder(SecretZoneId, VERY_LATE, nameof(RoadBuilder));
-
-            Debug.Entry(4, $"Listing Zone Builder Blueprints", Indent: 1);
-            foreach (ZoneBuilderBlueprint builderBlueprint in zoneManager.GetBuildersFor(SecretZoneId))
-            {
-                Debug.Divider(4, HONLY, Count: 25, Indent: 2);
-                Debug.Entry(4, $"{builderBlueprint.Class}", Indent: 2);
-            }
-            Debug.Divider(4, HONLY, Count: 25, Indent: 2);
-
-            Debug.Entry(4, $"Listing Zone Parts", Indent: 1);
-            ZonePartCollection zonePartCollection = new();
-            if (zoneManager.ZoneParts.ContainsKey(SecretZoneId))
-            {
-                zonePartCollection = zoneManager.ZoneParts[SecretZoneId];
-            }
-
-            if (!zonePartCollection.IsNullOrEmpty())
-            {
-                foreach (ZonePartBlueprint partBlueprint in zonePartCollection.Members)
-                {
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 2);
-                    Debug.Entry(4, $"{partBlueprint.Name}", Indent: 2);
-                }
-                Debug.Divider(4, HONLY, Count: 25, Indent: 2);
-            }
-            else
-            {
-                Debug.Entry(4, $"None", Indent: 2);
-            }
-
-            ZoneBlueprint zoneBlueprint = zoneManager.GetZoneBlueprint(SecretZoneId);
-            Debug.Entry(4, $"ZoneBlueprint is {zoneBlueprint.Name}", Indent: 1);
-
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(Hills));
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(FactionEncounters));
+            zoneManager.ClearZoneBuilders(SecretZoneId);
 
+            // zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(CreateGiantCrater));
+
+            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{ThisMod.Path}/Secrets/Maps/HNPS_GiantCrater_01_Center.rpm");
             zoneManager.AddZonePostBuilder(SecretZoneId, "Music", "Track", "Music/Barathrums Study");
+
+            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(IsCheckpoint), "Key", SecretZoneId);
+
             zoneManager.SetZoneProperty(SecretZoneId, "SkipTerrainBuilders", true);
+            zoneManager.SetZoneProperty(SecretZoneId, "NoBiomes", "Yes");
 
             zoneManager.SetZoneName(SecretZoneId, SECRET_GIANTLOCATION_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneId, false);
-            zoneManager.SetZoneProperty(SecretZoneId, "NoBiomes", "Yes");
 
-            zoneManager.AddZoneBuilder(
+            zoneManager.AddZonePostBuilder(
                 ZoneID: SecretZoneId, 
-                Priority: MID + ADJUST_LARGE, 
                 Class: nameof(AddObjectBuilder), 
                 Key1: "Object", 
                 Value1: zoneManager.CacheObject(GetTheGiant()));
-        }
+        } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
+
         public static GameObject GetTheGiant()
         {
             return GetAGiant(Unique: true);

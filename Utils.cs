@@ -25,6 +25,8 @@ namespace HNPS_GigantismPlus
     [HasVariableReplacer]
     public static class Utils
     {
+        public static ModInfo ThisMod => ModManager.GetMod(MOD_ID);
+
         [VariableReplacer]
         public static string nbsp(DelegateContext Context)
         {

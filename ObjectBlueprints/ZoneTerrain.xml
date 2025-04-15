@@ -15,22 +15,5 @@
     <part Name="RandomTileOnMove" Tiles="Terrain/WrassleRing_Floor_00.png,Terrain/WrassleRing_Floor_01.png,Terrain/WrassleRing_Floor_02.png,Terrain/WrassleRing_Floor_03.png,Terrain/WrassleRing_Floor_04.png,Terrain/WrassleRing_Floor_05.png,Terrain/WrassleRing_Floor_06.png,Terrain/WrassleRing_Floor_07.png,Terrain/WrassleRing_Floor_08.png,Terrain/WrassleRing_Floor_09.png,Terrain/WrassleRing_Floor_00.png" />
     <tag Name="NoSparkingQuest" />
   </object>
-
-  <object Name="WrassleRingRopes" Inherits="Wall">
-    <part Name="Render" DisplayName="rope barrier" RenderString="=" ColorString="&amp;y" TileColor="&amp;y" DetailColor="w" Occluding="false" RenderLayer="6" Tile="Tiles/WrassleRing_Ropes_.png" />
-    <part Name="Physics" Weight="30" Takeable="false" Solid="true" />
-    <part Name="Description" Short="A triplicate set of ropes held taught provide the perfect platform for launching oneself." />
-    <stat Name="AV" Value="1" />
-    <stat Name="Hitpoints" Value="15" />
-    <removetag Name="PaintedWall" />
-    <tag Name="PaintedFence" Value="WrassleRing_Ropes" />
-    <tag Name="PaintedFenceAtlas" Value="Tiles/" />
-    <tag Name="PaintedFenceExtension" Value=".png" />
-    <tag Name="PaintWith" Value="WrassleRingRopes" />
-    <tag Name="ImmutableWhenUnexplored" Value="1" />
-    <tag Name="Category_Settlement" />
-    <tag Name="Flyover" />
-    <intproperty Name="AllowMissiles" Value="1" />
-  </object>
   
 </objects>

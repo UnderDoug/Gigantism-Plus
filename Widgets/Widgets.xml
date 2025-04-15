@@ -8,21 +8,21 @@
    -->
 
   <object Name="RandomBoulderOrDebrisBase" Inherits="Widget">
-    <part Name="Render" DisplayName=""
+    <part Name="Render" DisplayName="[RandomBoulderOrDebris]"
           RenderString="B" Tile="Tiles2/sw_rubble_1.bmp"
           ColorString="&amp;y" DetailColor="K"/>
   </object>
   
-  <object Name="RandomWhiteBoulderOrDebris" Inherits="RandomBoulderOrDebrisBase">
-    <part Name="RandomBoulderOrDebris" TileColor="&amp;Y" DetailColor="y" />
+  <object Name="RandomBoulderOrDebrisLimestone" Inherits="RandomBoulderOrDebrisBase">
+    <part Name="RandomBoulderOrDebris" TileColor="&amp;y" DetailColor="K" />
   </object>
   
-  <object Name="RandomBlackBoulderOrDebris" Inherits="RandomBoulderOrDebrisBase">
+  <object Name="RandomBoulderOrDebrisGranite" Inherits="RandomBoulderOrDebrisBase">
     <part Name="RandomBoulderOrDebris" TileColor="&amp;w" DetailColor="K" />
   </object>
 
   <object Name="RandomTreeBase" Inherits="Widget">
-    <part Name="Render" DisplayName=""
+    <part Name="Render" DisplayName="[RandomTree]"
           RenderString="T" Tile="terrain/sw_fattree1.bmp"
           ColorString="&amp;K" DetailColor="y"/>
     <tag Name="BaseObject" Value="*noinherit" />
@@ -32,16 +32,39 @@
     <part Name="RandomTree" Nearby="true" />
   </object>
 
-  <object Name="RandomCoupleTreesNearby" Inherits="RandomTreeBase">
+  <object Name="RandomTreesNearbyCouple" Inherits="RandomTreeBase">
     <part Name="RandomTree" Nearby="true" Count="2" Persist="true" />
   </object>
 
-  <object Name="RandomFewTreesNearby" Inherits="RandomTreeBase">
+  <object Name="RandomTreesNearbyCoupleMaybe" Inherits="RandomTreeBase">
+    <part Name="RandomTree" Nearby="true" Count="2" Persist="true" ChancePer="50" />
+  </object>
+
+  <object Name="RandomTreesFewNearby" Inherits="RandomTreeBase">
     <part Name="RandomTree" Nearby="true" Count="3" Persist="true" />
   </object>
 
-  <object Name="RandomFewTreesNearbyMaybe" Inherits="RandomTreeBase">
-    <part Name="RandomTree" Nearby="true" Count="3" Persist="true" ChancePer="50"/>
+  <object Name="RandomTreesNearbyFewMaybe" Inherits="RandomTreeBase">
+    <part Name="RandomTree" Nearby="true" Count="3" Persist="true" ChancePer="50" />
+  </object>
+
+  <object Name="OverheadLightsBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[OverheadLights]"
+          RenderString="*" Tile="Items/sw_glowsphere.bmp"
+          ColorString="&amp;K" DetailColor="y" Visible="false" />
+    <tag Name="BaseObject" Value="*noinherit" />
+  </object>
+
+  <object Name="OverheadLightsWeak" Inherits="OverheadLightsBase">
+    <part Name="LightSource" Lit="true" Radius="1" />
+  </object>
+
+  <object Name="OverheadLightsMedium" Inherits="OverheadLightsBase">
+    <part Name="LightSource" Lit="true" Radius="3" />
+  </object>
+
+  <object Name="OverheadLightsStrong" Inherits="OverheadLightsBase">
+    <part Name="LightSource" Lit="true" Radius="5" />
   </object>
   
 </objects>

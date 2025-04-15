@@ -61,6 +61,14 @@ namespace HNPS_GigantismPlus
             {
                 Armor.CarryBonus = (int)(Armor.CarryBonus * 1.25f);
             }
+
+            Enclosing Enclosing = Object.GetPart<Enclosing>();
+            if (Enclosing != null)
+            {
+                Enclosing.AVBonus = Enclosing.AVBonus * 2;
+                Enclosing.DVPenalty = (int)Math.Floor(Enclosing.DVPenalty * 1.5);
+                Enclosing.ExitSaveTarget += 3;
+            }
             return true;
         }
     } //!-- public class AfterModGiganticAppliedHandler : IEventHandler, IModEventHandler<AfterModGiganticAppliedEvent>

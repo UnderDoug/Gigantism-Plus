@@ -545,6 +545,11 @@ namespace XRL.World.Parts.Mutation
                 Debug.LoopItem(4, "IsGiganticCreature = true", Indent: 2);
                 GO.RequirePart<StunningForceOnJump>();
                 Debug.LoopItem(4, "RequirePart<StunningForceOnJump>()", Indent: 2);
+                if (!GO.TryGetPart(out StewBelly stewBelly))
+                {
+                    stewBelly = new(1);
+                    GO.RequirePart(stewBelly);
+                }
             }
             else
             {
@@ -693,7 +698,8 @@ namespace XRL.World.Parts.Mutation
                 || ID == CanEnterInteriorEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == InventoryActionEvent.ID;
+                || ID == InventoryActionEvent.ID
+                || ID == DroppedEvent.ID;
         }
         public override bool Render(RenderEvent E)
         {
@@ -792,6 +798,15 @@ namespace XRL.World.Parts.Mutation
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(DroppedEvent E)
+        {
+            if (E.Actor.Is(ParentObject) && E.Item.GetBlueprint().DescendsFrom("Corpse"))
+            {
+                E.Item.ApplyModification("ModGigantic");
+            }
             return base.HandleEvent(E);
         }
 

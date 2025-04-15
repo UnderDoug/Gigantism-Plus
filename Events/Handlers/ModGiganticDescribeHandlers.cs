@@ -33,6 +33,15 @@ namespace HNPS_GigantismPlus
                 E.GeneralDescriptions.Add(new List<string> { "illuminate", "twice as far" });
             }
             */
+
+            if (Object.HasPart<Chair>())
+            {
+                E.GeneralDescriptions.Add(new List<string> { "support", "gigantic rumps" });
+            }
+            if (Object.HasPart<Bed>())
+            {
+                E.GeneralDescriptions.Add(new List<string> { "support", "gigantic sleepers" });
+            }
             return true;
         }
 
@@ -73,6 +82,24 @@ namespace HNPS_GigantismPlus
             {
                 E.GeneralDescriptions.Add(new() { null, "much more valuable" });
             }
+            if (Object.HasPart<Container>())
+            {
+                E.GeneralDescriptions.Add(new() { "store", "twice as many things (don't ask. It's fine)" });
+            }
+            if (Object.HasPart<Enclosing>())
+            {
+                E.GeneralDescriptions.Add(new() { "provide", "twice as much AV" });
+                E.GeneralDescriptions.Add(new() { "penalise", "DV half again as much" });
+                E.GeneralDescriptions.Add(new() { "have", "+3 higher save to exit" });
+            }
+            if (Object.TryGetPart(out Chat chat) && chat.ShowInShortDescription)
+            {
+                E.GeneralDescriptions.Add(new() { "convey", "its message with substantially more clarity" });
+            }
+            if (Object.HasPart<Tombstone>() || Object.HasTagOrProperty("Burial"))
+            {
+                E.GeneralDescriptions.Add(new() { "inspire", "greater sorrow" });
+            }
 
             bool isDefaultBehavior = Object.EquipAsDefaultBehavior();
             if (!isDefaultBehavior)
@@ -92,6 +119,16 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<Armor>() && Object.GetPart<Armor>().CarryBonus > 0)
             {
                 E.GeneralDescriptions.Add(new List<string> { "have", "a quarter more carry capcity" });
+            }
+
+            if (Object.HasTagOrProperty("Ornate"))
+            {
+                E.GeneralDescriptions.Add(new() { "inspire", "awe with its immensity" });
+            }
+
+            if (Object.HasTagOrProperty("Wall"))
+            {
+                E.GeneralDescriptions.Add(new() { "stand", "much taller than usual" });
             }
 
             MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
@@ -120,13 +157,10 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            bool improvisedMelee = false;
-            if (meleeWeapon != null && meleeWeapon.IsImprovised()) improvisedMelee = true;
-
             if (!isDefaultBehaviorOrFloating)
             {
                 if (Object.UsesSlots == null &&
-                    (!improvisedMelee
+                    (!(meleeWeapon != null && meleeWeapon.IsImprovised())
                     || (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
                     || Object.HasPart<MissileWeapon>()
                     || Object.HasPart<Shield>()))

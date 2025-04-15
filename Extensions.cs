@@ -582,6 +582,15 @@ namespace HNPS_GigantismPlus
             Debug.Entry(3, $"x {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//");
         }
 
+        public static IPart RequirePart(this GameObject Object, IPart Part, bool DoRegistration = true, bool Creation = false)
+        {
+            if (Object.HasPart(Part.Name))
+            {
+                return Object.GetPart(Part.Name);
+            }
+            Part.ParentObject = Object;
+            return Object.AddPart(Part, DoRegistration: DoRegistration, Creation: Creation);
+        }
         public static IPart RequirePart(this GameObject Object, string Part, bool DoRegistration = true, bool Creation = false)
         {
             if (Object.HasPart(Part))
@@ -842,6 +851,14 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<Chair>())
             {
                 return "chair";
+            }
+            if (Object.HasPart<Bed>())
+            {
+                return "bed";
+            }
+            if (Object.HasPart<Tombstone>())
+            {
+                return "tombstone";
             }
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {

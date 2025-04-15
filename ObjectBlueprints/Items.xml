@@ -226,11 +226,14 @@ You cannot wear equipment on your body." />
 
   <!-- 
       
-      Modified BaseGame "Natural" Weapons 
+      Modified BaseGame "Natural" Equipment 
       
   -->
   <object Name="Fist of the Ape God" Load="Merge">
     <part Name="Render" Tile="GiganticFist_Alt.png" />
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="FungalInfection" Load="Merge">
     <tag Name="GiganticEquippable" />
   </object>
 
@@ -276,6 +279,21 @@ You cannot wear equipment on your body." />
   <object Name="Helping Hands" Load="Merge">
     <tag Name="Mods" Value="Gigantify" Load="Merge" />
   </object>
+  
+  <!-- 
+      
+      Gigantic Variants 
+      
+  -->
+	<object Name="Gigantic FoldingChair" Inherits="FoldingChair">
+    <part Name="ModGigantic" />
+	</object>
+	<object Name="Gigantic PlasticTree" Inherits="PlasticTree">
+    <part Name="ModGigantic" />
+	</object>
+	<object Name="Gigantic StorageTank" Inherits="StorageTank">
+    <part Name="ModGigantic" />
+	</object>
 
   <!-- 
       

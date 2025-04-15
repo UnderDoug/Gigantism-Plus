@@ -46,7 +46,9 @@ namespace XRL.World.Parts
         {
             get => _Gains;
             private set => _Gains = Math.Max(0, value);
-        }  
+        }
+
+        public readonly int StartingHankering;
 
         [SerializeField]
         private int _Hankering;
@@ -62,12 +64,19 @@ namespace XRL.World.Parts
         public int TurnsTillGrumble;
 
         public StewBelly()
-        { 
+        {
             Stews = 0;
             Gains = 0;
-            Hankering = 2;
+            StartingHankering = 2;
+            Hankering = StartingHankering;
             Grumble = false;
             TurnsTillGrumble = GetTurnsTillGrumble();
+        }
+        public StewBelly(int StartingHankering)
+            : this()
+        {
+            this.StartingHankering = StartingHankering;
+            Hankering = this.StartingHankering;
         }
 
         public int GetNextHankering()
@@ -130,19 +139,20 @@ namespace XRL.World.Parts
             return Hankering;
         }
 
-        public static int CalculateStews(int Gains, int Hankering = 0)
+        public static int CalculateStews(int Gains, int Hankering = 0, int StartingHankering = 2)
         {
             int stews = Hankering > 0 ? Hankering : 0;
             while (Gains > 0)
             {
                 stews += Gains--;
             }
+            stews += StartingHankering - 1;
             return stews;
         }
 
         public int CalculateStews()
         {
-            return CalculateStews(Gains, Hankering);
+            return CalculateStews(Gains, Hankering, StartingHankering);
         }
 
         public void SatiateHankering()

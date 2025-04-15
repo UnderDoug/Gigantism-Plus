@@ -177,9 +177,13 @@ namespace HNPS_GigantismPlus
             creatureBlueprint.Parts.RemoveAll((KeyValuePair<string, GamePartBlueprint> entry)
                 => entry.Key == typeof(DromadCaravan).Name
                 || entry.Key == typeof(EyelessKingCrabSkuttle1).Name
+                || entry.Key == typeof(SnapjawPack1).Name
+                || entry.Key == typeof(BaboonHero1Pack).Name
+                || entry.Key == typeof(GoatfolkClan1).Name
                 || entry.Key == typeof(HasGuards).Name
                 || entry.Key == typeof(HasThralls).Name
                 || entry.Key == typeof(HasSlaves).Name
+                || entry.Key == typeof(Leader).Name
                 || entry.Key == typeof(Followers).Name);
 
             GameObject creature;
@@ -322,10 +326,14 @@ namespace HNPS_GigantismPlus
 
             if (creature.TryGetPart(out DromadCaravan dromadCaravan)) creature.RemovePart(dromadCaravan);
             if (creature.TryGetPart(out EyelessKingCrabSkuttle1 eyelessKingCrabSkuttle1)) creature.RemovePart(eyelessKingCrabSkuttle1);
+            if (creature.TryGetPart(out SnapjawPack1 snapjawPack1)) creature.RemovePart(snapjawPack1);
+            if (creature.TryGetPart(out BaboonHero1Pack baboonHero1Pack)) creature.RemovePart(baboonHero1Pack);
+            if (creature.TryGetPart(out GoatfolkClan1 goatfolkClan1)) creature.RemovePart(goatfolkClan1);
             if (creature.TryGetPart(out HasGuards hasGuards)) creature.RemovePart(hasGuards);
             if (creature.TryGetPart(out HasThralls hasThralls)) creature.RemovePart(hasThralls);
             if (creature.TryGetPart(out HasSlaves hasSlaves)) creature.RemovePart(hasSlaves);
             if (creature.TryGetPart(out Followers followers)) creature.RemovePart(followers);
+            if (creature.TryGetPart(out Leader leader)) creature.RemovePart(leader);
 
             return creature;
         }

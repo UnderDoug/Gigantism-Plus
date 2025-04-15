@@ -86,8 +86,11 @@ namespace XRL.World.Effects
 
         public static void ApplyTo(GameObject Object)
         {
-            StewBelly stewBelly = Object.RequirePart<StewBelly>();
-            if (Object.IsPlayer() && stewBelly.Stews == 0)
+            if (!Object.TryGetPart(out StewBelly stewBelly))
+            {
+                stewBelly = Object.RequirePart<StewBelly>();
+            }
+            if (Object.IsPlayer() && !Object.HasPart<GigantismPlus>() && stewBelly.Stews == 0)
             {
                 GigantismPlus gigantism = new();
                 Popup.Show("...");
@@ -139,7 +142,7 @@ namespace XRL.World.Effects
                     }
                     else
                     {
-                        Popup.Show("Still got a serious hankering!");
+                        Popup.Show("Still have a serious hankering!");
                     }
                 }
             }

@@ -1143,5 +1143,35 @@ namespace HNPS_GigantismPlus
         {
             return Math.Min(Math.Max(@float, Min), Max);
         }
+
+        public static int RapidAdvancementCeiling(this int @int, int Min = 0)
+        {
+            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
+            return (int)Math.Max(Min, Math.Ceiling(@int / 3.0)) * 3;
+        }
+
+        public static int RapidAdvancementFloor(this int @int, int Min = 0)
+        {
+            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
+            return (int)Math.Max(Min, Math.Floor(@int / 3.0)) * 3;
+        }
+
+        public static int RapidAdvancementRound(this int @int, int Min = 0)
+        {
+            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
+            return (int)Math.Max(Min, Math.Round(@int / 3.0)) * 3;
+        }
+
+        public static bool DescendsFrom(this GameObject Object, string Blueprint)
+        {
+            return Object.Blueprint.DescendsFrom(Blueprint);
+        }
+
+        public static bool DescendsFrom(this string Object, string Blueprint)
+        {
+            GameObjectBlueprint gameObjectBlueprint = GameObjectFactory.Factory.GetBlueprintIfExists(Object);
+            if (gameObjectBlueprint == null) return false;
+            return gameObjectBlueprint.DescendsFrom(Blueprint);
+        }
     }
 }

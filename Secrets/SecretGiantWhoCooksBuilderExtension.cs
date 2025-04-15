@@ -145,6 +145,7 @@ namespace HNPS_GigantismPlus
                 && !blueprint.HasTagOrProperty("StartInLiquid")
                 && !blueprint.HasProperName()
                 && !blueprint.DescendsFrom("BaseTrueKin")
+                && !blueprint.DescendsFrom("BaseNest")
                 && !blueprint.DescendsFrom("BasePlant")
                 && !(blueprint.DescendsFrom("BaseRobot")
                      && !(blueprint.Name.Is("Chrome Pyramid")
@@ -248,9 +249,16 @@ namespace HNPS_GigantismPlus
                 {
                     starting -= 10;
                 }
-                gigantism.Level = Unique ? 10 : 5;
-                gigantism.SetRapidLevelAmount((int)Math.Max(1, Math.Ceiling(starting / 3.0)) * 3);
+                gigantism.Level = Unique ? 10 : ExplodingDie(5, new DieRoll("1d3"), Limit: 10);
+                gigantism.SetRapidLevelAmount(starting.RapidAdvancementCeiling(Min: 3));
             }
+            if (!creature.TryGetPart(out StewBelly stewBelly))
+            {
+                stewBelly = creature.RequirePart<StewBelly>();
+            }
+            string dieRoll = Unique ? "4d4" : "2d4";
+            stewBelly.Stews += dieRoll.Roll();
+
             creature.Brain.Mobile = true;
             creature.Brain.Wanders = true;
             creature.Brain.Factions = "Giants";

@@ -25,12 +25,6 @@ namespace XRL.World.Parts
             ChancePer = 100;
         }
 
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("EnteredCell");
-            base.Register(Object, Registrar);
-        }
-
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -46,6 +40,11 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("EnteredCell");
+            base.Register(Object, Registrar);
+        }
         public override bool FireEvent(Event E)
         {
             if (E.ID == "EnteredCell" && ParentObject.CurrentZone != null)

@@ -687,40 +687,73 @@
 
   <object Name="Gigantic Statue" Inherits="Statue">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
 
   <object Name="Gigantic Random Statue" Inherits="Random Statue">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   <object Name="Gigantic Random Stone Statue" Inherits="Random Stone Statue">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   <object Name="Gigantic Random Marble Statue" Inherits="Random Marble Statue">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
 
   <object Name="Gigantic ImplantedEaterStatue" Inherits="ImplantedEaterStatue">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   <object Name="Gigantic EaterStatue" Inherits="EaterStatue">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   <object Name="Gigantic EaterStatueFlipped" Inherits="EaterStatueFlipped">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   <object Name="Gigantic EaterStatue Gold" Inherits="EaterStatue Gold">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   <object Name="Gigantic EaterStatueFlipped Gold" Inherits="EaterStatueFlipped Gold">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
 
   <object Name="Oboroqoru Statue" Load="Merge">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
 
   <object Name="NephilimShrine" Load="Merge">
     <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
 
   <!-- Gigantic Holograms -->

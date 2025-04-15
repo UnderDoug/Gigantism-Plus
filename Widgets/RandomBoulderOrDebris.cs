@@ -14,6 +14,8 @@ namespace XRL.World.Parts
     {
         public string TileColor;
         public string DetailColor;
+        public string ColorLike;
+        public bool Invert;
 
         public List<string> Blueprints = new()
         {
@@ -21,11 +23,14 @@ namespace XRL.World.Parts
             "MediumBoulder",
             "LargeBoulder",
             "Rubble",
+            "Rubble",
         };
         public RandomBoulderOrDebris()
         {
             TileColor = string.Empty;
             DetailColor = string.Empty;
+            ColorLike = string.Empty;
+            Invert = false;
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -37,12 +42,26 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject)
             {
+                if (!ColorLike.Is(string.Empty))
+                {
+                    GameObjectBlueprint blueprint = GameObjectFactory.Factory.GetBlueprintIfExists(ColorLike);
+                    if (blueprint != null && blueprint.Parts.ContainsKey("Render"))
+                    {
+                        GamePartBlueprint renderBlueprint = blueprint.Parts["Render"];
+
+                        // These are swapped, but that's a typical difference between walls and other objects
+                        if (renderBlueprint.TryGetParameter(Invert ? "TileColor" : "DetailColor", out string tileColor))
+                            TileColor = $"&{tileColor}";
+                        if (renderBlueprint.TryGetParameter(Invert ? "DetailColor" : "TileColor", out string detailColor))
+                            DetailColor = detailColor.Replace("&","");
+                    }
+                }
                 GameObject newObject = GameObjectFactory.Factory.CreateObject(Blueprints.GetRandomElement());
                 Render render = newObject?.Render;
                 if (render != null)
                 {
-                    render.TileColor = TileColor ?? render.TileColor;
                     render.ColorString = TileColor ?? render.TileColor;
+                    render.TileColor = TileColor ?? render.TileColor;
                     render.DetailColor = DetailColor ?? render.DetailColor;
                 }
                 E.ReplacementObject = newObject;

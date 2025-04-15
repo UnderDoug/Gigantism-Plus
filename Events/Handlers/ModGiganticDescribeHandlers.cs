@@ -157,7 +157,10 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            if (!isDefaultBehaviorOrFloating)
+            bool isOrnate = Object.HasPropertyOrTag("Ornate");
+            bool isFurniture = Object.DescendsFrom("Furniture");
+            bool isWall = Object.DescendsFrom("Wall");
+            if (!isDefaultBehaviorOrFloating && !isOrnate && !isFurniture && !isWall)
             {
                 if (Object.UsesSlots == null &&
                     (!(meleeWeapon != null && meleeWeapon.IsImprovised())

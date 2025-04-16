@@ -539,7 +539,6 @@ namespace HNPS_GigantismPlus
             GameObjectBlueprint = GetGameObjectBlueprint(Blueprint);
             return !GameObjectBlueprint.Is(null);
         }
-
     } //!-- public static class Utils
 
 }

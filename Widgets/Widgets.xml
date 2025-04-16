@@ -11,6 +11,7 @@
     <part Name="Render" DisplayName="[RandomBoulderOrDebris]"
           RenderString="B" Tile="Widgets/RandomBoulderOrRubble.png"
           ColorString="&amp;y" DetailColor="K"/>
+    <part Name="RandomBoulderOrDebris" />
   </object>
   
   <object Name="RandomBoulderOrDebrisLimestone" Inherits="RandomBoulderOrDebrisBase">
@@ -30,6 +31,7 @@
           RenderString="T" Tile="Widgets/RandomTree.png"
           ColorString="&amp;y" DetailColor="K"/>
     <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="RandomTree" />
   </object>
   
   <object Name="RandomTreeNearby" Inherits="RandomTreeBase">
@@ -67,24 +69,25 @@
           RenderString="*" Tile="Widgets/OverheadLights.png"
           ColorString="&amp;K" DetailColor="y" Visible="false" />
     <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="LightSource" Lit="true" Radius="0" />
   </object>
 
   <object Name="OverheadLightsWeak" Inherits="OverheadLightsBase">
     <part Name="Render" DisplayName="[OverheadLightsWeak]"
           ColorString="&amp;K" DetailColor="y" Visible="false" />
-    <part Name="LightSource" Lit="true" Radius="1" />
+    <part Name="LightSource" Radius="1" />
   </object>
 
   <object Name="OverheadLightsMedium" Inherits="OverheadLightsBase">
     <part Name="Render" DisplayName="[OverheadLightsMedium]"
           ColorString="&amp;K" DetailColor="Y" Visible="false" />
-    <part Name="LightSource" Lit="true" Radius="3" />
+    <part Name="LightSource" Radius="3" />
   </object>
 
   <object Name="OverheadLightsStrong" Inherits="OverheadLightsBase">
     <part Name="Render" DisplayName="[OverheadLightsStrong]"
           ColorString="&amp;K" DetailColor="W" Visible="false" />
-    <part Name="LightSource" Lit="true" Radius="5" />
+    <part Name="LightSource" Radius="5" />
   </object>
 
   <object Name="WallOrNotBase" Inherits="Widget">
@@ -92,6 +95,7 @@
           RenderString="H" Tile="Widgets/WallOrNot2.png"
           ColorString="&amp;K" DetailColor="y" Visible="false" />
     <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="WallOrNot" />
   </object>
 
   <object Name="WallOrNotGraniteProbably" Inherits="WallOrNotBase">
@@ -133,9 +137,11 @@
   </object>
 
   <object Name="RandomGiganticBedBase" Inherits="Widget">
-    <part Name="Render" DisplayName="[RandomGiganticBedBase]"
+    <part Name="Render" DisplayName="[RandomGiganticBed]"
+          RenderString="B" Tile="Items/sw_bed.bmp"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
     <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="RandomFurniture" Gigantic="true" />
   </object>
   
 </objects>

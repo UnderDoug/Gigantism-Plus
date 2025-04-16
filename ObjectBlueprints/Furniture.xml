@@ -6,6 +6,411 @@
     <tag Name="IsImprovisedMelee" />
   </object>
   
+  <!-- Gigantic Infrastructure -->
+
+  <object Name="Gigantic DoorSwitch" Inherits="DoorSwitch">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ElevatorSwitch" Inherits="ElevatorSwitch">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic DisabledSwitch" Inherits="DisabledSwitch">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Platform" Inherits="Platform">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Doors -->
+
+  <object Name="Gigantic Archway" Inherits="Archway">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Door" Inherits="Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Windowed Door" Inherits="Windowed Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Striped Door" Inherits="Striped Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Wavy Door" Inherits="Wavy Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Metal Door" Inherits="Metal Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Door N" Inherits="Double Door N">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Door S" Inherits="Double Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Door E" Inherits="Double Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Door W" Inherits="Double Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Windowed Door N" Inherits="Double Windowed Door N">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Windowed Door S" Inherits="Double Windowed Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Windowed Door E" Inherits="Double Windowed Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Windowed Door W" Inherits="Double Windowed Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Striped Door N" Inherits="Double Striped Door N">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Striped Door S" Inherits="Double Striped Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Striped Door E" Inherits="Double Striped Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Striped Door W" Inherits="Double Striped Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Wavy Door N" Inherits="Double Wavy Door N">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Wavy Door S" Inherits="Double Wavy Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Wavy Door E" Inherits="Double Wavy Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Wavy Door W" Inherits="Double Wavy Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Metal Door N" Inherits="Double Metal Door N">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Metal Door S" Inherits="Double Metal Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Metal Door E" Inherits="Double Metal Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Metal Door W" Inherits="Double Metal Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Door E" Inherits="Glass Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Door W" Inherits="Glass Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Tinted Glass Door E" Inherits="Tinted Glass Door E">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Tinted Glass Door W" Inherits="Tinted Glass Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Security Door" Inherits="Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Red Security Door" Inherits="Red Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Yellow Security Door" Inherits="Yellow Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Green Security Door" Inherits="Green Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Blue Security Door" Inherits="Blue Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Purple Security Door" Inherits="Purple Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Fused Security Door" Inherits="Fused Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Crypt Door" Inherits="Crypt Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Crypt Double Door N" Inherits="Crypt Double Door N">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Crypt Double Door S" Inherits="Crypt Double Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Brinestalk Gate" Inherits="Brinestalk Gate">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Iron Gate" Inherits="Iron Gate">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Grid-enabled Tech Furniture -->
+
+  <object Name="Gigantic Wooden Wind Turbine" Inherits="Wooden Wind Turbine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Millstone" Inherits="Millstone">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Wooden Water Wheel" Inherits="Wooden Water Wheel">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Powered Orrery" Inherits="Powered Orrery">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Kiln" Inherits="Kiln">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Electric Generator" Inherits="Electric Generator">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Induction Charging Station" Inherits="Induction Charging Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Irrigator" Inherits="Hydraulic Irrigator">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Clockthing_QGirl" Inherits="Clockthing_QGirl">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Bubblething" Inherits="Hydraulic Bubblething">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Gas Burner" Inherits="Gas Burner">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Powered Telescope" Inherits="Powered Telescope">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Rock Tumbler" Inherits="Rock Tumbler">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Lathe" Inherits="Lathe">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Solar Power Station" Inherits="Solar Power Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Solar Pumping Station" Inherits="Solar Pumping Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Food Processor" Inherits="Food Processor">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Universal Charging Station" Inherits="Universal Charging Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Turbine" Inherits="Hydraulic Turbine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Press" Inherits="Hydraulic Press">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Force Projector" Inherits="Force Projector">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Liquid-Cooled Unicomputer" Inherits="Liquid-Cooled Unicomputer">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Loudspeaker" Inherits="Loudspeaker">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Furnace" Inherits="Glass Furnace">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Wire Extruder" Inherits="Wire Extruder">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Broadcast Power Station" Inherits="Broadcast Power Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Fusion Power Station" Inherits="Fusion Power Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Fusion Pumping Station" Inherits="Fusion Pumping Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Industrial Fan North" Inherits="Industrial Fan North">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Industrial Fan South" Inherits="Industrial Fan South">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Broken Industrial Fan" Inherits="Broken Industrial Fan">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Printer" Inherits="Glass Printer">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Regen Tank" Inherits="Regen Tank">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Capacitor" Inherits="Capacitor">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Air Well" Inherits="Air Well">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Underground Air Well" Inherits="Underground Air Well">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Underground Catchbasin" Inherits="Underground Catchbasin">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2-32" MaxVolume="64" InitialLiquid="water-1000" />
+  </object>
+
+  <object Name="Gigantic Solar Still" Inherits="Solar Still">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Solar Condenser" Inherits="Solar Condenser">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Quantum Rippler" Inherits="Quantum Rippler">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Grid Quantum Rippler" Inherits="Grid Quantum Rippler">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic NormCore1" Inherits="NormCore1">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic NormCore2" Inherits="NormCore2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic NormCore3" Inherits="NormCore3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GridNormCore1" Inherits="GridNormCore1">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GridNormCore2" Inherits="GridNormCore2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GridNormCore3" Inherits="GridNormCore3">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Bookshelves -->
+
+  <object Name="Gigantic Bookshelf" Inherits="Bookshelf">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf1" Inherits="ishelf1">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf2" Inherits="ishelf2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf3" Inherits="ishelf3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf4" Inherits="ishelf4">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic UndergroundBookshelf" Inherits="UndergroundBookshelf">
+    <part Name="ModGigantic" />
+  </object>
+  
   <!-- Gigantic Beds -->
 
   <object Name="Gigantic Bedroll" Inherits="Bedroll">

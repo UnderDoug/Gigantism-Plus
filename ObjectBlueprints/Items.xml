@@ -179,6 +179,11 @@ You cannot wear equipment on your body." />
     <removetag Name="IsImprovisedMelee" />
   </object>
   
+  <object  Name="FoldingChair" Load="Merge">
+    <removetag Name="IsImprovisedMelee" />
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
   <object  Name="MeleeWeapon" Load="Merge">
     <removetag Name="IsImprovisedMelee" />
   </object>

@@ -34,7 +34,12 @@ namespace HNPS_GigantismPlus
             }
             */
 
-            if (Object.HasPart<Chair>())
+            if (Object.DescendsFrom("FoldingChair"))
+            {
+                E.GeneralDescriptions.Add(new List<string> { null, "the ultimate in wrestling weapons" });
+            }
+
+            if (Object.HasPart<Chair>() && !Object.DescendsFrom("FoldingChair"))
             {
                 E.GeneralDescriptions.Add(new List<string> { "support", "gigantic rumps" });
             }
@@ -121,7 +126,7 @@ namespace HNPS_GigantismPlus
                 E.GeneralDescriptions.Add(new List<string> { "have", "a quarter more carry capcity" });
             }
 
-            if (Object.HasTagOrProperty("Ornate"))
+            if (Object.HasTagOrProperty("Ornate") || Object.HasTagOrProperty("Door"))
             {
                 E.GeneralDescriptions.Add(new() { "inspire", "awe with its immensity" });
             }
@@ -179,6 +184,98 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<DiggingTool>() || Object.HasPart<Drill>())
             {
                 E.WeaponDescriptions.Add(new() { "dig", "twice as fast" });
+            }
+
+            if (Object.TryGetPart(out DeploymentMaintainer deploymentMaintainer))
+            {
+                E.GeneralDescriptions.Add(new() { "enforce", "its effect twice far" });
+            }
+
+            if (Object.TryGetPart(out LiquidProducer liquidProducer) && liquidProducer.Rate != 0)
+            {
+                E.GeneralDescriptions.Add(new() { "produce", "liquid twice as fast" });
+            }
+
+            if (Object.TryGetPart(out ItemConvertor itemConvertor))
+            {
+                if (itemConvertor.ConversionTag == "RockTumblerOutput")
+                    E.GeneralDescriptions.Add(new() { "process", "rocks twice as effectively" });
+                if (itemConvertor.ConversionTag == "WireExtruderOutput")
+                    E.GeneralDescriptions.Add(new() { "extrudes", "double the additional wire from gigantic materials" });
+            }
+
+            if (Object.TryGetPart(out Fan fan))
+            {
+                E.GeneralDescriptions.Add(new() { "blow", "with twice the strength" });
+                E.GeneralDescriptions.Add(new() { "blow", "half again as far" });
+            }
+
+            if (Object.TryGetPart(out LiquidPump liquidPump))
+            {
+                E.GeneralDescriptions.Add(new() { "pump", "five times as much liquid" });
+            }
+
+            if (Object.TryGetPart(out Capacitor capacitor))
+            {
+                E.GeneralDescriptions.Add(new() { "hold", "twice the maximum charge" });
+            }
+
+            if (Object.TryGetPart(out RegenTank regenTank))
+            {
+                E.GeneralDescriptions.Add(new() { "require", "twice the minimum liquid to operate" });
+            }
+
+            if (Object.TryGetPart(out TemperatureAdjuster temperatureAdjuster) && Object.InheritsFrom("SolidHighTechInstallation"))
+            {
+                if (temperatureAdjuster.TemperatureAmount != 0)
+                    E.GeneralDescriptions.Add(new() { "affect", "temperature twice as effectively" });
+                if (temperatureAdjuster.TemperatureThreshold != 0)
+                    E.GeneralDescriptions.Add(new() { "have", "half again its temperature threshold" });
+            }
+
+            if (Object.TryGetPart(out DamageContents damageContents))
+            {
+                E.GeneralDescriptions.Add(new() { null, "twice as destructive to its contents" });
+            }
+
+            bool chargeUseIncreased2 =
+                (Object.TryGetPart(out RealityStabilization realityStabilization) && realityStabilization.ChargeUse != 0)
+             || (Object.TryGetPart(out Bed bed) && bed.ChargeUse != 0)
+             || (Object.TryGetPart(out Chair chair) && chair.ChargeUse != 0)
+             || (Object.TryGetPart(out temperatureAdjuster) && temperatureAdjuster.ChargeUse != 0)
+             || (Object.TryGetPart(out ChargeSink chargeSink) && chargeSink.ChargeUse != 0)
+             || (Object.TryGetPart(out ConversationScript conversationScript) && conversationScript.ChargeUse != 0)
+             || (Object.TryGetPart(out Mill mill) && mill.ChargeUse != 0)
+             || (Object.TryGetPart(out RadiusEventSender radiusEventSender) && radiusEventSender.ChargeUse != 0)
+             || (Object.TryGetPart(out Enclosing enclosing) && enclosing.ChargeUse != 0)
+             || (Object.TryGetPart(out damageContents) && damageContents.ChargeUse != 0)
+             || (Object.TryGetPart(out liquidPump) && liquidPump.ChargeUse != 0)
+             || (Object.TryGetPart(out fan) && fan.ChargeUse != 0)
+             || (Object.TryGetPart(out itemConvertor) && itemConvertor.ChargeUse != 0)
+             || (Object.TryGetPart(out regenTank) && regenTank.ChargeUse != 0)
+             || (Object.TryGetPart(out liquidProducer) && liquidProducer.ChargeUse != 0);
+            if (chargeUseIncreased2)
+            {
+                E.GeneralDescriptions.Add(new() { "draw", "twice the charge to power" });
+            }
+
+            bool chargeRateIncreased2 =
+                (Object.TryGetPart(out FusionReactor fusionReactor) && fusionReactor.ChargeRate != 0)
+             || (Object.TryGetPart(out SolarArray solarArray) && solarArray.ChargeRate != 0)
+             || (Object.TryGetPart(out BroadcastPowerReceiver broadcastPowerReceiver) && broadcastPowerReceiver.ChargeRate != 0)
+             || (Object.TryGetPart(out HydraulicPowerTransmission hydraulicPowerTransmission) && hydraulicPowerTransmission.ChargeRate != 0 && hydraulicPowerTransmission.IsConsumer)
+             || (Object.TryGetPart(out ElectricalPowerTransmission electricalPowerTransmission) && electricalPowerTransmission.ChargeRate != 0 && electricalPowerTransmission.IsConsumer);
+            if (chargeUseIncreased2)
+            {
+                E.GeneralDescriptions.Add(new() { "charge", "at twice the rate" });
+            }
+
+            bool chargeTransmissionIncreased2 =
+                (Object.TryGetPart(out electricalPowerTransmission) && electricalPowerTransmission.ChargeRate != 0 && !electricalPowerTransmission.IsConsumer)
+             || (Object.TryGetPart(out hydraulicPowerTransmission) && hydraulicPowerTransmission.ChargeRate != 0 && !hydraulicPowerTransmission.IsConsumer);
+            if (chargeTransmissionIncreased2)
+            {
+                E.GeneralDescriptions.Add(new() { "transmit", "power at twice the rate" });
             }
 
             return true;

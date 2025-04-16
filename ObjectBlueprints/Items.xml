@@ -169,54 +169,56 @@ You cannot wear equipment on your body." />
       
   -->
 
-  <object  Name="Item" Load="Merge">
+  <object Name="Item" Load="Merge">
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
   </object>
 
-  <object  Name="NaturalWeapon" Load="Merge">
+  <object Name="NaturalWeapon" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
     <removetag Name="IsImprovisedMelee" />
   </object>
   
-  <object  Name="FoldingChair" Load="Merge">
+  <object Name="FoldingChair" Load="Merge">
     <removetag Name="IsImprovisedMelee" />
     <removetag Name="IsImprovisedThrown" />
+    <intproperty Name="IsImprovisedMelee" Value="1" />
+    <intproperty Name="IsImprovisedThrown" Value="1" />
   </object>
   
-  <object  Name="MeleeWeapon" Load="Merge">
+  <object Name="MeleeWeapon" Load="Merge">
     <removetag Name="IsImprovisedMelee" />
   </object>
   
-  <object  Name="BaseDagger" Load="Merge">
+  <object Name="BaseDagger" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="Vibro Dagger" Load="Merge">
+  <object Name="Vibro Dagger" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="Gaslight Dagger" Load="Merge">
+  <object Name="Gaslight Dagger" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="BaseThrownWeapon" Load="Merge">
+  <object Name="BaseThrownWeapon" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="Geomagnetic Disc" Load="Merge">
+  <object Name="Geomagnetic Disc" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="ThrowingAxe" Load="Merge">
+  <object Name="ThrowingAxe" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="CastNet" Load="Merge">
+  <object Name="CastNet" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
-  <object  Name="BaseStone" Load="Merge">
+  <object Name="BaseStone" Load="Merge">
     <removetag Name="IsImprovisedThrown" />
   </object>
   
@@ -225,7 +227,7 @@ You cannot wear equipment on your body." />
       Modified BaseGame Natural Weapons 
       
   -->
-  <object  Name="Crystalline Point" Load="Merge">
+  <object Name="Crystalline Point" Load="Merge">
 		<part Name="Render" DisplayName="{{crystallized|crystalline}} {{crystallized|point}}" />
 	</object>
 
@@ -302,11 +304,14 @@ You cannot wear equipment on your body." />
 
   <!-- 
       
-      Weapon Elongating 
+      Helper Parts 
       
   -->
   <object Name="MeleeWeapon" Load="Merge">
     <part Name="WeaponElongator" />
+  </object>
+  <object Name="Corpse" Load="Merge">
+    <part Name="CorpseGigantifier" />
   </object>
 
   <!-- 

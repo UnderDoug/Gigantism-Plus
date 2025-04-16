@@ -26,13 +26,21 @@ namespace HNPS_GigantismPlus
         {
             GameObject Object = E.Object;
 
-            if (Object.DescendsFrom("FoldingChair"))
+            if (Object.InheritsFrom("FoldingChair"))
             {
+                Object.SetIntProperty("IsImprovisedMelee", 0, true);
+                Object.SetStringProperty("ShowMeleeWeaponStats", "true");
                 MeleeWeapon meleeWeapon = Object.RequirePart<MeleeWeapon>();
                 meleeWeapon.BaseDamage = "3d3";
                 meleeWeapon.MaxStrengthBonus = 8;
                 meleeWeapon.Skill = "Cudgel";
                 meleeWeapon.Stat = "Strength";
+
+                Object.SetIntProperty("IsImprovisedThrown", 0, true);
+                ThrownWeapon thrownWeapon = Object.RequirePart<ThrownWeapon>();
+                thrownWeapon.Damage = "3d3";
+                thrownWeapon.Penetration = 8;
+                thrownWeapon.Attributes = "Cudgel";
             }
 
             if (Object.TryGetPart(out LightSource lightSource))
@@ -77,6 +85,7 @@ namespace HNPS_GigantismPlus
             {
                 capacitor.MaxCharge *= 2;
                 capacitor.Charge *= 2;
+                capacitor.ChargeRate *= 2;
             }
 
             if (Object.TryGetPart(out FusionReactor fusionReactor))

@@ -58,7 +58,9 @@ namespace HNPS_GigantismPlus.Harmony
                                     blueprintItemBlueprints[inventoryObject.Blueprint]++;
                                     continue;
                                 }
-                                blueprintItemBlueprints.Add(inventoryObject.Blueprint, int.Parse(inventoryObject.Number));
+                                if (!int.TryParse(inventoryObject.Number, out int number))
+                                    number = 1;
+                                blueprintItemBlueprints.Add(inventoryObject.Blueprint, number);
                                 /*
                                 string targetType = itemBlueprint.GetPartParameter<string>(nameof(Armor), "WornOn") ?? itemBlueprint.GetPartParameter<string>(nameof(MeleeWeapon), "Slot");
                                 bool freeSlot = false;

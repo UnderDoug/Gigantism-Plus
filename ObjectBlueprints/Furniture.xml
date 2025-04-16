@@ -5,6 +5,122 @@
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
   </object>
+
+  <!-- Quality Beds -->
+
+  <object Name="Bedroll" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Crib" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Folding Cot" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Hammock" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Four-Poster Bed" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Waterbed" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Bedger" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Medical Bed" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Hyperbiotic Bed" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <!-- Quality Chairs -->
+
+  <object Name="Chair" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Floor Cushion" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+  <object Name="Kline" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Bench" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Stool" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+  <object Name="Canvas Folding Chair" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+  <object Name="Throne" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Armchair" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Massage Chair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Work Chair" Load="Merge">
+    <tag Name="Utility" Value="work" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Ergomax Chair" Load="Merge">
+    <tag Name="Utility" Value="work" />
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Chairbear" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Torture Chair" Load="Merge">
+    <tag Name="Utility" Value="work" />
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Medical Chair" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Hyperbiotic Chair" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Gravchair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Ornate Chair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Scrapasan" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Starmchair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <!--object Name="Sofa L" Load="Merge">
+    <tag Name="Utility" Value="wide" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Sofa C" Load="Merge">
+    <tag Name="Utility" Value="wide" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Sofa R" Load="Merge">
+    <tag Name="Utility" Value="wide" />
+    <tag Name="Quality" Value="nice" />
+  </object-->
   
   <!-- Gigantic Infrastructure -->
 

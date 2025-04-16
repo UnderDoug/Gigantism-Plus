@@ -5,6 +5,7 @@ using XRL.Wish;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
@@ -173,7 +174,8 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == EndTurnEvent.ID;
+                || ID == EndTurnEvent.ID
+                || ID == GetShortDescriptionEvent.ID;
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
@@ -188,6 +190,26 @@ namespace XRL.World.Parts
                 if (--TurnsTillGrumble == 0) Grumble = true;
             }
             return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            E.Postfix.AppendRules($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: This creature has eaten {Stews.Things("hepling")} of Seriously Thick Stew, resulting in {Gains.Things("Gain")}!");
+            return base.HandleEvent(E);
+        }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("EnteredCell");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "EnteredCell" && ParentObject.CurrentZone != null)
+            {
+                Stews += ParentObject.GetIntProperty(GIANT_STARTINGSTEWS);
+                ParentObject.SetIntProperty(GIANT_STARTINGSTEWS, 0, true);
+            }
+            return base.FireEvent(E);
         }
 
         public void Slap()

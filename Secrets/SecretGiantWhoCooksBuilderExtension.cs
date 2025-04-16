@@ -134,23 +134,7 @@ namespace HNPS_GigantismPlus
                  where faction.Old
                  select faction.Name).ToList();
             GameObjectBlueprint creatureBlueprint = EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
-                => EncountersAPI.IsLegendaryEligible(blueprint)
-                && (blueprint.HasPart(nameof(Body)) || blueprint.HasTagOrProperty("BodySubstitute"))
-                && (blueprint.HasPart(nameof(Combat)) || blueprint.HasTagOrProperty("BodySubstitute"))
-                && oldFactions.Contains(blueprint.GetPrimaryFaction())
-                && !blueprint.HasTag("BaseObject")
-                && !blueprint.HasTag("NoLibrarian")
-                && !blueprint.Mutations.ContainsKey(nameof(Burrowing))
-                && !blueprint.Mutations.ContainsKey(nameof(WallWalker))
-                && !blueprint.HasTagOrProperty("StartInLiquid")
-                && !blueprint.HasProperName()
-                && !blueprint.DescendsFrom("BaseTrueKin")
-                && !blueprint.DescendsFrom("BaseNest")
-                && !blueprint.DescendsFrom("BasePlant")
-                && !(blueprint.DescendsFrom("BaseRobot")
-                     && !(blueprint.Name.Is("Chrome Pyramid")
-                       || blueprint.Name.Is("Leering Stalker")))
-                && !(blueprint.TryGetTag("Species", out string species) && species.Is("mecha")));
+                => IsGiantCookEligible(blueprint));
 
             GamePartBlueprint gigantifiedPartBlueprint = new("XRL.World.ObjectBuilders", nameof(Gigantified))
             {
@@ -185,7 +169,9 @@ namespace HNPS_GigantismPlus
                 || entry.Key == typeof(HasThralls).Name
                 || entry.Key == typeof(HasSlaves).Name
                 || entry.Key == typeof(Leader).Name
-                || entry.Key == typeof(Followers).Name);
+                || entry.Key == typeof(Followers).Name
+                || entry.Key == typeof(Breeder).Name
+                || entry.Key == typeof(GreaterVoider).Name);
 
             GameObject creature;
             creature = GameObjectFactory.Factory.CreateObject(
@@ -257,7 +243,9 @@ namespace HNPS_GigantismPlus
                 stewBelly = creature.RequirePart<StewBelly>();
             }
             string dieRoll = Unique ? "4d4" : "2d4";
-            stewBelly.Stews += dieRoll.Roll();
+            int startingStews = dieRoll.Roll();
+            if (Unique) creature.SetIntProperty(GIANT_STARTINGSTEWS, startingStews);
+            else stewBelly.Stews += startingStews;
 
             creature.Brain.Mobile = true;
             creature.Brain.Wanders = true;
@@ -270,7 +258,7 @@ namespace HNPS_GigantismPlus
             {
                 description = creature.RequirePart<Description>();
             }
-            string creatureNoun = creatureBlueprint.DisplayName() ?? creatureBlueprint.Name;
+            string creatureNoun = $"{creature.Render?.DisplayName ?? creatureBlueprint.DisplayName()}".Color("y");
             string creatureArticle = Grammar.IndefiniteArticle(creatureNoun).Capitalize();
             string preDesc = SECRET_GIANTPREDESC.Replace(SECRET_GIANTPREDESC_REPLACE, $"{creatureArticle} {creatureNoun}");
             description.Short = preDesc + description._Short;
@@ -340,10 +328,113 @@ namespace HNPS_GigantismPlus
             if (creature.TryGetPart(out HasGuards hasGuards)) creature.RemovePart(hasGuards);
             if (creature.TryGetPart(out HasThralls hasThralls)) creature.RemovePart(hasThralls);
             if (creature.TryGetPart(out HasSlaves hasSlaves)) creature.RemovePart(hasSlaves);
-            if (creature.TryGetPart(out Followers followers)) creature.RemovePart(followers);
             if (creature.TryGetPart(out Leader leader)) creature.RemovePart(leader);
+            if (creature.TryGetPart(out Followers followers)) creature.RemovePart(followers);
+            if (creature.TryGetPart(out Breeder breeder)) creature.RemovePart(breeder);
+            if (creature.TryGetPart(out GreaterVoider greaterVoider)) creature.RemovePart(greaterVoider);
 
             return creature;
+        }
+
+        public static bool IsGiantCookEligible(GameObjectBlueprint Blueprint)
+        {
+            if (!EncountersAPI.IsLegendaryEligible(Blueprint)) 
+                return false;
+
+            if (!Blueprint.HasPart(nameof(Body)) && !Blueprint.HasTagOrProperty("BodySubstitute"))
+                return false;
+
+            if (!Blueprint.HasPart(nameof(Combat)) && !Blueprint.HasTagOrProperty("BodySubstitute"))
+                return false;
+
+            List<string> oldFactions =
+                (from faction in Factions.Loop()
+                 where faction.Old
+                 select faction.Name).ToList();
+            if (!oldFactions.Contains(Blueprint.GetPrimaryFaction()))
+                return false;
+
+            if (Blueprint.HasTag("BaseObject"))
+                return false;
+
+            if (Blueprint.HasTag("NoLibrarian"))
+                return false;
+
+            if (Blueprint.InheritsFrom("BaseTrueKin"))
+                return false;
+
+            if (Blueprint.InheritsFrom("BaseNest"))
+                return false;
+
+            if (Blueprint.InheritsFrom("BasePlant"))
+                return false;
+
+            if (Blueprint.InheritsFrom("MutatedPlant"))
+                return false;
+
+            if (Blueprint.InheritsFrom("BaseSlynth"))
+                return false;
+
+            if (Blueprint.InheritsFrom("LiquidLichen"))
+                return false;
+
+            if (Blueprint.InheritsFrom("FungusPuffer"))
+                return false;
+
+            if (Blueprint.InheritsFrom("BaseUrchin"))
+                return false;
+
+            if (Blueprint.InheritsFrom("BaseRobot"))
+            {
+                if (!Blueprint.Name.Is("Chrome Pyramid") || !Blueprint.Name.Is("Leering Stalker"))
+                    return false;
+            }
+
+            if (Blueprint.InheritsFrom("BaseGyreWight"))
+                return false;
+
+            if (Blueprint.InheritsFrom("Gyre Wight Apotheote"))
+                return false;
+
+            if (Blueprint.TryGetTag("Species", out string species) && species.Is("mecha"))
+                return false;
+
+            if (Blueprint.HasTagOrProperty("StartInLiquid"))
+                return false;
+
+            if (Blueprint.Parts.ContainsKey(typeof(SpawnWithLiquid).Name))
+                return false;
+
+            if (Blueprint.Mutations.ContainsKey(nameof(Burrowing)))
+                return false;
+
+            if (Blueprint.Mutations.ContainsKey(nameof(WallWalker)))
+                return false;
+
+            if (Blueprint.HasProperName())
+                return false;
+
+            // from the playable snapjaws mod, kept popping up.
+            if (Blueprint.Name.Is("PlayableSnapjaw") || Blueprint.InheritsFrom("PlayableSnapjaw")) 
+                return false;
+
+            // from the RogueRobots mod, kept popping up.
+            if (Blueprint.Name.Is("PlayerBaseRobot") || Blueprint.InheritsFrom("PlayerBaseRobot")) 
+                return false;
+
+            // from the RogueRobots mod, kept popping up.
+            if (Blueprint.Name.Is("TinkerBot") || Blueprint.InheritsFrom("TinkerBot")) 
+                return false;
+
+            // from the RogueRobots mod, just in case.
+            if (Blueprint.Name.Is("Agooga") || Blueprint.InheritsFrom("Agooga")) 
+                return false;
+
+            // from the Gyre White Subtype mod, kept popping up.
+            if (Blueprint.Name.Is("Andrea_GyreWight_WightBody") || Blueprint.InheritsFrom("Andrea_GyreWight_WightBody")) 
+                return false;
+
+            return true;
         }
 
         [WishCommand(Command = "go2giant")]

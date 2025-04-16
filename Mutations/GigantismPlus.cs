@@ -803,9 +803,14 @@ namespace XRL.World.Parts.Mutation
 
         public override bool HandleEvent(DroppedEvent E)
         {
-            if (E.Actor.Is(ParentObject) && E.Item.GetBlueprint().DescendsFrom("Corpse"))
+            if (E.Actor.Is(ParentObject) && E.Item.InheritsFrom("Corpse"))
             {
-                E.Item.ApplyModification("ModGigantic");
+                Debug.Entry(4, 
+                    $"{typeof(GigantismPlus).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(CorpseGigantifier).Name} E)",
+                    Indent: 0);
+                ModGigantic modGigantic = new();
+                E.Item.ApplyModification(modGigantic);
             }
             return base.HandleEvent(E);
         }

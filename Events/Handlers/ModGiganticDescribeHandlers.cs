@@ -34,13 +34,14 @@ namespace HNPS_GigantismPlus
             }
             */
 
-            if (Object.DescendsFrom("FoldingChair"))
+            if (Object.InheritsFrom("FoldingChair"))
             {
                 E.GeneralDescriptions.Add(new List<string> { null, "the ultimate in wrestling weapons" });
             }
 
-            if (Object.HasPart<Chair>() && !Object.DescendsFrom("FoldingChair"))
+            if (Object.HasPart<Chair>())
             {
+                if (!Object.InheritsFrom("FoldingChair"))
                 E.GeneralDescriptions.Add(new List<string> { "support", "gigantic rumps" });
             }
             if (Object.HasPart<Bed>())
@@ -163,9 +164,10 @@ namespace HNPS_GigantismPlus
             }
 
             bool isOrnate = Object.HasPropertyOrTag("Ornate");
-            bool isFurniture = Object.DescendsFrom("Furniture");
-            bool isWall = Object.DescendsFrom("Wall");
-            if (!isDefaultBehaviorOrFloating && !isOrnate && !isFurniture && !isWall)
+            bool isFurniture = Object.InheritsFrom("Furniture");
+            bool isWall = Object.InheritsFrom("Wall");
+            bool isCorpse = Object.InheritsFrom("Corpse");
+            if (!isDefaultBehaviorOrFloating && !isOrnate && !isFurniture && !isWall && !isCorpse)
             {
                 if (Object.UsesSlots == null &&
                     (!(meleeWeapon != null && meleeWeapon.IsImprovised())
@@ -186,17 +188,17 @@ namespace HNPS_GigantismPlus
                 E.WeaponDescriptions.Add(new() { "dig", "twice as fast" });
             }
 
-            if (Object.TryGetPart(out DeploymentMaintainer deploymentMaintainer))
+            if (Object.HasPart<DeploymentMaintainer>() && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { "enforce", "its effect twice far" });
             }
 
-            if (Object.TryGetPart(out LiquidProducer liquidProducer) && liquidProducer.Rate != 0)
+            if (Object.TryGetPart(out LiquidProducer liquidProducer) && liquidProducer.Rate != 0 && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { "produce", "liquid twice as fast" });
             }
 
-            if (Object.TryGetPart(out ItemConvertor itemConvertor))
+            if (Object.TryGetPart(out ItemConvertor itemConvertor) && isFurniture)
             {
                 if (itemConvertor.ConversionTag == "RockTumblerOutput")
                     E.GeneralDescriptions.Add(new() { "process", "rocks twice as effectively" });
@@ -204,28 +206,28 @@ namespace HNPS_GigantismPlus
                     E.GeneralDescriptions.Add(new() { "extrudes", "double the additional wire from gigantic materials" });
             }
 
-            if (Object.TryGetPart(out Fan fan))
+            if (Object.HasPart<Fan>() && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { "blow", "with twice the strength" });
                 E.GeneralDescriptions.Add(new() { "blow", "half again as far" });
             }
 
-            if (Object.TryGetPart(out LiquidPump liquidPump))
+            if (Object.HasPart<LiquidPump>() && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { "pump", "five times as much liquid" });
             }
 
-            if (Object.TryGetPart(out Capacitor capacitor))
+            if (Object.HasPart<Capacitor>() && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { "hold", "twice the maximum charge" });
             }
 
-            if (Object.TryGetPart(out RegenTank regenTank))
+            if (Object.HasPart<RegenTank>() && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { "require", "twice the minimum liquid to operate" });
             }
 
-            if (Object.TryGetPart(out TemperatureAdjuster temperatureAdjuster) && Object.InheritsFrom("SolidHighTechInstallation"))
+            if (Object.TryGetPart(out TemperatureAdjuster temperatureAdjuster) && isFurniture)
             {
                 if (temperatureAdjuster.TemperatureAmount != 0)
                     E.GeneralDescriptions.Add(new() { "affect", "temperature twice as effectively" });
@@ -233,47 +235,71 @@ namespace HNPS_GigantismPlus
                     E.GeneralDescriptions.Add(new() { "have", "half again its temperature threshold" });
             }
 
-            if (Object.TryGetPart(out DamageContents damageContents))
+            if (Object.HasPart<DamageContents>() && isFurniture)
             {
                 E.GeneralDescriptions.Add(new() { null, "twice as destructive to its contents" });
             }
 
-            bool chargeUseIncreased2 =
-                (Object.TryGetPart(out RealityStabilization realityStabilization) && realityStabilization.ChargeUse != 0)
-             || (Object.TryGetPart(out Bed bed) && bed.ChargeUse != 0)
-             || (Object.TryGetPart(out Chair chair) && chair.ChargeUse != 0)
-             || (Object.TryGetPart(out temperatureAdjuster) && temperatureAdjuster.ChargeUse != 0)
-             || (Object.TryGetPart(out ChargeSink chargeSink) && chargeSink.ChargeUse != 0)
-             || (Object.TryGetPart(out ConversationScript conversationScript) && conversationScript.ChargeUse != 0)
-             || (Object.TryGetPart(out Mill mill) && mill.ChargeUse != 0)
-             || (Object.TryGetPart(out RadiusEventSender radiusEventSender) && radiusEventSender.ChargeUse != 0)
-             || (Object.TryGetPart(out Enclosing enclosing) && enclosing.ChargeUse != 0)
-             || (Object.TryGetPart(out damageContents) && damageContents.ChargeUse != 0)
-             || (Object.TryGetPart(out liquidPump) && liquidPump.ChargeUse != 0)
-             || (Object.TryGetPart(out fan) && fan.ChargeUse != 0)
-             || (Object.TryGetPart(out itemConvertor) && itemConvertor.ChargeUse != 0)
-             || (Object.TryGetPart(out regenTank) && regenTank.ChargeUse != 0)
-             || (Object.TryGetPart(out liquidProducer) && liquidProducer.ChargeUse != 0);
-            if (chargeUseIncreased2)
+            bool chargeUseIncreased2x = isFurniture && (
+                (Object.TryGetPart(out RealityStabilization realityStabilization) 
+                    && realityStabilization.ChargeUse != 0)
+             || (Object.TryGetPart(out Bed bed) 
+                    && bed.ChargeUse != 0)
+             || (Object.TryGetPart(out Chair chair) 
+                    && chair.ChargeUse != 0)
+             || (Object.TryGetPart(out Capacitor capacitor) 
+                    && capacitor.ChargeUse != 0)
+             || (Object.TryGetPart(out ChargeSink chargeSink) 
+                    && chargeSink.ChargeUse != 0)
+             || (Object.TryGetPart(out ConversationScript conversationScript) 
+                    && conversationScript.ChargeUse != 0)
+             || (Object.TryGetPart(out Mill mill) 
+                    && mill.ChargeUse != 0)
+             || (Object.TryGetPart(out RadiusEventSender radiusEventSender) 
+                    && radiusEventSender.ChargeUse != 0)
+             || (Object.TryGetPart(out Enclosing enclosing) 
+                    && enclosing.ChargeUse != 0)
+             || (Object.TryGetPart(out DamageContents damageContents) 
+                    && damageContents.ChargeUse != 0)
+             || (Object.TryGetPart(out LiquidPump liquidPump) 
+                    && liquidPump.ChargeUse != 0)
+             || (Object.TryGetPart(out Fan fan) 
+                    && fan.ChargeUse != 0)
+             || (Object.TryGetPart(out RegenTank regenTank) 
+                    && regenTank.ChargeUse != 0)
+             || (Object.TryGetPart(out temperatureAdjuster) 
+                    && temperatureAdjuster.ChargeUse != 0)
+             || (Object.TryGetPart(out itemConvertor) 
+                    && itemConvertor.ChargeUse != 0)
+             || (Object.TryGetPart(out liquidProducer) 
+                    && liquidProducer.ChargeUse != 0));
+            if (chargeUseIncreased2x)
             {
                 E.GeneralDescriptions.Add(new() { "draw", "twice the charge to power" });
             }
 
-            bool chargeRateIncreased2 =
-                (Object.TryGetPart(out FusionReactor fusionReactor) && fusionReactor.ChargeRate != 0)
-             || (Object.TryGetPart(out SolarArray solarArray) && solarArray.ChargeRate != 0)
-             || (Object.TryGetPart(out BroadcastPowerReceiver broadcastPowerReceiver) && broadcastPowerReceiver.ChargeRate != 0)
-             || (Object.TryGetPart(out HydraulicPowerTransmission hydraulicPowerTransmission) && hydraulicPowerTransmission.ChargeRate != 0 && hydraulicPowerTransmission.IsConsumer)
-             || (Object.TryGetPart(out ElectricalPowerTransmission electricalPowerTransmission) && electricalPowerTransmission.ChargeRate != 0 && electricalPowerTransmission.IsConsumer);
-            if (chargeUseIncreased2)
+            bool chargeRateIncreased2x = isFurniture && (
+                (Object.TryGetPart(out FusionReactor fusionReactor) 
+                    && fusionReactor.ChargeRate != 0)
+             || (Object.TryGetPart(out SolarArray solarArray) 
+                    && solarArray.ChargeRate != 0)
+             || (Object.TryGetPart(out BroadcastPowerReceiver broadcastPowerReceiver) 
+                    && broadcastPowerReceiver.ChargeRate != 0)
+             || (Object.TryGetPart(out HydraulicPowerTransmission hydraulicPowerTransmission) 
+                    && hydraulicPowerTransmission.ChargeRate != 0 && hydraulicPowerTransmission.IsConsumer)
+             || (Object.TryGetPart(out ElectricalPowerTransmission electricalPowerTransmission) 
+                    && electricalPowerTransmission.ChargeRate != 0 && electricalPowerTransmission.IsConsumer));
+            if (chargeRateIncreased2x)
             {
                 E.GeneralDescriptions.Add(new() { "charge", "at twice the rate" });
             }
 
-            bool chargeTransmissionIncreased2 =
-                (Object.TryGetPart(out electricalPowerTransmission) && electricalPowerTransmission.ChargeRate != 0 && !electricalPowerTransmission.IsConsumer)
-             || (Object.TryGetPart(out hydraulicPowerTransmission) && hydraulicPowerTransmission.ChargeRate != 0 && !hydraulicPowerTransmission.IsConsumer);
-            if (chargeTransmissionIncreased2)
+            bool chargeTransmissionIncreased2x = isFurniture && (
+                (Object.TryGetPart(out electricalPowerTransmission) 
+                    && electricalPowerTransmission.ChargeRate != 0 && !electricalPowerTransmission.IsConsumer)
+             || (Object.TryGetPart(out hydraulicPowerTransmission) 
+                    && hydraulicPowerTransmission.ChargeRate != 0 && !hydraulicPowerTransmission.IsConsumer));
+            if (chargeTransmissionIncreased2x)
             {
                 E.GeneralDescriptions.Add(new() { "transmit", "power at twice the rate" });
             }

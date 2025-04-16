@@ -30,6 +30,7 @@ namespace HNPS_GigantismPlus
         public const string SECRET_GIANT_UNIQUE_STATE = "HNPS_Giant_KnowsHowToCook_State";
         public const string SECRET_GIANT_HEROTEMPLATE = "HNPS_SpecialHeroTemplate_SecretGiant";
         public const string GIANT_HEROTEMPLATE = "HNPS_SpecialHeroTemplate_Giant";
+        public const string GIANT_STARTINGSTEWS = "GenerateWithStews";
         public const string SECRET_GIANTLOCATION_TEXT = "the location of the {{yuge|giant}} who knows how to cook";
         public const string SECRET_GIANTLOCATION_CATEGORY = "Oddities";
         public const string SECRET_GIANTCONVSCRIPT_ID = "HNPS_Giant_KnowsHowToCook_Convo";

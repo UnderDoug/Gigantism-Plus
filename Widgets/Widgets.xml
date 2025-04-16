@@ -17,13 +17,13 @@
   <object Name="RandomBoulderOrDebrisLimestone" Inherits="RandomBoulderOrDebrisBase">
     <part Name="Render" DisplayName="[RandomBoulderOrDebrisLimestone]"
           ColorString="&amp;y" DetailColor="K"/>
-    <part Name="RandomBoulderOrDebris" ColorLike="Limestone" />
+    <part Name="RandomBoulderOrDebris" ColorLike="Limestone" Invert="True" />
   </object>
   
   <object Name="RandomBoulderOrDebrisGranite" Inherits="RandomBoulderOrDebrisBase">
     <part Name="Render" DisplayName="[RandomBoulderOrDebrisGranite]"
           ColorString="&amp;w" DetailColor="K"/>
-    <part Name="RandomBoulderOrDebris" ColorLike="Granite" Invert="True" />
+    <part Name="RandomBoulderOrDebris" ColorLike="Granite" />
   </object>
 
   <object Name="RandomTreeBase" Inherits="Widget">
@@ -136,12 +136,24 @@
     <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="25" />
   </object>
 
-  <object Name="RandomGiganticBedBase" Inherits="Widget">
-    <part Name="Render" DisplayName="[RandomGiganticBed]"
-          RenderString="B" Tile="Items/sw_bed.bmp"
+  <object Name="RandomGiganticFurnitureBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[RandomGiganticFurnitureBase]"
+          RenderString="B"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
     <tag Name="BaseObject" Value="*noinherit" />
     <part Name="RandomFurniture" Gigantic="true" />
+  </object>
+
+  <object Name="RandomGiganticBed" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticBed]"
+          Tile="Items/sw_bed.bmp" />
+    <part Name="RandomFurniture" Gigantic="true" Class="bed" />
+  </object>
+
+  <object Name="RandomGiganticBedBasic" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticBed]"
+          Tile="Items/sw_bed.bmp" />
+    <part Name="RandomFurniture" Gigantic="true" Class="bed" Quality="nice" />
   </object>
   
 </objects>

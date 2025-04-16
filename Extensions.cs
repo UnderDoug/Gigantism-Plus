@@ -692,7 +692,7 @@ namespace HNPS_GigantismPlus
 
         public static bool InheritsFrom(this GameObject Object, string Blueprint)
         {
-            return Object.GetBlueprint().InheritsFrom(Blueprint);
+            return Object.Blueprint.Is(Blueprint) || Object.GetBlueprint().InheritsFrom(Blueprint);
         }
 
         // partially repurposed from https://stackoverflow.com/a/32184652
@@ -1037,6 +1037,19 @@ namespace HNPS_GigantismPlus
             {
                 return "container";
             }
+            string @class = Object.GetPropertyOrTag("Class");
+            if (!@class.IsNullOrEmpty())
+            {
+                return @class;
+            }
+            if (Object.InheritsFrom("Furniture"))
+            {
+                return "furniture";
+            }
+            if (Object.HasPart<Container>())
+            {
+                return "container";
+            }
             switch (Scanning.GetScanTypeFor(Object))
             {
                 case Scanning.Scan.Tech:
@@ -1160,18 +1173,6 @@ namespace HNPS_GigantismPlus
         {
             Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
             return (int)Math.Max(Min, Math.Round(@int / 3.0)) * 3;
-        }
-
-        public static bool DescendsFrom(this GameObject Object, string Blueprint)
-        {
-            return Object.Blueprint.DescendsFrom(Blueprint);
-        }
-
-        public static bool DescendsFrom(this string Object, string Blueprint)
-        {
-            GameObjectBlueprint gameObjectBlueprint = GameObjectFactory.Factory.GetBlueprintIfExists(Object);
-            if (gameObjectBlueprint == null) return false;
-            return gameObjectBlueprint.DescendsFrom(Blueprint);
         }
     }
 }

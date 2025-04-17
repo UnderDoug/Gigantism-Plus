@@ -849,14 +849,6 @@ namespace HNPS_GigantismPlus
             {
                 return "applicator";
             }
-            if (Object.HasPart<Chair>())
-            {
-                return "chair";
-            }
-            if (Object.HasPart<Bed>())
-            {
-                return "bed";
-            }
             if (Object.HasPart<Tombstone>())
             {
                 return "tombstone";
@@ -1042,7 +1034,7 @@ namespace HNPS_GigantismPlus
                 {
                     if (!bodyType.IsNullOrEmpty())
                     {
-                        if (!bodyType.Is("Pillow"))
+                        if (bodyType.Is("Pillow"))
                         {
                             return "seat";
                         }
@@ -1053,7 +1045,7 @@ namespace HNPS_GigantismPlus
                 {
                     return bodyType.SplitCamelCase().ToLower();
                 }
-                if (Object.InheritsFrom("Statue"))
+                if (Object.InheritsFrom("Statue") || Object.InheritsFrom("Random Statue"))
                 {
                     return "statue";
                 }
@@ -1074,6 +1066,14 @@ namespace HNPS_GigantismPlus
                     return "container";
                 }
                 return "furniture";
+            }
+            if (Object.HasPart<Chair>())
+            {
+                return "chair";
+            }
+            if (Object.HasPart<Bed>())
+            {
+                return "bed";
             }
             if (Object.HasPart<Container>() || Object.HasPart<LiquidVolume>())
             {
@@ -1220,5 +1220,48 @@ namespace HNPS_GigantismPlus
                 "$1 $2"
             );
         }
-    }
+
+        public static T Sample<T>(this Dictionary<T, int> WeightedList)
+            where T : class
+        {
+            T Output = default;
+            int weightMax = 0;
+            foreach ((_, int entryWeight) in WeightedList)
+            {
+                weightMax += entryWeight;
+            }
+            int ticket = RndGP.Next(1, weightMax);
+            int weightCurrent = 0;
+            foreach ((T entryT, int entryWeight) in WeightedList)
+            {
+                weightCurrent += entryWeight;
+                if (ticket <= weightCurrent)
+                {
+                    Output = entryT;
+                    break;
+                }
+            }
+            return Output;
+        }
+        public static T Draw<T>(this Dictionary<T, int> WeightedList)
+            where T : class
+        {
+            T Output = WeightedList.Sample();
+            if(--WeightedList[Output] == 0)
+                WeightedList.Remove(Output);
+            return Output;
+        }
+        public static void AddTicket<T>(this Dictionary<T, int> WeightedList, T Ticket)
+            where T : class
+        {
+            if (WeightedList.ContainsKey(Ticket))
+            {
+                WeightedList[Ticket]++;
+            }
+            else
+            {
+                WeightedList.Add(Ticket, 1);
+            }
+        }
+    } //!-- Extensions
 }

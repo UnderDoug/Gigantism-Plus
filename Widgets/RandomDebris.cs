@@ -17,20 +17,21 @@ namespace XRL.World.Parts
         public string ColorLike;
         public bool Invert;
 
-        public List<string> Blueprints = new()
-        {
-            "SmallBoulder",
-            "MediumBoulder",
-            "LargeBoulder",
-            "Rubble",
-            "Rubble",
-        };
+        public Dictionary<string, int> debrisBlueprints;
+
         public RandomDebris()
         {
             TileColor = string.Empty;
             DetailColor = string.Empty;
             ColorLike = string.Empty;
             Invert = false;
+            debrisBlueprints = new()
+            {
+                { "SmallBoulder", 10 },
+                { "MediumBoulder", 20 },
+                { "LargeBoulder", 30 },
+                { "Rubble", 70 },
+            };
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -56,7 +57,7 @@ namespace XRL.World.Parts
                             DetailColor = detailColor.Replace("&","");
                     }
                 }
-                GameObject newObject = GameObjectFactory.Factory.CreateObject(Blueprints.GetRandomElement());
+                GameObject newObject = GameObjectFactory.Factory.CreateObject(debrisBlueprints.Sample());
                 Render render = newObject?.Render;
                 if (render != null)
                 {

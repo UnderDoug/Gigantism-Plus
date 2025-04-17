@@ -90,7 +90,7 @@ namespace HNPS_GigantismPlus
             }
             if (Object.HasPart<Container>())
             {
-                E.GeneralDescriptions.Add(new() { "store", "twice as many things (don't ask, It's fine)" });
+                E.GeneralDescriptions.Add(new() { "store", "twice as many things (don't ask, it's fine)" });
             }
             if (Object.HasPart<Enclosing>())
             {

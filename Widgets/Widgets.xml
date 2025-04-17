@@ -90,6 +90,28 @@
     <part Name="LightSource" Radius="5" />
   </object>
 
+  <object Name="WallOrDebrisBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[WallOrDebris*]"
+          RenderString="H" Tile="Widgets/WallOrDebris.png"
+          ColorString="&amp;K" DetailColor="y" Visible="false" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="WallOrDebris" />
+  </object>
+
+  <object Name="WallOrDebrisGranite" Inherits="WallOrDebrisBase">
+    <part Name="Render" DisplayName="[WallOrDebrisGranite]"
+          RenderString="H" Tile="Widgets/WallOrDebris.png"
+          ColorString="&amp;K" DetailColor="w" Visible="false" />
+    <part Name="WallOrDebris" Wall="Granite" WallChanceIn100="50" InvertColor="false" />
+  </object>
+
+  <object Name="WallOrDebrisLimestone" Inherits="WallOrDebrisBase">
+    <part Name="Render" DisplayName="[WallOrDebrisLimestone]"
+          RenderString="H" Tile="Widgets/WallOrDebris.png"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <part Name="WallOrDebris" Wall="Limestone" WallChanceIn100="50" InvertColor="true" />
+  </object>
+
   <object Name="WallOrNotBase" Inherits="Widget">
     <part Name="Render" DisplayName="[WallOrNot]"
           RenderString="H" Tile="Widgets/WallOrNot2.png"
@@ -148,7 +170,7 @@
     <part Name="Render" DisplayName="[RandomGiganticBed]"
           Tile="Widgets/RandomBedNice.png"
           ColorString="&amp;w" DetailColor="y" />
-    <part Name="RandomFurniture" Gigantic="true" Class="bed" />
+    <part Name="RandomFurniture" Gigantic="true" Class="bed" Utility="!medical" />
   </object>
 
   <object Name="RandomGiganticBedBasic" Inherits="RandomGiganticBed">
@@ -172,7 +194,7 @@
     <part Name="Render" DisplayName="[RandomGiganticChair]"
           Tile="Widgets/RandomChairNice.png"
           ColorString="&amp;w" DetailColor="y" />
-    <part Name="RandomFurniture" Gigantic="true" Class="chair" />
+    <part Name="RandomFurniture" Gigantic="true" Class="chair" Utility="!medical" />
   </object>
 
   <object Name="RandomGiganticChairBasic" Inherits="RandomGiganticChair">
@@ -191,5 +213,14 @@
           Tile="Widgets/RandomChairLuxury.png" />
     <part Name="RandomFurniture" Quality="luxury" />
   </object>
+
+  <object Name="RandomGiganticTable" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticTable]"
+          Tile="Assets_Content_Textures_Tiles_sw_table.bmp"
+          ColorString="&amp;w" DetailColor="y" />
+    <part Name="RandomFurniture" Gigantic="true" Class="table" Utility="!medical" />
+  </object>
+  
+  <!-- WallOrOtherWall: Gives a wall, but sometimes another Wall-->
   
 </objects>

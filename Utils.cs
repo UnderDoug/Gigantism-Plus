@@ -539,6 +539,17 @@ namespace HNPS_GigantismPlus
             GameObjectBlueprint = GetGameObjectBlueprint(Blueprint);
             return !GameObjectBlueprint.Is(null);
         }
+        public static string MakeAndList(IReadOnlyList<string> Words, bool Serial = true, bool IgnoreCommas = false)
+        {
+            List<string> replacedList = new();
+            foreach (string entry in Words)
+            {
+                replacedList.Add(entry.Replace(",", ";;"));
+            }
+            string andList = Grammar.MakeAndList(replacedList, Serial);
+            return andList.Replace(";;", ",");
+        }
+
     } //!-- public static class Utils
 
 }

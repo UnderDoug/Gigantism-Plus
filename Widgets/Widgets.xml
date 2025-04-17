@@ -7,23 +7,23 @@
       
    -->
 
-  <object Name="RandomBoulderOrDebrisBase" Inherits="Widget">
-    <part Name="Render" DisplayName="[RandomBoulderOrDebris]"
-          RenderString="B" Tile="Widgets/RandomBoulderOrRubble.png"
+  <object Name="RandomDebrisBase" Inherits="Widget" PreviousName="RandomBoulderOrDebrisBase">
+    <part Name="Render" DisplayName="[RandomDebris]"
+          RenderString="B" Tile="Widgets/RandomDebris.png"
           ColorString="&amp;y" DetailColor="K"/>
-    <part Name="RandomBoulderOrDebris" />
+    <part Name="RandomDebris" />
   </object>
-  
-  <object Name="RandomBoulderOrDebrisLimestone" Inherits="RandomBoulderOrDebrisBase">
-    <part Name="Render" DisplayName="[RandomBoulderOrDebrisLimestone]"
+
+  <object Name="RandomDebrisLimestone" Inherits="RandomDebrisBase" PreviousName="RandomBoulderOrDebrisLimestone">
+    <part Name="Render" DisplayName="[RandomDebrisLimestone]"
           ColorString="&amp;y" DetailColor="K"/>
-    <part Name="RandomBoulderOrDebris" ColorLike="Limestone" Invert="True" />
+    <part Name="RandomDebris" ColorLike="Limestone" Invert="True" />
   </object>
-  
-  <object Name="RandomBoulderOrDebrisGranite" Inherits="RandomBoulderOrDebrisBase">
-    <part Name="Render" DisplayName="[RandomBoulderOrDebrisGranite]"
+
+  <object Name="RandomDebrisGranite" Inherits="RandomDebrisBase" PreviousName="RandomBoulderOrDebrisGranite">
+    <part Name="Render" DisplayName="[RandomDebrisGranite]"
           ColorString="&amp;w" DetailColor="K"/>
-    <part Name="RandomBoulderOrDebris" ColorLike="Granite" />
+    <part Name="RandomDebris" ColorLike="Granite" />
   </object>
 
   <object Name="RandomTreeBase" Inherits="Widget">
@@ -67,26 +67,26 @@
   <object Name="OverheadLightsBase" Inherits="Widget">
     <part Name="Render" DisplayName="[OverheadLights]"
           RenderString="*" Tile="Widgets/OverheadLights.png"
-          ColorString="&amp;K" DetailColor="y" Visible="false" />
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
     <tag Name="BaseObject" Value="*noinherit" />
     <part Name="LightSource" Lit="true" Radius="0" />
   </object>
 
   <object Name="OverheadLightsWeak" Inherits="OverheadLightsBase">
     <part Name="Render" DisplayName="[OverheadLightsWeak]"
-          ColorString="&amp;K" DetailColor="y" Visible="false" />
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
     <part Name="LightSource" Radius="1" />
   </object>
 
   <object Name="OverheadLightsMedium" Inherits="OverheadLightsBase">
     <part Name="Render" DisplayName="[OverheadLightsMedium]"
-          ColorString="&amp;K" DetailColor="Y" Visible="false" />
+          ColorString="&amp;Y" DetailColor="K" Visible="false" />
     <part Name="LightSource" Radius="3" />
   </object>
 
   <object Name="OverheadLightsStrong" Inherits="OverheadLightsBase">
     <part Name="Render" DisplayName="[OverheadLightsStrong]"
-          ColorString="&amp;K" DetailColor="W" Visible="false" />
+          ColorString="&amp;W" DetailColor="K" Visible="false" />
     <part Name="LightSource" Radius="5" />
   </object>
 
@@ -146,14 +146,50 @@
 
   <object Name="RandomGiganticBed" Inherits="RandomGiganticFurnitureBase">
     <part Name="Render" DisplayName="[RandomGiganticBed]"
-          Tile="Items/sw_bed.bmp" />
+          Tile="Widgets/RandomBedNice.png"
+          ColorString="&amp;w" DetailColor="y" />
     <part Name="RandomFurniture" Gigantic="true" Class="bed" />
   </object>
 
-  <object Name="RandomGiganticBedBasic" Inherits="RandomGiganticFurnitureBase">
-    <part Name="Render" DisplayName="[RandomGiganticBed]"
-          Tile="Items/sw_bed.bmp" />
-    <part Name="RandomFurniture" Gigantic="true" Class="bed" Quality="nice" />
+  <object Name="RandomGiganticBedBasic" Inherits="RandomGiganticBed">
+    <part Name="Render" DisplayName="[RandomGiganticBedBasic]"
+          Tile="Widgets/RandomBedBasic.png" />
+    <part Name="RandomFurniture" Quality="basic" />
+  </object>
+
+  <object Name="RandomGiganticBedNice" Inherits="RandomGiganticBed">
+    <part Name="Render" DisplayName="[RandomGiganticBedNice]" />
+    <part Name="RandomFurniture" Quality="nice" />
+  </object>
+
+  <object Name="RandomGiganticBedLuxury" Inherits="RandomGiganticBed">
+    <part Name="Render" DisplayName="[RandomGiganticBedLuxury]"
+          Tile="Widgets/RandomBedLuxury.png" />
+    <part Name="RandomFurniture" Quality="luxury" />
+  </object>
+
+  <object Name="RandomGiganticChair" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticChair]"
+          Tile="Widgets/RandomChairNice.png"
+          ColorString="&amp;w" DetailColor="y" />
+    <part Name="RandomFurniture" Gigantic="true" Class="chair" />
+  </object>
+
+  <object Name="RandomGiganticChairBasic" Inherits="RandomGiganticChair">
+    <part Name="Render" DisplayName="[RandomGiganticChairBasic]"
+          Tile="Widgets/RandomChairBasic.png" />
+    <part Name="RandomFurniture" Quality="basic" />
+  </object>
+
+  <object Name="RandomGiganticChairNice" Inherits="RandomGiganticChair">
+    <part Name="Render" DisplayName="[RandomGiganticChairNice]" />
+    <part Name="RandomFurniture" Quality="nice" />
+  </object>
+
+  <object Name="RandomGiganticChairLuxury" Inherits="RandomGiganticChair">
+    <part Name="Render" DisplayName="[RandomGiganticChairLuxury]"
+          Tile="Widgets/RandomChairLuxury.png" />
+    <part Name="RandomFurniture" Quality="luxury" />
   </object>
   
 </objects>

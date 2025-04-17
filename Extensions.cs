@@ -17,6 +17,7 @@ using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using XRL.World.ObjectBuilders;
+using System.Text.RegularExpressions;
 
 namespace HNPS_GigantismPlus
 {
@@ -1033,20 +1034,48 @@ namespace HNPS_GigantismPlus
                     return "shoe";
                 }
             }
-            if (Object.HasPart<LiquidVolume>())
-            {
-                return "container";
-            }
-            string @class = Object.GetPropertyOrTag("Class");
-            if (!@class.IsNullOrEmpty())
-            {
-                return @class;
-            }
             if (Object.InheritsFrom("Furniture"))
             {
+                string bodyType = Object.GetPropertyOrTag("BodyType");
+                string @class = Object.GetPropertyOrTag("Class");
+                if (!@class.IsNullOrEmpty())
+                {
+                    if (!bodyType.IsNullOrEmpty())
+                    {
+                        if (!bodyType.Is("Pillow"))
+                        {
+                            return "seat";
+                        }
+                    }
+                    return @class;
+                }
+                if (!bodyType.IsNullOrEmpty())
+                {
+                    return bodyType.SplitCamelCase().ToLower();
+                }
+                if (Object.InheritsFrom("Statue"))
+                {
+                    return "statue";
+                }
+                if (Object.InheritsFrom("Eater Hologram"))
+                {
+                    return "hologram";
+                }
+                if (Object.InheritsFrom("Switch"))
+                {
+                    return "switch";
+                }
+                if (Object.HasPart<MergeConduit>())
+                {
+                    return "power conduit";
+                }
+                if (Object.HasPart<Container>() || Object.HasPart<LiquidVolume>())
+                {
+                    return "container";
+                }
                 return "furniture";
             }
-            if (Object.HasPart<Container>())
+            if (Object.HasPart<Container>() || Object.HasPart<LiquidVolume>())
             {
                 return "container";
             }
@@ -1065,7 +1094,7 @@ namespace HNPS_GigantismPlus
                     {
                         return "object";
                     }
-                    return "item";
+                    return Object.Render?.DisplayName ?? "item";
             }
         }
 
@@ -1173,6 +1202,23 @@ namespace HNPS_GigantismPlus
         {
             Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
             return (int)Math.Max(Min, Math.Round(@int / 3.0)) * 3;
+        }
+
+        public static string Are(this GameObject Object)
+        {
+            return Object.IsPlural ? "are" : "is";
+        }
+        public static string SplitCamelCase(this string @string)
+        {
+            return Regex.Replace(
+                Regex.Replace(
+                    @string,
+                    @"(\P{Ll})(\P{Ll}\p{Ll})",
+                    "$1 $2"
+                ),
+                @"(\p{Ll})(\P{Ll})",
+                "$1 $2"
+            );
         }
     }
 }

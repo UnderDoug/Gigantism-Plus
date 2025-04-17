@@ -310,6 +310,24 @@
     <part Name="ModGigantic" />
   </object>
   
+  <!-- Gigantic Power Conduits -->
+
+  <object Name="Gigantic PowerLine" Inherits="PowerLine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic HeavyPowerLine" Inherits="HeavyPowerLine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GlassHydraulicPipe" Inherits="GlassHydraulicPipe">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic WoodenMechanicalTransmission" Inherits="WoodenMechanicalTransmission">
+    <part Name="ModGigantic" />
+  </object>
+  
   <!-- Gigantic Grid-enabled Tech Furniture -->
 
   <object Name="Gigantic Wooden Wind Turbine" Inherits="Wooden Wind Turbine">
@@ -444,7 +462,7 @@
     <part Name="ModGigantic" />
   </object>
 
-  <object Name="Gigantic Capacitor" Inherits="Capacitor">
+  <object Name="Gigantic Catchbasin" Inherits="Catchbasin">
     <part Name="ModGigantic" />
   </object>
 

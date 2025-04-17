@@ -36,7 +36,7 @@ namespace HNPS_GigantismPlus
 
             if (Object.InheritsFrom("FoldingChair"))
             {
-                E.GeneralDescriptions.Add(new List<string> { null, "the ultimate in wrestling weapons" });
+                E.WeaponDescriptions.Add(new List<string> { null, "the ultimate in wrestling weapons" });
             }
 
             if (Object.HasPart<Chair>())
@@ -90,7 +90,7 @@ namespace HNPS_GigantismPlus
             }
             if (Object.HasPart<Container>())
             {
-                E.GeneralDescriptions.Add(new() { "store", "twice as many things (don't ask. It's fine)" });
+                E.GeneralDescriptions.Add(new() { "store", "twice as many things (don't ask, It's fine)" });
             }
             if (Object.HasPart<Enclosing>())
             {
@@ -285,6 +285,8 @@ namespace HNPS_GigantismPlus
                     && solarArray.ChargeRate != 0)
              || (Object.TryGetPart(out BroadcastPowerReceiver broadcastPowerReceiver) 
                     && broadcastPowerReceiver.ChargeRate != 0)
+             || (Object.TryGetPart(out MechanicalPowerTransmission mechanicalPowerTransmission) 
+                    && mechanicalPowerTransmission.ChargeRate != 0 && mechanicalPowerTransmission.IsConsumer)
              || (Object.TryGetPart(out HydraulicPowerTransmission hydraulicPowerTransmission) 
                     && hydraulicPowerTransmission.ChargeRate != 0 && hydraulicPowerTransmission.IsConsumer)
              || (Object.TryGetPart(out ElectricalPowerTransmission electricalPowerTransmission) 
@@ -298,7 +300,9 @@ namespace HNPS_GigantismPlus
                 (Object.TryGetPart(out electricalPowerTransmission) 
                     && electricalPowerTransmission.ChargeRate != 0 && !electricalPowerTransmission.IsConsumer)
              || (Object.TryGetPart(out hydraulicPowerTransmission) 
-                    && hydraulicPowerTransmission.ChargeRate != 0 && !hydraulicPowerTransmission.IsConsumer));
+                    && hydraulicPowerTransmission.ChargeRate != 0 && !hydraulicPowerTransmission.IsConsumer)
+             || (Object.TryGetPart(out mechanicalPowerTransmission) 
+                    && mechanicalPowerTransmission.ChargeRate != 0 && !mechanicalPowerTransmission.IsConsumer));
             if (chargeTransmissionIncreased2x)
             {
                 E.GeneralDescriptions.Add(new() { "transmit", "power at twice the rate" });

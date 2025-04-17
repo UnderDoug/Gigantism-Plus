@@ -10,7 +10,7 @@ using Qud.API;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class RandomBoulderOrDebris : IScribedPart
+    public class RandomDebris : IScribedPart
     {
         public string TileColor;
         public string DetailColor;
@@ -25,7 +25,7 @@ namespace XRL.World.Parts
             "Rubble",
             "Rubble",
         };
-        public RandomBoulderOrDebris()
+        public RandomDebris()
         {
             TileColor = string.Empty;
             DetailColor = string.Empty;
@@ -69,5 +69,5 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-    } //!-- public class RandomBoulderOrDebris : IScribedPart
+    } //!-- public class RandomDebris : IScribedPart
 }

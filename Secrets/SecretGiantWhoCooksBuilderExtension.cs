@@ -338,7 +338,7 @@ namespace HNPS_GigantismPlus
 
         public static bool IsGiantCookEligible(GameObjectBlueprint Blueprint)
         {
-            if (!EncountersAPI.IsLegendaryEligible(Blueprint)) 
+            if (false && !EncountersAPI.IsLegendaryEligible(Blueprint)) 
                 return false;
 
             if (!Blueprint.HasPart(nameof(Body)) && !Blueprint.HasTagOrProperty("BodySubstitute"))

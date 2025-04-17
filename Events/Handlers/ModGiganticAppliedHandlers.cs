@@ -101,9 +101,13 @@ namespace HNPS_GigantismPlus
             {
                 hydraulicPowerTransmission.ChargeRate *= 2;
             }
+            if (Object.TryGetPart(out MechanicalPowerTransmission mechanicalPowerTransmission))
+            {
+                mechanicalPowerTransmission.ChargeRate *= 2;
+            }
             if (Object.TryGetPart(out BroadcastPowerReceiver broadcastPowerReceiver))
             {
-                hydraulicPowerTransmission.ChargeRate *= 2;
+                broadcastPowerReceiver.ChargeRate *= 2;
             }
 
             if (Object.TryGetPart(out TemperatureAdjuster temperatureAdjuster) && Object.InheritsFrom("SolidHighTechInstallation"))

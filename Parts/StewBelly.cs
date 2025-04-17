@@ -193,7 +193,11 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            E.Postfix.AppendRules($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: This creature has eaten {Stews.Things("hepling")} of Seriously Thick Stew, resulting in {Gains.Things("Gain")}!");
+            if (!E.Postfix.ToString().IsNullOrEmpty())
+            {
+                E.Postfix.AppendLine();
+            }
+            E.Postfix.AppendRules($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: This creature has achieved {Gains.Things("Gain")} from the {Stews.Things("hepling")} of Seriously Thick Stew they've eaten! Talk about a hankering!");
             return base.HandleEvent(E);
         }
 

@@ -194,7 +194,7 @@
     <part Name="Render" DisplayName="[RandomGiganticChair]"
           Tile="Widgets/RandomChairNice.png"
           ColorString="&amp;w" DetailColor="y" />
-    <part Name="RandomFurniture" Gigantic="true" Class="chair" Utility="!medical" />
+    <part Name="RandomFurniture" Gigantic="true" Class="chair" Utility="!medical,!wide" />
   </object>
 
   <object Name="RandomGiganticChairBasic" Inherits="RandomGiganticChair">
@@ -220,6 +220,10 @@
           ColorString="&amp;w" DetailColor="y" />
     <part Name="RandomFurniture" Gigantic="true" Class="table" Utility="!medical" />
   </object>
+  
+  <!-- RandomGiganticDoor -->
+  
+  <!-- RandomGiganticInfrastructure -->
   
   <!-- WallOrOtherWall: Gives a wall, but sometimes another Wall-->
   

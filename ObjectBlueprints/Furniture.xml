@@ -109,7 +109,7 @@
     <tag Name="Quality" Value="luxury" />
   </object>
 
-  <!--object Name="Sofa L" Load="Merge">
+  <object Name="Sofa L" Load="Merge">
     <tag Name="Utility" Value="wide" />
     <tag Name="Quality" Value="nice" />
   </object>
@@ -120,7 +120,194 @@
   <object Name="Sofa R" Load="Merge">
     <tag Name="Utility" Value="wide" />
     <tag Name="Quality" Value="nice" />
-  </object-->
+  </object>
+
+  <!-- Quality Doors -->
+
+  <object Name="Archway" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Door" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Windowed Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+
+  <object Name="Striped Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Wavy Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Metal Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+
+  <object Name="Double Door N" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Door S" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Door E" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Door W" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Windowed Door N" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Windowed Door S" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Windowed Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Windowed Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Striped Door N" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Striped Door S" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Striped Door E" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Striped Door W" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Wavy Door N" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Wavy Door S" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Wavy Door E" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Wavy Door W" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Metal Door N" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Metal Door S" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Metal Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Metal Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Glass Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+  <object Name="Glass Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+  
+  <object Name="Tinted Glass Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+  <object Name="Tinted Glass Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+
+  <object Name="Security Door" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  
+  <object Name="Red Security Door" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Yellow Security Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Green Security Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Blue Security Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Purple Security Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+
+  <object Name="Fused Security Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="secure,nopass" />
+  </object>
+
+  <object Name="Crypt Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="death" />
+  </object>
+  <object Name="Crypt Double Door N" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall,death" />
+  </object>
+  <object Name="Crypt Double Door S" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall,death" />
+  </object>
+
+  <object Name="Brinestalk Gate" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="gate" />
+  </object>
+  <object Name="Iron Gate" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="gate" />
+  </object>
   
   <!-- Gigantic Infrastructure -->
 
@@ -169,7 +356,6 @@
   <object Name="Gigantic Double Door N" Inherits="Double Door N">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Door S" Inherits="Double Door S">
     <part Name="ModGigantic" />
   </object>
@@ -177,7 +363,6 @@
   <object Name="Gigantic Double Door E" Inherits="Double Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Door W" Inherits="Double Door W">
     <part Name="ModGigantic" />
   </object>
@@ -185,7 +370,6 @@
   <object Name="Gigantic Double Windowed Door N" Inherits="Double Windowed Door N">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Windowed Door S" Inherits="Double Windowed Door S">
     <part Name="ModGigantic" />
   </object>
@@ -193,7 +377,6 @@
   <object Name="Gigantic Double Windowed Door E" Inherits="Double Windowed Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Windowed Door W" Inherits="Double Windowed Door W">
     <part Name="ModGigantic" />
   </object>
@@ -201,7 +384,6 @@
   <object Name="Gigantic Double Striped Door N" Inherits="Double Striped Door N">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Striped Door S" Inherits="Double Striped Door S">
     <part Name="ModGigantic" />
   </object>
@@ -209,7 +391,6 @@
   <object Name="Gigantic Double Striped Door E" Inherits="Double Striped Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Striped Door W" Inherits="Double Striped Door W">
     <part Name="ModGigantic" />
   </object>
@@ -217,7 +398,6 @@
   <object Name="Gigantic Double Wavy Door N" Inherits="Double Wavy Door N">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Wavy Door S" Inherits="Double Wavy Door S">
     <part Name="ModGigantic" />
   </object>
@@ -225,7 +405,6 @@
   <object Name="Gigantic Double Wavy Door E" Inherits="Double Wavy Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Wavy Door W" Inherits="Double Wavy Door W">
     <part Name="ModGigantic" />
   </object>
@@ -233,7 +412,6 @@
   <object Name="Gigantic Double Metal Door N" Inherits="Double Metal Door N">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Metal Door S" Inherits="Double Metal Door S">
     <part Name="ModGigantic" />
   </object>
@@ -241,7 +419,6 @@
   <object Name="Gigantic Double Metal Door E" Inherits="Double Metal Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Double Metal Door W" Inherits="Double Metal Door W">
     <part Name="ModGigantic" />
   </object>
@@ -249,7 +426,6 @@
   <object Name="Gigantic Glass Door E" Inherits="Glass Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Glass Door W" Inherits="Glass Door W">
     <part Name="ModGigantic" />
   </object>
@@ -257,7 +433,6 @@
   <object Name="Gigantic Tinted Glass Door E" Inherits="Tinted Glass Door E">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Tinted Glass Door W" Inherits="Tinted Glass Door W">
     <part Name="ModGigantic" />
   </object>
@@ -269,19 +444,15 @@
   <object Name="Gigantic Red Security Door" Inherits="Red Security Door">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Yellow Security Door" Inherits="Yellow Security Door">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Green Security Door" Inherits="Green Security Door">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Blue Security Door" Inherits="Blue Security Door">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Purple Security Door" Inherits="Purple Security Door">
     <part Name="ModGigantic" />
   </object>
@@ -293,11 +464,9 @@
   <object Name="Gigantic Crypt Door" Inherits="Crypt Door">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Crypt Double Door N" Inherits="Crypt Double Door N">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Crypt Double Door S" Inherits="Crypt Double Door S">
     <part Name="ModGigantic" />
   </object>
@@ -305,7 +474,6 @@
   <object Name="Gigantic Brinestalk Gate" Inherits="Brinestalk Gate">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic Iron Gate" Inherits="Iron Gate">
     <part Name="ModGigantic" />
   </object>
@@ -315,7 +483,6 @@
   <object Name="Gigantic PowerLine" Inherits="PowerLine">
     <part Name="ModGigantic" />
   </object>
-
   <object Name="Gigantic HeavyPowerLine" Inherits="HeavyPowerLine">
     <part Name="ModGigantic" />
   </object>

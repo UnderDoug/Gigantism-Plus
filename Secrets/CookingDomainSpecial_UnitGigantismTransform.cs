@@ -86,12 +86,11 @@ namespace XRL.World.Effects
 
         public static void ApplyTo(GameObject Object)
         {
-            if (Object.HasPart<GigantismPlus>())
+            if (!Object.TryGetPart(out StewBelly stewBelly))
             {
-                Object.ShowFailure($"You are already {"massive".OptionalColorGigantic(Colorfulness)}.");
-                return;
+                stewBelly = Object.RequirePart<StewBelly>();
             }
-            if (Object.IsPlayer())
+            if (Object.IsPlayer() && !Object.HasPart<GigantismPlus>() && stewBelly.Stews == 0)
             {
                 GigantismPlus gigantism = new();
                 Popup.Show("...");
@@ -126,6 +125,28 @@ namespace XRL.World.Effects
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
                 }
             }
+            if (Object.IsPlayer())
+            {
+                if (stewBelly.Stews > 0)
+                {
+                    int breakpoint = (int)Math.Floor(stewBelly.GetLastHankering() / 2.0);
+                    int hankering = stewBelly.Hankering;
+                    Popup.Show("{{emote|*chew* *chew*}} That is one " + "Seriously Thick Stew".OptionalColorYuge(Colorfulness) + "!");
+                    if (hankering == 1)
+                    {
+                        Popup.Show("That one hit the spot!");
+                    }
+                    if (hankering > 1 && hankering < breakpoint)
+                    {
+                        Popup.Show("Almost full!");
+                    }
+                    else
+                    {
+                        Popup.Show("Still have a serious hankering!");
+                    }
+                }
+            }
+            stewBelly.EatStew();
         }
     } //!-- public class CookingDomainSpecial_UnitGigantismTransform : ProceduralCookingEffectUnit
 }

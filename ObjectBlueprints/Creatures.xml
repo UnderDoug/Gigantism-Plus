@@ -23,46 +23,57 @@
     <object Name="Great Saltback" Load="Merge">
         <mutation Name="GigantismPlus" Level="3" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Chrome Pyramid" Load="Merge">
         <mutation Name="GigantismPlus" Level="7" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
 	  </object>
 	  <object Name="Great Magma Crab" Load="Merge">
 		    <mutation Name="GigantismPlus" Level="2" />
 		    <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Saltwurm" Load="Merge">
         <mutation Name="GigantismPlus" Level="10" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Star Kraken" Load="Merge">
         <mutation Name="GigantismPlus" Level="10" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="VehicleTemplarMech" Load="Merge">
         <mutation Name="GigantismPlus" Level="5" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="BaseNephal" Load="Merge">
         <mutation Name="GigantismPlus" Level="10" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="BaseVehicleGolem" Load="Merge">
         <mutation Name="GigantismPlus" Level="5" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Rodanis Y" Load="Merge">
         <mutation Name="GigantismPlus" Level="2" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Oboroqoru" Load="Merge">
         <mutation Name="GigantismPlus" Level="16" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Troll" Load="Merge">
         <mutation Name="GigantismPlus" Level="4" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
 
     <!--object Name="Knight Templar" Load="Merge">
@@ -214,5 +225,11 @@
       <tag Name="NoLibrarian" />
       <tag Name="ExcludeFromVillagePopulations" />
     </object>
-  
+
+    <!-- 
+        Vanilla Fixes
+     -->
+    <object Name="Scorpiock_Claws" Load="Merge">
+      <part Name="Render" DisplayName="claw" Load="Merge" />
+    </object>
 </objects>

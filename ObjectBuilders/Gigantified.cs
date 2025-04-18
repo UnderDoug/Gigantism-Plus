@@ -110,7 +110,7 @@ namespace XRL.World.ObjectBuilders
 
                 GameObject exoframeObject = GameObjectFactory.create(exoframe);
                 CyberneticsGiganticExoframe exoframeCybernetic = exoframeObject.GetPart<CyberneticsGiganticExoframe>();
-
+                exoframeCybernetic.MapAugmentAdjustments();
                 NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
 
                 Render render = Object.Render;

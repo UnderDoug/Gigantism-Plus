@@ -17,6 +17,7 @@ using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using XRL.World.ObjectBuilders;
+using System.Text.RegularExpressions;
 
 namespace HNPS_GigantismPlus
 {
@@ -152,6 +153,10 @@ namespace HNPS_GigantismPlus
         public static string OptionalColorGigantic(this string Text, int Option = 3)
         {
             return Text.OptionalColor(Color: "gigantic", FallbackColor: "w", Option);
+        }
+        public static string OptionalColorYuge(this string Text, int Option = 3)
+        {
+            return Text.OptionalColor(Color: "yuge", FallbackColor: "w", Option);
         }
         public static string OptionalColorGiant(this string Text, int Option = 3)
         {
@@ -578,6 +583,15 @@ namespace HNPS_GigantismPlus
             Debug.Entry(3, $"x {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//");
         }
 
+        public static IPart RequirePart(this GameObject Object, IPart Part, bool DoRegistration = true, bool Creation = false)
+        {
+            if (Object.HasPart(Part.Name))
+            {
+                return Object.GetPart(Part.Name);
+            }
+            Part.ParentObject = Object;
+            return Object.AddPart(Part, DoRegistration: DoRegistration, Creation: Creation);
+        }
         public static IPart RequirePart(this GameObject Object, string Part, bool DoRegistration = true, bool Creation = false)
         {
             if (Object.HasPart(Part))
@@ -585,6 +599,7 @@ namespace HNPS_GigantismPlus
                 return Object.GetPart(Part);
             }
             GamePartBlueprint gamePartBlueprint = new(Part);
+            if (gamePartBlueprint == null) return null;
             IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
             part.ParentObject = Object;
             gamePartBlueprint.InitializePartInstance(part);
@@ -678,7 +693,7 @@ namespace HNPS_GigantismPlus
 
         public static bool InheritsFrom(this GameObject Object, string Blueprint)
         {
-            return Object.GetBlueprint().InheritsFrom(Blueprint);
+            return Object.Blueprint.Is(Blueprint) || Object.GetBlueprint().InheritsFrom(Blueprint);
         }
 
         // partially repurposed from https://stackoverflow.com/a/32184652
@@ -834,9 +849,9 @@ namespace HNPS_GigantismPlus
             {
                 return "applicator";
             }
-            if (Object.HasPart<Chair>())
+            if (Object.HasPart<Tombstone>())
             {
-                return "chair";
+                return "tombstone";
             }
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {
@@ -1011,7 +1026,56 @@ namespace HNPS_GigantismPlus
                     return "shoe";
                 }
             }
-            if (Object.HasPart<LiquidVolume>())
+            if (Object.InheritsFrom("Furniture"))
+            {
+                string bodyType = Object.GetPropertyOrTag("BodyType");
+                string @class = Object.GetPropertyOrTag("Class");
+                if (!@class.IsNullOrEmpty())
+                {
+                    if (!bodyType.IsNullOrEmpty())
+                    {
+                        if (bodyType.Is("Pillow"))
+                        {
+                            return "seat";
+                        }
+                    }
+                    return @class;
+                }
+                if (!bodyType.IsNullOrEmpty())
+                {
+                    return bodyType.SplitCamelCase().ToLower();
+                }
+                if (Object.InheritsFrom("Statue") || Object.InheritsFrom("Random Statue"))
+                {
+                    return "statue";
+                }
+                if (Object.InheritsFrom("Eater Hologram"))
+                {
+                    return "hologram";
+                }
+                if (Object.InheritsFrom("Switch"))
+                {
+                    return "switch";
+                }
+                if (Object.HasPart<MergeConduit>())
+                {
+                    return "power conduit";
+                }
+                if (Object.HasPart<Container>() || Object.HasPart<LiquidVolume>())
+                {
+                    return "container";
+                }
+                return "furniture";
+            }
+            if (Object.HasPart<Chair>())
+            {
+                return "chair";
+            }
+            if (Object.HasPart<Bed>())
+            {
+                return "bed";
+            }
+            if (Object.HasPart<Container>() || Object.HasPart<LiquidVolume>())
             {
                 return "container";
             }
@@ -1030,7 +1094,7 @@ namespace HNPS_GigantismPlus
                     {
                         return "object";
                     }
-                    return "item";
+                    return Object.Render?.DisplayName ?? "item";
             }
         }
 
@@ -1103,5 +1167,101 @@ namespace HNPS_GigantismPlus
             GameObjectBlueprint = GameObject.GetGameObjectBlueprint();
             return !GameObjectBlueprint.Is(null);
         }
-    }
+
+        public static string DebugName(this BodyPart BodyPart)
+        {
+            return $"[{BodyPart.ID}:{BodyPart.Name}]::{BodyPart.Description}";
+        }
+
+        public static int Between(this int @int, int Min, int Max)
+        {
+            return Math.Min(Math.Max(@int, Min), Max);
+        }
+        public static double Between(this double @double, double Min, double Max)
+        {
+            return Math.Min(Math.Max(@double, Min), Max);
+        }
+        public static float Between(this float @float, float Min, float Max)
+        {
+            return Math.Min(Math.Max(@float, Min), Max);
+        }
+
+        public static int RapidAdvancementCeiling(this int @int, int Min = 0)
+        {
+            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
+            return (int)Math.Max(Min, Math.Ceiling(@int / 3.0)) * 3;
+        }
+
+        public static int RapidAdvancementFloor(this int @int, int Min = 0)
+        {
+            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
+            return (int)Math.Max(Min, Math.Floor(@int / 3.0)) * 3;
+        }
+
+        public static int RapidAdvancementRound(this int @int, int Min = 0)
+        {
+            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
+            return (int)Math.Max(Min, Math.Round(@int / 3.0)) * 3;
+        }
+
+        public static string Are(this GameObject Object)
+        {
+            return Object.IsPlural ? "are" : "is";
+        }
+        public static string SplitCamelCase(this string @string)
+        {
+            return Regex.Replace(
+                Regex.Replace(
+                    @string,
+                    @"(\P{Ll})(\P{Ll}\p{Ll})",
+                    "$1 $2"
+                ),
+                @"(\p{Ll})(\P{Ll})",
+                "$1 $2"
+            );
+        }
+
+        public static T Sample<T>(this Dictionary<T, int> WeightedList)
+            where T : class
+        {
+            T Output = default;
+            int weightMax = 0;
+            foreach ((_, int entryWeight) in WeightedList)
+            {
+                weightMax += entryWeight;
+            }
+            int ticket = RndGP.Next(1, weightMax);
+            int weightCurrent = 0;
+            foreach ((T entryT, int entryWeight) in WeightedList)
+            {
+                weightCurrent += entryWeight;
+                if (ticket <= weightCurrent)
+                {
+                    Output = entryT;
+                    break;
+                }
+            }
+            return Output;
+        }
+        public static T Draw<T>(this Dictionary<T, int> WeightedList)
+            where T : class
+        {
+            T Output = WeightedList.Sample();
+            if(--WeightedList[Output] == 0)
+                WeightedList.Remove(Output);
+            return Output;
+        }
+        public static void AddTicket<T>(this Dictionary<T, int> WeightedList, T Ticket)
+            where T : class
+        {
+            if (WeightedList.ContainsKey(Ticket))
+            {
+                WeightedList[Ticket]++;
+            }
+            else
+            {
+                WeightedList.Add(Ticket, 1);
+            }
+        }
+    } //!-- Extensions
 }

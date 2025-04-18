@@ -454,5 +454,18 @@ namespace HNPS_GigantismPlus
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
             return List;
         }
+
+        public static void InheritanceTree(GameObject Object)
+        {
+            GameObjectBlueprint objectBlueprint = Object.GetBlueprint();
+
+            Entry(4, $"objectBlueprint: {objectBlueprint.Name}", Indent: 0);
+            GameObjectBlueprint shallowParent = objectBlueprint.ShallowParent;
+            while (shallowParent != null)
+            {
+                Entry(4, $"shallowParent: {shallowParent.Name}", Indent: 0);
+                shallowParent = shallowParent.ShallowParent;
+            }
+        }
     } //!-- public static class Debug
 }

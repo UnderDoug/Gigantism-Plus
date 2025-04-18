@@ -187,21 +187,27 @@ namespace XRL.World.Parts
                     $"{typeof(ModNaturalEquipment<T>).Name}<{typeof(T).Name}>.{nameof(BeingAppliedBy)} (" +
                     $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
                     $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " +
-                    $"Failed to assign {typeof(T).Name} as AssigningPart",
+                    $"Failed to assign {GetSource()} as AssigningPart",
                     Indent: 0);
             }
             return base.BeingAppliedBy(obj, who);
         }
         public override void ApplyModification(GameObject Object)
         {
-            Debug.Entry(4, $"@ {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", Indent: 3);
+            Debug.Entry(4, 
+                $"@ {Name}[{GetSource()}]." + 
+                $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", 
+                Indent: 3);
 
             Object.GetPart<NaturalEquipmentManager>()
                 .AddShortDescriptionEntry(this);
             
             ApplyPartAndPropChanges(Object);
 
-            Debug.Entry(4, $"x {Name}.{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", Indent: 3);
+            Debug.Entry(4, 
+                $"x {Name}[{GetSource()}]." + 
+                $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", 
+                Indent: 3);
             base.ApplyModification(Object);
         }
         public override string GetSource()

@@ -90,7 +90,6 @@ namespace XRL.World.Parts.Mutation
                 AddedParts = new()
                 {
                     "Inorganic",
-                    "Stone",
                 },
 
                 AddedStringProps = new()
@@ -251,12 +250,12 @@ namespace XRL.World.Parts.Mutation
             ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = null;
             if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
             {
-                naturalEquipmentMod = new(NaturalEquipmentMod);
-                Debug.CheckYeh(4, $"naturalEquipmentMod for this BodyPart contained in Property", Indent: 2);
+                naturalEquipmentMod = NaturalEquipmentMod;
+                Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Property", Indent: 2);
             }
             else if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
             {
-                naturalEquipmentMod = new(NaturalEquipmentMods[targetType]);
+                naturalEquipmentMod = NaturalEquipmentMods[targetType];
                 Debug.CheckYeh(4, $"NaturalEquipmentMod for this BodyPart contained in Dictionary", Indent: 3);
             }
             else

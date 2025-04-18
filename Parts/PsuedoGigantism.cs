@@ -47,5 +47,5 @@ namespace XRL.World.Parts
         {
             return true;
         }
-    } //!-- public class PsudoGigantic : IPart
+    } //!-- public class PsudoGigantic : IScribedPart
 }

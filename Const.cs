@@ -4,6 +4,7 @@ namespace HNPS_GigantismPlus
 {
     public static class Const
     {
+        public const string MOD_ID = "gigantism_Plus";
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
         public const string TANDR = "\u2514"; // └
@@ -26,7 +27,10 @@ namespace HNPS_GigantismPlus
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
 
         public const string SECRET_GIANTID = "$HNPS_Giant_KnowsHowToCook";
-        public const string SECRET_GIANT_STATE = "HNPS_Giant_KnowsHowToCook_State";
+        public const string SECRET_GIANT_UNIQUE_STATE = "HNPS_Giant_KnowsHowToCook_State";
+        public const string SECRET_GIANT_HEROTEMPLATE = "HNPS_SpecialHeroTemplate_SecretGiant";
+        public const string GIANT_HEROTEMPLATE = "HNPS_SpecialHeroTemplate_Giant";
+        public const string GIANT_STARTINGSTEWS = "GenerateWithStews";
         public const string SECRET_GIANTLOCATION_TEXT = "the location of the {{yuge|giant}} who knows how to cook";
         public const string SECRET_GIANTLOCATION_CATEGORY = "Oddities";
         public const string SECRET_GIANTCONVSCRIPT_ID = "HNPS_Giant_KnowsHowToCook_Convo";

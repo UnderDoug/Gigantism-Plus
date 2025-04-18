@@ -25,6 +25,7 @@ namespace XRL.World.Parts.Mutation
 
         public static readonly int ICON_COLOR_PRIORITY = 81;
         public static readonly string ICON_COLOR = "&z";
+        public static readonly string ICON_COLOR_FALLBACK = "&w";
 
         private bool MutationColor = XRL.UI.Options.MutationColor;
 
@@ -544,6 +545,11 @@ namespace XRL.World.Parts.Mutation
                 Debug.LoopItem(4, "IsGiganticCreature = true", Indent: 2);
                 GO.RequirePart<StunningForceOnJump>();
                 Debug.LoopItem(4, "RequirePart<StunningForceOnJump>()", Indent: 2);
+                if (!GO.TryGetPart(out StewBelly stewBelly))
+                {
+                    stewBelly = new(1);
+                    GO.RequirePart(stewBelly);
+                }
             }
             else
             {
@@ -692,18 +698,23 @@ namespace XRL.World.Parts.Mutation
                 || ID == CanEnterInteriorEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == InventoryActionEvent.ID;
+                || ID == InventoryActionEvent.ID
+                || ID == DroppedEvent.ID;
         }
         public override bool Render(RenderEvent E)
         {
-            bool flag = true;
-            if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+            if (ParentObject.GetPropertyOrTag("GigantismPlusColorChange", "true").Is("true"))
             {
-                flag = MutationColor = UI.Options.MutationColor;
-            }
-            if (flag && !IsCyberGiant)
-            {
-                E.ApplyColors(ICON_COLOR, ICON_COLOR_PRIORITY);
+                bool flag = true;
+                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+                {
+                    flag = MutationColor = UI.Options.MutationColor;
+                }
+                if (flag && !IsCyberGiant)
+                {
+                    string newColor = Colorfulness > 2 ? ICON_COLOR : ICON_COLOR_FALLBACK;
+                    E.ApplyColors(newColor, ICON_COLOR_PRIORITY);
+                }
             }
             return base.Render(E);
         }
@@ -787,6 +798,20 @@ namespace XRL.World.Parts.Mutation
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(DroppedEvent E)
+        {
+            if (E.Actor.Is(ParentObject) && E.Item.InheritsFrom("Corpse"))
+            {
+                Debug.Entry(4, 
+                    $"{typeof(GigantismPlus).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(CorpseGigantifier).Name} E)",
+                    Indent: 0);
+                ModGigantic modGigantic = new();
+                E.Item.ApplyModification(modGigantic);
+            }
             return base.HandleEvent(E);
         }
 

@@ -1,0 +1,230 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+  
+  <!-- 
+      
+      Zone mutators, Tile mutators, Multi-tile presets, Quest triggers, UI widgets
+      
+   -->
+
+  <object Name="RandomDebrisBase" Inherits="Widget" PreviousName="RandomBoulderOrDebrisBase">
+    <part Name="Render" DisplayName="[RandomDebris]"
+          RenderString="B" Tile="Widgets/RandomDebris.png"
+          ColorString="&amp;y" DetailColor="K"/>
+    <part Name="RandomDebris" />
+  </object>
+
+  <object Name="RandomDebrisLimestone" Inherits="RandomDebrisBase" PreviousName="RandomBoulderOrDebrisLimestone">
+    <part Name="Render" DisplayName="[RandomDebrisLimestone]"
+          ColorString="&amp;y" DetailColor="K"/>
+    <part Name="RandomDebris" ColorLike="Limestone" Invert="True" />
+  </object>
+
+  <object Name="RandomDebrisGranite" Inherits="RandomDebrisBase" PreviousName="RandomBoulderOrDebrisGranite">
+    <part Name="Render" DisplayName="[RandomDebrisGranite]"
+          ColorString="&amp;w" DetailColor="K"/>
+    <part Name="RandomDebris" ColorLike="Granite" />
+  </object>
+
+  <object Name="RandomTreeBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[RandomTree]"
+          RenderString="T" Tile="Widgets/RandomTree.png"
+          ColorString="&amp;y" DetailColor="K"/>
+    <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="RandomTree" />
+  </object>
+  
+  <object Name="RandomTreeNearby" Inherits="RandomTreeBase">
+    <part Name="Render" DisplayName="[RandomTreeNearby]"
+          ColorString="&amp;w" DetailColor="K"/>
+    <part Name="RandomTree" Nearby="true" />
+  </object>
+
+  <object Name="RandomTreesNearbyCouple" Inherits="RandomTreeBase">
+    <part Name="Render" DisplayName="[RandomTreesNearbyCouple]"
+          ColorString="&amp;G" DetailColor="K"/>
+    <part Name="RandomTree" Nearby="true" Count="2" Persist="true" />
+  </object>
+
+  <object Name="RandomTreesNearbyCoupleMaybe" Inherits="RandomTreeBase">
+    <part Name="Render" DisplayName="[RandomTreesNearbyCoupleMaybe]"
+          ColorString="&amp;g" DetailColor="K"/>
+    <part Name="RandomTree" Nearby="true" Count="2" Persist="true" ChancePer="50" />
+  </object>
+
+  <object Name="RandomTreesNearbyFew" Inherits="RandomTreeBase">
+    <part Name="Render" DisplayName="[RandomTreesFewNearby]"
+          ColorString="&amp;G" DetailColor="K"/>
+    <part Name="RandomTree" Nearby="true" Count="3" Persist="true" />
+  </object>
+
+  <object Name="RandomTreesNearbyFewMaybe" Inherits="RandomTreeBase">
+    <part Name="Render" DisplayName="[RandomTreesNearbyFewMaybe]"
+          ColorString="&amp;g" DetailColor="K"/>
+    <part Name="RandomTree" Nearby="true" Count="3" Persist="true" ChancePer="50" />
+  </object>
+
+  <object Name="OverheadLightsBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[OverheadLights]"
+          RenderString="*" Tile="Widgets/OverheadLights.png"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="LightSource" Lit="true" Radius="0" />
+  </object>
+
+  <object Name="OverheadLightsWeak" Inherits="OverheadLightsBase">
+    <part Name="Render" DisplayName="[OverheadLightsWeak]"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <part Name="LightSource" Radius="1" />
+  </object>
+
+  <object Name="OverheadLightsMedium" Inherits="OverheadLightsBase">
+    <part Name="Render" DisplayName="[OverheadLightsMedium]"
+          ColorString="&amp;Y" DetailColor="K" Visible="false" />
+    <part Name="LightSource" Radius="3" />
+  </object>
+
+  <object Name="OverheadLightsStrong" Inherits="OverheadLightsBase">
+    <part Name="Render" DisplayName="[OverheadLightsStrong]"
+          ColorString="&amp;W" DetailColor="K" Visible="false" />
+    <part Name="LightSource" Radius="5" />
+  </object>
+
+  <object Name="WallOrDebrisBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[WallOrDebris*]"
+          RenderString="H" Tile="Widgets/WallOrDebris.png"
+          ColorString="&amp;K" DetailColor="y" Visible="false" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="WallOrDebris" />
+  </object>
+
+  <object Name="WallOrDebrisGranite" Inherits="WallOrDebrisBase">
+    <part Name="Render" DisplayName="[WallOrDebrisGranite]"
+          RenderString="H" Tile="Widgets/WallOrDebris.png"
+          ColorString="&amp;K" DetailColor="w" Visible="false" />
+    <part Name="WallOrDebris" Wall="Granite" WallChanceIn100="50" InvertColor="false" />
+  </object>
+
+  <object Name="WallOrDebrisLimestone" Inherits="WallOrDebrisBase">
+    <part Name="Render" DisplayName="[WallOrDebrisLimestone]"
+          RenderString="H" Tile="Widgets/WallOrDebris.png"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <part Name="WallOrDebris" Wall="Limestone" WallChanceIn100="50" InvertColor="true" />
+  </object>
+
+  <object Name="WallOrNotBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[WallOrNot]"
+          RenderString="H" Tile="Widgets/WallOrNot2.png"
+          ColorString="&amp;K" DetailColor="y" Visible="false" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="WallOrNot" />
+  </object>
+
+  <object Name="WallOrNotGraniteProbably" Inherits="WallOrNotBase">
+    <part Name="Render" DisplayName="[WallOrNotGraniteProbably]"
+          RenderString="H" Tile="Widgets/WallOrNot2.png"
+          ColorString="&amp;K" DetailColor="w" Visible="false" />
+    <part Name="WallOrNot" Blueprint="Granite" ChanceIn100="75" />
+  </object>
+  <object Name="WallOrNotGraniteMaybe" Inherits="WallOrNotBase">
+    <part Name="Render" DisplayName="[WallOrNotGraniteMaybe]"
+          RenderString="H" Tile="Widgets/WallOrNot2.png"
+          ColorString="&amp;K" DetailColor="w" Visible="false" />
+    <part Name="WallOrNot" Blueprint="Granite" ChanceIn100="50" />
+  </object>
+  <object Name="WallOrNotGraniteUnliekly" Inherits="WallOrNotBase">
+    <part Name="Render" DisplayName="[WallOrNotGraniteUnliekly]"
+          RenderString="H" Tile="Widgets/WallOrNot2.png"
+          ColorString="&amp;K" DetailColor="w" Visible="false" />
+    <part Name="WallOrNot" Blueprint="Granite" ChanceIn100="25" />
+  </object>
+
+  <object Name="WallOrNotLimestoneProbably" Inherits="WallOrNotBase">
+    <part Name="Render" DisplayName="[WallOrNotLimestoneProbably]"
+          RenderString="H" Tile="Widgets/WallOrNot.png"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="75" />
+  </object>
+  <object Name="WallOrNotLimestoneMaybe" Inherits="WallOrNotBase">
+    <part Name="Render" DisplayName="[WallOrNotLimestoneMaybe]"
+          RenderString="H" Tile="Widgets/WallOrNot.png"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="50" />
+  </object>
+  <object Name="WallOrNotLimestoneUnliekly" Inherits="WallOrNotBase">
+    <part Name="Render" DisplayName="[WallOrNotLimestoneMaybe]"
+          RenderString="H" Tile="Widgets/WallOrNot.png"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="25" />
+  </object>
+
+  <object Name="RandomGiganticFurnitureBase" Inherits="Widget">
+    <part Name="Render" DisplayName="[RandomGiganticFurnitureBase]"
+          RenderString="B"
+          ColorString="&amp;y" DetailColor="K" Visible="false" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <part Name="RandomFurniture" Gigantic="true" />
+  </object>
+
+  <object Name="RandomGiganticBed" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticBed]"
+          Tile="Widgets/RandomBedNice.png"
+          ColorString="&amp;w" DetailColor="y" />
+    <part Name="RandomFurniture" Gigantic="true" Class="bed" Utility="!medical" />
+  </object>
+
+  <object Name="RandomGiganticBedBasic" Inherits="RandomGiganticBed">
+    <part Name="Render" DisplayName="[RandomGiganticBedBasic]"
+          Tile="Widgets/RandomBedBasic.png" />
+    <part Name="RandomFurniture" Quality="basic" />
+  </object>
+
+  <object Name="RandomGiganticBedNice" Inherits="RandomGiganticBed">
+    <part Name="Render" DisplayName="[RandomGiganticBedNice]" />
+    <part Name="RandomFurniture" Quality="nice" />
+  </object>
+
+  <object Name="RandomGiganticBedLuxury" Inherits="RandomGiganticBed">
+    <part Name="Render" DisplayName="[RandomGiganticBedLuxury]"
+          Tile="Widgets/RandomBedLuxury.png" />
+    <part Name="RandomFurniture" Quality="luxury" />
+  </object>
+
+  <object Name="RandomGiganticChair" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticChair]"
+          Tile="Widgets/RandomChairNice.png"
+          ColorString="&amp;w" DetailColor="y" />
+    <part Name="RandomFurniture" Gigantic="true" Class="chair" Utility="!medical,!wide" />
+  </object>
+
+  <object Name="RandomGiganticChairBasic" Inherits="RandomGiganticChair">
+    <part Name="Render" DisplayName="[RandomGiganticChairBasic]"
+          Tile="Widgets/RandomChairBasic.png" />
+    <part Name="RandomFurniture" Quality="basic" />
+  </object>
+
+  <object Name="RandomGiganticChairNice" Inherits="RandomGiganticChair">
+    <part Name="Render" DisplayName="[RandomGiganticChairNice]" />
+    <part Name="RandomFurniture" Quality="nice" />
+  </object>
+
+  <object Name="RandomGiganticChairLuxury" Inherits="RandomGiganticChair">
+    <part Name="Render" DisplayName="[RandomGiganticChairLuxury]"
+          Tile="Widgets/RandomChairLuxury.png" />
+    <part Name="RandomFurniture" Quality="luxury" />
+  </object>
+
+  <object Name="RandomGiganticTable" Inherits="RandomGiganticFurnitureBase">
+    <part Name="Render" DisplayName="[RandomGiganticTable]"
+          Tile="Assets_Content_Textures_Tiles_sw_table.bmp"
+          ColorString="&amp;w" DetailColor="y" />
+    <part Name="RandomFurniture" Gigantic="true" Class="table" Utility="!medical" />
+  </object>
+  
+  <!-- RandomGiganticDoor -->
+  
+  <!-- RandomGiganticInfrastructure -->
+  
+  <!-- WallOrOtherWall: Gives a wall, but sometimes another Wall-->
+  
+</objects>

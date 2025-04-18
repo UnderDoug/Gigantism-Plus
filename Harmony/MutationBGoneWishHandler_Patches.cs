@@ -34,13 +34,10 @@ namespace HNPS_GigantismPlus.Harmony
             BaseMutation mutation = mutations.GetMutationByName(argument);
             if (mutation != null)
             {
-                MutationBGoneWishHandler.RemoveMutation(mutations, mutation);
+                argument = mutation.Name;
                 return false;
             }
-            else
-            {
-                return true;
-            }
+            return true;
         }
     }
 }

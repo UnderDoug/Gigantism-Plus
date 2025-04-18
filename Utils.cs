@@ -25,6 +25,8 @@ namespace HNPS_GigantismPlus
     [HasVariableReplacer]
     public static class Utils
     {
+        public static ModInfo ThisMod => ModManager.GetMod(MOD_ID);
+
         [VariableReplacer]
         public static string nbsp(DelegateContext Context)
         {
@@ -86,10 +88,10 @@ namespace HNPS_GigantismPlus
             Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
 
             bool found = false;
+            bool cache = false;
             Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2);
-            if (!_TilePathCache.TryGetValue(TileName, out TilePath))
+            if (cache = !_TilePathCache.TryGetValue(TileName, out TilePath))
             {
-
                 Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3);
                 Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2);
 
@@ -131,7 +133,8 @@ namespace HNPS_GigantismPlus
                 Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3);
             }
 
-            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in supplied subfolders", Indent: 2);
+            string foundLocation = cache ? "_TilePathCache" : "supplied subfolders";
+            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in {foundLocation}", Indent: 2);
 
             found = TilePath != null;
             Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2);
@@ -535,6 +538,16 @@ namespace HNPS_GigantismPlus
         {
             GameObjectBlueprint = GetGameObjectBlueprint(Blueprint);
             return !GameObjectBlueprint.Is(null);
+        }
+        public static string MakeAndList(IReadOnlyList<string> Words, bool Serial = true, bool IgnoreCommas = false)
+        {
+            List<string> replacedList = new();
+            foreach (string entry in Words)
+            {
+                replacedList.Add(entry.Replace(",", ";;"));
+            }
+            string andList = Grammar.MakeAndList(replacedList, Serial);
+            return andList.Replace(";;", ",");
         }
 
     } //!-- public static class Utils

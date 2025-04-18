@@ -333,7 +333,10 @@ namespace XRL.World.Parts
                     {
                         if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
                         {
-                            Debug.Entry(4, $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, attempting to adjust DamageDie", Indent: 3);
+                            Debug.Entry(4, 
+                                $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, " + 
+                                $"attempting to adjust DamageDie", 
+                                Indent: 3);
                             GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
                             if (defaultFist.TryGetPart(out MeleeWeapon defaultFistWeapon))
                             {
@@ -355,6 +358,10 @@ namespace XRL.World.Parts
                     }
                     else
                     {
+                        Debug.Entry(4,
+                            $"Natural Equipment: {OriginalNaturalEquipmentCopy.Blueprint} " + 
+                            $"has static DamageDie value ({damageDieValue})",
+                            Indent: 3);
                         AccumulatedDamageDie.Count = 0.Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
                         AccumulatedDamageDie.Size = 0.Vomit(4, "AccumulatedDamageDie.Size", Indent: 2);
                         AccumulatedDamageDie.Bonus = damageDieValue.Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2);
@@ -407,7 +414,7 @@ namespace XRL.World.Parts
                 // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
                 ApplyNaturalEquipmentMods();
 
-                if (DoDynamicTile)
+                if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))
                 {
                     Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1);
                     // This lets us check whether there's a Tile been provided anywhere in a fairly sizeable list of locations
@@ -438,6 +445,11 @@ namespace XRL.World.Parts
                 ParentObject.SetIntProperty("ShowAsPhysicalFeature", 1);
                 ParentObject.SetIntProperty("UndesirableWeapon", 0);
                 ParentObject.SetStringProperty("TemporaryDefaultBehavior", "NaturalEquipmentManager", false);
+
+                if (ParentObject.TryGetPart(out MakersMark makersMark))
+                {
+                    ParentObject.RemovePart(makersMark);
+                }
 
                 _shortDescriptionCache = ProcessShortDescription(ShortDescriptions);
             }
@@ -521,34 +533,13 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        public override void Remove()
         {
-            // Registrar.Register("BodypartsUpdated");
-            base.Register(Object, Registrar);
+            ResetShortDescriptions();
+            ClearAdjustmentTargets();
+            ClearNaturalWeaponMods();
+            base.Remove();
         }
-        public override bool FireEvent(Event E)
-        {
-            /*
-            if (E.ID == "BodypartsUpdated")
-            {
-                Debug.Entry(4,
-                $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(FireEvent)}(Event E.ID: \"{E.ID}\")",
-                Indent: 0);
-
-                BeforeManageDefaultEquipmentEvent beforeEvent = BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
-                ManageDefaultEquipmentEvent manageEvent = ManageDefaultEquipmentEvent.Manage(beforeEvent, Wielder);
-                AfterManageDefaultEquipmentEvent.Send(manageEvent);
-
-                Debug.Entry(4,
-                    $"x {nameof(NaturalEquipmentManager)}."
-                    + $"{nameof(FireEvent)}(Event E.ID: \"{E.ID}\") @//",
-                    Indent: 0);
-            }
-            */
-            return base.FireEvent(E);
-        }
-
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);

@@ -211,7 +211,7 @@ namespace HNPS_GigantismPlus
                 }
                 if (!processedWeaponDescription.IsNullOrEmpty())
                 {
-                    SB.Append(Grammar.MakeAndList(processedWeaponDescription) + ". ");
+                    SB.Append(Utils.MakeAndList(processedWeaponDescription, IgnoreCommas: true) + ". ");
                     capitalizeSecondList = true;
                 }
             }
@@ -222,11 +222,11 @@ namespace HNPS_GigantismPlus
             }
             if (!processedGeneralDescription.IsNullOrEmpty())
             {
-                SB.Append(Grammar.MakeAndList(processedGeneralDescription) + ".");
+                SB.Append(Utils.MakeAndList(processedGeneralDescription, IgnoreCommas: true) + ".");
             }
             else if (weaponDescriptions.Count == 0)
             {
-                SB.Append(", really big. Like, massive!");
+                SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
             }
 
             return Event.FinalizeString(SB);

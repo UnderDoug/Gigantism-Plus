@@ -67,13 +67,16 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            Debug.Entry(4,
+                $"\u2666 {typeof(ModBurrowingNaturalWeapon).Name}." +
+                $"{nameof(ApplyModification)}(JoppaWorldBuilder builder)",
+                Indent: 0);
             base.ApplyModification(Object);
 
             Object.RequirePart<BurrowingClawsProperties>();
             BurrowingClawsProperties burrowingClawsProperties = Object.GetPart<BurrowingClawsProperties>();
-            burrowingClawsProperties.WallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
-            burrowingClawsProperties.WallBonusPercentage = BurrowingClaws.GetWallBonusPercentage(AssigningPart.Level);
-
+            burrowingClawsProperties.WallBonusPenetration = UD_ManagedBurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            burrowingClawsProperties.WallBonusPercentage = UD_ManagedBurrowingClaws.GetWallBonusPercentage(AssigningPart.Level);
         }
         public override bool WantEvent(int ID, int cascade)
         {
@@ -92,8 +95,8 @@ namespace XRL.World.Parts
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             int dieSize = GetDamageDieSize(); 
-            int wallBonusPenetration = BurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
-            int wallHitsRequired = BurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
+            int wallBonusPenetration = UD_ManagedBurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            int wallHitsRequired = UD_ManagedBurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
             string description = $"{descriptionName}: ";
             description += ParentObject.IsPlural
                         ? ("These " + Grammar.Pluralize(text) + " ")

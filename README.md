@@ -12,7 +12,7 @@ This collaborative modification for _**[Caves of Qud](https://store.steampowered
 ## Wiki Documentation
 **[Current Features](https://github.com/hyd-n-plyn-syt/Gigantism-Plus/wiki/Features)** - A growing list of everything we've added so far to Gigantism Plus, and a bit of explanation on it's more complicated features.
 
-**[Upcoming Features]()** - Sort of a To-Do list for myself and contributors, and also to let you know what may or may not be coming in future updates to the mod.
+**[Upcoming Features](https://github.com/hyd-n-plyn-syt/Gigantism-Plus/wiki/Upcoming-Features)** - Sort of a To-Do list for myself and contributors, and also to let you know what may or may not be coming in future updates to the mod.
 
 **[Modder's Guide](https://github.com/hyd-n-plyn-syt/Gigantism-Plus/wiki/Modder's-Guide)** - Information for those interested in creating modules for Gigantism Plus, to outright modify their own copy of it, or just wanting to understand it's file structure in general to learn how to make their own mods for _**Caves of Qud**_.
 

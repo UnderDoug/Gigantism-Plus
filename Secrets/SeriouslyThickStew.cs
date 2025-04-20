@@ -65,7 +65,7 @@ namespace XRL.World.Skills.Cooking
             return true;
         }
 
-        [WishCommand(Command = SECRET_GIANTRECIPE)]
+        [WishCommand(Command = SCRT_GNT_RECIPE)]
         public static void WishSeriouslyThickStew()
         {
             CookingDomainSpecial_UnitGigantismTransform.ApplyTo(The.Player);

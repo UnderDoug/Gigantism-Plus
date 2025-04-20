@@ -210,8 +210,8 @@ namespace XRL.World.Parts
         {
             if (E.ID == "EnteredCell" && ParentObject.CurrentZone != null)
             {
-                Stews += ParentObject.GetIntProperty(GIANT_STARTINGSTEWS);
-                ParentObject.SetIntProperty(GIANT_STARTINGSTEWS, 0, true);
+                Stews += ParentObject.GetIntProperty(GNT_START_STEWS_PROPLABEL);
+                ParentObject.SetIntProperty(GNT_START_STEWS_PROPLABEL, 0, true);
             }
             return base.FireEvent(E);
         }

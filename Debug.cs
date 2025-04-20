@@ -9,6 +9,7 @@ using XRL.World.Parts.Mutation;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
+using Qud.API;
 
 namespace HNPS_GigantismPlus
 {
@@ -465,6 +466,63 @@ namespace HNPS_GigantismPlus
             {
                 Entry(4, $"shallowParent: {shallowParent.Name}", Indent: 0);
                 shallowParent = shallowParent.ShallowParent;
+            }
+        }
+
+        public static void LogNRandomGiantEligibleCreatureBlueprints(int Number = 1, bool Unique = false)
+        {
+            List<GameObjectBlueprint> blueprintList = new(Number);
+            for (int i = 0; i < Number; i++)
+            {
+                blueprintList.Add(EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
+                    => SecretGiantWhoCooksBuilderExtension.IsGiantCookEligible(blueprint, Unique)));
+            }
+            int ticker = 0;
+            int tickerPadding = $"{Number}".Length;
+            foreach (GameObjectBlueprint blueprint in blueprintList)
+            {
+                UnityEngine.Debug.LogError($"{++ticker}".PadLeft(tickerPadding) + $": {blueprint.Name}");
+            }
+        }
+        public static void LogFurnitureTiers()
+        {
+            UnityEngine.Debug.LogError($"Primary Widget Category,Secondary Widget Category,Tertiary Widget Category,Blueprint,Tier,Quality,Utility");
+            foreach (GameObjectBlueprint furniture in GameObjectFactory.Factory.GetBlueprintsInheritingFrom("Furniture", false))
+            {
+                if (!furniture.HasTag("WidgetCategory")
+                 || !furniture.HasTag("Tier")
+                 || furniture.HasTag("Creature")
+                 || furniture.InheritsFrom("Creature")
+                 || furniture.IsExcludedFromDynamicEncounters()) 
+                    continue;
+
+                string PrimaryWidgetCategory = string.Empty;
+                string SecondaryWidgetCategory = string.Empty;
+                string TertiaryWidgetCategory = string.Empty;
+                if (furniture.GetTag("WidgetCategory").Contains(","))
+                {
+                    string[] WidgetCategorys = furniture.GetTag("WidgetCategory").Split(",");
+                    if (WidgetCategorys.Length > 0) PrimaryWidgetCategory = Quote(WidgetCategorys[0]);
+                    if (WidgetCategorys.Length > 1) SecondaryWidgetCategory = Quote(WidgetCategorys[1]);
+                    if (WidgetCategorys.Length > 2) TertiaryWidgetCategory = Quote(WidgetCategorys[2]);
+                }
+                else
+                {
+                    PrimaryWidgetCategory = Quote(furniture.GetTag("WidgetCategory"));
+                }
+
+                string Blueprint = Quote(furniture.Name);
+                string Tier = Quote(furniture.Tier.ToString());
+                string Quality = Quote($"{furniture.GetTag("Quality")}");
+                string Utility = Quote($"{furniture.GetTag("Utility")}");
+                UnityEngine.Debug.LogError(
+                    $"{PrimaryWidgetCategory}," + 
+                    $"{SecondaryWidgetCategory}," + 
+                    $"{TertiaryWidgetCategory}," + 
+                    $"{Blueprint}," + 
+                    $"{Tier}," + 
+                    $"{Quality}," + 
+                    $"{Utility}");
             }
         }
     } //!-- public static class Debug

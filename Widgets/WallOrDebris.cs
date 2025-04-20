@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using Qud.API;
 using static FastNoise;
+using XRL.World.Parts.Mutation;
 
 namespace XRL.World.Parts
 {
@@ -14,7 +15,7 @@ namespace XRL.World.Parts
     public class WallOrDebris : IScribedPart
     {
 
-        public int WallChanceIn100;
+        public int WallChance;
         public string TileColor;
         public string DetailColor;
         public bool InvertColor;
@@ -26,7 +27,7 @@ namespace XRL.World.Parts
 
         public WallOrDebris()
         {
-            WallChanceIn100 = 50;
+            WallChance = 50;
             Wall = "Shale";
             debrisBlueprints = new()
             {
@@ -47,14 +48,20 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject)
             {
-                int byChance = RndGP.Next(1, 100);
-                if (byChance <= WallChanceIn100)
+                string debugHeader = 
+                    $"[{ParentObject.ID}:{ParentObject.Blueprint}] -> " + 
+                    $"{typeof(WallOrDebris).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(ObjectCreatedEvent).Name} E)";
+
+                if (WallChance.in100())
                 {
                     Blueprint = Wall;
+                    Debug.Entry(4, $"{debugHeader} resolved into {Blueprint}", Indent: 0);
                 }
                 else
                 {
-                    Blueprint = debrisBlueprints.Sample();
+                    string debrisBlueprint = debrisBlueprints.Sample();
+                    Blueprint = debrisBlueprint;
 
                     if (Blueprint.IsNullOrEmpty())
                     {
@@ -64,6 +71,7 @@ namespace XRL.World.Parts
                             Indent: 0);
                         Blueprint = Wall;
                     }
+                    Debug.Entry(4, $"{debugHeader} resolved into {debrisBlueprint}, {Blueprint} is what we got", Indent: 0);
                 }
 
                 GameObject newObject = GameObjectFactory.Factory.CreateObject(Blueprint);

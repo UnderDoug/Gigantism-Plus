@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<populations>
+  <!--
+
+  Some example tables
+
+  <population Name="Things">
+    <object Blueprint="Thing" Chance="50" />
+    <object Blueprint="BigThing" Chance="30" />
+    <object Blueprint="HugeThing" Chance="30" />
+  </population>
+
+  <population Name="Widgets">
+    <group Name="Widgets" Style="pickone" Chance="100,100,100,100,100,100,100,100">
+      <object Blueprint="BrownWidget" Weight="70" />
+      <object Blueprint="GoldWidget" Weight="5" />
+      <object Blueprint="BlueWidget" Weight="10" />
+      <object Blueprint="RedWidget" Weight="10" />
+    </group>
+  </population>
+
+  <population Name="BoxOfThingsOrWidgets">
+    <group Name="ThingsOrWidgets" Style="pickone">
+      <group Name="Things" Style="pickone" Weight="1">
+        <table Name="Things" Weight="1" Number="1-6" />
+      </group>
+      <group Name="Widgets" Style="pickone" Weight="1">
+        <table Name="Widgets" Weight="1" Number="1-6" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="BoxOfThingsAndWidgets">
+    <group Name="ThingsAndWidgets" Style="pickeach">
+      <object Blueprint="Things" Number="2" />
+      <object Blueprint="Widgets" Number="4-6" />
+    </group>
+  </population>
+  -->
+
+  <population Name="Gigantic Light LowTech">
+    <group Name="Items" Style="pickone">
+      <object Weight="2" Number="1" Blueprint="Gigantic Brazier" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Torchpost" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Half Candelabra" />
+    </group>
+  </population>
+  <population Name="Gigantic Light HighTech">
+    <group Name="Items" Style="pickone">
+      <object Number="1" Blueprint="Gigantic Techlight1" />
+      <object Number="1" Blueprint="Gigantic Techlight2" />
+      <object Number="1" Blueprint="Gigantic Techlight3" />
+    </group>
+  </population>
+  <population Name="Gigantic Light">
+    <group Name="Items" Style="pickone">
+      <table Weight="15" Name="Gigantic Light LowTech" />
+      <table Weight="4" Name="Gigantic Light HighTech" />
+      <table Weight="1" Name="Gigantic Campfire" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Bed Basic">
+    <group Name="Items" Style="pickone">
+      <object Weight="3" Number="1" Blueprint="Gigantic Bedroll" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Crib" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Folding Cot" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Hammock" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Kline" />
+    </group>
+  </population>
+  <population Name="Gigantic Bed Luxury">
+    <group Name="Items" Style="pickone">
+      <object Weight="1" Number="1" Blueprint="Gigantic Kline" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Four-Poster Bed" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Waterbed" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Bedger" />
+    </group>
+  </population>
+  <population Name="Gigantic Bed">
+    <group Name="Items" Style="pickone">
+      <table Weight="3" Name="Gigantic Bed Basic" />
+      <table Weight="1" Name="Gigantic Bed Luxury" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Table Basic">
+    <group Name="Items" Style="pickone">
+      <object Weight="5" Number="1" Blueprint="Gigantic Table" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Low Table" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Workbench" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Dresser" />
+    </group>
+  </population>
+  <population Name="Gigantic Table Nice">
+    <group Name="Items" Style="pickone">
+      <object Weight="5" Number="1" Blueprint="Gigantic Desk" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Metal Table" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Metal Workbench" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Dresser" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Book Table" />
+    </group>
+  </population>
+  <population Name="Gigantic Table Luxury">
+    <group Name="Items" Style="pickone">
+      <object Weight="3" Number="1" Blueprint="Gigantic Sleek Table" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Octagonal Table" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Book Table" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Ornate Table" />
+    </group>
+  </population>
+  <population Name="Gigantic Table">
+    <group Name="Items" Style="pickone">
+      <table Weight="5" Name="Gigantic Table Basic" />
+      <table Weight="3" Name="Gigantic Table Nice" />
+      <table Weight="1" Name="Gigantic Table Luxury" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Chair Basic">
+    <group Name="Items" Style="pickone">
+      <object Weight="5" Number="1" Blueprint="Gigantic Chair" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Floor Cushion" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Bench" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Stool" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Canvas Folding Chair" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Scrapasan" />
+    </group>
+  </population>
+  <population Name="Gigantic Chair Nice">
+    <group Name="Items" Style="pickone">
+      <object Weight="1" Number="1" Blueprint="Gigantic Floor Cushion" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Kline" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Bench" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Armchair" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Work Chair" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Chairbear" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Ornate Chair" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Scrapasan" />
+    </group>
+  </population>
+  <population Name="Gigantic Chair Luxury">
+    <group Name="Items" Style="pickone">
+      <object Weight="1" Number="1" Blueprint="Gigantic Throne" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Armchair" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Massage Chair" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Ergomax Chair" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Chairbear" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Gravchair" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Ornate Chair" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Starmchair" />
+      <group Name="Gigantic Sofa" Number="1" Style="pickeach" Weight="1">
+        <object Weight="1" Number="1" Blueprint="Gigantic Sofa L" Hint="Adjacent:100,AdjacentToEndsWith: C" />
+        <object Weight="1" Number="1" Blueprint="Gigantic Sofa C" Hint="Adjacent:100,AdjacentToEndsWith: L,AdjacentToEndsWith: R," />
+        <object Weight="1" Number="1" Blueprint="Gigantic Sofa R" Hint="Adjacent:100,AdjacentToEndsWith: C" />
+      </group>
+    </group>
+  </population>
+  <population Name="Gigantic Chair">
+    <group Name="Items" Style="pickone">
+      <table Weight="5" Number="1" Name="Gigantic Chair Basic" />
+      <table Weight="3" Number="1" Name="Gigantic Chair Nice" />
+      <table Weight="1" Number="1" Name="Gigantic Chair Luxury" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Container Not Chest">
+    <group Name="Items" Style="pickone">
+      <object Weight="8" Number="1" Blueprint="Gigantic Woven Basket" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Preserved Food Basket" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Multicabinet" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Book Table" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Pitcher" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Dresser" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Vessel">
+    <group Name="Items" Style="pickone">
+      <group Name="Empty" Style="pickone" Weight="25">
+        <object Number="1" Blueprint="Gigantic Vase" />
+        <object Number="1" Blueprint="Gigantic Vase Unhandled" />
+        <object Number="1" Blueprint="Gigantic Wide Bottle" />
+        <object Number="1" Blueprint="Gigantic Long Jug" />
+        <object Number="1" Blueprint="Gigantic Ewer" />
+        <object Number="1" Blueprint="Gigantic Pitcher" />
+        <object Number="1" Blueprint="Gigantic Vase" />
+        <object Number="1" Blueprint="Gigantic Empty Urn" />
+      </group>
+      <object Weight="35" Number="1" Blueprint="Gigantic Hookah" />
+      <group Name="Oil" Style="pickone" Weight="55">
+        <object Number="1" Blueprint="Gigantic Oil Vase" />
+        <object Number="1" Blueprint="Gigantic Oil Bottle" />
+        <object Number="1" Blueprint="Gigantic Oil Pitcher" />
+      </group>
+      <group Name="Cider" Style="pickone" Weight="45">
+        <object Number="1" Blueprint="Gigantic Cider Vase" />
+        <object Number="1" Blueprint="Gigantic Cider Bottle" />
+        <object Number="1" Blueprint="Gigantic Cider Pitcher" />
+      </group>
+      <group Name="Wine" Style="pickone" Weight="35">
+        <object Number="1" Blueprint="Gigantic Wine Vase" />
+        <object Number="1" Blueprint="Gigantic Wine Bottle" />
+        <object Number="1" Blueprint="Gigantic Wine Pitcher" />
+      </group>
+      <group Name="Rare" Style="pickone" Weight="10">
+        <object Weight="9" Number="1" Blueprint="Gigantic Random Bottle" />
+        <object Weight="1" Number="1" Blueprint="Gigantic Random Bottle Rare Liquid" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="Gigantic Decoration Plain">
+    <group Name="Items" Style="pickone">
+      <group Name="Basic" Style="pickone" Weight="35">
+        <object Weight="3" Number="1" Blueprint="Gigantic Globe" />
+        <object Weight="8" Number="1" Blueprint="Gigantic Clockthing" />
+        <object Weight="5" Number="1" Blueprint="Gigantic Telescope" />
+        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 1" />
+        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 2" />
+        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 3" />
+        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 4" />
+        <object Weight="8" Number="1" Blueprint="Gigantic Chalkboard" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Unfinished Sculpture" />
+        <object Weight="15" Number="1" Blueprint="Gigantic Mushroom Case" />
+        <object Weight="5" Number="1" Blueprint="Gigantic Anvil" />
+      </group>
+      <group Name="Plants" Style="pickone" Weight="25">
+        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 1" />
+        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 2" />
+        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 3" />
+        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 4" />
+      </group>
+      <group Name="Learned" Style="pickone" Weight="35">
+        <object Weight="10" Number="1" Blueprint="Gigantic Globe" />
+        <object Weight="3" Number="1" Blueprint="Gigantic Orrery" />
+        <object Weight="15" Number="1" Blueprint="Gigantic Clockthing" />
+        <object Weight="3" Number="1" Blueprint="Gigantic Powerless Electrothing" />
+        <object Weight="1" Number="1" Blueprint="Gigantic Powerless Unicomputer" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Telescope" />
+        <object Weight="3" Number="1" Blueprint="Gigantic Chalkboard" />
+        <object Weight="1" Number="1" Blueprint="Gigantic Display Breadboard" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Mushroom Case" />
+      </group>
+      <group Name="Creative" Style="pickone" Weight="25">
+        <object Weight="5" Number="1" Blueprint="Gigantic Chalkboard" />
+        <object Weight="3" Number="1" Blueprint="Gigantic Display Breadboard" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Unfinished Sculpture" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Anvil" />
+      </group>
+      <group Name="Musical" Style="pickone" Weight="15">
+        <object Number="1" Blueprint="Gigantic Harp" />
+        <object Number="1" Blueprint="Gigantic Rectangular Bells" />
+        <object Number="1" Blueprint="Gigantic Hammered Dulcimer" />
+      </group>
+      <group Name="Fancy" Style="pickone" Weight="15">
+        <object Weight="8" Number="1" Blueprint="Gigantic Globe" />
+        <object Weight="8" Number="1" Blueprint="Gigantic Orrery" />
+        <object Weight="12" Number="1" Blueprint="Gigantic Clockthing" />
+        <object Weight="15" Number="1" Blueprint="Gigantic Bust of K4K5" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Light Sculpture" />
+        <object Weight="8" Number="1" Blueprint="Gigantic Brain Sculpture" />
+        <object Weight="8" Number="1" Blueprint="Gigantic Mushroom Case" />
+        <object Weight="10" Number="1" Blueprint="Gigantic Random Stone Statue" />
+      </group>
+    </group>
+  </population>
+  
+  <population Name="Giant Abode">
+    <group Name="Contents" Style="pickeach">
+      <group Name="Irregularities" Style="pickeach">
+        <object Number="2" Chance="100" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Number="1" Chance="75" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Number="1" Chance="50" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Number="1" Chance="10" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+      </group>
+      
+      <table Name="Gigantic Light" Number="1" Chance="100" Hint="AlongWall" />
+      <table Name="Gigantic Bed" Number="1" Chance="100" Hint="AdjacentToStartsWith:Gigantic,AlongWall" />
+      <table Name="Gigantic Table" Number="1" Chance="75" Hint="AdjacentToEndsWith: Chair,AlongWall" />
+      <table Name="Gigantic Chair" Number="1" Chance="100" Hint="AdjacentToEndsWith: Table," />
+
+      <group Name="Booksehlf" Style="pickone" Chance="35" Hint="InsideCorner">
+        <object Number="1" Blueprint="Gigantic ishelf1" />
+        <object Number="1" Blueprint="Gigantic ishelf2" />
+        <object Number="1" Blueprint="Gigantic ishelf3" />
+        <object Number="1" Blueprint="Gigantic ishelf4" />
+      </group>
+
+      <group Name="Storage" Style="pickeach">
+        <table Name="Gigantic Container Not Chest" Number="1" Chance="75" Hint="AdjacentToStartsWith:Gigantic,InsideCorner" />
+        <table Name="Gigantic Vessel" Number="1" Chance="75" Hint="AdjacentToStartsWith:Gigantic" />
+      </group>
+
+      <group Name="Decor" Style="pickeach">
+        <table Chance="75" Number="1" Name="Gigantic Decoration Plain" Hint="InsideCorner" />
+        <table Chance="75" Number="1" Name="Gigantic Decoration Plain" Hint="AlongWall" />
+      </group>
+    </group>
+  </population>
+
+  <population Name="Giant Abode Cook">
+    <group Name="Contents" Style="pickeach">
+      <table Name="Giant Abode" Number="1" Chance="100" />
+      <object Blueprint="Gigantic Oven" Number="1" Chance="100" Hint="InsideCorner" />
+    </group>
+  </population>
+  
+</populations>

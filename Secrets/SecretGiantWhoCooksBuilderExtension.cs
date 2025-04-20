@@ -66,6 +66,16 @@ namespace HNPS_GigantismPlus
             $"who {"Hankers".OptionalColorYuge(Colorfulness)}",
             $"{"Hanker's Bane".OptionalColorYuge(Colorfulness)}",
         };
+        public static List<string> WrassleRingColors = new()
+        {
+            $"W",
+            $"M",
+            $"G",
+            $"B",
+            $"C",
+            $"R",
+            $"w",
+        };
 
         public override void OnAfterBuild(JoppaWorldBuilder builder)
         {
@@ -77,17 +87,17 @@ namespace HNPS_GigantismPlus
             Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
             SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
 
-            if (JournalAPI.GetMapNote(SECRET_GIANTID).Is(null))
+            if (JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID).Is(null))
             {
                 JournalAPI.AddMapNote(
                     ZoneID: SecretZoneId,
-                    text: SECRET_GIANTLOCATION_TEXT,
-                    category: SECRET_GIANTLOCATION_CATEGORY,
+                    text: SCRT_GNT_LCTN_TEXT,
+                    category: SCRT_GNT_LCTN_CATEGORY,
                     attributes: new[] { "giant", "humanoid", "settlement", "mountains", "recipe", "oddity" },
-                    secretId: SECRET_GIANTID
+                    secretId: SCRT_GNT_SCRT_ID
                 );
             }
-            SecretMapNote = JournalAPI.GetMapNote(SECRET_GIANTID);
+            SecretMapNote = JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID);
             SecretMapNote.Weight = 25000;
 
             ZoneManager zoneManager = The.ZoneManager;
@@ -98,7 +108,9 @@ namespace HNPS_GigantismPlus
 
             // zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(CreateGiantCrater));
 
-            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{ThisMod.Path}/Secrets/Maps/HNPS_GiantCrater_01_Center.rpm");
+            string MapFileName = SCRT_GNT_ZONE_MAP2_CENTRE;
+
+            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{ThisMod.Path}/Secrets/Maps/{MapFileName}");
             zoneManager.AddZonePostBuilder(SecretZoneId, "Music", "Track", "Music/Barathrums Study");
 
             zoneManager.AddZonePostBuilder(SecretZoneId, nameof(IsCheckpoint), "Key", SecretZoneId);
@@ -106,14 +118,23 @@ namespace HNPS_GigantismPlus
             zoneManager.SetZoneProperty(SecretZoneId, "SkipTerrainBuilders", true);
             zoneManager.SetZoneProperty(SecretZoneId, "NoBiomes", "Yes");
 
-            zoneManager.SetZoneName(SecretZoneId, SECRET_GIANTLOCATION_TEXT, Article: "the", Proper: true);
+            zoneManager.SetZoneName(SecretZoneId, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneId, false);
 
+            if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE)
+                zoneManager.AddZonePostBuilder(ZoneID: SecretZoneId, Builder: nameof(GiantAbodePopulator));
+            
             zoneManager.AddZonePostBuilder(
                 ZoneID: SecretZoneId, 
                 Class: nameof(AddObjectBuilder), 
                 Key1: "Object", 
                 Value1: zoneManager.CacheObject(GetTheGiant()));
+
+            string wrassleRingColor = WrassleRingColors.GetRandomElement();
+            foreach (GameObject rope in zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes"))
+            {
+                rope.Render.DetailColor = wrassleRingColor;
+            }
         } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
 
         public static GameObject GetTheGiant()
@@ -126,40 +147,37 @@ namespace HNPS_GigantismPlus
 
             if (Unique)
             {
-                Unique = !The.Game.HasStringGameState(SECRET_GIANT_UNIQUE_STATE);
+                Unique = !The.Game.HasStringGameState(SCRT_GNT_UNQ_STATE);
             }
 
-            List<string> oldFactions = 
-                (from faction in Factions.Loop()
-                 where faction.Old
-                 select faction.Name).ToList();
-            GameObjectBlueprint creatureBlueprint = EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
-                => IsGiantCookEligible(blueprint));
+            GameObjectBlueprint creatureObjectBlueprint = 
+                EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
+                => IsGiantCookEligible(blueprint, true));
 
             GamePartBlueprint gigantifiedPartBlueprint = new("XRL.World.ObjectBuilders", nameof(Gigantified))
             {
                 Name = nameof(Gigantified),
                 ChanceOneIn = 1,
             };
-            creatureBlueprint.Builders[gigantifiedPartBlueprint.Name] = gigantifiedPartBlueprint;
+            creatureObjectBlueprint.Builders[gigantifiedPartBlueprint.Name] = gigantifiedPartBlueprint;
 
-            creatureBlueprint.Tags["Culture"] = "Giant";
+            creatureObjectBlueprint.Tags["Culture"] = "Giant";
 
             if (Unique)
             {
-                if (!creatureBlueprint.Tags.ContainsKey("Role")) creatureBlueprint.Tags.Add("Role", "");
-                creatureBlueprint.Tags["Role"] = $"Leader";
+                if (!creatureObjectBlueprint.Tags.ContainsKey("Role")) creatureObjectBlueprint.Tags.Add("Role", "");
+                creatureObjectBlueprint.Tags["Role"] = $"Leader";
             }
 
-            if (creatureBlueprint.Tags.ContainsKey("NoHateFactions")) creatureBlueprint.Tags.Remove("NoHateFactions");
-            if (creatureBlueprint.Tags.ContainsKey("staticFaction1")) creatureBlueprint.Tags.Remove("staticFaction1");
-            if (creatureBlueprint.Tags.ContainsKey("staticFaction2")) creatureBlueprint.Tags.Remove("staticFaction2");
-            if (creatureBlueprint.Tags.ContainsKey("staticFaction3")) creatureBlueprint.Tags.Remove("staticFaction3");
+            if (creatureObjectBlueprint.Tags.ContainsKey("NoHateFactions")) creatureObjectBlueprint.Tags.Remove("NoHateFactions");
+            if (creatureObjectBlueprint.Tags.ContainsKey("staticFaction1")) creatureObjectBlueprint.Tags.Remove("staticFaction1");
+            if (creatureObjectBlueprint.Tags.ContainsKey("staticFaction2")) creatureObjectBlueprint.Tags.Remove("staticFaction2");
+            if (creatureObjectBlueprint.Tags.ContainsKey("staticFaction3")) creatureObjectBlueprint.Tags.Remove("staticFaction3");
 
-            if (!creatureBlueprint.Tags.ContainsKey("SharesRecipe")) creatureBlueprint.Tags.Add("SharesRecipe", "");
+            if (!creatureObjectBlueprint.Tags.ContainsKey("SharesRecipe")) creatureObjectBlueprint.Tags.Add("SharesRecipe", "");
 
             // Could possibly look at gigantifying them instead...
-            creatureBlueprint.Parts.RemoveAll((KeyValuePair<string, GamePartBlueprint> entry)
+            creatureObjectBlueprint.Parts.RemoveAll((KeyValuePair<string, GamePartBlueprint> entry)
                 => entry.Key == typeof(DromadCaravan).Name
                 || entry.Key == typeof(EyelessKingCrabSkuttle1).Name
                 || entry.Key == typeof(SnapjawPack1).Name
@@ -175,7 +193,7 @@ namespace HNPS_GigantismPlus
 
             GameObject creature;
             creature = GameObjectFactory.Factory.CreateObject(
-                    Blueprint: creatureBlueprint,
+                    Blueprint: creatureObjectBlueprint,
                     BonusModChance: 0,
                     SetModNumber: 0,
                     AutoMod: null,
@@ -184,7 +202,7 @@ namespace HNPS_GigantismPlus
                     Context: null,
                     ProvideInventory: null);
 
-            creature.SetStringProperty("SharesRecipe", SECRET_GIANTRECIPE);
+            creature.SetStringProperty("SharesRecipe", SCRT_GNT_RECIPE);
             creature.SetStringProperty("SharesRecipeWithTrueKin", "false");
             // creature.SetStringProperty("SharesRecipeText", "");
 
@@ -195,7 +213,7 @@ namespace HNPS_GigantismPlus
             if (Unique)
             {
                 gameUnique = creature.RequirePart<GameUnique>();
-                gameUnique.State = SECRET_GIANT_UNIQUE_STATE;
+                gameUnique.State = SCRT_GNT_UNQ_STATE;
             }
 
             creature.RequirePart<Calming>();
@@ -244,7 +262,7 @@ namespace HNPS_GigantismPlus
             }
             string dieRoll = Unique ? "4d4" : "2d4";
             int startingStews = dieRoll.Roll();
-            if (Unique) creature.SetIntProperty(GIANT_STARTINGSTEWS, startingStews);
+            if (Unique) creature.SetIntProperty(GNT_START_STEWS_PROPLABEL, startingStews);
             else stewBelly.Stews += startingStews;
 
             creature.Brain.Mobile = true;
@@ -258,9 +276,11 @@ namespace HNPS_GigantismPlus
             {
                 description = creature.RequirePart<Description>();
             }
-            string creatureNoun = $"{creature.Render?.DisplayName ?? creatureBlueprint.DisplayName()}".Color("y");
-            string creatureArticle = Grammar.IndefiniteArticle(creatureNoun).Capitalize();
-            string preDesc = SECRET_GIANTPREDESC.Replace(SECRET_GIANTPREDESC_REPLACE, $"{creatureArticle} {creatureNoun}");
+            string creatureNoun = $"{creature.Render?.DisplayName ?? creatureObjectBlueprint.DisplayName()}".Color("y");
+            string creatureArticle = Grammar.IndefiniteArticle(creatureNoun);
+            creatureArticle = Unique ? creatureArticle.Capitalize() : creatureArticle;
+            string preDesc = Unique ? SCRT_GNT_UNQ_PREDESC : GNT_PREDESC;
+            preDesc = preDesc.Replace(GNT_PREDESC_RPLC, $"{creatureArticle} {creatureNoun}");
             description.Short = preDesc + description._Short;
 
             Epithets epithets = creature.RequirePart<Epithets>();
@@ -277,7 +297,7 @@ namespace HNPS_GigantismPlus
                 {
                     conversationScript = creature.RequirePart<ConversationScript>();
                 }
-                conversationScript.ConversationID = SECRET_GIANTCONVSCRIPT_ID;
+                conversationScript.ConversationID = SCRT_GNT_UNQ_CONVSCRPT_ID;
             }
 
             // These are the skills the highest tier GiantSlayer has
@@ -305,16 +325,16 @@ namespace HNPS_GigantismPlus
             if (Unique)
             {
                 SecretRevealer secretRevealer = creature.RequirePart<SecretRevealer>();
-                secretRevealer.id = SECRET_GIANTID;
-                secretRevealer.text = SECRET_GIANTLOCATION_TEXT;
+                secretRevealer.id = SCRT_GNT_SCRT_ID;
+                secretRevealer.text = SCRT_GNT_LCTN_TEXT;
                 secretRevealer.message = $"You have discovered {secretRevealer.text}!";
-                secretRevealer.category = SECRET_GIANTLOCATION_CATEGORY;
+                secretRevealer.category = SCRT_GNT_LCTN_CATEGORY;
                 secretRevealer.adjectives = string.Join(",", 
                     new[] { "giant", "humanoid", "settlement", "mountains", "recipe", "oddity" });
             }
 
             creature.GiveProperName(giantName);
-            string heroTemplate = Unique ? SECRET_GIANT_HEROTEMPLATE : GIANT_HEROTEMPLATE;
+            string heroTemplate = Unique ? SCRT_GNT_HERO_TMPLT : GNT_HERO_TMPLT;
             int heroTier = Unique ? 8 : -1;
             creature = HeroMaker.MakeHero(creature, heroTemplate, heroTier, "Giant");
 
@@ -336,7 +356,7 @@ namespace HNPS_GigantismPlus
             return creature;
         }
 
-        public static bool IsGiantCookEligible(GameObjectBlueprint Blueprint)
+        public static bool IsGiantCookEligible(GameObjectBlueprint Blueprint, bool Unique = false)
         {
             if (false && !EncountersAPI.IsLegendaryEligible(Blueprint)) 
                 return false;
@@ -351,13 +371,16 @@ namespace HNPS_GigantismPlus
                 (from faction in Factions.Loop()
                  where faction.Old
                  select faction.Name).ToList();
-            if (!oldFactions.Contains(Blueprint.GetPrimaryFaction()))
+            if (Unique && !oldFactions.Contains(Blueprint.GetPrimaryFaction()))
                 return false;
 
             if (Blueprint.HasTag("BaseObject"))
                 return false;
 
-            if (Blueprint.HasTag("NoLibrarian"))
+            if (Blueprint.Name.StartsWith("Base"))
+                return false;
+
+            if (false && Blueprint.HasTag("NoLibrarian"))
                 return false;
 
             if (Blueprint.InheritsFrom("BaseTrueKin"))
@@ -386,7 +409,13 @@ namespace HNPS_GigantismPlus
 
             if (Blueprint.InheritsFrom("BaseRobot"))
             {
-                if (!Blueprint.Name.Is("Chrome Pyramid") || !Blueprint.Name.Is("Leering Stalker"))
+                List<string> acceptableRobots = new()
+                {
+                    "Chrome Pyramid",
+                    "Leering Stalker",
+                    "Aleksh_MetalBird",
+                };
+                if (!acceptableRobots.Contains(Blueprint.Name))
                     return false;
             }
 
@@ -399,10 +428,16 @@ namespace HNPS_GigantismPlus
             if (Blueprint.TryGetTag("Species", out string species) && species.Is("mecha"))
                 return false;
 
+            if (Blueprint.TryGetTag("Role", out string roll) && roll.Is("Minion"))
+                return false;
+
             if (Blueprint.HasTagOrProperty("StartInLiquid"))
                 return false;
 
             if (Blueprint.Parts.ContainsKey(typeof(SpawnWithLiquid).Name))
+                return false;
+
+            if (Blueprint.Parts.ContainsKey(typeof(AISitting).Name))
                 return false;
 
             if (Blueprint.Mutations.ContainsKey(nameof(Burrowing)))
@@ -458,6 +493,17 @@ namespace HNPS_GigantismPlus
                 return;
             }
             cell.AddObject(giant);
+        }
+
+        [WishCommand(Command = "hanker giants")]
+        public static void HankerGiantsWish()
+        {
+            Zone Z = The.Player.CurrentZone;
+            foreach (GameObject Object in Z.GetObjectsWithPart(typeof(GigantismPlus).Name))
+            {
+                if (Object.IsPlayer()) continue;
+                Object.Die(null ,null, "insufficient stew", "insufficient stew", true, DeathVerb: "hanker");
+            }
         }
     } //!-- public class SecretGiantWhoCooksBuilderExtension : IJoppaWorldBuilderExtension
 }

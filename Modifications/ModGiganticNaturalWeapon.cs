@@ -69,14 +69,18 @@ namespace XRL.World.Parts
             if (E.Object == ParentObject)
             {
                 int dieCount = GetDamageDieCount();
-                int damageBonus = 2+ GetDamageBonus();
+                int damageBonus = 2 + GetDamageBonus();
                 int hitBonus = GetHitBonus();
+                int cleaveBonus = -damageBonus;
 
                 if (dieCount > 0) E.WeaponDescriptions
                         .Add(new() { "gain", $"{dieCount} additional damage die" });
 
                 if (damageBonus != 0) E.WeaponDescriptions
                         .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
+
+                if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe") E.WeaponDescriptions
+                        .Add(new() { "has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV" });
 
                 if (hitBonus != 0) E.WeaponDescriptions
                         .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
@@ -88,13 +92,19 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject)
             {
-                List<string> elementToRemove = new() { "have", "+3 damage" };
-                int indexToRemove = 0;
-                foreach (List<string> entry in E.WeaponDescriptions)
+                List<List<string>> elementsToRemove = new() 
                 {
-                    if (entry[0] == elementToRemove[0] && entry[1] == elementToRemove[1])
-                        break;
-                    indexToRemove++;
+                    new List<string>() { "have", "+3 damage" },
+                    new List<string>() { "cleave", "for -3 AV" },
+                };
+                
+                int indexToRemove = 0;
+                List<List<string>> InumerateWeaponDescriptions = new(E.WeaponDescriptions); 
+                foreach (List<string> entry in InumerateWeaponDescriptions)
+                {
+                    if (elementsToRemove.Contains(entry))
+                        E.WeaponDescriptions.Remove(entry);
+
                 }
                 if (indexToRemove < E.WeaponDescriptions.Count)
                     E.WeaponDescriptions.RemoveAt(indexToRemove);
@@ -109,47 +119,6 @@ namespace XRL.World.Parts
             DescribeModGiganticEvent afterEvent = new(ParentObject, null, beforeEvent);
 
             return afterEvent.Send().Process();
-
-            Debug.Entry(4, $"{typeof(ModGiganticNaturalWeapon).Name}.{nameof(GetInstanceDescription)}()");
-            MeleeWeapon part = ParentObject.GetPart<MeleeWeapon>();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            int damageBonus = GetDamageBonus();
-            List<List<string>> list = new();
-            string text = ParentObject.GetObjectNoun();
-            if (part != null && ParentObject.HasTagOrProperty("ShowMeleeWeaponStats"))
-            {
-                list.Add(new List<string> { "have", $"{damageBonus.Signed()} damage" });
-                if (GetDamageDieCount() != 0)
-                {
-                    list.Add(new List<string> { "have", $"{GetDamageDieCount().Signed()} damage die count" });
-                }
-                if (GetHitBonus() != 0)
-                {
-                    list.Add(new List<string> { "have", $"a {GetHitBonus().Signed()} {(GetHitBonus() >= 0 ? "bonus" : "penalty")} to hit" });
-                }
-                if (part.Skill == "Cudgel")
-                {
-                    list.Add(new List<string> { null, "twice as effective when you Slam with " + ParentObject.them });
-                }
-                else if (part.Skill == "Axe")
-                {
-                    list.Add(new List<string> { "cleave", $"for {(-damageBonus).Signed()} AV" });
-                }
-            }
-            if (ParentObject.HasPart<DiggingTool>() || ParentObject.HasPart<Drill>())
-            {
-                list.Add(new List<string> { "dig", "twice as fast" });
-            }
-            if (list.Count == 0)
-            {
-                return $"{descriptionName}: " + $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text))} has {ParentObject.theirs} damage die count determined by {ParentObject.theirs} wielder's size.";
-            }
-            List<string> list2 = new();
-            foreach (List<string> item in list)
-            {
-                list2.Add(GetProcessedItem(item, second: false, list, ParentObject));
-            }
-            return $"{descriptionName}: " + (ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text)) : ("This " + text)) + " " + Grammar.MakeAndList(list2) + ".";
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

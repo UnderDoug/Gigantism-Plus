@@ -13,12 +13,12 @@ namespace XRL.World.Parts
     public class WallOrNot : IScribedPart
     {
         public string Blueprint;
-        public int ChanceIn100;
+        public int Chance;
 
         public WallOrNot()
         {
             Blueprint = "Shale";
-            ChanceIn100 = 100;
+            Chance = 100;
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -28,7 +28,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(ObjectCreatedEvent E)
         {
-            if (E.Object == ParentObject && RndGP.Next(1, 100) <= ChanceIn100)
+            if (E.Object == ParentObject && Chance.in100())
             {
                 E.ReplacementObject = GameObjectFactory.Factory.CreateObject(Blueprint) ?? E.ReplacementObject;
                 ParentObject.RemovePart(this);

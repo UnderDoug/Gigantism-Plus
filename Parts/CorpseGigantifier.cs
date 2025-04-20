@@ -22,7 +22,9 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(4,
                     $"{typeof(CorpseGigantifier).Name}." +
-                    $"{nameof(HandleEvent)}({typeof(CorpseGigantifier).Name} E)",
+                    $"{nameof(HandleEvent)}({typeof(CorpseGigantifier).Name} E) " + 
+                    $"E.Actor: [{E.Actor.ID}:{E.Actor.ShortDisplayNameStripped}], " + 
+                    $"E.Item: [{E.Item.ID}:{E.Item.ShortDisplayNameStripped}]",
                     Indent: 0);
                 ModGigantic modGigantic = new();
                 E.Item.ApplyModification(modGigantic);

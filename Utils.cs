@@ -549,6 +549,10 @@ namespace HNPS_GigantismPlus
             string andList = Grammar.MakeAndList(replacedList, Serial);
             return andList.Replace(";;", ",");
         }
+        public static string Quote(string @string)
+        {
+            return $"\"{@string}\"";
+        }
 
     } //!-- public static class Utils
 

@@ -58,7 +58,7 @@ namespace XRL.World.ZoneBuilders
         public bool BuildZone(Zone Z)
         {
             Debug.Entry(4,
-                $"\u03C0 {typeof(CreateGiantCrater).Name}." +
+                $"\u2229 {typeof(CreateGiantCrater).Name}." +
                 $"{nameof(BuildZone)}(Zone Z: {Z.ZoneID})",
                 Indent: 0);
 

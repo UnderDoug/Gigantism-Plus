@@ -107,16 +107,6 @@ namespace HNPS_GigantismPlus
                 E.GeneralDescriptions.Add(new() { "inspire", "greater sorrow" });
             }
 
-            bool isDefaultBehavior = Object.EquipAsDefaultBehavior();
-            if (!isDefaultBehavior)
-            {
-                E.GeneralDescriptions.Add(new() { null, "much heavier than usual" });
-            }
-            else
-            {
-                E.GeneralDescriptions.Add(new() { null, "unusually large" });
-            }
-
             if (Object.HasPart<Backpack>())
             {
                 E.GeneralDescriptions.Add(new List<string> { "support", "twice and a half as much weight" });
@@ -138,6 +128,7 @@ namespace HNPS_GigantismPlus
             }
 
             MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
+            bool isDefaultBehavior = Object.EquipAsDefaultBehavior();
             bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
             if (meleeWeapon != null && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
@@ -175,7 +166,7 @@ namespace HNPS_GigantismPlus
                     || Object.HasPart<MissileWeapon>()
                     || Object.HasPart<Shield>()))
                 {
-                    E.GeneralDescriptions.Add(new() { "", Object.it + " must be wielded " + (Object.UsesTwoSlots ? "four" : "two") + "-handed by non-gigantic creatures" });
+                    E.GeneralDescriptions.Add(new() { "", "must be wielded " + (Object.UsesTwoSlots ? "four" : "two") + "-handed by non-gigantic creatures" });
                 }
                 else
                 {
@@ -306,6 +297,15 @@ namespace HNPS_GigantismPlus
             if (chargeTransmissionIncreased2x)
             {
                 E.GeneralDescriptions.Add(new() { "transmit", "power at twice the rate" });
+            }
+
+            if (!isDefaultBehavior)
+            {
+                E.GeneralDescriptions.Add(new() { null, "much heavier than usual" });
+            }
+            else
+            {
+                E.GeneralDescriptions.Add(new() { null, "unusually large" });
             }
 
             return true;

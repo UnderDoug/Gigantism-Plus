@@ -7,20 +7,23 @@
       
    -->
 
-  <object Name="RandomDebrisBase" Inherits="Widget" PreviousName="RandomBoulderOrDebrisBase">
+  <object Name="RandomDebrisBase" Inherits="Widget" 
+          PreviousName="RandomBoulderOrDebrisBase">
     <part Name="Render" DisplayName="[RandomDebris]"
           RenderString="B" Tile="Widgets/RandomDebris.png"
           ColorString="&amp;y" DetailColor="K"/>
     <part Name="RandomDebris" />
   </object>
 
-  <object Name="RandomDebrisLimestone" Inherits="RandomDebrisBase" PreviousName="RandomBoulderOrDebrisLimestone">
+  <object Name="RandomDebrisLimestone" Inherits="RandomDebrisBase" 
+          PreviousName="RandomBoulderOrDebrisLimestone">
     <part Name="Render" DisplayName="[RandomDebrisLimestone]"
           ColorString="&amp;y" DetailColor="K"/>
     <part Name="RandomDebris" ColorLike="Limestone" Invert="True" />
   </object>
 
-  <object Name="RandomDebrisGranite" Inherits="RandomDebrisBase" PreviousName="RandomBoulderOrDebrisGranite">
+  <object Name="RandomDebrisGranite" Inherits="RandomDebrisBase" 
+          PreviousName="RandomBoulderOrDebrisGranite">
     <part Name="Render" DisplayName="[RandomDebrisGranite]"
           ColorString="&amp;w" DetailColor="K"/>
     <part Name="RandomDebris" ColorLike="Granite" />
@@ -102,14 +105,14 @@
     <part Name="Render" DisplayName="[WallOrDebrisGranite]"
           RenderString="H" Tile="Widgets/WallOrDebris.png"
           ColorString="&amp;K" DetailColor="w" Visible="false" />
-    <part Name="WallOrDebris" Wall="Granite" WallChanceIn100="50" InvertColor="false" />
+    <part Name="WallOrDebris" Wall="Granite" WallChance="50" InvertColor="false" />
   </object>
 
   <object Name="WallOrDebrisLimestone" Inherits="WallOrDebrisBase">
     <part Name="Render" DisplayName="[WallOrDebrisLimestone]"
           RenderString="H" Tile="Widgets/WallOrDebris.png"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
-    <part Name="WallOrDebris" Wall="Limestone" WallChanceIn100="50" InvertColor="true" />
+    <part Name="WallOrDebris" Wall="Limestone" WallChance="50" InvertColor="true" />
   </object>
 
   <object Name="WallOrNotBase" Inherits="Widget">
@@ -124,38 +127,38 @@
     <part Name="Render" DisplayName="[WallOrNotGraniteProbably]"
           RenderString="H" Tile="Widgets/WallOrNot2.png"
           ColorString="&amp;K" DetailColor="w" Visible="false" />
-    <part Name="WallOrNot" Blueprint="Granite" ChanceIn100="75" />
+    <part Name="WallOrNot" Blueprint="Granite" Chance="75" />
   </object>
   <object Name="WallOrNotGraniteMaybe" Inherits="WallOrNotBase">
     <part Name="Render" DisplayName="[WallOrNotGraniteMaybe]"
           RenderString="H" Tile="Widgets/WallOrNot2.png"
           ColorString="&amp;K" DetailColor="w" Visible="false" />
-    <part Name="WallOrNot" Blueprint="Granite" ChanceIn100="50" />
+    <part Name="WallOrNot" Blueprint="Granite" Chance="50" />
   </object>
   <object Name="WallOrNotGraniteUnliekly" Inherits="WallOrNotBase">
     <part Name="Render" DisplayName="[WallOrNotGraniteUnliekly]"
           RenderString="H" Tile="Widgets/WallOrNot2.png"
           ColorString="&amp;K" DetailColor="w" Visible="false" />
-    <part Name="WallOrNot" Blueprint="Granite" ChanceIn100="25" />
+    <part Name="WallOrNot" Blueprint="Granite" Chance="25" />
   </object>
 
   <object Name="WallOrNotLimestoneProbably" Inherits="WallOrNotBase">
     <part Name="Render" DisplayName="[WallOrNotLimestoneProbably]"
           RenderString="H" Tile="Widgets/WallOrNot.png"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
-    <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="75" />
+    <part Name="WallOrNot" Blueprint="Limestone" Chance="75" />
   </object>
   <object Name="WallOrNotLimestoneMaybe" Inherits="WallOrNotBase">
     <part Name="Render" DisplayName="[WallOrNotLimestoneMaybe]"
           RenderString="H" Tile="Widgets/WallOrNot.png"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
-    <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="50" />
+    <part Name="WallOrNot" Blueprint="Limestone" Chance="50" />
   </object>
   <object Name="WallOrNotLimestoneUnliekly" Inherits="WallOrNotBase">
     <part Name="Render" DisplayName="[WallOrNotLimestoneMaybe]"
           RenderString="H" Tile="Widgets/WallOrNot.png"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
-    <part Name="WallOrNot" Blueprint="Limestone" ChanceIn100="25" />
+    <part Name="WallOrNot" Blueprint="Limestone" Chance="25" />
   </object>
 
   <object Name="RandomGiganticFurnitureBase" Inherits="Widget">
@@ -170,55 +173,60 @@
     <part Name="Render" DisplayName="[RandomGiganticBed]"
           Tile="Widgets/RandomBedNice.png"
           ColorString="&amp;w" DetailColor="y" />
-    <part Name="RandomFurniture" Gigantic="true" Class="bed" Utility="!medical" />
+    <part Name="RandomFurniture" Gigantic="true" WidgetCategory="bed" Utility="!medical" />
   </object>
 
-  <object Name="RandomGiganticBedBasic" Inherits="RandomGiganticBed">
-    <part Name="Render" DisplayName="[RandomGiganticBedBasic]"
+  <object Name="RandomGiganticBedLowTier" Inherits="RandomGiganticBed"
+          PreviousName="RandomGiganticBedBasic">
+    <part Name="Render" DisplayName="[RandomGiganticBedLowTier]"
           Tile="Widgets/RandomBedBasic.png" />
-    <part Name="RandomFurniture" Quality="basic" />
+    <part Name="RandomFurniture" Tier="0" />
   </object>
 
-  <object Name="RandomGiganticBedNice" Inherits="RandomGiganticBed">
-    <part Name="Render" DisplayName="[RandomGiganticBedNice]" />
-    <part Name="RandomFurniture" Quality="nice" />
+  <object Name="RandomGiganticBedMidTier" Inherits="RandomGiganticBed"
+          PreviousName="RandomGiganticBedNice">
+    <part Name="Render" DisplayName="[RandomGiganticBedMidTier]" />
+    <part Name="RandomFurniture" Tier="1-2" />
   </object>
 
-  <object Name="RandomGiganticBedLuxury" Inherits="RandomGiganticBed">
-    <part Name="Render" DisplayName="[RandomGiganticBedLuxury]"
+  <object Name="RandomGiganticBedHighTier" Inherits="RandomGiganticBed"
+          PreviousName="RandomGiganticBedLuxury">
+    <part Name="Render" DisplayName="[RandomGiganticBedHighTier]"
           Tile="Widgets/RandomBedLuxury.png" />
-    <part Name="RandomFurniture" Quality="luxury" />
+    <part Name="RandomFurniture" Tier="3" />
   </object>
 
   <object Name="RandomGiganticChair" Inherits="RandomGiganticFurnitureBase">
     <part Name="Render" DisplayName="[RandomGiganticChair]"
           Tile="Widgets/RandomChairNice.png"
           ColorString="&amp;w" DetailColor="y" />
-    <part Name="RandomFurniture" Gigantic="true" Class="chair" Utility="!medical,!wide" />
+    <part Name="RandomFurniture" Gigantic="true" WidgetCategory="chair" Utility="!medical,!wide" />
   </object>
 
-  <object Name="RandomGiganticChairBasic" Inherits="RandomGiganticChair">
-    <part Name="Render" DisplayName="[RandomGiganticChairBasic]"
+  <object Name="RandomGiganticChairLowTier" Inherits="RandomGiganticChair"
+          PreviousName="RandomGiganticChairBasic">
+    <part Name="Render" DisplayName="[RandomGiganticChairLowTier]"
           Tile="Widgets/RandomChairBasic.png" />
-    <part Name="RandomFurniture" Quality="basic" />
+    <part Name="RandomFurniture" Tier="0" Utility="!medical,!wide,!work" />
   </object>
 
-  <object Name="RandomGiganticChairNice" Inherits="RandomGiganticChair">
-    <part Name="Render" DisplayName="[RandomGiganticChairNice]" />
-    <part Name="RandomFurniture" Quality="nice" />
+  <object Name="RandomGiganticChairMidTier" Inherits="RandomGiganticChair"
+          PreviousName="RandomGiganticChairNice">
+    <part Name="Render" DisplayName="[RandomGiganticChairMidTier]" />
+    <part Name="RandomFurniture" Tier="1" />
   </object>
 
   <object Name="RandomGiganticChairLuxury" Inherits="RandomGiganticChair">
     <part Name="Render" DisplayName="[RandomGiganticChairLuxury]"
           Tile="Widgets/RandomChairLuxury.png" />
-    <part Name="RandomFurniture" Quality="luxury" />
+    <part Name="RandomFurniture" Tier="3" />
   </object>
 
   <object Name="RandomGiganticTable" Inherits="RandomGiganticFurnitureBase">
     <part Name="Render" DisplayName="[RandomGiganticTable]"
           Tile="Assets_Content_Textures_Tiles_sw_table.bmp"
           ColorString="&amp;w" DetailColor="y" />
-    <part Name="RandomFurniture" Gigantic="true" Class="table" Utility="!medical" />
+    <part Name="RandomFurniture" Gigantic="true" WidgetCategory="table" Utility="!medical" />
   </object>
   
   <!-- RandomGiganticDoor -->
@@ -226,5 +234,66 @@
   <!-- RandomGiganticInfrastructure -->
   
   <!-- WallOrOtherWall: Gives a wall, but sometimes another Wall-->
+
+  <object Name="GiantAbodeSpawner" Inherits="Widget">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner]" />
+    <tag Name="ContentsTable" Value="Giant Abode" />
+    <tag Name="Wall" Value="Limestone" />
+    <tag Name="Floor" Value="TrainingMat" />
+    <tag Name="DoorRandom" Value="Constrained" />
+  </object>
+  
+  <object Name="GiantAbodeSpawner R2" Inherits="GiantAbodeSpawner">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R2]" />
+  </object>
+  <object Name="GiantAbodeSpawner R2 N" Inherits="GiantAbodeSpawner R2">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R2 N]" />
+    <tag Name="DoorDirection" Value="N" />
+  </object>
+  <object Name="GiantAbodeSpawner R2 S" Inherits="GiantAbodeSpawner R2">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R2 S]" />
+    <tag Name="DoorDirection" Value="S" />
+  </object>
+  <object Name="GiantAbodeSpawner R2 E" Inherits="GiantAbodeSpawner R2">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R2 E]" />
+    <tag Name="DoorDirection" Value="E" />
+  </object>
+  <object Name="GiantAbodeSpawner R2 W" Inherits="GiantAbodeSpawner R2">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R2 W]" />
+    <tag Name="DoorDirection" Value="W" />
+  </object>
+
+  <object Name="GiantAbodeSpawner R3" Inherits="GiantAbodeSpawner">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R3]" />
+    <intproperty Name="Radius" Value="3" />
+  </object>
+  <object Name="GiantAbodeSpawner R3 N" Inherits="GiantAbodeSpawner R3"
+          PreviousName="GiantAbodeSpawner N">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R3 N]" />
+    <tag Name="DoorDirection" Value="N" />
+  </object>
+  <object Name="GiantAbodeSpawner R3 S" Inherits="GiantAbodeSpawner R3"
+          PreviousName="GiantAbodeSpawner S">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R3 S]" />
+    <tag Name="DoorDirection" Value="S" />
+  </object>
+  <object Name="GiantAbodeSpawner R3 E" Inherits="GiantAbodeSpawner R3"
+          PreviousName="GiantAbodeSpawner E">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R3 E]" />
+    <tag Name="DoorDirection" Value="E" />
+  </object>
+  <object Name="GiantAbodeSpawner R3 W" Inherits="GiantAbodeSpawner R3"
+          PreviousName="GiantAbodeSpawner W">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner R3 W]" />
+    <tag Name="DoorDirection" Value="W" />
+  </object>
+  
+  <object Name="GiantAbodeSpawner Cook" Inherits="GiantAbodeSpawner R3"
+          PreviousName="GiantCookAbodeSpawner">
+    <part Name="Render" DisplayName="[GiantAbodeSpawner Cook]" />
+    <tag Name="ContentsTable" Value="Giant Abode Cook" />
+    <tag Name="DoorDirection" Value="S" />
+    <removetag Name="DoorRandom" />
+  </object>
   
 </objects>

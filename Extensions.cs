@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,11 +14,12 @@ using XRL.World.Capabilities;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+using XRL.World.ObjectBuilders;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using XRL.World.ObjectBuilders;
-using System.Text.RegularExpressions;
+using Genkit;
+using XRL.UI.ObjectFinderClassifiers;
 
 namespace HNPS_GigantismPlus
 {
@@ -801,6 +803,10 @@ namespace HNPS_GigantismPlus
             {
                 return "artifact";
             }
+            if (Object.InheritsFrom("FoldingChair") && Object.HasPart<ModGigantic>())
+            {
+                return "folding chair";
+            }
             if (Object.IsCreature)
             {
                 return "creature";
@@ -1057,6 +1063,10 @@ namespace HNPS_GigantismPlus
                 {
                     return "switch";
                 }
+                if (Object.InheritsFrom("Sign"))
+                {
+                    return "sign";
+                }
                 if (Object.HasPart<MergeConduit>())
                 {
                     return "power conduit";
@@ -1262,6 +1272,333 @@ namespace HNPS_GigantismPlus
             {
                 WeightedList.Add(Ticket, 1);
             }
+        }
+
+        public static bool TagIsIncludedOrNotExcluded(this GameObjectBlueprint Blueprint, string TagName, Dictionary<string, bool> IncludeExclude)
+        {
+            Debug.Entry(4, 
+                $"* ({Blueprint.Name})."
+                + $"{nameof(TagIsIncludedOrNotExcluded)}" 
+                + $"(string TagName: {TagName}, Dictionary<string, bool> IncludeExclude)",
+                Indent: 0);
+
+            if (!IncludeExclude.IsNullOrEmpty())
+            {
+
+                Debug.CheckYeh(4, $"IncludeExclude Not Empty", Indent: 1);
+
+                List<string> includeTags = new();
+                List<string> excludeTags = new();
+
+                Debug.Entry(4, $"IncludeExclude values:", Indent: 2);
+                foreach ((string entryValue, bool entryInclude) in IncludeExclude)
+                {
+                    if (entryInclude) includeTags.Add(entryValue);
+                    else excludeTags.Add(entryValue);
+                    Debug.LoopItem(4, $"{(entryInclude ? "include" : "exclude")}: {entryValue}", Indent: 2,
+                        Good: entryInclude);
+                }
+
+                bool noBlueprintTagValue = !Blueprint.TryGetTag(TagName, out string blueprintTagValue);
+                bool noBlueprintPart = true;
+                foreach ((string part,_) in Blueprint.Parts)
+                {
+                    if (includeTags.Contains(part.ToLower()))
+                    {
+                        noBlueprintPart = false;
+                        break;
+                    }
+                }
+                bool noBlueprintTagOrPart = noBlueprintTagValue && noBlueprintPart;
+                if (!includeTags.IsNullOrEmpty() && noBlueprintTagOrPart)
+                {
+                    Debug.CheckNah(4, $"includeTags not empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part", Indent: 1);
+                    return false; 
+                }
+                else if (noBlueprintTagOrPart)
+                {
+                    Debug.CheckYeh(4, 
+                        $"includeTags is empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part, " + 
+                        $"exclusions are irrelevant",
+                        Indent: 1);
+                    return true;
+                }
+
+                Debug.CheckYeh(4, $"{TagName}: \"{blueprintTagValue}\"", Indent: 1);
+                List<string> blueprintTagValues = new();
+                if (blueprintTagValue != null)
+                {
+                    if (blueprintTagValue.Contains(","))
+                    {
+                        Debug.Entry(4, $"blueprintTagValue contains \",\"", Indent: 2);
+                        string[] tagsArray = blueprintTagValue.Split(',');
+                        foreach (string value in tagsArray)
+                        {
+                            Debug.LoopItem(4, $" \"{value}\" added to values list", Indent: 3);
+                            blueprintTagValues.Add(value);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Entry(4, $"blueprintTagValue doesn't contain \",\"", Indent: 2);
+                        Debug.LoopItem(4, $" \"{blueprintTagValue}\" added to values list", Indent: 3);
+                        blueprintTagValues.Add(blueprintTagValue);
+                    }
+                }
+                foreach ((string part, _) in Blueprint.Parts)
+                {
+                    blueprintTagValues.Add(part.ToLower());
+                }
+
+                List<string> inclusionMatches = new();
+                List<string> exclusionMatches = new();
+
+                Debug.Entry(4, $"blueprintTagValues Matches:", Indent: 2);
+                foreach (string tagValue in blueprintTagValues)
+                {
+                    if (includeTags.Contains(tagValue))
+                    {
+                        Debug.CheckYeh(4, $"includeTags contains {tagValue}", Indent: 2);
+                        inclusionMatches.Add(tagValue);
+                    }
+                    if (excludeTags.Contains(tagValue))
+                    {
+                        Debug.CheckNah(4, $"excludeTags contains {tagValue}", Indent: 2);
+                        exclusionMatches.Add(tagValue);
+                    }
+                }
+
+                Debug.Entry(4, $"inclusionMatches:", Indent: 2);
+                foreach (string entry in inclusionMatches)
+                {
+                    Debug.CheckYeh(4, $"{entry}", Indent: 2);
+                }
+                if (inclusionMatches.IsNullOrEmpty())
+                    Debug.CheckNah(4, $"Empty", Indent: 2);
+
+                Debug.Entry(4, $"exclusionMatches:", Indent: 2);
+                foreach (string entry in exclusionMatches)
+                {
+                    Debug.CheckNah(4, $"{entry}", Indent: 2);
+                }
+                if (exclusionMatches.IsNullOrEmpty())
+                    Debug.CheckYeh(4, $"Empty", Indent: 2);
+
+                if (!includeTags.IsNullOrEmpty() && inclusionMatches.IsNullOrEmpty())
+                    return false;
+                Debug.CheckYeh(4, $"includeTags was Empty, or there was at least one inclusionMatch", Indent: 1);
+
+                if (!excludeTags.IsNullOrEmpty() && !exclusionMatches.IsNullOrEmpty())
+                    return false;
+                Debug.CheckYeh(4, $"excludeTags was Empty, or there were no exclusionMatchs", Indent: 1);
+            }
+            Debug.CheckYeh(4, $"IncludeExclude was empty or filter allowed blueprint through", Indent: 1);
+            return true;
+        }
+
+        public static void MakeIncludeExclude(this string valueString, Dictionary<string, bool> @return)
+        {
+            Debug.Entry(4,
+                $"* {valueString}."
+                + $"{nameof(MakeIncludeExclude)}"
+                + $"(Dictionary<string, bool> @return)",
+                Indent: 0);
+
+            if (!valueString.IsNullOrEmpty())
+            {
+                Debug.Entry(4, $"value not empty or null", Indent: 1);
+                if (valueString.Contains(","))
+                {
+                    Debug.Entry(4, $"valueString contains \",\"", Indent: 1);
+                    string[] classesArray = valueString.Split(',');
+                    foreach (string entry in classesArray)
+                    {
+                        bool isNot = entry.StartsWith("!");
+                        string value = isNot ? entry.Substring(1) : entry;
+                        Debug.LoopItem(4, $"{value}: {(!isNot ? "include" : "exclude")}", Indent: 2, Good: !isNot);
+                        @return.Add(value.ToLower(), !isNot);
+                    }
+                }
+                else
+                {
+                    Debug.Entry(4, $"valueString doesn't contain \",\"", Indent: 1);
+
+                    bool isNot = valueString.StartsWith("!");
+                    string value = isNot ? valueString.Substring(1) : valueString;
+                    Debug.LoopItem(4, $"{value}: {(!isNot ? "include" : "exclude")}", Indent: 2, Good: !isNot);
+                    @return.Add(value.ToLower(), !isNot);
+                }
+            }
+        }
+        public static string GetOwner(this GameObjectBlueprint Blueprint)
+        {
+            return Blueprint?.GetPartParameter<string>("Physics", "Owner");
+        }
+        public static bool HasOwner(this GameObjectBlueprint Blueprint)
+        {
+            return !Blueprint.GetOwner().IsNullOrEmpty();
+        }
+
+        public static string Quote(this string @string)
+        {
+            return Utils.Quote($"{@string}");
+        }
+
+        public static Dictionary<string,List<Cell>> GetHutRegion(this Zone Z, Rect2D R, bool Round = false)
+        {
+            string Inner = "Inner";
+            string Outer = "Outer";
+            string Corners = "Corners";
+            string NorthEdge = "NorthEdge";
+            string SouthEdge = "SouthEdge";
+            string EastEdge = "EastEdge";
+            string WestEdge = "WestEdge";
+            string Door = "Door";
+            Dictionary<string, List<Cell>> Region = new()
+            {
+                { Inner, new() },
+                { Outer, new() },
+                { Corners, new() },
+                { NorthEdge, new() },
+                { SouthEdge, new() },
+                { EastEdge, new() },
+                { WestEdge, new() },
+                { Door, new() },
+            };
+            Rect2D r = R.ReduceBy(1, 1);
+            Cell cell;
+            for (int i = r.y1; i <= r.y2; i++)
+            {
+                for (int j = r.x1; j <= r.x2; j++)
+                {
+                    if ((cell = Z.GetCell(j, i)) == null) continue;
+                    Region[Inner].Add(cell);
+                }
+            }
+            if (Round)
+            {
+                for (int k = R.x1 + 1; k <= R.x2 - 1; k++)
+                {
+                    if ((cell = Z.GetCell(k, R.y1)) != null)
+                        Region[Outer].Add(cell);
+                    if ((cell = Z.GetCell(k, R.y2)) != null)
+                        Region[Outer].Add(cell);
+                }
+                for (int l = R.y1 + 1; l <= R.y2 - 1; l++)
+                {
+                    if ((cell = Z.GetCell(R.x1, l)) != null)
+                        Region[Outer].Add(cell);
+                    if ((cell = Z.GetCell(R.x2, l)) != null)
+                        Region[Outer].Add(cell);
+                }
+
+                if ((cell = Z.GetCell(R.x1 + 1, R.y1 + 1)) != null)
+                    Region[Outer].Add(cell);
+                if ((cell = Z.GetCell(R.x2 - 1, R.y1 + 1)) != null)
+                    Region[Outer].Add(cell);
+                if ((cell = Z.GetCell(R.x1 + 1, R.y2 - 1)) != null)
+                    Region[Outer].Add(cell);
+                if ((cell = Z.GetCell(R.x2 - 1, R.y2 - 1)) != null)
+                    Region[Outer].Add(cell);
+            }
+            else
+            {
+                for (int m = R.x1; m <= R.x2; m++)
+                {
+                    if ((cell = Z.GetCell(m, R.y1)) != null)
+                        Region[Outer].Add(cell);
+                    if ((cell = Z.GetCell(m, R.y2)) != null)
+                        Region[Outer].Add(cell);
+                }
+                for (int n = R.y1; n <= R.y2; n++)
+                {
+                    if ((cell = Z.GetCell(R.x1, n)) != null)
+                        Region[Outer].Add(cell);
+                    if ((cell = Z.GetCell(R.x2, n)) != null)
+                        Region[Outer].Add(cell);
+                }
+            }
+            foreach (Cell outerCell in Region[Outer])
+            {
+                if (outerCell.Y == R.y1) Region[NorthEdge].Add(outerCell);
+                if (outerCell.Y == R.y2) Region[SouthEdge].Add(outerCell);
+                if (outerCell.X == R.x2) Region[EastEdge].Add(outerCell);
+                if (outerCell.X == R.x1) Region[WestEdge].Add(outerCell);
+                if ((outerCell.X == R.x1 || outerCell.X == R.x2) && (outerCell.Y == R.y1 || outerCell.Y == R.y2))
+                    Region[Corners].Add(outerCell);
+            }
+            if (R.Door != null)
+            {
+                Cell door = Z.GetCell(R.Door);
+                string doorSide = R.GetCellSide(R.Door) switch
+                {
+                    "N" => NorthEdge,
+                    "S" => SouthEdge,
+                    "E" => EastEdge,
+                    "W" => WestEdge,
+                    _ => null,
+                };
+                if (!Region[Outer].Contains(door) && doorSide != null)
+                {
+                    Cell newDoor = Region[doorSide].GetRandomElement();
+                    if (Region[Corners].Contains(newDoor))
+                    {
+                        if (doorSide != NorthEdge && doorSide != SouthEdge)
+                        {
+                            if (Region[NorthEdge].Contains(newDoor))
+                            {
+                                newDoor.X++;
+                            }
+                            else
+                            {
+                                newDoor.X--;
+                            }
+                        }
+                        if (doorSide != EastEdge && doorSide != WestEdge)
+                        {
+                            if (Region[WestEdge].Contains(newDoor))
+                            {
+                                newDoor.Y++;
+                            }
+                            else
+                            {
+                                newDoor.Y--;
+                            }
+                        }
+                    }
+                    R.Door.y = newDoor.Y;
+                    R.Door.x = newDoor.X;
+                }
+                Region[Door].Add(Z.GetCell(R.Door));
+            }
+            return Region;
+        }
+
+        public static List<Cell> GetOrdinalAdjacentCells(this Cell @this, bool bLocalOnly = false, bool BuiltOnly = true, bool IncludeThis = false)
+        {
+            List<Cell> exclusionList = new(Cell.DirectionListCardinalOnly.Length);
+            string[] directionListCardinalOnly = Cell.DirectionListCardinalOnly;
+            foreach (string direction in directionListCardinalOnly)
+            {
+                Cell cell = (bLocalOnly ? @this.GetLocalCellFromDirection(direction) : @this.GetCellFromDirection(direction));
+                if (cell != null)
+                {
+                    exclusionList.Add(cell);
+                }
+            }
+
+            List<Cell> cellsList = (bLocalOnly ? @this.GetLocalAdjacentCells() : @this.GetAdjacentCells());
+            foreach (Cell excludeCell in exclusionList)
+            {
+                if (cellsList.Contains(excludeCell)) cellsList.Remove(excludeCell);
+            }
+
+            if (IncludeThis)
+            {
+                cellsList.Add(@this);
+            }
+
+            return cellsList;
         }
     } //!-- Extensions
 }

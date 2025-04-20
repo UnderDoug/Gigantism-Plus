@@ -25,6 +25,7 @@ namespace XRL.World.Parts
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
 
+        [SerializeField]
         public GameObject OriginalNaturalEquipmentCopy;
         
         public DieRoll DamageDie;

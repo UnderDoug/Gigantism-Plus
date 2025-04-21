@@ -1067,6 +1067,10 @@ namespace HNPS_GigantismPlus
                 {
                     return "sign";
                 }
+                if (Object.InheritsFrom("BaseBookshelf"))
+                {
+                    return "bookshelf";
+                }
                 if (Object.HasPart<MergeConduit>())
                 {
                     return "power conduit";
@@ -1075,7 +1079,10 @@ namespace HNPS_GigantismPlus
                 {
                     return "container";
                 }
-                return "furniture";
+                if (Object.TryGetPart(out LightSource lightSource) && lightSource.Radius > 0)
+                {
+                    return "light source";
+                }
             }
             if (Object.HasPart<Chair>())
             {
@@ -1102,7 +1109,7 @@ namespace HNPS_GigantismPlus
                     }
                     if (!Object.Takeable)
                     {
-                        return "object";
+                        return Object.Render?.DisplayName ?? "object";
                     }
                     return Object.Render?.DisplayName ?? "item";
             }
@@ -1538,38 +1545,23 @@ namespace HNPS_GigantismPlus
                     "W" => WestEdge,
                     _ => null,
                 };
-                if (!Region[Outer].Contains(door) && doorSide != null)
+                if (doorSide != null)
                 {
                     Cell newDoor = Region[doorSide].GetRandomElement();
-                    if (Region[Corners].Contains(newDoor))
+                    
+                    Dictionary<string,List<Cell>> Edges = new()
                     {
-                        if (doorSide != NorthEdge && doorSide != SouthEdge)
-                        {
-                            if (Region[NorthEdge].Contains(newDoor))
-                            {
-                                newDoor.X++;
-                            }
-                            else
-                            {
-                                newDoor.X--;
-                            }
-                        }
-                        if (doorSide != EastEdge && doorSide != WestEdge)
-                        {
-                            if (Region[WestEdge].Contains(newDoor))
-                            {
-                                newDoor.Y++;
-                            }
-                            else
-                            {
-                                newDoor.Y--;
-                            }
-                        }
-                    }
-                    R.Door.y = newDoor.Y;
-                    R.Door.x = newDoor.X;
+                        { NorthEdge, Region[NorthEdge] },
+                        { SouthEdge, Region[SouthEdge] },
+                        { EastEdge, Region[EastEdge] },
+                        { WestEdge, Region[WestEdge] },
+                    };
+                    Point2D newDoor2D = newDoor.PullInsideFromEdges(Edges, doorSide);
+                    R.Door.x = newDoor2D.x;
+                    R.Door.y = newDoor2D.y;
                 }
-                Region[Door].Add(Z.GetCell(R.Door));
+                door = Z.GetCell(R.Door);
+                Region[Door].Add(door);
             }
             return Region;
         }
@@ -1599,6 +1591,121 @@ namespace HNPS_GigantismPlus
             }
 
             return cellsList;
+        }
+
+        public static Point2D PullInsideFromEdges(this Cell Cell, Dictionary<string,List<Cell>> Edges, string DoorSide = "")
+        {
+            Debug.Entry(4,
+                $"@ {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdges)}"
+                + $"(Cell: {Cell}, List<Cell> Edge, " 
+                + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())})",
+                Indent: 0);
+
+            Point2D output = new(Cell.X, Cell.Y);
+            foreach ((string Side, List<Cell> Edge) in Edges)
+            {
+                Debug.Entry(4, $"Side: {Side}", Indent: 1);
+                if (DoorSide == "" || Side == DoorSide)
+                    output = Cell.PullInsideFromEdge(Edge);
+            }
+            Debug.Entry(4,
+                $"x {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdges)}"
+                + $"(Cell: [{Cell}], List<Cell> Edge, "
+                + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())}) @//",
+                Indent: 0);
+            return output;
+        }
+
+        public static Point2D PullInsideFromEdge(this Cell Cell, List<Cell> Edge)
+        {
+            Debug.Entry(4,
+                $"* {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdge)}"
+                + $"(Cell: {Cell}, List<Cell> Edge)",
+                Indent: 1);
+
+            Point2D output = new(Cell.X, Cell.Y);
+            if (Edge != null && Edge.Contains(Cell))
+            {
+                List<int> Xs = new();
+                List<int> Ys = new();
+                string XsString = string.Empty;
+                string YsString = string.Empty;
+                foreach (Cell cell in Edge)
+                {
+                    if (!Xs.Contains(cell.X)) Xs.Add(cell.X);
+                    if (!Ys.Contains(cell.Y)) Ys.Add(cell.Y);
+                }
+                foreach (int X in Xs)
+                {
+                    XsString += XsString == "" ? $"{X}" : $",{X}";
+                }
+                foreach (int Y in Ys)
+                {
+                    YsString += YsString == "" ? $"{Y}" : $",{Y}";
+                }
+                Debug.Entry(4, $"Xs: {XsString}", Indent: 2);
+                Debug.Entry(4, $"Ys: {YsString}", Indent: 2);
+                if (Xs.Count > 1 &&  Ys.Count > 1)
+                {
+                    Debug.Entry(2, 
+                        $"WARN [GigantismPlus]: " + 
+                        $"{typeof(Extensions).Name}." + 
+                        $"{nameof(PullInsideFromEdge)}() " + 
+                        $"List<Cell> Edge must be a straight line.", 
+                        Indent: 0);
+                    return output;
+                }
+                bool edgeIsLat = Xs.Count > 1;
+                Debug.Entry(4, $"edgeIsLat: {edgeIsLat}", Indent: 2);
+                int max = int.MinValue;
+                int min = int.MaxValue;
+                if (edgeIsLat)
+                {
+                    foreach(int x in Xs)
+                    {
+                        max = Math.Max(max, x);
+                        min = Math.Min(min, x);
+                    }
+                    if (output.x <= min)
+                    {
+                        Debug.Entry(4, $"output.x ({output.x}) >= min ({min}): output.x = min + 1", Indent: 2);
+                        output.x = min + 1;
+                    }
+                    if (output.x >= max)
+                    {
+                        Debug.Entry(4, $"output.x ({output.x}) <= max ({max}): output.x = max - 1", Indent: 2);
+                        output.x = max - 1;
+                    }
+                }
+                else
+                {
+                    foreach (int y in Ys)
+                    {
+                        max = Math.Max(max, y);
+                        min = Math.Min(min, y);
+                    }
+                    if (output.y <= min)
+                    {
+                        Debug.Entry(4, $"output.y ({output.y}) >= min ({min}): output.y = min + 1", Indent: 2);
+                        output.y = min + 1;
+                    }
+                    if (output.y >= max)
+                    {
+                        Debug.Entry(4, $"output.y ({output.y}) <= max ({max}): output.y = max - 1", Indent: 2);
+                        output.y = max - 1;
+                    }
+                }
+            }
+            Debug.Entry(4,
+                $"x {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdge)}"
+                + $"(Cell: {Cell}, List<Cell> Edge) *//",
+                Indent: 1);
+
+            return output;
         }
     } //!-- Extensions
 }

@@ -189,7 +189,8 @@ namespace HNPS_GigantismPlus
                 || entry.Key == typeof(Leader).Name
                 || entry.Key == typeof(Followers).Name
                 || entry.Key == typeof(Breeder).Name
-                || entry.Key == typeof(GreaterVoider).Name);
+                || entry.Key == typeof(GreaterVoider).Name
+                || entry.Key == typeof(Rummager).Name);
 
             GameObject creature;
             creature = GameObjectFactory.Factory.CreateObject(
@@ -267,6 +268,7 @@ namespace HNPS_GigantismPlus
 
             creature.Brain.Mobile = true;
             creature.Brain.Wanders = true;
+            creature.Brain.WandersRandomly = true;
             creature.Brain.Factions = "Giants";
             creature.Brain.Allegiance.Clear();
             creature.Brain.Allegiance.Add("Giants", 700);
@@ -352,6 +354,7 @@ namespace HNPS_GigantismPlus
             if (creature.TryGetPart(out Followers followers)) creature.RemovePart(followers);
             if (creature.TryGetPart(out Breeder breeder)) creature.RemovePart(breeder);
             if (creature.TryGetPart(out GreaterVoider greaterVoider)) creature.RemovePart(greaterVoider);
+            if (creature.TryGetPart(out Rummager rummager)) creature.RemovePart(rummager);
 
             return creature;
         }

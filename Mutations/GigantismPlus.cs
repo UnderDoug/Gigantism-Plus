@@ -15,6 +15,7 @@ using static HNPS_GigantismPlus.Options;
 
 using SerializeField = UnityEngine.SerializeField;
 using XRL.Core;
+using XRL.Language;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -607,6 +608,22 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "deferring to base.Mutate(GO, Level)", Indent: 0);
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})");
             return base.Mutate(GO, Level);
+        }
+        public override void AfterMutate()
+        {
+            if (ParentObject.IsPlayer() || ParentObject.BaseID == 1)
+            {
+                GameObject metalFoldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
+                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer))
+                {
+                    if (metalFoldingChairExaminer.MakeUnderstood(ShowMessage: false) && The.Game.Turns > 1)
+                    {
+                        Popup.Show($"You're struck with a sudden, intimate understanding of {metalFoldingChair.GetPluralName()}.");
+                    }
+                }
+                metalFoldingChair.Obliterate();
+            }
+            base.AfterMutate();
         }
 
         public override bool Unmutate(GameObject GO)

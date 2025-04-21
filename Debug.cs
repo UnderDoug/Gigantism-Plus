@@ -1,18 +1,25 @@
-﻿using System;
+﻿using Qud.API;
+
+using System;
 using System.Collections.Generic;
 
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.Core;
+using XRL.Wish;
+
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
-using Qud.API;
+
+using HNPS_GigantismPlus;
 
 namespace HNPS_GigantismPlus
 {
+    [HasWishCommand]
     public static class Debug
     {
         private static int VerbosityOption => Options.DebugVerbosity;
@@ -525,5 +532,134 @@ namespace HNPS_GigantismPlus
                     $"{Utility}");
             }
         }
+
+        [WishCommand]
+        public static void ToggleCellHighlighting()
+        {
+            The.Game.SetBooleanGameState("UD_Debug_HighlightCells", !The.Game.GetBooleanGameState("UD_Debug_HighlightCells"));
+        }
+
+        [WishCommand]
+        public static void RemoveCellHighlighting()
+        {
+            foreach (GameObject @object in The.ActiveZone.GetObjects())
+            {
+                CellHighlighter highlighter = @object.RequirePart<CellHighlighter>();
+                @object.RemovePart(highlighter);
+            }
+        }
+        public static Cell HighlightColor(this Cell Cell, string TileColor, string DetailColor, string BackgroundColor = "^k", int Priority = 0)
+        {
+            if (!The.Game.HasBooleanGameState("UD_Debug_HighlightCells"))
+                The.Game.SetBooleanGameState("UD_Debug_HighlightCells", Options.DebugVerbosity > 3);
+            if (Cell.IsEmpty() && Cell.GetFirstVisibleObject() == null && Cell.GetHighestRenderLayerObject() == null)
+                Cell.AddObject("Cell Highlighter");
+
+            GameObject gameObject = null;
+            foreach (GameObject Object in Cell.GetObjects())
+            {
+                gameObject ??= Object;
+                if (Object.Render.RenderLayer >= gameObject.Render.RenderLayer)
+                    gameObject = Object;
+            }
+            gameObject = Cell.GetHighestRenderLayerObject();
+            CellHighlighter highlighter = gameObject.RequirePart<CellHighlighter>();
+            if (Priority >= highlighter.HighlightPriority)
+            {
+                highlighter.HighlightPriority = Priority;
+                highlighter.TileColor = TileColor;
+                highlighter.DetailColor = DetailColor;
+                highlighter.BackgroundColor = BackgroundColor;
+            }
+            return Cell;
+        }
+        public static Cell HighlightRed(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&r", DetailColor: "R", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightGreen(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&g", DetailColor: "G", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightYellow(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&w", DetailColor: "W", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightPurple(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&m", DetailColor: "M", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightBlue(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&b", DetailColor: "B", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightCyan(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&c", DetailColor: "C", BackgroundColor: "^k", Priority);
+        }
     } //!-- public static class Debug
+}
+
+namespace XRL.World.Parts
+{
+    [Serializable]
+    public class CellHighlighter : IScribedPart
+    {
+        public static readonly int ICON_COLOR_PRIORITY = 999;
+
+        public string TileColor;
+        public string DetailColor;
+        public string BackgroundColor;
+
+        public int HighlightPriority;
+
+        public bool DoHighlight;
+
+        public CellHighlighter()
+        {
+            BackgroundColor = "k";
+            DoHighlight = 
+                Options.DebugVerbosity > 3
+             && The.Game.GetBooleanGameState("UD_Debug_HighlightCells");
+            HighlightPriority = 0;
+        }
+
+        public override bool Render(RenderEvent E)
+        {
+            if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+            {
+                DoHighlight =
+                    Options.DebugVerbosity > 3 
+                 && The.Game.GetBooleanGameState("UD_Debug_HighlightCells");
+            }
+            if (DoHighlight)
+            {
+                if (ParentObject.InheritsFrom("Cell Highlighter"))
+                    ParentObject.Render.Visible = true;
+
+                E.ApplyColors(
+                    Foreground: TileColor ?? E.DetailColor, 
+                    Background: BackgroundColor, 
+                    Detail: DetailColor ?? E.DetailColor,
+                    ICON_COLOR_PRIORITY, 
+                    ICON_COLOR_PRIORITY, 
+                    ICON_COLOR_PRIORITY);
+            }
+            else
+            {
+                if (ParentObject.InheritsFrom("Cell Highlighter"))
+                    ParentObject.Render.Visible = false;
+            }
+            return base.Render(E);
+        }
+
+        public override void Remove()
+        {
+            if (ParentObject != null && ParentObject.InheritsFrom("Cell Highlighter"))
+            {
+                ParentObject.Obliterate();
+            }
+            base.Remove();
+        }
+    } //!-- public class CellHighlighter : IScribedPart
 }

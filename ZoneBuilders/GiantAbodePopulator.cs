@@ -5,17 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 
 using XRL.Rules;
+using XRL.World.Parts;
 using XRL.World.AI.Pathfinding;
+using static XRL.Core.XRLCore;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.World.Parts;
 
 namespace XRL.World.ZoneBuilders
 {
-	public class GiantAbodePopulator
+    public class GiantAbodePopulator
         : ZoneBuilderSandbox
     {
         List<Dictionary<string, List<Cell>>> Regions;
@@ -58,8 +59,8 @@ namespace XRL.World.ZoneBuilders
                 int y1 = cell.Y - radius;
                 int x2 = cell.X + radius;
                 int y2 = cell.Y + radius;
-                int doorXRnd = RndGP.Next(x1+1, x2-1);
-                int doorYRnd = RndGP.Next(y1+1, y2-1);
+                int doorXRnd = RndGP.Next(x1 + 1, x2 - 1);
+                int doorYRnd = RndGP.Next(y1 + 1, y2 - 1);
                 int doorX = Constrained ? doorXRnd : cell.X;
                 int doorY = Constrained ? doorYRnd : cell.Y;
                 Point2D doorLocation = DoorDirection switch
@@ -88,33 +89,42 @@ namespace XRL.World.ZoneBuilders
                     if (Region["Inner"].Contains(outerCell))
                         Region["Inner"].Remove(outerCell);
                     regionCells.Add(outerCell);
+                    // if (8.in100()) Wall = "WallOrDebrisLimestoneNoSmall";
                     outerCell.ClearAndAddObject(Wall);
                 }
-                
-                List<Location2D> innerRegion = new();
                 foreach (Cell innerCell in Region["Inner"])
                 {
-                    bool noAdjacentDoors = true;
-                    foreach (Cell adjacentCell in innerCell.GetAdjacentCells())
-                    {
-                        if (!cell.GetObjectsThatInheritFrom("Door").IsNullOrEmpty())
-                        {
-                            noAdjacentDoors = false;
-                            break;
-                        }
-                    }
                     regionCells.Add(innerCell);
                     PaintCell(innerCell.Clear(), Floor);
-                    if (noAdjacentDoors)
-                    {
-                        innerRegion.Add(innerCell.Location);
-                    }
                 }
-
                 Cell doorCell = Region["Door"][0];
+                R.Door.x = doorCell.X;
+                R.Door.y = doorCell.Y;
+
+                Rect2D P = R.GetCellSide(R.Door) switch
+                {
+                    "N" => new(R.x1, R.y1 + 1, R.x2, R.y2, R.Door),
+                    "S" => new(R.x1, R.y1, R.x2, R.y2 - 1, R.Door),
+                    "E" => new(R.x1, R.y1, R.x2 - 1, R.y2, R.Door),
+                    "W" => new(R.x1 + 1, R.y1, R.x2, R.y2, R.Door),
+                    _ => R,
+                };
+
+                List<Location2D> popArea = new();
+                List<Cell> popCells = new();
+                foreach (Point2D point in P.ReduceBy(1,1).getPoints())
+                {
+                    Cell pointCell = Z.GetCell(point);
+                    Location2D pointLocation = pointCell.Location;
+                    if (!popArea.Contains(pointLocation))
+                        popArea.Add(pointLocation);
+                    if (!popCells.Contains(pointCell))
+                        popCells.Add(pointCell);
+                }
+                Region.Add("Population", popCells);
 
                 doorCell.Clear();
-                foreach (Cell adjacentCell in doorCell.GetAdjacentCells())
+                foreach (Cell adjacentCell in doorCell.GetCardinalAdjacentCells())
                 {
                     if (!Region["Outer"].Contains(adjacentCell) && !Region["Inner"].Contains(adjacentCell))
                     {
@@ -132,16 +142,48 @@ namespace XRL.World.ZoneBuilders
                 if (door != null)
                     doorCell.AddObject(door);
 
+                string popRegionString = string.Empty;
+                foreach (Location2D popLocation in popArea)
+                {
+                    popRegionString += popRegionString == string.Empty ? $"[{popLocation}]" : $",[{popLocation}]";
+                }
+                Debug.Entry(4, $"populationRegion: {popRegionString}", Indent: 1);
+                Debug.Entry(4,
+                    $"> foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()})",
+                    Indent: 1);
                 foreach (PopulationResult item in PopulationManager.Generate(ContentsTable, "zonetier", Z.NewTier.ToString()))
                 {
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 1);
+
+                    Debug.Entry(4, $"item: {item.Blueprint}, number: {item.Number}", Indent: 1);
+
+                    Debug.Entry(4,
+                        $"> for (int num = 0; num < item.Number; num++)",
+                        Indent: 2);
                     for (int num = 0; num < item.Number; num++)
                     {
-                        PlaceObjectInArea(Z, new LocationList(innerRegion), GameObject.Create(item.Blueprint), 0, 0, item.Hint);
-                    }
-                }
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 2);
+                        Debug.Entry(4, 
+                            $"item: {item.Blueprint}, " + 
+                            $"number: {num + 1}/{item.Number}, " + 
+                            $"hint: {item.Hint.Quote()}", 
+                            Indent: 3);
 
+                        GameObject gameObject = GameObjectFactory.Factory.CreateObject(item.Blueprint);
+                        if (!PlaceObjectInArea(Z, new LocationList(popArea), gameObject, 0, 0, item.Hint))
+                            Debug.CheckNah(4, $"Failed to place [{num + 1}]{item.Blueprint}", Indent: 3);
+
+                        else Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3);
+                    }
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 2);
+                    Debug.Entry(4,
+                        $"x for (int num = 0; num < item.Number; num++) >//",
+                        Indent: 2);
+                }
+                Debug.Divider(4, HONLY, Count: 25, Indent: 1);
+                Debug.Entry(4, $"x foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()}) >//", Indent: 1);
             }
-            foreach(GameObject trash in trashCan)
+            foreach (GameObject trash in trashCan)
             {
                 trash.Obliterate(null, true);
             }
@@ -151,6 +193,36 @@ namespace XRL.World.ZoneBuilders
             {
                 if (!regionCells.Contains(emptyCell)) nonRegionEmptyCells.Add(emptyCell);
             }
+
+            foreach (Dictionary<string, List<Cell>> region in Regions)
+            {
+                Cell nearestEmptyCell = null;
+                Cell doorCell = region["Door"][0];
+                foreach (Cell emptyCell in nonRegionEmptyCells)
+                {
+                    nearestEmptyCell ??= emptyCell;
+                    if (doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y) < doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y))
+                        nearestEmptyCell = emptyCell;
+                }
+                CleanQueue<SortPoint> avoidCells = new();
+                foreach(Cell avoidCell in regionCells)
+                {
+                    SortPoint avoidPoint = new(avoidCell.X, avoidCell.Y);
+                    if (!avoidCells.Contains(avoidPoint)) avoidCells.Enqueue(avoidPoint);
+                }
+                FindPath path = new(doorCell, nearestEmptyCell, Avoid: avoidCells);
+                foreach (Cell step in path.Steps)
+                {
+                    if (step == doorCell) continue;
+                    step.Clear();
+                    if (85.in100())
+                    {
+                        step.RequireObject("DirtPath");
+                    }
+                    step.HighlightBlue(12);
+                }
+            }
+
             foreach (Cell cell in GraniteCells)
             {
                 if (!cell.GetObjectsThatInheritFrom("Wall").IsNullOrEmpty() && !cell.HasObject("Granite"))
@@ -170,24 +242,33 @@ namespace XRL.World.ZoneBuilders
                     }
                 }
             }
-            foreach (Dictionary<string,List<Cell>> region in Regions)
+
+            if (true) // this is just to have an easy toggle
             {
-                Cell nearestEmptyCell = null;
-                Cell doorCell = region["Door"][0];
-                foreach (Cell emptyCell in nonRegionEmptyCells)
+                foreach (Dictionary<string, List<Cell>> Region in Regions)
                 {
-                    nearestEmptyCell ??= emptyCell;
-                    if (doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y) < doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y))
-                        nearestEmptyCell = emptyCell;
-                }
-                FindPath path = new(doorCell, nearestEmptyCell);
-                foreach (Cell step in path.Steps)
-                {
-                    if (step == doorCell) continue;
-                    step.Clear();
-                    if (85.in100())
+                    foreach ((string label, List<Cell> subregion) in Region)
                     {
-                        step.RequireObject("DirtPath");
+                        foreach (Cell cell in subregion)
+                        {
+                            switch (label)
+                            {
+                                case "Inner":
+                                    cell.HighlightCyan(5);
+                                    break;
+                                case "Outer":
+                                    cell.HighlightPurple(3);
+                                    break;
+                                case "Door":
+                                    cell.HighlightRed(8);
+                                    break;
+                                case "Population":
+                                    cell.HighlightGreen(10);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }
             }
@@ -220,5 +301,5 @@ namespace XRL.World.ZoneBuilders
                 C.PaintRenderString = paintRenderString;
             }
         }
-    }
+    } //!-- public class GiantAbodePopulator : ZoneBuilderSandbox
 }

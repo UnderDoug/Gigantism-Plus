@@ -7,6 +7,13 @@
       
    -->
 
+  <object Name="Cell Highlighter" Inherits="Widget">
+    <part Name="Render" DisplayName="[Cell Highlighter]"
+          RenderString="*" RenderLayer="9"
+          Tile="terrain/sw_ground_dots1.png" 
+          ColorString="&amp;y" DetailColor="K" Visible="true" />
+  </object>
+  
   <object Name="RandomDebrisBase" Inherits="Widget" 
           PreviousName="RandomBoulderOrDebrisBase">
     <part Name="Render" DisplayName="[RandomDebris]"
@@ -113,6 +120,16 @@
           RenderString="H" Tile="Widgets/WallOrDebris.png"
           ColorString="&amp;y" DetailColor="K" Visible="false" />
     <part Name="WallOrDebris" Wall="Limestone" WallChance="50" InvertColor="true" />
+  </object>
+
+  <object Name="WallOrDebrisGraniteNoSmall" Inherits="WallOrDebrisGranite">
+    <part Name="Render" DisplayName="[WallOrDebrisGraniteNoSmall]" />
+    <part Name="WallOrDebris" WallChance="75" SmallBoulders="false" />
+  </object>
+
+  <object Name="WallOrDebrisLimestoneNoSmall" Inherits="WallOrDebrisLimestone">
+    <part Name="Render" DisplayName="[WallOrDebrisLimestoneNoSmall]" />
+    <part Name="WallOrDebris" WallChance="75" SmallBoulders="false" />
   </object>
 
   <object Name="WallOrNotBase" Inherits="Widget">

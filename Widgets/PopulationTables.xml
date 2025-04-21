@@ -40,8 +40,8 @@
 
   <population Name="Gigantic Light LowTech">
     <group Name="Items" Style="pickone">
-      <object Weight="2" Number="1" Blueprint="Gigantic Brazier" />
-      <object Weight="3" Number="1" Blueprint="Gigantic Torchpost" />
+      <object Weight="8" Number="1" Blueprint="Gigantic Brazier" />
+      <object Weight="15" Number="1" Blueprint="Gigantic Torchpost" />
       <object Weight="1" Number="1" Blueprint="Gigantic Half Candelabra" />
     </group>
   </population>
@@ -89,7 +89,6 @@
       <object Weight="5" Number="1" Blueprint="Gigantic Table" />
       <object Weight="5" Number="1" Blueprint="Gigantic Low Table" />
       <object Weight="3" Number="1" Blueprint="Gigantic Workbench" />
-      <object Weight="1" Number="1" Blueprint="Gigantic Dresser" />
     </group>
   </population>
   <population Name="Gigantic Table Nice">
@@ -107,6 +106,7 @@
       <object Weight="1" Number="1" Blueprint="Gigantic Octagonal Table" />
       <object Weight="2" Number="1" Blueprint="Gigantic Book Table" />
       <object Weight="2" Number="1" Blueprint="Gigantic Ornate Table" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Dresser" />
     </group>
   </population>
   <population Name="Gigantic Table">
@@ -149,11 +149,11 @@
       <object Weight="1" Number="1" Blueprint="Gigantic Gravchair" />
       <object Weight="3" Number="1" Blueprint="Gigantic Ornate Chair" />
       <object Weight="5" Number="1" Blueprint="Gigantic Starmchair" />
-      <group Name="Gigantic Sofa" Number="1" Style="pickeach" Weight="1">
+      <!--group Name="Gigantic Sofa" Number="1" Style="pickeach" Weight="1">
         <object Weight="1" Number="1" Blueprint="Gigantic Sofa L" Hint="Adjacent:100,AdjacentToEndsWith: C" />
         <object Weight="1" Number="1" Blueprint="Gigantic Sofa C" Hint="Adjacent:100,AdjacentToEndsWith: L,AdjacentToEndsWith: R," />
         <object Weight="1" Number="1" Blueprint="Gigantic Sofa R" Hint="Adjacent:100,AdjacentToEndsWith: C" />
-      </group>
+      </group-->
     </group>
   </population>
   <population Name="Gigantic Chair">
@@ -161,6 +161,20 @@
       <table Weight="5" Number="1" Name="Gigantic Chair Basic" />
       <table Weight="3" Number="1" Name="Gigantic Chair Nice" />
       <table Weight="1" Number="1" Name="Gigantic Chair Luxury" />
+    </group>
+  </population>
+  
+  <population Name="Gigantic Bookshelves">
+    <group Name="Items" Style="pickone">
+      <group Weight="19" Name="Common" Style="pickone">
+        <object Number="1" Blueprint="Gigantic UndergroundBookshelf" />
+      </group>
+      <group Weight="1" Name="Rare" Style="pickone">
+        <object Number="1" Blueprint="Gigantic ishelf1" />
+        <object Number="1" Blueprint="Gigantic ishelf2" />
+        <object Number="1" Blueprint="Gigantic ishelf3" />
+        <object Number="1" Blueprint="Gigantic ishelf4" />
+      </group>
     </group>
   </population>
 
@@ -266,30 +280,24 @@
     </group>
   </population>
   
-  <population Name="Giant Abode">
+  <population Name="Giant Abode Base">
     <group Name="Contents" Style="pickeach">
       <group Name="Irregularities" Style="pickeach">
-        <object Number="2" Chance="100" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
-        <object Number="1" Chance="75" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
-        <object Number="1" Chance="50" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
-        <object Number="1" Chance="10" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Chance="100" Number="2" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Chance="75" Number="1" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Chance="50" Number="1" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
+        <object Chance="10" Number="1" Blueprint="WallOrDebrisLimestone" Hint="InsideCorner" />
       </group>
       
-      <table Name="Gigantic Light" Number="1" Chance="100" Hint="AlongWall" />
-      <table Name="Gigantic Bed" Number="1" Chance="100" Hint="AdjacentToStartsWith:Gigantic,AlongWall" />
-      <table Name="Gigantic Table" Number="1" Chance="75" Hint="AdjacentToEndsWith: Chair,AlongWall" />
-      <table Name="Gigantic Chair" Number="1" Chance="100" Hint="AdjacentToEndsWith: Table," />
-
-      <group Name="Booksehlf" Style="pickone" Chance="35" Hint="InsideCorner">
-        <object Number="1" Blueprint="Gigantic ishelf1" />
-        <object Number="1" Blueprint="Gigantic ishelf2" />
-        <object Number="1" Blueprint="Gigantic ishelf3" />
-        <object Number="1" Blueprint="Gigantic ishelf4" />
-      </group>
+      <table Chance="100" Number="1" Name="Gigantic Light" Hint="AlongWall" />
+      <table Chance="100" Number="1" Name="Gigantic Bed" />
+      <table Chance="100" Number="1" Name="Gigantic Chair" Hint="AdjacentToEndsWith: Table" />
+      
+      <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AlongWall" />
 
       <group Name="Storage" Style="pickeach">
-        <table Name="Gigantic Container Not Chest" Number="1" Chance="75" Hint="AdjacentToStartsWith:Gigantic,InsideCorner" />
-        <table Name="Gigantic Vessel" Number="1" Chance="75" Hint="AdjacentToStartsWith:Gigantic" />
+        <table Number="1" Chance="75" Name="Gigantic Container Not Chest" Hint="InsideCorner" />
+        <table Number="1" Chance="75" Name="Gigantic Vessel" />
       </group>
 
       <group Name="Decor" Style="pickeach">
@@ -299,10 +307,25 @@
     </group>
   </population>
 
+  <population Name="Giant Abode">
+    <group Name="Contents" Style="pickeach">
+      <table Chance="100" Name="Giant Abode Base" />
+      <table Chance="75" Number="1" Name="Gigantic Table Basic" Hint="AlongWall,AdjacentToEndsWith: Chair" />
+    </group>
+  </population>
+
   <population Name="Giant Abode Cook">
     <group Name="Contents" Style="pickeach">
-      <table Name="Giant Abode" Number="1" Chance="100" />
-      <object Blueprint="Gigantic Oven" Number="1" Chance="100" Hint="InsideCorner" />
+      <table Chance="100" Name="Giant Abode Base" />
+      
+      <group Chance="100" Name="Table" Style="pickone">
+        <table Weight="3" Number="1" Name="Gigantic Table Nice" Hint="AdjacentToEndsWith: Chair" />
+        <table Weight="1" Number="1" Name="Gigantic Table Luxury" Hint="AdjacentToEndsWith: Chair" />
+      </group>
+
+      <table Chance="100" Number="1" Name="Gigantic Bookshelves" Hint="AlongWall" />
+      
+      <object Chance="100" Number="1" Blueprint="Gigantic Oven" Hint="AlongWall" />
     </group>
   </population>
   

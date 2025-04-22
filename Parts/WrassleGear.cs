@@ -28,7 +28,7 @@ namespace XRL.World.Parts
                     _TileColor = ColorBag.DrawElement(value);
                 else
                 {
-                    if (DetailColor != null && )
+                    if (DetailColor != null && true)
                     _TileColor = ColorBag.DrawRandomElement();
                 }
                     

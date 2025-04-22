@@ -114,7 +114,13 @@ namespace XRL.World.Parts
         public static void PlayerWassleIDWish()
         {
             Wrassler wrassler = The.Player.RequirePart<Wrassler>();
-            wrassler = new(Guid.NewGuid());
+
+            string oldWrassleID = wrassler.WrassleID.ToString();
+            wrassler.WrassleID = Guid.NewGuid();
+            Popup.Show($"Stealing identity...");
+            Popup.Show($"...");
+            Popup.Show($"... Done.");
+            Popup.Show($"Old: {oldWrassleID}; New: {wrassler.WrassleID.ToString()}");
         }
     } //!-- public class Wrassler : IScribedPart
 }

@@ -8,6 +8,12 @@ namespace HNPS_GigantismPlus
     {
         public const string MOD_ID = "gigantism_Plus";
 
+        public const string DEBUG_OBJECT_CREATION_ANALYSIS = "UD_Debug_DoObjectCreationAnalysis";
+        public const string DEBUG_HIGHLIGHT_CELLS = "UD_Debug_HighlightCells";
+
+        public const string TICK = "\u221A"; // √
+        public const string CROSS = "\u0058";  // X
+
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
         public const string TANDR = "\u2514"; // └

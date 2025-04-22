@@ -218,8 +218,9 @@ namespace XRL.World.Parts
 
         public void Slap()
         {
-            if(ParentObject != null && ParentObject.IsPlayer())
+            if (ParentObject != null && ParentObject.IsPlayer())
             {
+                CombatJuice.cameraShake(Stews * 25);
                 Popup.Show(
                     $"You slap your belly. It holds much stew. About {Stews.Things("helping")}. " + 
                     $"You hanker for more, though! You reckon {Hankering.Things("more helping")} will see additional gains.");

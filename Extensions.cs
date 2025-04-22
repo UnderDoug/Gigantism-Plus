@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Genkit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -18,8 +19,6 @@ using XRL.World.ObjectBuilders;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using Genkit;
-using XRL.UI.ObjectFinderClassifiers;
 
 namespace HNPS_GigantismPlus
 {
@@ -1159,11 +1158,34 @@ namespace HNPS_GigantismPlus
             return Body.GetEquippedObjects(filter);
         }
 
-        public static T DrawRandomElement<T>(this List<T> Bag)
+        public static T DrawRandomElement<T>(this List<T> Bag, T ExceptForElement = null, List<T> ExceptForElements = null)
+            where T : class
+        {
+            return Bag.DrawSeededElement(Guid.Empty, ExceptForElement, ExceptForElements);
+        }
+        public static T DrawSeededElement<T>(this List<T> Bag, Guid Seed, T ExceptForElement = null, List<T> ExceptForElements = null)
             where T : class
         {
             if (Bag.IsNullOrEmpty()) return null;
-            T output = Bag.GetRandomElement();
+            List<T> drawBag = new();
+            drawBag.AddRange(Bag);
+            ExceptForElements ??= new();
+            if (drawBag.Contains(ExceptForElement)) drawBag.Remove(ExceptForElement);
+            foreach (T exceptForElement in ExceptForElements)
+            {
+                if (drawBag.Contains(exceptForElement)) drawBag.Remove(exceptForElement);
+            }
+            if (drawBag.IsNullOrEmpty()) return null;
+            T output = null;
+            if (Seed != Guid.Empty)
+            {
+                string seed = Seed.ToString();
+                int low = 0;
+                int high = (drawBag.Count - 1) * 7;
+                int roll = Stat.SeededRandom(seed, low, high) % 7;
+                output = drawBag.ElementAt(roll);
+            }
+            output ??= drawBag.GetRandomElement();
             Bag.Remove(output);
             return output;
         }
@@ -1174,10 +1196,16 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromSubBag = "")
+        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromSubBag = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+            where T : class
+        {
+            return Bag.DrawSeededElement(Guid.Empty, FromSubBag, ExceptForElement, ExceptForElements);
+        }
+        public static T DrawSeededElement<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromSubBag = "", T ExceptForElement = null, List<T> ExceptForElements = null)
             where T : class
         {
             List<T> drawBag = new();
+            ExceptForElements ??= new();
             bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
             if (haveTargetedSubBag)
             {
@@ -1193,8 +1221,8 @@ namespace HNPS_GigantismPlus
                     }
                 }
             }
-            if (drawBag.IsNullOrEmpty()) return null;
-            T output = drawBag.GetRandomElement();
+
+            T output = drawBag.DrawSeededElement(Seed, ExceptForElement, ExceptForElements);
 
             if (haveTargetedSubBag)
             {
@@ -1228,6 +1256,7 @@ namespace HNPS_GigantismPlus
                     }
                 }
             }
+
             T output = (!drawBag.IsNullOrEmpty() && drawBag.Contains(Element)) ? Element : null;
 
             if (haveTargetedSubBag)
@@ -1813,6 +1842,53 @@ namespace HNPS_GigantismPlus
                 + $"(Cell: {Cell}, List<Cell> Edge) *//",
                 Indent: 1);
 
+            return output;
+        }
+
+        public static List<string> GetNumberedTileVariants(this string Source)
+        {
+            Debug.Entry(4,
+                $"* {typeof(Extensions).Name}."
+                + $"{nameof(GetNumberedTileVariants)}"
+                + $"(string Source: {Source})",
+                Indent: 0);
+            List<string> output = new();
+            
+            string[] sourcePieces = Source.Split("~");
+            string pathBefore = sourcePieces[0];
+            string pathAfter = sourcePieces[2];
+
+            Debug.Entry(4, $"pathBefore: {pathBefore}, pathAfter: {pathAfter}", Indent: 1);
+            Debug.Entry(4, $"sourcePieces[1] {sourcePieces[1]}", Indent: 1);
+            
+            string[] pathRange = sourcePieces[1].Split('-');
+            int first = int.Parse(pathRange[0]);
+            int last = int.Parse(pathRange[1]);
+
+            Debug.Entry(4, $"first {first} - last: {last}", Indent: 1);
+
+            for (int i = first; i <= last; i++)
+            {
+                Debug.Entry(4, $"i: {i}", Indent: 2);
+
+                int padding = Math.Max(2, last.ToString().Length);
+                string number = $"{i}".PadLeft(padding, '0');
+                string path = $"{pathBefore}{number}{pathAfter}";
+                Debug.Entry(4, $"path: {path}", Indent: 2);
+                if (/*TryGetTilePath(path, out path, IsWholePath: true) &&*/ !output.Contains(path)) output.Add(path);
+            }
+
+            return output;
+        }
+
+        public static List<string> CommaExpansion(this string String)
+        {
+            string[] stringPieces = String.Split(",");
+            List<string> output = new();
+            for (int i = 0; i <= stringPieces.Count(); i++)
+            {
+                if (!output.Contains(stringPieces[i])) output.Add(stringPieces[i]);
+            }
             return output;
         }
     } //!-- Extensions

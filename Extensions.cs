@@ -1167,6 +1167,114 @@ namespace HNPS_GigantismPlus
             Bag.Remove(output);
             return output;
         }
+        public static T DrawElement<T>(this List<T> Bag, T Element)
+            where T : class
+        {
+            T output = (!Bag.IsNullOrEmpty() || Bag.Remove(Element)) ? Element : null;
+            return output;
+        }
+
+        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromSubBag = "")
+            where T : class
+        {
+            List<T> drawBag = new();
+            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            if (haveTargetedSubBag)
+            {
+                drawBag = Bag[FromSubBag];
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    foreach (T element in subBag)
+                    {
+                        if (!drawBag.Contains(element)) drawBag.Add(element);
+                    }
+                }
+            }
+            if (drawBag.IsNullOrEmpty()) return null;
+            T output = drawBag.GetRandomElement();
+
+            if (haveTargetedSubBag)
+            {
+                if (Bag[FromSubBag].Contains(output)) Bag[FromSubBag].Remove(output);
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    if (subBag.Contains(output)) subBag.Remove(output);
+                }
+            }
+            return output;
+        }
+        public static T DrawElement<T>(this Dictionary<string, List<T>> Bag, T Element, string FromSubBag = "")
+            where T : class
+        {
+            List<T> drawBag = new();
+            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            if (haveTargetedSubBag)
+            {
+                drawBag = Bag[FromSubBag];
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    foreach (T element in subBag)
+                    {
+                        if (!drawBag.Contains(element)) drawBag.Add(element);
+                    }
+                }
+            }
+            T output = (!drawBag.IsNullOrEmpty() && drawBag.Contains(Element)) ? Element : null;
+
+            if (haveTargetedSubBag)
+            {
+                if (Bag[FromSubBag].Contains(output)) Bag[FromSubBag].Remove(output);
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    if (subBag.Contains(output)) subBag.Remove(output);
+                }
+            }
+            return output;
+        }
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, out string Key, string FromSubBag = "")
+            where T : class
+        {
+            List<T> peekBag = new();
+            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            bool haveElement = false;
+            Key = null;
+            if (haveTargetedSubBag)
+            {
+                peekBag = Bag[FromSubBag];
+            }
+            else
+            {
+                foreach ((string key, List<T> subBag) in Bag)
+                {
+                    foreach (T element in subBag)
+                    {
+                        if (peekBag.Contains(element))
+                        {
+                            Key = key;
+                            haveElement = true;
+                        }
+                    }
+                }
+            }
+            return haveElement;
+        }
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, string FromSubBag = "")
+            where T : class
+        {
+            return Bag.Contains(Element, out _, FromSubBag);
+        }
 
         public static void Gigantify(this GameObject Object, string Context = "")
         {

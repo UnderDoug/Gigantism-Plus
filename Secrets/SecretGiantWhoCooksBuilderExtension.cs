@@ -123,14 +123,19 @@ namespace HNPS_GigantismPlus
 
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE)
                 zoneManager.AddZonePostBuilder(ZoneID: SecretZoneId, Builder: nameof(GiantAbodePopulator));
-            
+
+            GameObject Giant = GetTheGiant();
+
+            string wrasslerColor = null;
+            if (Giant.TryGetPart(out Wrassler wrassler)) wrasslerColor = wrassler.DetailColor;
+
             zoneManager.AddZonePostBuilder(
                 ZoneID: SecretZoneId, 
                 Class: nameof(AddObjectBuilder), 
                 Key1: "Object", 
-                Value1: zoneManager.CacheObject(GetTheGiant()));
+                Value1: zoneManager.CacheObject(Giant));
 
-            string wrassleRingColor = WrassleRingColors.GetRandomElement();
+            string wrassleRingColor = wrasslerColor ?? WrassleRingColors.GetRandomElement();
             foreach (GameObject rope in zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes"))
             {
                 rope.Render.DetailColor = wrassleRingColor;
@@ -339,6 +344,12 @@ namespace HNPS_GigantismPlus
             string heroTemplate = Unique ? SCRT_GNT_HERO_TMPLT : GNT_HERO_TMPLT;
             int heroTier = Unique ? 8 : -1;
             creature = HeroMaker.MakeHero(creature, heroTemplate, heroTier, "Giant");
+
+            if (!creature.TryGetPart(out Wrassler wrassler))
+            {
+                wrassler = creature.RequirePart<Wrassler>();
+            }
+            wrassler.BestowWrassleGear();
 
             if (creature.TryGetPart(out HasMakersMark hasMakersMark)) creature.RemovePart(hasMakersMark);
 

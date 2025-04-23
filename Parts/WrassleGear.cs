@@ -15,7 +15,22 @@ namespace XRL.World.Parts
     [Serializable]
     public class WrassleGear : IScribedPart
     {
-        public Guid WrassleID;
+        [SerializeField]
+        private Guid _WrassleID;
+
+        public Guid WrassleID
+        {
+            get => _WrassleID = _WrassleID == Guid.Empty ? Guid.NewGuid() : _WrassleID;
+            set
+            {
+                _WrassleID = value;
+                _Tile = null;
+                TileBag = FillTileBag();
+                _TileColor = null;
+                _DetailColor = null;
+                ColorBag = NewColorBag();
+            }
+        }
 
         public List<string> TileBag = new();
 
@@ -33,7 +48,7 @@ namespace XRL.World.Parts
         private string _Tile;
         public string Tile
         {
-            get => _Tile ??= GetTileForWrassleID(WrassleID, RandomTiles);
+            get => _Tile ??= GetTileFromBag();
             set
             {
                 if (_Tile != value)
@@ -49,7 +64,7 @@ namespace XRL.World.Parts
         public string TileColor
         {
             get => _TileColor ??=
-                ( DetailColorIsBright 
+                (DetailColorIsBright 
                 ? ColorBag.DrawSeededElement(WrassleID,
                     ExceptForElements: new() 
                     { 
@@ -66,6 +81,7 @@ namespace XRL.World.Parts
                 );
             set
             {
+                if (value == null) _TileColor = null;
                 if (ColorBag.Contains(value))
                     _TileColor = ColorBag.DrawElement(value);
                 else
@@ -98,6 +114,7 @@ namespace XRL.World.Parts
                 );
             set
             {
+                if (value == null) _DetailColor = null;
                 if (ColorBag.Contains(value))
                     _DetailColor = ColorBag.DrawElement(value);
                 else
@@ -112,28 +129,14 @@ namespace XRL.World.Parts
         {
             WrassleID = Guid.NewGuid();
             RandomizeTile = false;
-            TileBag = FillTileBag(TileBag, RandomTiles);
-            ColorBag = SyncColorBag(ColorBag, TileColor, DetailColor);
+            TileBag = FillTileBag();
+            ColorBag = NewColorBag();
         }
-        public WrassleGear(Guid source)
-            : this()
-        {
-            WrassleID = source;
-        }
-        public WrassleGear(WrassleGear source)
-            : this(source.WrassleID)
-        {
-        }
-        public WrassleGear(Wrassler source)
-            : this(source.WrassleID)
-        {
-        }
-
         public static Dictionary<string, List<string>> NewColorBag()
         {
             return _ColorBag;
         }
-        public static Dictionary<string, List<string>> SyncColorBag(Dictionary<string, List<string>> ColorBag, string TileColor, string DetailColor)
+        public Dictionary<string, List<string>> SyncColorBag()
         {
             ColorBag = NewColorBag();
 
@@ -145,7 +148,7 @@ namespace XRL.World.Parts
 
             return ColorBag;
         }
-        public static List<string> FillTileBag(List<string> TileBag, string RandomTiles)
+        public List<string> FillTileBag()
         {
             TileBag = new();
             List<string> randomTiles = RandomTiles?.CommaExpansion() ?? new();
@@ -167,47 +170,16 @@ namespace XRL.World.Parts
             }
             return TileBag;
         }
-        public static string GetTileForWrassleID(Guid WrassleID, string RandomTiles)
-        {
-            return GetTileForWrassleID(WrassleID, RandomTiles, null);
-        }
-        public static string GetTileForWrassleID(Guid WrassleID, string RandomTiles, List<string> TileBag = null)
-        {
-            TileBag ??= new();
-            return FillTileBag(TileBag, RandomTiles).DrawSeededElement(WrassleID);
-        }
-        public static void GetColorsForWrassleID(Guid WrassleID, out string TileColor, out string DetailColor)
-        {
-            GetColorsForWrassleID(WrassleID, null, out TileColor, out DetailColor);
-        }
-        public static void GetColorsForWrassleID(Guid WrassleID, Dictionary<string, List<string>> ColorBag, out string TileColor, out string DetailColor)
-        {
-            ColorBag ??= NewColorBag();
 
-            TileColor = ColorBag.DrawSeededElement(WrassleID);
-            bool TileColorIsBright = TileColor != null && TileColor.Any(char.IsUpper);
-
-            DetailColor = TileColorIsBright
-                ? ColorBag.DrawSeededElement(WrassleID,
-                    ExceptForElements: new()
-                    {
-                        TileColor?.ToLower(),
-                        TileColor?.ToUpper()
-                    })
-                : ColorBag.DrawSeededElement(WrassleID,
-                    FromSubBag: "Bright",
-                    ExceptForElements: new()
-                    {
-                        TileColor?.ToLower(),
-                        TileColor?.ToUpper()
-                    })
-                ;
-            SyncColorBag(ColorBag, TileColor, DetailColor);
+        public string GetTileFromBag()
+        {
+            TileBag = FillTileBag();
+            return Tile = TileBag.DrawSeededElement(WrassleID);
         }
 
-        public static void ApplyFlair(GameObject Object, string Tile, string TileColor, string DetailColor, bool RandomizeTile = false)
+        public void ApplyFlair()
         {
-            if (Object != null && Object.TryGetPart(out Render render))
+            if (ParentObject != null && ParentObject.TryGetPart(out Render render))
             {
                 if (RandomizeTile && !Tile.IsNullOrEmpty())
                     render.Tile = Tile;
@@ -215,13 +187,6 @@ namespace XRL.World.Parts
                 render.DetailColor = DetailColor;
                 render.ColorString = $"&{TileColor}";
             }
-        }
-        public void ApplyFlair()
-        {
-            string tile = GetTileForWrassleID(WrassleID, RandomTiles);
-            GetColorsForWrassleID(WrassleID, out string tileColor, out string detailColor);
-            bool randomizeTile = tile != null;
-            ApplyFlair(ParentObject, tile, tileColor, detailColor, randomizeTile);
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -239,17 +204,15 @@ namespace XRL.World.Parts
             if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear"))
             {
                 string tileColor = $"&{TileColor}";
-                string detailColor = $"{DetailColor}";
-                string tile = GetTileForWrassleID(WrassleID, RandomTiles);
                 GameObject Object = E.Object;
                 Debug.Entry(4,
                     $"{typeof(WrassleGear).Name}." +
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " + 
-                    $"TileColor: &&{TileColor.Quote().Color("Y")}, DetailColor: {detailColor.Quote().Color("Y")}",
+                    $"TileColor: &&{TileColor.Quote().Color("Y")}, DetailColor: {DetailColor.Quote().Color("Y")}",
                     Indent: 0);
                 Debug.Entry(4,
-                    $"Tile: {tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
+                    $"Tile: {Tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
                     Indent: 0);
 
                 ApplyFlair();
@@ -287,10 +250,52 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("AdjustWeaponScore");
+            Registrar.Register("AdjustArmorScore");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
+            {
+                GameObject User = E.GetGameObjectParameter("User");
+                int Score = E.GetIntParameter("Score");
+                if (User.TryGetPart(out Wrassler wrassler))
+                {
+                    Score = Math.Max(100, Score);
+                    if (wrassler.WrassleID == WrassleID)
+                    {
+                        Score = Math.Max(150, Score + 50);
+                    }
+                }
+                E.SetParameter("Score", Score);
+            }
+            return base.FireEvent(E);
+        }
+
         public override bool AllowStaticRegistration()
         {
             return true;
         }
 
-    } //!-- public class WrassleGear : IScribedPart
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+            Writer.Write(_WrassleID);
+        }
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+            _WrassleID = Reader.ReadGuid();
+        }
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            WrassleGear wrassleGear = base.DeepCopy(Parent, MapInv) as WrassleGear;
+            wrassleGear._WrassleID = Guid.NewGuid();
+            return wrassleGear;
+        }
+
+    } //!-- public class Source : IScribedPart
 }

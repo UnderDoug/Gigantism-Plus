@@ -28,7 +28,7 @@ namespace XRL.World.Parts.Mutation
         public static readonly string ICON_COLOR = "&z";
         public static readonly string ICON_COLOR_FALLBACK = "&w";
 
-        private bool MutationColor = XRL.UI.Options.MutationColor;
+        private bool MutationColor => XRL.UI.Options.MutationColor;
 
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
@@ -82,8 +82,10 @@ namespace XRL.World.Parts.Mutation
         public int HunchedOverDVModifier = -6;
         public int HunchedOverQNModifier = -60;
         public int HunchedOverMSModifier = -60;
-        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
-        private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
+        
+        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched Over" : "Compact Mode";
+        // private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
+        // private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
 
         public bool UnHunchImmediately = false;
 
@@ -636,6 +638,8 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})");
             Body body = GO.Body;
 
+            GO.RequirePart<Wrassler>();
+
             Debug.Entry(4, "? if (body != null)", Indent: 1);
             if (body != null)
             {
@@ -667,8 +671,9 @@ namespace XRL.World.Parts.Mutation
 
                 HunchOverActivatedAbilityID =
                     AddMyActivatedAbility(
-                        Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
-                        Command: COMMAND_NAME_GROUND_POUND,
+                        Name: HunchedOverAbilityHunched,
+                        // Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
+                        Command: COMMAND_NAME_HUNCH_OVER,
                         Class: "Physical Mutations",
                         Description: null,
                         Icon: "&#214",
@@ -683,13 +688,15 @@ namespace XRL.World.Parts.Mutation
 
                 Debug.LoopItem(4, "Activated Ability Assigned", Indent: 2);
                 ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(HunchOverActivatedAbilityID);
+                /*
                 abilityEntry.DisplayName = 
                     "{{C|" + 
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 HunchedOverAbilityHunched + "\n" +
                        "}}";
+                */
 
-                Debug.LoopItem(4, "Activated Ability DisplayName Changed", Indent: 2);
+                // Debug.LoopItem(4, "Activated Ability DisplayName Changed", Indent: 2);
                 /* This causes a village generation crash.
                  * 
                 if (this.IsCyberGiant)
@@ -710,23 +717,6 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "deferring to base.Mutate(GO, Level)", Indent: 0);
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})");
             return base.Mutate(GO, Level);
-        }
-        public override void AfterMutate()
-        {
-            if (ParentObject.IsPlayer() || ParentObject.BaseID == 1)
-            {
-                GameObject metalFoldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
-                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer))
-                {
-                    metalFoldingChairExaminer.MakeUnderstood(ShowMessage: false);
-                    if (The.Game.Turns > 1)
-                    {
-                        Popup.Show($"You're struck with a sudden, intimate understanding of {metalFoldingChair.GetPluralName()}.");
-                    }
-                }
-                metalFoldingChair.Obliterate();
-            }
-            base.AfterMutate();
         }
 
         public override bool Unmutate(GameObject GO)
@@ -796,12 +786,12 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool Render(RenderEvent E)
         {
-            if (ParentObject.GetPropertyOrTag("GigantismPlusColorChange", "true").Is("true"))
+            if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
             {
                 bool flag = true;
                 if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
                 {
-                    flag = MutationColor = UI.Options.MutationColor;
+                    flag = MutationColor;
                 }
                 if (flag && !IsCyberGiant)
                 {
@@ -870,7 +860,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(2, "We are big, gonna HunchOver");
                 IsHunchFree = true;
-                CommandEvent.Send(actor, COMMAND_NAME_GROUND_POUND);
+                CommandEvent.Send(actor, COMMAND_NAME_HUNCH_OVER);
                 Debug.Entry(3, "HunchOver Sent for CanEnterInteriorEvent");
                 bool check = CanEnterInteriorEvent.Check(E.Actor, E.Object, E.Interior, ref E.Status, ref E.Action, ref E.ShowMessage);
                 E.Status = check ? 0 : E.Status;
@@ -897,12 +887,15 @@ namespace XRL.World.Parts.Mutation
         public override bool HandleEvent(AfterAddSkillEvent E)
         {
             bool includesJump = E.Skill.Name == nameof(Acrobatics_Jump);
-            foreach (BaseSkill skill in E.Include)
+            if (!E.Include.IsNullOrEmpty())
             {
-                if (includesJump || skill.Name == nameof(Acrobatics_Jump))
+                foreach (BaseSkill skill in E.Include)
                 {
-                    includesJump = true;
-                    break;
+                    if (includesJump || skill.Name == nameof(Acrobatics_Jump))
+                    {
+                        includesJump = true;
+                        break;
+                    }
                 }
             }
             AddGroundPoundActivatedAbility(E.Actor, includesJump);
@@ -918,13 +911,13 @@ namespace XRL.World.Parts.Mutation
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
+            Registrar.Register(COMMAND_NAME_HUNCH_OVER);
             Registrar.Register(COMMAND_NAME_GROUND_POUND);
             base.Register(Object, Registrar);
         }
-
         public override bool FireEvent(Event E)
         {
-            if (E.ID == COMMAND_NAME_GROUND_POUND)
+            if (E.ID == COMMAND_NAME_HUNCH_OVER)
             {
                 GameObject actor = ParentObject;
                 
@@ -996,12 +989,14 @@ namespace XRL.World.Parts.Mutation
                     Popup.Show("You hunch over, allowing you access to smaller spaces.");
                 }
 
-                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
+                // ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
+                /*
                 abilityEntry.DisplayName =
                     "{{C|" + 
                                 HunchedOverAbilityUpright + "\n" +
                     "{{W|[}}" + HunchedOverAbilityHunched + "{{W|]}}\n" +
                        "}}";
+                */
 
             }
             Debug.Entry(1, "Should be Hunched Over");
@@ -1037,11 +1032,13 @@ namespace XRL.World.Parts.Mutation
                 }
 
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
-                abilityEntry.DisplayName =
+                /* 
+                abilityEntry.DisplayName = 
                     "{{C|" +
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 HunchedOverAbilityHunched + "\n" +
                        "}}";
+                */
             }
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
@@ -1067,17 +1064,21 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
             Writer.Write(HunchOverActivatedAbilityID);
+            Writer.Write(GroundPoundActivatedAbilityID);
         }
 
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
             HunchOverActivatedAbilityID = Reader.ReadGuid();
+            GroundPoundActivatedAbilityID = Reader.ReadGuid();
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+            gigantism.HunchOverActivatedAbilityID = Guid.Empty;
+            gigantism.GroundPoundActivatedAbilityID = Guid.Empty;
             gigantism.NaturalEquipmentMods = new();
             foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
             {

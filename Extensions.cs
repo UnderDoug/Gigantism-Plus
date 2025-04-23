@@ -1169,7 +1169,7 @@ namespace HNPS_GigantismPlus
                 string seed = Seed.ToString();
                 int low = 0;
                 int high = (drawBag.Count - 1) * 7;
-                int roll = Stat.SeededRandom(seed, low, high) % 7;
+                int roll = Stat.SeededRandom(seed, low, high) % (drawBag.Count - 1);
                 output = drawBag.ElementAt(roll);
             }
             output ??= drawBag.GetRandomElement();
@@ -1872,7 +1872,7 @@ namespace HNPS_GigantismPlus
         {
             string[] stringPieces = String.Split(",");
             List<string> output = new();
-            for (int i = 0; i <= stringPieces.Count(); i++)
+            for (int i = 0; i < stringPieces.Count(); i++)
             {
                 if (!output.Contains(stringPieces[i])) output.Add(stringPieces[i]);
             }

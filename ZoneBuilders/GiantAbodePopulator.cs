@@ -219,7 +219,7 @@ namespace XRL.World.ZoneBuilders
                     {
                         step.RequireObject("DirtPath");
                     }
-                    step.HighlightBlue(12);
+                    // step.HighlightBlue(12);
                 }
             }
 
@@ -243,7 +243,7 @@ namespace XRL.World.ZoneBuilders
                 }
             }
 
-            if (true) // this is just to have an easy toggle
+            if (false) // this is just to have an easy toggle
             {
                 foreach (Dictionary<string, List<Cell>> Region in Regions)
                 {

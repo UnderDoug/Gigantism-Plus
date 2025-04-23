@@ -301,6 +301,11 @@ You cannot wear equipment on your body." />
       Wrassle Gear 
       
   -->
+  
+  <object Name="FoldingChair" Load="Merge">
+    <part Name="WrassleGear" RandomizeTile="false" />
+  </object>
+  
 	<object Name="BaseWrassleGear" Inherits="Armor">
     <part Name="Render" DisplayName="[WrassleGear]" 
           RenderString="]" RenderColor="&amp;Y"
@@ -325,7 +330,7 @@ You cannot wear equipment on your body." />
 	<object Name="WrassleCape" Inherits="BaseWrassleGear">
     <part Name="Render" DisplayName="vibrant nanoweave cape" RenderString="U"
           Tile="items/sw_cloak_fancy.bmp" />
-    <part Name="WrassleGear" RandomTiles="items/sw_cloak_fancy.bmp,items/sw_cloak.bmp,items/sw_cloak_panther.bmp,items/sw_cloak_scrap.bmp" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Cape_~01-07~.png" />
     <part Name="Armor" WornOn="Back" />
     <part Name="Physics" Weight="1" />
 	</object>
@@ -341,6 +346,30 @@ You cannot wear equipment on your body." />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Botas_~01-04~.png" />
     <part Name="Armor" WornOn="Feet" />
     <part Name="Physics" Weight="2" />
+	</object>
+	<object Name="BaseWrassleBoot" Inherits="WrassleBoots">
+    <part Name="Render" DisplayName="[BaseWrassleBoot]" RenderString="L"
+          Tile="Items/Nanoweave_Bota_01_Right.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Left.png,Items/Nanoweave_Bota_~01-04~_Right.png" />
+    <part Name="Armor" WornOn="Foot" />
+    <part Name="Physics" Weight="1" />
+    <tag Name="BaseObject" Value="*noinherit" />
+	</object>
+	<object Name="WrassleBootLeft" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_Bota_01_Left.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Left.png" />
+	</object>
+	<object Name="WrassleBootRight" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_Bota_01_Right.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Right.png" />
+	</object>
+	<object Name="WrassleBootTail" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_TailBota_01_Right.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_TailBota_~01-04~_Left.png,Items/Nanoweave_TailBota_~01-04~_Right.png" />
+    <part Name="Armor" WornOn="Tail" />
 	</object>
   
 

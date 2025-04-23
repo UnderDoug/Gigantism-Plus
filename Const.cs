@@ -37,6 +37,9 @@ namespace HNPS_GigantismPlus
 
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
 
+        public const string GIGANTISMPLUS_COLORCHANGE_PROP = "GigantismPlusColorChange";
+        public const string WRASSLER_COLORCHANGE_PROP = "WrasslerColorChange";
+
         public const string SCRT_GNT_ZONE_MAP1_CENTRE = "HNPS_GiantCrater_01_Center.rpm";
         public const string SCRT_GNT_ZONE_MAP2_CENTRE = "HNPS_GiantCrater_02_Center.rpm";
         public const string SCRT_GNT_SCRT_ID = "$HNPS_Giant_KnowsHowToCook";

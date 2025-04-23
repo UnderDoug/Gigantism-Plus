@@ -306,33 +306,38 @@ You cannot wear equipment on your body." />
           RenderString="]" RenderColor="&amp;Y"
           TileColor="&amp;Y" DetailColor="r" />
     <part Name="Physics" Weight="1" />
-    <part Name="WrassleGear" />
+    <part Name="WrassleGear" RandomizeTile="true" />
     <tag Name="BaseObject" Value="*noinherit" />
 	</object>
 	<object Name="WrassleFace" Inherits="BaseWrassleGear">
-    <part Name="Render" DisplayName="vibrant nanoweave mask" RenderString="W" />
+    <part Name="Render" DisplayName="vibrant nanoweave mask" RenderString="W"
+          Tile="Items/Nanoweave_Mask_01.png" />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Mask_~01-08~.png" />
     <part Name="Armor" WornOn="Face" />
 	</object>
 	<object Name="WrassleSuit" Inherits="BaseWrassleGear">
-    <part Name="Render" DisplayName="vibrant nanoweave suit" RenderString="B" />
+    <part Name="Render" DisplayName="vibrant nanoweave suit" RenderString="B"
+          Tile="Items/Nanoweave_Suit_01.png" />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Suit_~01-07~.png" />
     <part Name="Armor" WornOn="Body" />
     <part Name="Physics" Weight="3" />
 	</object>
 	<object Name="WrassleCape" Inherits="BaseWrassleGear">
-    <part Name="Render" DisplayName="vibrant nanoweave cape" RenderString="U" />
+    <part Name="Render" DisplayName="vibrant nanoweave cape" RenderString="U"
+          Tile="items/sw_cloak_fancy.bmp" />
     <part Name="WrassleGear" RandomTiles="items/sw_cloak_fancy.bmp,items/sw_cloak.bmp,items/sw_cloak_panther.bmp,items/sw_cloak_scrap.bmp" />
     <part Name="Armor" WornOn="Back" />
     <part Name="Physics" Weight="1" />
 	</object>
 	<object Name="WrassleGloves" Inherits="BaseWrassleGear">
-    <part Name="Render" DisplayName="vibrant nanoweave grips" RenderString="Z" />
+    <part Name="Render" DisplayName="vibrant nanoweave grips" RenderString="Z"
+          Tile="Items/Nanoweave_Mask_Grips.png" />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Grips_~01-07~.png" />
     <part Name="Armor" WornOn="Hands" />
 	</object>
 	<object Name="WrassleBoots" Inherits="BaseWrassleGear">
-    <part Name="Render" DisplayName="vibrant nanoweave botas" RenderString="M" />
+    <part Name="Render" DisplayName="vibrant nanoweave botas" RenderString="M"
+          Tile="Items/Nanoweave_Botas_01.png" />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Botas_~01-04~.png" />
     <part Name="Armor" WornOn="Feet" />
     <part Name="Physics" Weight="2" />

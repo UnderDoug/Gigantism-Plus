@@ -25,6 +25,8 @@ namespace HNPS_GigantismPlus
         public const string LAST = TANDR + HONLY + HONLY + SPACE; // "└── "
         public const string DIST = SPACE + SPACE + SPACE + SPACE; // "    "
 
+        public const string JUMP_RANGE_MODIFIER = "JumpRangeModifier";
+
         public const string GAMEOBJECT = "GameObject";
         public const string RENDER = "Render";
         public const string MELEEWEAPON = "MeleeWeapon";

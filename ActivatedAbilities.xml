@@ -11,4 +11,12 @@
 		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="x" />
 		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOn.png" Foreground="z" Detail="x"  State="ToggleOn" />
 	</ability>
+	<ability Command="CommandToggleGigantismPlusGroundPound">
+		<description>
+			<p>A shockwave of stunning force is expelled where you land after jumping a minimum distance.</p>
+		</description>
+		<!-- Foreground is black pixels, Detail is white pixels -->
+    <!--UITile Tile="Abilities/GigantismPlus_Pound_ToggleOff.png" Foreground="z" Detail="x" /-->
+    <!--UITile Tile="Abilities/GigantismPlus_Pound_ToggleOn.png" Foreground="z" Detail="x"  State="ToggleOn" /-->
+	</ability>
 </activatedabilities>

@@ -39,7 +39,7 @@ namespace HNPS_GigantismPlus.Harmony
 
                     gigantism.IsHunchFree = true;
                     gigantism.UnHunchImmediately = IsStart;
-                    CommandEvent.Send(Actor, GigantismPlus.HUNCH_OVER_COMMAND_NAME);
+                    CommandEvent.Send(Actor, GigantismPlus.COMMAND_NAME_HUNCH_OVER);
 
                     if (IsStart)
                     {

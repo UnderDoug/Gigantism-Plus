@@ -226,13 +226,17 @@ namespace XRL.World.Parts
 
         public override bool WantEvent(int ID, int cascade)
         {
+            bool wantObjectCreated = ParentObject.InheritsFrom("BaseWrassleGear");
+            bool wantKineticResist = ParentObject.InheritsFrom("WrassleRingRopes");
+
             return base.WantEvent(ID, cascade)
-                || ID == AfterObjectCreatedEvent.ID;
+                || (wantObjectCreated && ID == AfterObjectCreatedEvent.ID)
+                || (wantKineticResist && ID == GetKineticResistanceEvent.ID);
         }
 
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            if (E.Object != null && E.Object == ParentObject)
+            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear"))
             {
                 string tileColor = $"&{TileColor}";
                 string detailColor = $"{DetailColor}";
@@ -249,6 +253,36 @@ namespace XRL.World.Parts
                     Indent: 0);
 
                 ApplyFlair();
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetKineticResistanceEvent E)
+        {
+            if (E.Object == ParentObject && E.Object.InheritsFrom("WrassleRingRopes"))
+            {
+                GameObject Object = E.Object;
+                Debug.Entry(4,
+                    $"! {typeof(WrassleGear).Name}."
+                    + $"{nameof(HandleEvent)}({typeof(GetKineticResistanceEvent).Name} " 
+                    + $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID}",
+                    Indent: 0);
+
+                E.LinearIncrease = 99999999;
+                E.PercentageIncrease = 0;
+                E.LinearReduction = 0;
+                E.PercentageReduction = 0;
+
+                Debug.LoopItem(4, $" E.LinearIncrease", $"{E.LinearIncrease}", Indent: 1);
+                Debug.LoopItem(4, $" E.PercentageIncrease", $"{E.PercentageIncrease}", Indent: 1);
+                Debug.LoopItem(4, $" E.LinearReduction", $"{E.LinearReduction}", Indent: 1);
+                Debug.LoopItem(4, $" E.PercentageReduction", $"{E.PercentageReduction}", Indent: 1);
+
+                Debug.Entry(4,
+                    $"x {typeof(WrassleGear).Name}." 
+                    + $"{nameof(HandleEvent)}({typeof(GetKineticResistanceEvent).Name} " 
+                    + $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
+                    Indent: 0);
+                return false;
             }
             return base.HandleEvent(E);
         }

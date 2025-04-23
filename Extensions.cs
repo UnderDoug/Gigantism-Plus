@@ -798,237 +798,224 @@ namespace HNPS_GigantismPlus
 
         public static string GetObjectNoun(this GameObject Object)
         {
+            if (Object == null)
+                return null;
+
             if (!Object.Understood())
-            {
                 return "artifact";
-            }
-            if (Object.InheritsFrom("FoldingChair") && Object.HasPart<ModGigantic>())
-            {
+
+            if (Object.InheritsFrom("FoldingChair") 
+                && Object.HasPart<ModGigantic>())
                 return "folding chair";
-            }
+
             if (Object.IsCreature)
-            {
                 return "creature";
-            }
+
             if (Object.HasPart<CyberneticsBaseItem>())
-            {
                 return "implant";
-            }
+
             if (Object.InheritsFrom("Tonic"))
-            {
                 return "tonic";
-            }
+
             if (Object.HasPart<Medication>())
-            {
                 return "medication";
-            }
+
             if (Object.InheritsFrom("Energy Cell"))
-            {
                 return "energy cell";
-            }
+
             if (Object.InheritsFrom("LightSource"))
-            {
                 return "light source";
-            }
+
             if (Object.InheritsFrom("Tool"))
-            {
                 return "tool";
-            }
+
             if (Object.InheritsFrom("BaseRecoiler"))
-            {
                 return "recoiler";
-            }
+
             if (Object.InheritsFrom("BaseNugget"))
-            {
                 return "nugget";
-            }
+
             if (Object.InheritsFrom("Gemstone"))
-            {
                 return "gemstone";
-            }
+
             if (Object.InheritsFrom("Random Figurine"))
-            {
                 return "figurine";
-            }
+
             if (Object.HasPart<Applicator>())
-            {
                 return "applicator";
-            }
+
             if (Object.HasPart<Tombstone>())
-            {
                 return "tombstone";
-            }
+
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {
                 if (missileWeapon.Skill.Contains("Shotgun") 
                     || Object.InheritsFrom("BaseShotgun") 
                     || (Object.TryGetPart(out MagazineAmmoLoader loader) && loader.AmmoPart.Is("AmmoShotgunShell")))
-                {
                     return "shotgun";
-                }
+
                 if (Object.InheritsFrom("BaseHeavyWeapon"))
-                {
                     return "heavy weapon";
-                }
+
                 if (Object.InheritsFrom("BaseBow"))
-                {
                     return "bow";
-                }
+
                 if (Object.InheritsFrom("BaseRifle"))
-                {
                     return "rifle";
-                }
+
                 if (Object.InheritsFrom("BasePistol"))
-                {
                     return "pistol";
-                }
+
                 return "missile weapon";
             }
+
             if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
             {
                 if (Object.InheritsFrom("BaseBoulder"))
-                {
                     return "boulder";
-                }
+
                 if (Object.InheritsFrom("BaseStone"))
-                {
                     return "stone";
-                }
+
                 if (Object.InheritsFrom("Grenade"))
-                {
                     return "grenade";
-                }
+
                 if (Object.InheritsFrom("BaseDagger"))
-                {
                     return "dagger";
-                }
+
                 return "thrown weapon";
             }
+
             if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
             {
                 if (Object.HasPart<NaturalEquipmentManager>())
-                {
                     return Object.Render.DisplayName;
-                }
+
                 if (Object.InheritsFrom("BaseCudgel"))
-                {
                     return "cudgel";
-                }
+
                 if (Object.InheritsFrom("BaseAxe"))
-                {
                     return "axe";
-                }
+
                 if (Object.InheritsFrom("BaseLongBlade"))
-                {
                     return "long blade";
-                }
+
                 if (Object.InheritsFrom("BaseDagger"))
-                {
                     return "short blade";
-                }
+
                 return "weapon";
             }
+
             if (Object.TryGetPart(out Armor armor))
             {
                 if (!Object.IsPluralIfKnown)
                 {
-                    if (armor.WornOn.Is("Back"))
+                    switch (armor.WornOn)
                     {
-                        if (Object.Blueprint.Is("Gas Tumbler"))
-                        {
-                            return "tumbler";
-                        }
-                        if (armor.CarryBonus > 0 || Object.Blueprint.Is("Gyrocopter Backpack") || Object.Blueprint.Is("SkybearJetpack"))
-                        {
-                            return "pack";
-                        }
-                        return "cloak";
-                    }
-                    if (armor.WornOn.Is("Head"))
-                    {
-                        return "helmet";
-                    }
-                    if (armor.WornOn.Is("Face"))
-                    {
-                        if (Object.InheritsFrom("BaseMask"))
-                        {
-                            return "mask";
-                        }
-                    }
-                    if (armor.WornOn.Is("Actor"))
-                    {
-                        if (Object.Blueprint.Contains("Plate"))
-                        {
-                            return "plate";
-                        }
-                        if (armor.AV > 2)
-                        {
-                            return "suit";
-                        }
-                        return "vest";
-                    }
-                    if (armor.WornOn.Is("Arm"))
-                    {
-                        if (Object.InheritsFrom("BaseUtilityBracelet"))
-                        {
-                            return "utility bracelet";
-                        }
-                        if (Object.InheritsFrom("BaseBracelet"))
-                        {
-                            return "bracelet";
-                        }
-                        if (Object.InheritsFrom("BaseArmlet"))
-                        {
-                            return "armlet";
-                        }
-                    }
-                    return "armor";
+                        case "Back":
+                            {
+                                if (Object.Blueprint.Is("Mechanical Wings"))
+                                    return "wing";
+
+                                if (Object.Blueprint.Is("Gas Tumbler"))
+                                    return "tumbler";
+
+                                if (armor.CarryBonus > 0
+                                    || Object.Blueprint.Is("Gyrocopter Backpack")
+                                    || Object.Blueprint.Is("SkybearJetpack"))
+                                    return "pack";
+
+                                return "cloak";
+                            }
+                        case "Head":
+                            {
+                                if (armor.AV < 3)
+                                    return "hat";
+
+                                return "helmet";
+                            }
+                        case "Face":
+                            {
+                                if (Object.InheritsFrom("BaseMask"))
+                                    return "mask";
+
+                                break;
+                            }
+                        case "Body":
+                            {
+                                if (Object.Blueprint.Contains("Plate"))
+                                    return "plate";
+
+                                if (armor.AV > 2)
+                                    return "suit";
+
+                                return "vest";
+                            }
+                        case "Arm":
+                            {
+                                if (Object.InheritsFrom("BaseUtilityBracelet"))
+                                    return "utility bracelet";
+
+                                if (Object.InheritsFrom("BaseBracelet"))
+                                    return "bracelet";
+
+                                if (Object.InheritsFrom("BaseArmlet"))
+                                    return "armlet";
+
+                                break;
+                            }
+                        default:
+                            return "armor";
+                    };
                 }
-                if (armor.WornOn.Is("Back"))
+                switch (armor.WornOn)
                 {
-                    if (Object.Blueprint.Is("Mechanical Wings"))
-                    {
-                        return "wings";
-                    }
-                }
-                if (armor.WornOn.Is("Face"))
-                {
-                    if (Object.HasPart<Spectacles>())
-                    {
-                        return "spectacle";
-                    }
-                    if (Object.InheritsFrom("BaseEyewear"))
-                    {
-                        return "goggle";
-                    }
-                    if (Object.InheritsFrom("BaseFaceJewelry"))
-                    {
-                        return "jewelry";
-                    }
-                    if (Object.Blueprint.Is("VISAGE"))
-                    {
-                        return "scanner";
-                    }
-                }
-                if (armor.WornOn.Is("Hands"))
-                {
-                    if (Object.HasPart<Metal>())
-                    {
-                        return "gauntlet";
-                    }
-                    return "glove";
-                }
-                if (armor.WornOn.Is("Feet"))
-                {
-                    if (Object.InheritsFrom("BaseBoot"))
-                    {
-                        if (Object.HasPart<Metal>())
+                    case "Back":
                         {
-                            return "sabaton";
+                            if (Object.Blueprint.Is("Mechanical Wings"))
+                                return "wing";
+
+                            if (Object.Blueprint.Is("Gas Tumbler"))
+                                return "tumbler";
+
+                            break;
                         }
-                        return "boot";
-                    }
-                    return "shoe";
+                    case "Face":
+                        {
+                            if (Object.HasPart<Spectacles>())
+                                return "spectacle";
+
+                            if (Object.InheritsFrom("BaseEyewear"))
+                                return "goggle";
+
+                            if (Object.InheritsFrom("BaseFaceJewelry"))
+                                return "jewelry";
+
+                            if (Object.Blueprint.Is("VISAGE"))
+                                return "scanner";
+
+                            break;
+                        }
+                    case "Hands":
+                        {
+                            if (Object.HasPart<Metal>())
+                                return "gauntlet";
+
+                            return "glove";
+                        }
+                    case "Feet":
+                        {
+                            if (Object.InheritsFrom("BaseBoot"))
+                            {
+                                if (Object.HasPart<Metal>())
+                                    return "sabaton";
+                                return "boot";
+                            }
+
+                            return "shoe";
+                        }
+                    default:
+                        break;
                 }
             }
             if (Object.InheritsFrom("Furniture"))

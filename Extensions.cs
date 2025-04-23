@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Genkit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -18,8 +19,6 @@ using XRL.World.ObjectBuilders;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using Genkit;
-using XRL.UI.ObjectFinderClassifiers;
 
 namespace HNPS_GigantismPlus
 {
@@ -799,237 +798,224 @@ namespace HNPS_GigantismPlus
 
         public static string GetObjectNoun(this GameObject Object)
         {
+            if (Object == null)
+                return null;
+
             if (!Object.Understood())
-            {
                 return "artifact";
-            }
-            if (Object.InheritsFrom("FoldingChair") && Object.HasPart<ModGigantic>())
-            {
+
+            if (Object.InheritsFrom("FoldingChair") 
+                && Object.HasPart<ModGigantic>())
                 return "folding chair";
-            }
+
             if (Object.IsCreature)
-            {
                 return "creature";
-            }
+
             if (Object.HasPart<CyberneticsBaseItem>())
-            {
                 return "implant";
-            }
+
             if (Object.InheritsFrom("Tonic"))
-            {
                 return "tonic";
-            }
+
             if (Object.HasPart<Medication>())
-            {
                 return "medication";
-            }
+
             if (Object.InheritsFrom("Energy Cell"))
-            {
                 return "energy cell";
-            }
+
             if (Object.InheritsFrom("LightSource"))
-            {
                 return "light source";
-            }
+
             if (Object.InheritsFrom("Tool"))
-            {
                 return "tool";
-            }
+
             if (Object.InheritsFrom("BaseRecoiler"))
-            {
                 return "recoiler";
-            }
+
             if (Object.InheritsFrom("BaseNugget"))
-            {
                 return "nugget";
-            }
+
             if (Object.InheritsFrom("Gemstone"))
-            {
                 return "gemstone";
-            }
+
             if (Object.InheritsFrom("Random Figurine"))
-            {
                 return "figurine";
-            }
+
             if (Object.HasPart<Applicator>())
-            {
                 return "applicator";
-            }
+
             if (Object.HasPart<Tombstone>())
-            {
                 return "tombstone";
-            }
+
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {
                 if (missileWeapon.Skill.Contains("Shotgun") 
                     || Object.InheritsFrom("BaseShotgun") 
                     || (Object.TryGetPart(out MagazineAmmoLoader loader) && loader.AmmoPart.Is("AmmoShotgunShell")))
-                {
                     return "shotgun";
-                }
+
                 if (Object.InheritsFrom("BaseHeavyWeapon"))
-                {
                     return "heavy weapon";
-                }
+
                 if (Object.InheritsFrom("BaseBow"))
-                {
                     return "bow";
-                }
+
                 if (Object.InheritsFrom("BaseRifle"))
-                {
                     return "rifle";
-                }
+
                 if (Object.InheritsFrom("BasePistol"))
-                {
                     return "pistol";
-                }
+
                 return "missile weapon";
             }
+
             if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
             {
                 if (Object.InheritsFrom("BaseBoulder"))
-                {
                     return "boulder";
-                }
+
                 if (Object.InheritsFrom("BaseStone"))
-                {
                     return "stone";
-                }
+
                 if (Object.InheritsFrom("Grenade"))
-                {
                     return "grenade";
-                }
+
                 if (Object.InheritsFrom("BaseDagger"))
-                {
                     return "dagger";
-                }
+
                 return "thrown weapon";
             }
+
             if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
             {
                 if (Object.HasPart<NaturalEquipmentManager>())
-                {
                     return Object.Render.DisplayName;
-                }
+
                 if (Object.InheritsFrom("BaseCudgel"))
-                {
                     return "cudgel";
-                }
+
                 if (Object.InheritsFrom("BaseAxe"))
-                {
                     return "axe";
-                }
+
                 if (Object.InheritsFrom("BaseLongBlade"))
-                {
                     return "long blade";
-                }
+
                 if (Object.InheritsFrom("BaseDagger"))
-                {
                     return "short blade";
-                }
+
                 return "weapon";
             }
+
             if (Object.TryGetPart(out Armor armor))
             {
                 if (!Object.IsPluralIfKnown)
                 {
-                    if (armor.WornOn.Is("Back"))
+                    switch (armor.WornOn)
                     {
-                        if (Object.Blueprint.Is("Gas Tumbler"))
-                        {
-                            return "tumbler";
-                        }
-                        if (armor.CarryBonus > 0 || Object.Blueprint.Is("Gyrocopter Backpack") || Object.Blueprint.Is("SkybearJetpack"))
-                        {
-                            return "pack";
-                        }
-                        return "cloak";
-                    }
-                    if (armor.WornOn.Is("Head"))
-                    {
-                        return "helmet";
-                    }
-                    if (armor.WornOn.Is("Face"))
-                    {
-                        if (Object.InheritsFrom("BaseMask"))
-                        {
-                            return "mask";
-                        }
-                    }
-                    if (armor.WornOn.Is("Actor"))
-                    {
-                        if (Object.Blueprint.Contains("Plate"))
-                        {
-                            return "plate";
-                        }
-                        if (armor.AV > 2)
-                        {
-                            return "suit";
-                        }
-                        return "vest";
-                    }
-                    if (armor.WornOn.Is("Arm"))
-                    {
-                        if (Object.InheritsFrom("BaseUtilityBracelet"))
-                        {
-                            return "utility bracelet";
-                        }
-                        if (Object.InheritsFrom("BaseBracelet"))
-                        {
-                            return "bracelet";
-                        }
-                        if (Object.InheritsFrom("BaseArmlet"))
-                        {
-                            return "armlet";
-                        }
-                    }
-                    return "armor";
+                        case "Back":
+                            {
+                                if (Object.Blueprint.Is("Mechanical Wings"))
+                                    return "wing";
+
+                                if (Object.Blueprint.Is("Gas Tumbler"))
+                                    return "tumbler";
+
+                                if (armor.CarryBonus > 0
+                                    || Object.Blueprint.Is("Gyrocopter Backpack")
+                                    || Object.Blueprint.Is("SkybearJetpack"))
+                                    return "pack";
+
+                                return "cloak";
+                            }
+                        case "Head":
+                            {
+                                if (armor.AV < 3)
+                                    return "hat";
+
+                                return "helmet";
+                            }
+                        case "Face":
+                            {
+                                if (Object.InheritsFrom("BaseMask"))
+                                    return "mask";
+
+                                break;
+                            }
+                        case "Body":
+                            {
+                                if (Object.Blueprint.Contains("Plate"))
+                                    return "plate";
+
+                                if (armor.AV > 2)
+                                    return "suit";
+
+                                return "vest";
+                            }
+                        case "Arm":
+                            {
+                                if (Object.InheritsFrom("BaseUtilityBracelet"))
+                                    return "utility bracelet";
+
+                                if (Object.InheritsFrom("BaseBracelet"))
+                                    return "bracelet";
+
+                                if (Object.InheritsFrom("BaseArmlet"))
+                                    return "armlet";
+
+                                break;
+                            }
+                        default:
+                            return "armor";
+                    };
                 }
-                if (armor.WornOn.Is("Back"))
+                switch (armor.WornOn)
                 {
-                    if (Object.Blueprint.Is("Mechanical Wings"))
-                    {
-                        return "wings";
-                    }
-                }
-                if (armor.WornOn.Is("Face"))
-                {
-                    if (Object.HasPart<Spectacles>())
-                    {
-                        return "spectacle";
-                    }
-                    if (Object.InheritsFrom("BaseEyewear"))
-                    {
-                        return "goggle";
-                    }
-                    if (Object.InheritsFrom("BaseFaceJewelry"))
-                    {
-                        return "jewelry";
-                    }
-                    if (Object.Blueprint.Is("VISAGE"))
-                    {
-                        return "scanner";
-                    }
-                }
-                if (armor.WornOn.Is("Hands"))
-                {
-                    if (Object.HasPart<Metal>())
-                    {
-                        return "gauntlet";
-                    }
-                    return "glove";
-                }
-                if (armor.WornOn.Is("Feet"))
-                {
-                    if (Object.InheritsFrom("BaseBoot"))
-                    {
-                        if (Object.HasPart<Metal>())
+                    case "Back":
                         {
-                            return "sabaton";
+                            if (Object.Blueprint.Is("Mechanical Wings"))
+                                return "wing";
+
+                            if (Object.Blueprint.Is("Gas Tumbler"))
+                                return "tumbler";
+
+                            break;
                         }
-                        return "boot";
-                    }
-                    return "shoe";
+                    case "Face":
+                        {
+                            if (Object.HasPart<Spectacles>())
+                                return "spectacle";
+
+                            if (Object.InheritsFrom("BaseEyewear"))
+                                return "goggle";
+
+                            if (Object.InheritsFrom("BaseFaceJewelry"))
+                                return "jewelry";
+
+                            if (Object.Blueprint.Is("VISAGE"))
+                                return "scanner";
+
+                            break;
+                        }
+                    case "Hands":
+                        {
+                            if (Object.HasPart<Metal>())
+                                return "gauntlet";
+
+                            return "glove";
+                        }
+                    case "Feet":
+                        {
+                            if (Object.InheritsFrom("BaseBoot"))
+                            {
+                                if (Object.HasPart<Metal>())
+                                    return "sabaton";
+                                return "boot";
+                            }
+
+                            return "shoe";
+                        }
+                    default:
+                        break;
                 }
             }
             if (Object.InheritsFrom("Furniture"))
@@ -1067,6 +1053,10 @@ namespace HNPS_GigantismPlus
                 {
                     return "sign";
                 }
+                if (Object.InheritsFrom("BaseBookshelf"))
+                {
+                    return "bookshelf";
+                }
                 if (Object.HasPart<MergeConduit>())
                 {
                     return "power conduit";
@@ -1075,7 +1065,10 @@ namespace HNPS_GigantismPlus
                 {
                     return "container";
                 }
-                return "furniture";
+                if (Object.TryGetPart(out LightSource lightSource) && lightSource.Radius > 0)
+                {
+                    return "light source";
+                }
             }
             if (Object.HasPart<Chair>())
             {
@@ -1102,7 +1095,7 @@ namespace HNPS_GigantismPlus
                     }
                     if (!Object.Takeable)
                     {
-                        return "object";
+                        return Object.Render?.DisplayName ?? "object";
                     }
                     return Object.Render?.DisplayName ?? "item";
             }
@@ -1152,13 +1145,151 @@ namespace HNPS_GigantismPlus
             return Body.GetEquippedObjects(filter);
         }
 
-        public static T DrawRandomElement<T>(this List<T> Bag)
+        public static T DrawRandomElement<T>(this List<T> Bag, T ExceptForElement = null, List<T> ExceptForElements = null)
+            where T : class
+        {
+            return Bag.DrawSeededElement(Guid.Empty, ExceptForElement, ExceptForElements);
+        }
+        public static T DrawSeededElement<T>(this List<T> Bag, Guid Seed, T ExceptForElement = null, List<T> ExceptForElements = null)
             where T : class
         {
             if (Bag.IsNullOrEmpty()) return null;
-            T output = Bag.GetRandomElement();
+            List<T> drawBag = new();
+            drawBag.AddRange(Bag);
+            ExceptForElements ??= new();
+            if (drawBag.Contains(ExceptForElement)) drawBag.Remove(ExceptForElement);
+            foreach (T exceptForElement in ExceptForElements)
+            {
+                if (drawBag.Contains(exceptForElement)) drawBag.Remove(exceptForElement);
+            }
+            if (drawBag.IsNullOrEmpty()) return null;
+            T output = null;
+            if (Seed != Guid.Empty)
+            {
+                string seed = Seed.ToString();
+                int low = 0;
+                int high = (drawBag.Count - 1) * 7;
+                int roll = Stat.SeededRandom(seed, low, high) % (drawBag.Count - 1);
+                output = drawBag.ElementAt(roll);
+            }
+            output ??= drawBag.GetRandomElement();
             Bag.Remove(output);
             return output;
+        }
+        public static T DrawElement<T>(this List<T> Bag, T Element)
+            where T : class
+        {
+            T output = (!Bag.IsNullOrEmpty() || Bag.Remove(Element)) ? Element : null;
+            return output;
+        }
+
+        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromSubBag = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+            where T : class
+        {
+            return Bag.DrawSeededElement(Guid.Empty, FromSubBag, ExceptForElement, ExceptForElements);
+        }
+        public static T DrawSeededElement<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromSubBag = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+            where T : class
+        {
+            List<T> drawBag = new();
+            ExceptForElements ??= new();
+            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            if (haveTargetedSubBag)
+            {
+                drawBag = Bag[FromSubBag];
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    foreach (T element in subBag)
+                    {
+                        if (!drawBag.Contains(element)) drawBag.Add(element);
+                    }
+                }
+            }
+
+            T output = drawBag.DrawSeededElement(Seed, ExceptForElement, ExceptForElements);
+
+            if (haveTargetedSubBag)
+            {
+                if (Bag[FromSubBag].Contains(output)) Bag[FromSubBag].Remove(output);
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    if (subBag.Contains(output)) subBag.Remove(output);
+                }
+            }
+            return output;
+        }
+        public static T DrawElement<T>(this Dictionary<string, List<T>> Bag, T Element, string FromSubBag = "")
+            where T : class
+        {
+            List<T> drawBag = new();
+            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            if (haveTargetedSubBag)
+            {
+                drawBag = Bag[FromSubBag];
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    foreach (T element in subBag)
+                    {
+                        if (!drawBag.Contains(element)) drawBag.Add(element);
+                    }
+                }
+            }
+
+            T output = (!drawBag.IsNullOrEmpty() && drawBag.Contains(Element)) ? Element : null;
+
+            if (haveTargetedSubBag)
+            {
+                if (Bag[FromSubBag].Contains(output)) Bag[FromSubBag].Remove(output);
+            }
+            else
+            {
+                foreach ((_, List<T> subBag) in Bag)
+                {
+                    if (subBag.Contains(output)) subBag.Remove(output);
+                }
+            }
+            return output;
+        }
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, out string Key, string FromSubBag = "")
+            where T : class
+        {
+            List<T> peekBag = new();
+            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            bool haveElement = false;
+            Key = null;
+            if (haveTargetedSubBag)
+            {
+                peekBag = Bag[FromSubBag];
+            }
+            else
+            {
+                foreach ((string key, List<T> subBag) in Bag)
+                {
+                    foreach (T element in subBag)
+                    {
+                        if (peekBag.Contains(element))
+                        {
+                            Key = key;
+                            haveElement = true;
+                        }
+                    }
+                }
+            }
+            return haveElement;
+        }
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, string FromSubBag = "")
+            where T : class
+        {
+            return Bag.Contains(Element, out _, FromSubBag);
         }
 
         public static void Gigantify(this GameObject Object, string Context = "")
@@ -1538,38 +1669,23 @@ namespace HNPS_GigantismPlus
                     "W" => WestEdge,
                     _ => null,
                 };
-                if (!Region[Outer].Contains(door) && doorSide != null)
+                if (doorSide != null)
                 {
                     Cell newDoor = Region[doorSide].GetRandomElement();
-                    if (Region[Corners].Contains(newDoor))
+                    
+                    Dictionary<string,List<Cell>> Edges = new()
                     {
-                        if (doorSide != NorthEdge && doorSide != SouthEdge)
-                        {
-                            if (Region[NorthEdge].Contains(newDoor))
-                            {
-                                newDoor.X++;
-                            }
-                            else
-                            {
-                                newDoor.X--;
-                            }
-                        }
-                        if (doorSide != EastEdge && doorSide != WestEdge)
-                        {
-                            if (Region[WestEdge].Contains(newDoor))
-                            {
-                                newDoor.Y++;
-                            }
-                            else
-                            {
-                                newDoor.Y--;
-                            }
-                        }
-                    }
-                    R.Door.y = newDoor.Y;
-                    R.Door.x = newDoor.X;
+                        { NorthEdge, Region[NorthEdge] },
+                        { SouthEdge, Region[SouthEdge] },
+                        { EastEdge, Region[EastEdge] },
+                        { WestEdge, Region[WestEdge] },
+                    };
+                    Point2D newDoor2D = newDoor.PullInsideFromEdges(Edges, doorSide);
+                    R.Door.x = newDoor2D.x;
+                    R.Door.y = newDoor2D.y;
                 }
-                Region[Door].Add(Z.GetCell(R.Door));
+                door = Z.GetCell(R.Door);
+                Region[Door].Add(door);
             }
             return Region;
         }
@@ -1599,6 +1715,168 @@ namespace HNPS_GigantismPlus
             }
 
             return cellsList;
+        }
+
+        public static Point2D PullInsideFromEdges(this Cell Cell, Dictionary<string,List<Cell>> Edges, string DoorSide = "")
+        {
+            Debug.Entry(4,
+                $"@ {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdges)}"
+                + $"(Cell: {Cell}, List<Cell> Edge, " 
+                + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())})",
+                Indent: 0);
+
+            Point2D output = new(Cell.X, Cell.Y);
+            foreach ((string Side, List<Cell> Edge) in Edges)
+            {
+                Debug.Entry(4, $"Side: {Side}", Indent: 1);
+                if (DoorSide == "" || Side == DoorSide)
+                    output = Cell.PullInsideFromEdge(Edge);
+            }
+            Debug.Entry(4,
+                $"x {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdges)}"
+                + $"(Cell: [{Cell}], List<Cell> Edge, "
+                + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())}) @//",
+                Indent: 0);
+            return output;
+        }
+
+        public static Point2D PullInsideFromEdge(this Cell Cell, List<Cell> Edge)
+        {
+            Debug.Entry(4,
+                $"* {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdge)}"
+                + $"(Cell: {Cell}, List<Cell> Edge)",
+                Indent: 1);
+
+            Point2D output = new(Cell.X, Cell.Y);
+            if (Edge != null && Edge.Contains(Cell))
+            {
+                List<int> Xs = new();
+                List<int> Ys = new();
+                string XsString = string.Empty;
+                string YsString = string.Empty;
+                foreach (Cell cell in Edge)
+                {
+                    if (!Xs.Contains(cell.X)) Xs.Add(cell.X);
+                    if (!Ys.Contains(cell.Y)) Ys.Add(cell.Y);
+                }
+                foreach (int X in Xs)
+                {
+                    XsString += XsString == "" ? $"{X}" : $",{X}";
+                }
+                foreach (int Y in Ys)
+                {
+                    YsString += YsString == "" ? $"{Y}" : $",{Y}";
+                }
+                Debug.Entry(4, $"Xs: {XsString}", Indent: 2);
+                Debug.Entry(4, $"Ys: {YsString}", Indent: 2);
+                if (Xs.Count > 1 &&  Ys.Count > 1)
+                {
+                    Debug.Entry(2, 
+                        $"WARN [GigantismPlus]: " + 
+                        $"{typeof(Extensions).Name}." + 
+                        $"{nameof(PullInsideFromEdge)}() " + 
+                        $"List<Cell> Edge must be a straight line.", 
+                        Indent: 0);
+                    return output;
+                }
+                bool edgeIsLat = Xs.Count > 1;
+                Debug.Entry(4, $"edgeIsLat: {edgeIsLat}", Indent: 2);
+                int max = int.MinValue;
+                int min = int.MaxValue;
+                if (edgeIsLat)
+                {
+                    foreach(int x in Xs)
+                    {
+                        max = Math.Max(max, x);
+                        min = Math.Min(min, x);
+                    }
+                    if (output.x <= min)
+                    {
+                        Debug.Entry(4, $"output.x ({output.x}) >= min ({min}): output.x = min + 1", Indent: 2);
+                        output.x = min + 1;
+                    }
+                    if (output.x >= max)
+                    {
+                        Debug.Entry(4, $"output.x ({output.x}) <= max ({max}): output.x = max - 1", Indent: 2);
+                        output.x = max - 1;
+                    }
+                }
+                else
+                {
+                    foreach (int y in Ys)
+                    {
+                        max = Math.Max(max, y);
+                        min = Math.Min(min, y);
+                    }
+                    if (output.y <= min)
+                    {
+                        Debug.Entry(4, $"output.y ({output.y}) >= min ({min}): output.y = min + 1", Indent: 2);
+                        output.y = min + 1;
+                    }
+                    if (output.y >= max)
+                    {
+                        Debug.Entry(4, $"output.y ({output.y}) <= max ({max}): output.y = max - 1", Indent: 2);
+                        output.y = max - 1;
+                    }
+                }
+            }
+            Debug.Entry(4,
+                $"x {typeof(Extensions).Name}."
+                + $"{nameof(PullInsideFromEdge)}"
+                + $"(Cell: {Cell}, List<Cell> Edge) *//",
+                Indent: 1);
+
+            return output;
+        }
+
+        public static List<string> GetNumberedTileVariants(this string Source)
+        {
+            Debug.Entry(4,
+                $"* {typeof(Extensions).Name}."
+                + $"{nameof(GetNumberedTileVariants)}"
+                + $"(string Source: {Source})",
+                Indent: 0);
+            List<string> output = new();
+            
+            string[] sourcePieces = Source.Split("~");
+            string pathBefore = sourcePieces[0];
+            string pathAfter = sourcePieces[2];
+
+            Debug.Entry(4, $"pathBefore: {pathBefore}, pathAfter: {pathAfter}", Indent: 1);
+            Debug.Entry(4, $"sourcePieces[1] {sourcePieces[1]}", Indent: 1);
+            
+            string[] pathRange = sourcePieces[1].Split('-');
+            int first = int.Parse(pathRange[0]);
+            int last = int.Parse(pathRange[1]);
+
+            Debug.Entry(4, $"first {first} - last: {last}", Indent: 1);
+
+            for (int i = first; i <= last; i++)
+            {
+                Debug.Entry(4, $"i: {i}", Indent: 2);
+
+                int padding = Math.Max(2, last.ToString().Length);
+                string number = $"{i}".PadLeft(padding, '0');
+                string path = $"{pathBefore}{number}{pathAfter}";
+                Debug.Entry(4, $"path: {path}", Indent: 2);
+                if (/*TryGetTilePath(path, out path, IsWholePath: true) &&*/ !output.Contains(path)) output.Add(path);
+            }
+
+            return output;
+        }
+
+        public static List<string> CommaExpansion(this string String)
+        {
+            string[] stringPieces = String.Split(",");
+            List<string> output = new();
+            for (int i = 0; i < stringPieces.Count(); i++)
+            {
+                if (!output.Contains(stringPieces[i])) output.Add(stringPieces[i]);
+            }
+            return output;
         }
     } //!-- Extensions
 }

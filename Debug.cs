@@ -1,18 +1,25 @@
-﻿using System;
+﻿using Qud.API;
+
+using System;
 using System.Collections.Generic;
 
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.Core;
+using XRL.Wish;
+
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
-using Qud.API;
+
+using HNPS_GigantismPlus;
 
 namespace HNPS_GigantismPlus
 {
+    [HasWishCommand]
     public static class Debug
     {
         private static int VerbosityOption => Options.DebugVerbosity;
@@ -110,8 +117,8 @@ namespace HNPS_GigantismPlus
 
         public static void LoopItem(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = null)
         {
-            string good = "\u221A"; // √
-            string bad = "\u0058";  // X
+            string good = TICK; // √
+            string bad = CROSS;  // X
             string goodOrBad = string.Empty;
             if (Good != null) goodOrBad = ((bool)Good ? good : bad) + "\u005D "; // ]
             string output = Text != string.Empty ? Label + ": " + Text : Label;
@@ -128,27 +135,21 @@ namespace HNPS_GigantismPlus
 
         public static void TreeItem(int Verbosity, string Label, string Text = "", bool Last = false, int Branch = 0, int Distance = 0, int Indent = 0)
         {
-            string VandR = "\u251C"; // ├
-            string Vonly = "\u2502"; // │
-            string TandR = "\u2514"; // └
-            string Honly = "\u2500"; // ─
-            string Space = "\u0020"; //" "
-
-            string item   = $"{VandR}{Honly}{Honly}{Space}"; // "├── "
-            string branch = $"{Vonly}{Space}{Space}{Space}"; // "│   "
-            string last   = $"{TandR}{Honly}{Honly}{Space}"; // "└── "
-            string dist   = $"{Space}{Space}{Space}{Space}"; // "    "
+            // ITEM: "├── "
+            // BRAN: "│   "
+            // LAST: "└── "
+            // DIST: "    "
 
             string Output = string.Empty;
             for (int i = 0; i < Branch; i++)
             {
-                Output += branch;
+                Output += BRAN;
             }
             for (int i = 0; i < Distance; i++)
             {
-                Output += dist;
+                Output += DIST;
             }
-            Output += Last ? last : item;
+            Output += Last ? LAST : ITEM;
 
             Output += Text != string.Empty ? Label + ": " + Text : Label;
 
@@ -525,5 +526,203 @@ namespace HNPS_GigantismPlus
                     $"{Utility}");
             }
         }
+
+        [WishCommand]
+        public static void ToggleCellHighlighting()
+        {
+            The.Game.SetBooleanGameState(DEBUG_HIGHLIGHT_CELLS, !The.Game.GetBooleanGameState(DEBUG_HIGHLIGHT_CELLS));
+        }
+        [WishCommand]
+        public static void debug_ToggleCH()
+        {
+            ToggleCellHighlighting();
+        }
+
+        [WishCommand]
+        public static void RemoveCellHighlighting()
+        {
+            foreach (GameObject @object in The.ActiveZone.GetObjects())
+            {
+                CellHighlighter highlighter = @object.RequirePart<CellHighlighter>();
+                @object.RemovePart(highlighter);
+            }
+        }
+        public static Cell HighlightColor(this Cell Cell, string TileColor, string DetailColor, string BackgroundColor = "^k", int Priority = 0)
+        {
+            if (!The.Game.HasBooleanGameState(DEBUG_HIGHLIGHT_CELLS))
+                The.Game.SetBooleanGameState(DEBUG_HIGHLIGHT_CELLS, Options.DebugVerbosity > 3);
+            if (Cell.IsEmpty() && Cell.GetFirstVisibleObject() == null && Cell.GetHighestRenderLayerObject() == null)
+                Cell.AddObject("Cell Highlighter");
+
+            GameObject gameObject = null;
+            foreach (GameObject Object in Cell.GetObjects())
+            {
+                gameObject ??= Object;
+                if (Object.Render.RenderLayer >= gameObject.Render.RenderLayer)
+                    gameObject = Object;
+            }
+            gameObject = Cell.GetHighestRenderLayerObject();
+            CellHighlighter highlighter = gameObject.RequirePart<CellHighlighter>();
+            if (Priority >= highlighter.HighlightPriority)
+            {
+                highlighter.HighlightPriority = Priority;
+                highlighter.TileColor = TileColor;
+                highlighter.DetailColor = DetailColor;
+                highlighter.BackgroundColor = BackgroundColor;
+            }
+            return Cell;
+        }
+        public static Cell HighlightRed(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&r", DetailColor: "R", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightGreen(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&g", DetailColor: "G", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightYellow(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&w", DetailColor: "W", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightPurple(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&m", DetailColor: "M", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightBlue(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&b", DetailColor: "B", BackgroundColor: "^k", Priority);
+        }
+        public static Cell HighlightCyan(this Cell Cell, int Priority = 0)
+        {
+            return Cell.HighlightColor(TileColor: "&c", DetailColor: "C", BackgroundColor: "^k", Priority);
+        }
+
+        [WishCommand]
+        public static void ToggleObjectCreationAnalysis()
+        {
+            The.Game.SetBooleanGameState(DEBUG_OBJECT_CREATION_ANALYSIS, !The.Game.GetBooleanGameState(DEBUG_OBJECT_CREATION_ANALYSIS));
+        }
+
+        [WishCommand]
+        public static void debug_ToggleOCA()
+        {
+            ToggleObjectCreationAnalysis();
+        }
+
     } //!-- public static class Debug
+}
+
+namespace XRL.World.Parts
+{
+    [Serializable]
+    public class CellHighlighter : IScribedPart
+    {
+        public static readonly int ICON_COLOR_PRIORITY = 999;
+
+        public string TileColor;
+        public string DetailColor;
+        public string BackgroundColor;
+
+        public int HighlightPriority;
+
+        public bool DoHighlight;
+
+        public CellHighlighter()
+        {
+            BackgroundColor = "k";
+            DoHighlight = 
+                Options.DebugVerbosity > 3
+             && The.Game.GetBooleanGameState(DEBUG_HIGHLIGHT_CELLS);
+            HighlightPriority = 0;
+        }
+
+        public override bool Render(RenderEvent E)
+        {
+            if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+            {
+                DoHighlight =
+                    Options.DebugVerbosity > 3 
+                 && The.Game.GetBooleanGameState(DEBUG_HIGHLIGHT_CELLS);
+            }
+            if (DoHighlight)
+            {
+                if (ParentObject.InheritsFrom("Cell Highlighter"))
+                    ParentObject.Render.Visible = true;
+
+                E.ApplyColors(
+                    Foreground: TileColor ?? E.DetailColor, 
+                    Background: BackgroundColor, 
+                    Detail: DetailColor ?? E.DetailColor,
+                    ICON_COLOR_PRIORITY, 
+                    ICON_COLOR_PRIORITY, 
+                    ICON_COLOR_PRIORITY);
+            }
+            else
+            {
+                if (ParentObject.InheritsFrom("Cell Highlighter"))
+                    ParentObject.Render.Visible = false;
+            }
+            return base.Render(E);
+        }
+
+        public override void Remove()
+        {
+            if (ParentObject != null && ParentObject.InheritsFrom("Cell Highlighter"))
+            {
+                ParentObject.Obliterate();
+            }
+            base.Remove();
+        }
+    } //!-- public class CellHighlighter : IScribedPart[Serializable]
+
+
+    [Serializable]
+    public class ObjectCreationAnalyzer : IScribedPart
+    {
+        public bool DoAnalysis;
+
+        public ObjectCreationAnalyzer()
+        {
+            bool veboseEnough = Options.DebugVerbosity > 3;
+            if (!The.Game.HasBooleanGameState(DEBUG_OBJECT_CREATION_ANALYSIS))
+            {
+                The.Game.SetBooleanGameState(DEBUG_OBJECT_CREATION_ANALYSIS, veboseEnough);
+            }
+            bool gameStateOn = The.Game.GetBooleanGameState(DEBUG_OBJECT_CREATION_ANALYSIS);
+            DoAnalysis = veboseEnough && gameStateOn;
+        }
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || (DoAnalysis && ID == AfterObjectCreatedEvent.ID);
+        }
+
+        public override bool HandleEvent(AfterObjectCreatedEvent E)
+        {
+            if (E.Object != null && E.Object == ParentObject)
+            {
+                GameObject Object = E.Object;
+                Debug.Entry(4,
+                    $"% {typeof(ObjectCreationAnalyzer).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
+                    $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}])",
+                    Indent: 0);
+                Debug.Divider(4, HONLY, Count: 60, Indent: 1);
+
+                Debug.LoopItem(4, $"E.Context: {E.Context}", Indent: 1);
+                string ROIDString = E.ReplacementObject != null ? E.ReplacementObject.ID : "null";
+                string RODisplayNameString = E.ReplacementObject != null ? E.ReplacementObject.ShortDisplayNameStripped : "null";
+                Debug.LoopItem(4, $"E.ReplacementObject: [{ROIDString}:{RODisplayNameString}]", Indent: 1);
+
+                Debug.Divider(4, HONLY, Count: 60, Indent: 1);
+                Debug.Entry(4,
+                    $"x {typeof(ObjectCreationAnalyzer).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
+                    $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) %//",
+                    Indent: 0);
+            }
+            return base.HandleEvent(E);
+        }
+
+    } //!-- public class ObjectCreationAnalyzer : IScribedPart
 }

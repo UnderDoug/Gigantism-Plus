@@ -120,7 +120,7 @@ namespace XRL.World.ObjectBuilders
                 if (render.DetailColor == exoframeCybernetic.AugmentTileDetailColor)
                 {
                         render.DetailColor = ColorUtility.FindLastForeground(tileColor)?.ToString() ?? Crayons.GetRandomColor();
-                    }
+                }
                 if (!NamePrefix.IsNullOrEmpty())
                 {
                     Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);

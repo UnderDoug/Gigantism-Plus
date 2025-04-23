@@ -8,7 +8,15 @@
 			<p>Attempting to sprint or fly while hunched over will cause you stand up straight.</p-->
 		</description>
 		<!-- Foreground is tile body, Detail is tile arms -->
-		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="x" />
-		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOn.png" Foreground="z" Detail="x"  State="ToggleOn" />
+		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="y" />
+		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
+	</ability>
+	<ability Command="CommandToggleGigantismPlusGroundPound">
+		<description>
+			<p>You create a shockwave of stunning force where you land after jumping a minimum distance.</p>
+		</description>
+		<!-- Foreground is black pixels, Detail is white pixels -->
+    <UITile Tile="Abilities/GigantismPlus_GroundPound_ToggleOff.png" Foreground="z" Detail="y" />
+    <UITile Tile="Abilities/GigantismPlus_GroundPound_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
 	</ability>
 </activatedabilities>

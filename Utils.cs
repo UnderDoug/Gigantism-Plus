@@ -19,6 +19,7 @@ using XRL.World.Text.Attributes;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using System.IO;
 
 namespace HNPS_GigantismPlus
 {
@@ -77,13 +78,17 @@ namespace HNPS_GigantismPlus
             "Mutations",
             "NaturalWeapons",
             "Terrain",
-            "Tiles"
+            "Tiles",
+            "Tiles2",
+            "Walls",
+            "Walls2",
+            "Widgets",
         };
         public static string BuildCustomTilePath(string DisplayName)
         {
             return Grammar.MakeTitleCase(ColorUtility.StripFormatting(DisplayName)).Replace(" ", "");
         }
-        public static bool TryGetTilePath(string TileName, out string TilePath)
+        public static bool TryGetTilePath(string TileName, out string TilePath, bool IsWholePath = false)
         {
             Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
 
@@ -99,34 +104,50 @@ namespace HNPS_GigantismPlus
                 if (!found && !_TilePathCache.TryAdd(TileName, TilePath))
                     Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 3);
 
-                Debug.Entry(4, $"Listing subfolders", Indent: 2);
-                Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2);
-                foreach (string subfolder in TileSubfolders)
+                if (IsWholePath)
                 {
-                    Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3);
-                }
-                Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2);
-
-                Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 2);
-                Debug.Divider(3, "-", Count: 25, Indent: 2);
-                foreach (string subfolder in TileSubfolders)
-                {
-                    string path = subfolder;
-                    if (path != "") path += "/";
-                    path += TileName;
-                    if (SpriteManager.HasTextureInfo(path))
+                    if (SpriteManager.HasTextureInfo(TileName))
                     {
-                        TilePath = path;
-                        _TilePathCache[TileName] = TilePath;
-                        Debug.CheckYeh(4, $"Tile: \"{path}\", Added entry to _TilePathCache", Indent: 3);
+                        TilePath = TileName;
+                        _TilePathCache[TileName] = TileName;
+                        Debug.CheckYeh(4, $"Tile: \"{TileName}\", Added entry to _TilePathCache", Indent: 3);
                     }
                     else
                     {
-                        Debug.CheckNah(4, $"Tile: \"{path}\"", Indent: 3);
+                        Debug.CheckNah(4, $"Tile: \"{TileName}\"", Indent: 3);
                     }
                 }
-                Debug.Divider(3, "-", Count: 25, Indent: 2);
-                Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 2);
+                else
+                {
+                    Debug.Entry(4, $"Listing subfolders", Indent: 2);
+                    Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2);
+                    foreach (string subfolder in TileSubfolders)
+                    {
+                        Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3);
+                    }
+                    Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2);
+
+                    Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 2);
+                    Debug.Divider(3, "-", Count: 25, Indent: 2);
+                    foreach (string subfolder in TileSubfolders)
+                    {
+                        string path = subfolder;
+                        if (path != "") path += "/";
+                        path += TileName;
+                        if (SpriteManager.HasTextureInfo(path))
+                        {
+                            TilePath = path;
+                            _TilePathCache[TileName] = TilePath;
+                            Debug.CheckYeh(4, $"Tile: \"{path}\", Added entry to _TilePathCache", Indent: 3);
+                        }
+                        else
+                        {
+                            Debug.CheckNah(4, $"Tile: \"{path}\"", Indent: 3);
+                        }
+                    }
+                    Debug.Divider(3, "-", Count: 25, Indent: 2);
+                    Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 2);
+                }
             }
             else
             {

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
@@ -6,6 +7,12 @@ namespace HNPS_GigantismPlus
     public static class Const
     {
         public const string MOD_ID = "gigantism_Plus";
+
+        public const string DEBUG_OBJECT_CREATION_ANALYSIS = "UD_Debug_DoObjectCreationAnalysis";
+        public const string DEBUG_HIGHLIGHT_CELLS = "UD_Debug_HighlightCells";
+
+        public const string TICK = "\u221A"; // √
+        public const string CROSS = "\u0058";  // X
 
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
@@ -18,6 +25,8 @@ namespace HNPS_GigantismPlus
         public const string LAST = TANDR + HONLY + HONLY + SPACE; // "└── "
         public const string DIST = SPACE + SPACE + SPACE + SPACE; // "    "
 
+        public const string JUMP_RANGE_MODIFIER = "JumpRangeModifier";
+
         public const string GAMEOBJECT = "GameObject";
         public const string RENDER = "Render";
         public const string MELEEWEAPON = "MeleeWeapon";
@@ -27,6 +36,9 @@ namespace HNPS_GigantismPlus
         public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentManager::IntProp:Priority";
 
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
+
+        public const string GIGANTISMPLUS_COLORCHANGE_PROP = "GigantismPlusColorChange";
+        public const string WRASSLER_COLORCHANGE_PROP = "WrasslerColorChange";
 
         public const string SCRT_GNT_ZONE_MAP1_CENTRE = "HNPS_GiantCrater_01_Center.rpm";
         public const string SCRT_GNT_ZONE_MAP2_CENTRE = "HNPS_GiantCrater_02_Center.rpm";

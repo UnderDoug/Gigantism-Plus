@@ -16,6 +16,7 @@ namespace XRL.World.Parts
     {
 
         public int WallChance;
+        public bool SmallBoulders;
         public string TileColor;
         public string DetailColor;
         public bool InvertColor;
@@ -28,10 +29,11 @@ namespace XRL.World.Parts
         public WallOrDebris()
         {
             WallChance = 50;
+            SmallBoulders = true;
             Wall = "Shale";
             debrisBlueprints = new()
             {
-                { "SmallBoulder", 10 },
+                { "SmallBoulder", SmallBoulders ? 10 : 0 },
                 { "MediumBoulder", 20 },
                 { "LargeBoulder", 30 },
                 { "Rubble", 70 },

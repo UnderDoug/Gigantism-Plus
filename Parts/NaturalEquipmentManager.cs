@@ -534,6 +534,25 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("AdjustWeaponScore");
+            Registrar.Register("AdjustArmorScore");
+            base.Register(Object, Registrar);
+        }
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
+            {
+                GameObject User = E.GetGameObjectParameter("User");
+                int Score = E.GetIntParameter("Score");
+                Score = Math.Max(100, Score);
+
+                E.SetParameter("Score", Score);
+            }
+            return base.FireEvent(E);
+        }
+
         public override void Remove()
         {
             ResetShortDescriptions();

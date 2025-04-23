@@ -307,6 +307,10 @@ namespace HNPS_GigantismPlus
             {
                 E.GeneralDescriptions.Add(new() { null, "unusually large" });
             }
+            if (Object.HasPart<Campfire>())
+            {
+                E.GeneralDescriptions.Add(new() { "", "could probably make some seriously thick stew.." });
+            }
 
             return true;
         }

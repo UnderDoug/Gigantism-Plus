@@ -12,9 +12,11 @@
         - give mutation "GigantismPlus"
         - remove tag "Gigantic" 
         Give creatures InventoryGigantifier.
+        Give creatures ObjectCreationAnalyzer.
      -->
     <object Name="Creature" Load="Merge">
       <part Name="InventoryGigantifier" />
+      <!-- part Name="ObjectCreationAnalyzer" /-->
       <builder Name="Gigantified" ChanceOneIn="5000" />
     </object>
     <object Name="Templar" Load="Merge">

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using XRL.UI;
+using XRL.Core;
+using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
 
@@ -14,7 +16,6 @@ using static HNPS_GigantismPlus.Extensions;
 using static HNPS_GigantismPlus.Options;
 
 using SerializeField = UnityEngine.SerializeField;
-using XRL.Core;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -27,7 +28,7 @@ namespace XRL.World.Parts.Mutation
         public static readonly string ICON_COLOR = "&z";
         public static readonly string ICON_COLOR_FALLBACK = "&w";
 
-        private bool MutationColor = XRL.UI.Options.MutationColor;
+        private bool MutationColor => XRL.UI.Options.MutationColor;
 
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
@@ -72,15 +73,19 @@ namespace XRL.World.Parts.Mutation
         }
 
         public Guid HunchOverActivatedAbilityID = Guid.Empty;
+        public Guid GroundPoundActivatedAbilityID = Guid.Empty;
 
-        public static readonly string HUNCH_OVER_COMMAND_NAME = "CommandToggleGigantismPlusHunchOver";
+        public static readonly string COMMAND_NAME_HUNCH_OVER = "CommandToggleGigantismPlusHunchOver";
+        public static readonly string COMMAND_NAME_GROUND_POUND = "CommandToggleGigantismPlusGroundPound";
 
         public int HunchedOverAVModifier = 4;
         public int HunchedOverDVModifier = -6;
         public int HunchedOverQNModifier = -60;
         public int HunchedOverMSModifier = -60;
-        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
-        private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
+        
+        private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched Over" : "Compact Mode";
+        // private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
+        // private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
 
         public bool UnHunchImmediately = false;
 
@@ -296,6 +301,115 @@ namespace XRL.World.Parts.Mutation
             return StunningForceDistance;
         }
 
+        public virtual bool ApplyStunningForceOnJump(GameObject GO = null, int Level = 0)
+        {
+            if (Level < 1)
+                return false;
+
+            GO ??= ParentObject;
+
+            if (GO == null)
+                return false;
+
+            Debug.Entry(4, "Stunning Force", Indent: 1);
+            // Stunning Force
+            Debug.Entry(4, "? if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))", Indent: 1);
+            if (!GO.TryGetPart(out StunningForceOnJump stunning))
+            {
+                Debug.CheckNah(4, $"No StunningForceOnJump part", Indent: 2);
+                GO.RequirePart<StunningForceOnJump>();
+                Debug.Entry(4, $"GO.RequirePart<StunningForceOnJump>()", Indent: 3);
+            }
+            Debug.Entry(4, "x if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump)) ?//", Indent: 1);
+
+            Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 1);
+            Debug.LoopItem(4, $" stunningForceOnJump.Level: {stunning.Level}", Indent: 2);
+            Debug.LoopItem(4, $" stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2);
+            stunning.Level = GetStunningForceLevel(Level); // Scale stunningForceOnJump force with mutation level
+            stunning.Distance = StunningForceDistance;
+            Debug.Entry(4, $"New values calculated and assigned", Indent: 1);
+            Debug.LoopItem(4, $" stunningForceOnJump.Level: {stunning.Level}", Indent: 2);
+            Debug.LoopItem(4, $" stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2);
+
+            return true;
+        }
+        public virtual bool UnapplyStunningForceOnJump(GameObject GO = null)
+        {
+            GO ??= ParentObject;
+
+            if (GO == null) 
+                return false;
+
+            Debug.LoopItem(4, "Removing StunningForceOnJump", Indent: 2);
+
+            Debug.Entry(4, "? if (!GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))", Indent: 2);
+            if (!GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))
+            {
+                Debug.CheckNah(4, "No StunningForceOnJump part", Indent: 3);
+                Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2);
+                return false;
+            }
+            Debug.CheckYeh(4, "StunningForceOnJump part found", Indent: 3);
+            Debug.LoopItem(4, $"Found StunningForceOnJump: [Level: {stunningForceOnJump.Level}, Distance: {stunningForceOnJump.Distance}]", Indent: 3);
+
+            GO.RemovePart(stunningForceOnJump);
+            Debug.LoopItem(4, $"StunningForceOnJump removed", Indent: 3);
+            Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2);
+
+            return true;
+        }
+
+        public virtual bool ApplyJumpRangeBonus(GameObject GO = null, int Level = 0)
+        {
+            if (Level < 1) 
+                return false;
+
+            GO ??= ParentObject;
+
+            if (GO == null)
+                return false;
+
+            Debug.Entry(4, "Jump Bonus", Indent: 1);
+            // Jump Bonus
+            Debug.Entry(4, "? if (AppliedJumpRangeBonus > 0 and UnapplyJumpRangeBonus())", Indent: 1);
+            if (AppliedJumpRangeBonus > 0 && UnapplyJumpRangeBonus(GO))
+            {
+                Debug.Entry(4, $"JumpRangeModifier reduced to {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2);
+            }
+            else
+            {
+                Debug.CheckNah(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
+            }
+            Debug.Entry(4, "x if (AppliedJumpRangeBonus > 0 and UnapplyJumpRangeBonus()) ?//", Indent: 1);
+
+            AppliedJumpRangeBonus = GetJumpRangeBonus(Level);
+
+            Debug.Entry(4, $"Calculated new AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 1);
+            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 1);
+
+            GO.ModIntProperty(JUMP_RANGE_MODIFIER, AppliedJumpRangeBonus);
+
+            Debug.Entry(4, $"JumpRangeModifier reduced to {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 1);
+            Acrobatics_Jump.SyncAbility(GO);
+
+            return true;
+        }
+        public virtual bool UnapplyJumpRangeBonus(GameObject GO = null)
+        {
+            GO ??= ParentObject;
+
+            if (GO == null)
+                return false;
+
+            Debug.CheckYeh(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
+            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2); 
+            GO.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus, RemoveIfZero: true);
+            AppliedJumpRangeBonus += -AppliedJumpRangeBonus;
+            Acrobatics_Jump.SyncAbility(GO);
+            Debug.LoopItem(4, "JumpRangeModifier reverted", Indent: 2);
+            return AppliedJumpRangeBonus == 0;
+        }
+
         public override bool ChangeLevel(int NewLevel)
         {
             Debug.Header(4, "GigantismPlus", $"ChangeLevel({NewLevel})");
@@ -323,55 +437,12 @@ namespace XRL.World.Parts.Mutation
             // Start of Change Level updates.
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
-            Debug.Entry(4, "Jump Bonus", Indent: 1);
-            // Jump Bonus
-            Debug.Entry(4, "? if (AppliedJumpRangeBonus > 0)", Indent: 1);
-            if (AppliedJumpRangeBonus > 0)
-            {
-                Debug.CheckYeh(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
-                Debug.Entry(4, $"JumpRangeModifier: {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 2);
-                ParentObject.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus);
-                Debug.Entry(4, $"JumpRangeModifier reduced to {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 2);
-            }
-            else
-            {
-                Debug.CheckNah(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2);
-            }
-            Debug.Entry(4, "x if (AppliedJumpRangeBonus > 0) ?//", Indent: 1);
 
-            AppliedJumpRangeBonus = GetJumpRangeBonus(NewLevel);
-            Debug.Entry(4, $"Calculated new AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 1);
-            Debug.Entry(4, $"JumpRangeModifier: {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 1);
-            ParentObject.ModIntProperty("JumpRangeModifier", AppliedJumpRangeBonus);
-            Debug.Entry(4, $"JumpRangeModifier reduced to {ParentObject.GetIntProperty("JumpRangeModifier")}", Indent: 1);
-            Acrobatics_Jump.SyncAbility(ParentObject);
-
+            ApplyJumpRangeBonus(ParentObject, NewLevel);
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
-            Debug.Entry(4, "Stunning Force", Indent: 1);
-            // Stunning Force
-            Debug.Entry(4, "? if (ParentObject.TryGetPart(out StunningForceOnJump stunning))", Indent: 1);
-            CheckStunningForceOnJump:
-            if (ParentObject.TryGetPart(out StunningForceOnJump stunning))
-            {
-                Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 2);
-                Debug.Entry(4, $"stunning.Level: {stunning.Level}", Indent: 3);
-                Debug.Entry(4, $"stunning.Distance: {stunning.Distance}", Indent: 3);
-                stunning.Level = GetStunningForceLevel(NewLevel); // Scale stunning force with mutation level
-                stunning.Distance = StunningForceDistance;
-                Debug.Entry(4, $"New values calculated and assigned", Indent: 2);
-                Debug.Entry(4, $"stunning.Level: {stunning.Level}", Indent: 3);
-                Debug.Entry(4, $"stunning.Distance: {stunning.Distance}", Indent: 3);
-            }
-            else
-            {
-                Debug.CheckNah(4, $"No StunningForceOnJump part", Indent: 2);
-                ParentObject.RequirePart<StunningForceOnJump>();
-                Debug.Entry(4, $"ParentObject.RequirePart<StunningForceOnJump>()", Indent: 3);
-                Debug.Entry(4, $"goto CheckStunningForceOnJump", Indent: 2);
-                goto CheckStunningForceOnJump;
-            }
-            Debug.Entry(4, "x if (ParentObject.TryGetPart(out StunningForceOnJump stunning)) ?//", Indent: 1);
+
+            ApplyStunningForceOnJump(ParentObject, NewLevel);
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             Debug.Entry(4, "Hunch Over Penalties", Indent: 1);
@@ -413,12 +484,14 @@ namespace XRL.World.Parts.Mutation
         public override void CollectStats(Templates.StatCollector stats, int Level)
         {
             // Currently unused but will comprise part of the stat-shifting for Hunch Over.
-            int HunchedOverAV = GetHunchedOverAVModifier(Level);
-            int HunchedOverDV = GetHunchedOverDVModifier(Level);
-            int HunchedOverMS = GetHunchedOverMSModifier(Level);
-            stats.Set("HunchedOverAV", "+" + HunchedOverAV);
+            string HunchedOverAV = GetHunchedOverAVModifier(Level).Signed();
+            string HunchedOverDV = GetHunchedOverDVModifier(Level).Signed();
+            string HunchedOverMS = GetHunchedOverMSModifier(Level).Signed();
+            stats.Set("HunchedOverAV", HunchedOverAV);
             stats.Set("HunchedOverDV", HunchedOverDV);
             stats.Set("HunchedOverMS", HunchedOverMS);
+
+            // Add stunning force on jump stats for the Ground Pound toggle.
         }
 
         public override string GetDescription()
@@ -428,8 +501,8 @@ namespace XRL.World.Parts.Mutation
             double stunningForceLevelFactor = 0.5;
             if (ParentObject != null)
             {
-                WeaponNoun = ParentObject?.Body?.GetFirstPart("Hand")?.DefaultBehavior?.Render?.DisplayName ?? WeaponNoun;
-                stunningForceDistance = StunningForceDistance;
+                WeaponNoun = ParentObject?.Body?.GetFirstPart("Hand")?.DefaultBehavior?.GetObjectNoun() ?? WeaponNoun;
+                stunningForceDistance = GetStunningForceDistance(Level);
                 stunningForceLevelFactor = GetStunningForceLevelFactor();
             }
 
@@ -483,7 +556,6 @@ namespace XRL.World.Parts.Mutation
 
         public override string GetLevelText(int Level)
         {
-
             string MSPenalty;
             if (GetHunchedOverMSModifier(Level) >= 0)
             {
@@ -530,10 +602,43 @@ namespace XRL.World.Parts.Mutation
             */
         }
 
+        public virtual Guid AddGroundPoundActivatedAbility(GameObject GO, bool Force = false)
+        {
+            if (GO.HasSkill(nameof(Acrobatics_Jump)) || Force)
+            {
+                GroundPoundActivatedAbilityID = AddMyActivatedAbility(
+                        Name: "Ground Pound",
+                        Command: COMMAND_NAME_GROUND_POUND,
+                        Class: "Physical Mutations",
+                        Description: null,
+                        Icon: "&#214",
+                        DisabledMessage: null,
+                        Toggleable: true,
+                        DefaultToggleState: false,
+                        ActiveToggle: true,
+                        IsAttack: false,
+                        IsRealityDistortionBased: false,
+                        IsWorldMapUsable: false
+                        );
+            }
+            return GroundPoundActivatedAbilityID;
+        }
+        public virtual bool RemoveGroundPoundActivatedAbility(GameObject GO, bool Force = false)
+        {
+            bool removed = false;
+            if (!GO.HasSkill(nameof(Acrobatics_Jump)) || Force)
+            {
+                removed = RemoveMyActivatedAbility(ref GroundPoundActivatedAbilityID, GO);
+            }
+            return removed;
+        }
+
         public override bool Mutate(GameObject GO, int Level)
         {
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})");
             Body body = GO.Body;
+
+            GO.RequirePart<Wrassler>();
 
             Debug.Entry(4, "? if (body != null)", Indent: 1);
             if (body != null)
@@ -557,6 +662,8 @@ namespace XRL.World.Parts.Mutation
             }
             Debug.Entry(4, "x if (body != null) ?//", Indent: 1);
 
+            AddGroundPoundActivatedAbility(GO);
+
             Debug.Entry(4, "? if (!GO.HasPart<Vehicle>())", Indent: 1);
             if (!GO.HasPart<Vehicle>())
             {
@@ -564,8 +671,9 @@ namespace XRL.World.Parts.Mutation
 
                 HunchOverActivatedAbilityID =
                     AddMyActivatedAbility(
-                        Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
-                        Command: HUNCH_OVER_COMMAND_NAME,
+                        Name: HunchedOverAbilityHunched,
+                        // Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
+                        Command: COMMAND_NAME_HUNCH_OVER,
                         Class: "Physical Mutations",
                         Description: null,
                         Icon: "&#214",
@@ -580,13 +688,15 @@ namespace XRL.World.Parts.Mutation
 
                 Debug.LoopItem(4, "Activated Ability Assigned", Indent: 2);
                 ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(HunchOverActivatedAbilityID);
+                /*
                 abilityEntry.DisplayName = 
                     "{{C|" + 
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 HunchedOverAbilityHunched + "\n" +
                        "}}";
+                */
 
-                Debug.LoopItem(4, "Activated Ability DisplayName Changed", Indent: 2);
+                // Debug.LoopItem(4, "Activated Ability DisplayName Changed", Indent: 2);
                 /* This causes a village generation crash.
                  * 
                 if (this.IsCyberGiant)
@@ -618,28 +728,9 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.CheckYeh(4, "GO not null", Indent: 2);
                 // Remove jumping properties
-                GO.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus, RemoveIfZero: true);
-                AppliedJumpRangeBonus = 0;
-                Acrobatics_Jump.SyncAbility(GO);
-                Debug.LoopItem(4, "JumpRangeModifier reverted", Indent: 2);
+                UnapplyJumpRangeBonus(GO);
 
-                Debug.LoopItem(4, "Removing StunningForceOnJump", Indent: 2);
-
-                Debug.Entry(4, "? if (GO.HasPart<StunningForceOnJump>())", Indent: 2);
-                if (GO.HasPart<StunningForceOnJump>())
-                {
-                    Debug.CheckYeh(4, "StunningForceOnJump part found", Indent: 3);
-                    var stunning = GO.GetPart<StunningForceOnJump>();
-                    Debug.LoopItem(4, $"Found StunningForceOnJump: Level={stunning.Level}, Distance={stunning.Distance}", Indent: 3);
-                    GO.RemovePart<StunningForceOnJump>();
-                    Debug.LoopItem(4, $"StunningForceOnJump removed", Indent: 3);
-                }
-                else
-                {
-                    Debug.CheckNah(4, "No StunningForceOnJump part", Indent: 3);
-                }
-                Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2);
-
+                UnapplyStunningForceOnJump(GO);
 
                 Debug.Entry(4, "Attempting to StraightenUp()", Indent: 2);
                 StraightenUp();
@@ -677,19 +768,10 @@ namespace XRL.World.Parts.Mutation
             return base.Unmutate(GO);
         }
 
-        private bool ShouldRapidAdvance(int Level, GameObject Actor)
-        {
-            bool IsMutant = Actor.IsMutant();
-            bool RapidAdvancement = IsMutant
-                                 && (Level + 5) % 10 == 0
-                                 && !Actor.IsEsper()
-                                 && EnableGigantismRapidAdvance;
-
-            return RapidAdvancement;
-        } //!--- private bool ShouldRapidAdvance(int Level, GameObject Actor)
-
         public override bool WantEvent(int ID, int cascade)
         {
+            bool wantAddGroundPound = GroundPoundActivatedAbilityID == Guid.Empty;
+            bool wantRemoveGroundPound = GroundPoundActivatedAbilityID != Guid.Empty;
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
                 || ID == BeforeRapidAdvancementEvent.ID
@@ -699,16 +781,17 @@ namespace XRL.World.Parts.Mutation
                 || ID == GetExtraPhysicalFeaturesEvent.ID
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
                 || ID == InventoryActionEvent.ID
-                || ID == DroppedEvent.ID;
+                || (wantAddGroundPound && ID == AfterAddSkillEvent.ID)
+                || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID);
         }
         public override bool Render(RenderEvent E)
         {
-            if (ParentObject.GetPropertyOrTag("GigantismPlusColorChange", "true").Is("true"))
+            if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
             {
                 bool flag = true;
                 if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
                 {
-                    flag = MutationColor = UI.Options.MutationColor;
+                    flag = MutationColor;
                 }
                 if (flag && !IsCyberGiant)
                 {
@@ -777,7 +860,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(2, "We are big, gonna HunchOver");
                 IsHunchFree = true;
-                CommandEvent.Send(actor, HUNCH_OVER_COMMAND_NAME);
+                CommandEvent.Send(actor, COMMAND_NAME_HUNCH_OVER);
                 Debug.Entry(3, "HunchOver Sent for CanEnterInteriorEvent");
                 bool check = CanEnterInteriorEvent.Check(E.Actor, E.Object, E.Interior, ref E.Status, ref E.Action, ref E.ShowMessage);
                 E.Status = check ? 0 : E.Status;
@@ -801,29 +884,40 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
-        public override bool HandleEvent(DroppedEvent E)
+        public override bool HandleEvent(AfterAddSkillEvent E)
         {
-            if (E.Actor.Is(ParentObject) && E.Item.InheritsFrom("Corpse"))
+            bool includesJump = E.Skill.Name == nameof(Acrobatics_Jump);
+            if (!E.Include.IsNullOrEmpty())
             {
-                Debug.Entry(4, 
-                    $"{typeof(GigantismPlus).Name}." +
-                    $"{nameof(HandleEvent)}({typeof(CorpseGigantifier).Name} E)",
-                    Indent: 0);
-                ModGigantic modGigantic = new();
-                E.Item.ApplyModification(modGigantic);
+                foreach (BaseSkill skill in E.Include)
+                {
+                    if (includesJump || skill.Name == nameof(Acrobatics_Jump))
+                    {
+                        includesJump = true;
+                        break;
+                    }
+                }
             }
+            AddGroundPoundActivatedAbility(E.Actor, includesJump);
+            Acrobatics_Jump.SyncAbility(ParentObject);
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(AfterRemoveSkillEvent E)
+        {
+            RemoveGroundPoundActivatedAbility(E.Actor, E.Skill.Name == nameof(Acrobatics_Jump));
             return base.HandleEvent(E);
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register(HUNCH_OVER_COMMAND_NAME);
+            Registrar.Register(COMMAND_NAME_HUNCH_OVER);
+            Registrar.Register(COMMAND_NAME_GROUND_POUND);
             base.Register(Object, Registrar);
         }
-
         public override bool FireEvent(Event E)
         {
-            if (E.ID == HUNCH_OVER_COMMAND_NAME)
+            if (E.ID == COMMAND_NAME_HUNCH_OVER)
             {
                 GameObject actor = ParentObject;
                 
@@ -851,7 +945,17 @@ namespace XRL.World.Parts.Mutation
 
                 Debug.Entry(2, "IsPseudoGiganticCreature", IsPseudoGiganticCreature ? "true" : "false");
                 Debug.Entry(2, "IsGiganticCreature", IsGiganticCreature ? "true" : "false");
+            }
 
+            if (E.ID == COMMAND_NAME_GROUND_POUND)
+            {
+                GameObject actor = ParentObject;
+
+                ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, null, Silent: true, null);
+                Debug.Entry(3, "Ground Pound Toggled");
+
+                Debug.Entry(3, "Proceeding to Ground Pound Ability Effects");
+                GroundPoundAbilityToggled(actor, IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID));
             }
 
             The.Core.RenderBase();
@@ -885,12 +989,14 @@ namespace XRL.World.Parts.Mutation
                     Popup.Show("You hunch over, allowing you access to smaller spaces.");
                 }
 
-                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
+                // ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
+                /*
                 abilityEntry.DisplayName =
                     "{{C|" + 
                                 HunchedOverAbilityUpright + "\n" +
                     "{{W|[}}" + HunchedOverAbilityHunched + "{{W|]}}\n" +
                        "}}";
+                */
 
             }
             Debug.Entry(1, "Should be Hunched Over");
@@ -926,30 +1032,53 @@ namespace XRL.World.Parts.Mutation
                 }
 
                 ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
-                abilityEntry.DisplayName =
+                /* 
+                abilityEntry.DisplayName = 
                     "{{C|" +
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
                                 HunchedOverAbilityHunched + "\n" +
                        "}}";
+                */
             }
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
+
+        public bool GroundPoundAbilityToggled(GameObject GO = null, bool ToggledOn = false)
+        {
+            GO ??= ParentObject;
+            if (GO == null)
+                return false;
+
+            if (ToggledOn)
+            {
+                ToggledOn = ApplyStunningForceOnJump(GO, Level);
+            }
+            else
+            {
+                ToggledOn = UnapplyStunningForceOnJump(GO);
+            }
+            return ToggledOn;
+        }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
             Writer.Write(HunchOverActivatedAbilityID);
+            Writer.Write(GroundPoundActivatedAbilityID);
         }
 
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
             HunchOverActivatedAbilityID = Reader.ReadGuid();
+            GroundPoundActivatedAbilityID = Reader.ReadGuid();
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+            gigantism.HunchOverActivatedAbilityID = Guid.Empty;
+            gigantism.GroundPoundActivatedAbilityID = Guid.Empty;
             gigantism.NaturalEquipmentMods = new();
             foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
             {

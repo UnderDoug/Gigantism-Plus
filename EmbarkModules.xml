@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<embarkmodules>
+  <module Class="XRL.CharacterBuilds.Qud.QudPregenModule">
+    <pregens>
+      <pregen Name="Gentle Giant" Genotype="Mutated Human" Tile="Creatures/Class_GiantHumanoid2.png" Foreground="z" Detail="c" Background="k">
+        <code>H4sIAAAAAAAACs1VW2vbMBR+L/Q/CLNHxyQlG2shD5m7dVvbkcUh2xilyPbBFpMlo8tKCPnvO7Jzc8KarnQmCcHR+c7l06ej4/npCSFeRgv4DUozKbwL4p0F3eCsex7033h+hceW8XTLoYcO3SVWyNRy0Gj+6daEzOvHGprMSnBB38c3QZhTRRMD6p3LqIOvNnW/KxDSoNttFeCTodZQxHzWCSMMKH0yrWsPNsx8ElpurIKBAGsU5T4Z2Ziz5BpmE/kLxEBYzmuOFZmUGoo01uzQ9Mr8K7VLTLJHb1MEc678Xdpba6iBlHy0BRUNrz0tV9ii/rPwn61lZOMjlbLB7LCSS3eXNEpyyalqS8Lq3DC3PkIRd7gdlrEoMWN326KBQ1Ll2Fza+jPfXpBlAy9FHqYKBOUklMIoybdrVL5TqhgVBl3dRnfRUNoK623bF/5Ti19K1BI6hdUJh7Td2l9YlhsyZVW3tVp5DBkIUPW61cqTB9nJgSrTtthXLMPcTBcjbvWLlN4s7v46PnovOj6GxigWWwPHOD92yR0eICPJhNEjq5KcauyHi+YBepHBwZCZHIHzxpF4w4xxZmYIvG4CE2mzXIB2A+htE/okDHDOsPET2Ee/Mc5L+QBqH3qfSVdoY9tuOo+WUQlVd3T6/SYwhoIywUS2Oydj3O7QTc9mxH988YS5lBoigxcP+dzIpLoXR9hFjxF9wpt9J84V+yzLkrbygr8GJYAXYHKZ3tcb+SGt+uDGPKj7EaczULgV4CvhH48IUhxF67PoBtX3uQfhrMvtucfd6cniD4i1K3OjCwAA</code>
+        <description>
+&amp;c&#249;&amp;y Brawler: big hits, big damage
+&amp;c&#249;&amp;y Recovers quickly from fights
+&amp;c&#249;&amp;y Even a marathon is a sprint
+&amp;c&#249;&amp;y {{W|Highly survivable}} starting build
+        </description>
+      </pregen>
+      <pregen Name="Errant Giant Hunter" Genotype="True Kin" Tile="Creatures/Class_Errant_GiantHunter" Foreground="Y" Detail="r" Background="k">
+        <code>H4sIAAAAAAAACs1V22rbQBB9D+QfFtFHWdhuKUnAD46apq1TcGOTtpQQVtJEWrreFXtpKoL+vbOSHUkWxG2gxjZG0py5nDkzWj8eHxHipXQFv0BpJoV3RrxxMAzGw9PgzVvPr/DIMp60HEboMFxjK5lYDhrNP9wzIY/15QlaFjm4oG/XV0GYUUVjA+rcZdTBF5u43yUIadDtcxXgk6nWsIp4MQgXGJD75KauPWmY+SS03FgFEwHWKMp9MrcRZ/EMiqX8CWIiLOc1x4pMQg1FGk/s0PTK/Cu1d5ikR68pgjk3/i7tUlkgMyY6Dj0ZN1hZ35T+i2Vc2OhAVeww2y3i2t0lDTPMQ+Q9MRmQD0CVyfYl59QYxSJrQB+gotvkdos6l0wYPbcqzqiGpFvTiW4UiBTlPSOnfgeZpowzUyAw7gJLadNMgHZv/0kX+igMcM5SEDH0A78yznP5AKofeJFK59/YynYTNF/kIAx6DF6fdIFrWFEmmEgRHLahCNud5mjtRvzHzQmLCJQAw+JDXJ0eu927w518g1HbpIFDbLCD1tFffzprhZ5NPUfskqVU4P3Fb3mv8H9nyvOMev52jLTVlEfbwA1VjFaQdy6TwmvDZfNwu69JZ1JqWBg8l3DzrmRMnSSHOPRniP7FgbwV54p9knlO93IWz9z68BWYTCZ3dSPfpVXvWZqh492c0wIUtgJ8I/zzEUHCeTOLYVB9XzoIZ1235y63x0flH8bBTFtVCQAA</code>
+        <description>
+&amp;c&#249;&amp;y Brawler: big hits, big damage
+&amp;c&#249;&amp;y Recovers quickly from fights
+&amp;c&#249;&amp;y Even a marathon is a sprint
+&amp;c&#249;&amp;y {{W|Highly survivable}} starting build
+        </description>
+      </pregen>
+    </pregens>
+  </module>
+</embarkmodules>

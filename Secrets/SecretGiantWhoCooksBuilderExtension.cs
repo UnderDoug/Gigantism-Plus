@@ -123,14 +123,19 @@ namespace HNPS_GigantismPlus
 
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE)
                 zoneManager.AddZonePostBuilder(ZoneID: SecretZoneId, Builder: nameof(GiantAbodePopulator));
-            
+
+            GameObject Giant = GetTheGiant();
+
+            string wrasslerColor = null;
+            if (Giant.TryGetPart(out Wrassler wrassler)) wrasslerColor = wrassler.DetailColor;
+
             zoneManager.AddZonePostBuilder(
                 ZoneID: SecretZoneId, 
                 Class: nameof(AddObjectBuilder), 
                 Key1: "Object", 
-                Value1: zoneManager.CacheObject(GetTheGiant()));
+                Value1: zoneManager.CacheObject(Giant));
 
-            string wrassleRingColor = WrassleRingColors.GetRandomElement();
+            string wrassleRingColor = wrasslerColor ?? WrassleRingColors.GetRandomElement();
             foreach (GameObject rope in zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes"))
             {
                 rope.Render.DetailColor = wrassleRingColor;
@@ -189,7 +194,8 @@ namespace HNPS_GigantismPlus
                 || entry.Key == typeof(Leader).Name
                 || entry.Key == typeof(Followers).Name
                 || entry.Key == typeof(Breeder).Name
-                || entry.Key == typeof(GreaterVoider).Name);
+                || entry.Key == typeof(GreaterVoider).Name
+                || entry.Key == typeof(Rummager).Name);
 
             GameObject creature;
             creature = GameObjectFactory.Factory.CreateObject(
@@ -267,6 +273,7 @@ namespace HNPS_GigantismPlus
 
             creature.Brain.Mobile = true;
             creature.Brain.Wanders = true;
+            creature.Brain.WandersRandomly = true;
             creature.Brain.Factions = "Giants";
             creature.Brain.Allegiance.Clear();
             creature.Brain.Allegiance.Add("Giants", 700);
@@ -338,6 +345,12 @@ namespace HNPS_GigantismPlus
             int heroTier = Unique ? 8 : -1;
             creature = HeroMaker.MakeHero(creature, heroTemplate, heroTier, "Giant");
 
+            if (!creature.TryGetPart(out Wrassler wrassler))
+            {
+                wrassler = creature.RequirePart<Wrassler>();
+            }
+            wrassler.BestowWrassleGear();
+
             if (creature.TryGetPart(out HasMakersMark hasMakersMark)) creature.RemovePart(hasMakersMark);
 
             if (creature.TryGetPart(out DromadCaravan dromadCaravan)) creature.RemovePart(dromadCaravan);
@@ -352,6 +365,7 @@ namespace HNPS_GigantismPlus
             if (creature.TryGetPart(out Followers followers)) creature.RemovePart(followers);
             if (creature.TryGetPart(out Breeder breeder)) creature.RemovePart(breeder);
             if (creature.TryGetPart(out GreaterVoider greaterVoider)) creature.RemovePart(greaterVoider);
+            if (creature.TryGetPart(out Rummager rummager)) creature.RemovePart(rummager);
 
             return creature;
         }

@@ -5,9 +5,11 @@
       <scopes>
         <!--scope Name="Subtype1" Subtype="Artifex" Priority="100" Combine="false" /-->
         <scope Name="Culture" Culture="Giant" Priority="100" Combine="false" />
+        <scope Name="Culture" Culture="WrassleGiant" Priority="100" Combine="false" />
         <scope Name="Special" Special="Giant" Priority="100" Combine="false" />
+        <scope Name="Special" Special="WrassleGiant" Priority="100" Combine="false" />
       </scopes>
-      <prefixes Amount="1-3">
+      <prefixes Amount="1-2">
         <prefix Name="om" Weight="5" />
         <prefix Name="um" />
         <prefix Name="ob" Weight="2" />

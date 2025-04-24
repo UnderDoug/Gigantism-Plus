@@ -12,13 +12,14 @@
     InitialPlayerReputation="0"
     PositiveSound="Sounds/Reputation/sfx_reputation_cragmensch_positive"
     NegativeSound="Sounds/Reputation/sfx_reputation_cragmensch_negative"
-    EmblemTile="Mutations/GigantismPlus.png"
+    EmblemTile="Factions/Giants.png"
     EmblemTileColor="z"
     EmblemDetailColor="X"
   >
     <partreputation About="GigantismPlus" Value="200" />
     <feeling About="*" Value="0" />
     <feeling About="Player" Value="200" />
+    <feeling About="WrassleGiants" Value="600" />
     <feeling About="Cragmensch" Value="200" />
     <feeling About="Girsh" Value="150" />
     <feeling About="Templar" Value="-300" />
@@ -39,6 +40,50 @@
       <interest Tags="mountains" WillBuy="true" WillSell="true" />
     </interests>
     <factionworshipattitudes>
+      <factionworshipattitude Name="WrassleGiants" Attitude="100" />
+      <factionworshipattitude Name="Cragmensch" Attitude="50" />
+      <factionworshipattitude Name="Templar" Attitude="-100" />
+      <factionworshipattitude Name="GiantTemplar" Attitude="-100" />
+    </factionworshipattitudes>
+  </faction>
+
+  <faction
+    Name="WrassleGiants"
+    DisplayName="Folk of the Square Ring"
+    Old="true"
+    FormatWithArticle="true"
+    InitialPlayerReputation="0"
+    PositiveSound="Sounds/Reputation/sfx_reputation_cragmensch_positive"
+    NegativeSound="Sounds/Reputation/sfx_reputation_cragmensch_negative"
+    EmblemTile="Factions/WrassleGiants.png"
+    EmblemTileColor="z"
+    EmblemDetailColor="X"
+  >
+    <partreputation About="GigantismPlus" Value="200" />
+    <feeling About="*" Value="0" />
+    <feeling About="Player" Value="0" />
+    <feeling About="Giants" Value="800" />
+    <feeling About="Cragmensch" Value="200" />
+    <feeling About="Girsh" Value="150" />
+    <feeling About="Templar" Value="-400" />
+    <feeling About="GiantTemplar" Value="-900" />
+    <waterritual
+      BuyMostValuableItem="true"
+    />
+    <interests 
+      BuyDescription=" interested in good food and a good throw down: "
+      SellDescription=" interested in setting up a spectacle: "
+      >
+      <interest Tags="recipe" WillBuy="true" WillSell="false" />
+      <interest Tags="wrasslegiants,lair" WillBuy="false" WillSell="true" />
+      <interest Tags="recipe" WillBuy="true" WillSell="false" />
+      <interest Tags="giant,settlement" WillBuy="true" WillSell="false" />
+      <interest Tags="giant,lair" WillBuy="true" WillSell="false" />
+      <interest Tags="mountains" WillBuy="true" WillSell="true" />
+    </interests>
+    <factionworshipattitudes>
+      <factionworshipattitude Name="Giants" Attitude="100" />
+      <factionworshipattitude Name="Cragmensch" Attitude="50" />
       <factionworshipattitude Name="Templar" Attitude="-100" />
       <factionworshipattitude Name="GiantTemplar" Attitude="-100" />
     </factionworshipattitudes>
@@ -52,19 +97,22 @@
     FormatWithArticle="true"
     PositiveSound="Sounds/Reputation/sfx_reputation_putusTemplar_positive"
     NegativeSound="Sounds/Reputation/sfx_reputation_putusTemplar_negative"
-    EmblemTile="Mutations/GigantismPlus.png"
-    EmblemTileColor="Z"
-    EmblemDetailColor="r"
+    EmblemTile="Factions/GiantTemplar.png"
+    EmblemTileColor="r"
+    EmblemDetailColor="Z"
   >
     <partreputation About="GigantismPlus" Value="-200" />
     <feeling About="Giants" Value="-1200" />
+    <feeling About="WrassleGiants" Value="-1200" />
     <feeling About="Templar" Value="1200" />
     <waterritual
       BuyMostValuableItem="true"
     />
     <interests BuyDescription=" interested in the location of imminently dangerous mutants: " >
-      <interest Tags="giant,settlement" WillBuy="true" WillSell="false" />
-      <interest Tags="giant,lair" WillBuy="true" WillSell="false" />
+      <interest Tags="giants,settlement" WillBuy="true" WillSell="false" />
+      <interest Tags="wrasslegiants,settlement" WillBuy="true" WillSell="false" />
+      <interest Tags="giants,lair" WillBuy="true" WillSell="false" />
+      <interest Tags="wrasslegiants,lair" WillBuy="true" WillSell="false" />
       <interest Tags="mountains" WillBuy="true" WillSell="true" />
     </interests>
     <factionworshipattitudes>

@@ -54,6 +54,7 @@ namespace HNPS_GigantismPlus
             "Trolls",
             "Cragmensch",
         };
+        public static string UniqueEpithet => $"who knows how to {"Cook".OptionalColorYuge(Colorfulness)}";
         public static List<string> EpithetsBag = new()
         {
             $"the {"Giant".OptionalColorYuge(Colorfulness)}",
@@ -61,7 +62,6 @@ namespace HNPS_GigantismPlus
             $"the {"Swole".OptionalColorYuge(Colorfulness)}",
             $"of the {"Gains".OptionalColorYuge(Colorfulness)}",
             $"of the {"Stew".OptionalColorYuge(Colorfulness)}",
-            $"who {"Cooks".OptionalColorYuge(Colorfulness)}",
             $"who is {"Immense".OptionalColorYuge(Colorfulness)}",
             $"who {"Hankers".OptionalColorYuge(Colorfulness)}",
             $"{"Hanker's Bane".OptionalColorYuge(Colorfulness)}",
@@ -274,9 +274,10 @@ namespace HNPS_GigantismPlus
             creature.Brain.Mobile = true;
             creature.Brain.Wanders = true;
             creature.Brain.WandersRandomly = true;
-            creature.Brain.Factions = "Giants";
+            creature.Brain.Factions = "WrassleGiants";
             creature.Brain.Allegiance.Clear();
-            creature.Brain.Allegiance.Add("Giants", 700);
+            creature.Brain.Allegiance.Add("WrassleGiants", 800);
+            creature.Brain.Allegiance.Add("Giants", 600);
             creature.RequirePart<Interesting>();
 
             if (!creature.TryGetPart(out Description description))
@@ -291,7 +292,7 @@ namespace HNPS_GigantismPlus
             description.Short = preDesc + description._Short;
 
             Epithets epithets = creature.RequirePart<Epithets>();
-            epithets.Primary = EpithetsBag.GetRandomElement().Color("y");
+            epithets.Primary = Unique ? UniqueEpithet.Color("y") : EpithetsBag.GetRandomElement().Color("y");
 
             if (creature.TryGetPart(out DisplayNameAdjectives displayNameAdjectives))
             {

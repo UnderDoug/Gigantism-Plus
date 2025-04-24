@@ -15,6 +15,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 using SerializeField = UnityEngine.SerializeField;
+using XRL.Rules;
 
 namespace XRL.World.Parts
 {
@@ -161,7 +162,9 @@ namespace XRL.World.Parts
             int handCount = (int)Math.Floor(Actor.Body.GetPartCount("Hand") / 2.0);
             int feetCount = Actor.Body.GetPartCount("Feet");
             int footCount = Actor.Body.GetPartCount("Foot");
-            string FootOrFeet = feetCount * 2 >= footCount ? "Feet" : "Foot";
+            string FootOrFeet = "Feet";
+            if (feetCount * 2 < footCount) FootOrFeet = "Foot";
+            if (feetCount == footCount && Stat.SeededRandom(WrassleID.ToString(), 0, 199) % 2 == 1) FootOrFeet = "Foot";
 
             foreach (BodyPart bodyPart in Actor.Body.GetParts())
             {

@@ -62,5 +62,261 @@
         <postfix Name="mh" Weight="3" />
       </postfixes>
     </namestyle>
+
+    <namestyle Name="Giant Hero Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Hero" Faction="Giant" Priority="200" Combine="false" />
+        <scope Name="Culture" Type="Epithet" Special="Hero" Culture="Giants" Priority="100" Combine="true" />
+        <scope Name="Faction" Type="Epithet" Special="Hero" Faction="Giants" Priority="100" Combine="true" />
+        <scope Name="Species" Type="Epithet" Special="Hero" Species="Giant" Priority="100" Combine="true" />
+      </scopes>
+      <templates>
+        <template Name="the *Adjective* *Role*" />
+        <template Name="the *Adjective*" />
+        <template Name="who *Verb*" />
+        <template Name="the *Adjective* *Role*, who *Verb*" />
+        <template Name="the *Adjective*, who *Verb*" />
+        <template Name="of the *Noun*" />
+        <template Name="the *Adjective*, of the *Noun*" />
+        <template Name="the *Adjective*, of the *Noun*, who *Verb*" />
+        <template Name="the *Role*, of the *Noun*" />
+        <template Name="the *Actioner* of the *Subject*" />
+        <template Name="the *Role* of the *Noun*, who *Verb*" />
+        <template Name="the *Actioner* of the *Subject*, who *Verb*" />
+        <template Name="the *Adjective* *Role*, of the *Noun*" />
+        <template Name="the *Adjective* *Actioner* of the *Subject*" />
+      </templates>
+      <templatevars>
+        <!-- the -->
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Somewhat Big" />
+          <value Name="Really Big" />
+          <value Name="Solid" />
+          <value Name="Sturdy" />
+          <value Name="Unmovable" />
+          <value Name="Unmoving" />
+          <value Name="Immovable" />
+          <value Name="Unstoppable" />
+          <value Name="Non-stop" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Cook" />
+          <value Name="Hankerer" />
+          <value Name="Gains Seeker" />
+          <value Name="Thinker" />
+          <value Name="Listener" />
+          <value Name="Philosopher" />
+          <value Name="Altruist" />
+        </templatevar>
+        <templatevar Name="Actioner">
+          <value Name="Slapper" />
+          <value Name="Hankerer" />
+          <value Name="Seeker" />
+        </templatevar>
+        <!-- , of the -->
+        <templatevar Name="Noun">
+          <value Name="Stew" />
+          <value Name="Gains" />
+          <value Name="Hankering" />
+          <value Name="Folding Chair" />
+          <value Name="Belly" />
+          <value Name="Heft" />
+          <value Name="Mountains" />
+          <value Name="Stone" />
+          <value Name="Pillar" />
+          <value Name="Considerable Size" />
+          <value Name="Books" />
+          <value Name="Thoughts" />
+        </templatevar>
+        <templatevar Name="Subject">
+          <value Name="Stew" />
+          <value Name="Stews" />
+          <value Name="Gains" />
+          <value Name="Folding Chairs" />
+          <value Name="Bellies" />
+          <value Name="Stone" />
+          <value Name="Stones" />
+          <value Name="Pillars" />
+          <value Name="Books" />
+        </templatevar>
+        <!-- , who -->
+        <templatevar Name="Verb">
+          <value Name="Cooks" />
+          <value Name="Hankers" />
+          <value Name="Achieves Gains" />
+          <value Name="Slaps" />
+          <value Name="Bellows" />
+          <value Name="Rumbles" />
+          <value Name="Thinks" />
+          <value Name="Listens" />
+          <value Name="Keeps Going" />
+          <value Name="Waits" />
+          <value Name="Stands Tall" />
+          <value Name="Sits" />
+          <value Name="Remains Silent" />
+          <value Name="Remains Still" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
+
+    <namestyle Name="WrassleGiant Hero Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Hero" Faction="WrassleGiant" Priority="200" Combine="false" />
+        <scope Name="Faction" Type="Epithet" Special="Hero" Faction="WrassleGiant" Priority="100" Combine="true" />
+      </scopes>
+      <templates>
+        <templates>
+          <template Name="the *Adjective* *Role*" />
+          <template Name="the *Adjective*" />
+          <template Name="who *Verb*" />
+          <template Name="the *Adjective* *Role*, who *Verb*" />
+          <template Name="the *Adjective*, who *Verb*" />
+          <template Name="of the *Noun*" />
+          <template Name="the *Adjective*, of the *Noun*" />
+          <template Name="the *Adjective*, of the *Noun*, who *Verb*" />
+          <template Name="the *Role*, of the *Noun*" />
+          <template Name="the *Actioner* of the *Subject*" />
+          <template Name="the *Role* of the *Noun*, who *Verb*" />
+          <template Name="the *Actioner* of the *Subject*, who *Verb*" />
+          <template Name="the *Adjective* *Role*, of the *Noun*" />
+          <template Name="the *Adjective* *Actioner* of the *Subject*" />
+        </templates>
+      </templates>
+      <templatevars>
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Heavyweight" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Cook" />
+          <value Name="Disciple" />
+          <value Name="Hankerer" />
+          <value Name="Gains Seeker" />
+          <value Name="Champion" />
+          <value Name="Contender" />
+          <value Name="Suplexer" />
+        </templatevar>
+        <templatevar Name="Actioner">
+          <value Name="Slapper" />
+          <value Name="Hankerer" />
+          <value Name="Seeker" />
+          <value Name="Kicker" />
+          <value Name="Hurler" />
+          <value Name="Conker" />
+        </templatevar>
+        <templatevar Name="Noun">
+          <value Name="Stew" />
+          <value Name="Gains" />
+          <value Name="Hankering" />
+          <value Name="Folding Chair" />
+          <value Name="Nanoweave Mask" />
+          <value Name="Nanoweave Suit" />
+          <value Name="Open Palm" />
+          <value Name="Closed Fist" />
+          <value Name="Elbow" />
+          <value Name="Seismic Toss" />
+          <value Name="Ground Pound" />
+          <value Name="Suplex" />
+          <value Name="Ring Jump" />
+          <value Name="Roundhouse Kick" />
+          <value Name="Belly" />
+          <value Name="Heft" />
+          <value Name="Belt" />
+          <value Name="Mountain" />
+          <value Name="Stone" />
+          <value Name="Pillar" />
+          <value Name="Noggin" />
+          <value Name="Bonce" />
+          <value Name="Dome" />
+        </templatevar>
+        <templatevar Name="Subject">
+          <value Name="Gains" />
+          <value Name="Folding Chairs" />
+          <value Name="Bellies" />
+          <value Name="Stone" />
+          <value Name="Pillars" />
+          <value Name="Noggins" />
+          <value Name="Bonces" />
+        </templatevar>
+        <templatevar Name="Verb">
+          <value Name="Cooks" />
+          <value Name="Hankers" />
+          <value Name="Slams" />
+          <value Name="Throws Down" />
+          <value Name="Never Taps Out" />
+          <value Name="Doesn't Back Down" />
+          <value Name="Achieves Gains" />
+          <value Name="Slaps" />
+          <value Name="Bellows" />
+          <value Name="Kicks" />
+          <value Name="Resists" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
+    
+    <namestyle Name="WrassleGiant Master Title">
+      <scopes>
+        <scope Name="Master" Type="Title" Special="Master" Faction="WrassleGiant" Priority="250" Combine="false" />
+      </scopes>
+      <templates>
+        <template Name="Master *Name*" />
+      </templates>
+    </namestyle>
+    
+    <namestyle Name="WrassleGiant Master Epithet">
+      <scopes>
+        <scope Name="Master" Type="Epithet" Special="Master" Faction="WrassleGiant" Priority="250" Combine="false" />
+      </scopes>
+      <templates>
+        <template Name=", of *Fighting Style*" />
+      </templates>
+    </namestyle>
+    
+    <namestyle Name="Unique WrassleGiant Epithet">
+      <scopes>
+        <scope Name="Unique" Type="Epithet" Special="Unique" Faction="WrassleGiant" Priority="300" Combine="false" />
+      </scopes>
+      <templates>
+        <template Name="the *Adjective* *Role* of the *Noun*, who *Verb*" />
+      </templates>
+      <templatevars>
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Hankerer" />
+        </templatevar>
+        <templatevar Name="Noun">
+          <value Name="Stew" />
+        </templatevar>
+        <templatevar Name="Verb">
+          <value Name="Knows How To Cook" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
+    
   </namestyles>
 </naming>

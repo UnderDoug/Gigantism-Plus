@@ -415,6 +415,11 @@ namespace XRL.World.Parts
                 // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
                 ApplyNaturalEquipmentMods();
 
+                if (ParentObject.TryGetPart(out MakersMark makersMark))
+                {
+                    ParentObject.RemovePart(makersMark);
+                }
+
                 if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))
                 {
                     Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1);
@@ -446,11 +451,6 @@ namespace XRL.World.Parts
                 ParentObject.SetIntProperty("ShowAsPhysicalFeature", 1);
                 ParentObject.SetIntProperty("UndesirableWeapon", 0);
                 ParentObject.SetStringProperty("TemporaryDefaultBehavior", "NaturalEquipmentManager", false);
-
-                if (ParentObject.TryGetPart(out MakersMark makersMark))
-                {
-                    ParentObject.RemovePart(makersMark);
-                }
 
                 _shortDescriptionCache = ProcessShortDescription(ShortDescriptions);
             }

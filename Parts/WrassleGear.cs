@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using XRL.UI;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
@@ -31,6 +32,10 @@ namespace XRL.World.Parts
                 ColorBag = NewColorBag();
             }
         }
+
+        public MeleeWeapon MeleeWeaponCopy;
+
+        public bool RandomGeneration;
 
         public List<string> TileBag = new();
 
@@ -128,10 +133,22 @@ namespace XRL.World.Parts
         public WrassleGear()
         {
             WrassleID = Guid.NewGuid();
+            RandomGeneration = true;
+            MeleeWeaponCopy = null;
             RandomizeTile = false;
-            TileBag = FillTileBag();
+            FillTileBag();
             ColorBag = NewColorBag();
         }
+
+        public override void Attach()
+        {
+            base.Attach();
+            if (ParentObject.TryGetPart(out MeleeWeapon meleeWeapon))
+            {
+                MeleeWeaponCopy = meleeWeapon.DeepCopy(ParentObject) as MeleeWeapon;
+            }
+        }
+
         public static Dictionary<string, List<string>> NewColorBag()
         {
             return _ColorBag;
@@ -173,19 +190,20 @@ namespace XRL.World.Parts
 
         public string GetTileFromBag()
         {
-            TileBag = FillTileBag();
-            return Tile = TileBag.DrawSeededElement(WrassleID);
+            if (TileBag.IsNullOrEmpty())
+                return FillTileBag().DrawSeededElement(WrassleID);
+            return TileBag.DrawSeededElement(WrassleID);
         }
 
-        public void ApplyFlair()
+        public void ApplyFlair(bool doTile = true, bool doTileColor = true, bool doDetailColor = true, bool doColorString = true)
         {
             if (ParentObject != null && ParentObject.TryGetPart(out Render render))
             {
-                if (RandomizeTile && !Tile.IsNullOrEmpty())
+                if (doTile && RandomizeTile && !Tile.IsNullOrEmpty())
                     render.Tile = Tile;
-                render.TileColor = $"&{TileColor}";
-                render.DetailColor = DetailColor;
-                render.ColorString = $"&{TileColor}";
+                if (doTileColor) render.TileColor = $"&{TileColor}";
+                if (doDetailColor) render.DetailColor = DetailColor;
+                if (doColorString) render.ColorString = $"&{TileColor}";
             }
         }
 
@@ -193,15 +211,27 @@ namespace XRL.World.Parts
         {
             bool wantObjectCreated = ParentObject.InheritsFrom("BaseWrassleGear");
             bool wantKineticResist = ParentObject.InheritsFrom("WrassleRingRopes");
+            bool wantEquipped =
+                ParentObject.InheritsFrom("BaseWrassleGear")
+             || ParentObject.InheritsFrom("FoldingChair")
+             || ParentObject.HasPart<Armor>();
+            bool wantUnequipped =
+                ParentObject.InheritsFrom("BaseWrassleGear")
+             || (ParentObject.HasPart<Armor>() && ParentObject.HasPart<MeleeWeapon>());
+            bool wantLateBeforeApplyDamage =
+                ParentObject.InheritsFrom("WrassleRingRopes");
 
             return base.WantEvent(ID, cascade)
                 || (wantObjectCreated && ID == AfterObjectCreatedEvent.ID)
-                || (wantKineticResist && ID == GetKineticResistanceEvent.ID);
+                || (wantEquipped && ID == EquippedEvent.ID)
+                || (wantUnequipped && ID == UnequippedEvent.ID)
+                || (wantKineticResist && ID == GetKineticResistanceEvent.ID)
+                || (wantLateBeforeApplyDamage && ID == LateBeforeApplyDamageEvent.ID);
         }
 
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear"))
+            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear") && E.Context != "Bestowal")
             {
                 string tileColor = $"&{TileColor}";
                 GameObject Object = E.Object;
@@ -219,6 +249,64 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
+        public override bool HandleEvent(EquippedEvent E)
+        {
+            if (E.Actor.IsPlayer() && E.Actor.TryGetPart(out Wrassler wrassler) && E.Item != null)
+            {
+                GameObject Item = E.Item;
+                GameObject Actor = E.Actor;
+                if (E.Item.InheritsFrom("FoldingChair"))
+                {
+                    Debug.Entry(4,
+                        $"{typeof(WrassleGear).Name}." +
+                        $"{nameof(HandleEvent)}({typeof(EquippedEvent).Name} " +
+                        $"E.Item: [{Item.ID}:{Item.ShortDisplayNameStripped}] " +
+                        $"E.Actor: [{Actor.ID}:{Actor.ShortDisplayNameStripped}]" +
+                        $") WrassleID: {WrassleID}",
+                        Indent: 0);
+
+                    if (Item.TryGetPart(out Examiner examiner))
+                    {
+                        examiner.MakeUnderstood(ShowMessage: false);
+                        if (Actor.Understood(examiner) && !wrassler.KnowsChairs)
+                        {
+                            Popup.Show($"You're struck with a sudden, intimate understanding of {Item.GetPluralName()}.");
+                        }
+                        wrassler.KnowsChairs = true;
+                    }
+                }
+                if (Item.InheritsFrom("WrassleGear") 
+                    && Item.TryGetPart(out Armor armor))
+                {
+                    GameObject defaultBehavior = Item.EquippedOn().DefaultBehavior;
+                    if (defaultBehavior != null && defaultBehavior.TryGetPart(out MeleeWeapon defaultMeleeWeapon))
+                    {
+                        ParentObject.RequirePart(defaultMeleeWeapon.DeepCopy(ParentObject) as MeleeWeapon);
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(UnequippedEvent E)
+        {
+            if (E.Actor.IsPlayer() && E.Actor.TryGetPart(out Wrassler wrassler) && E.Item != null)
+            {
+                GameObject Item = E.Item;
+                GameObject Actor = E.Actor;
+
+                if (Item.InheritsFrom("WrassleGear") 
+                    && Item.TryGetPart(out Armor armor) 
+                    && Item.TryGetPart(out MeleeWeapon meleeWeapon))
+                {
+                    ParentObject.RemovePart(meleeWeapon);
+                    if (MeleeWeaponCopy != null)
+                    {
+                        ParentObject.RequirePart(MeleeWeaponCopy.DeepCopy(ParentObject) as MeleeWeapon);
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
         public override bool HandleEvent(GetKineticResistanceEvent E)
         {
             if (E.Object == ParentObject && E.Object.InheritsFrom("WrassleRingRopes"))
@@ -230,7 +318,7 @@ namespace XRL.World.Parts
                     + $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID}",
                     Indent: 0);
 
-                E.LinearIncrease = 99999999;
+                E.LinearIncrease = 999999999;
                 E.PercentageIncrease = 0;
                 E.LinearReduction = 0;
                 E.PercentageReduction = 0;
@@ -249,11 +337,34 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
+        public override bool HandleEvent(LateBeforeApplyDamageEvent E)
+        {
+            if (E.Object == ParentObject && E.Object.InheritsFrom("WrassleRingRopes"))
+            {
+
+                Debug.Entry(4, 
+                    $"{typeof(WrassleGear).Name}." + 
+                    $"{nameof(FireEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
+                    Indent: 0);
+                Damage damage = E.Damage;
+                GameObject attacker = E.Source;
+
+                Debug.Entry(4, $"Damage Before: {damage.Amount}; {damage.Attributes.Join(",")}", Indent: 1);
+                if (damage != null && (damage.Attributes.Contains("Concussion") || E.Indirect))
+                {
+                    damage = new(0);
+                }
+                Debug.Entry(4, $"Damage  After: {damage.Amount}; {damage.Attributes.Join(",")}", Indent: 1);
+                return false;
+            }
+            return base.HandleEvent(E);
+        }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
             Registrar.Register("AdjustWeaponScore");
             Registrar.Register("AdjustArmorScore");
+            Registrar.Register("TakeDamage");
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
@@ -271,6 +382,9 @@ namespace XRL.World.Parts
                     }
                 }
                 E.SetParameter("Score", Score);
+            }
+            if (E.ID == "TakeDamage" && ParentObject.InheritsFrom("WrassleRingRopes"))
+            {
             }
             return base.FireEvent(E);
         }
@@ -290,12 +404,14 @@ namespace XRL.World.Parts
             base.Read(Basis, Reader);
             _WrassleID = Reader.ReadGuid();
         }
+        /*
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             WrassleGear wrassleGear = base.DeepCopy(Parent, MapInv) as WrassleGear;
             wrassleGear._WrassleID = Guid.NewGuid();
             return wrassleGear;
         }
+        */
 
     } //!-- public class Source : IScribedPart
 }

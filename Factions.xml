@@ -56,8 +56,8 @@
     PositiveSound="Sounds/Reputation/sfx_reputation_cragmensch_positive"
     NegativeSound="Sounds/Reputation/sfx_reputation_cragmensch_negative"
     EmblemTile="Factions/WrassleGiants.png"
-    EmblemTileColor="z"
-    EmblemDetailColor="X"
+    EmblemTileColor="R"
+    EmblemDetailColor="B"
   >
     <partreputation About="GigantismPlus" Value="200" />
     <feeling About="*" Value="0" />

@@ -1,5 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <colors>
+  <solidcolors>
+    <solidcolor Name="flesh" Color="Z" LightTone="z" DarkTone="x" ShowInPicker="true" />
+    <solidcolor Name="dark flesh" Color="x" LightTone="Z" DarkTone="X" ShowInPicker="true" />
+    <solidcolor Name="light flesh" Color="z" DarkTone="Z" ShowInPicker="true" />
+    <solidcolor Name="fleshy" Color="X" LightTone="x" ShowInPicker="true" />
+  </solidcolors>
   <shaders>
     <shader Name="gigantic" Type="sequence" Colors="z-Z-x-X-X-x-Z-z" ShowInPicker="false" />
     <shader Name="gigantism" Type="sequence" Colors="z-Z-x-X-x-X-x-Z-z" ShowInPicker="false" />

@@ -16,9 +16,12 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
+using XRL.World.Parts.Skill;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using XRL.UI;
+using Microsoft.CodeAnalysis;
 
 namespace HNPS_GigantismPlus
 {
@@ -1089,7 +1092,7 @@ namespace HNPS_GigantismPlus
                 case Scanning.Scan.Bio:
                     return "organism";
                 default:
-                    if (Object.HasPart<Shield>() && !Object.IsPluralIfKnown)
+                    if (Object.HasPart<XRL.World.Parts.Shield>() && !Object.IsPluralIfKnown)
                     {
                         return "shield";
                     }
@@ -1878,5 +1881,230 @@ namespace HNPS_GigantismPlus
             }
             return output;
         }
+
+        public static bool SeededRandomBool(this Guid Seed, int ChanceIn = 2)
+        {
+            int High = ChanceIn * 7;
+            return Stat.SeededRandom(Seed.ToString(), 0, High) % ChanceIn == 0;
+        }
+
+        public static string Join<T>(this List<T> List, string Delimiter = ",")
+            where T : IConvertible
+        {
+            string output = string.Empty;
+            if (!List.IsNullOrEmpty())
+            {
+                foreach (T item in List)
+                {
+                    output += $"{(output == string.Empty ? "" : Delimiter)}{item}";
+                }
+            }
+            return output;
+        }
+
+        public static bool TrySplit(this string String, string Delimiter, out string[] split)
+        {
+            if (!String.IsNullOrEmpty() && String.Contains(Delimiter))
+            {
+                split = String.Split(Delimiter);
+                return true;
+            }
+            split = null;
+            return false;
+        }
+
+        public static bool TrySplitToList(this string String, string Delimiter, out List<string> List)
+        {
+            List<string> strings = new();
+            if (!String.IsNullOrEmpty() && String.TrySplit(Delimiter, out string[] split))
+            {
+                foreach (string item in split)
+                {
+                    if (!strings.Contains(item)) strings.Add(item);
+                }
+                List = strings;
+                return true;
+            }
+            List = new();
+            return false;
+        }
+
+        public static bool ContainsCI(this string String, string Value)
+        {
+            return String.ToLower().Contains(Value.ToLower());
+        }
+
+        public static bool IsGivingStewful(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Stew")
+                || NamePiece.ContainsCI("Cook");
+        }
+        public static bool IsGivingStewless(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Hanker")
+                || NamePiece.ContainsCI("Gains Seeker");
+        }
+        public static bool IsGivingThoughtful(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Thought")
+                || NamePiece.ContainsCI("Think")
+                || NamePiece.ContainsCI("Book")
+                || NamePiece.ContainsCI("Listen")
+                || NamePiece.ContainsCI("Philosoph");
+        }
+        public static bool IsGivingTough(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Stone")
+                || NamePiece.ContainsCI("Pillar")
+                || NamePiece.ContainsCI("Solid")
+                || NamePiece.ContainsCI("Sturdy")
+                || NamePiece.ContainsCI("Mov") // Immovable, Unmoving
+                || NamePiece.ContainsCI("Stop")
+                || NamePiece.ContainsCI("Mountain")
+                || NamePiece.ContainsCI("Thic") // Thick, Thicc
+                || NamePiece.ContainsCI("Hefty");
+        }
+        public static bool IsGivingStrong(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Gain")
+                || NamePiece.ContainsCI("Swole")
+                || NamePiece.ContainsCI("Mighty")
+                || NamePiece.ContainsCI("Mountain")
+                || NamePiece.ContainsCI("Slap");
+        }
+        public static bool IsGivingResilient(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Waits")
+                || NamePiece.ContainsCI("Sits")
+                || NamePiece.ContainsCI("Silent")
+                || NamePiece.ContainsCI("Still")
+                || NamePiece.ContainsCI("Tall")
+                || NamePiece.ContainsCI("Mountain")
+                || NamePiece.ContainsCI("Keeps Going");
+        }
+        public static bool IsGivingPopular(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Altruis");
+        }
+        public static bool IsGivingWrassler(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Folding Chair");
+        }
+        public static bool IsGivingTrulyImmense(this string NamePiece)
+        {
+            return NamePiece.ContainsCI("Belly")
+                || NamePiece.ContainsCI("Heft")
+                || NamePiece.ContainsCI("Considerable Size")
+                || NamePiece.ContainsCI("Bellows")
+                || NamePiece.ContainsCI("Rumbles")
+                || NamePiece.ContainsCI("Rotund")
+                || NamePiece.ContainsCI("Giant")
+                || NamePiece.ContainsCI("Immense")
+                || NamePiece.ContainsCI("Enormous")
+                || NamePiece.ContainsCI("Huge")
+                || NamePiece.ContainsCI("Yuge")
+                || NamePiece.ContainsCI("Somewhat Big")
+                || NamePiece.ContainsCI("Really Big");
+        }
+
+        public static List<BaseSkill> AddSkills(this GameObject Creature, List<string> Skills)
+        {
+            List<BaseSkill> output = new();
+            foreach (var skill in Skills)
+            {
+                if (Creature.HasSkill(skill)) continue;
+                BaseSkill outputSkill = Creature.AddSkill(skill);
+                if (!output.Contains(outputSkill)) output.Add(outputSkill);
+            }
+            return output;
+        }
+
+        public static bool TryAdd<T>(this List<T> List, T Item)
+            where T : class
+        {
+            if (!List.Contains(Item))
+            {
+                List.Add(Item);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryGetBook(this string BookName, out BookInfo Book)
+        {
+            return BookUI.Books.TryGetValue(BookName, out Book);
+        }
+        public static bool TryGetListBookPages(this string BookName, out List<string> Pages)
+        {
+            List<string> pages = new();
+            if (BookName.TryGetBook(out BookInfo Book) && !Book.Pages.IsNullOrEmpty())
+            {
+                foreach (BookPage page in Book.Pages)
+                {
+                    pages.TryAdd(page.FullText.Trim());
+                }
+            }
+            Pages = pages;
+            return !Pages.IsNullOrEmpty();
+        }
+        public static List<string> BookPagesAsList(this string BookName)
+        {
+            BookName.TryGetListBookPages(out List<string> pages);
+            return pages;
+        }
+
+        public static List<Location2D> ToLocation2DList(this List<Cell> CellList)
+        {
+            if (CellList.IsNullOrEmpty()) return null;
+            List<Location2D> Location2DList = new();
+            foreach (Cell cell in CellList)
+            {
+                Location2DList.TryAdd(cell.Location);
+            }
+            return Location2DList;
+        }
+        public static List<string> ToStringList(this List<Location2D> Location2DList)
+        {
+            if (Location2DList.IsNullOrEmpty()) return null;
+            List<string> stringList = new();
+            foreach (Location2D location in Location2DList)
+            {
+                stringList.TryAdd(location.ToString());
+            }
+            return stringList;
+        }
+        public static List<string> ToStringList(this List<Cell> CellList)
+        {
+            return CellList.ToLocation2DList().ToStringList();
+        }
+
+        public static List<Cell> ToCellList(this List<string> StringList, Zone Z)
+        {
+            List<Cell> cellList = new();
+            foreach (string @string in StringList)
+            {
+                string[] coord = @string.Split(",");
+                cellList.TryAdd(Z.GetCell(int.Parse(coord[0]), int.Parse(coord[1])));
+            }
+            return cellList;
+        }
+        public static List<string> ToStringCoordList(this string String)
+        {
+            List<string> stringList = new();
+            if (!String.Contains(";"))
+            {
+                stringList.TryAdd(String);
+            }
+            else
+            {
+                string[] coords = String.Split(";");
+                foreach (string coord in coords)
+                {
+                    stringList.TryAdd(coord);
+                }
+            }
+            return stringList;
+        }
+
     } //!-- Extensions
 }

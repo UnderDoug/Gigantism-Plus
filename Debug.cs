@@ -16,6 +16,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 using HNPS_GigantismPlus;
+using XRL.World.ObjectBuilders;
 
 namespace HNPS_GigantismPlus
 {
@@ -475,8 +476,11 @@ namespace HNPS_GigantismPlus
             List<GameObjectBlueprint> blueprintList = new(Number);
             for (int i = 0; i < Number; i++)
             {
-                blueprintList.Add(EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
-                    => SecretGiantWhoCooksBuilderExtension.IsGiantCookEligible(blueprint, Unique)));
+                GameObjectBlueprint blueprint = Unique
+                    ? WrassleGiantHero.GetAUniqueGiantHeroBluePrintModel()
+                    : WrassleGiantHero.GetAGiantHeroBluePrintModel()
+                    ;
+                blueprintList.Add(blueprint);
             }
             int ticker = 0;
             int tickerPadding = $"{Number}".Length;

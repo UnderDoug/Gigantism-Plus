@@ -16,6 +16,7 @@ using XRL.Language;
 using XRL.World.Capabilities;
 using XRL.World.Skills.Cooking;
 using XRL.Messages;
+using System.Data;
 
 namespace XRL.World.Parts
 {
@@ -175,7 +176,8 @@ namespace XRL.World.Parts
         {
             return base.WantEvent(ID, cascade)
                 || ID == EndTurnEvent.ID
-                || ID == GetShortDescriptionEvent.ID;
+                || ID == GetShortDescriptionEvent.ID
+                || ID == ObjectEnteredCellEvent.ID;
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
@@ -200,18 +202,27 @@ namespace XRL.World.Parts
             E.Postfix.AppendRules($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: This creature has achieved {Gains.Things("Gain")} from the {Stews.Things("hepling")} of Seriously Thick Stew they've eaten! Talk about a hankering!");
             return base.HandleEvent(E);
         }
+        public override bool HandleEvent(ObjectEnteredCellEvent E)
+        {
+            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews))
+            {
+                if (Stews <  startingSews)
+                    Stews += startingSews;
+            }
+            // ParentObject.SetIntProperty(GNT_START_STEWS_PROPLABEL, 0, true);
+            Stews = Stews;
+            return base.HandleEvent(E);
+        }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register("EnteredCell");
+            // Registrar.Register("EnteredCell");
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "EnteredCell" && ParentObject.CurrentZone != null)
+            if (E.ID == "EnteredCell")
             {
-                Stews += ParentObject.GetIntProperty(GNT_START_STEWS_PROPLABEL);
-                ParentObject.SetIntProperty(GNT_START_STEWS_PROPLABEL, 0, true);
             }
             return base.FireEvent(E);
         }
@@ -220,12 +231,27 @@ namespace XRL.World.Parts
         {
             if (ParentObject != null && ParentObject.IsPlayer())
             {
-                CombatJuice.cameraShake(Stews * 25);
-                Popup.Show(
-                    $"You slap your belly. It holds much stew. About {Stews.Things("helping")}. " + 
-                    $"You hanker for more, though! You reckon {Hankering.Things("more helping")} will see additional gains.");
+                int stews = Math.Max(1, Stews);
+                Rumble(stews, 0.2f);
+                if (Stews < 1)
+                    Popup.Show(
+                        $"You slap your belly. It will hold much stew yet. It grumbles with a serious hankering. " +
+                        $"You reckon {Hankering.Things("more helping")} to see any gains.");
+                else
+                    Popup.Show(
+                        $"You slap your belly. It holds much stew. About {Stews.Things("helping")}. " +
+                        $"You hanker for more, though! You reckon {Hankering.Things("more helping")} will see additional gains.");
             }
         }
+
+        /*
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            StewBelly stewBelly = base.DeepCopy(Parent, MapInv) as StewBelly;
+            stewBelly.Stews = Stews;
+            return stewBelly;
+        }
+        */
 
         [WishCommand(Command = "Slap Belly")]
         public static void SlapBellyWish()

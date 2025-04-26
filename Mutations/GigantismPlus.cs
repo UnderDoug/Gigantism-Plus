@@ -28,7 +28,11 @@ namespace XRL.World.Parts.Mutation
         public static readonly string ICON_COLOR = "&z";
         public static readonly string ICON_COLOR_FALLBACK = "&w";
 
-        private bool MutationColor => XRL.UI.Options.MutationColor;
+        private bool MutationColor => UI.Options.MutationColor;
+
+        public float WeightFactor = 5.0f;
+        public float CarryCapFactor => 2.0f;
+        public int CarryCapBonus;
 
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
@@ -244,6 +248,15 @@ namespace XRL.World.Parts.Mutation
 
         public override bool GeneratesEquipment() { return true; }
 
+        public static float GetWeightFactor(int level)
+        {
+            return 4.75f + (0.25f * level);
+        }
+        public static int GetCarryCapBonus(int level)
+        {
+            return 8 * level;
+        }
+
         public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
             if (NaturalEquipmentMod.BodyPartType == "Head") return 2;
@@ -435,6 +448,19 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Entry(4, "Start of Change Level updates", Indent: 1);
             // Start of Change Level updates.
+
+            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Entry(4, "Weight Factor and Carry Cap Bonus changes", Indent: 1);
+            // Hunch Over Penalties
+            Debug.Entry(4, $"Values Before", Indent: 2);
+            Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3);
+            Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3);
+            WeightFactor = GetWeightFactor(NewLevel);
+            CarryCapBonus = GetCarryCapBonus(NewLevel);
+            Debug.Entry(4, $"Values After", Indent: 2);
+            Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3);
+            Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3);
+            Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3);
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
 
@@ -772,8 +798,11 @@ namespace XRL.World.Parts.Mutation
         {
             bool wantAddGroundPound = GroundPoundActivatedAbilityID == Guid.Empty;
             bool wantRemoveGroundPound = GroundPoundActivatedAbilityID != Guid.Empty;
+            bool wantJumped = ParentObject.HasPart<StunningForceOnJump>();
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
+                || ID == GetIntrinsicWeightEvent.ID
+                || ID == GetMaxCarriedWeightEvent.ID
                 || ID == BeforeRapidAdvancementEvent.ID
                 || ID == AfterRapidAdvancementEvent.ID
                 || ID == AfterLevelGainedEvent.ID
@@ -782,24 +811,19 @@ namespace XRL.World.Parts.Mutation
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
                 || ID == InventoryActionEvent.ID
                 || (wantAddGroundPound && ID == AfterAddSkillEvent.ID)
-                || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID);
+                || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID)
+                || (wantJumped && ID == JumpedEvent.ID);
         }
-        public override bool Render(RenderEvent E)
+        public override bool HandleEvent(GetIntrinsicWeightEvent E)
         {
-            if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
-            {
-                bool flag = true;
-                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
-                {
-                    flag = MutationColor;
-                }
-                if (flag && !IsCyberGiant)
-                {
-                    string newColor = Colorfulness > 2 ? ICON_COLOR : ICON_COLOR_FALLBACK;
-                    E.ApplyColors(newColor, ICON_COLOR_PRIORITY);
-                }
-            }
-            return base.Render(E);
+            E.BaseWeight *= WeightFactor;
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetMaxCarriedWeightEvent E)
+        {
+            E.BaseWeight *= CarryCapFactor;
+            E.Weight += CarryCapBonus;
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(BeforeRapidAdvancementEvent E)
         {
@@ -902,11 +926,39 @@ namespace XRL.World.Parts.Mutation
             Acrobatics_Jump.SyncAbility(ParentObject);
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(AfterRemoveSkillEvent E)
         {
             RemoveGroundPoundActivatedAbility(E.Actor, E.Skill.Name == nameof(Acrobatics_Jump));
             return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(JumpedEvent E)
+        {
+            if (ParentObject != null && ParentObject == E.Actor)
+            {
+                if (ParentObject.HasPart<StunningForceOnJump>())
+                {
+                    Rumble(ParentObject.GetWeight(), 0.0001f, 1.5f);
+                }
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool Render(RenderEvent E)
+        {
+            if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
+            {
+                bool flag = true;
+                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+                {
+                    flag = MutationColor;
+                }
+                if (flag && !IsCyberGiant)
+                {
+                    string newColor = Colorfulness > 2 ? ICON_COLOR : ICON_COLOR_FALLBACK;
+                    E.ApplyColors(newColor, ICON_COLOR_PRIORITY);
+                }
+            }
+            return base.Render(E);
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)

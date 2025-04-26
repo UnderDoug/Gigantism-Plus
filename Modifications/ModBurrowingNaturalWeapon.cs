@@ -69,8 +69,8 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"\u2666 {typeof(ModBurrowingNaturalWeapon).Name}." +
-                $"{nameof(ApplyModification)}(JoppaWorldBuilder builder)",
-                Indent: 0);
+                $"{nameof(ApplyModification)}(GameObject Object)",
+                Indent: 3);
             base.ApplyModification(Object);
 
             Object.RequirePart<BurrowingClawsProperties>();

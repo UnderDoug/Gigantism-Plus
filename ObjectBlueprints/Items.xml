@@ -2,13 +2,16 @@
 <objects>
   <!-- 
       
-      1: Gigantic Exoframes
-      2: Modified BaseGame Natural Weapons
-      3: Modified BaseGame "Natural" Weapons
-      4: Sultan Masks
-      5: Gigantic Modable Changes 
-      6: Weapon Elongating
-      7: Testing
+       1: Gigantic Exoframes
+       2: Modified BaseGame Natural Weapons
+       3: Modified BaseGame "Natural" Weapons
+       4: Sultan Masks
+       5: General GiganticEquippable Changes
+       6: Gigantic Modable Changes 
+       7: Gigantic Variants
+       8: Wrassle Gear
+       9: Weapon Elongating
+      10: Testing
       
   -->
   <!-- 
@@ -272,6 +275,22 @@ You cannot wear equipment on your body." />
   
   <!-- 
       
+      General GiganticEquippable Changes 
+        
+  -->
+  <object Name="BaseStone" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="Energy Cell" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="BaseThrownWeapon" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  
+  
+  <!-- 
+      
       Gigantic Modable Changes 
       
   -->
@@ -310,6 +329,8 @@ You cannot wear equipment on your body." />
     <part Name="Render" DisplayName="[WrassleGear]" 
           RenderString="]" RenderColor="&amp;Y"
           TileColor="&amp;Y" DetailColor="r" />
+    <part Name="Description" 
+          Short="Vibrant nanoweave material of variant colors has been sutured together into a gestalt display of unique flair." />
     <part Name="Physics" Weight="1" />
     <part Name="WrassleGear" RandomizeTile="true" />
     <tag Name="BaseObject" Value="*noinherit" />

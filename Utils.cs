@@ -13,13 +13,16 @@ using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+using XRL.World.ObjectBuilders;
 using XRL.Language;
 using XRL.World.Text.Delegates;
 using XRL.World.Text.Attributes;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using System.IO;
+using XRL.UI;
+using NAudio.CoreAudioApi;
+using XRL.World.AI.GoalHandlers;
 
 namespace HNPS_GigantismPlus
 {
@@ -27,6 +30,10 @@ namespace HNPS_GigantismPlus
     public static class Utils
     {
         public static ModInfo ThisMod => ModManager.GetMod(MOD_ID);
+
+        public static Gigantified Gigantifier = new();
+        public static GiantHero GiantHeroBuilder = new();
+        public static WrassleGiantHero WrassleGiantHeroBuilder = new();
 
         [VariableReplacer]
         public static string nbsp(DelegateContext Context)
@@ -42,6 +49,34 @@ namespace HNPS_GigantismPlus
             }
             return output;
         }
+        [VariableReplacer]
+        public static string OptionalColor(DelegateContext Context)
+        {
+            string Text = string.Empty;
+            string Color = string.Empty;
+            string Fallback = string.Empty;
+            if (!Context.Parameters.IsNullOrEmpty())
+            {
+                if (Context.Parameters[0] != null)
+                    Text = Context.Parameters[0];
+                if (Context.Parameters[1] != null)
+                    Color = Context.Parameters[1];
+                if (Context.Parameters[2] != null)
+                    Fallback = Context.Parameters[2];
+            }
+            return Text.OptionalColor(Color, Fallback, Colorfulness);
+        }
+        [VariableReplacer]
+        public static string OptionalColorYuge(DelegateContext Context)
+        {
+            string Text = string.Empty;
+            if (!Context.Parameters.IsNullOrEmpty())
+            {
+                if (Context.Parameters[0] != null)
+                    Text = Context.Parameters[0];
+            }
+            return Text.OptionalColorYuge(Colorfulness);
+        }
 
         public static bool RegisterGameLevelEventHandlers()
         {
@@ -49,6 +84,7 @@ namespace HNPS_GigantismPlus
             bool flag = The.Game != null;
             if (flag)
             {
+                CrayonsGetColorHandler.Register();
                 BeforeModGiganticAppliedHandler.Register();
                 AfterModGiganticAppliedHandler.Register();
                 BeforeDescribeModGiganticHandler.Register();
@@ -92,16 +128,16 @@ namespace HNPS_GigantismPlus
         {
             Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
 
-            bool found = false;
-            bool cache = false;
+            bool wasFound = false;
+            bool inCache;
             Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2);
-            if (cache = !_TilePathCache.TryGetValue(TileName, out TilePath))
+            if (inCache = !_TilePathCache.TryGetValue(TileName, out TilePath))
             {
                 Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3);
                 Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2);
 
                 Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 3);
-                if (!found && !_TilePathCache.TryAdd(TileName, TilePath))
+                if (!wasFound && !_TilePathCache.TryAdd(TileName, TilePath))
                     Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 3);
 
                 if (IsWholePath)
@@ -153,13 +189,18 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3);
             }
+            string foundLocation = 
+                inCache 
+                ? "_TilePathCache" 
+                : IsWholePath 
+                    ? "files" 
+                    : "supplied subfolders";
 
-            string foundLocation = cache ? "_TilePathCache" : "supplied subfolders";
             Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in {foundLocation}", Indent: 2);
 
-            found = TilePath != null;
+            wasFound = TilePath != null;
             Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2);
-            return found;
+            return wasFound;
         }
 
         public static string WeaponDamageString(int DieSize, int DieCount, int Bonus)
@@ -575,6 +616,26 @@ namespace HNPS_GigantismPlus
             return $"\"{@string}\"";
         }
 
+        public static BookInfo GetBook(string BookName)
+        {
+            BookUI.Books.TryGetValue(BookName, out BookInfo Book);
+            return Book;
+        }
+
+        public static void Rumble(float Cause, float DurationFactor, float DurationMax = 1.0f)
+        {
+            float duration = Math.Min(DurationMax, Cause * DurationFactor);
+            CombatJuice.cameraShake(duration, Async: true);
+            Debug.Entry(4, $"* {nameof(Rumble)}: Duration ({duration}), Cause ({Cause}), DurationFactor ({DurationFactor}), DurationMax({DurationMax})");
+        }
+        public static void Rumble(double Cause, float DurationFactor, float DurationMax = 1.0f)
+        {
+            Rumble((float)Cause, DurationFactor, DurationMax);
+        }
+        public static void Rumble(int Cause, float DurationFactor, float DurationMax = 1.0f)
+        {
+            Rumble((float)Cause, DurationFactor, DurationMax);
+        }
     } //!-- public static class Utils
 
 }

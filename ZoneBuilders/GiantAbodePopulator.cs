@@ -19,7 +19,10 @@ namespace XRL.World.ZoneBuilders
     public class GiantAbodePopulator
         : ZoneBuilderSandbox
     {
-        List<Dictionary<string, List<Cell>>> Regions;
+        Dictionary<string, Dictionary<string, List<Cell>>> Regions;
+
+        public string GiantID;
+
         public GiantAbodePopulator()
         {
             Regions = new();
@@ -38,8 +41,11 @@ namespace XRL.World.ZoneBuilders
 
             List<Cell> regionCells = new();
             List<GameObject> trashCan = new();
+            int abodeNumber = 0;
             foreach (GameObject abodeSpawner in zone.GetObjectsThatInheritFrom("GiantAbodeSpawner"))
             {
+                bool isUnique = abodeSpawner.Blueprint == "GiantAbodeSpawner Cook";
+                string abodeLabel = $"HNPS_GigantismPlus::Abode:{(isUnique ? "Cook" : ++abodeNumber)}::";
                 string DoorDirection = abodeSpawner.GetTagOrStringProperty("DoorDirection");
                 string ContentsTable = abodeSpawner.GetTagOrStringProperty("ContentsTable");
                 string Floor = abodeSpawner.GetTagOrStringProperty("Floor");
@@ -82,15 +88,14 @@ namespace XRL.World.ZoneBuilders
                 Rect2D R = new(x1, y1, x2, y2, doorLocation);
 
                 Dictionary<string, List<Cell>> Region = Z.GetHutRegion(R, true);
-                Regions.Add(Region);
+                Regions.Add($"Abode:{(isUnique ? "Cook" : abodeNumber)}", Region);
 
                 foreach (Cell outerCell in Region["Outer"])
                 {
                     if (Region["Inner"].Contains(outerCell))
                         Region["Inner"].Remove(outerCell);
                     regionCells.Add(outerCell);
-                    // if (8.in100()) Wall = "WallOrDebrisLimestoneNoSmall";
-                    outerCell.ClearAndAddObject(Wall);
+                    outerCell.ClearAndAddObject(8.in100() ? "WallOrDebrisLimestoneNoSmall" : Wall);
                 }
                 foreach (Cell innerCell in Region["Inner"])
                 {
@@ -182,7 +187,14 @@ namespace XRL.World.ZoneBuilders
                 }
                 Debug.Divider(4, HONLY, Count: 25, Indent: 1);
                 Debug.Entry(4, $"x foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()}) >//", Indent: 1);
+
+                string abodeRegionString = string.Empty;
+                foreach ((string regionLabel, List<Cell> cells) in Region)
+                {
+                    zone.SetZoneProperty(abodeLabel+regionLabel, cells.ToStringList().Join(";"));
+                }
             }
+            zone.SetZoneProperty($"HNPS_GigantismPlus::Abodes", $"{abodeNumber}");
             foreach (GameObject trash in trashCan)
             {
                 trash.Obliterate(null, true);
@@ -194,7 +206,7 @@ namespace XRL.World.ZoneBuilders
                 if (!regionCells.Contains(emptyCell)) nonRegionEmptyCells.Add(emptyCell);
             }
 
-            foreach (Dictionary<string, List<Cell>> region in Regions)
+            foreach ((_,Dictionary<string, List<Cell>> region) in Regions)
             {
                 Cell nearestEmptyCell = null;
                 Cell doorCell = region["Door"][0];
@@ -238,14 +250,14 @@ namespace XRL.World.ZoneBuilders
                     }
                     if (doRemplacement)
                     {
-                        cell.Clear().AddObject("WallOrDebrisGranite");
+                        cell.Clear().AddObject("WallOrDebrisGraniteNoSmall");
                     }
                 }
             }
 
             if (false) // this is just to have an easy toggle
             {
-                foreach (Dictionary<string, List<Cell>> Region in Regions)
+                foreach ((_, Dictionary<string, List<Cell>> Region) in Regions)
                 {
                     foreach ((string label, List<Cell> subregion) in Region)
                     {
@@ -272,6 +284,16 @@ namespace XRL.World.ZoneBuilders
                     }
                 }
             }
+
+            Cell giantLocation = 
+                zone?.FindFirstObject("Gigantic Oven")?.CurrentCell?.GetEmptyAdjacentCells()?.GetRandomElement()
+             ?? nonRegionEmptyCells?.GetRandomElement() 
+             ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+            GameObject UniqueGiant = The.ZoneManager.GetCachedObjects(GiantID) ?? SecretGiantWhoCooksBuilderExtension.GetTheGiant();
+
+            if (UniqueGiant != null)
+                giantLocation.AddObject(UniqueGiant);
 
             return true;
         } //!-- public bool BuildZone(Zone Z)

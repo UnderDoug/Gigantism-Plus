@@ -97,11 +97,5 @@ namespace HNPS_GigantismPlus
             afterManageDefaultEquipmentEvent.BodyPart = BodyPart;
             return afterManageDefaultEquipmentEvent;
         }
-
-        public bool ManageDefaultEquipment()
-        {
-
-            return true;
-        }
     }
 }

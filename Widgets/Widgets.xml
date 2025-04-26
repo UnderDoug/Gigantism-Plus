@@ -19,6 +19,7 @@
     <part Name="Render" DisplayName="[RandomDebris]"
           RenderString="B" Tile="Widgets/RandomDebris.png"
           ColorString="&amp;y" DetailColor="K"/>
+    <part Name="Physics" Solid="true" />
     <part Name="RandomDebris" />
   </object>
 
@@ -40,6 +41,7 @@
     <part Name="Render" DisplayName="[RandomTree]"
           RenderString="T" Tile="Widgets/RandomTree.png"
           ColorString="&amp;y" DetailColor="K"/>
+    <part Name="Physics" Solid="true" />
     <tag Name="BaseObject" Value="*noinherit" />
     <part Name="RandomTree" />
   </object>
@@ -104,6 +106,7 @@
     <part Name="Render" DisplayName="[WallOrDebris*]"
           RenderString="H" Tile="Widgets/WallOrDebris.png"
           ColorString="&amp;K" DetailColor="y" Visible="false" />
+    <part Name="Physics" Solid="true" />
     <tag Name="BaseObject" Value="*noinherit" />
     <part Name="WallOrDebris" />
   </object>

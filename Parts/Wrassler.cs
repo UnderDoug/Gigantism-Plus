@@ -5,9 +5,12 @@ using System.Linq;
 
 using XRL.UI;
 using XRL.Core;
+using XRL.Rules;
 using XRL.World.Anatomy;
 using XRL.World.Capabilities;
 using XRL.World.Parts.Mutation;
+using XRL.World.ObjectBuilders;
+using XRL.World.Tinkering;
 using XRL.Wish;
 
 using HNPS_GigantismPlus;
@@ -39,7 +42,7 @@ namespace XRL.World.Parts
             }
         }
 
-        public bool Bestow = false;
+        public bool Bestow = true;
         public bool BeenBestowed = false;
         public bool KnowsChairs = false;
 
@@ -161,8 +164,29 @@ namespace XRL.World.Parts
             int handCount = (int)Math.Floor(Actor.Body.GetPartCount("Hand") / 2.0);
             int feetCount = Actor.Body.GetPartCount("Feet");
             int footCount = Actor.Body.GetPartCount("Foot");
-            string FootOrFeet = feetCount * 2 >= footCount ? "Feet" : "Foot";
 
+            Debug.Entry(4,
+                $"{typeof(Wrassler).Name}." +
+                $"{nameof(BestowWrassleGear)}() " + 
+                $"Actor: {Actor.DebugName}", 
+                Indent: 0);
+
+            string FootOrFeet = "Feet";
+            if (feetCount * 2 < footCount) FootOrFeet = "Foot";
+            if (feetCount * 2 == footCount && WrassleID.SeededRandomBool()) FootOrFeet = "Foot";
+            
+            Debug.Entry(4, 
+                $"handCount: {handCount}, " + 
+                $"feetCount: {feetCount}, " + 
+                $"footCount: {footCount}", 
+                Indent: 1);
+
+            Debug.Entry(4, 
+                $"SeededBool: {WrassleID.SeededRandomBool()}, " + 
+                $"FootOrFeet: {FootOrFeet}", 
+                Indent: 1);
+
+            List<GameObject> wrassleGearObjects = new();
             foreach (BodyPart bodyPart in Actor.Body.GetParts())
             {
                 // no blueprint for part? Skip.
@@ -183,8 +207,10 @@ namespace XRL.World.Parts
                     if (bodyPart.Laterality.HasBit(Laterality.RIGHT))
                         blueprint += "Right";
                 }
-                
-                GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint);
+
+                GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint, Context: "Bestowal");
+
+                // TinkeringHelpers.CheckMakersMark(wrassleGearObject, Actor, null, null);
 
                 if (wrassleGearObject != null && wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
                 {
@@ -196,6 +222,7 @@ namespace XRL.World.Parts
                     wrassleGear.ApplyFlair();
                 }
 
+                wrassleGearObjects.TryAdd(wrassleGearObject);
                 if (!bodyPart.Equip(wrassleGearObject)) wrassleGearObject.Obliterate();
             }
 
@@ -214,12 +241,24 @@ namespace XRL.World.Parts
                 metalFoldingChair.Obliterate();
             }
 
+            List<GameObject> EquippedList = Actor.GetEquippedObjects();
+            foreach (GameObject reject in wrassleGearObjects)
+            {
+                if (reject != null && !EquippedList.Contains(reject))
+                {
+                    Actor.Inventory.RemoveObjectFromInventory(reject);
+                    reject.Obliterate();
+                }
+            }
+
             Bestowed = true;
             return this;
         }
-        public Wrassler BestowWrassleGear()
+        public Wrassler BestowWrassleGear(bool Force = false)
         {
-            return BestowWrassleGear(out _);
+            if (!BeenBestowed || Force)
+                return BestowWrassleGear(out BeenBestowed);
+            return this;
         }
 
         public override void AddedAfterCreation()
@@ -227,15 +266,15 @@ namespace XRL.World.Parts
             if (ParentObject.IsPlayer() && !KnowsChairs)
             {
                 GameObject metalFoldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
-                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer))
+                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer) && !metalFoldingChair.Understood())
                 {
                     metalFoldingChairExaminer.MakeUnderstood(ShowMessage: false);
                     if (The.Game.Turns > 1)
                     {
                         Popup.Show($"You're struck with a sudden, intimate understanding of {metalFoldingChair.GetPluralName()}.");
-                        KnowsChairs = true;
                     }
                 }
+                KnowsChairs = !metalFoldingChair.Understood();
                 metalFoldingChair.Obliterate();
             }
             base.AddedAfterCreation();
@@ -245,33 +284,33 @@ namespace XRL.World.Parts
         {
             return base.WantEvent(ID, cascade)
                 || ID == AfterObjectCreatedEvent.ID
-                || (!KnowsChairs && ID == BeforeTakeActionEvent.ID);
+                || ID == ObjectEnteredCellEvent.ID;
         }
-
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
             if (E.Object != null && E.Object == ParentObject)
             {
-                BestowWrassleGear(out _);
-                Render render = E.Object.Render;
+                if (Bestow && !E.Object.InheritsFrom("BaseTemplar"))
+                    BestowWrassleGear(out BeenBestowed);
             }
             return base.HandleEvent(E);
         }
-
-        public override bool HandleEvent(BeforeTakeActionEvent E)
+        public override bool HandleEvent(ObjectEnteredCellEvent E)
         {
-            if (ParentObject.IsPlayer())
+            if (E.Object != null && E.Object == ParentObject && !E.Object.HasStringProperty("HNPS_CellShouted"))
             {
-                GameObject metalFoldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
-                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer))
-                {
-                    metalFoldingChairExaminer.MakeUnderstood(ShowMessage: false);
-                    if (The.Game.Turns > 1)
-                    {
-                        KnowsChairs = true;
-                    }
-                }
-                metalFoldingChair.Obliterate();
+                Debug.Entry(4,
+                    $"{typeof(Wrassler).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(ObjectEnteredCellEvent).Name} E)",
+                    Indent: 0);
+                Debug.Entry(4,
+                    $"E.Object: {E.Object.ShortDisplayName} in Cell:{E.Cell.Location}",
+                    Indent: 1);
+                Debug.Entry(4,
+                    $"Cell:{E.Cell}",
+                    Indent: 1);
+                E.Object.SetStringProperty("HNPS_CellShouted", "Yeh");
+
             }
             return base.HandleEvent(E);
         }
@@ -315,15 +354,13 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             Wrassler wrassler = base.DeepCopy(Parent, MapInv) as Wrassler;
-            wrassler.WrassleID = Guid.NewGuid();
-            wrassler.BeenBestowed = false;
             return wrassler;
         }
 
         [WishCommand(Command = "flex muscles")]
         public static void PlayerWrasslerWish()
         {
-            Wrassler wrassler = The.Player.RequirePart<Wrassler>().BestowWrassleGear();
+            Wrassler wrassler = The.Player.RequirePart<Wrassler>().BestowWrassleGear(Force: true);
             string wrassleID = wrassler.WrassleID.ToString();
             bool doMessage = !The.Player.HasPart<Wrassler>() || The.Player.GetStringProperty("WrassleID") != wrassleID;
             The.Player.SetStringProperty("WrassleID", wrassler.WrassleID.ToString());
@@ -338,12 +375,13 @@ namespace XRL.World.Parts
         {
             Wrassler wrassler = The.Player.RequirePart<Wrassler>();
 
-            string oldWrassleID = wrassler.WrassleID.ToString();
-            wrassler.WrassleID = Guid.NewGuid();
             Popup.Show($"Stealing identity...");
+            string oldWrassleID = wrassler.WrassleID.ToString();
             Popup.Show($"...");
+            wrassler.WrassleID = Guid.NewGuid();
             Popup.Show($"... Done.");
-            Popup.Show($"Old: {oldWrassleID}; New: {wrassler.WrassleID.ToString()}");
+            wrassler.BeenBestowed = false;
+            Popup.Show($"Old: [{oldWrassleID.Color("W")}]; \nNew: [{wrassler.WrassleID.ToString().Color("G")}]");
         }
     } //!-- public class Wrassler : IScribedPart
 }

@@ -10,13 +10,13 @@
  -->
 <objects>
   
-  <object Name="TrainingMat" Inherits="Floor">
+  <object Name="TrainingMat" Inherits="ArenaFloor">
     <part Name="Render" DisplayName="" RenderString="." ColorString="&amp;K" TileColor="&amp;K" DetailColor="y" RenderLayer="0" Tile="Terrain/WrassleRing_Floor_03.png" />
     <part Name="RandomTileOnMove" Tiles="Terrain/WrassleRing_Floor_00.png,Terrain/WrassleRing_Floor_01.png,Terrain/WrassleRing_Floor_02.png,Terrain/WrassleRing_Floor_03.png,Terrain/WrassleRing_Floor_04.png,Terrain/WrassleRing_Floor_05.png,Terrain/WrassleRing_Floor_06.png,Terrain/WrassleRing_Floor_07.png,Terrain/WrassleRing_Floor_08.png,Terrain/WrassleRing_Floor_09.png,Terrain/WrassleRing_Floor_00.png,Terrain/WrassleRing_Floor_00.png,Terrain/WrassleRing_Floor_00.png" />
   </object>
   
   <object Name="WrassleRingFloor" Inherits="TrainingMat">
-    <part Name="Render" DisplayName="wrestling ring floor" RenderString="3" RenderLayer="1" />
+    <part Name="Render" DisplayName="wrestling ring floor" RenderString="3" RenderLayer="0" />
   </object>
   
 </objects>

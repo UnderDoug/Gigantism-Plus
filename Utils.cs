@@ -7,6 +7,7 @@ using ConsoleLib.Console;
 using Kobold;
 
 using XRL;
+using XRL.UI;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Anatomy;
@@ -14,15 +15,14 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
+using XRL.World.AI.GoalHandlers;
 using XRL.Language;
+
 using XRL.World.Text.Delegates;
 using XRL.World.Text.Attributes;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.UI;
-using NAudio.CoreAudioApi;
-using XRL.World.AI.GoalHandlers;
 
 namespace HNPS_GigantismPlus
 {
@@ -49,6 +49,7 @@ namespace HNPS_GigantismPlus
             }
             return output;
         }
+
         [VariableReplacer]
         public static string OptionalColor(DelegateContext Context)
         {
@@ -66,6 +67,7 @@ namespace HNPS_GigantismPlus
             }
             return Text.OptionalColor(Color, Fallback, Colorfulness);
         }
+
         [VariableReplacer]
         public static string OptionalColorYuge(DelegateContext Context)
         {
@@ -622,19 +624,19 @@ namespace HNPS_GigantismPlus
             return Book;
         }
 
-        public static void Rumble(float Cause, float DurationFactor, float DurationMax = 1.0f)
+        public static void Rumble(float Cause, float DurationFactor, float DurationMax = 1.0f, bool Async = true)
         {
             float duration = Math.Min(DurationMax, Cause * DurationFactor);
-            CombatJuice.cameraShake(duration, Async: true);
+            CombatJuice.cameraShake(duration, Async: Async);
             Debug.Entry(4, $"* {nameof(Rumble)}: Duration ({duration}), Cause ({Cause}), DurationFactor ({DurationFactor}), DurationMax({DurationMax})");
         }
-        public static void Rumble(double Cause, float DurationFactor, float DurationMax = 1.0f)
+        public static void Rumble(double Cause, float DurationFactor, float DurationMax = 1.0f, bool Async = true)
         {
-            Rumble((float)Cause, DurationFactor, DurationMax);
+            Rumble((float)Cause, DurationFactor, DurationMax, Async);
         }
-        public static void Rumble(int Cause, float DurationFactor, float DurationMax = 1.0f)
+        public static void Rumble(int Cause, float DurationFactor, float DurationMax = 1.0f, bool Async = true)
         {
-            Rumble((float)Cause, DurationFactor, DurationMax);
+            Rumble((float)Cause, DurationFactor, DurationMax, Async);
         }
     } //!-- public static class Utils
 

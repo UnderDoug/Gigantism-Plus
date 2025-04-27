@@ -13,6 +13,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using XRL.World.ObjectBuilders;
 
 namespace XRL.World.ZoneBuilders
 {
@@ -293,7 +294,30 @@ namespace XRL.World.ZoneBuilders
             GameObject UniqueGiant = The.ZoneManager.GetCachedObjects(GiantID) ?? SecretGiantWhoCooksBuilderExtension.GetTheGiant();
 
             if (UniqueGiant != null)
+            {
                 giantLocation.AddObject(UniqueGiant);
+                if (UniqueGiant.Brain != null)
+                {
+                    UniqueGiant.Brain.StartingCell = new();
+                    UniqueGiant.Brain.StartingCell.SetCell(giantLocation);
+                    UniqueGiant.Brain.Wanders = true;
+                    UniqueGiant.Brain.WandersRandomly = true;
+                }
+                if (UniqueGiant.TryGetPart(out StewBelly stewBelly))
+                {
+                    stewBelly.OnGained();
+                }
+            }
+            else 
+            {
+                Debug.Entry(4,
+                    $"/!\\ " +
+                    $"WARN: " +
+                    $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
+                    $"in zone {zone.ZoneID} " + 
+                    $"for cell [{giantLocation.Location}]",
+                    Indent: 1);
+            }
 
             return true;
         } //!-- public bool BuildZone(Zone Z)

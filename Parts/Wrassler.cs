@@ -210,7 +210,7 @@ namespace XRL.World.Parts
 
                 GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint, Context: "Bestowal");
 
-                // TinkeringHelpers.CheckMakersMark(wrassleGearObject, Actor, null, null);
+                TinkeringHelpers.CheckMakersMark(wrassleGearObject, Actor, null, null);
 
                 if (wrassleGearObject != null && wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
                 {
@@ -223,7 +223,7 @@ namespace XRL.World.Parts
                 }
 
                 wrassleGearObjects.TryAdd(wrassleGearObject);
-                if (!bodyPart.Equip(wrassleGearObject)) wrassleGearObject.Obliterate();
+                if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
             }
 
             if (ParentObject.IsPlayer())
@@ -265,18 +265,22 @@ namespace XRL.World.Parts
         {
             if (ParentObject.IsPlayer() && !KnowsChairs)
             {
-                GameObject metalFoldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
-                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer) && !metalFoldingChair.Understood())
+                GameObject foldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
+                if (foldingChair.TryGetPart(out Examiner foldingChairEx) && !foldingChair.Understood())
                 {
-                    metalFoldingChairExaminer.MakeUnderstood(ShowMessage: false);
-                    if (The.Game.Turns > 1)
-                    {
-                        Popup.Show($"You're struck with a sudden, intimate understanding of {metalFoldingChair.GetPluralName()}.");
-                    }
+                    foldingChairEx.MakeUnderstood(ShowMessage: false);
+                    Popup.Show($"You're struck with a sudden, intimate understanding of {foldingChair.GetPluralName()}.");
                 }
-                KnowsChairs = !metalFoldingChair.Understood();
-                metalFoldingChair.Obliterate();
+                KnowsChairs = !foldingChair.Understood();
+                foldingChair.Obliterate();
             }
+
+            if (!ParentObject.TryGetPart(out HasMakersMark hasMakersMark))
+            {
+                hasMakersMark = ParentObject.RequirePart<HasMakersMark>();
+            }
+            hasMakersMark.Color = DetailColor;
+
             base.AddedAfterCreation();
         }
 
@@ -284,14 +288,24 @@ namespace XRL.World.Parts
         {
             return base.WantEvent(ID, cascade)
                 || ID == AfterObjectCreatedEvent.ID
-                || ID == ObjectEnteredCellEvent.ID;
+                || ID == ObjectEnteredCellEvent.ID
+                || (!KnowsChairs && ID == ExamineSuccessEvent.ID);
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
             if (E.Object != null && E.Object == ParentObject)
             {
-                if (Bestow && !E.Object.InheritsFrom("BaseTemplar"))
+                GameObject Actor = E.Object;
+                if (Bestow && !Actor.InheritsFrom("BaseTemplar"))
+                {
                     BestowWrassleGear(out BeenBestowed);
+                }
+
+                if (!Actor.TryGetPart(out HasMakersMark hasMakersMark))
+                {
+                    hasMakersMark = Actor.RequirePart<HasMakersMark>();
+                }
+                hasMakersMark.Color = DetailColor;
             }
             return base.HandleEvent(E);
         }
@@ -299,18 +313,48 @@ namespace XRL.World.Parts
         {
             if (E.Object != null && E.Object == ParentObject && !E.Object.HasStringProperty("HNPS_CellShouted"))
             {
+                GameObject Actor = E.Object;
                 Debug.Entry(4,
                     $"{typeof(Wrassler).Name}." +
                     $"{nameof(HandleEvent)}({typeof(ObjectEnteredCellEvent).Name} E)",
                     Indent: 0);
                 Debug.Entry(4,
-                    $"E.Object: {E.Object.ShortDisplayName} in Cell:{E.Cell.Location}",
+                    $"E.Object: {Actor.ShortDisplayName} in Cell:{E.Cell.Location}",
                     Indent: 1);
                 Debug.Entry(4,
                     $"Cell:{E.Cell}",
                     Indent: 1);
-                E.Object.SetStringProperty("HNPS_CellShouted", "Yeh");
+                Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
 
+                List<GameObject> EquippedList = Actor.GetEquippedObjects();
+                List<GameObject> wrassleGearObjects = Actor.GetInventory();
+                foreach (GameObject reject in wrassleGearObjects)
+                {
+                    if (reject != null && reject.InheritsFrom("WrassleGear") && !EquippedList.Contains(reject))
+                    {
+                        if (reject.TryGetPart(out WrassleGear wrassleGear) && wrassleGear.WrassleID == WrassleID)
+                        {
+                            Actor.Inventory.RemoveObjectFromInventory(reject);
+                            reject.Obliterate();
+                        }
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(ExamineSuccessEvent E)
+        {
+            if (E.Actor != null && E.Actor == ParentObject && E.Object != null && E.Object.InheritsFrom("Gigantic FoldingChair"))
+            {
+                Debug.Entry(4,
+                    $"{typeof(Wrassler).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(ExamineSuccessEvent).Name} E)",
+                    Indent: 0);
+
+                if (E.Object.TryGetPart(out Examiner examiner))
+                {
+                    KnowsChairs = E.Actor.Understood(examiner);
+                }
             }
             return base.HandleEvent(E);
         }

@@ -12,10 +12,10 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Debug;
-using System.Xml;
 
 namespace XRL.World.ObjectBuilders
 {
+    [Serializable]
     public class GiantHero : IObjectBuilder
     {
         public static List<string> NoHateFactionsList => GNT_NOHATEFACTION_BOOK.BookPagesAsList();

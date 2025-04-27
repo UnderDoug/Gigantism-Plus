@@ -1,22 +1,16 @@
 ﻿using System;
 using SerializeField = UnityEngine.SerializeField;
 
-using XRL.Wish;
+using XRL.UI;
 using XRL.World.Parts.Mutation;
+using XRL.World.Skills.Cooking;
+using XRL.Wish;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
-using XRL.World.Parts.Skill;
-using System.Text.RegularExpressions;
-using XRL.UI;
-using XRL.Language;
-using XRL.World.Capabilities;
-using XRL.World.Skills.Cooking;
-using XRL.Messages;
-using System.Data;
 
 namespace XRL.World.Parts
 {
@@ -64,6 +58,7 @@ namespace XRL.World.Parts
 
         public bool Grumble;
         public int TurnsTillGrumble;
+        public bool StartingStewsPocessed { get; private set; }
 
         public StewBelly()
         {
@@ -73,6 +68,7 @@ namespace XRL.World.Parts
             Hankering = StartingHankering;
             Grumble = false;
             TurnsTillGrumble = GetTurnsTillGrumble();
+            StartingStewsPocessed = false;
         }
         public StewBelly(int StartingHankering)
             : this()
@@ -92,11 +88,7 @@ namespace XRL.World.Parts
 
         public void OnGained()
         {
-            Mutations mutations = ParentObject.RequirePart<Mutations>();
-            if (mutationMod != Guid.Empty)
-            {
-                mutations.RemoveMutationMod(mutationMod);
-            }
+            Mutations mutations = RemoveMutationMod(ParentObject, mutationMod);
             if (Gains > 0)
             {
                 mutationMod = mutations.AddMutationMod(
@@ -107,14 +99,25 @@ namespace XRL.World.Parts
                     SourceName: $"{Stews.Things("Helping")} of {new SeriouslyThickStew().GetDisplayName()}");
             }
         }
-
-        public override void Remove()
+        public static Mutations RemoveMutationMod(GameObject Object, Guid mutationMod)
         {
-            Mutations mutations = ParentObject.RequirePart<Mutations>();
+            if (Object == null) return null;
+            Mutations mutations = Object.RequirePart<Mutations>();
             if (mutationMod != Guid.Empty)
             {
                 mutations.RemoveMutationMod(mutationMod);
             }
+            return mutations;
+        }
+        public Mutations RemoveMutationMod()
+        {
+            return RemoveMutationMod(ParentObject, mutationMod);
+        }
+
+
+        public override void Remove()
+        {
+            RemoveMutationMod(ParentObject, mutationMod);
             base.Remove();
         }
 
@@ -177,7 +180,7 @@ namespace XRL.World.Parts
             return base.WantEvent(ID, cascade)
                 || ID == EndTurnEvent.ID
                 || ID == GetShortDescriptionEvent.ID
-                || ID == ObjectEnteredCellEvent.ID;
+                || (!StartingStewsPocessed && ID == ObjectEnteredCellEvent.ID);
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
@@ -195,36 +198,31 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            if (!E.Postfix.ToString().IsNullOrEmpty())
+            if (Stews > 0)
             {
-                E.Postfix.AppendLine();
+                if (!E.Postfix.IsNullOrEmpty())
+                {
+                    E.Postfix.AppendLine();
+                }
+                E.Postfix.AppendRules(
+                    $"{"Stew Belly".OptionalColorYuge(Colorfulness)}: " + 
+                    $"This creature has achieved {Gains.Things("Gain")} " 
+                    + $"from the {Stews.Things("hepling")} of {new SeriouslyThickStew().GetDisplayName()} they've eaten! " + 
+                    $"Talk about a hankering!");
             }
-            E.Postfix.AppendRules($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: This creature has achieved {Gains.Things("Gain")} from the {Stews.Things("hepling")} of Seriously Thick Stew they've eaten! Talk about a hankering!");
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(ObjectEnteredCellEvent E)
         {
-            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews))
+            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews) && startingSews > 0)
             {
                 if (Stews <  startingSews)
                     Stews += startingSews;
             }
             // ParentObject.SetIntProperty(GNT_START_STEWS_PROPLABEL, 0, true);
             Stews = Stews;
+            StartingStewsPocessed = Stews >= startingSews;
             return base.HandleEvent(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            // Registrar.Register("EnteredCell");
-            base.Register(Object, Registrar);
-        }
-        public override bool FireEvent(Event E)
-        {
-            if (E.ID == "EnteredCell")
-            {
-            }
-            return base.FireEvent(E);
         }
 
         public void Slap()
@@ -243,15 +241,13 @@ namespace XRL.World.Parts
                         $"You hanker for more, though! You reckon {Hankering.Things("more helping")} will see additional gains.");
             }
         }
-
-        /*
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             StewBelly stewBelly = base.DeepCopy(Parent, MapInv) as StewBelly;
             stewBelly.Stews = Stews;
+            stewBelly.OnGained();
             return stewBelly;
         }
-        */
 
         [WishCommand(Command = "Slap Belly")]
         public static void SlapBellyWish()

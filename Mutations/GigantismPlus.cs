@@ -937,7 +937,7 @@ namespace XRL.World.Parts.Mutation
             {
                 if (ParentObject.HasPart<StunningForceOnJump>())
                 {
-                    Rumble(ParentObject.GetWeight(), 0.0001f, 1.5f);
+                    Rumble(Level, 0.1f, 1.5f);
                 }
             }
             return base.HandleEvent(E);

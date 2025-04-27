@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ConsoleLib.Console;
 
 using XRL.Core;
@@ -13,8 +14,6 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using System.Xml;
-using System.Linq;
 
 namespace XRL.World.ObjectBuilders
 {

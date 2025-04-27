@@ -51,7 +51,7 @@ namespace HNPS_GigantismPlus
         public const string SCRT_GNT_LCTN_TEXT = "the location of the {{yuge|giant}} who knows how to cook";
         public const string SCRT_GNT_LCTN_CATEGORY = "Oddities";
         public const string SCRT_GNT_UNQ_CONVSCRPT_ID = "HNPS_Giant_KnowsHowToCook_Convo";
-        public const string SCRT_GNT_UNQ_TEMPLAR_HATEREASON = "GiantTemplar,hate,suplexing their warleader in the ring";
+        public const string SCRT_GNT_UNQ_TEMPLAR_HATEREASON = "suplexing their warleader in the ring";
         public const string GNT_THICCBOI_ADMIREREASON = "=pronouns.possessive= impressive gains";
         public const string GNT_THICCBOI_BOOK = "GiantHero_ThiccBois";
         public const string SCRT_GNT_GNT_ADMIREREASON_BOOK = "WrassleGiantHero_FactionAdmirationBag";
@@ -61,6 +61,7 @@ namespace HNPS_GigantismPlus
         public const string GNT_PREDESC_RPLC = "::CREATURE::";
         public const string SCRT_GNT_UNQ_PREDESC = "A creature of immensity mounts the upper eyeline. Deep sonorous tones reverberate gently off the very ground and ring subsonically from every improvised antenna jutting crudely out of it. Amidst the rumbling, a sonnet emerges in a language old as life, of home-sick stones traversing mountain-ranges, of oceans whittling shorelines, and of ancient wood giving way to time's inevitable arrival. As distance dwindles, the behemoth's shape begins to resolve... " + GNT_PREDESC_RPLC + ", in every way, except an order of magnitude greater in size...\n\n";
         public const string GNT_PREDESC = "A creature of immensity mounts th" + HONLY + " actually, not quite... Though it {{Y|is}} massive. Biology strains itself against physics with the creature's every belief-challenging movement. Perspective shifts, and, seemingly the ground with it, as the realisation hits: this creature, " + GNT_PREDESC_RPLC + ", is quite a distance further away than it first appeared...\n\n";
+        public const string GNT_POUND = "\u00A3";
 
     } //!-- public static class Const
 }

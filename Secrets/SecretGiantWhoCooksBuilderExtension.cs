@@ -67,7 +67,7 @@ namespace HNPS_GigantismPlus
                     ZoneID: SecretZoneId,
                     text: SCRT_GNT_LCTN_TEXT,
                     category: SCRT_GNT_LCTN_CATEGORY,
-                    attributes: new[] { "giant", "humanoid", "settlement", "mountains", "recipe", "oddity" },
+                    attributes: WrassleGiantHero.SecretAttributes,
                     secretId: SCRT_GNT_SCRT_ID
                 );
             }

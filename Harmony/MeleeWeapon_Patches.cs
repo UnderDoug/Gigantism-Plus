@@ -8,12 +8,12 @@ using static HNPS_GigantismPlus.Const;
 namespace HNPS_GigantismPlus.Harmony
 {
     [HarmonyPatch(typeof(MeleeWeapon))]
-    public static class MaxStrengthBonus_Display_Patches
+    public static class MeleeWeapon_Patches
     {
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(MeleeWeapon.GetSimplifiedStats))]
-        static bool GetSimplifiedStatsPrefix(MeleeWeapon __instance)
+        [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.GetSimplifiedStats))]
+        public static bool GetSimplifiedStatsPrefix(MeleeWeapon __instance)
         {
             // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
             if (__instance.MaxStrengthBonus > MeleeWeapon.BONUS_CAP_UNLIMITED) __instance.MaxStrengthBonus = MeleeWeapon.BONUS_CAP_UNLIMITED;
@@ -21,8 +21,8 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(MeleeWeapon.GetDetailedStats))]
-        static bool GetDetailedStatsPrefix(MeleeWeapon __instance)
+        [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.GetDetailedStats))]
+        public static bool GetDetailedStatsPrefix(MeleeWeapon __instance)
         {
             // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
             if (__instance.MaxStrengthBonus > MeleeWeapon.BONUS_CAP_UNLIMITED) __instance.MaxStrengthBonus = MeleeWeapon.BONUS_CAP_UNLIMITED;
@@ -30,8 +30,8 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(MeleeWeapon.AdjustBonusCap))]
-        static bool AdjustBonusCapPrefix(MeleeWeapon __instance)
+        [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.AdjustBonusCap))]
+        public static bool AdjustBonusCapPrefix(MeleeWeapon __instance)
         {
             // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
             if (__instance.MaxStrengthBonus > MeleeWeapon.BONUS_CAP_UNLIMITED) __instance.MaxStrengthBonus = MeleeWeapon.BONUS_CAP_UNLIMITED;

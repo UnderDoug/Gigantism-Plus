@@ -10,6 +10,7 @@ using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using XRL.UI;
 
 namespace HNPS_GigantismPlus
 {
@@ -214,6 +215,18 @@ namespace HNPS_GigantismPlus
 
             ManagedVanillaMutationOptionHandler();
 
+            if (player.TryGetPart(out Wrassler wrassler) && !wrassler.KnowsChairs)
+            {
+                GameObject foldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
+                if (foldingChair.TryGetPart(out Examiner foldingChairEx) && !foldingChair.Understood())
+                {
+                    foldingChairEx.MakeUnderstood(ShowMessage: false);
+                    // Popup.Show($"You're struck with a sudden, intimate understanding of {foldingChair.GetPluralName()}.");
+                }
+                wrassler.KnowsChairs = foldingChair.Understood();
+                foldingChair.Obliterate();
+            }
+            
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusOnPlayerLoad)}",
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");

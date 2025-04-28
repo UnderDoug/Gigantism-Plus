@@ -19,4 +19,12 @@
     <UITile Tile="Abilities/GigantismPlus_GroundPound_ToggleOff.png" Foreground="z" Detail="y" />
     <UITile Tile="Abilities/GigantismPlus_GroundPound_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
 	</ability>
+	<ability Command="CommandToggleGigantismPlusCloseFist">
+		<description>
+			<p>You clench your fists tight allowing you to use them as cudgels.</p>
+		</description>
+		<!-- Foreground is black pixels, Detail is white pixels -->
+    <UITile Tile="NaturalWeapons/GiganticFist.png" Foreground="y" Detail="K" />
+    <UITile Tile="NaturalWeapons/GiganticFist.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
+	</ability>
 </activatedabilities>

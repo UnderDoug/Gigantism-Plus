@@ -44,7 +44,17 @@ namespace XRL.World.Parts
             private set => _Gains = Math.Max(0, value);
         }
 
-        public readonly int StartingHankering;
+        [SerializeField]
+        private int _StartingHankering;
+        public int StartingHankering
+        {
+            get => _StartingHankering != 0 ? _StartingHankering : 2;
+            set 
+            {
+                _StartingHankering = value;
+                Hankering += _StartingHankering;
+            }
+        }
 
         [SerializeField]
         private int _Hankering;
@@ -87,8 +97,9 @@ namespace XRL.World.Parts
         }
 
         public void OnGained()
-        {
-            Mutations mutations = RemoveMutationMod(ParentObject, mutationMod);
+        {   
+            RemoveMutationMod(ParentObject, mutationMod);
+            Mutations mutations = ParentObject.RequirePart<Mutations>(); 
             if (Gains > 0)
             {
                 mutationMod = mutations.AddMutationMod(
@@ -99,22 +110,32 @@ namespace XRL.World.Parts
                     SourceName: $"{Stews.Things("Helping")} of {new SeriouslyThickStew().GetDisplayName()}");
             }
         }
-        public static Mutations RemoveMutationMod(GameObject Object, Guid mutationMod)
+        public static Guid RemoveMutationMod(GameObject Object, Guid mutationMod)
         {
-            if (Object == null) return null;
+            if (Object == null) return Guid.Empty;
             Mutations mutations = Object.RequirePart<Mutations>();
             if (mutationMod != Guid.Empty)
             {
                 mutations.RemoveMutationMod(mutationMod);
             }
-            return mutations;
+            mutationMod = Guid.Empty;
+            return mutationMod;
         }
-        public Mutations RemoveMutationMod()
+        public Guid RemoveMutationMod()
         {
             return RemoveMutationMod(ParentObject, mutationMod);
         }
 
-
+        public override void AddedAfterCreation()
+        {
+            RemoveMutationMod();
+            base.AddedAfterCreation();
+        }
+        public override void Attach()
+        {
+            base.Attach();
+            RemoveMutationMod();
+        }
         public override void Remove()
         {
             RemoveMutationMod(ParentObject, mutationMod);
@@ -244,8 +265,8 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             StewBelly stewBelly = base.DeepCopy(Parent, MapInv) as StewBelly;
-            stewBelly.Stews = Stews;
-            stewBelly.OnGained();
+            stewBelly.Stews = 0;
+            stewBelly.StartingStewsPocessed = false;
             return stewBelly;
         }
 

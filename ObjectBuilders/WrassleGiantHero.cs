@@ -645,9 +645,9 @@ namespace XRL.World.ObjectBuilders
                     mutations.AddMutation(Chimera);
                     Debug.LoopItem(4, 
                         $"Chimera Mutation added", 
-                        Good: mutations.MutationList.Contains(Chimera),
+                        Good: mutations.ActiveMutationList.Contains(Chimera),
                         Indent: 3);
-                    mutations.MutationList = mutations.MutationList.OrderByDescending(x => x.Name == Chimera.Name).ToList();
+                    // mutations.MutationList = mutations.MutationList.OrderByDescending(x => x.Name == Chimera.Name).ToList();
                     Debug.LoopItem(4, 
                         $"Mutations list sorted to have Chimera at the top", 
                         Good: mutations.MutationList.ElementAt(0) == Chimera,

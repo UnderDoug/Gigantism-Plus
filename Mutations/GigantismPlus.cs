@@ -1232,9 +1232,9 @@ namespace XRL.World.Parts.Mutation
                 ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
                 ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
-                ClosedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", true);
+                ClosedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", false);
 
-                ClosedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", true);
+                ClosedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", false);
 
                 NaturalEquipmentMod = ClosedGiganticFist;
 

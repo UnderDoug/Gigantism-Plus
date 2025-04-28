@@ -624,19 +624,20 @@ namespace HNPS_GigantismPlus
             return Book;
         }
 
-        public static void Rumble(float Cause, float DurationFactor, float DurationMax = 1.0f, bool Async = true)
+        public static float Rumble(float Cause, float DurationFactor = 1.0f, float DurationMax = 1.0f, bool Async = true)
         {
             float duration = Math.Min(DurationMax, Cause * DurationFactor);
             CombatJuice.cameraShake(duration, Async: Async);
             Debug.Entry(4, $"* {nameof(Rumble)}: Duration ({duration}), Cause ({Cause}), DurationFactor ({DurationFactor}), DurationMax({DurationMax})");
+            return duration;
         }
-        public static void Rumble(double Cause, float DurationFactor, float DurationMax = 1.0f, bool Async = true)
+        public static float Rumble(double Cause, float DurationFactor = 1.0f, float DurationMax = 1.0f, bool Async = true)
         {
-            Rumble((float)Cause, DurationFactor, DurationMax, Async);
+            return Rumble((float)Cause, DurationFactor, DurationMax, Async);
         }
-        public static void Rumble(int Cause, float DurationFactor, float DurationMax = 1.0f, bool Async = true)
+        public static float Rumble(int Cause, float DurationFactor = 1.0f, float DurationMax = 1.0f, bool Async = true)
         {
-            Rumble((float)Cause, DurationFactor, DurationMax, Async);
+            return Rumble((float)Cause, DurationFactor, DurationMax, Async);
         }
     } //!-- public static class Utils
 

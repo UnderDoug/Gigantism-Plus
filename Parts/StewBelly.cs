@@ -201,13 +201,22 @@ namespace XRL.World.Parts
             return base.WantEvent(ID, cascade)
                 || ID == EndTurnEvent.ID
                 || ID == GetShortDescriptionEvent.ID
-                || (!StartingStewsPocessed && ID == ObjectEnteredCellEvent.ID);
+                || (Stews <= 0 && ID == ObjectEnteredCellEvent.ID);
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
             if (Grumble)
             {
-                DidX("a serious hankering", "got", "!");
+                DidX("got", "a serious hankering", "!", UseVisibilityOf: ParentObject);
+                int nearness = 6;
+                if (!ParentObject.IsPlayer())
+                {
+                    nearness -= Math.Max(0, ParentObject.CurrentCell.CosmeticDistanceto(The.Player.CurrentCell.Location));
+                }
+                if (ParentObject.IsVisible() || ParentObject.IsPlayer())
+                {
+                    Rumble(nearness, 0.1f);
+                }
                 Grumble = false;
                 TurnsTillGrumble = GetTurnsTillGrumble();
             }
@@ -240,7 +249,6 @@ namespace XRL.World.Parts
                 if (Stews <  startingSews)
                     Stews += startingSews;
             }
-            // ParentObject.SetIntProperty(GNT_START_STEWS_PROPLABEL, 0, true);
             Stews = Stews;
             StartingStewsPocessed = Stews >= startingSews;
             return base.HandleEvent(E);

@@ -295,6 +295,7 @@ namespace XRL.World.ObjectBuilders
                 NamingContext: null);
 
             int Stews = Stat.Roll("4d4");
+            Debug.CheckYeh(4, $"{"4d4".Quote()} Stews", $"{Stews}", Indent: 1);
 
             // Creature.RequirePart<DisplayNameColor>().SetColorByPriority("yuge", 40);
 
@@ -490,7 +491,6 @@ namespace XRL.World.ObjectBuilders
 
                 int extraStews = Stat.Roll("2d4");
                 Stews += extraStews;
-
                 Debug.CheckYeh(4, $"{"2d4".Quote()} extraStews", $"{extraStews}", Indent: 2);
 
                 Dictionary<string, (string die, int roll)> statRolls = new()
@@ -503,7 +503,7 @@ namespace XRL.World.ObjectBuilders
                     { "extraEgo", ("2d3", Stat.Roll("2d3")) },
                 };
 
-                Debug.CheckYeh(4, $"Extra Stats", $"{extraStews}", Indent: 2);
+                Debug.CheckYeh(4, $"Extra Stats", Indent: 2);
                 Creature.AddBaseStat("Strength",     statRolls["extraStr"].roll);
                 Creature.AddBaseStat("Agility",      statRolls["extraAgi"].roll);
                 Creature.AddBaseStat("Toughness",    statRolls["extraTou"].roll);

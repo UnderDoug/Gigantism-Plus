@@ -78,9 +78,11 @@ namespace XRL.World.Parts.Mutation
 
         public Guid HunchOverActivatedAbilityID = Guid.Empty;
         public Guid GroundPoundActivatedAbilityID = Guid.Empty;
+        public Guid CloseFistActivatedAbilityID = Guid.Empty;
 
         public static readonly string COMMAND_NAME_HUNCH_OVER = "CommandToggleGigantismPlusHunchOver";
         public static readonly string COMMAND_NAME_GROUND_POUND = "CommandToggleGigantismPlusGroundPound";
+        public static readonly string COMMAND_NAME_CLOSE_FIST = "CommandToggleGigantismPlusCloseFist";
 
         public int HunchedOverAVModifier = 4;
         public int HunchedOverDVModifier = -6;
@@ -259,12 +261,14 @@ namespace XRL.World.Parts.Mutation
 
         public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
+            if (NaturalEquipmentMod.Adjective == "closed") return 0;
             if (NaturalEquipmentMod.BodyPartType == "Head") return 2;
             if (NaturalEquipmentMod.BodyPartType == "Hand") return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
             return 0;
         }
         public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
+            if (NaturalEquipmentMod.Adjective == "closed") return 0;
             double perLevel = 3.0;
             int levelOffset = MinDamageBonusIncrease * (int)perLevel;
             if (NaturalEquipmentMod.BodyPartType == "Head") return 5;
@@ -273,6 +277,7 @@ namespace XRL.World.Parts.Mutation
         }
         public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
+            if (NaturalEquipmentMod.Adjective == "closed") return 0;
             if (NaturalEquipmentMod.BodyPartType == "Head") return 3;
             return -3 + (int)Math.Floor(Level / 2.0);
         }
@@ -628,7 +633,7 @@ namespace XRL.World.Parts.Mutation
             */
         }
 
-        public virtual Guid AddGroundPoundActivatedAbility(GameObject GO, bool Force = false)
+        public virtual Guid AddActivatedAbilityGroundPound(GameObject GO, bool Force = false, bool Silent = false)
         {
             if (GO.HasSkill(nameof(Acrobatics_Jump)) || Force)
             {
@@ -644,17 +649,58 @@ namespace XRL.World.Parts.Mutation
                         ActiveToggle: true,
                         IsAttack: false,
                         IsRealityDistortionBased: false,
-                        IsWorldMapUsable: false
+                        IsWorldMapUsable: false,
+                        Silent: Silent
                         );
+            }
+            if (GroundPoundActivatedAbilityID != Guid.Empty)
+            {
+                AbilityToggledGroundPound(GO, ToggledOn: false);
             }
             return GroundPoundActivatedAbilityID;
         }
-        public virtual bool RemoveGroundPoundActivatedAbility(GameObject GO, bool Force = false)
+        public virtual bool RemoveActivatedAbilityGroundPound(GameObject GO, bool Force = false)
         {
             bool removed = false;
             if (!GO.HasSkill(nameof(Acrobatics_Jump)) || Force)
             {
                 removed = RemoveMyActivatedAbility(ref GroundPoundActivatedAbilityID, GO);
+            }
+            return removed;
+        }
+
+        public virtual Guid AddActivatedAbilityCloseFist(GameObject GO, bool Force = false, bool Silent = false)
+        {
+            if ((GO.HasBodyPart("Hand", false) && CloseFistActivatedAbilityID == Guid.Empty) || Force)
+            {
+                CloseFistActivatedAbilityID =
+                    AddMyActivatedAbility(
+                        Name: "Close Fist",
+                        Command: COMMAND_NAME_CLOSE_FIST,
+                        Class: "Physical Mutations",
+                        Description: null,
+                        Icon: "&#214",
+                        DisabledMessage: null,
+                        Toggleable: true,
+                        DefaultToggleState: false,
+                        ActiveToggle: true,
+                        IsAttack: false,
+                        IsRealityDistortionBased: false,
+                        IsWorldMapUsable: true,
+                        Silent: Silent
+                        );
+            }
+            return CloseFistActivatedAbilityID;
+        }
+        public virtual bool RemoveActivatedAbilityCloseFist(GameObject GO, bool Force = false)
+        {
+            bool removed = false;
+            if ((!GO.HasBodyPart("Hand", false) && CloseFistActivatedAbilityID != Guid.Empty) || Force)
+            {
+                if (removed = RemoveMyActivatedAbility(ref CloseFistActivatedAbilityID, GO))
+                {
+                    CloseFistActivatedAbilityID = Guid.Empty;
+                }
             }
             return removed;
         }
@@ -670,17 +716,26 @@ namespace XRL.World.Parts.Mutation
             if (body != null)
             {
                 Debug.CheckYeh(4, "Have Body", Indent: 2);
+               
                 GO.RemovePart<Gigantism>();
                 Debug.LoopItem(4, "RemovePart<Gigantism>()", Indent: 2);
+               
                 IsGiganticCreature = true; // Enable the Gigantic flag
                 Debug.LoopItem(4, "IsGiganticCreature = true", Indent: 2);
+                
                 GO.RequirePart<StunningForceOnJump>();
                 Debug.LoopItem(4, "RequirePart<StunningForceOnJump>()", Indent: 2);
+                
                 if (!GO.TryGetPart(out StewBelly stewBelly))
                 {
-                    stewBelly = new(1);
-                    GO.RequirePart(stewBelly);
+                    stewBelly = GO.RequirePart<StewBelly>();
                 }
+                if (!stewBelly.StartingStewsPocessed)
+                {
+                    stewBelly.StartingHankering = 1;
+                    Debug.LoopItem(4, "stewBelly.StartingHankering = 1", Indent: 2);
+                }
+                Debug.LoopItem(4, "StewBelly already processed Stews", Indent: 2);
             }
             else
             {
@@ -688,7 +743,9 @@ namespace XRL.World.Parts.Mutation
             }
             Debug.Entry(4, "x if (body != null) ?//", Indent: 1);
 
-            AddGroundPoundActivatedAbility(GO);
+            AddActivatedAbilityGroundPound(GO);
+
+            
 
             Debug.Entry(4, "? if (!GO.HasPart<Vehicle>())", Indent: 1);
             if (!GO.HasPart<Vehicle>())
@@ -713,8 +770,9 @@ namespace XRL.World.Parts.Mutation
                         );
 
                 Debug.LoopItem(4, "Activated Ability Assigned", Indent: 2);
-                ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(HunchOverActivatedAbilityID);
+
                 /*
+                ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(HunchOverActivatedAbilityID);
                 abilityEntry.DisplayName = 
                     "{{C|" + 
                     "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
@@ -778,6 +836,14 @@ namespace XRL.World.Parts.Mutation
                 }
                 Debug.Entry(4, "x if (HunchOverActivatedAbilityID != Guid.Empty) ?//", Indent: 2);
 
+                ToggleMyActivatedAbility(CloseFistActivatedAbilityID, null, Silent: true, false);
+                AbilityToggledCloseFist(GO, ToggledOn: false);
+                RemoveActivatedAbilityCloseFist(GO, true);
+
+                ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, null, Silent: true, false);
+                AbilityToggledGroundPound(GO, ToggledOn: false);
+                RemoveActivatedAbilityGroundPound(GO, true);
+
                 Debug.LoopItem(4, "GO.WantToReequip()", Indent: 2);
                 GO.WantToReequip();
                 Debug.LoopItem(4, "GO.CheckEquipmentSlots()", Indent: 2);
@@ -809,7 +875,7 @@ namespace XRL.World.Parts.Mutation
                 || ID == CanEnterInteriorEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == InventoryActionEvent.ID
+                || ID == BeforeBodyPartsUpdatedEvent.ID
                 || (wantAddGroundPound && ID == AfterAddSkillEvent.ID)
                 || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID)
                 || (wantJumped && ID == JumpedEvent.ID);
@@ -848,28 +914,6 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
-        public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
-        {
-            E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(GetSlotsRequiredEvent E)
-        {
-            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
-            // exceptions are 
-            if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment && E.Object.HasTagOrProperty("GiganticEquippable"))
-            {
-                E.Decreases++;
-                if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
-                {
-                    E.CanBeTooSmall = true;
-                }
-            }
-
-            return base.HandleEvent(E);
-        }
-
         public override bool HandleEvent(CanEnterInteriorEvent E)
         {
             Debug.Entry(1, "Checking CanEnterInteriorEvent");
@@ -902,6 +946,41 @@ namespace XRL.World.Parts.Mutation
             return base.HandleEvent(E);
         }
 
+        public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
+        {
+            E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(GetSlotsRequiredEvent E)
+        {
+            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
+            // exceptions are 
+            if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment && E.Object.HasTagOrProperty("GiganticEquippable"))
+            {
+                E.Decreases++;
+                if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
+                {
+                    E.CanBeTooSmall = true;
+                }
+            }
+
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        {
+            if (!E.Actor.HasBodyPart("Hand", false))
+            {
+                RemoveActivatedAbilityCloseFist(E.Actor, false);
+            }
+            else
+            {
+                AddActivatedAbilityCloseFist(E.Actor, false);
+            }
+            return base.HandleEvent(E);
+        }
+
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
@@ -922,13 +1001,13 @@ namespace XRL.World.Parts.Mutation
                     }
                 }
             }
-            AddGroundPoundActivatedAbility(E.Actor, includesJump);
+            AddActivatedAbilityGroundPound(E.Actor, includesJump);
             Acrobatics_Jump.SyncAbility(ParentObject);
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(AfterRemoveSkillEvent E)
         {
-            RemoveGroundPoundActivatedAbility(E.Actor, E.Skill.Name == nameof(Acrobatics_Jump));
+            RemoveActivatedAbilityGroundPound(E.Actor, E.Skill.Name == nameof(Acrobatics_Jump));
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(JumpedEvent E)
@@ -965,6 +1044,7 @@ namespace XRL.World.Parts.Mutation
         {
             Registrar.Register(COMMAND_NAME_HUNCH_OVER);
             Registrar.Register(COMMAND_NAME_GROUND_POUND);
+            Registrar.Register(COMMAND_NAME_CLOSE_FIST);
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
@@ -1007,7 +1087,27 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(3, "Ground Pound Toggled");
 
                 Debug.Entry(3, "Proceeding to Ground Pound Ability Effects");
-                GroundPoundAbilityToggled(actor, IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID));
+                AbilityToggledGroundPound(actor, IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID));
+            }
+
+            if (E.ID == COMMAND_NAME_CLOSE_FIST)
+            {
+                GameObject actor = ParentObject;
+
+                if (ToggleMyActivatedAbility(CloseFistActivatedAbilityID, null, Silent: true, null))
+                {
+                    Debug.Entry(3, "Close Fist Toggled");
+                }
+                else
+                {
+                    Debug.Entry(3, "Close Fist failed to Toggle");
+                }
+
+                Debug.Entry(3, "Proceeding to Close Fist Ability Effects");
+                if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID) != AbilityToggledCloseFist(actor, IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID)))
+                {
+                    Debug.CheckNah(3, "Something went wrong changing fist state (Open/Close)");
+                }
             }
 
             The.Core.RenderBase();
@@ -1083,7 +1183,7 @@ namespace XRL.World.Parts.Mutation
                     Popup.Show("You stand tall, relaxing into your immense stature.");
                 }
 
-                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
+                // ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
                 /* 
                 abilityEntry.DisplayName = 
                     "{{C|" +
@@ -1095,7 +1195,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(1, "Should be Standing Tall");
         } //!-- public void StraightenUp(bool Message = false)
 
-        public bool GroundPoundAbilityToggled(GameObject GO = null, bool ToggledOn = false)
+        public bool AbilityToggledGroundPound(GameObject GO = null, bool ToggledOn = false)
         {
             GO ??= ParentObject;
             if (GO == null)
@@ -1109,6 +1209,76 @@ namespace XRL.World.Parts.Mutation
             {
                 ToggledOn = UnapplyStunningForceOnJump(GO);
             }
+            return ToggledOn;
+        }
+
+        public bool AbilityToggledCloseFist(GameObject GO = null, bool ToggledOn = false)
+        {
+            GO ??= ParentObject;
+
+            if (GO == null)
+                return false;
+
+            bool OriginalToggledOn = ToggledOn;
+            if (ToggledOn)
+            {
+                Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1);
+                ModClosedGiganticNaturalWeapon ClosedGiganticFist = new()
+                {
+                    AssigningPart = this,
+                    BodyPartType = "Hand",
+
+                    ModPriority = -999999, // -999,999
+                    DescriptionPriority = -999999, // -999,999
+
+                    Adjective = "closed",
+                    AdjectiveColor = "Y",
+                    AdjectiveColorFallback = "y",
+
+                    Adjustments = new(),
+
+                    AddedIntProps = new()
+                    {
+                        { "ModGiganticNoShortDescription", 1 },
+                        { "ModGiganticNoDisplayName", 1 }
+                    },
+                        AddedStringProps = new()
+                    {
+                        { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
+                        { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
+                    },
+                };
+                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", false);
+                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", false);
+
+                ClosedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", false);
+
+                ClosedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", false);
+
+                NaturalEquipmentMod = ClosedGiganticFist;
+
+                ToggledOn = true;
+
+                if (NaturalEquipmentMod == null)
+                {
+                    Debug.Entry(4, "NaturalEquipmentMod Failed to instantiate", Indent: 1);
+                    NaturalEquipmentMod = new();
+                    ToggledOn = false;
+                }
+            }
+            else
+            {
+                Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1);
+                NaturalEquipmentMod = new();
+                ToggledOn = false;
+            }
+
+            if (OriginalToggledOn == ToggledOn)
+            {
+                Debug.Entry(4, "Sending Bodyparts Update", Indent: 1);
+                GO.Body.UpdateBodyParts();
+            }
+
             return ToggledOn;
         }
 
@@ -1129,8 +1299,6 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            gigantism.HunchOverActivatedAbilityID = Guid.Empty;
-            gigantism.GroundPoundActivatedAbilityID = Guid.Empty;
             gigantism.NaturalEquipmentMods = new();
             foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
             {

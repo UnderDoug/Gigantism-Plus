@@ -65,17 +65,21 @@ namespace XRL.World.ObjectBuilders
             {
                 mutations.AddMutation(new GigantismPlus());
             }
+            gigantismPlus = mutations.GetMutation(gigantismPlus.GetMutationClass()) as GigantismPlus;
 
-            mutations.GetMutation(gigantismPlus.GetMutationClass()).Level += Level - 1;
+            int level = Level > 10 ? 10 : Level;
+            int rapidAdvances = Level > 10 ? Level - 10 : 0;
+            gigantismPlus.BaseLevel = level;
+            if (rapidAdvances > 0)
+            {
+                gigantismPlus.SetRapidLevelAmount(rapidAdvances.RapidAdvancementCeiling(1), Sync: true);
+            }
 
             int startingStews = Stews ?? Stat.Roll("2d2");
+            Creature.SetIntProperty(GNT_START_STEWS_PROPLABEL, startingStews);
             if (Creature.TryGetPart(out StewBelly stewBelly))
             {
-                stewBelly.Stews = startingStews;
-            }
-            else
-            {
-                Creature.SetIntProperty(GNT_START_STEWS_PROPLABEL, startingStews);
+                stewBelly.ProcessStartingStews();
             }
 
             if (!NamePrefix.IsNullOrEmpty() && Context != "Hero" && Context != "Unique")

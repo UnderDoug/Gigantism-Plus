@@ -11,6 +11,7 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
+using XRL.Language;
 
 namespace XRL.World.Parts
 {
@@ -44,7 +45,17 @@ namespace XRL.World.Parts
             private set => _Gains = Math.Max(0, value);
         }
 
-        public readonly int StartingHankering;
+        [SerializeField]
+        private int _StartingHankering;
+        public int StartingHankering
+        {
+            get => _StartingHankering != 0 ? _StartingHankering : 2;
+            set 
+            {
+                _StartingHankering = value;
+                Hankering += _StartingHankering;
+            }
+        }
 
         [SerializeField]
         private int _Hankering;
@@ -87,8 +98,9 @@ namespace XRL.World.Parts
         }
 
         public void OnGained()
-        {
-            Mutations mutations = RemoveMutationMod(ParentObject, mutationMod);
+        {   
+            RemoveMutationMod(ParentObject, ref mutationMod);
+            Mutations mutations = ParentObject.RequirePart<Mutations>(); 
             if (Gains > 0)
             {
                 mutationMod = mutations.AddMutationMod(
@@ -98,26 +110,59 @@ namespace XRL.World.Parts
                     SourceType: Mutations.MutationModifierTracker.SourceType.Unknown,
                     SourceName: $"{Stews.Things("Helping")} of {new SeriouslyThickStew().GetDisplayName()}");
             }
+            ParentObject.CheckEquipmentSlots();
         }
-        public static Mutations RemoveMutationMod(GameObject Object, Guid mutationMod)
+        public static Guid RemoveMutationMod(GameObject Object, ref Guid mutationMod)
         {
-            if (Object == null) return null;
+            if (Object == null) return Guid.Empty;
             Mutations mutations = Object.RequirePart<Mutations>();
             if (mutationMod != Guid.Empty)
             {
                 mutations.RemoveMutationMod(mutationMod);
             }
-            return mutations;
+            mutationMod = Guid.Empty;
+            Object.CheckEquipmentSlots();
+            return mutationMod;
         }
-        public Mutations RemoveMutationMod()
+        public Guid RemoveMutationMod()
         {
-            return RemoveMutationMod(ParentObject, mutationMod);
+            return RemoveMutationMod(ParentObject, ref mutationMod);
         }
 
-
+        public override void AddedAfterCreation()
+        {
+            mutationMod = RemoveMutationMod(ParentObject, ref mutationMod);
+            foreach (IPart part in ParentObject.PartsList)
+            {
+                if (part.Name == nameof(StewBelly) && this != part as StewBelly)
+                {
+                    StewBelly stewBelly = part as StewBelly;
+                    stewBelly.mutationMod = RemoveMutationMod(ParentObject, ref stewBelly.mutationMod);
+                    ParentObject.RemovePart(stewBelly);
+                    StartingStewsPocessed = false;
+                    ProcessStartingStews();
+                }
+            }
+            base.AddedAfterCreation();
+        }
+        public override void Attach()
+        {
+            foreach (IPart part in ParentObject.PartsList)
+            {
+                if (part.Name == nameof(StewBelly) && this != part as StewBelly)
+                {
+                    StewBelly stewBelly = part as StewBelly;
+                    stewBelly.mutationMod = RemoveMutationMod(ParentObject, ref stewBelly.mutationMod);
+                    ParentObject.RemovePart(stewBelly);
+                    StartingStewsPocessed = false;
+                    ProcessStartingStews();
+                }
+            }
+            base.Attach();
+        }
         public override void Remove()
         {
-            RemoveMutationMod(ParentObject, mutationMod);
+            mutationMod = RemoveMutationMod(ParentObject, ref mutationMod);
             base.Remove();
         }
 
@@ -169,6 +214,18 @@ namespace XRL.World.Parts
         {
             Stews++;
         }
+        public bool ProcessStartingStews()
+        {
+            bool did = false;
+            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews))
+            {
+                if (Stews < startingSews)
+                    Stews += startingSews;
+                did = true;
+            }
+            StartingStewsPocessed = Stews >= startingSews;
+            return StartingStewsPocessed && did;
+        }
 
         public int GetTurnsTillGrumble()
         {
@@ -180,13 +237,22 @@ namespace XRL.World.Parts
             return base.WantEvent(ID, cascade)
                 || ID == EndTurnEvent.ID
                 || ID == GetShortDescriptionEvent.ID
-                || (!StartingStewsPocessed && ID == ObjectEnteredCellEvent.ID);
+                || ((!StartingStewsPocessed || Stews <= 0) && ID == ObjectEnteredCellEvent.ID);
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
             if (Grumble)
             {
-                DidX("a serious hankering", "got", "!");
+                DidX("seriously hanker", "for more stew", "!", $"{Grammar.MakePossessive(ParentObject.ShortDisplayName)} Stew Belly", UseVisibilityOf: ParentObject);
+                int nearness = 7;
+                if (!ParentObject.IsPlayer())
+                {
+                    nearness -= Math.Max(0, ParentObject.CurrentCell.CosmeticDistanceto(The.Player.CurrentCell.Location));
+                }
+                if (ParentObject.IsVisible() || ParentObject.IsPlayer())
+                {
+                    Rumble(nearness, 0.2f);
+                }
                 Grumble = false;
                 TurnsTillGrumble = GetTurnsTillGrumble();
             }
@@ -198,6 +264,18 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
+            Debug.Entry(4,
+                $"{nameof(StewBelly)}" + 
+                $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
+                Indent: 0);
+
+            Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1);
+            Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1);
+            Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1);
+            Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1);
+            Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1);
+            Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1);
+
             if (Stews > 0)
             {
                 if (!E.Postfix.IsNullOrEmpty())
@@ -214,14 +292,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(ObjectEnteredCellEvent E)
         {
-            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews) && startingSews > 0)
-            {
-                if (Stews <  startingSews)
-                    Stews += startingSews;
-            }
-            // ParentObject.SetIntProperty(GNT_START_STEWS_PROPLABEL, 0, true);
-            Stews = Stews;
-            StartingStewsPocessed = Stews >= startingSews;
+            ProcessStartingStews();
             return base.HandleEvent(E);
         }
 
@@ -241,11 +312,13 @@ namespace XRL.World.Parts
                         $"You hanker for more, though! You reckon {Hankering.Things("more helping")} will see additional gains.");
             }
         }
+
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             StewBelly stewBelly = base.DeepCopy(Parent, MapInv) as StewBelly;
-            stewBelly.Stews = Stews;
-            stewBelly.OnGained();
+            mutationMod = RemoveMutationMod(ParentObject, ref mutationMod);
+            stewBelly.mutationMod = RemoveMutationMod(Parent, ref stewBelly.mutationMod);
+            stewBelly.StartingStewsPocessed = false;
             return stewBelly;
         }
 

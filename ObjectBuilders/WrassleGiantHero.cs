@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Qud.API;
+using XRL.UI;
 using XRL.Names;
 using XRL.Rules;
 using XRL.Language;
@@ -12,13 +13,13 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using XRL.World.ObjectBuilders;
 using XRL.World.Capabilities;
+using XRL.Wish;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.Wish;
-using XRL.UI;
+using HistoryKit;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -109,7 +110,12 @@ namespace XRL.World.ObjectBuilders
                 Context = "Hero";
                 Unique = false;
             }
+
             Debug.LoopItem(4, $"Unique?", Good: Unique, Indent: 1);
+
+            string nameSpecial = Unique ? "Unique" : "Hero";
+
+            Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: 1);
 
             if (!Creature.TryGetPart(out Wrassler wrassler))
             {
@@ -258,7 +264,7 @@ namespace XRL.World.ObjectBuilders
                 Gender: null, 
                 Mutations: null, 
                 Tag: null, 
-                Special: Context, 
+                Special: nameSpecial, 
                 NamingContext: null, 
                 SpecialFaildown: true, 
                 HasHonorific: null, 
@@ -277,7 +283,7 @@ namespace XRL.World.ObjectBuilders
                 Gender: null,
                 Mutations: null,
                 Tag: null,
-                Special: Context,
+                Special: nameSpecial,
                 NamingContext: null,
                 SpecialFaildown: true,
                 HasHonorific: null,
@@ -286,17 +292,16 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"CreatureName", CreatureName ?? "null", Good: CreatureName != null, Indent: 1);
 
             Creature.GiveProperName(
-                Name: CreatureName.OptionalColorYuge(Colorfulness), 
-                Force: true, 
-                Special: Context, 
-                SpecialFaildown: true, 
-                HasHonorific: null, 
-                HasEpithet: null, 
+                Name: CreatureName.OptionalColorYuge(),
+                Force: true,
+                Special: nameSpecial,
+                SpecialFaildown: true,
+                HasHonorific: null,
+                HasEpithet: null,
                 NamingContext: null);
 
             int Stews = Stat.Roll("4d4");
-
-            // Creature.RequirePart<DisplayNameColor>().SetColorByPriority("yuge", 40);
+            Debug.CheckYeh(4, $"{"4d4".Quote()} Stews", $"{Stews}", Indent: 1);
 
             if (!Epithet.IsNullOrEmpty()) Creature.RequirePart<Epithets>().Primary = GameText.VariableReplace(Epithet).Color("y");
             if (!Epithet.IsNullOrEmpty() && !Unique)
@@ -490,7 +495,6 @@ namespace XRL.World.ObjectBuilders
 
                 int extraStews = Stat.Roll("2d4");
                 Stews += extraStews;
-
                 Debug.CheckYeh(4, $"{"2d4".Quote()} extraStews", $"{extraStews}", Indent: 2);
 
                 Dictionary<string, (string die, int roll)> statRolls = new()
@@ -503,7 +507,7 @@ namespace XRL.World.ObjectBuilders
                     { "extraEgo", ("2d3", Stat.Roll("2d3")) },
                 };
 
-                Debug.CheckYeh(4, $"Extra Stats", $"{extraStews}", Indent: 2);
+                Debug.CheckYeh(4, $"Extra Stats", Indent: 2);
                 Creature.AddBaseStat("Strength",     statRolls["extraStr"].roll);
                 Creature.AddBaseStat("Agility",      statRolls["extraAgi"].roll);
                 Creature.AddBaseStat("Toughness",    statRolls["extraTou"].roll);
@@ -614,6 +618,11 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"starting level", $"{level}", Indent: 3);
             Debug.LoopItem(4, $"{"3d3".Quote()} extraLevels", $"{extraLevels}", Indent: 3);
 
+            int extraMP = (Creature.GetStat("Level").BaseValue - 1) * 4;
+            Creature.AddBaseStat("MP", extraMP);
+            Debug.CheckYeh(4, $"Add extraMP", $"{extraMP}", Indent: 2);
+            Debug.LoopItem(4, $"(starting Level - 1) x4", Indent: 3);
+
             int extraXP = Stat.Roll("1d18") * Stat.Roll("18d18");
             Creature.GetStat("XP").BaseValue = Leveler.GetXPForLevel(Creature.GetStat("Level").Value) + extraXP;
             Debug.CheckYeh(4, $"Set XP", $"{Creature.GetStat("XP").BaseValue}", Indent: 2);
@@ -645,9 +654,9 @@ namespace XRL.World.ObjectBuilders
                     mutations.AddMutation(Chimera);
                     Debug.LoopItem(4, 
                         $"Chimera Mutation added", 
-                        Good: mutations.MutationList.Contains(Chimera),
+                        Good: mutations.ActiveMutationList.Contains(Chimera),
                         Indent: 3);
-                    mutations.MutationList = mutations.MutationList.OrderByDescending(x => x.Name == Chimera.Name).ToList();
+                    // mutations.MutationList = mutations.MutationList.OrderByDescending(x => x.Name == Chimera.Name).ToList();
                     Debug.LoopItem(4, 
                         $"Mutations list sorted to have Chimera at the top", 
                         Good: mutations.MutationList.ElementAt(0) == Chimera,
@@ -851,10 +860,20 @@ namespace XRL.World.ObjectBuilders
 
         public static GameObjectBlueprint GetGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
         {
-            GameObjectBlueprint creatureObjectBlueprint =
+            
+            GameObjectBlueprint creatureObjectBlueprint = 
                 EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
                 => IsWrassleGiantEligible(blueprint, filter, Old, Unique));
-            return creatureObjectBlueprint;
+            GameObjectBlueprint alternateCreatureObjectBlueprint = null;
+            
+            int chance = Unique || Old ? 10 : 5;
+            if (chance.in1000())
+            {
+                alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero");
+                alternateCreatureObjectBlueprint?.Builders.Remove("TrollHero1");
+            }
+
+            return alternateCreatureObjectBlueprint ?? creatureObjectBlueprint;
         }
         public static GameObjectBlueprint GetOldGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
         {
@@ -917,7 +936,11 @@ namespace XRL.World.ObjectBuilders
             {
                 Name = nameof(GameUnique),
             };
-            GameUniquePartBlueprint.Parameters.TryAdd("State", SCRT_GNT_UNQ_STATE);
+            if (GameUniquePartBlueprint != null)
+            {
+                if (GameUniquePartBlueprint.Parameters.IsNullOrEmpty()) GameUniquePartBlueprint.Parameters = new();
+                GameUniquePartBlueprint.Parameters.TryAdd("State", SCRT_GNT_UNQ_STATE);
+            }
             
             if (CreatureBlueprint.HasPart(nameof(GameUnique)))
             {

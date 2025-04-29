@@ -61,50 +61,6 @@ namespace HNPS_GigantismPlus.Harmony
                                 if (!int.TryParse(inventoryObject.Number, out int number))
                                     number = 1;
                                 blueprintItemBlueprints.Add(inventoryObject.Blueprint, number);
-                                /*
-                                string targetType = itemBlueprint.GetPartParameter<string>(nameof(Armor), "WornOn") ?? itemBlueprint.GetPartParameter<string>(nameof(MeleeWeapon), "Slot");
-                                bool freeSlot = false;
-                                Debug.Entry(4, $"> foreach (BodyPart part in @this.LoopPart(targetType))", Indent: 4);
-                                foreach (BodyPart part in @this.LoopPart(targetType))
-                                {
-                                    Debug.Divider(4, HONLY, Count: 25, Indent: 4);
-
-                                    Debug.Entry(4, $"part", $"{part.DebugName()}", Indent: 5);
-                                    Debug.Divider(4, HONLY, Count: 15, Indent: 5);
-                                    bool naturalEquipped 
-                                      = !part.Equipped.Is(null) 
-                                     && !part.Equipped.IsNatural();
-                                    Debug.LoopItem(4, $"naturalEquipped", Good: naturalEquipped, Indent: 5);
-
-                                    bool defaultBehavior 
-                                      = !part.DefaultBehavior.Is(null) 
-                                     && part.DefaultBehavior.IsNatural();
-                                    Debug.LoopItem(4, $"defaultBehavior", Good: defaultBehavior, Indent: 5);
-
-                                    bool permanentCybernetic 
-                                      = !part.Cybernetics.Is(null) 
-                                     && part.Cybernetics.HasTag("CyberneticsUsesEqSlot") 
-                                     && part.Cybernetics.HasTag("CyberneticsNoRemove");
-                                    Debug.LoopItem(4, $"permanentCybernetic", Good: permanentCybernetic, Indent: 5);
-                                    Debug.Divider(4, HONLY, Count: 15, Indent: 5);
-
-                                    freeSlot = !naturalEquipped && !defaultBehavior && !permanentCybernetic;
-                                    Debug.LoopItem(4, $"freeSlot", Good: freeSlot, Indent: 5);
-                                    if (freeSlot) break;
-                                }
-                                Debug.Divider(4, HONLY, Count: 25, Indent: 4);
-                                Debug.Entry(4, $"x foreach (BodyPart part in @this.LoopPart(targetType)) >//", Indent: 4);
-
-                                if (freeSlot)
-                                {
-                                    Debug.Entry(4, 
-                                        $"Have a Free Slot, creating {itemBlueprint.Name} and placing in inventory", 
-                                        Indent: 4);
-                                    ParentObject.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(itemBlueprint));
-                                    doReequip = true;
-                                    Debug.LoopItem(4, $"doReequip", Good: doReequip, Indent: 4);
-                                }
-                                */
                             }
                             else
                             {

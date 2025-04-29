@@ -21,8 +21,10 @@
     <part Name="Description" Short="A triplicate set of ropes held taught provide the perfect platform for launching oneself." />
     <removepart Name="Graffitied" />
     <part Name="WrassleGear" RandomGeneration="false" />
-    <stat Name="AV" Value="1" />
-    <stat Name="Hitpoints" Value="15" />
+    <part Name="Vaultable" />
+    <stat Name="AV" Value="10" />
+    <stat Name="DV" Value="15" />
+    <stat Name="Hitpoints" Value="150" />
     <removetag Name="PaintedWall" />
     <tag Name="PaintedFence" Value="WrassleRing_Ropes" />
     <tag Name="PaintedFenceAtlas" Value="Tiles/" />

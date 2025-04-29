@@ -7,6 +7,9 @@
         <scope Name="Culture" Culture="Giant" Priority="100" Combine="true" />
         <scope Name="Species" Species="Giant" Priority="50" Combine="true" />
       </scopes>
+      <templates>
+        <template Name="*Name*" />
+      </templates>
       <prefixes Amount="1-2">
         <prefix Name="om" Weight="5" />
         <prefix Name="um" />
@@ -80,103 +83,127 @@
         <scope Name="Species" Type="Epithet" Special="Hero" Species="Giant" Priority="100" Combine="true" />
       </scopes>
       <templates>
-        <template Name="the *Adjective* *Role*" />
-        <template Name="the *Adjective*" />
-        <template Name="who *Verb*" />
-        <template Name="the *Adjective* *Role*, who *Verb*" />
-        <template Name="the *Adjective*, who *Verb*" />
-        <template Name="of the *Noun*" />
-        <template Name="the *Adjective*, of the *Noun*" />
-        <template Name="the *Adjective*, of the *Noun*, who *Verb*" />
-        <template Name="the *Role*, of the *Noun*" />
-        <template Name="the *Actioner* of the *Subject*" />
-        <template Name="the *Role* of the *Noun*, who *Verb*" />
-        <template Name="the *Actioner* of the *Subject*, who *Verb*" />
-        <template Name="the *Adjective* *Role*, of the *Noun*" />
-        <template Name="the *Adjective* *Actioner* of the *Subject*" />
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+        
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+        
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+        
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+        
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+        
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
       </templates>
       <templatevars>
-        <!-- the -->
         <templatevar Name="Adjective">
-          <value Name="=optionalColorYuge:Giant=" />
-          <value Name="=optionalColorYuge:Gentle=" />
-          <value Name="=optionalColorYuge:Swole=" />
-          <value Name="=optionalColorYuge:Thick=" />
-          <value Name="=optionalColorYuge:Thicc=" />
-          <value Name="=optionalColorYuge:Hefty=" />
-          <value Name="=optionalColorYuge:Immense=" />
-          <value Name="=optionalColorYuge:Thoughtful=" />
-          <value Name="=optionalColorYuge:Mighty=" />
-          <value Name="=optionalColorYuge:Enormous=" />
-          <value Name="=optionalColorYuge:Huge=" />
-          <value Name="=optionalColorYuge:Yuge=" />
-          <value Name="=optionalColorYuge:Somewhat Big=" />
-          <value Name="=optionalColorYuge:Really Big=" />
-          <value Name="=optionalColorYuge:Solid=" />
-          <value Name="=optionalColorYuge:Sturdy=" />
-          <value Name="=optionalColorYuge:Unmovable=" />
-          <value Name="=optionalColorYuge:Unmoving=" />
-          <value Name="=optionalColorYuge:Immovable=" />
-          <value Name="=optionalColorYuge:Unstoppable=" />
-          <value Name="=optionalColorYuge:Non-stop=" />
-          <value Name="=optionalColorYuge:Rotund=" />
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Somewhat Big" />
+          <value Name="Really Big" />
+          <value Name="Solid" />
+          <value Name="Sturdy" />
+          <value Name="Unmovable" />
+          <value Name="Unmoving" />
+          <value Name="Immovable" />
+          <value Name="Unstoppable" />
+          <value Name="Non-stop" />
+          <value Name="Rotund" />
         </templatevar>
         <templatevar Name="Role">
-          <value Name="=optionalColorYuge:Cook=" />
-          <value Name="=optionalColorYuge:Hankerer=" />
-          <value Name="=optionalColorYuge:Gains Seeker=" />
-          <value Name="=optionalColorYuge:Thinker=" />
-          <value Name="=optionalColorYuge:Listener=" />
-          <value Name="=optionalColorYuge:Philosopher=" />
-          <value Name="=optionalColorYuge:Altruist=" />
+          <value Name="Cook" />
+          <value Name="Hankerer" />
+          <value Name="Gains Seeker" />
+          <value Name="Thinker" />
+          <value Name="Listener" />
+          <value Name="Philosopher" />
+          <value Name="Altruist" />
         </templatevar>
         <templatevar Name="Actioner">
-          <value Name="=optionalColorYuge:Slapper=" />
-          <value Name="=optionalColorYuge:Hankerer=" />
-          <value Name="=optionalColorYuge:Seeker=" />
+          <value Name="Slapper" />
+          <value Name="Hankerer" />
+          <value Name="Seeker" />
         </templatevar>
-        <!-- , of the -->
         <templatevar Name="Noun">
-          <value Name="=optionalColorYuge:Stew=" />
-          <value Name="=optionalColorYuge:Gains=" />
-          <value Name="=optionalColorYuge:Hankering=" />
-          <value Name="=optionalColorYuge:Folding Chair=" />
-          <value Name="=optionalColorYuge:Belly=" />
-          <value Name="=optionalColorYuge:Heft=" />
-          <value Name="=optionalColorYuge:Mountains=" />
-          <value Name="=optionalColorYuge:Stone=" />
-          <value Name="=optionalColorYuge:Pillar=" />
-          <value Name="=optionalColorYuge:Considerable Size=" />
-          <value Name="=optionalColorYuge:Books=" />
-          <value Name="=optionalColorYuge:Thoughts=" />
+          <value Name="Stew" />
+          <value Name="Gains" />
+          <value Name="Hankering" />
+          <value Name="Folding Chair" />
+          <value Name="Belly" />
+          <value Name="Heft" />
+          <value Name="Mountains" />
+          <value Name="Stone" />
+          <value Name="Pillar" />
+          <value Name="Considerable Size" />
+          <value Name="Books" />
+          <value Name="Thoughts" />
         </templatevar>
         <templatevar Name="Subject">
-          <value Name="=optionalColorYuge:Stew=" />
-          <value Name="=optionalColorYuge:Stews=" />
-          <value Name="=optionalColorYuge:Gains=" />
+          <value Name="Stew" />
+          <value Name="Stews" />
+          <value Name="Gains" />
           <value Name="=optionalColor:Folding Chairs:c=" />
-          <value Name="=optionalColorYuge:Bellies=" />
-          <value Name="=optionalColorYuge:Stone=" />
-          <value Name="=optionalColorYuge:Stones=" />
-          <value Name="=optionalColorYuge:Pillars=" />
-          <value Name="=optionalColorYuge:Books=" />
+          <value Name="Bellies" />
+          <value Name="Stone" />
+          <value Name="Stones" />
+          <value Name="Pillars" />
+          <value Name="Books" />
         </templatevar>
-        <!-- , who -->
-        <templatevar Name="Verb">
-          <value Name="=optionalColorYuge:Cooks=" />
-          <value Name="=optionalColorYuge:Hankers=" />
-          <value Name="=optionalColorYuge:Achieves Gains=" />
-          <value Name="=optionalColorYuge:Slaps=" />
-          <value Name="=optionalColorYuge:Bellows=" />
-          <value Name="=optionalColorYuge:Rumbles=" />
-          <value Name="=optionalColorYuge:Thinks=" />
-          <value Name="=optionalColorYuge:Listens=" />
-          <value Name="=optionalColorYuge:Keeps Going=" />
-          <value Name="=optionalColorYuge:Waits=" />
-          <value Name="=optionalColorYuge:Stands Tall=" />
-          <value Name="=optionalColorYuge:Sits=" />
-          <value Name="=optionalColorYuge:Remains Silent=" />
-          <value Name="=optionalColorYuge:Remains Still=" />
+        <templatevar Name="Verbs">
+          <value Name="Cooks" />
+          <value Name="Hankers" />
+          <value Name="Achieves Gains" />
+          <value Name="Slaps" />
+          <value Name="Bellows" />
+          <value Name="Rumbles" />
+          <value Name="Thinks" />
+          <value Name="Listens" />
+          <value Name="Keeps Going" />
+          <value Name="Waits" />
+          <value Name="Stands Tall" />
+          <value Name="Sits" />
+          <value Name="Remains Silent" />
+          <value Name="Remains Still" />
         </templatevar>
       </templatevars>
     </namestyle>
@@ -186,100 +213,127 @@
         <scope Name="Main" Type="Epithet" Special="Hero" Faction="WrassleGiants" Priority="200" Combine="false" />
       </scopes>
       <templates>
-        <template Name="the *Adjective* *Role*" />
-        <template Name="the *Adjective*" />
-        <template Name="who *Verb*" />
-        <template Name="the *Adjective* *Role*, who *Verb*" />
-        <template Name="the *Adjective*, who *Verb*" />
-        <template Name="of the *Noun*" />
-        <template Name="the *Adjective*, of the *Noun*" />
-        <template Name="the *Adjective*, of the *Noun*, who *Verb*" />
-        <template Name="the *Role*, of the *Noun*" />
-        <template Name="the *Actioner* of the *Subject*" />
-        <template Name="the *Role* of the *Noun*, who *Verb*" />
-        <template Name="the *Actioner* of the *Subject*, who *Verb*" />
-        <template Name="the *Adjective* *Role*, of the *Noun*" />
-        <template Name="the *Adjective* *Actioner* of the *Subject*" />
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
       </templates>
       <templatevars>
         <templatevar Name="Adjective">
-          <value Name="=optionalColorYuge:Giant=" />
-          <value Name="=optionalColorYuge:Gentle=" />
-          <value Name="=optionalColorYuge:Swole=" />
-          <value Name="=optionalColorYuge:Thick=" />
-          <value Name="=optionalColorYuge:Thicc=" />
-          <value Name="=optionalColorYuge:Hefty=" />
-          <value Name="=optionalColorYuge:Immense=" />
-          <value Name="=optionalColorYuge:Thoughtful=" />
-          <value Name="=optionalColorYuge:Mighty=" />
-          <value Name="=optionalColorYuge:Enormous=" />
-          <value Name="=optionalColorYuge:Huge=" />
-          <value Name="=optionalColorYuge:Yuge=" />
-          <value Name="=optionalColorYuge:Heavyweight=" />
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Heavyweight" />
         </templatevar>
         <templatevar Name="Role">
-          <value Name="=optionalColorYuge:Cook=" />
-          <value Name="=optionalColorYuge:Disciple=" />
-          <value Name="=optionalColorYuge:Hankerer=" />
-          <value Name="=optionalColorYuge:Gains Seeker=" />
-          <value Name="=optionalColorYuge:Champion=" />
-          <value Name="=optionalColorYuge:Contender=" />
-          <value Name="=optionalColorYuge:Suplexer=" />
+          <value Name="Cook" />
+          <value Name="Disciple" />
+          <value Name="Hankerer" />
+          <value Name="Gains Seeker" />
+          <value Name="Champion" />
+          <value Name="Contender" />
+          <value Name="Suplexer" />
         </templatevar>
         <templatevar Name="Actioner">
-          <value Name="=optionalColorYuge:Slapper=" />
-          <value Name="=optionalColorYuge:Hankerer=" />
-          <value Name="=optionalColorYuge:Seeker=" />
-          <value Name="=optionalColorYuge:Kicker=" />
-          <value Name="=optionalColorYuge:Hurler=" />
-          <value Name="=optionalColorYuge:Conker=" />
+          <value Name="Slapper" />
+          <value Name="Hankerer" />
+          <value Name="Seeker" />
+          <value Name="Kicker" />
+          <value Name="Hurler" />
+          <value Name="Conker" />
         </templatevar>
         <templatevar Name="Noun">
-          <value Name="=optionalColorYuge:Stew=" />
-          <value Name="=optionalColorYuge:Gains=" />
-          <value Name="=optionalColorYuge:Hankering=" />
-          <value Name="=optionalColorYuge:Folding Chair=" />
-          <value Name="=optionalColorYuge:Nanoweave Mask=" />
-          <value Name="=optionalColorYuge:Nanoweave Suit=" />
-          <value Name="=optionalColorYuge:Open Palm=" />
-          <value Name="=optionalColorYuge:Closed Fist=" />
-          <value Name="=optionalColorYuge:Elbow=" />
-          <value Name="=optionalColorYuge:Seismic Toss=" />
-          <value Name="=optionalColorYuge:Ground Pound=" />
-          <value Name="=optionalColorYuge:Suplex=" />
-          <value Name="=optionalColorYuge:Ring Jump=" />
-          <value Name="=optionalColorYuge:Roundhouse Kick=" />
-          <value Name="=optionalColorYuge:Belly=" />
-          <value Name="=optionalColorYuge:Heft=" />
-          <value Name="=optionalColorYuge:Belt=" />
-          <value Name="=optionalColorYuge:Mountain=" />
-          <value Name="=optionalColorYuge:Stone=" />
-          <value Name="=optionalColorYuge:Pillar=" />
-          <value Name="=optionalColorYuge:Noggin=" />
-          <value Name="=optionalColorYuge:Bonce=" />
-          <value Name="=optionalColorYuge:Dome=" />
+          <value Name="Stew" />
+          <value Name="Gains" />
+          <value Name="Hankering" />
+          <value Name="Folding Chair" />
+          <value Name="Nanoweave Mask" />
+          <value Name="Nanoweave Suit" />
+          <value Name="Open Palm" />
+          <value Name="Closed Fist" />
+          <value Name="Elbow" />
+          <value Name="Seismic Toss" />
+          <value Name="Ground Pound" />
+          <value Name="Suplex" />
+          <value Name="Ring Jump" />
+          <value Name="Roundhouse Kick" />
+          <value Name="Belly" />
+          <value Name="Heft" />
+          <value Name="Belt" />
+          <value Name="Mountain" />
+          <value Name="Stone" />
+          <value Name="Pillar" />
+          <value Name="Noggin" />
+          <value Name="Bonce" />
+          <value Name="Dome" />
         </templatevar>
         <templatevar Name="Subject">
-          <value Name="=optionalColorYuge:Gains=" />
+          <value Name="Gains" />
           <value Name="=optionalColor:Folding Chairs:c=" />
-          <value Name="=optionalColorYuge:Bellies=" />
-          <value Name="=optionalColorYuge:Stone=" />
-          <value Name="=optionalColorYuge:Pillars=" />
-          <value Name="=optionalColorYuge:Noggins=" />
-          <value Name="=optionalColorYuge:Bonces=" />
+          <value Name="Bellies" />
+          <value Name="Stone" />
+          <value Name="Pillars" />
+          <value Name="Noggins" />
+          <value Name="Bonces" />
         </templatevar>
-        <templatevar Name="Verb">
-          <value Name="=optionalColorYuge:Cooks=" />
-          <value Name="=optionalColorYuge:Hankers=" />
-          <value Name="=optionalColorYuge:Slams=" />
-          <value Name="=optionalColorYuge:Throws Down=" />
-          <value Name="=optionalColorYuge:Never Taps Out=" />
-          <value Name="=optionalColorYuge:Doesn't Back Down=" />
-          <value Name="=optionalColorYuge:Achieves Gains=" />
-          <value Name="=optionalColorYuge:Slaps=" />
-          <value Name="=optionalColorYuge:Bellows=" />
-          <value Name="=optionalColorYuge:Kicks=" />
-          <value Name="=optionalColorYuge:Resists=" />
+        <templatevar Name="Verbs">
+          <value Name="Cooks" />
+          <value Name="Hankers" />
+          <value Name="Slams" />
+          <value Name="Throws Down" />
+          <value Name="Never Taps Out" />
+          <value Name="Doesn't Back Down" />
+          <value Name="Achieves Gains" />
+          <value Name="Slaps" />
+          <value Name="Bellows" />
+          <value Name="Kicks" />
+          <value Name="Resists" />
         </templatevar>
       </templatevars>
     </namestyle>
@@ -317,7 +371,7 @@
         <scope Name="Main" Type="Epithet" Special="Unique" Faction="WrassleGiants" Priority="300" Combine="false" />
       </scopes>
       <templates>
-        <template Name="the *Adjective* *Role* of the *Noun*, who *Verb*" />
+        <template Name="the *Adjective* *Role* of the *Noun*, who *Verbs*" />
       </templates>
       <templatevars>
         <templatevar Name="Adjective">
@@ -329,7 +383,7 @@
         <templatevar Name="Noun">
           <value Name="=optionalColorYuge:Stew=" />
         </templatevar>
-        <templatevar Name="Verb">
+        <templatevar Name="Verbs">
           <value Name="=optionalColorYuge:Knows How To Cook=" />
         </templatevar>
       </templatevars>

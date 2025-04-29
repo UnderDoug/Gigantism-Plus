@@ -221,6 +221,8 @@ namespace XRL.World.Parts
             bool wantLateBeforeApplyDamage =
                 ParentObject.InheritsFrom("WrassleRingRopes")
              || ParentObject.InheritsFrom("FoldingChair");
+            bool wantInventoryActions =
+                ParentObject.InheritsFrom("WrassleRingRopes");
 
             return base.WantEvent(ID, cascade)
                 || (wantObjectCreated && ID == AfterObjectCreatedEvent.ID)

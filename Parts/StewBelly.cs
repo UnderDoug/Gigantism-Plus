@@ -110,6 +110,7 @@ namespace XRL.World.Parts
                     SourceType: Mutations.MutationModifierTracker.SourceType.Unknown,
                     SourceName: $"{Stews.Things("Helping")} of {new SeriouslyThickStew().GetDisplayName()}");
             }
+            ParentObject.CheckEquipmentSlots();
         }
         public static Guid RemoveMutationMod(GameObject Object, ref Guid mutationMod)
         {
@@ -120,6 +121,7 @@ namespace XRL.World.Parts
                 mutations.RemoveMutationMod(mutationMod);
             }
             mutationMod = Guid.Empty;
+            Object.CheckEquipmentSlots();
             return mutationMod;
         }
         public Guid RemoveMutationMod()

@@ -832,6 +832,14 @@ namespace XRL.World.Parts.Mutation
                 }
                 Debug.Entry(4, "x if (HunchOverActivatedAbilityID != Guid.Empty) ?//", Indent: 2);
 
+                ToggleMyActivatedAbility(CloseFistActivatedAbilityID, null, Silent: true, false);
+                AbilityToggledCloseFist(GO, ToggledOn: false);
+                RemoveActivatedAbilityCloseFist(GO, true);
+
+                ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, null, Silent: true, false);
+                AbilityToggledGroundPound(GO, ToggledOn: false);
+                RemoveActivatedAbilityGroundPound(GO, true);
+
                 Debug.LoopItem(4, "GO.WantToReequip()", Indent: 2);
                 GO.WantToReequip();
                 Debug.LoopItem(4, "GO.CheckEquipmentSlots()", Indent: 2);
@@ -1082,8 +1090,14 @@ namespace XRL.World.Parts.Mutation
             {
                 GameObject actor = ParentObject;
 
-                ToggleMyActivatedAbility(CloseFistActivatedAbilityID, null, Silent: true, null);
-                Debug.Entry(3, "Close Fist Toggled");
+                if (ToggleMyActivatedAbility(CloseFistActivatedAbilityID, null, Silent: true, null))
+                {
+                    Debug.Entry(3, "Close Fist Toggled");
+                }
+                else
+                {
+                    Debug.Entry(3, "Close Fist failed to Toggle");
+                }
 
                 Debug.Entry(3, "Proceeding to Close Fist Ability Effects");
                 if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID) != AbilityToggledCloseFist(actor, IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID)))
@@ -1165,7 +1179,7 @@ namespace XRL.World.Parts.Mutation
                     Popup.Show("You stand tall, relaxing into your immense stature.");
                 }
 
-                ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
+                // ActivatedAbilityEntry abilityEntry = actor.ActivatedAbilities.GetAbility(HunchOverActivatedAbilityID);
                 /* 
                 abilityEntry.DisplayName = 
                     "{{C|" +
@@ -1204,6 +1218,7 @@ namespace XRL.World.Parts.Mutation
             bool OriginalToggledOn = ToggledOn;
             if (ToggledOn)
             {
+                Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1);
                 ModClosedGiganticNaturalWeapon ClosedGiganticFist = new()
                 {
                     AssigningPart = this,
@@ -1229,8 +1244,8 @@ namespace XRL.World.Parts.Mutation
                         { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
                     },
                 };
-                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
-                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", false);
+                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", false);
 
                 ClosedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", false);
 
@@ -1242,18 +1257,21 @@ namespace XRL.World.Parts.Mutation
 
                 if (NaturalEquipmentMod == null)
                 {
+                    Debug.Entry(4, "NaturalEquipmentMod Failed to instantiate", Indent: 1);
                     NaturalEquipmentMod = new();
                     ToggledOn = false;
                 }
             }
             else
             {
+                Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1);
                 NaturalEquipmentMod = new();
                 ToggledOn = false;
             }
 
             if (OriginalToggledOn == ToggledOn)
             {
+                Debug.Entry(4, "Sending Bodyparts Update", Indent: 1);
                 GO.Body.UpdateBodyParts();
             }
 
@@ -1277,9 +1295,6 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
-            gigantism.HunchOverActivatedAbilityID = Guid.Empty;
-            gigantism.GroundPoundActivatedAbilityID = Guid.Empty;
-            gigantism.CloseFistActivatedAbilityID = Guid.Empty;
             gigantism.NaturalEquipmentMods = new();
             foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
             {

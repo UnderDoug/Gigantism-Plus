@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Qud.API;
+using XRL.UI;
 using XRL.Names;
 using XRL.Rules;
 using XRL.Language;
@@ -12,13 +13,12 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using XRL.World.ObjectBuilders;
 using XRL.World.Capabilities;
+using XRL.Wish;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.Wish;
-using XRL.UI;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -109,7 +109,12 @@ namespace XRL.World.ObjectBuilders
                 Context = "Hero";
                 Unique = false;
             }
+
             Debug.LoopItem(4, $"Unique?", Good: Unique, Indent: 1);
+
+            string nameSpecial = Unique ? "Unique" : "Hero";
+
+            Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: 1);
 
             if (!Creature.TryGetPart(out Wrassler wrassler))
             {
@@ -258,7 +263,7 @@ namespace XRL.World.ObjectBuilders
                 Gender: null, 
                 Mutations: null, 
                 Tag: null, 
-                Special: Context, 
+                Special: nameSpecial, 
                 NamingContext: null, 
                 SpecialFaildown: true, 
                 HasHonorific: null, 
@@ -277,7 +282,7 @@ namespace XRL.World.ObjectBuilders
                 Gender: null,
                 Mutations: null,
                 Tag: null,
-                Special: Context,
+                Special: nameSpecial,
                 NamingContext: null,
                 SpecialFaildown: true,
                 HasHonorific: null,
@@ -286,9 +291,9 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"CreatureName", CreatureName ?? "null", Good: CreatureName != null, Indent: 1);
 
             Creature.GiveProperName(
-                Name: CreatureName.OptionalColorYuge(Colorfulness), 
+                Name: CreatureName, 
                 Force: true, 
-                Special: Context, 
+                Special: nameSpecial, 
                 SpecialFaildown: true, 
                 HasHonorific: null, 
                 HasEpithet: null, 
@@ -296,8 +301,6 @@ namespace XRL.World.ObjectBuilders
 
             int Stews = Stat.Roll("4d4");
             Debug.CheckYeh(4, $"{"4d4".Quote()} Stews", $"{Stews}", Indent: 1);
-
-            // Creature.RequirePart<DisplayNameColor>().SetColorByPriority("yuge", 40);
 
             if (!Epithet.IsNullOrEmpty()) Creature.RequirePart<Epithets>().Primary = GameText.VariableReplace(Epithet).Color("y");
             if (!Epithet.IsNullOrEmpty() && !Unique)
@@ -614,6 +617,11 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"starting level", $"{level}", Indent: 3);
             Debug.LoopItem(4, $"{"3d3".Quote()} extraLevels", $"{extraLevels}", Indent: 3);
 
+            int extraMP = (Creature.GetStat("Level").BaseValue - 1) * 4;
+            Creature.AddBaseStat("MP", extraMP);
+            Debug.CheckYeh(4, $"Add extraMP", $"{extraMP}", Indent: 2);
+            Debug.LoopItem(4, $"(starting Level - 1) x4", Indent: 3);
+
             int extraXP = Stat.Roll("1d18") * Stat.Roll("18d18");
             Creature.GetStat("XP").BaseValue = Leveler.GetXPForLevel(Creature.GetStat("Level").Value) + extraXP;
             Debug.CheckYeh(4, $"Set XP", $"{Creature.GetStat("XP").BaseValue}", Indent: 2);
@@ -917,7 +925,11 @@ namespace XRL.World.ObjectBuilders
             {
                 Name = nameof(GameUnique),
             };
-            GameUniquePartBlueprint.Parameters.TryAdd("State", SCRT_GNT_UNQ_STATE);
+            if (GameUniquePartBlueprint != null)
+            {
+                if (GameUniquePartBlueprint.Parameters.IsNullOrEmpty()) GameUniquePartBlueprint.Parameters = new();
+                GameUniquePartBlueprint.Parameters.TryAdd("State", SCRT_GNT_UNQ_STATE);
+            }
             
             if (CreatureBlueprint.HasPart(nameof(GameUnique)))
             {

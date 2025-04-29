@@ -1330,22 +1330,22 @@ namespace HNPS_GigantismPlus
             return Math.Min(Math.Max(@float, Min), Max);
         }
 
-        public static int RapidAdvancementCeiling(this int @int, int Min = 0)
+        public static int RapidAdvancementCeiling(this int @int, int MinAdvances = 0)
         {
-            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
-            return (int)Math.Max(Min, Math.Ceiling(@int / 3.0)) * 3;
+            MinAdvances = MinAdvances > 0 ? (int)Math.Ceiling(MinAdvances / 3.0) : 0;
+            return (int)Math.Max(MinAdvances, Math.Ceiling(@int / 3.0)) * 3;
         }
 
-        public static int RapidAdvancementFloor(this int @int, int Min = 0)
+        public static int RapidAdvancementFloor(this int @int, int MinAdvances = 0)
         {
-            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
-            return (int)Math.Max(Min, Math.Floor(@int / 3.0)) * 3;
+            MinAdvances = MinAdvances > 0 ? (int)Math.Ceiling(MinAdvances / 3.0) : 0;
+            return (int)Math.Max(MinAdvances, Math.Floor(@int / 3.0)) * 3;
         }
 
-        public static int RapidAdvancementRound(this int @int, int Min = 0)
+        public static int RapidAdvancementRound(this int @int, int MinAdvances = 0)
         {
-            Min = Min > 0 ? (int)Math.Ceiling(Min / 3.0) : 0;
-            return (int)Math.Max(Min, Math.Round(@int / 3.0)) * 3;
+            MinAdvances = MinAdvances > 0 ? (int)Math.Ceiling(MinAdvances / 3.0) : 0;
+            return (int)Math.Max(MinAdvances, Math.Round(@int / 3.0)) * 3;
         }
 
         public static string Are(this GameObject Object)

@@ -58,28 +58,28 @@ namespace XRL.World.Conversations.Parts
                 Debug.Entry(4, $"times", $"{times}", Indent: 1);
                 Debug.Entry(4, $"MaxTotalDuration", $"{MaxTotalDuration}", Indent: 1);
 
-                Debug.Entry(4, $"> while (Times > 0 && currentTime - startTime < (MaxTotalDuration * 1000))", Indent: 1);
+                Debug.Entry(4, $"> while (times > 0 && (currentTime - startTime) < (MaxTotalDuration * 1000))", Indent: 1);
                 Debug.Divider(4, HONLY, Count: 40, Indent: 1);
-                while (Times > 0 && (currentTime - startTime) >= (MaxTotalDuration * 1000))
+                while (times > 0 && (currentTime - startTime) < (MaxTotalDuration * 1000))
                 {
                     currentTime = XRLCore.FrameTimer.ElapsedMilliseconds;
                     float testDuration = 1000 * (times == Times ? Delay : TimeBetween);
                     float elapsedTime = currentTime - testTime;
-                    if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0xFF) == 0L) Debug.Entry(4, $"elapsedTime", $"{elapsedTime}", Indent: 2);
+                    if ((XRLCore.FrameTimer.ElapsedMilliseconds % 2000L) == 0L) Debug.Entry(4, $"testDuration: {testDuration}, elapsedTime: {elapsedTime}", Indent: 2);
 
                     if (elapsedTime > testDuration)
                     {
                         Debug.Divider(4, HONLY, Count: 25, Indent: 2);
                         Debug.Entry(4, $"Rumble!", Indent: 2);
                         times--;
-                        testTime = currentTime + (1000 * Rumble(speakerGigantism.Level, 0.5f, 2.5f));
+                        testTime = currentTime + (1000 * Rumble(speakerGigantism.Level, 0.2f, 2.0f));
                         Debug.Entry(4, $"times", $"{times}", Indent: 2);
                         Debug.Entry(4, $"testTime", $"{testTime}", Indent: 2);
                         Debug.Divider(4, HONLY, Count: 25, Indent: 2);
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 40, Indent: 1);
-                Debug.Entry(4, $"x while (Times > 0 && currentTime - startTime < (MaxTotalDuration * 1000)) >//", Indent: 1);
+                Debug.Entry(4, $"x while (times > 0 && (currentTime - startTime) < (MaxTotalDuration * 1000)) >//", Indent: 1);
             }
             return base.HandleEvent(E);
         }

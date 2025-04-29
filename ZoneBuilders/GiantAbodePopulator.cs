@@ -305,8 +305,10 @@ namespace XRL.World.ZoneBuilders
                 }
                 if (UniqueGiant.TryGetPart(out StewBelly stewBelly))
                 {
-                    stewBelly.Stews--;
-                    stewBelly.EatStew();
+                    // UniqueGiant.RemovePart(stewBelly);
+                    // UniqueGiant.RequirePart(stewBelly);
+                    stewBelly.ProcessStartingStews();
+
                 }
             }
             else 

@@ -149,8 +149,8 @@ namespace HNPS_GigantismPlus
         {
             GameObject creature;
             GameObjectBlueprint creatureBlueprint = Unique 
-                ? WrassleGiantHero.GetAGiantHeroBluePrintModel()
-                : WrassleGiantHero.GetAUniqueGiantHeroBluePrintModel()
+                ? WrassleGiantHero.GetAUniqueGiantHeroBluePrintModel()
+                : WrassleGiantHero.GetAGiantHeroBluePrintModel()
                 ;
 
             creature = GameObjectFactory.Factory.CreateObject(

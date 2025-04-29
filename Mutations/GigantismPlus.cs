@@ -653,6 +653,10 @@ namespace XRL.World.Parts.Mutation
                         Silent: Silent
                         );
             }
+            if (GroundPoundActivatedAbilityID != Guid.Empty)
+            {
+                AbilityToggledGroundPound(GO, ToggledOn: false);
+            }
             return GroundPoundActivatedAbilityID;
         }
         public virtual bool RemoveActivatedAbilityGroundPound(GameObject GO, bool Force = false)

@@ -314,6 +314,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             StewBelly stewBelly = base.DeepCopy(Parent, MapInv) as StewBelly;
+            mutationMod = RemoveMutationMod(ParentObject, ref mutationMod);
             stewBelly.mutationMod = RemoveMutationMod(Parent, ref stewBelly.mutationMod);
             stewBelly.StartingStewsPocessed = false;
             return stewBelly;

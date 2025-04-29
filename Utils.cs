@@ -624,7 +624,7 @@ namespace HNPS_GigantismPlus
             return Book;
         }
 
-        public static float Rumble(float Cause, float DurationFactor = 1.0f, float DurationMax = 1.0f, bool Async = true)
+        public static float Rumble(float Cause, float DurationFactor = 1.0f, float DurationMax = 1.0f, bool Async = false)
         {
             float duration = Math.Min(DurationMax, Cause * DurationFactor);
             CombatJuice.cameraShake(duration, Async: Async);

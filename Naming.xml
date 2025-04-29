@@ -8,7 +8,7 @@
         <scope Name="Species" Species="Giant" Priority="50" Combine="true" />
       </scopes>
       <templates>
-        <template Name="=optionalColorYuge:*Name*=" />
+        <template Name="*Name*" />
       </templates>
       <prefixes Amount="1-2">
         <prefix Name="om" Weight="5" />

@@ -19,6 +19,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using HistoryKit;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -291,12 +292,12 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"CreatureName", CreatureName ?? "null", Good: CreatureName != null, Indent: 1);
 
             Creature.GiveProperName(
-                Name: CreatureName, 
-                Force: true, 
-                Special: nameSpecial, 
-                SpecialFaildown: true, 
-                HasHonorific: null, 
-                HasEpithet: null, 
+                Name: CreatureName.OptionalColorYuge(),
+                Force: true,
+                Special: nameSpecial,
+                SpecialFaildown: true,
+                HasHonorific: null,
+                HasEpithet: null,
                 NamingContext: null);
 
             int Stews = Stat.Roll("4d4");
@@ -859,10 +860,20 @@ namespace XRL.World.ObjectBuilders
 
         public static GameObjectBlueprint GetGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
         {
-            GameObjectBlueprint creatureObjectBlueprint =
+            
+            GameObjectBlueprint creatureObjectBlueprint = 
                 EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
                 => IsWrassleGiantEligible(blueprint, filter, Old, Unique));
-            return creatureObjectBlueprint;
+            GameObjectBlueprint alternateCreatureObjectBlueprint = null;
+            
+            int chance = Unique || Old ? 10 : 5;
+            if (chance.in1000())
+            {
+                alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero");
+                alternateCreatureObjectBlueprint?.Builders.Remove("TrollHero1");
+            }
+
+            return alternateCreatureObjectBlueprint ?? creatureObjectBlueprint;
         }
         public static GameObjectBlueprint GetOldGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
         {

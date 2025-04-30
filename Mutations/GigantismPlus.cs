@@ -895,13 +895,23 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(GetIntrinsicWeightEvent E)
         {
+            Debug.Entry(4,
+                $"{nameof(GigantismPlus)}." +
+                $"{nameof(HandleEvent)}({nameof(GetIntrinsicWeightEvent)} E.BaseWeight: {E.BaseWeight})",
+                Indent: 0);
             E.BaseWeight *= WeightFactor;
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetMaxCarriedWeightEvent E)
         {
+            Debug.Entry(4,
+                $"{nameof(GigantismPlus)}." +
+                $"{nameof(HandleEvent)}({nameof(GetMaxCarriedWeightEvent)} E.BaseWeight: {E.BaseWeight}, E.Weight: {E.Weight})",
+                Indent: 0);
             E.BaseWeight *= CarryCapFactor;
             E.Weight += CarryCapBonus;
+            Debug.Entry(4, $"E.BaseWeight: {E.BaseWeight})", Indent: 1);
+            Debug.Entry(4, $"E.Weight: {E.Weight})", Indent: 1);
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(BeforeRapidAdvancementEvent E)

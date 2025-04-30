@@ -11,6 +11,11 @@ using static HNPS_GigantismPlus.Const;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using System.Linq;
 using XRL.EditorFormats.Screen;
+using static UnityEngine.UI.Image;
+using System.Drawing;
+using PlayFab.DataModels;
+using XRL.World.Capabilities;
+using System.IO;
 
 namespace XRL.World.Parts
 {
@@ -43,6 +48,8 @@ namespace XRL.World.Parts
 
         public bool CanVault(GameObject Vaulter, GameObject Vaultee)
         {
+            if (Vaulter == null || Vaultee == null) return false;
+
             // BigEnough IF size doesn't matter OR vaulter is gigantic OR Vaultee isn't gigantic
             bool BigEnough = !SizeMatters || Vaulter.IsGiganticCreature || (Vaultee.HasPart<ModGigantic>() && !Vaultee.IsGiganticCreature);
 
@@ -61,117 +68,184 @@ namespace XRL.World.Parts
             // OnTheGround IF vaulter is not flying
             bool OnTheGround = !Vaulter.IsFlying;
 
-            // CanVault IF able to move AND on the groud AND one of: have overriding parts OR have enabling limbs OR have required skill
-            return AbleToMove && OnTheGround && (HaveOverridingParts || HaveEnablingLimbs || HaveRequiredSkill);
+            // PhaseMatches IF well, phase matches.
+            bool PhaseMatches = Vaulter.PhaseMatches(Vaultee);
+
+            // CanVault IF able to move AND on the ground AND phase matches AND any:
+            //      have overriding parts OR have enabling limbs OR have required skill
+            return AbleToMove && OnTheGround && PhaseMatches && (HaveOverridingParts || HaveEnablingLimbs || HaveRequiredSkill);
         }
 
-        public bool AttemptVault(GameObject Vaulter, GameObject Vaultee, IEvent FromEvent = null)
+        public bool AttemptVault(GameObject Vaulter, GameObject Vaultee, IEvent FromEvent = null, bool Silent = false)
         {
             if (Vaulter.IsFlying)
             {
-                Vaulter.Fail("You cannot vault while flying.");
+                if (!Silent)
+                    Vaulter.Fail("You cannot vault while flying.");
                 return false;
             }
-            if (!Vaulter.CanChangeMovementMode("Jumping", ShowMessage: true) || !Vaulter.CanChangeBodyPosition("Jumping", ShowMessage: true))
+            if (!Vaulter.CanChangeMovementMode("Jumping", ShowMessage: !Silent) || !Vaulter.CanChangeBodyPosition("Jumping", ShowMessage: !Silent))
             {
                 return false;
             }
+            if (!Vaulter.PhaseMatches(Vaultee))
+            {
+                if (!Silent)
+                    Vaulter.Fail("You cannot vault something you're out of phase with.");
+                return false;
+            }
 
+            if (!TryGetValidDestinationCell(Vaulter, Vaultee, out Cell destinationCell))
+            {
+                Debug.CheckNah(4, $"No DestinationCell", Indent: 2);
+                FromEvent?.RequestInterfaceExit();
+                if (Vaulter.IsPlayer())
+                {
+                    Popup.Show($"There's no room on the other side of the {Vaultee.DisplayName} you're trying to vault over!");
+                }
+                return false;
+            }
+
+            if (!PerformVault(Vaulter, Vaultee, destinationCell))
+                return false;
+
+            FromEvent?.RequestInterfaceExit();
+            return true;
+        }
+
+        public static bool TryGetValidDestinationCell(GameObject Vaulter, GameObject Vaultee, out Cell DestinationCell)
+        {
             Cell originCell = Vaulter.CurrentCell;
             Cell overCell = Vaultee.CurrentCell;
-            Cell destinationCell = null;
+            DestinationCell = null;
 
-            string TargetDirectionFromOverCell = originCell.GetDirectionFromCell(overCell);
+            string DirectionOriginToOver = originCell.GetDirectionFromCell(overCell);
+            bool DirectionOriginToOverIsCardinal = DirectionOriginToOver.Length == 1;
 
-            Debug.Entry(4, $"DirectionOverToTargetCell", TargetDirectionFromOverCell, Indent: 2);
+            Debug.Entry(4, $"DirectionOverToTargetCell ({DirectionOriginToOver}), IsCardinal:", $"{DirectionOriginToOverIsCardinal}", Indent: 2);
             foreach (Cell cell in overCell.GetAdjacentCells())
             {
-                if (overCell.GetDirectionFromCell(cell) != TargetDirectionFromOverCell)
+                string DirectionOverToDestination = overCell.GetDirectionFromCell(cell);
+                if (DirectionOverToDestination != DirectionOriginToOver)
                 {
-                    Debug.CheckNah(4, $"overCell.GetDirectionFromCell(cell)", overCell.GetDirectionFromCell(cell), Indent: 3);
+                    Debug.CheckNah(4, $"DirectionOverToDestination", DirectionOverToDestination, Indent: 3);
                     continue;
                 }
-                Debug.CheckYeh(4, $"overCell.GetDirectionFromCell(cell)", overCell.GetDirectionFromCell(cell), Indent: 3);
-                destinationCell = cell;
+                Debug.CheckYeh(4, $"DirectionOverToDestination", DirectionOverToDestination, Indent: 3);
+                DestinationCell = cell;
                 break;
             }
 
-            // do some checks about this if it's otherwise occupied.
-            Cell preferedDestinationCell = destinationCell;
+            Cell preferedDestinationCell = DestinationCell;
 
+            bool destinationCellIsAcceptable =
+                DestinationCell != null
+             && DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true)
+             && DestinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty();
 
-            List<Cell> possibleDestinations = new();
-            if (destinationCell == null || !destinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true) || !destinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty())
+            Debug.LoopItem(4,
+                $"DestinationCell != null",
+                Good: DestinationCell != null,
+                Indent: 3);
+
+            Debug.LoopItem(4,
+                $"DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true)",
+                Good: DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true),
+                Indent: 3);
+
+            Debug.LoopItem(4,
+                $"DestinationCell.GetObjectsWithTagOrProperty(\"NoAutowalk\").IsNullOrEmpty()",
+                Good: DestinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty(),
+                Indent: 3);
+
+            Debug.LoopItem(4,
+                $"destinationCellIsAcceptable",
+                Good: destinationCellIsAcceptable,
+                Indent: 2);
+
+            if (!destinationCellIsAcceptable)
             {
-                Debug.Entry(4, $"Destination Cell Occupied, Finding Alternative", Indent: 2);
+                DestinationCell = null;
+            }
+
+            if (DestinationCell == null && !DirectionOriginToOverIsCardinal)
+            {
+
+                Debug.Entry(4, $"Destination cell unacceptable, finding alternative", Indent: 2);
                 foreach (Cell cell in overCell.GetAdjacentCells())
                 {
                     Debug.Divider(4, HONLY, Count: 40, Indent: 2);
-                    Debug.Entry(4, $"Checking cell [{cell.Location}] ({overCell.GetDirectionFromCell(cell)} of Vaultee)", Indent: 2);
+                    Debug.Entry(4, $"Checking cell [{cell.Location}] ({overCell.GetDirectionFromCell(cell)} of Vaultee)", Indent: 3);
 
-                    bool CellIsAdjacentToOrigin = originCell.GetAdjacentCells().Contains(cell);
-                    bool CellIsNotEmpty = !cell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true) || !destinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty();
-                    bool DirectionIsUnaccptable = !IsDirectionAcceptable(originCell, overCell, cell);
-;
-                    bool cellIsADud =
-                        CellIsAdjacentToOrigin
-                     || CellIsNotEmpty
-                     || DirectionIsUnaccptable;
-
-                    Debug.LoopItem(4, $"cellIsADud", $"{cellIsADud}", Good: !cellIsADud, Indent: 3);
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 3);
-                    Debug.LoopItem(4, $"CellIsAdjacentToOrigin", $"{CellIsAdjacentToOrigin}", Good: !CellIsAdjacentToOrigin, Indent: 4);
-                    Debug.LoopItem(4, $"CellIsNotEmpty", $"{CellIsNotEmpty}", Good: !CellIsNotEmpty, Indent: 4);
-                    Debug.LoopItem(4, $"DirectionIsUnacceptable", $"{DirectionIsUnaccptable}", Good: !DirectionIsUnaccptable, Indent: 4);
-
-                    if (cellIsADud)
+                    if (originCell.GetAdjacentCells().Contains(cell))
                     {
+                        Debug.CheckNah(4, $"CellIsAdjacentToOrigin", Indent: 5);
                         continue;
                     }
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 3);
-                    Debug.Entry(4, $"Adding cell to possibleDestinations", Indent: 2);
-                    possibleDestinations.Add(cell);
+                    Debug.CheckYeh(4, $"CellIsNotAdjacentToOrigin", Indent: 5);
+
+                    if (!cell.GetAdjacentCells().Contains(preferedDestinationCell))
+                    {
+                        Debug.CheckNah(4, $"CellIsNotAdjacentToPreferredCell", Indent: 5);
+                        continue;
+                    }
+                    Debug.CheckYeh(4, $"CellIsAdjacentToPreferredCell", Indent: 5);
+
+                    if (!cell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true))
+                    {
+                        Debug.CheckNah(4, $"CellIsNotEmpty", Indent: 5);
+                        continue;
+                    }
+                    Debug.CheckYeh(4, $"CellIsEmpty", Indent: 5);
+
+                    if (!cell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty())
+                    {
+                        Debug.CheckNah(4, $"CellIsNotSafe", Indent: 5);
+                        continue;
+                    }
+                    Debug.CheckYeh(4, $"CellIsSafe", Indent: 5);
+
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 4);
+                    Debug.Entry(4, $"DestinationCell set to [{cell.Location}]", Indent: 3);
+                    DestinationCell = cell;
+                    break;
                 }
                 Debug.Divider(4, HONLY, Count: 40, Indent: 2);
+            }
 
-                if (possibleDestinations.IsNullOrEmpty())
-                {
-                    Debug.CheckNah(4, $"No possibleDestinations", Indent: 2);
-                    FromEvent?.RequestInterfaceExit();
-                    if (Vaulter.IsPlayer())
-                    {
-                        Popup.Show($"There's no room on the other side of the {Vaultee.DisplayName} you're trying to vault over!");
-                    }
-                    return false;
-                }
-            }
+            return DestinationCell != null;
+        }
+
+        public bool PerformVault(GameObject Vaulter, GameObject Vaultee, Cell DestinationCell, bool Silent = false)
+        {
+            Cell originCell = Vaulter.CurrentCell;
+
             SoundManager.PreloadClipSet("Sounds/Abilities/sfx_ability_jump");
-            Debug.Entry(4, $"Getting furthest Cell from possibleDestinations", Indent: 2);
-            foreach (Cell cell in possibleDestinations)
-            {
-                destinationCell ??= cell;
-                if (originCell.CosmeticDistanceto(cell.Location) >= originCell.CosmeticDistanceto(destinationCell.Location))
-                    destinationCell = cell;
-            }
+
             Debug.CheckNah(4,
-                $"destinationCell is [{destinationCell.Location}] " +
-                $"which is {overCell.GetDirectionFromCell(destinationCell)} of {Vaultee.DisplayName} " +
-                $"and {originCell.GetDirectionFromCell(destinationCell)} of {Vaulter.DisplayName}",
+                $"DestinationCell is [{DestinationCell.Location}] " +
+                $"which is {Vaultee.CurrentCell.GetDirectionFromCell(DestinationCell)} of {Vaultee.DisplayName}",
                 Indent: 2);
 
-            GameObject Over = ParentObject;
-            if (!Acrobatics_Jump.CheckPath(Vaulter, destinationCell, out Over, out List<Point> Path, Silent: true, CanJumpOverCreatures: true, CanLandOnCreature: false, "vault"))
+            /*
+            if (!Acrobatics_Jump.CheckPath(
+                Vaulter, 
+                DestinationCell, 
+                out Vaultee, 
+                out List<Point> Path, 
+                Silent: true, 
+                CanJumpOverCreatures: true, 
+                CanLandOnCreature: false, "vault"))
             {
                 Debug.Entry(4, $"/!\\ WARN: CheckPath Failed, vault aborted", Indent: 2);
-                FromEvent?.RequestInterfaceExit();
                 return false;
             }
+            */
 
-            if (!BeforeVaultEvent.CheckFor(Vaulter, originCell, Vaultee, destinationCell, out string Message))
+            if (!BeforeVaultEvent.CheckFor(Vaulter, originCell, Vaultee, DestinationCell, out string Message))
             {
                 Debug.CheckNah(4, $"Cancelled by VaultEvent.CheckFor", Message, Indent: 2);
-                FromEvent?.RequestInterfaceExit();
-                if (Vaulter.IsPlayer() && !Message.IsNullOrEmpty())
+                if (Vaulter.IsPlayer() && !Message.IsNullOrEmpty() && !Silent)
                 {
                     Popup.Show(Message);
                 }
@@ -182,91 +256,27 @@ namespace XRL.World.Parts
             Vaulter.MovementModeChanged("Jumping");
             Vaulter.BodyPositionChanged("Jumping");
 
-            Acrobatics_Jump.PlayAnimation(Vaulter, destinationCell);
+            Acrobatics_Jump.PlayAnimation(Vaulter, DestinationCell);
             XDidYToZ(Vaulter, "vault", "over", ParentObject, null, ".");
 
-            if (Vaulter.DirectMoveTo(destinationCell, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true))
+            if (Vaulter.DirectMoveTo(DestinationCell, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true))
             {
-                JumpedEvent.Send(Vaulter, originCell, destinationCell, Path, Path.Count, "Vault");
-                VaultedEvent.Send(Vaulter, originCell, Vaultee, destinationCell);
+                List<Point> Path = Zone.Line(originCell.X, originCell.Y, DestinationCell.X, DestinationCell.Y);
+                JumpedEvent.Send(Vaulter, originCell, DestinationCell, Path, Path.Count, "Vault");
+                VaultedEvent.Send(Vaulter, originCell, Vaultee, DestinationCell);
             }
             Vaulter.Gravitate();
-            Acrobatics_Jump.Land(originCell, destinationCell);
-            FromEvent?.RequestInterfaceExit();
+            Acrobatics_Jump.Land(originCell, DestinationCell);
             return true;
         }
 
-        public static bool IsDirectionAcceptable(Cell Origin, Cell Over, Cell Target)
+        public bool CanPathThrough(GameObject who)
         {
-            Debug.Divider(4, HONLY, Count: 15, Indent: 3);
-            Debug.LoopItem(4, $"IsDirectionAcceptable: Target [{Target.Location}]", Indent: 3);
-            string DirectionOriginToOverCell = Origin.GetDirectionFromCell(Over);
-
-            string DirectionOverToTargetCell = Over.GetDirectionFromCell(Target);
-            string DirectionOriginToTargetCell = Origin.GetDirectionFromCell(Target);
-
-            string LongitudinalDirectionOverToTarget = (from s in DirectionOverToTargetCell where (s == 'N' || s == 'S') select s.ToString()).FirstOrDefault() ?? string.Empty;
-            string LatitudinalDirectionOverToTarget = (from s in DirectionOverToTargetCell where (s == 'E' || s == 'W') select s.ToString()).FirstOrDefault() ?? string.Empty;
-
-            Debug.LoopItem(4, $"LongitudinalDirectionOverToTarget", LongitudinalDirectionOverToTarget, Indent: 4);
-            Debug.LoopItem(4, $"LatitudinalDirectionOverToTarget", LatitudinalDirectionOverToTarget, Indent: 4);
-
-            bool directionIsLongitudinal = !LongitudinalDirectionOverToTarget.IsNullOrEmpty();
-            bool directionIsLatitudinal = !LatitudinalDirectionOverToTarget.IsNullOrEmpty();
-
-            bool directionIsCardianl = !(directionIsLongitudinal && directionIsLatitudinal);
-
-            if(directionIsCardianl)
+            if (CanVault(who, ParentObject))
             {
-                Debug.LoopItem(4, $"directionIsCardianl", $"{directionIsCardianl}", Good: directionIsCardianl, Indent: 4);
-                if (directionIsLongitudinal)
-                {
-                    Debug.LoopItem(4, $"directionIsLongitudinal", $"{directionIsLongitudinal}", Indent: 4);
-                    if (!DirectionOverToTargetCell.Contains(LongitudinalDirectionOverToTarget))
-                    {
-                        Debug.CheckNah(4, $"DirectionOverToTargetCell ({DirectionOverToTargetCell}), LongitudinalDirectionOverToTarget ({LongitudinalDirectionOverToTarget})", Indent: 5);
-                        return false;
-                    }
-                    Debug.CheckYeh(4, $"DirectionOverToTargetCell ({DirectionOverToTargetCell}), LongitudinalDirectionOverToTarget ({LongitudinalDirectionOverToTarget})", Indent: 5);
-                }
-                if (directionIsLatitudinal)
-                {
-                    Debug.LoopItem(4, $"directionIsLatitudinal", $"{directionIsLatitudinal}", Indent: 4);
-                    if (!DirectionOverToTargetCell.Contains(LatitudinalDirectionOverToTarget))
-                    {
-                        Debug.CheckNah(4, $"DirectionOverToTargetCell ({DirectionOverToTargetCell}), LatitudinalDirectionOverToTarget ({LatitudinalDirectionOverToTarget})", Indent: 5);
-                        return false;
-                    }
-                    Debug.CheckYeh(4, $"DirectionOverToTargetCell ({DirectionOverToTargetCell}), LatitudinalDirectionOverToTarget ({LatitudinalDirectionOverToTarget})", Indent: 5);
-                }
+                return true;
             }
-            else
-            {
-                Debug.LoopItem(4, $"directionIsCardianl", $"{directionIsCardianl}", Good: directionIsCardianl, Indent: 4);
-                if (!DirectionOriginToTargetCell.Contains(LongitudinalDirectionOverToTarget) && !Target.GetDirectionFromCell(Origin).Contains(LatitudinalDirectionOverToTarget))
-                {
-                    Debug.LoopItem(4,
-                        $"DirectionOriginToTargetCell ({DirectionOriginToTargetCell}), LongitudinalDirectionOverToTarget ({LongitudinalDirectionOverToTarget})",
-                        Good: !DirectionOriginToTargetCell.Contains(LongitudinalDirectionOverToTarget),
-                        Indent: 5);
-                    Debug.LoopItem(4, 
-                        $"DirectionOriginToTargetCell ({DirectionOriginToTargetCell}), LatitudinalDirectionOverToTarget ({LatitudinalDirectionOverToTarget})",
-                        Good: !DirectionOriginToTargetCell.Contains(LatitudinalDirectionOverToTarget),
-                        Indent: 5);
-                    return false;
-                }
-                Debug.LoopItem(4,
-                    $"DirectionOriginToTargetCell ({DirectionOriginToTargetCell}), LongitudinalDirectionOverToTarget ({LongitudinalDirectionOverToTarget})",
-                    Good: DirectionOriginToTargetCell.Contains(LongitudinalDirectionOverToTarget),
-                    Indent: 5);
-                Debug.LoopItem(4,
-                    $"DirectionOriginToTargetCell ({DirectionOriginToTargetCell}), LatitudinalDirectionOverToTarget ({LatitudinalDirectionOverToTarget})",
-                    Good: DirectionOriginToTargetCell.Contains(LatitudinalDirectionOverToTarget),
-                    Indent: 5);
-            }
-            Debug.CheckYeh(4, $"IsDirectionAcceptable", Indent: 4);
-            Debug.Divider(4, HONLY, Count: 15, Indent: 3);
-            return true;
+            return false;
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -275,7 +285,9 @@ namespace XRL.World.Parts
                 || ID == GetInventoryActionsEvent.ID
                 || ID == InventoryActionEvent.ID
                 || ID == CanSmartUseEvent.ID
-                || ID == CommandSmartUseEvent.ID;
+                || ID == CommandSmartUseEvent.ID
+                || ID == GetNavigationWeightEvent.ID
+                || ID == GetMovementCapabilitiesEvent.ID;
         }
         public override bool HandleEvent(GetInventoryActionsEvent E)
         {
@@ -320,6 +332,42 @@ namespace XRL.World.Parts
                 return false;
             }
             return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetNavigationWeightEvent E)
+        {
+
+            if (CanPathThrough(E.Actor))
+            {
+                E.Uncacheable = true;
+                E.Weight = 0;
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetMovementCapabilitiesEvent E)
+        {
+            E.Add("Vault over short objects", "Vault", 11250);
+            return base.HandleEvent(E);
+        }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforePhysicsRejectObjectEntringCell");
+            base.Register(Object, Registrar);
+        }
+
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "BeforePhysicsRejectObjectEntringCell" && E.HasFlag("Actual"))
+            {
+                GameObject Vaulter = E.GetGameObjectParameter("Object");
+                GameObject Vaultee = ParentObject;
+                if (CanVault(Vaulter, Vaultee) 
+                    && TryGetValidDestinationCell(Vaulter, Vaultee, out Cell DestinationCell))
+                {
+                    return PerformVault(Vaulter, Vaultee, DestinationCell, Silent: true);
+                }
+            }
+            return base.FireEvent(E);
         }
     } //!-- public class Vaultable : IScribedPart
 }

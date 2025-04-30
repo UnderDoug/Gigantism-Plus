@@ -271,10 +271,6 @@
     <tag Name="WidgetCategory" Value="decoration,statue" />
   </object>
 
-  <object Name="Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue" />
-  </object>
-
   <object Name="Random Statue" Load="Merge">
     <tag Name="WidgetCategory" Value="decoration,statue" />
   </object>

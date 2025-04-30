@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<!--  
+      
+    <object Name="DirtFloor" Inherits="Floor">
+      <part Name="Render" DisplayName="packed dirt floor" RenderString="250" ColorString="&amp;w" DetailColor="w" RenderLayer="0" />
+      <part Name="RandomTileOnMove" Tiles="Terrain/sw_ground_dots1.png,Terrain/sw_ground_dots2.png,Terrain/sw_ground_dots3.png,Terrain/sw_ground_dots4.png" />
+      <tag Name="NoSparkingQuest" />
+    </object>
+      
+ -->
+<objects>
+
+  <object Name="Wall" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+  </object>
+  
+  <object Name="WrassleRingRopes" Inherits="Wall">
+    <part Name="Render" DisplayName="rope barrier" RenderString="=" ColorString="&amp;y" TileColor="&amp;y" DetailColor="w" Occluding="false" RenderLayer="6" Tile="Tiles/WrassleRing_Ropes_.png" />
+    <part Name="Physics" Weight="30" Takeable="false" Solid="true" />
+    <part Name="Description" Short="A triplicate set of ropes held taught provide the perfect platform for launching oneself." />
+    <removepart Name="Graffitied" />
+    <part Name="WrassleGear" RandomGeneration="false" />
+    <part Name="Vaultable" />
+    <stat Name="AV" Value="10" />
+    <stat Name="DV" Value="15" />
+    <stat Name="Hitpoints" Value="150" />
+    <removetag Name="PaintedWall" />
+    <tag Name="PaintedFence" Value="WrassleRing_Ropes" />
+    <tag Name="PaintedFenceAtlas" Value="Tiles/" />
+    <tag Name="PaintedFenceExtension" Value=".png" />
+    <tag Name="PaintWith" Value="WrassleRingRopes" />
+    <tag Name="ImmutableWhenUnexplored" Value="1" />
+    <tag Name="Category_Settlement" />
+    <tag Name="Flyover" />
+    <tag Name="AnimatedSkills" Value="Acrobatics,Acrobatics_Jump,Endurance,Endurance_ShakeItOff,Tactics,Tactics_Charge,Cudgel,Cudgel_Expertise,Cudgel_Bludgeon,Cudgel_Slam,Cudgel_ChargingStrike,SingleWeaponFighting,SingleWeaponFighting_OpportuneAttacks" />
+    <intproperty Name="AllowMissiles" Value="1" />
+  </object>
+
+  <object Name="Gigantic WrassleRingRopes" Inherits="WrassleRingRopes">
+    <part Name="ModGigantic" />
+    <tag Name="AnimatedSkills" Value="Acrobatics,Acrobatics_Jump,Endurance,Endurance_ShakeItOff,Endurance_Weathered,Endurance_Calloused,Tactics,Tactics_Charge,Cudgel,Cudgel_Expertise,Cudgel_Bludgeon,Cudgel_Slam,Cudgel_ChargingStrike,Cudgel_Backswing,Cudgel_Conk,Cudgel_SmashUp,SingleWeaponFighting,SingleWeaponFighting_OpportuneAttacks,SingleWeaponFighting_WeaponExpertise,SingleWeaponFighting_PenetratingStrikes" />
+  </object>
+  
+  
+</objects>

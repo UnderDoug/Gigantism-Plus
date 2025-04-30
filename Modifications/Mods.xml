@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mods>
+  <mod Part="ModGigantic" TinkerTier="3" TinkerDisplayName="gigantic" Tables="Gigantify,CommonMods,PotteryMods,ShevaPotteryMods,EnergyCellMods,GrenadeMods,NuggetMods,GemstoneMods,TonicMods" Load="Merge" />
+</mods>

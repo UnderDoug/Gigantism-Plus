@@ -8,17 +8,23 @@
 			<p>Attempting to sprint or fly while hunched over will cause you stand up straight.</p-->
 		</description>
 		<!-- Foreground is tile body, Detail is tile arms -->
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="x" />
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOn.png" Foreground="z" Detail="x"  State="ToggleOn" />
+		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOff.png" Foreground="z" Detail="y" />
+		<UITile Tile="Abilities/GigantismPlus_Hunch_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
 	</ability>
-	
-  <ability Command="CommandToggleExoframeCompactMode">
+	<ability Command="CommandToggleGigantismPlusGroundPound">
 		<description>
-			<p>Your exoframe can compact itself to allow entry into smaller spaces.</p>
-			<p>While compacted you gain +4 AV but take -6 DV and suffer significant movement and quickness penalties.</p>
+			<p>You create a shockwave of stunning force where you land after jumping a minimum distance.</p>
 		</description>
-    <!-- Foreground is tile body, Detail is tile arms -->
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOff.png" Foreground="b" Detail="B" />
-		<UITile Tile="Abil_GigantismPlus_Hunch_ToggleOn.png" Foreground="b" Detail="B" State="ToggleOn" />
+		<!-- Foreground is black pixels, Detail is white pixels -->
+    <UITile Tile="Abilities/GigantismPlus_GroundPound_ToggleOff.png" Foreground="z" Detail="y" />
+    <UITile Tile="Abilities/GigantismPlus_GroundPound_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
+	</ability>
+	<ability Command="CommandToggleGigantismPlusCloseFist">
+		<description>
+			<p>You clench your fists tight allowing you to use them as cudgels.</p>
+		</description>
+		<!-- Foreground is black pixels, Detail is white pixels -->
+    <UITile Tile="Abilities/GigantismPlus_CloseFist_ToggleOff.png" Foreground="z" Detail="y" />
+    <UITile Tile="Abilities/GigantismPlus_CloseFist_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
 	</ability>
 </activatedabilities>

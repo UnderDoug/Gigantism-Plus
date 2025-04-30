@@ -1,0 +1,2188 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="Furniture" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+  </object>
+
+  <!-- Widget Categories -->
+
+  <object Name="Archway" Load="Merge">
+    <tag Name="WidgetCategory" Value="door" />
+  </object>
+
+  <object Name="Door" Load="Merge">
+    <tag Name="WidgetCategory" Value="door" />
+  </object>
+
+  <object Name="BaseBookshelf" Load="Merge">
+    <tag Name="WidgetCategory" Value="bookshelf" />
+  </object>
+
+  <object Name="BaseBed" Load="Merge">
+    <tag Name="WidgetCategory" Value="bed" />
+  </object>
+
+  <object Name="Bedroll" Load="Merge">
+    <tag Name="WidgetCategory" Value="bed" />
+  </object>
+
+  <object Name="Hammock" Load="Merge">
+    <tag Name="WidgetCategory" Value="bed" />
+  </object>
+
+  <object Name="BaseChair" Load="Merge">
+    <tag Name="WidgetCategory" Value="chair" />
+  </object>
+
+  <object Name="Kline" Load="Merge">
+    <tag Name="WidgetCategory" Value="chair,bed" />
+  </object>
+
+  <object Name="Chest" Load="Merge">
+    <tag Name="WidgetCategory" Value="chest,container" />
+  </object>
+
+  <object Name="Woven Basket" Load="Merge">
+    <tag Name="WidgetCategory" Value="chest,container" />
+  </object>
+
+  <object Name="Multicabinet" Load="Merge">
+    <tag Name="WidgetCategory" Value="surface,chest,container" />
+  </object>
+
+  <object Name="Brazier" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+  <object Name="Tall Brazier" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+
+  <object Name="Sconce" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+
+  <object Name="Torchpost" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+  <object Name="Unlit Torchpost" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+
+  <object Name="Techlight1" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+  <object Name="Techlight2" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+  <object Name="Techlight3" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+
+  <object Name="Full-Spectrum Techlight" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+  <object Name="Half Candelabra" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+  <object Name="Candelabra" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+
+  <object Name="Tomb Techlight1" Load="Merge">
+    <tag Name="WidgetCategory" Value="light" />
+  </object>
+
+  <object Name="Vessel" Load="Merge">
+    <tag Name="WidgetCategory" Value="liquid container,container" />
+  </object>
+
+  <object Name="Table" Load="Merge">
+    <tag Name="WidgetCategory" Value="table,surface" />
+  </object>
+
+  <object Name="Low Table" Load="Merge">
+    <tag Name="WidgetCategory" Value="table,surface" />
+  </object>
+
+  <object Name="Octagonal Table" Load="Merge">
+    <tag Name="WidgetCategory" Value="table,surface" />
+  </object>
+
+  <object Name="Dresser" Load="Merge">
+    <tag Name="WidgetCategory" Value="table,surface" />
+  </object>
+
+  <object Name="Book Table" Load="Merge">
+    <tag Name="WidgetCategory" Value="table,surface" />
+  </object>
+
+  <object Name="Globe" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Orrery" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Clockthing" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Bubblething" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,installation" />
+  </object>
+
+  <object Name="Fluxthing" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,installation" />
+  </object>
+
+  <object Name="Electrothing" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,installation" />
+  </object>
+
+  <object Name="Unicomputer" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,installation" />
+  </object>
+
+  <object Name="Loudspeaker" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,installation" />
+  </object>
+
+  <object Name="Telescope" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,installation" />
+  </object>
+
+  <object Name="Bust of K4K5" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,sculpture" />
+  </object>
+
+  <object Name="Bust of Mehmet I" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,sculpture" />
+  </object>
+
+  <object Name="Ornate Potted Plant 1" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,greenery" />
+  </object>
+
+  <object Name="Ornate Potted Plant 2" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,greenery" />
+  </object>
+
+  <object Name="Ornate Potted Plant 3" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,greenery" />
+  </object>
+
+  <object Name="Ornate Potted Plant 4" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,greenery" />
+  </object>
+
+  <object Name="Chalkboard" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Display Breadboard" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Sewing Machine" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool" />
+  </object>
+
+  <object Name="Light Sculpture" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,sculpture" />
+  </object>
+
+  <object Name="Brain Sculpture" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,sculpture" />
+  </object>
+
+  <object Name="Unfinished Sculpture" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,sculpture" />
+  </object>
+
+  <object Name="Painted Column L" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,column" />
+  </object>
+
+  <object Name="Painting" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Mushroom Case" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration" />
+  </object>
+
+  <object Name="Harp" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,instrument" />
+  </object>
+
+  <object Name="Rectangular Bells" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,instrument" />
+  </object>
+
+  <object Name="Hammered Dulcimer" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,instrument" />
+  </object>
+
+  <object Name="Iron Maiden" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,death" />
+  </object>
+
+  <object Name="Hookah" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,liquid container,container" />
+  </object>
+
+  <object Name="Cage" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,death" />
+  </object>
+
+  <object Name="Forge" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool" />
+  </object>
+
+  <object Name="Anvil" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool" />
+  </object>
+
+  <object Name="Statue" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,statue" />
+  </object>
+
+  <object Name="Statue" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,statue" />
+  </object>
+
+  <object Name="Random Statue" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,statue" />
+  </object>
+
+  <object Name="Oboroqoru Statue" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,statue,shrine" />
+  </object>
+
+  <object Name="Keresh Statue" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,statue,shrine" />
+  </object>
+
+  <object Name="Six Day Stilt statue" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,statue,shrine" />
+  </object>
+
+  <object Name="Eater Hologram" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,hologram" />
+  </object>
+
+  <object Name="Village Monument" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,monument" />
+  </object>
+
+  <object Name="Village Hologram 1" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,monument,hologram" />
+  </object>
+
+  <object Name="Village Hologram 2" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,monument,hologram" />
+  </object>
+
+  <object Name="Sign" Load="Merge">
+    <tag Name="WidgetCategory" Value="sign" />
+  </object>
+
+  <object Name="Tombstone" Load="Merge">
+    <tag Name="WidgetCategory" Value="tombstone,death" />
+  </object>
+
+  <object Name="Empty Urn" Load="Merge">
+    <tag Name="WidgetCategory" Value="liquid container,container,death" />
+  </object>
+
+  <object Name="Urn" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tombstone,death" />
+  </object>
+
+  <object Name="Urn" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tombstone,death" />
+  </object>
+
+  <object Name="TombUrn" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tombstone,death" />
+  </object>
+
+  <object Name="Sarcophagus" Load="Merge">
+    <tag Name="WidgetCategory" Value="tombstone,death" />
+  </object>
+
+  <object Name="Wooden Wind Turbine" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator" />
+  </object>
+
+  <object Name="Millstone" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool" />
+  </object>
+
+  <object Name="Wooden Water Wheel" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator" />
+  </object>
+
+  <object Name="Kiln" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool" />
+  </object>
+
+  <object Name="Electric Generator" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator" />
+  </object>
+
+  <object Name="Induction Charging Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Hydraulic Irrigator" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Rock Tumbler" Load="Merge">
+    <tag Name="WidgetCategory" Value="container,tool,installation" />
+  </object>
+
+  <object Name="Lathe" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
+  </object>
+
+  <object Name="Solar Power Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator,installation" />
+  </object>
+
+  <object Name="Solar Pumping Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator,installation" />
+  </object>
+
+  <object Name="Food Processor" Load="Merge">
+    <tag Name="WidgetCategory" Value="container,tool,installation" />
+  </object>
+
+  <object Name="Universal Charging Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Hydraulic Turbine" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Hydraulic Press" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Force Projector" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Glass Furnace" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Wire Extruder" Load="Merge">
+    <tag Name="WidgetCategory" Value="container,tool,installation" />
+  </object>
+
+  <object Name="Broadcast Power Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator,installation" />
+  </object>
+
+  <object Name="Fusion Power Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator,installation" />
+  </object>
+
+  <object Name="Fusion Pumping Station" Load="Merge">
+    <tag Name="WidgetCategory" Value="generator,installation" />
+  </object>
+
+  <object Name="Industrial Fan" Load="Merge">
+    <tag Name="WidgetCategory" Value="installation" />
+  </object>
+
+  <object Name="Glass Printer" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
+  </object>
+
+  <object Name="Regen Tank" Load="Merge">
+    <tag Name="WidgetCategory" Value="tool,installation" />
+  </object>
+
+  <object Name="Catchbasin" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,liquid container,tool" />
+  </object>
+
+  <object Name="Air Well" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool" />
+  </object>
+
+  <object Name="Solar Still" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,liquid container,tool" />
+  </object>
+
+  <object Name="Solar Condenser" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,liquid container,tool" />
+  </object>
+
+  <object Name="Quantum Rippler" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
+  </object>
+
+  <object Name="NormCore" Load="Merge">
+    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
+  </object>
+
+  <!-- Quality Beds -->
+
+  <object Name="Bedroll" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Crib" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Folding Cot" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Hammock" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Four-Poster Bed" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Waterbed" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Bedger" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Medical Bed" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Hyperbiotic Bed" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <!-- Quality Chairs -->
+
+  <object Name="Chair" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Floor Cushion" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+  <object Name="Kline" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Bench" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Stool" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+  <object Name="Canvas Folding Chair" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+  <object Name="Throne" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Armchair" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Massage Chair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Work Chair" Load="Merge">
+    <tag Name="Utility" Value="work" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Ergomax Chair" Load="Merge">
+    <tag Name="Utility" Value="work" />
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Chairbear" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Torture Chair" Load="Merge">
+    <tag Name="Utility" Value="work" />
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Medical Chair" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Hyperbiotic Chair" Load="Merge">
+    <tag Name="Utility" Value="medical" />
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Gravchair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Ornate Chair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+  <object Name="Scrapasan" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Starmchair" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Sofa L" Load="Merge">
+    <tag Name="Utility" Value="wide" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Sofa C" Load="Merge">
+    <tag Name="Utility" Value="wide" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+  <object Name="Sofa R" Load="Merge">
+    <tag Name="Utility" Value="wide" />
+    <tag Name="Quality" Value="nice" />
+  </object>
+
+  <!-- Quality Doors -->
+
+  <object Name="Archway" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Door" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+  </object>
+
+  <object Name="Windowed Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+
+  <object Name="Striped Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Wavy Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+  </object>
+
+  <object Name="Metal Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+  </object>
+
+  <object Name="Double Door N" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Door S" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Door E" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Door W" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Windowed Door N" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Windowed Door S" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Windowed Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Windowed Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Striped Door N" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Striped Door S" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Striped Door E" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Striped Door W" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Wavy Door N" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Wavy Door S" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Wavy Door E" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Wavy Door W" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Double Metal Door N" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+  <object Name="Double Metal Door S" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="tall" />
+  </object>
+
+  <object Name="Double Metal Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+  <object Name="Double Metal Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide" />
+  </object>
+
+  <object Name="Glass Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+  <object Name="Glass Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+  
+  <object Name="Tinted Glass Door E" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+  <object Name="Tinted Glass Door W" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="wide,vision" />
+  </object>
+
+  <object Name="Security Door" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  
+  <object Name="Red Security Door" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Yellow Security Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Green Security Door" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Blue Security Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+  <object Name="Purple Security Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="secure" />
+  </object>
+
+  <object Name="Fused Security Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="secure,nopass" />
+  </object>
+
+  <object Name="Crypt Door" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="death" />
+  </object>
+  <object Name="Crypt Double Door N" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall,death" />
+  </object>
+  <object Name="Crypt Double Door S" Load="Merge">
+    <tag Name="Quality" Value="luxury" />
+    <tag Name="Utility" Value="tall,death" />
+  </object>
+
+  <object Name="Brinestalk Gate" Load="Merge">
+    <tag Name="Quality" Value="basic" />
+    <tag Name="Utility" Value="gate" />
+  </object>
+  <object Name="Iron Gate" Load="Merge">
+    <tag Name="Quality" Value="nice" />
+    <tag Name="Utility" Value="gate" />
+  </object>
+  
+  <!-- Gigantic Infrastructure -->
+
+  <object Name="Gigantic DoorSwitch" Inherits="DoorSwitch">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ElevatorSwitch" Inherits="ElevatorSwitch">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic DisabledSwitch" Inherits="DisabledSwitch">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Platform" Inherits="Platform">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Doors -->
+
+  <object Name="Gigantic Archway" Inherits="Archway">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Door" Inherits="Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Windowed Door" Inherits="Windowed Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Striped Door" Inherits="Striped Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Wavy Door" Inherits="Wavy Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Metal Door" Inherits="Metal Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Door N" Inherits="Double Door N">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Door S" Inherits="Double Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Door E" Inherits="Double Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Door W" Inherits="Double Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Windowed Door N" Inherits="Double Windowed Door N">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Windowed Door S" Inherits="Double Windowed Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Windowed Door E" Inherits="Double Windowed Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Windowed Door W" Inherits="Double Windowed Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Striped Door N" Inherits="Double Striped Door N">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Striped Door S" Inherits="Double Striped Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Striped Door E" Inherits="Double Striped Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Striped Door W" Inherits="Double Striped Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Wavy Door N" Inherits="Double Wavy Door N">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Wavy Door S" Inherits="Double Wavy Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Wavy Door E" Inherits="Double Wavy Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Wavy Door W" Inherits="Double Wavy Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Metal Door N" Inherits="Double Metal Door N">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Metal Door S" Inherits="Double Metal Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Double Metal Door E" Inherits="Double Metal Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Double Metal Door W" Inherits="Double Metal Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Door E" Inherits="Glass Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Glass Door W" Inherits="Glass Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Tinted Glass Door E" Inherits="Tinted Glass Door E">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tinted Glass Door W" Inherits="Tinted Glass Door W">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Security Door" Inherits="Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Red Security Door" Inherits="Red Security Door">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Yellow Security Door" Inherits="Yellow Security Door">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Green Security Door" Inherits="Green Security Door">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Blue Security Door" Inherits="Blue Security Door">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Purple Security Door" Inherits="Purple Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Fused Security Door" Inherits="Fused Security Door">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Crypt Door" Inherits="Crypt Door">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Crypt Double Door N" Inherits="Crypt Double Door N">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Crypt Double Door S" Inherits="Crypt Double Door S">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Brinestalk Gate" Inherits="Brinestalk Gate">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Iron Gate" Inherits="Iron Gate">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Power Conduits -->
+
+  <object Name="Gigantic PowerLine" Inherits="PowerLine">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic HeavyPowerLine" Inherits="HeavyPowerLine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GlassHydraulicPipe" Inherits="GlassHydraulicPipe">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic WoodenMechanicalTransmission" Inherits="WoodenMechanicalTransmission">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Grid-enabled Tech Furniture -->
+
+  <object Name="Gigantic Wooden Wind Turbine" Inherits="Wooden Wind Turbine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Millstone" Inherits="Millstone">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Wooden Water Wheel" Inherits="Wooden Water Wheel">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Powered Orrery" Inherits="Powered Orrery">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Kiln" Inherits="Kiln">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Electric Generator" Inherits="Electric Generator">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Induction Charging Station" Inherits="Induction Charging Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Irrigator" Inherits="Hydraulic Irrigator">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Clockthing_QGirl" Inherits="Clockthing_QGirl">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Bubblething" Inherits="Hydraulic Bubblething">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Gas Burner" Inherits="Gas Burner">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Powered Telescope" Inherits="Powered Telescope">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Rock Tumbler" Inherits="Rock Tumbler">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Lathe" Inherits="Lathe">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Solar Power Station" Inherits="Solar Power Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Solar Pumping Station" Inherits="Solar Pumping Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Food Processor" Inherits="Food Processor">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Universal Charging Station" Inherits="Universal Charging Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Turbine" Inherits="Hydraulic Turbine">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Hydraulic Press" Inherits="Hydraulic Press">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Force Projector" Inherits="Force Projector">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Liquid-Cooled Unicomputer" Inherits="Liquid-Cooled Unicomputer">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Loudspeaker" Inherits="Loudspeaker">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Furnace" Inherits="Glass Furnace">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Wire Extruder" Inherits="Wire Extruder">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Broadcast Power Station" Inherits="Broadcast Power Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Fusion Power Station" Inherits="Fusion Power Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Fusion Pumping Station" Inherits="Fusion Pumping Station">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Industrial Fan North" Inherits="Industrial Fan North">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Industrial Fan South" Inherits="Industrial Fan South">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Broken Industrial Fan" Inherits="Broken Industrial Fan">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Glass Printer" Inherits="Glass Printer">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Regen Tank" Inherits="Regen Tank">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Catchbasin" Inherits="Catchbasin">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Air Well" Inherits="Air Well">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Underground Air Well" Inherits="Underground Air Well">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Underground Catchbasin" Inherits="Underground Catchbasin">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2-32" MaxVolume="64" InitialLiquid="water-1000" />
+  </object>
+
+  <object Name="Gigantic Solar Still" Inherits="Solar Still">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Solar Condenser" Inherits="Solar Condenser">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Quantum Rippler" Inherits="Quantum Rippler">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Grid Quantum Rippler" Inherits="Grid Quantum Rippler">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic NormCore1" Inherits="NormCore1">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic NormCore2" Inherits="NormCore2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic NormCore3" Inherits="NormCore3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GridNormCore1" Inherits="GridNormCore1">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GridNormCore2" Inherits="GridNormCore2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GridNormCore3" Inherits="GridNormCore3">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Bookshelves -->
+
+  <object Name="Gigantic Bookshelf" Inherits="Bookshelf">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf1" Inherits="ishelf1">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf2" Inherits="ishelf2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf3" Inherits="ishelf3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ishelf4" Inherits="ishelf4">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic UndergroundBookshelf" Inherits="UndergroundBookshelf">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <!-- Gigantic Beds -->
+
+  <object Name="Gigantic Bedroll" Inherits="Bedroll">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Crib" Inherits="Crib">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Folding Cot" Inherits="Folding Cot">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Hammock" Inherits="Hammock">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Four-Poster Bed" Inherits="Four-Poster Bed">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Waterbed" Inherits="Waterbed">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Bedger" Inherits="Bedger">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Medical Bed" Inherits="Medical Bed">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Hyperbiotic Bed" Inherits="Hyperbiotic Bed">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Chairs -->
+  
+  <object Name="Gigantic Chair" Inherits="Chair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Floor Cushion" Inherits="Floor Cushion">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Kline" Inherits="Kline">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Bench" Inherits="Bench">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Stool" Inherits="Stool">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Canvas Folding Chair" Inherits="Canvas Folding Chair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Throne" Inherits="Throne">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Armchair" Inherits="Armchair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Massage Chair" Inherits="Massage Chair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Work Chair" Inherits="Work Chair">
+    <part Name="ModGigantic" />
+    <removepart Name="TinkerItem" />
+  </object>
+  <object Name="Gigantic Ergomax Chair" Inherits="Ergomax Chair">
+    <part Name="ModGigantic" />
+    <removepart Name="TinkerItem" />
+  </object>
+  <object Name="Gigantic Chairbear" Inherits="Chairbear">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <object Name="Gigantic Torture Chair" Inherits="Torture Chair">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <object Name="Gigantic Medical Chair" Inherits="Medical Chair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Hyperbiotic Chair" Inherits="Hyperbiotic Chair">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <object Name="Gigantic Gravchair" Inherits="Gravchair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Ornate Chair" Inherits="Ornate Chair">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Scrapasan" Inherits="Scrapasan">
+    <part Name="ModGigantic" />
+    <removepart Name="TinkerItem" />
+  </object>
+  <object Name="Gigantic Starmchair" Inherits="Starmchair">
+    <part Name="ModGigantic" />
+  </object>
+  
+  <object Name="Gigantic Sofa L" Inherits="Sofa L">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Sofa C" Inherits="Sofa C">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Sofa R" Inherits="Sofa R">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Chests -->
+
+  <object Name="Gigantic Chest" Inherits="Chest">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ScrapChest" Inherits="ScrapChest">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Chest1" Inherits="Chest1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest2" Inherits="Chest2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest3" Inherits="Chest3">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest4" Inherits="Chest4">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest5" Inherits="Chest5">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest6" Inherits="Chest6">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest7" Inherits="Chest7">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Chest8" Inherits="Chest8">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Metal Chest1" Inherits="Metal Chest1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest2" Inherits="Metal Chest2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest3" Inherits="Metal Chest3">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest4" Inherits="Metal Chest4">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest5" Inherits="Metal Chest5">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest6" Inherits="Metal Chest6">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest7" Inherits="Metal Chest7">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Chest8" Inherits="Metal Chest8">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ChestMinorRazed" Inherits="ChestMinorRazed">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic RareChest" Inherits="RareChest">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest1" Inherits="Rare Chest1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest2" Inherits="Rare Chest2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest3" Inherits="Rare Chest3">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest4" Inherits="Rare Chest4">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest5" Inherits="Rare Chest5">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest6" Inherits="Rare Chest6">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest7" Inherits="Rare Chest7">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Rare Chest8" Inherits="Rare Chest8">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic RelicChest" Inherits="RelicChest">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic RewardChestJunk" Inherits="RewardChestJunk">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Locker2" Inherits="Locker2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic RustLocker" Inherits="RustLocker">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic MedLocker" Inherits="MedLocker">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Locker" Inherits="Locker">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Scrapable Deposit Box 6" Inherits="Scrapable Deposit Box 6">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Weapon Rack" Inherits="Weapon Rack">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Gun Rack" Inherits="Gun Rack">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Armor Rack" Inherits="Armor Rack">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic CyberneticsRack" Inherits="CyberneticsRack">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic CyberneticsStationRack" Inherits="CyberneticsStationRack">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic WedgeChest1" Inherits="WedgeChest1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WedgeChest2" Inherits="WedgeChest2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WedgeChest3" Inherits="WedgeChest3">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WedgeChest4" Inherits="WedgeChest4">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WedgeChest5" Inherits="WedgeChest5">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WedgeChest6" Inherits="WedgeChest6">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Reliquaries -->
+
+  <object Name="Gigantic Reliquary" Inherits="Reliquary">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Non-chest Storage -->
+
+  <object Name="Gigantic Woven Basket" Inherits="Woven Basket">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Preserved Food Basket" Inherits="Preserved Food Basket">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Multicabinet" Inherits="Multicabinet">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Light Sources -->
+
+  <object Name="Gigantic Brazier" Inherits="Brazier">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tall Brazier" Inherits="Tall Brazier">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Sconce" Inherits="Sconce">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Torchpost" Inherits="Torchpost">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Unlit Torchpost" Inherits="Unlit Torchpost">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Techlight1" Inherits="Techlight1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Techlight2" Inherits="Techlight2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Techlight3" Inherits="Techlight3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Full-Spectrum Techlight" Inherits="Full-Spectrum Techlight">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Half Candelabra" Inherits="Half Candelabra">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Candelabra" Inherits="Candelabra">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Tomb Techlight1" Inherits="Tomb Techlight1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tomb Techlight2" Inherits="Tomb Techlight2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tomb Techlight3" Inherits="Tomb Techlight3">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tomb Techlight4" Inherits="Tomb Techlight4">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tomb Techlight5" Inherits="Tomb Techlight5">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Tomb Techlight6" Inherits="Tomb Techlight6">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Inner Tomb Techlight1" Inherits="Inner Tomb Techlight1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Inner Tomb Techlight2" Inherits="Inner Tomb Techlight2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Inner Tomb Techlight3" Inherits="Inner Tomb Techlight3">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Inner Tomb Techlight4" Inherits="Inner Tomb Techlight4">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Inner Tomb Techlight5" Inherits="Inner Tomb Techlight5">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Inner Tomb Techlight6" Inherits="Inner Tomb Techlight6">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic CatacombLight" Inherits="CatacombLight">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Liquid Vessels -->
+
+  <object Name="Gigantic Vase" Inherits="Vase">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Vase Unhandled" Inherits="Vase Unhandled">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Cider Vase" Inherits="Cider Vase">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Honey Vase" Inherits="Honey Vase">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Wine Vase" Inherits="Wine Vase">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Oil Vase" Inherits="Oil Vase">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+
+  <object Name="Gigantic Wide Bottle" Inherits="Wide Bottle">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Random Bottle" Inherits="Random Bottle">
+    <part Name="ModGigantic" />
+    <part Name="PopulationLiquidFiller" Table="RandomLiquid" Volume="2d8" />
+  </object>
+  <object Name="Gigantic Random Bottle Rare Liquid" Inherits="Random Bottle Rare Liquid">
+    <part Name="ModGigantic" />
+    <part Name="PopulationLiquidFiller" Table="RandomRareLiquid" Volume="1d2" />
+  </object>
+
+  <object Name="Gigantic Cider Bottle" Inherits="Cider Bottle">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Honey Bottle" Inherits="Honey Bottle">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Wine Bottle" Inherits="Wine Bottle">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Oil Bottle" Inherits="Oil Bottle">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+
+  <object Name="Gigantic Ewer" Inherits="Ewer">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Jug" Inherits="Jug">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Jug Eastern Style" Inherits="Jug Eastern Style">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Jug Wide Eastern Style" Inherits="Jug Wide Eastern Style">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Jug Wide Eastern Style with Wine" Inherits="Jug Wide Eastern Style with Wine">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="4-16" />
+  </object>
+  <object Name="Gigantic Long Jug" Inherits="Long Jug">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Pitcher" Inherits="Pitcher">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Cider Pitcher" Inherits="Cider Pitcher">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Honey Pitcher" Inherits="Honey Pitcher">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Wine Pitcher" Inherits="Wine Pitcher">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+  <object Name="Gigantic Oil Pitcher" Inherits="Oil Pitcher">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d7-1" />
+  </object>
+
+  <!-- Gigantic Ovens -->
+
+  <object Name="Gigantic Campfire" Inherits="Campfire">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Oven" Inherits="Oven">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Tables & Table-likes -->
+
+  <object Name="Gigantic Table" Inherits="Table">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Table" Inherits="Metal Table">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Workbench" Inherits="Workbench">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Metal Workbench" Inherits="Metal Workbench">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Desk" Inherits="Desk">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Sleek Table" Inherits="Sleek Table">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Low Table" Inherits="Low Table">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Octagonal Table" Inherits="Octagonal Table">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Dresser" Inherits="Dresser">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Book Table" Inherits="Book Table">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Ornate Table" Inherits="Ornate Table">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Arts/crafts/culture/decorations -->
+
+  <object Name="Gigantic Globe" Inherits="Globe">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Orrery" Inherits="Orrery">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Clockthing" Inherits="Clockthing">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Bubblething" Inherits="Bubblething">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Fluxthing" Inherits="Fluxthing">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Electrothing" Inherits="Electrothing">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Unicomputer" Inherits="Unicomputer">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Powerless Bubblething" Inherits="Powerless Bubblething">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Powerless Fluxthing" Inherits="Powerless Fluxthing">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Powerless Electrothing" Inherits="Powerless Electrothing">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Powerless Unicomputer" Inherits="Powerless Unicomputer">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  
+  <object Name="Gigantic Telescope" Inherits="Telescope">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Bust of K4K5" Inherits="Bust of K4K5">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Bust of Mehmet I" Inherits="Bust of Mehmet I">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  
+  <object Name="Gigantic Ornate Potted Plant 1" Inherits="Ornate Potted Plant 1">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Ornate Potted Plant 2" Inherits="Ornate Potted Plant 2">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Ornate Potted Plant 3" Inherits="Ornate Potted Plant 3">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Ornate Potted Plant 4" Inherits="Ornate Potted Plant 4">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Chalkboard" Inherits="Chalkboard">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Display Breadboard" Inherits="Display Breadboard">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Sewing Machine" Inherits="Sewing Machine">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Mannequin" Inherits="Mannequin">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Light Sculpture" Inherits="Light Sculpture">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Brain Sculpture" Inherits="Brain Sculpture">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Unfinished Sculpture" Inherits="Unfinished Sculpture">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Painted Column L" Inherits="Painted Column L">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Painted Column R" Inherits="Painted Column R">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Painting" Inherits="Painting">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Mushroom Case" Inherits="Mushroom Case">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Harp" Inherits="Harp">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Rectangular Bells" Inherits="Rectangular Bells">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Hammered Dulcimer" Inherits="Hammered Dulcimer">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Iron Maiden" Inherits="Iron Maiden">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Hookah" Inherits="Hookah">
+    <part Name="ModGigantic" />
+    <part Name="LiquidVolume" StartVolume="2d4" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Cage" Inherits="Cage">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Forge" Inherits="Forge">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Anvil" Inherits="Anvil">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+  </object>
+
+  <!-- Gigantic Statues -->
+
+  <object Name="Statue" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Statue" Inherits="Statue">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Random Statue" Inherits="Random Statue">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Random Stone Statue" Inherits="Random Stone Statue">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Random Marble Statue" Inherits="Random Marble Statue">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic ImplantedEaterStatue" Inherits="ImplantedEaterStatue">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic EaterStatue" Inherits="EaterStatue">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic EaterStatueFlipped" Inherits="EaterStatueFlipped">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic EaterStatue Gold" Inherits="EaterStatue Gold">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic EaterStatueFlipped Gold" Inherits="EaterStatueFlipped Gold">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Oboroqoru Statue" Load="Merge">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="NephilimShrine" Load="Merge">
+    <part Name="ModGigantic" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+  </object>
+
+  <!-- Gigantic Holograms -->
+
+  <object Name="Eater Hologram" Load="Merge">
+    <tag Name="Ornate" />
+  </object>
+  <object Name="Gigantic Eater Hologram" Inherits="Eater Hologram">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Eater Hologram Flipped" Inherits="Eater Hologram Flipped">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Eater Hologram Dynamic Flip" Inherits="Eater Hologram Dynamic Flip">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Village Monuments -->
+
+  <object Name="Village Monument" Load="Merge">
+    <tag Name="Ornate" />
+  </object>
+
+  <object Name="Gigantic Village Monument Obelisk" Inherits="Village Monument Obelisk">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Amphora" Inherits="Village Monument Amphora">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Birdhouse" Inherits="Village Monument Birdhouse">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Diptych" Inherits="Village Monument Diptych">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Stele" Inherits="Village Monument Stele">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Monolith" Inherits="Village Monument Monolith">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Sculpture" Inherits="Village Monument Sculpture">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Monument Orb" Inherits="Village Monument Orb">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic Village Hologram 1" Inherits="Village Hologram 1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Village Hologram 2" Inherits="Village Hologram 2">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Signs -->
+
+  <object Name="Gigantic Sign" Inherits="Sign">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic AppleSign1" Inherits="AppleSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic AppleSign2" Inherits="AppleSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic AppleSign3" Inherits="AppleSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic BookSign1" Inherits="BookSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic BookSign2" Inherits="BookSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic BookSign3" Inherits="BookSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic BottleSign1" Inherits="BottleSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic BottleSign2" Inherits="BottleSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic BottleSign3" Inherits="BottleSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic BootSign1" Inherits="BootSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic BootSign2" Inherits="BootSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic BootSign3" Inherits="BootSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic HatSign1" Inherits="HatSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic HatSign2" Inherits="HatSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic HatSign3" Inherits="HatSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GloveSign1" Inherits="GloveSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic GloveSign2" Inherits="GloveSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic GloveSign3" Inherits="GloveSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic CloakSign1" Inherits="CloakSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic CloakSign2" Inherits="CloakSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic CloakSign3" Inherits="CloakSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ArmorSign1" Inherits="ArmorSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic ArmorSign2" Inherits="ArmorSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic ArmorSign3" Inherits="ArmorSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GunSign1" Inherits="GunSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic GunSign2" Inherits="GunSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic GunSign3" Inherits="GunSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic DiscSign1" Inherits="DiscSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic DiscSign2" Inherits="DiscSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic DiscSign3" Inherits="DiscSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic LiquidSign1" Inherits="LiquidSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic LiquidSign2" Inherits="LiquidSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic LiquidSign3" Inherits="LiquidSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic JewelSign1" Inherits="JewelSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic JewelSign2" Inherits="JewelSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic JewelSign3" Inherits="JewelSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic HookahSign1" Inherits="HookahSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic HookahSign2" Inherits="HookahSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic HookahSign3" Inherits="HookahSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic GrenadeSign1" Inherits="GrenadeSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic GrenadeSign2" Inherits="GrenadeSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic GrenadeSign3" Inherits="GrenadeSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic PepperSign1" Inherits="PepperSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic PepperSign2" Inherits="PepperSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic PepperSign3" Inherits="PepperSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic FoodSign1" Inherits="FoodSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic FoodSign2" Inherits="FoodSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic FoodSign3" Inherits="FoodSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic PreserveSign1" Inherits="PreserveSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic PreserveSign2" Inherits="PreserveSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic PreserveSign3" Inherits="PreserveSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic PigSign" Inherits="PigSign">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic WineSign1" Inherits="WineSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WineSign2" Inherits="WineSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic WineSign3" Inherits="WineSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <object Name="Gigantic ImplantSign1" Inherits="ImplantSign1">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic ImplantSign2" Inherits="ImplantSign2">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic ImplantSign3" Inherits="ImplantSign3">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Burial Furniture -->
+
+  <object Name="Gigantic Tombstone" Inherits="Tombstone">
+    <part Name="ModGigantic" />
+  </object>
+
+  <!-- Gigantic Urns -->
+
+  <object Name="Gigantic Empty Urn" Inherits="Empty Urn">
+    <part Name="ModGigantic" />
+    <tag Name="Burial" />
+  </object>
+  <object Name="Gigantic Urn" Inherits="Urn">
+    <part Name="ModGigantic" />
+    <tag Name="Burial" />
+  </object>
+  <object Name="Gigantic TombUrn" Inherits="TombUrn">
+    <part Name="ModGigantic" />
+    <tag Name="Burial" />
+  </object>
+
+  <!-- Gigantic Sarcophagi -->
+
+  <object Name="Gigantic Sarcophagus" Inherits="Sarcophagus">
+    <part Name="ModGigantic" />
+    <tag Name="Burial" />
+  </object>
+
+  <!-- Gigantic Special Quest Furniture -->
+
+  <object Name="Golem Mound" Load="Merge">
+    <part Name="ModGigantic" />
+    <tag Name="Ornate" />
+    <tag Name="ModGiganticNoDisplayName" />
+  </object>
+
+  <!-- Gigantic Vehicle Furniture -->
+
+  <object Name="VehicleGolemSeat" Load="Merge">
+    <part Name="Chair" Level="3" Securing="true" BreakIfGiganticOnNonGigantic="false" />
+  </object>
+    
+</objects>

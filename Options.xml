@@ -28,7 +28,7 @@
 	
   <option
         ID="Option_GigantismPlus_DebugIncludeInMessage"
-		Requires="Option_GigantismPlus_DebugVerbosity!=0"
+		    Requires="Option_GigantismPlus_DebugVerbosity!=0"
         DisplayText="{{giant|Gigantism Plus}}: Also show debug entries in the Message Queue"
         Category="Debug"
         Type="Checkbox"
@@ -48,14 +48,35 @@
   <!-- 
   Mod Options
   -->
-	
+
+  <option
+		  ID="Option_GigantismPlus_Colorfulness"
+	    DisplayText="Use colorful text strings throughout the mod"
+	    Category="Mods: Gigantism Plus"
+      Type="Slider"
+      Default="3"
+      Min="1"
+      Max="3"
+      Increment="1"
+	    >
+    <helptext>
+      This mod makes use of a number of custom {{giant|colors}} and {{gianter|shaders}} in a lot of places vanilla does, but also in a number of places vanilla doesn't. To give you the ability to maintain the vanilla aesthetic, this slider should adjust which colors appear where.
+
+      {{Z|3}}: {{gigantic|Gigantic}} shaders (or their {{w|Fallbacks}} if they fail to load) all throughout the mod.
+      {{w|2}}: {{w|Fallback}} shaders all throughout the mod.
+      {{Y|1}}: Regular, plain text with some infrequent use of {{w|Fallback}} where it matches vanilla.
+
+      The default is {{Z|3}}.
+    </helptext>
+  </option>
+  
 	<option 
-		ID="Option_GigantismPlus_EnableGiganticStartingGear"
+		  ID="Option_GigantismPlus_EnableGiganticStartingGear"
 	    DisplayText="{{gigantic|Gigantify}} starting equipment for {{gigantic|Gigantic}} ({{r|D}}) players ({{R|new save}})"
 	    Category="Mods: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
-	>
+	    >
 		<helptext>
 			A {{gigantic|gigantic}} character would have {{gigantic|gigantic}} equipment when they arrive in Qud.
 			Disabling this option will make for a more difficult start.
@@ -65,13 +86,13 @@
 	</option>
 	
 	<option 
-		ID="Option_GigantismPlus_EnableGiganticStartingGear_Grenades"
+		  ID="Option_GigantismPlus_EnableGiganticStartingGear_Grenades"
 	    Requires="Option_GigantismPlus_EnableGiganticStartingGear==Yes"
 	    DisplayText="Include starting grenades ({{R|new save}})"
 	    Category="Mods: Gigantism Plus"
 	    Type="Checkbox" 
 			Default="No"
-	>
+	    >
 		<helptext>
 			The {{gigantic|gigantic}} modifier typically increases the radius of grenades which could represent a significant reduction in starting difficulty for characters who generate with several of them.
 
@@ -80,12 +101,12 @@
 	</option>
 
 	<option
-		ID="Option_GigantismPlus_EnableGigantismRapidAdvance"
+		  ID="Option_GigantismPlus_EnableGigantismRapidAdvance"
 	    DisplayText="Make {{gigantic|Gigantism}} ({{r|D}}) eligible for rapid advancement"
 	    Category="Mods: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
-	>
+	    >
 		<helptext>
 			({{r|D}})efects aren't typically able to be leveled up and are excluded from rapid advancement by default.
 			When enabled, {{gigantism|Gigantism}} ({{r|D}}) will be included in the list of physical mutations for this purpose.
@@ -95,12 +116,12 @@
 	</option>
 	
 	<option 
-		ID="Option_GigantismPlus_SelectGiganticTinkering"
+		  ID="Option_GigantismPlus_SelectGiganticTinkering"
 	    DisplayText="Make the {{gigantic|gigantic}} modifier tinkerable"
 	    Category="Mods: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
-	>
+	    >
 		<helptext>
       This makes the {{gigantic|gigantic}} modifier tinkerable, including the availability of the data disk for it.
       Its tech tier has been adjusted up to 3 so that it will cost at least a {{b|3}} bit to tinker.
@@ -111,12 +132,12 @@
 	</option>
 	
 	<option 
-		ID="Option_GigantismPlus_SelectGiganticDerarification"
+		  ID="Option_GigantismPlus_SelectGiganticDerarification"
 	    DisplayText="Make {{gigantic|gigantic}} items slightly more common"
 	    Category="Mods: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
-	>
+	    >
 		<helptext>
       This makes {{gigantic|gigantic}} items a little less rare to find by adjusting their rarity from R2 to R.
       Some examples of other mods with R rarity: {{spiked|Spiked}}, {{k|Nulling}}, and {{C|Radio Powered}}.
@@ -127,35 +148,67 @@
 
   <!-- NPC Equipment Options -->
   <option 
-    ID="Option_GigantismPlus_EnableGiganticNPCGear"
-    DisplayText="Make NPC Equipment {{gigantic|Gigantic}}"
-    Category="Mods: Gigantism Plus"
-    Type="Checkbox"
-    Default="Yes"
-  >
+      ID="Option_GigantismPlus_EnableGiganticNPCGear"
+      DisplayText="Make NPC Equipment {{gigantic|Gigantic}}"
+      Category="Mods: Gigantism Plus"
+      Type="Checkbox"
+      Default="Yes"
+      >
     <helptext>
       Should equipment carried by {{gigantic|gigantic}} NPCs be {{gigantic|gigantic}}?
+      This option can be changed mid-game, however, due to targeting the creation of the creature, it will only apply to creatures generated after this option is enabled.
       
       The default is {{w|Enabled}}.
     </helptext>
   </option>
   
   <option 
-    ID="Option_GigantismPlus_EnableGiganticNPCGear_Grenades"
-    Requires="Option_GigantismPlus_EnableGiganticNPCGear==Yes"
-    DisplayText="Include NPC grenades"
-    Category="Mods: Gigantism Plus"
-    Type="Checkbox"
-    Default="No"
-  >
+      ID="Option_GigantismPlus_EnableGiganticNPCGear_Grenades"
+      Requires="Option_GigantismPlus_EnableGiganticNPCGear==Yes"
+      DisplayText="Include NPC grenades"
+      Category="Mods: Gigantism Plus"
+      Type="Checkbox"
+      Default="No"
+      >
     <helptext>
       Should grenades carried by {{gigantic|gigantic}} NPCs be {{gigantic|gigantic}}?
       {{gigantic|Gigantic}} grenades have a larger blast radius, which can make encounters significantly harder.
-      
+      This option can be changed mid-game, however, due to targeting the creation of the creature, it will only apply to creatures generated after this option is enabled.
+
       The default is {{w|Disabled}}.
     </helptext>
   </option>
-  
-  <!-- End of Mod Options -->
+
+  <!-- Advanced Options -->
+
+  <option
+		  ID="Option_GigantismPlus_ManagedVanilla"
+	    DisplayText="Use &quot;up-classed&quot; versions of vanilla mutations that have natural weapons ({{R|new save}})"
+      Requires="OptionShowAdvancedOptions==Yes"
+	    Category="Mods: Gigantism Plus"
+      Type="Button"
+      Default="Yes"
+      OnClick="HNPS_GigantismPlus.Options.OnOptionManagedVanilla"
+	    >
+    <helptext>
+      {{K|This option is currently inactive. The "Enabled" behavior is currently forced.}}
+
+      This mod adjusts how a number of vanilla mutations grant their natural weapons.
+
+      With this option enabled, the mod will replace the mutation entries' class for the mutations in question with an alternate version that implements the adjustments intended by the mod, but are otherwise identical in behaviour. Wishes that target the mutation class instead of the mutation name will require the alternate class name.
+
+      With this option disabled, the mod will leave the mutation entries for the mutations in question completely vanilla, and uses a patch to bypass the relevant parts of their regular behaviour and deferring those parts to the relevant alternate mutation class mentioned above. Other mods that make changes to the mutations in question will likely have their behaviour impacted by this mod due to the nature of the patch.
+
+      Mutations currently affected:
+      &#xF9; {{W|Burrowing Claws}}
+      &#xF9; {{crystalline|Crystallinity}}
+
+      {{r|If the above reads like nonsense then this option is fine to leave on default.}}
+
+      The default is {{w|Enabled}}.
+    </helptext>
+  </option>
 	
+  <!-- End of Mod Options -->
+  
 </options>

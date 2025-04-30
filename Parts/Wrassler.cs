@@ -143,6 +143,26 @@ namespace XRL.World.Parts
             return ColorBag;
         }
 
+        public override void Attach()
+        {
+            base.Attach();
+            if (ParentObject != null)
+            {
+                if (!ParentObject.TryGetPart(out Vaultable vaultable))
+                {
+                    vaultable = ParentObject.RequirePart<Vaultable>();
+                }
+                vaultable.SizeMatters = true;
+                vaultable.EnablingLimbs = "Hand,Hands,Foot,Feet,Tail";
+                vaultable.EnablingLimbsList = vaultable.EnablingLimbs.CommaExpansion();
+                vaultable.OverridingParts = "Wrassler";
+                vaultable.OverridingPartsList = new()
+                {
+                    "Wrassler",
+                };
+            }
+        }
+
         public Wrassler BestowWrassleGear(out bool Bestowed)
         {
             Bestowed = false;

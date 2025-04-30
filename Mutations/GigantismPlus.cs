@@ -22,8 +22,9 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class GigantismPlus 
         : BaseManagedDefaultEquipmentMutation<GigantismPlus>
+        , IModEventHandler<BeforeVaultEvent>
+        , IModEventHandler<VaultedEvent>
     {
-
         public static readonly int ICON_COLOR_PRIORITY = 81;
         public static readonly string ICON_COLOR = "&z";
         public static readonly string ICON_COLOR_FALLBACK = "&w";
@@ -301,14 +302,19 @@ namespace XRL.World.Parts.Mutation
 
         public int GetJumpRangeBonus(int Level)
         {
-            return 1 + GiganticExoframe?.JumpDistanceBonus == null ? 0 : GiganticExoframe.JumpDistanceBonus;
+            return 1 + 
+                GiganticExoframe?.JumpDistanceBonus != null 
+                ? GiganticExoframe.JumpDistanceBonus
+                : 0
+                ;
         }
         public double GetStunningForceLevelFactor()
         {
             return _stunningForceLevelFactor =
-                (GiganticExoframe?.StunningForceLevelFactor) == null
+                GiganticExoframe?.StunningForceLevelFactor == null
                 ? _stunningForceLevelFactor
-                : GiganticExoframe.StunningForceLevelFactor;
+                : GiganticExoframe.StunningForceLevelFactor
+                ;
         }
         public int GetStunningForceLevel(int Level)
         {
@@ -340,14 +346,17 @@ namespace XRL.World.Parts.Mutation
             }
             Debug.Entry(4, "x if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump)) ?//", Indent: 1);
 
-            Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 1);
-            Debug.LoopItem(4, $" stunningForceOnJump.Level: {stunning.Level}", Indent: 2);
-            Debug.LoopItem(4, $" stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2);
-            stunning.Level = GetStunningForceLevel(Level); // Scale stunningForceOnJump force with mutation level
-            stunning.Distance = StunningForceDistance;
-            Debug.Entry(4, $"New values calculated and assigned", Indent: 1);
-            Debug.LoopItem(4, $" stunningForceOnJump.Level: {stunning.Level}", Indent: 2);
-            Debug.LoopItem(4, $" stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2);
+            if (stunning != null)
+            {
+                Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 1);
+                Debug.LoopItem(4, $"stunningForceOnJump.Level: {(stunning?.Level != null ? stunning?.Level : "null")}", Indent: 2);
+                Debug.LoopItem(4, $"stunningForceOnJump.Distance: {(stunning?.Distance != null ? stunning?.Distance : "null")}", Indent: 2);
+                stunning.Level = GetStunningForceLevel(Level); // Scale stunningForceOnJump force with mutation level
+                stunning.Distance = StunningForceDistance;
+                Debug.Entry(4, $"New values calculated and assigned", Indent: 1);
+                Debug.LoopItem(4, $"stunningForceOnJump.Level: {stunning.Level}", Indent: 2);
+                Debug.LoopItem(4, $"stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2);
+            }
 
             return true;
         }
@@ -473,7 +482,10 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
 
-            ApplyStunningForceOnJump(ParentObject, NewLevel);
+            if (IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, ParentObject))
+            {
+                ApplyStunningForceOnJump(ParentObject, NewLevel);
+            }
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
             Debug.Entry(4, "Hunch Over Penalties", Indent: 1);
@@ -745,8 +757,6 @@ namespace XRL.World.Parts.Mutation
 
             AddActivatedAbilityGroundPound(GO);
 
-            
-
             Debug.Entry(4, "? if (!GO.HasPart<Vehicle>())", Indent: 1);
             if (!GO.HasPart<Vehicle>())
             {
@@ -811,10 +821,6 @@ namespace XRL.World.Parts.Mutation
             if (GO != null)
             {
                 Debug.CheckYeh(4, "GO not null", Indent: 2);
-                // Remove jumping properties
-                UnapplyJumpRangeBonus(GO);
-
-                UnapplyStunningForceOnJump(GO);
 
                 Debug.Entry(4, "Attempting to StraightenUp()", Indent: 2);
                 StraightenUp();
@@ -843,6 +849,11 @@ namespace XRL.World.Parts.Mutation
                 ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, null, Silent: true, false);
                 AbilityToggledGroundPound(GO, ToggledOn: false);
                 RemoveActivatedAbilityGroundPound(GO, true);
+                
+                // Remove jumping properties
+                UnapplyJumpRangeBonus(GO);
+
+                UnapplyStunningForceOnJump(GO);
 
                 Debug.LoopItem(4, "GO.WantToReequip()", Indent: 2);
                 GO.WantToReequip();
@@ -864,7 +875,7 @@ namespace XRL.World.Parts.Mutation
         {
             bool wantAddGroundPound = GroundPoundActivatedAbilityID == Guid.Empty;
             bool wantRemoveGroundPound = GroundPoundActivatedAbilityID != Guid.Empty;
-            bool wantJumped = ParentObject.HasPart<StunningForceOnJump>();
+            bool wantJumped = true || ParentObject.HasPart<StunningForceOnJump>();
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
                 || ID == GetIntrinsicWeightEvent.ID
@@ -878,7 +889,9 @@ namespace XRL.World.Parts.Mutation
                 || ID == BeforeBodyPartsUpdatedEvent.ID
                 || (wantAddGroundPound && ID == AfterAddSkillEvent.ID)
                 || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID)
-                || (wantJumped && ID == JumpedEvent.ID);
+                || (wantJumped && ID == JumpedEvent.ID)
+                || ID == BeforeVaultEvent.ID
+                || ID == VaultedEvent.ID;
         }
         public override bool HandleEvent(GetIntrinsicWeightEvent E)
         {
@@ -1014,10 +1027,32 @@ namespace XRL.World.Parts.Mutation
         {
             if (ParentObject != null && ParentObject == E.Actor)
             {
-                if (ParentObject.HasPart<StunningForceOnJump>())
+                float factor = 0.08f;
+                float max = 1.2f;
+                if (E.Actor.HasPart<StunningForceOnJump>())
                 {
-                    Rumble(Level, 0.1f, 1.5f);
+                    factor = 0.1f;
+                    max = 1.5f;
                 }
+                Rumble(Level, factor, max);
+            }
+            return base.HandleEvent(E);
+        }
+        public bool HandleEvent(BeforeVaultEvent E)
+        {
+            if (ParentObject != null && ParentObject == E.Vaulter && IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, E.Vaulter))
+            {
+                CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
+                E.Vaulter.SetStringProperty("Flip_Ground_Pound", "Please");
+            }
+            return base.HandleEvent(E);
+        }
+        public bool HandleEvent(VaultedEvent E)
+        {
+            if (ParentObject != null && ParentObject == E.Vaulter && !IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, E.Vaulter))
+            {
+                if (E.Vaulter.HasStringProperty("Flip_Ground_Pound"))
+                    CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
             }
             return base.HandleEvent(E);
         }
@@ -1209,6 +1244,7 @@ namespace XRL.World.Parts.Mutation
             {
                 ToggledOn = UnapplyStunningForceOnJump(GO);
             }
+            GO.SetStringProperty("Flip_Ground_Pound", null, true);
             return ToggledOn;
         }
 

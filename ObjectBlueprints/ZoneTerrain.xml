@@ -9,6 +9,38 @@
       
  -->
 <objects>
+
+  <object Name="Water" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+
+  <object Name="SlimyShaft" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="OpenShaft" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="OpenShaft2" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="Air" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="LazyAir" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="Pit" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="TombShaft" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="ElevatorShaft" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
+  <object Name="ReefOpenShaft" Load="Merge">
+    <part Name="Vaultable" RequiresSkill="true" />
+  </object>
   
   <object Name="TrainingMat" Inherits="ArenaFloor">
     <part Name="Render" DisplayName="" RenderString="." ColorString="&amp;K" TileColor="&amp;K" DetailColor="y" RenderLayer="0" Tile="Terrain/WrassleRing_Floor_03.png" />

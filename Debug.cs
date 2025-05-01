@@ -19,6 +19,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 using Debug = HNPS_GigantismPlus.Debug;
+using HNPS_GigantismPlus.Harmony;
 
 namespace HNPS_GigantismPlus
 {
@@ -34,90 +35,6 @@ namespace HNPS_GigantismPlus
         // 4 : Maximally Verbose. Just like, all of it. Every step of a process, as much detail as possible.
 
         private static bool IncludeInMessage => Options.DebugIncludeInMessage;
-
-        public static string GetCallingClassName()
-        {
-            return new StackFrame(1).GetMethod().ReflectedType.Name;
-        }
-
-        public static bool GetDebugToggle(Type CallingClass)
-        {
-            if (CallingClass == typeof(Utils))
-                return false;
-
-            if (CallingClass == typeof(GigantismPlus))
-                return false;
-
-            if (CallingClass == typeof(ElongatedPaws))
-                return false;
-
-            if (CallingClass == typeof(BaseManagedDefaultEquipmentMutation<>) 
-             || CallingClass.BaseType == typeof(BaseManagedDefaultEquipmentMutation<>))
-                return false;
-
-            if (CallingClass == typeof(BaseManagedDefaultEquipmentCybernetic<>) 
-             || CallingClass.BaseType == typeof(BaseManagedDefaultEquipmentCybernetic<>))
-                return false;
-
-            if (CallingClass == typeof(ModNaturalEquipmentBase) 
-             || CallingClass.BaseType == typeof(ModNaturalEquipmentBase))
-                return false;
-
-            if (CallingClass == typeof(ModNaturalEquipment<>) 
-             || CallingClass.BaseType == typeof(ModNaturalEquipment<>))
-                return false;
-
-            if (CallingClass == typeof(ModBurrowingNaturalWeapon))
-                return false;
-
-            if (CallingClass == typeof(ModCrystallineNaturalWeapon))
-                return false;
-
-            if (CallingClass == typeof(ModPooledEvent<>) 
-             || CallingClass.BaseType == typeof(ModPooledEvent<>))
-                return false;
-
-            if (CallingClass == typeof(NaturalEquipmentManager)
-             || CallingClass.BaseType == typeof(NaturalEquipmentManager))
-                return false;
-
-            if (CallingClass == typeof(BeforeBodyPartsUpdatedEvent) 
-             || CallingClass.BaseType == typeof(UpdateNaturalEquipmentModsEvent))
-                return false;
-
-            if (CallingClass == typeof(UpdateNaturalEquipmentModsEvent) 
-             || CallingClass.BaseType == typeof(UpdateNaturalEquipmentModsEvent))
-                return false;
-
-            if (CallingClass == typeof(AfterBodyPartsUpdatedEvent) 
-             || CallingClass.BaseType == typeof(AfterBodyPartsUpdatedEvent))
-                return false;
-
-            if (CallingClass == typeof(BeforeManageDefaultEquipmentEvent) 
-             || CallingClass.BaseType == typeof(BeforeManageDefaultEquipmentEvent))
-                return false;
-
-            if (CallingClass == typeof(ManageDefaultEquipmentEvent) 
-             || CallingClass.BaseType == typeof(ManageDefaultEquipmentEvent))
-                return false;
-
-            if (CallingClass == typeof(AfterManageDefaultEquipmentEvent) 
-             || CallingClass.BaseType == typeof(AfterManageDefaultEquipmentEvent))
-                return false;
-
-            if (CallingClass == typeof(BeforeRapidAdvancementEvent) 
-             || CallingClass.BaseType == typeof(BeforeRapidAdvancementEvent))
-                return false;
-
-            if (CallingClass == typeof(AfterRapidAdvancementEvent) 
-             || CallingClass.BaseType == typeof(AfterRapidAdvancementEvent))
-                return false;
-
-            if (CallingClass.Name.EndsWith("_Patches"))
-                return false;
-
-            return true;
-        }
 
         private static void Message(string Text)
         {
@@ -148,8 +65,7 @@ namespace HNPS_GigantismPlus
 
         public static void Indent(int Verbosity, string Text, int Spaces = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (Verbosity > VerbosityOption || !Toggle || !GetDebugToggle(callingClass)) return;
+            if (Verbosity > VerbosityOption || !Toggle) return;
             int factor = 4;
             // NBSP  \u00A0
             // Space \u0020
@@ -167,9 +83,6 @@ namespace HNPS_GigantismPlus
 
         public static void Divider(int Verbosity = 0, string String = null, int Count = 60, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             string output = "";
             if (String == null) String = "\u003D"; // =
             else String = String[..1];
@@ -182,9 +95,6 @@ namespace HNPS_GigantismPlus
 
         public static void Header(int Verbosity, string ClassName, string MethodName, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             string divider = "\u2550"; // ═ (box drawing, double horizontal)
             Divider(Verbosity, divider, Toggle: Toggle);
             string output = "@START: " + ClassName + "." + MethodName;
@@ -192,9 +102,6 @@ namespace HNPS_GigantismPlus
         }
         public static void Footer(int Verbosity, string ClassName, string MethodName, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             string divider = "\u2550"; // ═ (box drawing, double horizontal)
             string output = "///END: " + ClassName + "." + MethodName + " !//";
             Entry(Verbosity, output, Toggle: Toggle);
@@ -203,26 +110,17 @@ namespace HNPS_GigantismPlus
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             Divider(Verbosity, "\u003E", 25, Indent); // >
             Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
         }
         public static void DiveOut(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             Entry(Verbosity, Text, Indent + 1);
             Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
         }
 
         public static void LoopItem(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = null, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             string good = TICK; // √
             string bad = CROSS;  // X
             string goodOrBad = string.Empty;
@@ -232,24 +130,15 @@ namespace HNPS_GigantismPlus
         }
         public static void CheckYeh(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = true, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             LoopItem(Verbosity, Label, Text, Indent, Good, Toggle: Toggle);
         }
         public static void CheckNah(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = false, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             LoopItem(Verbosity, Label, Text, Indent, Good, Toggle: Toggle);
         }
 
         public static void TreeItem(int Verbosity, string Label, string Text = "", bool Last = false, int Branch = 0, int Distance = 0, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             // ITEM: "├── "
             // BRAN: "│   "
             // LAST: "└── "
@@ -272,18 +161,12 @@ namespace HNPS_GigantismPlus
         }
         public static void TreeLast(int Verbosity, string Label, string Text = "", int Branch = 0, int Distance = 0, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return;
-
             TreeItem(Verbosity, Label, Text, true, Branch, Distance, Indent, Toggle: Toggle);
         }
 
         // Class Specific Debugs
         public static MeleeWeapon Vomit(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return MeleeWeapon;
-
             string title = Title == null ? "" : $"{Title}:";
             int indent = Indent;
             Entry(Verbosity, $"% Vomit: {MeleeWeapon.ParentObject.DebugName} {title}", Indent, Toggle: Toggle);
@@ -472,9 +355,6 @@ namespace HNPS_GigantismPlus
 
         public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return @string;
-
             string Output = Label != "" ? $"{Label}: {@string}" : @string;
             if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
@@ -482,9 +362,6 @@ namespace HNPS_GigantismPlus
         }
         public static int Vomit(this int @int, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return @int;
-
             string Output = Label != "" ? $"{Label}: {@int}" : $"{@int}";
             if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
@@ -492,9 +369,6 @@ namespace HNPS_GigantismPlus
         }
         public static bool Vomit(this bool @bool, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return @bool;
-
             string Output = Label != "" ? $"{Label}: {@bool}" : $"{@bool}";
             if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
@@ -503,9 +377,6 @@ namespace HNPS_GigantismPlus
         public static List<T> Vomit<T>(this List<T> List, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
             where T : Type
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             string Output = Label != "" ? $"{Label}: {nameof(List)}" : $"{nameof(List)}";
             if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
@@ -519,9 +390,6 @@ namespace HNPS_GigantismPlus
         }
         public static List<object> Vomit(this List<object> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (object item in List)
@@ -534,9 +402,6 @@ namespace HNPS_GigantismPlus
         }
         public static List<MutationEntry> Vomit(this List<MutationEntry> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (MutationEntry item in List)
@@ -549,9 +414,6 @@ namespace HNPS_GigantismPlus
         }
         public static List<MutationCategory> Vomit(this List<MutationCategory> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (MutationCategory item in List)
@@ -564,9 +426,6 @@ namespace HNPS_GigantismPlus
         }
         public static List<GameObject> Vomit(this List<GameObject> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (GameObject item in List)
@@ -579,9 +438,6 @@ namespace HNPS_GigantismPlus
         }
         public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (BaseMutation item in List)
@@ -594,9 +450,6 @@ namespace HNPS_GigantismPlus
         }
         public static List<Adjustment> Vomit(this List<Adjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            Type callingClass = new StackFrame(1).GetMethod().ReflectedType;
-            if (!GetDebugToggle(callingClass)) return List;
-
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (Adjustment item in List)

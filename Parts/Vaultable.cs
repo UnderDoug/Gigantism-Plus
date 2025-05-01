@@ -13,6 +13,7 @@ using static HNPS_GigantismPlus.Const;
 using XRL.Rules;
 using XRL.World.Conversations.Parts;
 using XRL.World.Conversations;
+using XRL.World.Capabilities;
 
 namespace XRL.World.Parts
 {
@@ -382,8 +383,7 @@ namespace XRL.World.Parts
                 if (CanVaultThrough(E.Actor, ParentObject))
                 {
                     E.Uncacheable = true;
-                    // E.MinWeight(0);
-                    // Debug.Entry(4, GetDebugInternalsEvent.GetFor(E.Actor), Indent: 0);
+                    E.MinWeight(0);
                     Debug.Entry(4,
                         $"@ {nameof(Vaultable)}."
                         + $"{nameof(HandleEvent)}({nameof(GetNavigationWeightEvent)} E.Weight: {E.Weight})",
@@ -399,11 +399,11 @@ namespace XRL.World.Parts
             {
                 GameObject Vaulter = E.GetGameObjectParameter("Object");
                 GameObject Vaultee = ParentObject;
-                return AttemptVault(Vaulter, Vaultee, E);
-                if (CanVault(Vaulter, Vaultee) 
-                    && TryGetValidDestinationCell(Vaulter, Vaultee, out Cell DestinationCell))
+                Vaultee.SetStringProperty("NoBlockMessage", null, true);
+                if (AttemptVault(Vaulter, Vaultee, E))
                 {
-                    return PerformVault(Vaulter, Vaultee, DestinationCell, Silent: true);
+                    Vaultee.SetStringProperty("NoBlockMessage", "true");
+                    return true;
                 }
             }
             return base.FireEvent(E);

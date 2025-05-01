@@ -59,23 +59,23 @@ public class BeforeVaultEvent : ModPooledEvent<BeforeVaultEvent>
         E.Message = string.Empty;
         Message = E.Message;
 
-        bool flag = true;
+        bool check = true;
         if (AnyWants)
         {
-            if (flag && AnyWantsMin)
+            if (check && AnyWantsMin)
             {
                 E.Vaulter = Vaulter;
                 E.OriginCell = OriginCell;
                 E.Vaultee = Vaultee;
                 E.DestinationCell = DestinationCell;
-                if (flag && VaulterWantsMin) flag = Vaulter.HandleEvent(E);
-                if (flag && VaulteeWantsMin) flag = Vaultee.HandleEvent(E);
-                if (!flag)
+                if (check && VaulterWantsMin) check = Vaulter.HandleEvent(E);
+                if (check && VaulteeWantsMin) check = Vaultee.HandleEvent(E);
+                if (!check)
                 {
                     Message = E.Message;
                 }
             }
-            if (flag && AnyWantsStr)
+            if (check && AnyWantsStr)
             {
                 Event @event = Event.New(E.GetRegisteredEventID());
                 @event.SetParameter(nameof(Vaulter), Vaulter);
@@ -83,15 +83,15 @@ public class BeforeVaultEvent : ModPooledEvent<BeforeVaultEvent>
                 @event.SetParameter(nameof(Vaulter), Vaulter);
                 @event.SetParameter(nameof(DestinationCell), DestinationCell);
                 @event.SetParameter(nameof(Message), E.Message);
-                if (flag && VaulterWantsMin) flag = Vaulter.FireEvent(@event);
-                if (flag && VaulteeWantsMin) flag = Vaultee.FireEvent(@event); 
-                if (!flag)
+                if (check && VaulterWantsMin) check = Vaulter.FireEvent(@event);
+                if (check && VaulteeWantsMin) check = Vaultee.FireEvent(@event); 
+                if (!check)
                 {
                     Message = @event.GetStringParameter(nameof(Message));
                 }
             }
         }
         E.Reset();
-        return flag;
+        return check;
     }
 }

@@ -1,22 +1,25 @@
-﻿using Qud.API;
-
+﻿using System.Diagnostics;
+using System.Reflection;
 using System;
 using System.Collections.Generic;
+
+using Qud.API;
 
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.ObjectBuilders;
 using XRL.Core;
 using XRL.Wish;
-
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
-using HNPS_GigantismPlus;
-using XRL.World.ObjectBuilders;
+using Debug = HNPS_GigantismPlus.Debug;
+using HNPS_GigantismPlus.Harmony;
 
 namespace HNPS_GigantismPlus
 {
@@ -43,26 +46,26 @@ namespace HNPS_GigantismPlus
             UnityEngine.Debug.LogError(Text);
         }
 
-        public static void Entry(int Verbosity, string Text, int Indent = 0)
+        public static void Entry(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Debug.Indent(Verbosity, Text, Indent);
+            Debug.Indent(Verbosity, Text, Indent, Toggle: Toggle);
         }
 
-        public static void Entry(string Text, int Indent = 0)
+        public static void Entry(string Text, int Indent = 0, bool Toggle = true)
         {
             int Verbosity = 0;
-            Debug.Indent(Verbosity, Text, Indent);
+            Debug.Indent(Verbosity, Text, Indent, Toggle: Toggle);
         }
 
-        public static void Entry(int Verbosity, string Label, string Text, int Indent = 0)
+        public static void Entry(int Verbosity, string Label, string Text, int Indent = 0, bool Toggle = true)
         {
             string output = Label + ": " + Text;
-            Entry(Verbosity, output, Indent);
+            Entry(Verbosity, output, Indent, Toggle: Toggle);
         }
 
-        public static void Indent(int Verbosity, string Text, int Spaces = 0)
+        public static void Indent(int Verbosity, string Text, int Spaces = 0, bool Toggle = true)
         {
-            if (Verbosity > VerbosityOption) return;
+            if (Verbosity > VerbosityOption || !Toggle) return;
             int factor = 4;
             // NBSP  \u00A0
             // Space \u0020
@@ -78,7 +81,7 @@ namespace HNPS_GigantismPlus
                 Message(output);
         }
 
-        public static void Divider(int Verbosity = 0, string String = null, int Count = 60, int Indent = 0)
+        public static void Divider(int Verbosity = 0, string String = null, int Count = 60, int Indent = 0, bool Toggle = true)
         {
             string output = "";
             if (String == null) String = "\u003D"; // =
@@ -87,54 +90,54 @@ namespace HNPS_GigantismPlus
             {
                 output += String;
             }
-            Entry(Verbosity, output, Indent);
+            Entry(Verbosity, output, Indent, Toggle: Toggle);
         }
 
-        public static void Header(int Verbosity, string ClassName, string MethodName)
+        public static void Header(int Verbosity, string ClassName, string MethodName, bool Toggle = true)
         {
             string divider = "\u2550"; // ═ (box drawing, double horizontal)
-            Divider(Verbosity, divider);
+            Divider(Verbosity, divider, Toggle: Toggle);
             string output = "@START: " + ClassName + "." + MethodName;
-            Entry(Verbosity, output);
+            Entry(Verbosity, output, Toggle: Toggle);
         }
-        public static void Footer(int Verbosity, string ClassName, string MethodName)
+        public static void Footer(int Verbosity, string ClassName, string MethodName, bool Toggle = true)
         {
             string divider = "\u2550"; // ═ (box drawing, double horizontal)
             string output = "///END: " + ClassName + "." + MethodName + " !//";
-            Entry(Verbosity, output);
-            Divider(Verbosity, divider);
+            Entry(Verbosity, output, Toggle: Toggle);
+            Divider(Verbosity, divider, Toggle: Toggle);
         }
 
-        public static void DiveIn(int Verbosity, string Text, int Indent = 0)
+        public static void DiveIn(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
             Divider(Verbosity, "\u003E", 25, Indent); // >
-            Entry(Verbosity, Text, Indent + 1);
+            Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
         }
-        public static void DiveOut(int Verbosity, string Text, int Indent = 0)
+        public static void DiveOut(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
             Entry(Verbosity, Text, Indent + 1);
-            Divider(Verbosity, "\u003C", 25, Indent); // <
+            Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
         }
 
-        public static void LoopItem(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = null)
+        public static void LoopItem(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = null, bool Toggle = true)
         {
             string good = TICK; // √
             string bad = CROSS;  // X
             string goodOrBad = string.Empty;
             if (Good != null) goodOrBad = ((bool)Good ? good : bad) + "\u005D "; // ]
             string output = Text != string.Empty ? Label + ": " + Text : Label;
-            Entry(Verbosity, "\u005B" + goodOrBad + output, Indent);
+            Entry(Verbosity, "\u005B" + goodOrBad + output, Indent, Toggle: Toggle);
         }
-        public static void CheckYeh(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = true)
+        public static void CheckYeh(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = true, bool Toggle = true)
         {
-            LoopItem(Verbosity, Label, Text, Indent, Good);
+            LoopItem(Verbosity, Label, Text, Indent, Good, Toggle: Toggle);
         }
-        public static void CheckNah(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = false)
+        public static void CheckNah(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = false, bool Toggle = true)
         {
-            LoopItem(Verbosity, Label, Text, Indent, Good);
+            LoopItem(Verbosity, Label, Text, Indent, Good, Toggle: Toggle);
         }
 
-        public static void TreeItem(int Verbosity, string Label, string Text = "", bool Last = false, int Branch = 0, int Distance = 0, int Indent = 0)
+        public static void TreeItem(int Verbosity, string Label, string Text = "", bool Last = false, int Branch = 0, int Distance = 0, int Indent = 0, bool Toggle = true)
         {
             // ITEM: "├── "
             // BRAN: "│   "
@@ -154,19 +157,19 @@ namespace HNPS_GigantismPlus
 
             Output += Text != string.Empty ? Label + ": " + Text : Label;
 
-            Entry(Verbosity, Output, Indent);
+            Entry(Verbosity, Output, Indent, Toggle: Toggle);
         }
-        public static void TreeLast(int Verbosity, string Label, string Text = "", int Branch = 0, int Distance = 0, int Indent = 0)
+        public static void TreeLast(int Verbosity, string Label, string Text = "", int Branch = 0, int Distance = 0, int Indent = 0, bool Toggle = true)
         {
-            TreeItem(Verbosity, Label, Text, true, Branch, Distance, Indent);
+            TreeItem(Verbosity, Label, Text, true, Branch, Distance, Indent, Toggle: Toggle);
         }
 
         // Class Specific Debugs
-        public static MeleeWeapon Vomit(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
+        public static MeleeWeapon Vomit(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
         {
             string title = Title == null ? "" : $"{Title}:";
             int indent = Indent;
-            Entry(Verbosity, $"% Vomit: {MeleeWeapon.ParentObject.DebugName} {title}", Indent);
+            Entry(Verbosity, $"% Vomit: {MeleeWeapon.ParentObject.DebugName} {title}", Indent, Toggle: Toggle);
             List<string> @default = new()
             {
                 "Damage",
@@ -178,32 +181,32 @@ namespace HNPS_GigantismPlus
             indent++;
             foreach (string category in Categories)
             {
-                if (@default.Contains(category)) Entry(Verbosity, $"{category}", indent);
+                if (@default.Contains(category)) Entry(Verbosity, $"{category}", indent, Toggle: Toggle);
                 indent++;
                 switch (category)
                 {
                     case "Damage":
-                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", indent);
-                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", indent);
-                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", indent);
-                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", indent);
+                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", indent, Toggle: Toggle);
                         break;
                     case "Combat":
-                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", indent);
-                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", indent);
-                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", indent);
+                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", indent, Toggle: Toggle);
                         break;
                     case "Render":
                         Render Render = MeleeWeapon.ParentObject.Render;
-                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", indent);
-                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", indent);
-                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", indent);
-                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", indent);
+                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", indent, Toggle: Toggle);
                         break;
                     case "etc":
-                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", indent);
-                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", indent);
-                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", indent);
+                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", indent, Toggle: Toggle);
                         break;
                 }
                 indent--;
@@ -212,12 +215,12 @@ namespace HNPS_GigantismPlus
         }
 
         /*
-        public static NaturalEquipmentSubpart<E> Vomit<E>(this NaturalEquipmentSubpart<E> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0)
+        public static NaturalEquipmentSubpart<E> Vomit<E>(this NaturalEquipmentSubpart<E> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
             where E : IPart, IManagedDefaultNaturalEquipment<E>, new()
         {
             string title = Title == null ? "" : $"{Title}:";
             GameObject Creature = Subpart.ParentPart?.ParentObject;
-            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.HandsBlueprint} {title}", Indent: Indent);
+            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.HandsBlueprint} {title}", Indent: Indent, Toggle: Toggle);
             List<string> @default = new()
             {
                 "Meta",
@@ -232,88 +235,88 @@ namespace HNPS_GigantismPlus
             foreach (string category in Categories)
             {
                 Indent = indent;
-                if (@default.Contains(category)) LoopItem(Verbosity, $"{category}", Indent: ++Indent);
+                if (@default.Contains(category)) LoopItem(Verbosity, $"{category}", Indent: ++Indent, Toggle: Toggle);
                 switch (category)
                 {
                     case "Meta":
-                        LoopItem(Verbosity, "Type", $"{Subpart.Type}", Indent: ++Indent);
-                        LoopItem(Verbosity, "CosmeticOnly", $"{Subpart.CosmeticOnly}", Indent: Indent);
-                        LoopItem(Verbosity, "Managed", $"{Subpart.Managed}", Indent: Indent--);
+                        LoopItem(Verbosity, "Type", $"{Subpart.Type}", Indent: ++Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "CosmeticOnly", $"{Subpart.CosmeticOnly}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Managed", $"{Subpart.Managed}", Indent: Indent--, Toggle: Toggle);
                         break;
                     case "Combat":
-                        LoopItem(Verbosity, "Level", $"{Subpart.Level}", Indent: ++Indent);
-                        LoopItem(Verbosity, "DamageDieCount", $"{Subpart.DamageDieCount}", Indent: Indent);
-                        LoopItem(Verbosity, "DamageDieSize", $"{Subpart.DamageDieSize}", Indent: Indent);
-                        LoopItem(Verbosity, "DamageBonus", $"{Subpart.DamageBonus}", Indent: Indent);
-                        LoopItem(Verbosity, "HitBonus", $"{Subpart.HitBonus}", Indent: Indent);
-                        LoopItem(Verbosity, "Skill", $"{Subpart.Skill}", Indent: Indent);
-                        LoopItem(Verbosity, "Stat", $"{Subpart.Stat}", Indent: Indent--);
+                        LoopItem(Verbosity, "Level", $"{Subpart.Level}", Indent: ++Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DamageDieCount", $"{Subpart.DamageDieCount}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DamageDieSize", $"{Subpart.DamageDieSize}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DamageBonus", $"{Subpart.DamageBonus}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "HitBonus", $"{Subpart.HitBonus}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Skill", $"{Subpart.Skill}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Stat", $"{Subpart.Stat}", Indent: Indent--, Toggle: Toggle);
                         break;
                     case "Priority":
-                        LoopItem(Verbosity, "ModPriority", $"{Subpart.ModPriority}", Indent: ++Indent);
-                        LoopItem(Verbosity, "AdjectivePriority", $"{Subpart.AdjectivePriority}", Indent: Indent);
-                        LoopItem(Verbosity, "NounPriority", $"{Subpart.NounPriority}", Indent: Indent--);
+                        LoopItem(Verbosity, "ModPriority", $"{Subpart.ModPriority}", Indent: ++Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "AdjectivePriority", $"{Subpart.AdjectivePriority}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "NounPriority", $"{Subpart.NounPriority}", Indent: Indent--, Toggle: Toggle);
                         break;
                     case "Grammar":
-                        LoopItem(Verbosity, "Adjective", $"{Subpart.Adjective}", Indent: ++Indent);
-                        LoopItem(Verbosity, "AdjectiveColor", $"{Subpart.AdjectiveColor}", Indent: Indent);
-                        LoopItem(Verbosity, "AdjectiveColorFallback", $"{Subpart.AdjectiveColorFallback}", Indent: Indent);
+                        LoopItem(Verbosity, "Adjective", $"{Subpart.Adjective}", Indent: ++Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "AdjectiveColor", $"{Subpart.AdjectiveColor}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "AdjectiveColorFallback", $"{Subpart.AdjectiveColorFallback}", Indent: Indent, Toggle: Toggle);
                         LoopItem(Verbosity, "Noun", $"{Subpart.Noun}", Indent: Indent--);
                         break;
                     case "Render":
-                        LoopItem(Verbosity, "Tile", $"{Subpart.Tile}", Indent: ++Indent);
-                        LoopItem(Verbosity, "ColorString", $"{Subpart.ColorString}", Indent: Indent);
-                        LoopItem(Verbosity, "DetailColor", $"{Subpart.DetailColor}", Indent: Indent);
-                        LoopItem(Verbosity, "SecondColorString", $"{Subpart.SecondColorString}", Indent: Indent);
-                        LoopItem(Verbosity, "SecondDetailColor", $"{Subpart.SecondDetailColor}", Indent: Indent);
-                        LoopItem(Verbosity, "SwingSound", $"{Subpart.SwingSound}", Indent: Indent);
-                        LoopItem(Verbosity, "BlockedSound", $"{Subpart.BlockedSound}", Indent: Indent);
-                        LoopItem(Verbosity, "EquipmentFrameColors", $"{Subpart.EquipmentFrameColors}", Indent: Indent--);
+                        LoopItem(Verbosity, "Tile", $"{Subpart.Tile}", Indent: ++Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "ColorString", $"{Subpart.ColorString}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DetailColor", $"{Subpart.DetailColor}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "SecondColorString", $"{Subpart.SecondColorString}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "SecondDetailColor", $"{Subpart.SecondDetailColor}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "SwingSound", $"{Subpart.SwingSound}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "BlockedSound", $"{Subpart.BlockedSound}", Indent: Indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "EquipmentFrameColors", $"{Subpart.EquipmentFrameColors}", Indent: Indent--, Toggle: Toggle);
                         break;
                     case "Additions":
                         if (!Subpart.AddedParts.IsNullOrEmpty())
                         {
-                            LoopItem(Verbosity, "AddedParts: ", Indent: ++Indent);
+                            LoopItem(Verbosity, "AddedParts: ", Indent: ++Indent, Toggle: Toggle);
                             Indent++;
                             foreach (string part in Subpart.AddedParts)
                             {
-                                LoopItem(Verbosity, $"{part}", Indent: Indent);
+                                LoopItem(Verbosity, $"{part}", Indent: Indent, Toggle: Toggle);
                             }
                             Indent--;
                         }
                         else
                         {
-                            LoopItem(Verbosity, $"AddedParts: Empty", Indent: ++Indent);
+                            LoopItem(Verbosity, $"AddedParts: Empty", Indent: ++Indent, Toggle: Toggle);
                         }
                         Indent--;
                         if (!Subpart.AddedStringProps.IsNullOrEmpty())
                         {
-                            LoopItem(Verbosity, "AddedStringProps: ", Indent: ++Indent);
+                            LoopItem(Verbosity, "AddedStringProps: ", Indent: ++Indent, Toggle: Toggle);
                             Indent++;
                             foreach ((string prop, string value) in Subpart.AddedStringProps)
                             {
-                                LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent);
+                                LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent, Toggle: Toggle);
                             }
                             Indent--;
                         }
                         else
                         {
-                            LoopItem(Verbosity, $"AddedStringProps: Empty", Indent: ++Indent);
+                            LoopItem(Verbosity, $"AddedStringProps: Empty", Indent: ++Indent, Toggle: Toggle);
                         }
                         Indent--;
                         if (!Subpart.AddedIntProps.IsNullOrEmpty())
                         {
-                            LoopItem(Verbosity, "AddedIntProps: ", Indent: ++Indent);
+                            LoopItem(Verbosity, "AddedIntProps: ", Indent: ++Indent, Toggle: Toggle);
                             Indent++;
                             foreach ((string prop, int value) in Subpart.AddedIntProps)
                             {
-                                LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent);
+                                LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent, Toggle: Toggle);
                             }
                             Indent--;
                         }
                         else
                         {
-                            LoopItem(Verbosity, $"AddedIntProps: Empty", Indent: ++Indent);
+                            LoopItem(Verbosity, $"AddedIntProps: Empty", Indent: ++Indent, Toggle: Toggle);
                         }
                         break;
                 }
@@ -322,7 +325,7 @@ namespace HNPS_GigantismPlus
         }
         */
 
-        public static bool WasEventHandlerRegistered<H, E>(this XRLGame Game)
+        public static bool WasEventHandlerRegistered<H, E>(this XRLGame Game, bool Toggle = true)
             where H : IEventHandler
             where E : MinEvent, new()
         {
@@ -330,143 +333,143 @@ namespace HNPS_GigantismPlus
             E e = new();
             if (Game != null && Game.RegisteredEvents.ContainsKey(e.ID))
             {
-                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
+                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2, Toggle: Toggle);
                 flag = true;
             }
             else if (Game != null)
             {
-                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
+                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2, Toggle: Toggle);
             }
             else
             {
-                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2);
+                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2, Toggle: Toggle);
             }
             return flag;
         }
-        public static bool WasModEventHandlerRegistered<H, E>(this XRLGame Game)
+        public static bool WasModEventHandlerRegistered<H, E>(this XRLGame Game, bool Toggle = true)
             where H : IEventHandler, IModEventHandler<E>
             where E : MinEvent, new()
         {
-            return Game.WasEventHandlerRegistered<H, E>();
+            return Game.WasEventHandlerRegistered<H, E>(Toggle: Toggle);
         }
 
-        public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)
+        public static string Vomit(this string @string, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
         {
             string Output = Label != "" ? $"{Label}: {@string}" : @string;
-            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Output, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
             return @string;
         }
-        public static int Vomit(this int @int, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)
+        public static int Vomit(this int @int, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
         {
             string Output = Label != "" ? $"{Label}: {@int}" : $"{@int}";
-            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Output, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
             return @int;
         }
-        public static bool Vomit(this bool @bool, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0)
+        public static bool Vomit(this bool @bool, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
         {
             string Output = Label != "" ? $"{Label}: {@bool}" : $"{@bool}";
-            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Output, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
             return @bool;
         }
-        public static List<T> Vomit<T>(this List<T> List, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<T> Vomit<T>(this List<T> List, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
             where T : Type
         {
             string Output = Label != "" ? $"{Label}: {nameof(List)}" : $"{nameof(List)}";
-            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Output, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
             foreach (T item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent+1);
-                else Entry(Verbosity, item.ToString(), Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent+1, Toggle: Toggle);
+                else Entry(Verbosity, item.ToString(), Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<object> Vomit(this List<object> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<object> Vomit(this List<object> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Label, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (object item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item}", Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item}", Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<MutationEntry> Vomit(this List<MutationEntry> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<MutationEntry> Vomit(this List<MutationEntry> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Label, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (MutationEntry item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Mutation.Name}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item.Mutation.Name}", Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Mutation.Name}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item.Mutation.Name}", Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<MutationCategory> Vomit(this List<MutationCategory> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<MutationCategory> Vomit(this List<MutationCategory> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Label, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (MutationCategory item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Name}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item.Name}", Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Name}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item.Name}", Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<GameObject> Vomit(this List<GameObject> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<GameObject> Vomit(this List<GameObject> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Label, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (GameObject item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.DebugName}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item.DebugName}", Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.DebugName}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item.DebugName}", Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Label, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (BaseMutation item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<Adjustment> Vomit(this List<Adjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0)
+        public static List<Adjustment> Vomit(this List<Adjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent);
-            else Entry(Verbosity, Label, Indent: Indent);
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
             foreach (Adjustment item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1);
-                else Entry(Verbosity, $"{item}", Indent: Indent + 1);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item}", Indent: Indent + 1, Toggle: Toggle);
             }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: 1);
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
 
-        public static void InheritanceTree(GameObject Object)
+        public static void InheritanceTree(GameObject Object, bool Toggle = true)
         {
             GameObjectBlueprint objectBlueprint = Object.GetBlueprint();
 
-            Entry(4, $"objectBlueprint: {objectBlueprint.Name}", Indent: 0);
+            Entry(4, $"objectBlueprint: {objectBlueprint.Name}", Indent: 0, Toggle: Toggle);
             GameObjectBlueprint shallowParent = objectBlueprint.ShallowParent;
             while (shallowParent != null)
             {
-                Entry(4, $"shallowParent: {shallowParent.Name}", Indent: 0);
+                Entry(4, $"shallowParent: {shallowParent.Name}", Indent: 0, Toggle: Toggle);
                 shallowParent = shallowParent.ShallowParent;
             }
         }

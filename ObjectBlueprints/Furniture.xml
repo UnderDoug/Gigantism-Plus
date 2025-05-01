@@ -6,6 +6,27 @@
     <tag Name="IsImprovisedMelee" />
   </object>
 
+  <object Name="Statue" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="RandomStatue" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="Village Monument" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  
+  <object Name="Table" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  
+  <object Name="Brinestalk Gate" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="Iron Gate" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+
   <!-- Widget Categories -->
 
   <object Name="Archway" Load="Merge">
@@ -244,10 +265,6 @@
 
   <object Name="Anvil" Load="Merge">
     <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue" />
   </object>
 
   <object Name="Statue" Load="Merge">

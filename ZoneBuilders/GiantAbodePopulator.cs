@@ -286,10 +286,18 @@ namespace XRL.World.ZoneBuilders
                 }
             }
 
-            Cell giantLocation = 
-                zone?.FindFirstObject("Gigantic Oven")?.CurrentCell?.GetEmptyAdjacentCells()?.GetRandomElement()
-             ?? nonRegionEmptyCells?.GetRandomElement() 
-             ?? zone?.GetEmptyCells()?.GetRandomElement();
+            Cell giantLocation = zone?.FindFirstObject("Gigantic Oven")?.CurrentCell?.GetEmptyAdjacentCells()?.GetRandomElement();
+
+            if (giantLocation == null)
+            {
+                foreach (Cell prospectiveCell in zone?.FindFirstObject("Gigantic Oven")?.CurrentCell.GetAdjacentCells())
+                {
+                    giantLocation = prospectiveCell.GetFirstEmptyAdjacentCell();
+                    if (giantLocation != null)
+                        break;
+                }
+            }
+            giantLocation ??= nonRegionEmptyCells?.GetRandomElement() ?? zone?.GetEmptyCells()?.GetRandomElement();
 
             GameObject UniqueGiant = The.ZoneManager.GetCachedObjects(GiantID) ?? SecretGiantWhoCooksBuilderExtension.GetTheGiant();
 

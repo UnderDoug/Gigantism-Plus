@@ -396,6 +396,18 @@ You cannot wear equipment on your body." />
 
   <!-- 
       
+      Vaultable Items
+      
+  -->
+  <object Name="LargeBoulder" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="FoldingChair" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+
+  <!-- 
+      
       Helper Parts 
       
   -->

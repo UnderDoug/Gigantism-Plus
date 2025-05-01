@@ -12,32 +12,28 @@ using XRL.World.Anatomy;
 namespace HNPS_GigantismPlus.Harmony
 {
     [HarmonyPatch(typeof(GameObject))]
-    public static class ForceDefaultBehaviorToAssignEquipped
+    public static class GameObject_Patches
     {
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(GameObject.CheckDefaultBehaviorGiganticness))]
-        static void CheckDefaultBehaviorGiganticnessPostfix(ref GameObject __instance, ref GameObject Equipper)
+        [HarmonyPatch(typeof(GameObject), nameof(GameObject.CheckDefaultBehaviorGiganticness))]
+        public static void CheckDefaultBehaviorGiganticness_ForceEquipped_Postfix(ref GameObject __instance, GameObject Equipper)
         {
             GameObject @this = __instance;
 
             if (@this.Physics.Equipped != Equipper) @this.Physics.Equipped = Equipper;
         }
-    }
 
-    [HarmonyPatch(typeof(GameObject))]
-    public static class GameObject_DeepCopy_Patches
-    {
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(GameObject.FinalizeCopy))]
-        static void FinalizeCopy_Postfix(GameObject __instance)
+        [HarmonyPatch(typeof(GameObject), nameof(GameObject.FinalizeCopy))]
+        public static void FinalizeCopy_ReequipImprovedMutationMod_Postfix(GameObject __instance)
         {
             GameObject Object = __instance;
             if (Object?.Body == null) return;
 
             Debug.Divider(4, HONLY, Count: 40, Indent: 0);
             Debug.Entry(4, 
-                $"# {nameof(GameObject_DeepCopy_Patches)}." + 
-                $"{nameof(FinalizeCopy_Postfix)}(GameObject __instance: {Object.DebugName})", 
+                $"# {nameof(GameObject_Patches)}." + 
+                $"{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}(GameObject __instance: {Object.DebugName})", 
                 Indent: 0);
 
             Debug.Entry(4, $"> foreach (BodyPart part in Object.Actor.LoopParts())", Indent: 1);
@@ -111,7 +107,7 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, $"x foreach (BodyPart part in Object.Actor.LoopParts()) >//", Indent: 1);
             Debug.Entry(4, $"Updating Body Parts: Object.Body.UpdateBodyParts()", Indent: 1);
             Object.Body.UpdateBodyParts();
-            Debug.Entry(4, $"x {nameof(GameObject_DeepCopy_Patches)}.{nameof(FinalizeCopy_Postfix)}(GameObject __instance: {Object.DebugName}) #//", Indent: 0);
+            Debug.Entry(4, $"x {nameof(GameObject_Patches)}.{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}(GameObject __instance: {Object.DebugName}) #//", Indent: 0);
             Debug.Divider(4, HONLY, Count: 40, Indent: 0);
         }
     }

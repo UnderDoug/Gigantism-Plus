@@ -2106,5 +2106,22 @@ namespace HNPS_GigantismPlus
             return stringList;
         }
 
+        public static bool OverlapsWith<T>(this List<T> List, List<T> TestList)
+        {
+            bool overlaps = false;
+            if (!List.IsNullOrEmpty() && !TestList.IsNullOrEmpty())
+            {
+                foreach (T entry in List)
+                {
+                    if (TestList.Contains(entry))
+                    {
+                        overlaps = true;
+                        break;
+                    }
+                }
+            }
+            return overlaps;
+        }
+
     } //!-- Extensions
 }

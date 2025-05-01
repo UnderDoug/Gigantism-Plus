@@ -22,6 +22,8 @@ namespace XRL.World.Parts
         , IModEventHandler<BeforeBodyPartsUpdatedEvent>
         , IModEventHandler<AfterBodyPartsUpdatedEvent>
     {
+        private static bool doDebug => false;
+
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
 
@@ -97,20 +99,20 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"* {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(ProcessShortDescription)}(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions)",
-                Indent: 1);
+                Indent: 1, Toggle: doDebug);
 
             StringBuilder StringBuilder = Event.NewStringBuilder();
 
             foreach ((int priority, ModNaturalEquipmentBase mod) in ShortDescriptions)
             {
                 StringBuilder.AppendRules(mod.GetInstanceDescription());
-                Debug.CheckYeh(4, $"{priority}::{mod.GetSource()}:Description Appended", Indent: 1);
+                Debug.CheckYeh(4, $"{priority}::{mod.GetSource()}:Description Appended", Indent: 1, Toggle: doDebug);
             }
 
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(ProcessShortDescription)}(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions) *//",
-                Indent: 1);
+                Indent: 1, Toggle: doDebug);
             return Event.FinalizeString(StringBuilder);
         }
 
@@ -124,17 +126,17 @@ namespace XRL.World.Parts
         }
         public void ClearNaturalWeaponMods()
         {
-            Debug.Entry(4, $"* {nameof(ClearNaturalWeaponMods)}()", Indent: 1);
+            Debug.Entry(4, $"* {nameof(ClearNaturalWeaponMods)}()", Indent: 1, Toggle: doDebug);
             NaturalEquipmentMods = new();
         }
         public void ClearAdjustmentTargets()
         {
-            Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: 1);
+            Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: 1, Toggle: doDebug);
             AdjustmentTargets = new();
         }
         public void ResetShortDescriptions()
         {
-            Debug.Entry(4, $"* {nameof(ResetShortDescriptions)}()", Indent: 1);
+            Debug.Entry(4, $"* {nameof(ResetShortDescriptions)}()", Indent: 1, Toggle: doDebug);
             ClearShortDescriptionCache();
             ClearShortDescriptions();
         }
@@ -144,7 +146,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddNaturalEquipmentMod)}(NaturalWeaponMod: {NaturalEquipmentMod.Name})",
-                Indent: 3);
+                Indent: 3, Toggle: doDebug);
 
             NaturalEquipmentMods ??= new();
             if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
@@ -158,15 +160,15 @@ namespace XRL.World.Parts
                     Indent: 4);
             }
             NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = NaturalEquipmentMod;
-            Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 4);
+            Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 4, Toggle: doDebug);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}", Indent: 4);
+                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}", Indent: 4, Toggle: doDebug);
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddNaturalEquipmentMod)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}) @//",
-                Indent: 3);
+                Indent: 3, Toggle: doDebug);
         }
 
         public void AddShortDescriptionEntry(ModNaturalEquipmentBase NaturalEquipmentMod)
@@ -174,19 +176,19 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.GetAdjective()}])",
-                Indent: 4);
+                Indent: 4, Toggle: doDebug);
 
             ShortDescriptions ??= new();
             ShortDescriptions[NaturalEquipmentMod.DescriptionPriority] = NaturalEquipmentMod;
-            Debug.Entry(4, $"ShortDescriptions:", Indent: 5);
+            Debug.Entry(4, $"ShortDescriptions:", Indent: 5, Toggle: doDebug);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 5);
+                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 5, Toggle: doDebug);
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.GetAdjective()}]) @//",
-                Indent: 4);
+                Indent: 4, Toggle: doDebug);
         }
 
         public bool RaplacedBasedOnPriority(Dictionary<string, (int Priority, string Value)> Dictionary, Adjustment Adjustment)
@@ -195,33 +197,33 @@ namespace XRL.World.Parts
                 $"* {nameof(RaplacedBasedOnPriority)}" + 
                 $"(Dictionary<string, (int Priority: {Adjustment.Priority}, string Value: {Adjustment.Value})> Dictionary, " + 
                 $"Adjustment Adjustment)",
-                Indent: 4);
+                Indent: 4, Toggle: doDebug);
 
             bool flag = false;
             string @field = Adjustment.Field;
             (int Priority, string Value) entry = (Adjustment.Priority, Adjustment.Value);
 
             // does an entry for this field exist or, if it does, is its priority beat?
-            Debug.Entry(4, $"Existing: {(Dictionary.ContainsKey(@field) ? Dictionary[@field].Priority : "no entry")} | Proposed: {entry.Priority}", Indent: 5);
+            Debug.Entry(4, $"Existing: {(Dictionary.ContainsKey(@field) ? Dictionary[@field].Priority : "no entry")} | Proposed: {entry.Priority}", Indent: 5, Toggle: doDebug);
             if (!Dictionary.ContainsKey(@field) || Dictionary[@field].Priority >= entry.Priority)
             {
                 Dictionary[@field] = entry;
                 flag = true;
             }
-            Debug.LoopItem(4, $"{(flag ? "" : "Not ")}Replaced", Indent: 5, Good: flag);
+            Debug.LoopItem(4, $"{(flag ? "" : "Not ")}Replaced", Indent: 5, Good: flag, Toggle: doDebug);
             return flag;
         }
         public void PrepareNaturalEquipmentModAdjustments(ModNaturalEquipmentBase NaturalWeaponMod)
         {
-            Debug.Entry(4, $"* {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name})", Indent: 1);
+            Debug.Entry(4, $"* {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name})", Indent: 1, Toggle: doDebug);
             if (NaturalWeaponMod?.Adjustments != null)
             {
-                Debug.Entry(4, $"NaturalWeaponMod?.Adjustments != null", Indent: 2);
-                Debug.Entry(4, $"> foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments)", Indent: 2);
+                Debug.Entry(4, $"NaturalWeaponMod?.Adjustments != null", Indent: 2, Toggle: doDebug);
+                Debug.Entry(4, $"> foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments)", Indent: 2, Toggle: doDebug);
                 foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments)
                 {
                     string target = adjustment.Target;
-                    Debug.LoopItem(4, $"target", $"{target}", Indent: 3);
+                    Debug.LoopItem(4, $"target", $"{target}", Indent: 3, Toggle: doDebug);
                     if (AdjustmentTargets != null && AdjustmentTargets.ContainsKey(target))
                     {
                         RaplacedBasedOnPriority(AdjustmentTargets[target].Entry, adjustment);
@@ -235,17 +237,17 @@ namespace XRL.World.Parts
                             Indent: 2);
                     }
                 }
-                Debug.Entry(4, $"x foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments) >//", Indent: 2);
+                Debug.Entry(4, $"x foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments) >//", Indent: 2, Toggle: doDebug);
             }
-            Debug.Entry(4, $"x {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name}) *//", Indent: 1);
+            Debug.Entry(4, $"x {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name}) *//", Indent: 1, Toggle: doDebug);
         }
 
         public virtual void AccumulateMeleeWeaponBonuses()
         {
-            Debug.Entry(4, $"* {nameof(AccumulateMeleeWeaponBonuses)}()", Indent: 2);
+            Debug.Entry(4, $"* {nameof(AccumulateMeleeWeaponBonuses)}()", Indent: 2, Toggle: doDebug);
 
-            Debug.Entry(4, $"> foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 3);
-            Debug.Divider(4, "-", 25, Indent: 4);
+            Debug.Entry(4, $"> foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 3, Toggle: doDebug);
+            Debug.Divider(4, "-", 25, Indent: 4, Toggle: doDebug);
             foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
                 AccumulatedDamageDie.Count += naturalEquipmentMod.GetDamageDieCount();
@@ -254,27 +256,27 @@ namespace XRL.World.Parts
                 AccumulatedHitBonus += naturalEquipmentMod.GetHitBonus();
                 AccumulatedPenBonus += naturalEquipmentMod.GetPenBonus();
 
-                Debug.Entry(4, $"{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 4);
-                Debug.CheckYeh(4, $"DamageDieCount", $"{naturalEquipmentMod.GetDamageDieCount().Signed()}", Indent: 4);
-                Debug.CheckYeh(4, $"DamageDiesize", $" {naturalEquipmentMod.GetDamageDieSize().Signed()}", Indent: 4);
-                Debug.CheckYeh(4, $"DamageBonus", $"   {naturalEquipmentMod.GetDamageBonus().Signed()}", Indent: 4);
-                Debug.CheckYeh(4, $"HitBonus", $"      {naturalEquipmentMod.GetHitBonus().Signed()}", Indent: 4);
-                Debug.CheckYeh(4, $"PenBonus", $"      {naturalEquipmentMod.GetPenBonus().Signed()}", Indent: 4);
+                Debug.Entry(4, $"{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 4, Toggle: doDebug);
+                Debug.CheckYeh(4, $"DamageDieCount", $"{naturalEquipmentMod.GetDamageDieCount().Signed()}", Indent: 4, Toggle: doDebug);
+                Debug.CheckYeh(4, $"DamageDiesize", $" {naturalEquipmentMod.GetDamageDieSize().Signed()}", Indent: 4, Toggle: doDebug);
+                Debug.CheckYeh(4, $"DamageBonus", $"   {naturalEquipmentMod.GetDamageBonus().Signed()}", Indent: 4, Toggle: doDebug);
+                Debug.CheckYeh(4, $"HitBonus", $"      {naturalEquipmentMod.GetHitBonus().Signed()}", Indent: 4, Toggle: doDebug);
+                Debug.CheckYeh(4, $"PenBonus", $"      {naturalEquipmentMod.GetPenBonus().Signed()}", Indent: 4, Toggle: doDebug);
 
-                Debug.Divider(4, "-", 25, Indent: 4);
+                Debug.Divider(4, "-", 25, Indent: 4, Toggle: doDebug);
             }
-            Debug.Entry(4, $"x foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 3);
+            Debug.Entry(4, $"x foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 3, Toggle: doDebug);
 
             DamageDie = new(1, AccumulatedDamageDie.Count, AccumulatedDamageDie.Size);
             DamageDie.AdjustResult(AccumulatedDamageDie.Bonus);
-            Debug.Entry(4, $"x {nameof(AccumulateMeleeWeaponBonuses)}() *//", Indent: 2);
+            Debug.Entry(4, $"x {nameof(AccumulateMeleeWeaponBonuses)}() *//", Indent: 2, Toggle: doDebug);
         }
 
         public virtual void ManageNaturalEquipment()
         {
             Debug.Header(4, 
                 $"{typeof(NaturalEquipmentManager).Name}",
-                $"{nameof(ManageNaturalEquipment)}()");
+                $"{nameof(ManageNaturalEquipment)}()", Toggle: doDebug);
 
             string wielderString = 
                 Wielder != null 
@@ -287,10 +289,10 @@ namespace XRL.World.Parts
 
             Debug.LoopItem(4, 
                 $" Wielder: {wielderString}", 
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
             Debug.LoopItem(4, 
                 $" ParentLimb: {parentLimbString}", 
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
@@ -309,26 +311,26 @@ namespace XRL.World.Parts
                         ( ParentArmor, new() )
                     },
                 };
-                Debug.Entry(4, $"Cycling NaturalEquipmentMods for PrepareNaturalEquipmentModAdjustments(naturalEquipmentMod)", Indent: 1);
+                Debug.Entry(4, $"Cycling NaturalEquipmentMods for PrepareNaturalEquipmentModAdjustments(naturalEquipmentMod)", Indent: 1, Toggle: doDebug);
                 // Cycle the NaturalEquipmentMods to prepare the final set of adjustments to make
-                Debug.Entry(4, $"> foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+                Debug.Entry(4, $"> foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1, Toggle: doDebug);
                 foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                 {
                     PrepareNaturalEquipmentModAdjustments(naturalEquipmentMod);
                 }
-                Debug.Entry(4, $"x foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+                Debug.Entry(4, $"x foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1, Toggle: doDebug);
 
                 // Collect the "starting" values for damage if the NaturalEquipment is a defaultFistWeapon
                 // Accumulate bonuses from NaturalEquipmentMods
                 // Apply the finalised values over the top
 
-                Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1);
+                Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1, Toggle: doDebug);
                 if (ParentMeleeWeapon != null)
                 {
                     OriginalNaturalEquipmentCopy = ParentObject.DeepCopy();
                     MeleeWeapon originalWeapon = OriginalNaturalEquipmentCopy.GetPart<MeleeWeapon>();
                     DamageDie = new(originalWeapon.BaseDamage);
-                    DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2);
+                    DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
 
                     if (!int.TryParse(DamageDie.ToString(), out int damageDieValue))
                     {
@@ -337,41 +339,41 @@ namespace XRL.World.Parts
                             Debug.Entry(4, 
                                 $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, " + 
                                 $"attempting to adjust DamageDie", 
-                                Indent: 3);
+                                Indent: 3, Toggle: doDebug);
                             GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
                             if (defaultFist.TryGetPart(out MeleeWeapon defaultFistWeapon))
                             {
                                 DamageDie = new(defaultFistWeapon.BaseDamage);
                                 DamageDie.ToString()
-                                    .Vomit(4, "DamageDie", Indent: 2);
+                                    .Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
                             }
                         }
                         AccumulatedDamageDie.Count = DamageDie.GetDieCount()
-                            .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
+                            .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
                         AccumulatedDamageDie.Size = (DamageDie.LeftValue > 0 ? DamageDie.RightValue : DamageDie.Left.RightValue)
-                            .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2);
+                            .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2, Toggle: doDebug);
 
                         bool dieBonusIsPenalty = DamageDie.FindTypeWithConstantRight(5) != null;
                         int dieBonus = (DamageDie.LeftValue > 0 ? 0 : DamageDie.RightValue);
                         if (dieBonus != 0 && dieBonusIsPenalty) dieBonus = -dieBonus;
                         AccumulatedDamageDie.Bonus = dieBonus
-                                    .Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2);
+                                    .Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2, Toggle: doDebug);
                     }
                     else
                     {
                         Debug.Entry(4,
                             $"Natural Equipment: {OriginalNaturalEquipmentCopy.Blueprint} " + 
                             $"has static DamageDie value ({damageDieValue})",
-                            Indent: 3);
-                        AccumulatedDamageDie.Count = 0.Vomit(4, "AccumulatedDamageDie.Count", Indent: 2);
-                        AccumulatedDamageDie.Size = 0.Vomit(4, "AccumulatedDamageDie.Size", Indent: 2);
-                        AccumulatedDamageDie.Bonus = damageDieValue.Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2);
+                            Indent: 3, Toggle: doDebug);
+                        AccumulatedDamageDie.Count = 0.Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
+                        AccumulatedDamageDie.Size = 0.Vomit(4, "AccumulatedDamageDie.Size", Indent: 2, Toggle: doDebug);
+                        AccumulatedDamageDie.Bonus = damageDieValue.Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2, Toggle: doDebug);
                     }
 
                     AccumulatedHitBonus = originalWeapon.HitBonus
-                            .Vomit(4, "AccumulatedHitBonus", Indent: 2);
+                            .Vomit(4, "AccumulatedHitBonus", Indent: 2, Toggle: doDebug);
                     AccumulatedPenBonus = originalWeapon.PenBonus
-                        .Vomit(4, "AccumulatedPenBonus", Indent: 2);
+                        .Vomit(4, "AccumulatedPenBonus", Indent: 2, Toggle: doDebug);
 
                     if (OriginalNaturalEquipmentBlueprint == DefaultFistBlueprint)
                     {
@@ -380,27 +382,27 @@ namespace XRL.World.Parts
 
                     AccumulateMeleeWeaponBonuses();
 
-                    ParentMeleeWeapon.BaseDamage = DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2);
-                    ParentMeleeWeapon.HitBonus = AccumulatedHitBonus.Vomit(4, "AccumulatedHitBonus", Indent: 2);
-                    ParentMeleeWeapon.PenBonus = AccumulatedPenBonus.Vomit(4, "AccumulatedPenBonus", Indent: 2);
+                    ParentMeleeWeapon.BaseDamage = DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
+                    ParentMeleeWeapon.HitBonus = AccumulatedHitBonus.Vomit(4, "AccumulatedHitBonus", Indent: 2, Toggle: doDebug);
+                    ParentMeleeWeapon.PenBonus = AccumulatedPenBonus.Vomit(4, "AccumulatedPenBonus", Indent: 2, Toggle: doDebug);
                 }
                 else
                 {
-                    Debug.Entry(4, $"ParentMeleeWeapon is null", Indent: 2);
+                    Debug.Entry(4, $"ParentMeleeWeapon is null", Indent: 2, Toggle: doDebug);
                 }
-                Debug.Entry(4, $"x if (ParentMeleeWeapon != null) ?//", Indent: 1);
+                Debug.Entry(4, $"x if (ParentMeleeWeapon != null) ?//", Indent: 1, Toggle: doDebug);
 
-                Debug.Entry(4, $"Cycling Adjustments, Applying where applicable", Indent: 1);
+                Debug.Entry(4, $"Cycling Adjustments, Applying where applicable", Indent: 1, Toggle: doDebug);
                 // Cycle through the AdjustmentTargets (GameObject, Render, MeleeWeapon, Armor)
                 // |__ Cycle through each Target's set of adjustments, applying them if possible 
                 //     |__ Where not possible, output a warning.
-                Debug.Entry(4, $"> foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)", Indent: 1);
+                Debug.Entry(4, $"> foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)", Indent: 1, Toggle: doDebug);
                 foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)
                 {
-                    Debug.Entry(4, $"Target: {Target}", Indent: 2);
+                    Debug.Entry(4, $"Target: {Target}", Indent: 2, Toggle: doDebug);
                     foreach ((string Field, (int Priority, string Value)) in Entries)
                     {
-                        Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3);
+                        Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3, Toggle: doDebug);
                         if (TargetObject.SetPropertyOrFieldValue(Field, Value))
                             continue;
                         Debug.Entry(2,
@@ -410,7 +412,7 @@ namespace XRL.World.Parts
                             Indent: 4);
                     }
                 }
-                Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1);
+                Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1, Toggle: doDebug);
                 
                 // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
                 ApplyNaturalEquipmentMods();
@@ -422,7 +424,7 @@ namespace XRL.World.Parts
 
                 if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))
                 {
-                    Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1);
+                    Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1, Toggle: doDebug);
                     // This lets us check whether there's a Tile been provided anywhere in a fairly sizeable list of locations
                     // named "AdjectiveAdjectiveAdjectiveNoun", allowing for tiles to be added for an arbitrary set of combinations
                     // provided the order of the adjectives is consistent (which should definitely be the case with this mod.
@@ -434,15 +436,15 @@ namespace XRL.World.Parts
                     displayNameOnlySansRays.Replace(icyString, "");
                     displayNameOnlySansRays.Replace(flamingString, "");
 
-                    Debug.Divider(4, "-", 25, Indent: 2);
+                    Debug.Divider(4, "-", 25, Indent: 2, Toggle: doDebug);
                     if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath)) ParentRender.Tile = tilePath;
-                    Debug.Divider(4, "-", 25, Indent: 2);
+                    Debug.Divider(4, "-", 25, Indent: 2, Toggle: doDebug);
                     if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath)) ParentRender.Tile = tilePath;
-                    Debug.Divider(4, "-", 25, Indent: 2);
+                    Debug.Divider(4, "-", 25, Indent: 2, Toggle: doDebug);
                 }
                 else
                 {
-                    Debug.Entry(4, "DynamicTile search/application overriden", Indent: 2);
+                    Debug.Entry(4, "DynamicTile search/application overriden", Indent: 2, Toggle: doDebug);
                 }
 
                 // We want these sick as, modified Natural Equipments to show up as a physical feature.
@@ -456,23 +458,23 @@ namespace XRL.World.Parts
             }
             else
             {
-                Debug.Entry(4, $"Nothing to Manage", Indent: 1);
+                Debug.Entry(4, $"Nothing to Manage", Indent: 1, Toggle: doDebug);
             }
 
             Debug.Footer(4,
                 $"{typeof(NaturalEquipmentManager).Name}",
-                $"{nameof(ManageNaturalEquipment)}()");
+                $"{nameof(ManageNaturalEquipment)}()", Toggle: doDebug);
         }
 
         public virtual void ApplyNaturalEquipmentMods()
         {
-            Debug.Entry(4, $"* {nameof(ApplyNaturalEquipmentMods)}()", Indent: 1);
+            Debug.Entry(4, $"* {nameof(ApplyNaturalEquipmentMods)}()", Indent: 1, Toggle: doDebug);
             foreach ((_, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.Entry(4, $"Applying {naturalEquipmentMod.Name} to {ParentObject?.ShortDisplayNameStripped}", Indent: 2);
+                Debug.Entry(4, $"Applying {naturalEquipmentMod.Name} to {ParentObject?.ShortDisplayNameStripped}", Indent: 2, Toggle: doDebug);
                 ParentObject.ApplyNaturalEquipmentModification(naturalEquipmentMod, Wielder);
             }
-            Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: 1);
+            Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: 1, Toggle: doDebug);
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -487,7 +489,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.DebugName})",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
             if(E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
             {
@@ -503,10 +505,10 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E.Actor.DebugName}))",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
             Debug.Entry(4,
                 $" Actor:{E.Actor.ShortDisplayName} | Limb: [{ParentLimb.ID}:{ParentLimb.Type}] {ParentLimb.Description}",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
             if (E.Actor == Wielder)
             {
@@ -522,7 +524,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E (Actor:{E.Actor.DebugName}))",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
             if (E.Actor == Wielder)
             {

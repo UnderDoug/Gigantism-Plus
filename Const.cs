@@ -11,8 +11,10 @@ namespace HNPS_GigantismPlus
         public const string DEBUG_OBJECT_CREATION_ANALYSIS = "UD_Debug_DoObjectCreationAnalysis";
         public const string DEBUG_HIGHLIGHT_CELLS = "UD_Debug_HighlightCells";
 
-        public const string TICK = "\u221A"; // √
-        public const string CROSS = "\u0058";  // X
+        public const string NULL = "\"null\"";
+
+        public const string TICK = "\u221A";  // √
+        public const string CROSS = "\u0058"; // X
 
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
@@ -59,8 +61,8 @@ namespace HNPS_GigantismPlus
         public const string GNT_ADMIREREASON_BOOK = "GiantHero_FactionAdmirationBag";
         public const string GNT_HERO_CONVSCRPT_ID = "HNPS_Giant_Hero_Convo"; // This convo doesn't currently exist @ 18/04/2025
         public const string GNT_PREDESC_RPLC = "::CREATURE::";
-        public const string SCRT_GNT_UNQ_PREDESC = "A creature of immensity mounts the upper eyeline. Deep sonorous tones reverberate gently off the very ground and ring subsonically from every improvised antenna jutting crudely out of it. Amidst the rumbling, a sonnet emerges in a language old as life, of home-sick stones traversing mountain-ranges, of oceans whittling shorelines, and of ancient wood giving way to time's inevitable arrival. As distance dwindles, the behemoth's shape begins to resolve... " + GNT_PREDESC_RPLC + ", in every way, except an order of magnitude greater in size...\n\n";
-        public const string GNT_PREDESC = "A creature of immensity mounts th" + HONLY + " actually, not quite... Though it {{Y|is}} massive. Biology strains itself against physics with the creature's every belief-challenging movement. Perspective shifts, and, seemingly the ground with it, as the realisation hits: this creature, " + GNT_PREDESC_RPLC + ", is quite a distance further away than it first appeared...\n\n";
+        public const string SCRT_GNT_UNQ_PREDESC = "A creature of immensity mounts the upper eyeline. Deep sonorous tones reverberate gently off the very ground and ring subsonically from every improvised antenna jutting crudely out of it. Amidst the rumbling, a sonnet emerges in a language old as life, of home-sick stones traversing mountain-ranges, of oceans whittling shorelines, and of ancient wood giving way to time's inevitable arrival. As distance dwindles, the behemoth's shape begins to resolve... " + GNT_PREDESC_RPLC + "in every way, except an order of magnitude greater in size...\n\n";
+        public const string GNT_PREDESC = "A creature of immensity mounts th" + HONLY + " actually, not quite... Though it {{Y|is}} massive. Biology strains itself against physics with the creature's every belief-challenging movement. Perspective shifts, and, seemingly the ground with it, as the realisation hits: this creature" + GNT_PREDESC_RPLC  + "is quite a distance further away than it first appeared...\n\n";
         public const string GNT_POUND = "\u00A3";
 
     } //!-- public static class Const

@@ -14,6 +14,22 @@
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
   </object>
+
+  <object Name="BrinestalkStakes" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="WoodFence" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="BrinestalkFence" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="HalfWall" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="Rubble" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
   
   <object Name="WrassleRingRopes" Inherits="Wall">
     <part Name="Render" DisplayName="rope barrier" RenderString="=" ColorString="&amp;y" TileColor="&amp;y" DetailColor="w" Occluding="false" RenderLayer="6" Tile="Tiles/WrassleRing_Ropes_.png" />

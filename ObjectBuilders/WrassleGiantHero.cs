@@ -303,7 +303,15 @@ namespace XRL.World.ObjectBuilders
             int Stews = Stat.Roll("4d4");
             Debug.CheckYeh(4, $"{"4d4".Quote()} Stews", $"{Stews}", Indent: 1);
 
-            if (!Epithet.IsNullOrEmpty()) Creature.RequirePart<Epithets>().Primary = GameText.VariableReplace(Epithet).Color("y");
+            if (!Epithet.IsNullOrEmpty())
+            {
+                if (Creature.TryGetPart(out Epithets epithets))
+                {
+                    Creature.RemovePart(epithets);
+                }
+                epithets = Creature.RequirePart<Epithets>();
+                epithets.Primary = GameText.VariableReplace(Epithet).Color("y");
+            }
             if (!Epithet.IsNullOrEmpty() && !Unique)
             {
                 Debug.Entry(4, $"Beginning WrassleGiant Runway", Indent: 1);
@@ -618,10 +626,10 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"starting level", $"{level}", Indent: 3);
             Debug.LoopItem(4, $"{"3d3".Quote()} extraLevels", $"{extraLevels}", Indent: 3);
 
-            int extraMP = (Creature.GetStat("Level").BaseValue - 1) * 4;
+            int extraMP = (Creature.GetStat("Level").BaseValue - 1);
             Creature.AddBaseStat("MP", extraMP);
             Debug.CheckYeh(4, $"Add extraMP", $"{extraMP}", Indent: 2);
-            Debug.LoopItem(4, $"(starting Level - 1) x4", Indent: 3);
+            Debug.LoopItem(4, $"(starting Level - 1)", Indent: 3);
 
             int extraXP = Stat.Roll("1d18") * Stat.Roll("18d18");
             Creature.GetStat("XP").BaseValue = Leveler.GetXPForLevel(Creature.GetStat("Level").Value) + extraXP;
@@ -845,11 +853,26 @@ namespace XRL.World.ObjectBuilders
             {
                 description = Creature.RequirePart<Description>();
             }
-            string creatureNoun = $"{Creature?.GetCreatureType() ?? Creature?.GetBlueprint()?.DisplayName() ?? "creature"}".Color("y");
+
+            string creatureSubtype = Creature != null && Creature.IsPlayer() ? Creature?.GetSubtype() : null;
+            string creatureType = Creature?.GetCreatureType();
+            string creatureBlueprint = Creature?.GetBlueprint()?.DisplayName();
+
+            string creatureNoun = creatureSubtype ?? creatureType ?? creatureBlueprint ?? null;
             string creatureArticle = Grammar.IndefiniteArticle(creatureNoun);
             creatureArticle = Unique ? creatureArticle.Capitalize() : creatureArticle;
+
+            string aCreature = creatureNoun != null ? $"{creatureArticle} {creatureNoun}" : "";
+            aCreature = Unique
+                ? $"{aCreature}, "
+                : !aCreature.IsNullOrEmpty()
+                    ? $", {aCreature}, "
+                    : ""
+                    ;
+
             string preDesc = Unique ? SCRT_GNT_UNQ_PREDESC : GNT_PREDESC;
-            preDesc = preDesc.Replace(GNT_PREDESC_RPLC, $"{creatureArticle} {creatureNoun}");
+            preDesc = preDesc.Replace(GNT_PREDESC_RPLC, aCreature);
+
             description.Short = preDesc + description._Short;
 
             Debug.LoopItem(4, 

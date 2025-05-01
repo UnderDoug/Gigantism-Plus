@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using XRL.UI;
 using XRL.World.Parts.Skill;
 using XRL.World.Anatomy;
+using XRL.World.AI.Pathfinding;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
-using System.Linq;
-using XRL.EditorFormats.Screen;
-using static UnityEngine.UI.Image;
-using System.Drawing;
-using PlayFab.DataModels;
-using XRL.World.Capabilities;
-using System.IO;
+using XRL.Rules;
+using XRL.World.Conversations.Parts;
+using XRL.World.Conversations;
 
 namespace XRL.World.Parts
 {
@@ -46,26 +43,31 @@ namespace XRL.World.Parts
             return true;
         }
 
-        public bool CanVault(GameObject Vaulter, GameObject Vaultee)
+        public bool CanVault(GameObject Vaulter)
+        {
+            return CanVault(Vaulter, ParentObject, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList);
+        }
+
+        public static bool CanVault(GameObject Vaulter, GameObject Vaultee, bool SizeMatters = false, bool RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null)
         {
             if (Vaulter == null || Vaultee == null) return false;
 
-            // BigEnough IF size doesn't matter OR vaulter is gigantic OR Vaultee isn't gigantic
+            // BigEnough IF size doesn't matter OR Vaulter is gigantic OR Vaultee isn't gigantic
             bool BigEnough = !SizeMatters || Vaulter.IsGiganticCreature || (Vaultee.HasPart<ModGigantic>() && !Vaultee.IsGiganticCreature);
 
-            // HaveRequiredSkill IF no required skill OR vaulter has required skill
+            // HaveRequiredSkill IF no required skill OR Vaulter has required skill
             bool HaveRequiredSkill = !RequiresSkill || Vaulter.HasSkill(nameof(Acrobatics_Jump));
 
-            // HaveEnablingLimbs IF enabling limbs list is empty OR enabling limb list overlaps with vaulter limbs
-            bool HaveEnablingLimbs = EnablingLimbs.IsNullOrEmpty() || EnablingLimbsList.OverlapsWith((from bp in Vaulter.Body.GetParts(EvenIfDismembered: false) select bp.Type).ToList());
+            // HaveEnablingLimbs IF enabling limbs list is empty OR enabling limb list overlaps with Vaulter limbs
+            bool HaveEnablingLimbs = EnablingLimbsList.IsNullOrEmpty() || EnablingLimbsList.OverlapsWith((from bp in Vaulter.Body.GetParts(EvenIfDismembered: false) select bp.Type).ToList());
 
-            // HaveOverridingParts IF overriding parts list has entries AND overriding parts list overlaps with vaulter parts
-            bool HaveOverridingParts = !OverridingParts.IsNullOrEmpty() && OverridingPartsList.OverlapsWith((from p in Vaulter.GetPartsDescendedFrom<IPart>() select p.Name).ToList());
+            // HaveOverridingParts IF overriding parts list has entries AND overriding parts list overlaps with Vaulter parts
+            bool HaveOverridingParts = !OverridingPartsList.IsNullOrEmpty() && OverridingPartsList.OverlapsWith((from p in Vaulter.GetPartsDescendedFrom<IPart>() select p.Name).ToList());
 
-            // AbleToMove IF vaulter can change to jump mode AND vaulter can change body to jump position
+            // AbleToMove IF Vaulter can change to jump mode AND Vaulter can change body to jump position
             bool AbleToMove = Vaulter.CanChangeMovementMode("Jumping") && Vaulter.CanChangeBodyPosition("Jumping");
 
-            // OnTheGround IF vaulter is not flying
+            // OnTheGround IF Vaulter is not flying
             bool OnTheGround = !Vaulter.IsFlying;
 
             // PhaseMatches IF well, phase matches.
@@ -76,7 +78,7 @@ namespace XRL.World.Parts
             return AbleToMove && OnTheGround && PhaseMatches && (HaveOverridingParts || HaveEnablingLimbs || HaveRequiredSkill);
         }
 
-        public bool AttemptVault(GameObject Vaulter, GameObject Vaultee, IEvent FromEvent = null, bool Silent = false)
+        public static bool AttemptVault(GameObject Vaulter, GameObject Vaultee, IEvent FromEvent = null, bool Silent = false)
         {
             if (Vaulter.IsFlying)
             {
@@ -113,19 +115,32 @@ namespace XRL.World.Parts
             return true;
         }
 
+        public static bool TryGetValidDestinationCell(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, out Cell DestinationCell)
+        {
+            return TryGetValidDestinationCell(Vaulter, OriginCell, Vaultee, Vaultee.CurrentCell, out DestinationCell);
+        }
+
         public static bool TryGetValidDestinationCell(GameObject Vaulter, GameObject Vaultee, out Cell DestinationCell)
         {
-            Cell originCell = Vaulter.CurrentCell;
-            Cell overCell = Vaultee.CurrentCell;
+            return TryGetValidDestinationCell(Vaulter, Vaulter.CurrentCell, Vaultee, Vaultee.CurrentCell, out DestinationCell);
+        }
+        
+        public static bool TryGetValidDestinationCell(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, Cell OverCell, out Cell DestinationCell)
+        {
+            OriginCell ??= Vaulter.CurrentCell;
+            OverCell ??= Vaultee.CurrentCell;
             DestinationCell = null;
 
-            string DirectionOriginToOver = originCell.GetDirectionFromCell(overCell);
+            if (OriginCell == OverCell)
+                return false;
+
+            string DirectionOriginToOver = OriginCell.GetDirectionFromCell(OverCell);
             bool DirectionOriginToOverIsCardinal = DirectionOriginToOver.Length == 1;
 
             Debug.Entry(4, $"DirectionOverToTargetCell ({DirectionOriginToOver}), IsCardinal:", $"{DirectionOriginToOverIsCardinal}", Indent: 2);
-            foreach (Cell cell in overCell.GetAdjacentCells())
+            foreach (Cell cell in OverCell.GetAdjacentCells())
             {
-                string DirectionOverToDestination = overCell.GetDirectionFromCell(cell);
+                string DirectionOverToDestination = OverCell.GetDirectionFromCell(cell);
                 if (DirectionOverToDestination != DirectionOriginToOver)
                 {
                     Debug.CheckNah(4, $"DirectionOverToDestination", DirectionOverToDestination, Indent: 3);
@@ -150,16 +165,16 @@ namespace XRL.World.Parts
 
             Debug.LoopItem(4,
                 $"DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true)",
-                Good: DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true),
+                Good: DestinationCell != null && DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true),
                 Indent: 3);
 
             Debug.LoopItem(4,
                 $"DestinationCell.GetObjectsWithTagOrProperty(\"NoAutowalk\").IsNullOrEmpty()",
-                Good: DestinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty(),
+                Good: DestinationCell != null && DestinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty(),
                 Indent: 3);
 
             Debug.LoopItem(4,
-                $"destinationCellIsAcceptable",
+                $"destinationCell{(destinationCellIsAcceptable ? "" : "not")}IsAcceptable",
                 Good: destinationCellIsAcceptable,
                 Indent: 2);
 
@@ -172,12 +187,12 @@ namespace XRL.World.Parts
             {
 
                 Debug.Entry(4, $"Destination cell unacceptable, finding alternative", Indent: 2);
-                foreach (Cell cell in overCell.GetAdjacentCells())
+                foreach (Cell cell in OverCell.GetAdjacentCells())
                 {
                     Debug.Divider(4, HONLY, Count: 40, Indent: 2);
-                    Debug.Entry(4, $"Checking cell [{cell.Location}] ({overCell.GetDirectionFromCell(cell)} of Vaultee)", Indent: 3);
+                    Debug.Entry(4, $"Checking cell [{cell.Location}] ({OverCell.GetDirectionFromCell(cell)} of Vaultee)", Indent: 3);
 
-                    if (originCell.GetAdjacentCells().Contains(cell))
+                    if (OriginCell.GetAdjacentCells().Contains(cell))
                     {
                         Debug.CheckNah(4, $"CellIsAdjacentToOrigin", Indent: 5);
                         continue;
@@ -216,7 +231,7 @@ namespace XRL.World.Parts
             return DestinationCell != null;
         }
 
-        public bool PerformVault(GameObject Vaulter, GameObject Vaultee, Cell DestinationCell, bool Silent = false)
+        public static bool PerformVault(GameObject Vaulter, GameObject Vaultee, Cell DestinationCell, bool Silent = false)
         {
             Cell originCell = Vaulter.CurrentCell;
 
@@ -226,21 +241,6 @@ namespace XRL.World.Parts
                 $"DestinationCell is [{DestinationCell.Location}] " +
                 $"which is {Vaultee.CurrentCell.GetDirectionFromCell(DestinationCell)} of {Vaultee.DisplayName}",
                 Indent: 2);
-
-            /*
-            if (!Acrobatics_Jump.CheckPath(
-                Vaulter, 
-                DestinationCell, 
-                out Vaultee, 
-                out List<Point> Path, 
-                Silent: true, 
-                CanJumpOverCreatures: true, 
-                CanLandOnCreature: false, "vault"))
-            {
-                Debug.Entry(4, $"/!\\ WARN: CheckPath Failed, vault aborted", Indent: 2);
-                return false;
-            }
-            */
 
             if (!BeforeVaultEvent.CheckFor(Vaulter, originCell, Vaultee, DestinationCell, out string Message))
             {
@@ -257,7 +257,7 @@ namespace XRL.World.Parts
             Vaulter.BodyPositionChanged("Jumping");
 
             Acrobatics_Jump.PlayAnimation(Vaulter, DestinationCell);
-            XDidYToZ(Vaulter, "vault", "over", ParentObject, null, ".");
+            XDidYToZ(Vaulter, "vault", "over", Vaultee, null, ".");
 
             if (Vaulter.DirectMoveTo(DestinationCell, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true))
             {
@@ -270,15 +270,58 @@ namespace XRL.World.Parts
             return true;
         }
 
-        public bool CanPathThrough(GameObject who)
+        public bool CanVaultThrough(GameObject Vaulter)
         {
-            if (CanVault(who, ParentObject))
-            {
-                return true;
-            }
-            return false;
+            return CanVaultThrough(Vaulter, ParentObject, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList);
         }
 
+        public static bool CanVaultThrough(GameObject Vaulter, GameObject Vaultee, bool SizeMatters = false, bool RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null)
+        {
+            if (!CanVault(Vaulter, Vaultee, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList))
+                return false;
+
+            Cell vaulterCell = Vaulter.CurrentCell;
+            Cell vaulteeCell = Vaultee.CurrentCell;
+
+            Cell vaultTestCell = vaulteeCell.getClosestReachableCellFor(Vaulter);
+            List<Cell> dudCells = new();
+            FindPath path = new();
+
+            bool canVaultThrough = false;
+
+            if (!canVaultThrough && vaultTestCell != null && TryGetValidDestinationCell(Vaulter, vaultTestCell, Vaultee, out Cell destinationCell))
+            {
+                canVaultThrough = destinationCell != null;
+            }
+            else
+            {
+                dudCells.TryAdd(vaultTestCell);
+            }
+
+            if (!canVaultThrough)
+            {
+                foreach (Cell prospectiveCell in vaulteeCell.GetAdjacentCells())
+                {
+                    if (dudCells.Contains(prospectiveCell))
+                        continue;
+
+                    if (TryGetValidDestinationCell(Vaulter, prospectiveCell, Vaultee, out destinationCell))
+                    {
+                        if (canVaultThrough = destinationCell != null)
+                            break;
+                    }
+                    dudCells.TryAdd(prospectiveCell);
+                }
+            }
+            return canVaultThrough;
+        }
+
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforePhysicsRejectObjectEntringCell");
+            Registrar.Register(ParentObject, GetNavigationWeightEvent.ID, Order: 1);
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -286,8 +329,7 @@ namespace XRL.World.Parts
                 || ID == InventoryActionEvent.ID
                 || ID == CanSmartUseEvent.ID
                 || ID == CommandSmartUseEvent.ID
-                || ID == GetNavigationWeightEvent.ID
-                || ID == GetMovementCapabilitiesEvent.ID;
+                || ID == GetNavigationWeightEvent.ID;
         }
         public override bool HandleEvent(GetInventoryActionsEvent E)
         {
@@ -335,32 +377,29 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetNavigationWeightEvent E)
         {
-
-            if (CanPathThrough(E.Actor))
+            if (E.Object == ParentObject && E.Cell == ParentObject.CurrentCell)
             {
-                E.Uncacheable = true;
-                E.Weight = 0;
+                if (CanVaultThrough(E.Actor, ParentObject))
+                {
+                    E.Uncacheable = true;
+                    // E.MinWeight(0);
+                    // Debug.Entry(4, GetDebugInternalsEvent.GetFor(E.Actor), Indent: 0);
+                    Debug.Entry(4,
+                        $"@ {nameof(Vaultable)}."
+                        + $"{nameof(HandleEvent)}({nameof(GetNavigationWeightEvent)} E.Weight: {E.Weight})",
+                        Indent: 0);
+                    return true;
+                }
             }
             return base.HandleEvent(E);
         }
-        public override bool HandleEvent(GetMovementCapabilitiesEvent E)
-        {
-            E.Add("Vault over short objects", "Vault", 11250);
-            return base.HandleEvent(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("BeforePhysicsRejectObjectEntringCell");
-            base.Register(Object, Registrar);
-        }
-
         public override bool FireEvent(Event E)
         {
             if (E.ID == "BeforePhysicsRejectObjectEntringCell" && E.HasFlag("Actual"))
             {
                 GameObject Vaulter = E.GetGameObjectParameter("Object");
                 GameObject Vaultee = ParentObject;
+                return AttemptVault(Vaulter, Vaultee, E);
                 if (CanVault(Vaulter, Vaultee) 
                     && TryGetValidDestinationCell(Vaulter, Vaultee, out Cell DestinationCell))
                 {

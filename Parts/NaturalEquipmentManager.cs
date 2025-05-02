@@ -504,10 +504,10 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E.Actor.DebugName}))",
+                + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E?.Actor?.DebugName}))",
                 Indent: 0, Toggle: doDebug);
             Debug.Entry(4,
-                $" Actor:{E.Actor.ShortDisplayName} | Limb: [{ParentLimb.ID}:{ParentLimb.Type}] {ParentLimb.Description}",
+                $" Actor:{E?.Actor?.ShortDisplayName} | Limb: [{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description}",
                 Indent: 0, Toggle: doDebug);
 
             if (E.Actor == Wielder)

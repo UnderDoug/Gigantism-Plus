@@ -26,9 +26,6 @@ namespace XRL.World.Parts
 
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
-
-        [SerializeField]
-        public GameObject OriginalNaturalEquipmentCopy;
         
         public DieRoll DamageDie;
         public (int Count, int Size, int Bonus) AccumulatedDamageDie;
@@ -327,8 +324,8 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1, Toggle: doDebug);
                 if (ParentMeleeWeapon != null)
                 {
-                    OriginalNaturalEquipmentCopy = ParentObject.DeepCopy();
-                    MeleeWeapon originalWeapon = OriginalNaturalEquipmentCopy.GetPart<MeleeWeapon>();
+                    GameObject originalNaturalEquipment = GameObjectFactory.Factory.CreateSampleObject(OriginalNaturalEquipmentBlueprint);
+                    MeleeWeapon originalWeapon = originalNaturalEquipment.GetPart<MeleeWeapon>();
                     DamageDie = new(originalWeapon.BaseDamage);
                     DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
 
@@ -337,7 +334,7 @@ namespace XRL.World.Parts
                         if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
                         {
                             Debug.Entry(4, 
-                                $"Non-standard fist: {OriginalNaturalEquipmentCopy.Blueprint}, " + 
+                                $"Non-standard fist: {OriginalNaturalEquipmentBlueprint}, " + 
                                 $"attempting to adjust DamageDie", 
                                 Indent: 3, Toggle: doDebug);
                             GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
@@ -362,7 +359,7 @@ namespace XRL.World.Parts
                     else
                     {
                         Debug.Entry(4,
-                            $"Natural Equipment: {OriginalNaturalEquipmentCopy.Blueprint} " + 
+                            $"Natural Equipment: {OriginalNaturalEquipmentBlueprint} " + 
                             $"has static DamageDie value ({damageDieValue})",
                             Indent: 3, Toggle: doDebug);
                         AccumulatedDamageDie.Count = 0.Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
@@ -385,6 +382,8 @@ namespace XRL.World.Parts
                     ParentMeleeWeapon.BaseDamage = DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
                     ParentMeleeWeapon.HitBonus = AccumulatedHitBonus.Vomit(4, "AccumulatedHitBonus", Indent: 2, Toggle: doDebug);
                     ParentMeleeWeapon.PenBonus = AccumulatedPenBonus.Vomit(4, "AccumulatedPenBonus", Indent: 2, Toggle: doDebug);
+
+                    originalNaturalEquipment.Obliterate();
                 }
                 else
                 {
@@ -565,17 +564,14 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-            Writer.WriteGameObject(OriginalNaturalEquipmentCopy);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            OriginalNaturalEquipmentCopy = Reader.ReadGameObject();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             NaturalEquipmentManager naturalEquipmentManager = base.DeepCopy(Parent, MapInv) as NaturalEquipmentManager;
-            naturalEquipmentManager.OriginalNaturalEquipmentCopy = OriginalNaturalEquipmentCopy?.DeepCopy();
             naturalEquipmentManager.ShortDescriptions = null;
             naturalEquipmentManager._shortDescriptionCache = null;
             naturalEquipmentManager.NaturalEquipmentMods = null;

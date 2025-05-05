@@ -787,7 +787,6 @@ namespace XRL.World.ObjectBuilders
                 Good: Creature.HasPart<GivesRep>(), 
                 Indent: 2);
 
-
             Debug.CheckYeh(4, $"Remove Problem Parts", Indent: 2);
             if (Creature.TryGetPart(out GreaterVoider greaterVoider))
             {
@@ -804,6 +803,8 @@ namespace XRL.World.ObjectBuilders
                 Debug.CheckYeh(4, $"Removed {nameof(Breeder)}", Indent: 3);
                 Creature.RemovePart(breeder);
             }
+
+            Creature.FireEvent("VillageInit");
                 
             if (Creature.TryGetPart(out DisplayNameAdjectives displayNameAdjectives))
             {

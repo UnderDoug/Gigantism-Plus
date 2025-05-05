@@ -184,11 +184,11 @@ namespace HNPS_GigantismPlus
                 }
                 else
                 {
-                    Debug.Entry(4, $"Listing subfolders", Indent: 2);
+                    Debug.Entry(4, $"Listing subfolders", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     foreach (string subfolder in TileSubfolders)
                     {
-                        Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3);
+                        Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     }
                     Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
 
@@ -443,7 +443,7 @@ namespace HNPS_GigantismPlus
             int Result = DieRoll.Resolve();
             if (Result == High)
             {
-                Debug.Entry(4, $"Result: {Result}, Success!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
+                Debug.Entry(4, $"continue: {Result}, Success!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
                 Debug.Entry(4, $"Increasing Number by {Step}", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
                 Debug.Entry(4, $"Sending Number for another roll!", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
                 Number += Step;
@@ -453,7 +453,7 @@ namespace HNPS_GigantismPlus
             }
             else
             {
-                Debug.Entry(4, $"Result: {Result}, Failure!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
+                Debug.Entry(4, $"continue: {Result}, Failure!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
             }
 
             Exit:

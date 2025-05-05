@@ -145,7 +145,6 @@ namespace XRL.World.Parts
 
         public override void Attach()
         {
-            base.Attach();
             if (ParentObject != null)
             {
                 if (!ParentObject.TryGetPart(out Vaultable vaultable))
@@ -161,6 +160,7 @@ namespace XRL.World.Parts
                     "Wrassler",
                 };
             }
+            base.Attach();
         }
 
         public Wrassler BestowWrassleGear(out bool Bestowed)

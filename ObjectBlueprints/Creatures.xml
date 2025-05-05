@@ -18,6 +18,7 @@
       <part Name="InventoryGigantifier" />
       <!-- part Name="ObjectCreationAnalyzer" /-->
       <builder Name="Gigantified" ChanceOneIn="5000" />
+      <skill Name="Tactics_Vault" />
     </object>
     <object Name="Templar" Load="Merge">
       <builder Name="Gigantified" ChanceOneIn="500" />

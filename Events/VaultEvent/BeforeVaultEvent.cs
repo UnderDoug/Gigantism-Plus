@@ -16,7 +16,7 @@ public class BeforeVaultEvent : ModPooledEvent<BeforeVaultEvent>
 
     public GameObject Vaulter;
     public Cell OriginCell;
-    public GameObject Vaultee;
+    public Cell OverCell;
     public Cell DestinationCell;
     public string Message;
 
@@ -35,25 +35,33 @@ public class BeforeVaultEvent : ModPooledEvent<BeforeVaultEvent>
         base.Reset();
         Vaulter = null;
         OriginCell = null;
-        Vaultee = null;
+        OverCell = null;
         DestinationCell = null;
     }
 
-    public static bool CheckFor(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, Cell DestinationCell, out string Message)
+    public static bool CheckFor(GameObject Vaulter, Cell OriginCell, Cell OverCell, Cell DestinationCell, out string Message)
     {
         Debug.Entry(4, 
             $"{typeof(BeforeVaultEvent).Name}." + 
-            $"{nameof(CheckFor)}(Vaulter: {Vaulter?.DebugName}, OriginCell: [{OriginCell?.Location}], Vaulter: {Vaultee?.DebugName}, DestinationCell: [{DestinationCell?.Location}])", 
+            $"{nameof(CheckFor)}" + 
+            $"(Vaulter: {Vaulter?.DebugName}," + 
+            $" OriginCell: [{OriginCell?.Location}]," + 
+            $" OverCell: [{OverCell?.Location}]," + 
+            $" DestinationCell: [{DestinationCell?.Location}])", 
             Indent: 0);
 
         BeforeVaultEvent E = FromPool();
 
         bool VaulterWantsMin = Vaulter.WantEvent(ID, E.GetCascadeLevel());
-        bool VaulteeWantsMin = Vaultee.WantEvent(ID, E.GetCascadeLevel());
+        bool OverCellWantsMin = OverCell.WantEvent(ID, E.GetCascadeLevel());
+        bool DestinationCellWantsMin = DestinationCell.WantEvent(ID, E.GetCascadeLevel());
+        bool AnyWantsMin = VaulterWantsMin || OverCellWantsMin || DestinationCellWantsMin;
+
         bool VaulterWantsStr = Vaulter.HasRegisteredEvent(E.GetRegisteredEventID());
-        bool VaulteeWantsStr = Vaultee.HasRegisteredEvent(E.GetRegisteredEventID());
-        bool AnyWantsMin = VaulterWantsMin || VaulteeWantsMin;
-        bool AnyWantsStr = VaulterWantsStr || VaulteeWantsStr;
+        bool OverCellWantsStr = OverCell.HasObjectWithRegisteredEvent(E.GetRegisteredEventID());
+        bool DestinationCellWantsStr = DestinationCell.HasObjectWithRegisteredEvent(E.GetRegisteredEventID());
+        bool AnyWantsStr = VaulterWantsStr || OverCellWantsStr || DestinationCellWantsStr;
+
         bool AnyWants = AnyWantsMin || AnyWantsStr;
 
         E.Message = string.Empty;
@@ -66,10 +74,11 @@ public class BeforeVaultEvent : ModPooledEvent<BeforeVaultEvent>
             {
                 E.Vaulter = Vaulter;
                 E.OriginCell = OriginCell;
-                E.Vaultee = Vaultee;
+                E.OverCell = OverCell;
                 E.DestinationCell = DestinationCell;
                 if (check && VaulterWantsMin) check = Vaulter.HandleEvent(E);
-                if (check && VaulteeWantsMin) check = Vaultee.HandleEvent(E);
+                if (check && OverCellWantsMin) check = OverCell.HandleEvent(E);
+                if (check && DestinationCellWantsMin) check = DestinationCell.HandleEvent(E);
                 if (!check)
                 {
                     Message = E.Message;
@@ -80,11 +89,12 @@ public class BeforeVaultEvent : ModPooledEvent<BeforeVaultEvent>
                 Event @event = Event.New(E.GetRegisteredEventID());
                 @event.SetParameter(nameof(Vaulter), Vaulter);
                 @event.SetParameter(nameof(OriginCell), OriginCell);
-                @event.SetParameter(nameof(Vaulter), Vaulter);
+                @event.SetParameter(nameof(OverCell), OverCell);
                 @event.SetParameter(nameof(DestinationCell), DestinationCell);
                 @event.SetParameter(nameof(Message), E.Message);
                 if (check && VaulterWantsMin) check = Vaulter.FireEvent(@event);
-                if (check && VaulteeWantsMin) check = Vaultee.FireEvent(@event); 
+                if (check && OverCellWantsMin) check = OverCell.FireEvent(@event); 
+                if (check && DestinationCellWantsMin) check = DestinationCell.FireEvent(@event); 
                 if (!check)
                 {
                     Message = @event.GetStringParameter(nameof(Message));

@@ -2151,5 +2151,32 @@ namespace HNPS_GigantismPlus
             return overlaps;
         }
 
+        public static Cell GetCellOppositePivotCell(this Cell Origin, Cell Pivot)
+        {
+            if (Origin == null || Origin == Pivot || !Origin.GetAdjacentCells().Contains(Pivot)) return null;
+            return Pivot.GetCellFromDirection(Origin.GetDirectionFromCell(Pivot));
+        }
+
+        public static string YehNah(this bool Condition, bool Flip = false)
+        {
+            // Input |  Flip
+            // true  != false   == true
+            // true  != true    == false
+            // false != false   == false
+            // false != true    == true
+            return Condition != Flip ? TICK.Color("G") : CROSS.Color("R");
+        }
+        public static string ThisManyTimes(this string @string, int Times = 1)
+        {
+            string output = @string;
+
+            for (int i = 0; i < Times; i++)
+            {
+                output += @string;
+            }
+
+            return output;
+        }
+
     } //!-- Extensions
 }

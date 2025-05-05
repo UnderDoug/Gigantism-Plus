@@ -499,7 +499,7 @@ namespace XRL.World.Parts.Mutation
             HunchedOverAVModifier = GetHunchedOverAVModifier(NewLevel);
             HunchedOverDVModifier = GetHunchedOverDVModifier(NewLevel);
             HunchedOverMSModifier = GetHunchedOverMSModifier(NewLevel);
-            Debug.Entry(4, $"Values After", Indent: 2);
+            Debug.Entry(4, $"Values After", Indent: 2, Toggle: doDebug);
             Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3, Toggle: doDebug);
             Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: doDebug);
             Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: doDebug);
@@ -660,7 +660,7 @@ namespace XRL.World.Parts.Mutation
                         DisabledMessage: null,
                         Toggleable: true,
                         DefaultToggleState: false,
-                        ActiveToggle: true,
+                        ActiveToggle: false,
                         IsAttack: false,
                         IsRealityDistortionBased: false,
                         IsWorldMapUsable: false,
@@ -697,7 +697,7 @@ namespace XRL.World.Parts.Mutation
                         DisabledMessage: null,
                         Toggleable: true,
                         DefaultToggleState: false,
-                        ActiveToggle: true,
+                        ActiveToggle: false,
                         IsAttack: false,
                         IsRealityDistortionBased: false,
                         IsWorldMapUsable: true,

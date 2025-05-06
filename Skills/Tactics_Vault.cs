@@ -18,7 +18,7 @@ using HNPS_GigantismPlus;
 using Debug = HNPS_GigantismPlus.Debug;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using System.Data;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts.Skill
 {
@@ -57,8 +57,6 @@ namespace XRL.World.Parts.Skill
         public Guid ActivatedAbilityID = Guid.Empty;
 
         public string ActiveAbilityName = GetActivatedAbilityName();
-
-        public string ActiveAbilityDescription = GetActivatedAbilityDescription();
 
         private bool _wantToVault = false;
         public bool WantToVault
@@ -123,7 +121,7 @@ namespace XRL.World.Parts.Skill
                         Name: ActiveAbilityName,
                         Command: COMMAND_TOGGLE,
                         Class: "Skills",
-                        Description: ActiveAbilityDescription,
+                        Description: null,
                         Icon: "\xE3", // π
                         DisabledMessage: null,
                         Toggleable: true,
@@ -148,19 +146,19 @@ namespace XRL.World.Parts.Skill
             return $"Vault";
         }
 
-        public static string GetActivatedAbilityDescription()
+        public static StringBuilder GetActivatedAbilityDescription(bool Enabled = true)
         {
-            StringBuilder SB = Event.NewStringBuilder();
-            SB.Append($"When standing next to certain walls, objects, environmental features, or creatures, ")
-              .Append($"you may vault from an adjacent square on one side of them to the square on the direct opposite side.")
-              .AppendLine().AppendLine()
-              .Append($"Some targets of a vault may require you to ")
-              .Append($"be at least the same size as them, ")
-              .Append($"have the Jump skill, or ")
-              .Append($"be possessed of specific anatomy.")
-              .AppendLine().AppendLine()
-              .Append($"Certain parts or abilities might allow you to overcome any of the above listed restrictions under varying circumstances.");
-            return Event.FinalizeString(SB);
+            string onOffColor = Enabled ? "g" : "r";
+
+            string enabledText = "You will vault over anything you're able to that would otherwise block you while auto-moving.";
+            string disabledText = "You won't automatically vault while auto-moving, but you may still attempt to manually vault.";
+
+            return Event.NewStringBuilder().AppendColored(onOffColor, Enabled ? enabledText : disabledText);
+        }
+
+        public void CollectStats(Templates.StatCollector stats)
+        {
+            stats.Set("EnableDisable", Event.FinalizeString(GetActivatedAbilityDescription(WantToVault)));
         }
 
         public static bool CanTryVault(GameObject Vaulter, GameObject Vaultee, out Tactics_Vault VaultSkill, bool Silent = true)
@@ -501,7 +499,7 @@ namespace XRL.World.Parts.Skill
             {
                 Debug.LoopItem(4, $"!] Vaulter lacks {nameof(Tactics_Vault)} part", Indent: 2, Toggle: getDoDebug());
 
-                Debug.LoopItem(4, $" ] Clearing out Cells...", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Clearing out Cells...", Indent: 3, Toggle: getDoDebug());
                 Origin = null;
                 Over = null;
                 Destination = null;
@@ -513,13 +511,13 @@ namespace XRL.World.Parts.Skill
                     Indent: 1, Toggle: getDoDebug());
                 return false;
             }
-            Debug.LoopItem(4, $" ] Storing cells in {nameof(vaultSkill)}...", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Storing cells in {nameof(vaultSkill)}...", Indent: 2, Toggle: getDoDebug());
             vaultSkill.Origin = Origin;
             vaultSkill.Over = Over;
             vaultSkill.Destination = Destination;
             vaultSkill.Vomit(4, nameof(Vault), $"Cells Stored", Indent: 2, Toggle: getDoDebug());
 
-            Debug.LoopItem(4, $" ] Preloading Sound Clip...", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Preloading Sound Clip...", Indent: 2, Toggle: getDoDebug());
             SoundManager.PreloadClipSet("Sounds/Abilities/sfx_ability_jump");
 
             Debug.Entry(4,
@@ -527,7 +525,7 @@ namespace XRL.World.Parts.Skill
                 $"which is {Vaultee?.CurrentCell?.GetDirectionFromCell(DestinationCell)} of {Vaultee?.DisplayName}",
                 Indent: 2, Toggle: getDoDebug());
 
-            Debug.LoopItem(4, $" ] Sending BeforeVaultEvent...", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Sending BeforeVaultEvent...", Indent: 2, Toggle: getDoDebug());
 
             if (!BeforeVaultEvent.CheckFor(Vaulter, Origin, Over, Destination, out string Message))
             {
@@ -558,7 +556,7 @@ namespace XRL.World.Parts.Skill
 
             if (isAutoActingPlayer)
             {
-                Debug.LoopItem(4, $" ] Checking AutoAct for Movement...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Checking AutoAct for Movement or Explore...", Indent: 2, Toggle: getDoDebug());
                 if (AutoAct.IsAnyMovement() && (AutoAct.Setting.StartsWith("M") || AutoAct.ResumeSetting.StartsWith("M")))
                 {
                     Debug.CheckYeh(4, $"AutoAct is Movement with \"M\" Setting", Indent: 2, Toggle: getDoDebug());
@@ -568,23 +566,25 @@ namespace XRL.World.Parts.Skill
                     Debug.LoopItem(4, $"WasAutoActing", $"{vaultSkill.WasAutoActing}", Good: vaultSkill.WasAutoActing,
                         Indent: 2, Toggle: getDoDebug());
                 }
-                else
+                else if (AutoAct.IsAnyExploration() && (AutoAct.Setting.StartsWith("?") || AutoAct.ResumeSetting.StartsWith("?")))
                 {
-                    Debug.CheckNah(4, $"AutoAct is Movement with \"M\" Setting", Indent: 2, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $" ] AutoAct.GetDescription", $"{AutoAct.GetDescription() ?? NULL}", Indent: 3, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $" ] AutoAct.Setting", $"{AutoAct.Setting ?? NULL}", Indent: 3, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $" ] AutoAct.ResumeSetting", $"{AutoAct.ResumeSetting ?? NULL}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"AutoAct is Explore with \"?\" Setting", Indent: 2, Toggle: getDoDebug());
+                    vaultSkill.AutoActSetting = AutoAct.Setting.StartsWith("?") ? AutoAct.Setting : AutoAct.ResumeSetting;
+                    vaultSkill.WasAutoActing = vaultSkill.AutoActSetting.StartsWith("?");
+                    Debug.CheckYeh(4, $"AutoActSetting", $"{vaultSkill.AutoActSetting}", Indent: 2, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"WasAutoActing", $"{vaultSkill.WasAutoActing}", Good: vaultSkill.WasAutoActing,
+                        Indent: 2, Toggle: getDoDebug());
                 }
 
-                Debug.LoopItem(4, $" ] Interrupting AutoAct...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Interrupting AutoAct...", Indent: 2, Toggle: getDoDebug());
                 AutoAct.Interrupt();
 
-                Debug.LoopItem(4, $" ] Setting MidVault to true...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Setting MidVault to true...", Indent: 2, Toggle: getDoDebug());
                 vaultSkill.MidVault = true;
                 Debug.LoopItem(4, $"MidVault", $"{vaultSkill.MidVault}", Good: vaultSkill.MidVault,
                     Indent: 2, Toggle: getDoDebug());
 
-                Debug.LoopItem(4, $" ] DirectMove Vaulter to Vaultee Cell...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"DirectMove Vaulter to Vaultee Cell...", Indent: 2, Toggle: getDoDebug());
                 bool directMove = Vaulter.DirectMoveTo(Over, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true, Ignore: Vaultee);
                 Debug.LoopItem(4, $"directMove", $"{directMove}", Good: directMove,
                     Indent: 2, Toggle: getDoDebug());
@@ -601,7 +601,7 @@ namespace XRL.World.Parts.Skill
                     vaultSkill.MidVault = false;
                 }
 
-                Debug.LoopItem(4, $" ] AutoAct.TryToMove Vaulter to Destination Cell...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"AutoAct.TryToMove Vaulter to Destination Cell...", Indent: 2, Toggle: getDoDebug());
                 vaultSkill.Vaulted = vaulted = AutoAct.TryToMove(Vaulter, Over, Destination);
                 Debug.LoopItem(4, $"vaulted", $"{vaulted}", Good: vaulted,
                     Indent: 2, Toggle: getDoDebug());
@@ -609,7 +609,7 @@ namespace XRL.World.Parts.Skill
             // Possibly swap this to be "else" instead of a different "if"
             if (!vaulted)
             {
-                Debug.LoopItem(4, $" ] DirectMove Vaulter to Destination Cell...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"DirectMove Vaulter to Destination Cell...", Indent: 2, Toggle: getDoDebug());
                 vaulted = Vaulter.DirectMoveTo(Destination, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true);
                 Debug.LoopItem(4, $"vaulted", $"{vaulted}", Good: vaulted,
                     Indent: 2, Toggle: getDoDebug());
@@ -617,28 +617,28 @@ namespace XRL.World.Parts.Skill
 
             if (vaulted)
             {
-                Debug.LoopItem(4, $" ] Playing World Sound...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Playing World Sound...", Indent: 2, Toggle: getDoDebug());
                 Vaulter?.PlayWorldSound("Sounds/Abilities/sfx_ability_jump");
 
-                Debug.LoopItem(4, $" ] Changing Movement Mode...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Changing Movement Mode...", Indent: 2, Toggle: getDoDebug());
                 Vaulter.MovementModeChanged("Jumping");
 
-                Debug.LoopItem(4, $" ] Changing Body Position...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Changing Body Position...", Indent: 2, Toggle: getDoDebug());
                 Vaulter.BodyPositionChanged("Jumping");
 
-                Debug.LoopItem(4, $" ] Playing Animation...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Playing Animation...", Indent: 2, Toggle: getDoDebug());
                 PlayAnimation(Vaulter, Origin, Destination);
 
-                Debug.LoopItem(4, $" ] Sending Message Queue Text ({nameof(XDidYToZ)})...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Sending Message Queue Text ({nameof(XDidYToZ)})...", Indent: 2, Toggle: getDoDebug());
                 XDidYToZ(Vaulter, "vault", "over", Vaultee, null, ".");
 
-                Debug.LoopItem(4, $" ] Sending Vaulted Event...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Sending Vaulted Event...", Indent: 2, Toggle: getDoDebug());
                 VaultedEvent.Send(Vaulter, Origin, Over, DestinationCell);
 
-                Debug.LoopItem(4, $" ] Gravitating Vaulter...", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Gravitating Vaulter...", Indent: 2, Toggle: getDoDebug());
                 Vaulter.Gravitate();
 
-                Debug.LoopItem(4, $" ] Landing Vaulter from Origin [{Origin?.Location}] to Destination [{Destination?.Location}]...", 
+                Debug.LoopItem(4, $"Landing Vaulter from Origin [{Origin?.Location}] to Destination [{Destination?.Location}]...", 
                     Indent: 2, Toggle: getDoDebug());
                 Land(Origin, Destination);
             }
@@ -650,12 +650,12 @@ namespace XRL.World.Parts.Skill
                     Indent: 2, Toggle: getDoDebug());
 
                 Debug.LoopItem(4, $"!] Vault has gone wrong somewhere", Indent: 2, Toggle: getDoDebug());
-                Debug.LoopItem(4, $" ] Clearing out Cells...", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Clearing out Cells...", Indent: 3, Toggle: getDoDebug());
                 Origin = null;
                 Over = null;
                 Destination = null;
 
-                Debug.LoopItem(4, $" ] Clearing Stored Cells...", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Clearing Stored Cells...", Indent: 3, Toggle: getDoDebug());
 
                 vaultSkill.Clear().Vomit(4, nameof(Vault), $"Cleared after Vault erroneously failed", Indent: 3, Toggle: getDoDebug());
 
@@ -671,9 +671,9 @@ namespace XRL.World.Parts.Skill
                 Debug.LoopItem(4, $"isAutoActingPlayer", $"{isAutoActingPlayer}", Good: isAutoActingPlayer,
                     Indent: 2, Toggle: getDoDebug());
 
-                Debug.LoopItem(4, $" ] Clearing Stored Cells...", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Clearing Stored Cells...", Indent: 3, Toggle: getDoDebug());
                 vaultSkill.Clear().Vomit(4, nameof(Vault), $"Cleared after Manual Vault", Indent: 3, Toggle: getDoDebug());
-                Debug.LoopItem(4, $" ] Setting Vaulted to false...", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Setting Vaulted to false...", Indent: 3, Toggle: getDoDebug());
                 vaultSkill.Vaulted = false;
             }
 
@@ -766,6 +766,8 @@ namespace XRL.World.Parts.Skill
             bool wasAutoActing = haveSkill && vaultSkill.WasAutoActing;
             bool haveAutoActSetting = haveSkill && !vaultSkill.AutoActSetting.IsNullOrEmpty();
             bool autoActSettingIsMovement = haveAutoActSetting && vaultSkill.AutoActSetting.StartsWith("M");
+            bool autoActSettingIsExplore = haveAutoActSetting && vaultSkill.AutoActSetting.StartsWith("?");
+            bool autoActSettingIsMovementOrExplore = autoActSettingIsMovement || autoActSettingIsExplore;
 
             bool shouldResume =
                 vaulterNotNull
@@ -773,7 +775,7 @@ namespace XRL.World.Parts.Skill
              && haveSkill
              && wasAutoActing
              && haveAutoActSetting
-             && autoActSettingIsMovement;
+             && autoActSettingIsMovementOrExplore;
 
             Debug.Entry(4, $"Determining whether to resume AutoAct", Indent: 1, Toggle: getDoDebug());
 
@@ -794,8 +796,14 @@ namespace XRL.World.Parts.Skill
             Debug.LoopItem(4, $"{nameof(haveAutoActSetting)}", $"{haveAutoActSetting}",
                 Good: haveAutoActSetting, Indent: 1, Toggle: getDoDebug());
 
+            Debug.LoopItem(4, $"{nameof(autoActSettingIsMovementOrExplore)}", $"{autoActSettingIsMovementOrExplore}",
+                Good: autoActSettingIsMovementOrExplore, Indent: 2, Toggle: getDoDebug());
+
             Debug.LoopItem(4, $"{nameof(autoActSettingIsMovement)}", $"{autoActSettingIsMovement}",
-                Good: autoActSettingIsMovement, Indent: 2, Toggle: getDoDebug());
+                Good: autoActSettingIsMovement, Indent: 3, Toggle: getDoDebug());
+
+            Debug.LoopItem(4, $"{nameof(autoActSettingIsExplore)}", $"{autoActSettingIsExplore}",
+                Good: autoActSettingIsExplore, Indent: 3, Toggle: getDoDebug());
 
             Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: getDoDebug());
 
@@ -863,11 +871,21 @@ namespace XRL.World.Parts.Skill
         }
         public override bool WantEvent(int ID, int cascade)
         {
+            bool zoneLoaded =
+                ParentObject != null
+             && ParentObject.CurrentZone == The.ActiveZone;
+
             return base.WantEvent(ID, cascade)
-                || (getDoDebug("SD") && ID == GetShortDescriptionEvent.ID)
+                || (DebugVaultDescriptions && zoneLoaded && ID == GetShortDescriptionEvent.ID)
+                || ID == BeforeAbilityManagerOpenEvent.ID
                 || ID == GetMovementCapabilitiesEvent.ID
                 || ID == CommandEvent.ID
                 || ID == GetItemElementsEvent.ID;
+        }
+        public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
+        {
+            DescribeMyActivatedAbility(ActivatedAbilityID, CollectStats);
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
@@ -879,7 +897,7 @@ namespace XRL.World.Parts.Skill
                 bool haveAutoActSetting = !AutoActSetting.IsNullOrEmpty();
 
                 StringBuilder SB = Event.NewStringBuilder();
-                SB.AppendColored("M", $"Vault").Append(": ")
+                SB.AppendColored("M", $"Vaulter").Append(": ")
                     .AppendLine()
                     .AppendColored("W", $"Cells and Vault State").AppendLine()
                     .Append(VANDR).Append($"[{MidVault.YehNah(true)}]{HONLY}MidVault: ").AppendColored("B", $"{MidVault}").AppendLine()

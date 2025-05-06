@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 
 using XRL.UI;
@@ -12,8 +14,7 @@ using XRL.Wish;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using System.Text;
-using System.Collections;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts
 {
@@ -140,7 +141,7 @@ namespace XRL.World.Parts
                 || ID == CanSmartUseEvent.ID
                 || ID == CommandSmartUseEvent.ID
                 || (zoneLoaded && ID == ObjectEnteringCellEvent.ID)
-                || (zoneLoaded && ID == GetShortDescriptionEvent.ID);
+                || (DebugVaultDescriptions && zoneLoaded && ID == GetShortDescriptionEvent.ID);
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
@@ -217,7 +218,7 @@ namespace XRL.World.Parts
                                   .Append("[").AppendColored(DI["N"].C, DI["N"].YN).Append($"]")
                                   .Append("[").AppendColored(DI["NE"].C, DI["NE"].YN).Append($"]").AppendLine()
                     .Append(VANDR).Append("[").AppendColored(DI["W"].C, DI["W"].YN).Append($"]")
-                                  .Append("[").AppendColored("y", "o").Append($"]")
+                                  .Append("[").AppendColored("y", STAR).Append($"]")
                                   .Append("[").AppendColored(DI["E"].C, DI["E"].YN).Append($"]").AppendLine()
                     .Append(TANDR).Append("[").AppendColored(DI["SW"].C, DI["SW"].YN).Append($"]")
                                   .Append("[").AppendColored(DI["S"].C, DI["S"].YN).Append($"]")
@@ -405,6 +406,7 @@ namespace XRL.World.Parts
                 Indent: 0);
 
             bool vaulterNotNull = Vaulter != null;
+            bool cellExists = E.Cell != null;
             bool cellIsSolidForVaulter = E.Cell.IsSolidFor(Vaulter);
             bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill);
             bool wantToVault = vaultSkill.WantToVault;

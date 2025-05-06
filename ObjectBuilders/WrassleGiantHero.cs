@@ -803,6 +803,11 @@ namespace XRL.World.ObjectBuilders
                 Debug.CheckYeh(4, $"Removed {nameof(Breeder)}", Indent: 3);
                 Creature.RemovePart(breeder);
             }
+            if (Creature.TryGetPart(out ReplaceObject replaceObject))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(ReplaceObject)}", Indent: 3);
+                Creature.RemovePart(replaceObject);
+            }
 
             Creature.FireEvent("VillageInit");
                 
@@ -1069,6 +1074,9 @@ namespace XRL.World.ObjectBuilders
                 return false;
 
             if (Blueprint.Parts.ContainsKey(typeof(AISitting).Name))
+                return false;
+
+            if (Blueprint.Parts.ContainsKey(typeof(CherubimSpawner).Name))
                 return false;
 
             if (Blueprint.Mutations.ContainsKey(nameof(Burrowing)))

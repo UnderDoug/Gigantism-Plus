@@ -69,6 +69,18 @@ namespace HNPS_GigantismPlus
             }
         }
 
+        public static bool DebugVaultDescriptions
+        {
+            get
+            {
+                return GetOption("Option_GigantismPlus_DebugIncludeVaultDebugDescriptions").EqualsNoCase("Yes");
+            }
+            private set
+            {
+                DebugVaultDescriptions = value;
+            }
+        }
+
         // OnClick Handlers
         public static bool OnOptionManagedVanilla()
         {

@@ -16,6 +16,7 @@ namespace HNPS_GigantismPlus
         public const string TICK = "\u221A";  // √
         public const string CROSS = "\u0058"; // X
         public const string BLOCK = "\u2588"; // █
+        public const string STAR = "\u263C";  // ☼
 
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │

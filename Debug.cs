@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using Qud.API;
 
 using XRL;
+using XRL.UI;
+using XRL.Core;
 using XRL.World;
 using XRL.World.Parts;
+using XRL.World.Parts.Skill;
 using XRL.World.Parts.Mutation;
 using XRL.World.ObjectBuilders;
-using XRL.Core;
 using XRL.Wish;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 
@@ -19,7 +21,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 using Debug = HNPS_GigantismPlus.Debug;
-using HNPS_GigantismPlus.Harmony;
+using Options = HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
@@ -119,9 +121,16 @@ namespace HNPS_GigantismPlus
             Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
         }
 
+        public static void Warn(int Verbosity, string ClassName, string MethodName, string Issue = null, int Indent = 0)
+        {
+            string noIssue = "Something didn't go as planned";
+            string output = $"/!\\ WARN | {ClassName}.{MethodName}: {Issue ?? noIssue}";
+            Entry(Verbosity, output, Indent, Toggle: true);
+        }
+
         public static void LoopItem(int Verbosity, string Label, string Text = "", int Indent = 0, bool? Good = null, bool Toggle = true)
         {
-            string good = TICK; // √
+            string good = TICK;  // √
             string bad = CROSS;  // X
             string goodOrBad = string.Empty;
             if (Good != null) goodOrBad = ((bool)Good ? good : bad) + "\u005D "; // ]
@@ -165,11 +174,16 @@ namespace HNPS_GigantismPlus
         }
 
         // Class Specific Debugs
+        public static void Vomit(int Verbosity, string Source, string Context = null, int Indent = 0, bool Toggle = true)
+        {
+            string context = Context == null ? "" : $"{Context}:";
+            Entry(Verbosity, $"% Vomit: {Source} {context}", Indent, Toggle: Toggle);
+        }
+
         public static MeleeWeapon Vomit(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
         {
-            string title = Title == null ? "" : $"{Title}:";
             int indent = Indent;
-            Entry(Verbosity, $"% Vomit: {MeleeWeapon.ParentObject.DebugName} {title}", Indent, Toggle: Toggle);
+            Vomit(Verbosity, MeleeWeapon.ParentObject.DebugName, Title, Indent, Toggle);
             List<string> @default = new()
             {
                 "Damage",
@@ -214,116 +228,60 @@ namespace HNPS_GigantismPlus
             return MeleeWeapon;
         }
 
-        /*
-        public static NaturalEquipmentSubpart<E> Vomit<E>(this NaturalEquipmentSubpart<E> Subpart, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
-            where E : IPart, IManagedDefaultNaturalEquipment<E>, new()
+        public static GameObject VaultVomit(this GameObject Vaulter, int Verbosity, string Method = null, string Context = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
         {
-            string title = Title == null ? "" : $"{Title}:";
-            GameObject Creature = Subpart.ParentPart?.ParentObject;
-            Entry(Verbosity, $"% Vomit: NaturalEquipmentMod<{typeof(E).Name}> of {Creature?.HandsBlueprint} {title}", Indent: Indent, Toggle: Toggle);
-            List<string> @default = new()
+            if (Vaulter.TryGetPart(out Tactics_Vault vaultSkill))
             {
-                "Meta",
-                "Combat",
-                "Priority",
-                "Grammar",
-                "Render",
-                "Additions"
-            };
-            Categories ??= @default;
-            int indent = Indent;
-            foreach (string category in Categories)
-            {
-                Indent = indent;
-                if (@default.Contains(category)) LoopItem(Verbosity, $"{category}", Indent: ++Indent, Toggle: Toggle);
-                switch (category)
-                {
-                    case "Meta":
-                        LoopItem(Verbosity, "Type", $"{Subpart.Type}", Indent: ++Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "CosmeticOnly", $"{Subpart.CosmeticOnly}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Managed", $"{Subpart.Managed}", Indent: Indent--, Toggle: Toggle);
-                        break;
-                    case "Combat":
-                        LoopItem(Verbosity, "Level", $"{Subpart.Level}", Indent: ++Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "DamageDieCount", $"{Subpart.DamageDieCount}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "DamageDieSize", $"{Subpart.DamageDieSize}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "DamageBonus", $"{Subpart.DamageBonus}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "HitBonus", $"{Subpart.HitBonus}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Skill", $"{Subpart.Skill}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Stat", $"{Subpart.Stat}", Indent: Indent--, Toggle: Toggle);
-                        break;
-                    case "Priority":
-                        LoopItem(Verbosity, "ModPriority", $"{Subpart.ModPriority}", Indent: ++Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "AdjectivePriority", $"{Subpart.AdjectivePriority}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "NounPriority", $"{Subpart.NounPriority}", Indent: Indent--, Toggle: Toggle);
-                        break;
-                    case "Grammar":
-                        LoopItem(Verbosity, "Adjective", $"{Subpart.Adjective}", Indent: ++Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "AdjectiveColor", $"{Subpart.AdjectiveColor}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "AdjectiveColorFallback", $"{Subpart.AdjectiveColorFallback}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Noun", $"{Subpart.Noun}", Indent: Indent--);
-                        break;
-                    case "Render":
-                        LoopItem(Verbosity, "Tile", $"{Subpart.Tile}", Indent: ++Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "ColorString", $"{Subpart.ColorString}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "DetailColor", $"{Subpart.DetailColor}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "SecondColorString", $"{Subpart.SecondColorString}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "SecondDetailColor", $"{Subpart.SecondDetailColor}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "SwingSound", $"{Subpart.SwingSound}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "BlockedSound", $"{Subpart.BlockedSound}", Indent: Indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "EquipmentFrameColors", $"{Subpart.EquipmentFrameColors}", Indent: Indent--, Toggle: Toggle);
-                        break;
-                    case "Additions":
-                        if (!Subpart.AddedParts.IsNullOrEmpty())
-                        {
-                            LoopItem(Verbosity, "AddedParts: ", Indent: ++Indent, Toggle: Toggle);
-                            Indent++;
-                            foreach (string part in Subpart.AddedParts)
-                            {
-                                LoopItem(Verbosity, $"{part}", Indent: Indent, Toggle: Toggle);
-                            }
-                            Indent--;
-                        }
-                        else
-                        {
-                            LoopItem(Verbosity, $"AddedParts: Empty", Indent: ++Indent, Toggle: Toggle);
-                        }
-                        Indent--;
-                        if (!Subpart.AddedStringProps.IsNullOrEmpty())
-                        {
-                            LoopItem(Verbosity, "AddedStringProps: ", Indent: ++Indent, Toggle: Toggle);
-                            Indent++;
-                            foreach ((string prop, string value) in Subpart.AddedStringProps)
-                            {
-                                LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent, Toggle: Toggle);
-                            }
-                            Indent--;
-                        }
-                        else
-                        {
-                            LoopItem(Verbosity, $"AddedStringProps: Empty", Indent: ++Indent, Toggle: Toggle);
-                        }
-                        Indent--;
-                        if (!Subpart.AddedIntProps.IsNullOrEmpty())
-                        {
-                            LoopItem(Verbosity, "AddedIntProps: ", Indent: ++Indent, Toggle: Toggle);
-                            Indent++;
-                            foreach ((string prop, int value) in Subpart.AddedIntProps)
-                            {
-                                LoopItem(Verbosity, $"{prop}", $"{value}", Indent: Indent, Toggle: Toggle);
-                            }
-                            Indent--;
-                        }
-                        else
-                        {
-                            LoopItem(Verbosity, $"AddedIntProps: Empty", Indent: ++Indent, Toggle: Toggle);
-                        }
-                        break;
-                }
+                string vaulterName = Vaulter.DebugName;
+                Context = Context == null ? vaulterName : $"{vaulterName} {Context}";
+                vaultSkill.Vomit(Verbosity, Method, Context, Categories, Indent, Toggle);
             }
-            return Subpart;
+            return Vaulter;
         }
-        */
+        public static Tactics_Vault Vomit(this Tactics_Vault VaultSkill, int Verbosity, string Method = null, string Context = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
+        {
+            if (!Method.IsNullOrEmpty()) Method = $".{Method}";
+            Method = $"{nameof(Tactics_Vault)}{Method}";
+            Vomit(Verbosity, Method, Context, Indent, Toggle);
+            Divider(Verbosity, HONLY, Count: 40, Indent: Indent, Toggle: Toggle);
+
+            int indent = Indent;
+            ++indent;
+
+            bool wantToVault = VaultSkill.WantToVault;
+
+            Cell origin = VaultSkill.Origin;
+            bool haveOrigin = origin != null;
+
+            Cell over = VaultSkill.Over;
+            bool haveOver = over != null;
+
+            Cell destination = VaultSkill.Destination;
+            bool haveDestination = destination != null;
+
+            bool midVault = VaultSkill.MidVault;
+            bool vaulted = VaultSkill.Vaulted;
+
+            Entry(Verbosity, $"Cells and Vault State", indent++, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.MidVault)}", $"{midVault}", indent, Good: midVault, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Vaulted)}", $"{vaulted}", indent, Good: vaulted, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Origin)}", $"[{origin?.Location}]", indent, Good: haveOrigin, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Over)}", $"[{over?.Location}]", indent, Good: haveOver, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Destination)}", $"[{destination?.Location}]", indent, Good: haveDestination, Toggle);
+            Divider(Verbosity, HONLY, Count: 25, Indent: --indent, Toggle: Toggle);
+
+            bool wasAutoActing = VaultSkill.WasAutoActing;
+            string autoActSetting = VaultSkill.AutoActSetting;
+            bool haveAutoActSetting = !autoActSetting.IsNullOrEmpty();
+
+            Entry(Verbosity, $"AutoAct State", indent++, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.WantToVault)}", $"{wantToVault}", indent, Good: wantToVault, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.WasAutoActing)}", $"{wasAutoActing}", indent, Good: wasAutoActing, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.AutoActSetting)}", $"{autoActSetting}", indent, Good: haveAutoActSetting, Toggle);
+            Divider(Verbosity, HONLY, Count: 40, Indent: Indent, Toggle: Toggle);
+
+            return VaultSkill;
+        }
 
         public static bool WasEventHandlerRegistered<H, E>(this XRLGame Game, bool Toggle = true)
             where H : IEventHandler
@@ -614,6 +572,41 @@ namespace HNPS_GigantismPlus
         public static void debug_ToggleOCA()
         {
             ToggleObjectCreationAnalysis();
+        }
+
+        [WishCommand(Command = "player vault")]
+        public static void ShowPlayerVault()
+        {
+            The.Player.VaultVomit(0, Context: "Wish");
+        }
+
+        [WishCommand(Command = "player vault clear")]
+        public static void ClearPlayerVault()
+        {
+            if (The.Player.TryGetPart(out Tactics_Vault vaultSkill))
+            {
+                vaultSkill.Clear();
+                vaultSkill.Vaulted = false;
+                Popup.Show($"[{TICK.Color("G")}] Ye");
+            }
+            else
+            {
+                Popup.Show($"[{CROSS.Color("R")}] You're not a {"Hardcore Parkour Master".Color("W")}, so you don't {"need".Color("r")} your Vault Skill cleared!");
+            }
+        }
+
+        [WishCommand(Command = "player vault resume")]
+        public static void ResumeAfterPlayerVault()
+        {
+            if (The.Player.TryGetPart(out Tactics_Vault vaultSkill))
+            {
+                vaultSkill.ResumeAfterVault();
+                Popup.Show($"[{TICK.Color("G")}] Ye");
+            }
+            else
+            {
+                Popup.Show($"[{CROSS.Color("R")}] You're not a {"Hardcore Parkour Master".Color("W")}, so you don't {"need".Color("r")} your AutoAct resumed!");
+            }
         }
 
     } //!-- public static class Debug

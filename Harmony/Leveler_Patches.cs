@@ -15,7 +15,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPrefix]
         [HarmonyPriority(800)]
         [HarmonyPatch(nameof(Leveler.RapidAdvancement))]
-        static bool RapidAdvancement_SendBeforeEvent_Prefix(int Amount, GameObject ParentObject)
+        public static bool RapidAdvancement_SendBeforeEvent_Prefix(int Amount, GameObject ParentObject)
         {
             /*Debug.Entry(4, 
                 $"{typeof(Leveler_Patches).Name}." + 
@@ -35,7 +35,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         [HarmonyPriority(1)]
         [HarmonyPatch(nameof(Leveler.RapidAdvancement))]
-        static void RapidAdvancement_SendAfterEvent_Postfix(int Amount, GameObject ParentObject)
+        public static void RapidAdvancement_SendAfterEvent_Postfix(int Amount, GameObject ParentObject)
         {
             /*Debug.Entry(4,
                 $"{typeof(Leveler_Patches).Name}." +

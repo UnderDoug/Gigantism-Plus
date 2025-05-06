@@ -357,7 +357,7 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(4, 
                     $"{typeof(WrassleGear).Name}." + 
-                    $"{nameof(FireEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
+                    $"{nameof(HandleEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
                     Indent: 0);
                 Damage damage = E.Damage;
                 GameObject attacker = E.Source;

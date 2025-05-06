@@ -787,7 +787,6 @@ namespace XRL.World.ObjectBuilders
                 Good: Creature.HasPart<GivesRep>(), 
                 Indent: 2);
 
-
             Debug.CheckYeh(4, $"Remove Problem Parts", Indent: 2);
             if (Creature.TryGetPart(out GreaterVoider greaterVoider))
             {
@@ -804,6 +803,13 @@ namespace XRL.World.ObjectBuilders
                 Debug.CheckYeh(4, $"Removed {nameof(Breeder)}", Indent: 3);
                 Creature.RemovePart(breeder);
             }
+            if (Creature.TryGetPart(out ReplaceObject replaceObject))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(ReplaceObject)}", Indent: 3);
+                Creature.RemovePart(replaceObject);
+            }
+
+            Creature.FireEvent("VillageInit");
                 
             if (Creature.TryGetPart(out DisplayNameAdjectives displayNameAdjectives))
             {
@@ -1068,6 +1074,9 @@ namespace XRL.World.ObjectBuilders
                 return false;
 
             if (Blueprint.Parts.ContainsKey(typeof(AISitting).Name))
+                return false;
+
+            if (Blueprint.Parts.ContainsKey(typeof(CherubimSpawner).Name))
                 return false;
 
             if (Blueprint.Mutations.ContainsKey(nameof(Burrowing)))

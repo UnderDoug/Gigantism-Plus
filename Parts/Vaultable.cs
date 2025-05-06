@@ -1,27 +1,39 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 
 using XRL.UI;
 using XRL.World.Parts.Skill;
+using XRL.World.Capabilities;
 using XRL.World.Anatomy;
 using XRL.World.AI.Pathfinding;
+using XRL.Wish;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using XRL.Rules;
-using XRL.World.Conversations.Parts;
-using XRL.World.Conversations;
-using XRL.World.Capabilities;
+using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.Parts
 {
+    [HasWishCommand]
     [Serializable]
-    public class Vaultable : IScribedPart
+    public class Vaultable 
+        : IScribedPart
+        , IModEventHandler<AutoActTryToMoveEvent>
     {
+        private static bool doDebug => true;
+
+        private static int InventoryActionPriority = 0;
+        private static int InventoryActionDefault = 2;
+        private static int InventoryActionCreatureOffset = 5;
+
+        public static readonly string COMMAND_VAULT_OVER_ME = "VaultOverMe";
+
         public bool SizeMatters;
-        public bool RequiresSkill;
+        public bool RequiresJumpSkill;
 
         public string EnablingLimbs;
         public List<string> EnablingLimbsList;
@@ -32,319 +44,219 @@ namespace XRL.World.Parts
         public Vaultable() 
         {
             SizeMatters = false;
-            RequiresSkill = false;
+            RequiresJumpSkill = false;
             EnablingLimbs = null;
             EnablingLimbsList = EnablingLimbs?.CommaExpansion() ?? new();
             OverridingParts = null;
             OverridingPartsList = OverridingParts?.CommaExpansion() ?? new();
         }
 
+        public override void Attach()
+        {
+            base.Attach();
+            if (ParentObject.TryGetPart(out Vaultable vaultable) && vaultable != this)
+            {
+                SizeMatters = vaultable.SizeMatters;
+                RequiresJumpSkill = vaultable.RequiresJumpSkill;
+                EnablingLimbs = vaultable.EnablingLimbs;
+                EnablingLimbsList = new(vaultable.EnablingLimbsList);
+                OverridingParts = vaultable.OverridingParts;
+                OverridingPartsList = new(vaultable.OverridingPartsList);
+                ParentObject.RemovePart(vaultable);
+            }
+        }
+
+        public Dictionary<Cell, Cell> GetVaultableCellPairs(GameObject For = null)
+        {
+            return GetVaultableCellPairs(ParentObject.CurrentCell, For);
+        }
+        public static Dictionary<Cell, Cell> GetVaultableCellPairs(Cell Pivot, GameObject For = null)
+        {
+            Dictionary<Cell, Cell> OriginDestinationPairs = new();
+            foreach (Cell cell in Pivot.GetLocalAdjacentCells())
+            {
+                if (cell == Pivot || OriginDestinationPairs.ContainsKey(cell) || OriginDestinationPairs.ContainsValue(cell) || !IsValidDestination(cell, For))
+                    continue;
+
+                Cell cellOpposite = cell.GetCellOppositePivotCell(Pivot);
+                if (cellOpposite != null && IsValidDestination(cellOpposite, For))
+                {
+                    OriginDestinationPairs.TryAdd(cell, cellOpposite);
+                    OriginDestinationPairs.TryAdd(cellOpposite, cell);
+                }
+
+            }
+            return OriginDestinationPairs;
+        }
+
+        public static bool IsValidDestination(Cell Destination, GameObject For = null)
+        {
+            if (Destination == null)
+                return false;
+
+            if (For != null && Destination == For.CurrentCell)
+                return true;
+
+            if (Destination.GetDangerousOpenLiquidVolume() != null)
+                return false;
+
+            if (Destination.HasSwimmingDepthLiquid())
+                return false;
+
+            if (!Destination.GetObjectsWithTagOrProperty("NoAutoWalk").IsNullOrEmpty())
+                return false;
+
+            if (Destination.HasCombatObject())
+                return false;
+
+            if (Destination.HasWall())
+                return false;
+
+            if (!Destination.IsEmptyOfSolid())
+                return false;
+
+            return true;
+        }
+
         public override bool AllowStaticRegistration()
         {
             return true;
         }
-
-        public bool CanVault(GameObject Vaulter)
-        {
-            return CanVault(Vaulter, ParentObject, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList);
-        }
-
-        public static bool CanVault(GameObject Vaulter, GameObject Vaultee, bool SizeMatters = false, bool RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null)
-        {
-            if (Vaulter == null || Vaultee == null) return false;
-
-            // BigEnough IF size doesn't matter OR Vaulter is gigantic OR Vaultee isn't gigantic
-            bool BigEnough = !SizeMatters || Vaulter.IsGiganticCreature || (Vaultee.HasPart<ModGigantic>() && !Vaultee.IsGiganticCreature);
-
-            // HaveRequiredSkill IF no required skill OR Vaulter has required skill
-            bool HaveRequiredSkill = !RequiresSkill || Vaulter.HasSkill(nameof(Acrobatics_Jump));
-
-            // HaveEnablingLimbs IF enabling limbs list is empty OR enabling limb list overlaps with Vaulter limbs
-            bool HaveEnablingLimbs = EnablingLimbsList.IsNullOrEmpty() || EnablingLimbsList.OverlapsWith((from bp in Vaulter.Body.GetParts(EvenIfDismembered: false) select bp.Type).ToList());
-
-            // HaveOverridingParts IF overriding parts list has entries AND overriding parts list overlaps with Vaulter parts
-            bool HaveOverridingParts = !OverridingPartsList.IsNullOrEmpty() && OverridingPartsList.OverlapsWith((from p in Vaulter.GetPartsDescendedFrom<IPart>() select p.Name).ToList());
-
-            // AbleToMove IF Vaulter can change to jump mode AND Vaulter can change body to jump position
-            bool AbleToMove = Vaulter.CanChangeMovementMode("Jumping") && Vaulter.CanChangeBodyPosition("Jumping");
-
-            // OnTheGround IF Vaulter is not flying
-            bool OnTheGround = !Vaulter.IsFlying;
-
-            // PhaseMatches IF well, phase matches.
-            bool PhaseMatches = Vaulter.PhaseMatches(Vaultee);
-
-            // CanVault IF able to move AND on the ground AND phase matches AND any:
-            //      have overriding parts OR have enabling limbs OR have required skill
-            return AbleToMove && OnTheGround && PhaseMatches && (HaveOverridingParts || HaveEnablingLimbs || HaveRequiredSkill);
-        }
-
-        public static bool AttemptVault(GameObject Vaulter, GameObject Vaultee, IEvent FromEvent = null, bool Silent = false)
-        {
-            if (Vaulter.IsFlying)
-            {
-                if (!Silent)
-                    Vaulter.Fail("You cannot vault while flying.");
-                return false;
-            }
-            if (!Vaulter.CanChangeMovementMode("Jumping", ShowMessage: !Silent) || !Vaulter.CanChangeBodyPosition("Jumping", ShowMessage: !Silent))
-            {
-                return false;
-            }
-            if (!Vaulter.PhaseMatches(Vaultee))
-            {
-                if (!Silent)
-                    Vaulter.Fail("You cannot vault something you're out of phase with.");
-                return false;
-            }
-
-            if (!TryGetValidDestinationCell(Vaulter, Vaultee, out Cell destinationCell))
-            {
-                Debug.CheckNah(4, $"No DestinationCell", Indent: 2);
-                FromEvent?.RequestInterfaceExit();
-                if (Vaulter.IsPlayer())
-                {
-                    Popup.Show($"There's no room on the other side of the {Vaultee.DisplayName} you're trying to vault over!");
-                }
-                return false;
-            }
-
-            if (!PerformVault(Vaulter, Vaultee, destinationCell))
-                return false;
-
-            FromEvent?.RequestInterfaceExit();
-            return true;
-        }
-
-        public static bool TryGetValidDestinationCell(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, out Cell DestinationCell)
-        {
-            return TryGetValidDestinationCell(Vaulter, OriginCell, Vaultee, Vaultee.CurrentCell, out DestinationCell);
-        }
-
-        public static bool TryGetValidDestinationCell(GameObject Vaulter, GameObject Vaultee, out Cell DestinationCell)
-        {
-            return TryGetValidDestinationCell(Vaulter, Vaulter.CurrentCell, Vaultee, Vaultee.CurrentCell, out DestinationCell);
-        }
-        
-        public static bool TryGetValidDestinationCell(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, Cell OverCell, out Cell DestinationCell)
-        {
-            OriginCell ??= Vaulter.CurrentCell;
-            OverCell ??= Vaultee.CurrentCell;
-            DestinationCell = null;
-
-            if (OriginCell == OverCell)
-                return false;
-
-            string DirectionOriginToOver = OriginCell.GetDirectionFromCell(OverCell);
-            bool DirectionOriginToOverIsCardinal = DirectionOriginToOver.Length == 1;
-
-            Debug.Entry(4, $"DirectionOverToTargetCell ({DirectionOriginToOver}), IsCardinal:", $"{DirectionOriginToOverIsCardinal}", Indent: 2);
-            foreach (Cell cell in OverCell.GetAdjacentCells())
-            {
-                string DirectionOverToDestination = OverCell.GetDirectionFromCell(cell);
-                if (DirectionOverToDestination != DirectionOriginToOver)
-                {
-                    Debug.CheckNah(4, $"DirectionOverToDestination", DirectionOverToDestination, Indent: 3);
-                    continue;
-                }
-                Debug.CheckYeh(4, $"DirectionOverToDestination", DirectionOverToDestination, Indent: 3);
-                DestinationCell = cell;
-                break;
-            }
-
-            Cell preferedDestinationCell = DestinationCell;
-
-            bool destinationCellIsAcceptable =
-                DestinationCell != null
-             && DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true)
-             && DestinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty();
-
-            Debug.LoopItem(4,
-                $"DestinationCell != null",
-                Good: DestinationCell != null,
-                Indent: 3);
-
-            Debug.LoopItem(4,
-                $"DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true)",
-                Good: DestinationCell != null && DestinationCell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true),
-                Indent: 3);
-
-            Debug.LoopItem(4,
-                $"DestinationCell.GetObjectsWithTagOrProperty(\"NoAutowalk\").IsNullOrEmpty()",
-                Good: DestinationCell != null && DestinationCell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty(),
-                Indent: 3);
-
-            Debug.LoopItem(4,
-                $"destinationCell{(destinationCellIsAcceptable ? "" : "not")}IsAcceptable",
-                Good: destinationCellIsAcceptable,
-                Indent: 2);
-
-            if (!destinationCellIsAcceptable)
-            {
-                DestinationCell = null;
-            }
-
-            if (DestinationCell == null && !DirectionOriginToOverIsCardinal)
-            {
-
-                Debug.Entry(4, $"Destination cell unacceptable, finding alternative", Indent: 2);
-                foreach (Cell cell in OverCell.GetAdjacentCells())
-                {
-                    Debug.Divider(4, HONLY, Count: 40, Indent: 2);
-                    Debug.Entry(4, $"Checking cell [{cell.Location}] ({OverCell.GetDirectionFromCell(cell)} of Vaultee)", Indent: 3);
-
-                    if (OriginCell.GetAdjacentCells().Contains(cell))
-                    {
-                        Debug.CheckNah(4, $"CellIsAdjacentToOrigin", Indent: 5);
-                        continue;
-                    }
-                    Debug.CheckYeh(4, $"CellIsNotAdjacentToOrigin", Indent: 5);
-
-                    if (!cell.GetAdjacentCells().Contains(preferedDestinationCell))
-                    {
-                        Debug.CheckNah(4, $"CellIsNotAdjacentToPreferredCell", Indent: 5);
-                        continue;
-                    }
-                    Debug.CheckYeh(4, $"CellIsAdjacentToPreferredCell", Indent: 5);
-
-                    if (!cell.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true))
-                    {
-                        Debug.CheckNah(4, $"CellIsNotEmpty", Indent: 5);
-                        continue;
-                    }
-                    Debug.CheckYeh(4, $"CellIsEmpty", Indent: 5);
-
-                    if (!cell.GetObjectsWithTagOrProperty("NoAutowalk").IsNullOrEmpty())
-                    {
-                        Debug.CheckNah(4, $"CellIsNotSafe", Indent: 5);
-                        continue;
-                    }
-                    Debug.CheckYeh(4, $"CellIsSafe", Indent: 5);
-
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 4);
-                    Debug.Entry(4, $"DestinationCell set to [{cell.Location}]", Indent: 3);
-                    DestinationCell = cell;
-                    break;
-                }
-                Debug.Divider(4, HONLY, Count: 40, Indent: 2);
-            }
-
-            return DestinationCell != null;
-        }
-
-        public static bool PerformVault(GameObject Vaulter, GameObject Vaultee, Cell DestinationCell, bool Silent = false)
-        {
-            Cell originCell = Vaulter.CurrentCell;
-
-            SoundManager.PreloadClipSet("Sounds/Abilities/sfx_ability_jump");
-
-            Debug.CheckNah(4,
-                $"DestinationCell is [{DestinationCell.Location}] " +
-                $"which is {Vaultee.CurrentCell.GetDirectionFromCell(DestinationCell)} of {Vaultee.DisplayName}",
-                Indent: 2);
-
-            if (!BeforeVaultEvent.CheckFor(Vaulter, originCell, Vaultee, DestinationCell, out string Message))
-            {
-                Debug.CheckNah(4, $"Cancelled by VaultEvent.CheckFor", Message, Indent: 2);
-                if (Vaulter.IsPlayer() && !Message.IsNullOrEmpty() && !Silent)
-                {
-                    Popup.Show(Message);
-                }
-                return false;
-            }
-
-            Vaulter?.PlayWorldSound("Sounds/Abilities/sfx_ability_jump");
-            Vaulter.MovementModeChanged("Jumping");
-            Vaulter.BodyPositionChanged("Jumping");
-
-            Acrobatics_Jump.PlayAnimation(Vaulter, DestinationCell);
-            XDidYToZ(Vaulter, "vault", "over", Vaultee, null, ".");
-
-            if (Vaulter.DirectMoveTo(DestinationCell, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true))
-            {
-                List<Point> Path = Zone.Line(originCell.X, originCell.Y, DestinationCell.X, DestinationCell.Y);
-                JumpedEvent.Send(Vaulter, originCell, DestinationCell, Path, Path.Count, "Vault");
-                VaultedEvent.Send(Vaulter, originCell, Vaultee, DestinationCell);
-            }
-            Vaulter.Gravitate();
-            Acrobatics_Jump.Land(originCell, DestinationCell);
-            return true;
-        }
-
-        public bool CanVaultThrough(GameObject Vaulter)
-        {
-            return CanVaultThrough(Vaulter, ParentObject, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList);
-        }
-
-        public static bool CanVaultThrough(GameObject Vaulter, GameObject Vaultee, bool SizeMatters = false, bool RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null)
-        {
-            if (!CanVault(Vaulter, Vaultee, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList))
-                return false;
-
-            Cell vaulterCell = Vaulter.CurrentCell;
-            Cell vaulteeCell = Vaultee.CurrentCell;
-
-            Cell vaultTestCell = vaulteeCell.getClosestReachableCellFor(Vaulter);
-            List<Cell> dudCells = new();
-            FindPath path = new();
-
-            bool canVaultThrough = false;
-
-            if (!canVaultThrough && vaultTestCell != null && TryGetValidDestinationCell(Vaulter, vaultTestCell, Vaultee, out Cell destinationCell))
-            {
-                canVaultThrough = destinationCell != null;
-            }
-            else
-            {
-                dudCells.TryAdd(vaultTestCell);
-            }
-
-            if (!canVaultThrough)
-            {
-                foreach (Cell prospectiveCell in vaulteeCell.GetAdjacentCells())
-                {
-                    if (dudCells.Contains(prospectiveCell))
-                        continue;
-
-                    if (TryGetValidDestinationCell(Vaulter, prospectiveCell, Vaultee, out destinationCell))
-                    {
-                        if (canVaultThrough = destinationCell != null)
-                            break;
-                    }
-                    dudCells.TryAdd(prospectiveCell);
-                }
-            }
-            return canVaultThrough;
-        }
-
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
             Registrar.Register("BeforePhysicsRejectObjectEntringCell");
-            Registrar.Register(ParentObject, GetNavigationWeightEvent.ID, Order: 1);
+            Registrar.Register(ParentObject, GetNavigationWeightEvent.ID, EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
         {
+            bool zoneLoaded =
+                ParentObject != null
+             && ParentObject.CurrentZone == The.ActiveZone;
+
             return base.WantEvent(ID, cascade)
+                || ID == GetItemElementsEvent.ID
                 || ID == GetInventoryActionsEvent.ID
                 || ID == InventoryActionEvent.ID
                 || ID == CanSmartUseEvent.ID
                 || ID == CommandSmartUseEvent.ID
-                || ID == GetNavigationWeightEvent.ID;
+                || (zoneLoaded && ID == ObjectEnteringCellEvent.ID)
+                || (DebugVaultDescriptions && zoneLoaded && ID == GetShortDescriptionEvent.ID);
+        }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            if(The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
+            {
+                int navWeight = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, false);
+                int navWeightAuto = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, true);
+
+                int navWeightThreshold = 25;
+                int navWeightAutoThreshold = 50;
+
+                string navWeightColor =
+                    navWeight <= navWeightThreshold
+                    ? "G"
+                    : navWeight == 100
+                        ? "R"
+                        : "W"
+                        ;
+                string navWeightAutoColor =
+                    navWeightAuto <= navWeightAutoThreshold
+                    ? "G"
+                    : navWeightAuto == 100
+                        ? "R"
+                        : "W"
+                        ;
+
+                StringBuilder SB = Event.NewStringBuilder();
+
+                Cell parentCell = ParentObject.CurrentCell;
+                Dictionary<string, Cell> cellsByDirection = new()
+                {
+                    { "N", parentCell.GetCellFromDirection("N") },
+                    { "NE", parentCell.GetCellFromDirection("NE") },
+                    { "E", parentCell.GetCellFromDirection("E") },
+                    { "SE", parentCell.GetCellFromDirection("SE") },
+                    { "S", parentCell.GetCellFromDirection("S") },
+                    { "SW", parentCell.GetCellFromDirection("SW") },
+                    { "W", parentCell.GetCellFromDirection("W") },
+                    { "NW", parentCell.GetCellFromDirection("NW") },
+                };
+                Dictionary<string, (string C, string YN)> DI = new();
+
+                Dictionary<Cell, Cell> OriginDestinationPairs = GetVaultableCellPairs(The.Player);
+
+                foreach ((string direction, Cell cell) in cellsByDirection)
+                {
+                    (string Color, string yehNah) entry = ("R", CROSS);
+                    if (OriginDestinationPairs.ContainsKey(cell))
+                    {
+                        entry = ("G", TICK);
+                    }
+                    DI.TryAdd(direction, entry);
+                }
+
+                int validCellsCount = OriginDestinationPairs.Count / 2;
+                string cellCountColor =
+                    validCellsCount >= 2
+                    ? "G"
+                    : validCellsCount <= 0
+                        ? "R"
+                        : "W"
+                        ;
+
+                SB.AppendColored("M", $"Vaultable").Append(": ")
+                    .AppendLine()
+                    .AppendColored("W", "Nav Weight")
+                    .AppendLine()
+                    .Append(VANDR).Append("(").AppendColored(navWeightColor, $"{navWeight}").Append($"){HONLY}NavigationWeight").AppendLine()
+                    .Append(TANDR).Append("(").AppendColored(navWeightAutoColor, $"{navWeightAuto}".ToString()).Append($"){HONLY}NavigationWeight [").AppendColored("K", "AutoExplore").Append("]")
+                    .AppendLine()
+                    .AppendColored("W", "Vaultable Cells (").AppendColored(cellCountColor, $"{validCellsCount}").AppendColored("W", ")")
+                    .AppendLine()
+                    .Append(VANDR).Append("[").AppendColored(DI["NW"].C, DI["NW"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["N"].C, DI["N"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["NE"].C, DI["NE"].YN).Append($"]").AppendLine()
+                    .Append(VANDR).Append("[").AppendColored(DI["W"].C, DI["W"].YN).Append($"]")
+                                  .Append("[").AppendColored("y", STAR).Append($"]")
+                                  .Append("[").AppendColored(DI["E"].C, DI["E"].YN).Append($"]").AppendLine()
+                    .Append(TANDR).Append("[").AppendColored(DI["SW"].C, DI["SW"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["S"].C, DI["S"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["SE"].C, DI["SE"].YN).Append($"]").AppendLine();
+
+                E.Infix.AppendRules(Event.FinalizeString(SB));
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetItemElementsEvent E)
+        {
+            if (E.IsRelevantCreature(ParentObject))
+            {
+                E.Add("travel", 1);
+            }
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetInventoryActionsEvent E)
         {
-            if (CanVault(E.Actor, E.Object))
+            bool wantInventoryAction =
+                E.Object == ParentObject
+             && E.Actor.TryGetPart(out Tactics_Vault vaultSkill)
+             && vaultSkill.CanNormallyVault(E.Object);
+            if (wantInventoryAction)
             {
+                int priority = InventoryActionPriority;
+                priority -= E.Object.IsCreature ? InventoryActionCreatureOffset : 0;
+                int @default = InventoryActionDefault;
+
                 E.AddAction(
-                Name: "Vault",
-                Display: "vault",
-                Command: "Vault",
+                Name: "Vault Over",
+                Display: "vault over",
+                Command: COMMAND_VAULT_OVER_ME,
                 PreferToHighlight: null,
                 Key: 'v',
                 FireOnActor: false,
-                Default: 12,
-                Priority: 0,
+                Default: @default,
+                Priority: priority,
                 Override: false,
                 WorksAtDistance: false,
                 WorksTelekinetically: false);
@@ -353,42 +265,209 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(InventoryActionEvent E)
         {
-            if (E.Command == "Vault" && !AttemptVault(E.Actor, ParentObject, E))
+            if (E.Command == COMMAND_VAULT_OVER_ME && E.Item == ParentObject)
             {
-                return false;
+                GameObject vaulter = E.Actor;
+                GameObject vaultee = E.Item;
+                Cell pivot = vaultee.CurrentCell;
+                Cell targetCell = Tactics_Vault.GetValidDestinationCell(vaulter, pivot);
+
+                Debug.Entry(4,
+                    $"@ {nameof(Vaultable)}."
+                    + $"{nameof(HandleEvent)}({nameof(InventoryActionEvent)}"
+                    + $" E.Command: {E.Command.Quote()})",
+                    Indent: 0, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"E.Item", $"{E.Item?.DebugName ?? NULL}", Good: E.Item != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"ParentObject", $"{ParentObject?.DebugName ?? NULL}", Good: ParentObject != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"vaultee", $"{vaultee?.DebugName ?? NULL}", Good: vaultee != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"E.Actor", $"{E.Actor?.DebugName ?? NULL}", Good: E.Actor != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"vaulter", $"{vaulter?.DebugName ?? NULL}", Good: vaulter != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"pivot", $"[{pivot?.Location}]", Good: pivot != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"targetCell", $"[{targetCell?.Location}]", Good: targetCell != null,
+                    Indent: 1, Toggle: doDebug);
+
+                if (!CommandEvent.Send(
+                    Actor: vaulter,
+                    Command: Tactics_Vault.COMMAND_NAME,
+                    Target: vaultee,
+                    TargetCell: targetCell,
+                    Silent: false))
+                {
+                    return false;
+                }
+                E.RequestInterfaceExit();
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(CanSmartUseEvent E)
         {
-            if (CanVault(E.Actor, E.Item))
+            bool canSmartUse =
+                E.Item == ParentObject
+             && !E.Item.IsCreature
+             && E.Actor.TryGetPart(out Tactics_Vault vaultSkill) 
+             && vaultSkill.CanNormallyVault(E.Item);
+
+            if (canSmartUse)
             {
-                return false;
+                return false; // not sure the logic, but this one is a "false means yes"
             }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(CommandSmartUseEvent E)
         {
-            if (!AttemptVault(E.Actor, ParentObject, E))
+            if (E.Actor.TryGetPart(out Tactics_Vault vaultSkill) && vaultSkill.CanVault(E.Item))
             {
-                return false;
+                GameObject vaulter = E.Actor;
+                Cell origin = vaulter.CurrentCell;
+                GameObject vaultee = E.Item;
+                Cell pivot = vaultee.CurrentCell;
+                Cell targetCell = Tactics_Vault.GetValidDestinationCell(vaulter, pivot);
+
+                Debug.Entry(4,
+                    $"@ {nameof(Vaultable)}."
+                    + $"{nameof(HandleEvent)}({nameof(CommandSmartUseEvent)} E)",
+                    Indent: 0, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"E.Item", $"{E.Item?.DebugName ?? NULL}", Good: E.Item != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"ParentObject", $"{ParentObject?.DebugName ?? NULL}", Good: ParentObject != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"vaultee", $"{vaultee?.DebugName ?? NULL}", Good: vaultee != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"E.Actor", $"{E.Actor?.DebugName ?? NULL}", Good: E.Actor != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"vaulter", $"{vaulter?.DebugName ?? NULL}", Good: vaulter != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"origin", $"[{origin?.Location}]", Good: origin != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"pivot", $"[{pivot?.Location}]", Good: pivot != null,
+                    Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"targetCell", $"[{targetCell?.Location}]", Good: targetCell != null,
+                    Indent: 1, Toggle: doDebug);
+
+                CommandEvent.Send(
+                    Actor: vaulter,
+                    Command: Tactics_Vault.COMMAND_NAME,
+                    Target: vaultee,
+                    TargetCell: targetCell,
+                    Silent: false);
             }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetNavigationWeightEvent E)
         {
-            if (E.Object == ParentObject && E.Cell == ParentObject.CurrentCell)
+            Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
+            bool hasAnyValidVaultCells = !originDestinationPairs.IsNullOrEmpty();
+
+            if (hasAnyValidVaultCells && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null)
             {
-                if (CanVaultThrough(E.Actor, ParentObject))
+                if (Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
                 {
-                    E.Uncacheable = true;
-                    E.MinWeight(0);
-                    Debug.Entry(4,
-                        $"@ {nameof(Vaultable)}."
-                        + $"{nameof(HandleEvent)}({nameof(GetNavigationWeightEvent)} E.Weight: {E.Weight})",
-                        Indent: 0);
-                    return true;
+                    int validPairs = originDestinationPairs.Count / 2;
+                    int baseWeight = validPairs switch
+                    {
+                        4 => 1,
+                        3 => 1,
+                        2 => 1,
+                        1 => 15,
+                        _ => 100,
+                    };
+
+                    int weight = Math.Min(100, baseWeight * (E.Autoexploring ? 5 : 1));
+                    int maxWeight = Math.Min(100, baseWeight * (E.Autoexploring ? 5 : 1));
+                    if (maxWeight < 100)
+                    {
+                        E.Uncacheable = true;
+                        E.MinWeight(weight, maxWeight);
+                        return false;
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(ObjectEnteringCellEvent E)
+        {
+            GameObject Vaulter = E.Object;
+            GameObject Vaultee = ParentObject;
+
+            Debug.Entry(4,
+                $"@ {nameof(Vaultable)}."
+                + $"{nameof(HandleEvent)}({nameof(ObjectEnteringCellEvent)} E)"
+                + $" E.Cell: [{E?.Cell?.Location}],"
+                + $" E.Actor: {Vaulter?.DebugName ?? NULL},"
+                + $" E.Object: {Vaultee?.DebugName ?? NULL}",
+                Indent: 0);
+
+            bool vaulterNotNull = Vaulter != null;
+            bool cellExists = E.Cell != null;
+            bool cellIsSolidForVaulter = E.Cell.IsSolidFor(Vaulter);
+            bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill);
+            bool wantToVault = vaultSkill.WantToVault;
+            bool midVault = vaultSkill.MidVault;
+            bool notPlayer = !Vaulter.IsPlayer();
+            bool autoActActive = AutoAct.IsActive();
+            bool actingAutomatically = notPlayer || autoActActive;
+
+            bool shouldBlock =
+                vaulterNotNull
+             && cellIsSolidForVaulter
+             && haveSkill
+             && wantToVault
+             && actingAutomatically;
+
+            if (midVault)
+            {
+                Debug.LoopItem(4, $"{nameof(midVault)}", $"{midVault}",
+                    Good: midVault, Indent: 1, Toggle: doDebug);
+
+                Debug.Entry(4, $"Allowing Vaulter {Vaulter?.DebugName ?? NULL} to vault through cell [{E?.Cell?.Location}]", Indent: 1);
+                vaultSkill.MidVault = false;
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+            }
+            else
+            {
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}",
+                    Good: vaulterNotNull, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(cellIsSolidForVaulter)}", $"{cellIsSolidForVaulter}",
+                    Good: cellIsSolidForVaulter, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(haveSkill)}", $"{haveSkill}",
+                    Good: haveSkill, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(wantToVault)}", $"{wantToVault}",
+                    Good: wantToVault, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(midVault)}", $"{midVault}",
+                    Good: midVault, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(actingAutomatically)}", $"{actingAutomatically}",
+                    Good: actingAutomatically, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(notPlayer)}", $"{notPlayer}",
+                    Good: notPlayer, Indent: 2, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(autoActActive)}", $"{autoActActive}",
+                    Good: autoActActive, Indent: 2, Toggle: doDebug);
+
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(shouldBlock)}", $"{shouldBlock}",
+                    Good: shouldBlock, Indent: 1, Toggle: doDebug);
+
+                if (shouldBlock && vaultSkill.CanVault(Vaultee, Silent: false))
+                {
+                    Debug.Entry(4, $"Preventing {Vaulter?.DebugName ?? NULL} from entering cell [{E?.Cell?.Location}]", Indent: 1);
+
+                    return false;
                 }
             }
             return base.HandleEvent(E);
@@ -397,16 +476,105 @@ namespace XRL.World.Parts
         {
             if (E.ID == "BeforePhysicsRejectObjectEntringCell" && E.HasFlag("Actual"))
             {
+                Debug.Entry(4,
+                    $"@ {nameof(Vaultable)}."
+                    + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()})",
+                    Indent: 0, Toggle: doDebug);
+
                 GameObject Vaulter = E.GetGameObjectParameter("Object");
                 GameObject Vaultee = ParentObject;
-                Vaultee.SetStringProperty("NoBlockMessage", null, true);
-                if (AttemptVault(Vaulter, Vaultee, E))
+
+                bool vaulterNotNull = Vaulter != null;
+                bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill);
+                bool notMidVault = !vaultSkill.MidVault;
+                bool vaulted = vaultSkill.Vaulted;
+                bool wantToVault = vaultSkill.WantToVault;
+                bool isPlayer = Vaulter.IsPlayer();
+                bool autoActActive = AutoAct.IsActive();
+                bool actingAutomatically = isPlayer || autoActActive;
+
+                bool shouldResumeAfterVault =
+                    vaulterNotNull
+                 && haveSkill
+                 && notMidVault
+                 && vaulted
+                 && wantToVault
+                 && actingAutomatically;
+
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}", 
+                    Good: vaulterNotNull, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(haveSkill)}", $"{haveSkill}", 
+                    Good: haveSkill, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(notMidVault)}", $"{notMidVault}", 
+                    Good: notMidVault, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaulted)}", $"{vaulted}", 
+                    Good: vaulted, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(wantToVault)}", $"{wantToVault}", 
+                    Good: wantToVault, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(isPlayer)}", $"{isPlayer}", 
+                    Good: isPlayer, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(autoActActive)}", $"{autoActActive}", 
+                    Good: autoActActive, Indent: 1, Toggle: doDebug);
+
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(shouldResumeAfterVault)}", $"{shouldResumeAfterVault}", 
+                    Good: shouldResumeAfterVault, Indent: 1, Toggle: doDebug);
+
+                if (shouldResumeAfterVault)
                 {
-                    Vaultee.SetStringProperty("NoBlockMessage", "true");
-                    return true;
+
+                    if (vaultSkill.ResumeAfterVault())
+                    {
+                        Debug.CheckYeh(4, $"Resume Successful, allowing through", Indent: 1, Toggle: doDebug);
+
+                        Debug.Entry(4,
+                        $"x {nameof(Vaultable)}."
+                        + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()}) @//",
+                        Indent: 0, Toggle: doDebug);
+
+                        return false; // don't Reject entering cell
+                    }
+
+                    Debug.CheckNah(4, $"Resume Failed, blocking", Indent: 1, Toggle: doDebug);
+
                 }
+                Debug.Entry(4,
+                    $"x {nameof(Vaultable)}."
+                    + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()}) @//",
+                    Indent: 0, Toggle: doDebug);
             }
             return base.FireEvent(E);
         }
+
+        public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+        {
+            Vaultable vaultable = base.DeepCopy(Parent, MapInv) as Vaultable;
+            return vaultable;
+        }
+
+        [WishCommand(Command = "via priority")]
+        public static void SetVaultInventoryActionPriority(string Value)
+        {
+            InventoryActionPriority = int.Parse(Value);
+        }
+        [WishCommand(Command = "via default")]
+        public static void SetVaultInventoryActionDefault(string Value)
+        {
+            InventoryActionDefault = int.Parse(Value);
+        }
+        [WishCommand(Command = "via co")]
+        public static void SetVaultInventoryActionCreatureOffset(string Value)
+        {
+            InventoryActionCreatureOffset = int.Parse(Value);
+        }
+
     } //!-- public class Vaultable : IScribedPart
 }

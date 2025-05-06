@@ -27,4 +27,18 @@
     <UITile Tile="Abilities/GigantismPlus_CloseFist_ToggleOff.png" Foreground="z" Detail="y" />
     <UITile Tile="Abilities/GigantismPlus_CloseFist_ToggleOn.png" Foreground="Z" Detail="Y"  State="ToggleOn" />
 	</ability>
+	<ability Command="CommandToggleTacticsVault">
+    <description>
+      <p><stat Name="EnabledDisabled" /></p>
+      <br />
+      <p>When standing next to certain walls, objects, environmental features, or creatures, you may vault from an adjacent square on one side of them to the square on the direct opposite side.</p>
+      <br />
+      <p>Some targets of a vault may require you to be at least the same size as them, have the Jump skill, or be possessed of specific anatomy.</p>
+      <br />
+      <p>Certain parts or abilities might allow you to overcome any of the above listed restrictions under varying circumstances.</p>
+    </description>
+		<!-- Foreground is black pixels, Detail is white pixels -->
+    <UITile Tile="Abilities/GigantismPlus_Vault_ToggleOff.png" Foreground="b" Detail="y" />
+    <UITile Tile="Abilities/GigantismPlus_Vault_ToggleOn.png" Foreground="B" Detail="Y"  State="ToggleOn" />
+	</ability>
 </activatedabilities>

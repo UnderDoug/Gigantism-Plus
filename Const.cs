@@ -15,17 +15,21 @@ namespace HNPS_GigantismPlus
 
         public const string TICK = "\u221A";  // √
         public const string CROSS = "\u0058"; // X
+        public const string BLOCK = "\u2588"; // █
+        public const string STAR = "\u263C";  // ☼
 
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
         public const string TANDR = "\u2514"; // └
         public const string HONLY = "\u2500"; // ─
         public const string SPACE = "\u0020"; //" "
+        public const string NBSP  = "\u00A0"; //" " (NBSP)
 
         public const string ITEM = VANDR + HONLY + HONLY + SPACE; // "├── "
         public const string BRAN = VONLY + SPACE + SPACE + SPACE; // "│   "
         public const string LAST = TANDR + HONLY + HONLY + SPACE; // "└── "
         public const string DIST = SPACE + SPACE + SPACE + SPACE; // "    "
+        public const string NACE = NBSP + NBSP + NBSP + NBSP;     // "    " (NBSP)
 
         public const string JUMP_RANGE_MODIFIER = "JumpRangeModifier";
 

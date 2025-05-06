@@ -23,7 +23,7 @@ namespace HNPS_GigantismPlus.Harmony
             methodName: nameof(MutationBGoneWishHandler.MutationBGone),
             argumentTypes: new Type[] { typeof(string) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
-        static bool MutationBGone_WorkOnEntryName_Prefix(string argument)
+        public static bool MutationBGone_WorkOnEntryName_Prefix(string argument)
         {
             Debug.Entry(4,
                 $"# {nameof(MutationBGoneWishHandler_Patches)}." +
@@ -35,7 +35,6 @@ namespace HNPS_GigantismPlus.Harmony
             if (mutation != null)
             {
                 argument = mutation.Name;
-                return false;
             }
             return true;
         }

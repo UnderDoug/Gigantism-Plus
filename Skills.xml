@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<skills>
+  <skill Name="Tactics" Load="Merge">
+    <power Name="Vault" Cost="0" Attribute="Agility" Minimum="0" Class="Tactics_Hurdle" Snippet="vaulting" Description="You can vault over certain obstacles, landing on the opposite side of them. Some obstacles may require specific anatomy." Tile="Abilities/GigantismPlus_Vault_ToggleOff.png" Foreground="y" Detail="B"></power>
+  </skill>
+</skills>

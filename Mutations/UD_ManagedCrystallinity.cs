@@ -210,12 +210,12 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
-            GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
+            // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
             return base.Mutate(GO, Level);
         }
         public override bool Unmutate(GameObject GO)
         {
-            GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
+            // GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
             return base.Unmutate(GO);
         }
 
@@ -313,6 +313,12 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforeMutationAdded");
+            Registrar.Register("MutationAdded");
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -344,13 +350,6 @@ namespace XRL.World.Parts.Mutation
                 OnUpdateNaturalEquipmentMods();
             }
             return base.HandleEvent(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("BeforeMutationAdded");
-            Registrar.Register("MutationAdded");
-            base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {

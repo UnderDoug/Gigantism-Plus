@@ -21,6 +21,8 @@ namespace XRL.World.Parts
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
+        private static bool doDebug => false;
+
         [SerializeField]
         private T _assigningPart = null;
 
@@ -98,18 +100,18 @@ namespace XRL.World.Parts
 
         public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4);
-            Debug.Entry(4, $"{AssigningPart.Name}; Level: {AssigningPart.Level}", Indent: 5);
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4, Toggle: doDebug);
+            Debug.Entry(4, $"{AssigningPart.Name}; Level: {AssigningPart.Level}", Indent: 5, Toggle: doDebug);
 
             if (AddedParts != null)
             {
-                Debug.Entry(4, "> foreach (string part in NaturalEquipmentMod.GetAddedParts())", Indent: 5);
+                Debug.Entry(4, "> foreach (string part in NaturalEquipmentMod.GetAddedParts())", Indent: 5, Toggle: doDebug);
                 foreach (string part in AddedParts)
                 {
-                    Debug.LoopItem(4, "part", part, Indent: 6);
+                    Debug.LoopItem(4, "part", part, Indent: 6, Toggle: doDebug);
                     Object.RequirePart(part);
                 }
-                Debug.Entry(4, $"x foreach (string part in NaturalEquipmentMod.GetAddedParts()) >//", Indent: 5);
+                Debug.Entry(4, $"x foreach (string part in NaturalEquipmentMod.GetAddedParts()) >//", Indent: 5, Toggle: doDebug);
             }
 
             if (AddedStringProps != null)
@@ -121,19 +123,19 @@ namespace XRL.World.Parts
                 {
                     Object.SetIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY, -ModPriority);
 
-                    Debug.Entry(4, "> foreach ((string Name, string Value) in AddedStringProps)", Indent: 5);
+                    Debug.Entry(4, "> foreach ((string Name, string Value) in AddedStringProps)", Indent: 5, Toggle: doDebug);
                     foreach ((string Name, string Value) in AddedStringProps)
                     {
-                        Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
+                        Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6, Toggle: doDebug);
                         Object.SetStringProperty(Name: Name, Value: Value, RemoveIfNull: true);
                     }
-                    Debug.Entry(4, $"x foreach ((string Name, string Value) in AddedStringProps) >//", Indent: 5);
+                    Debug.Entry(4, $"x foreach ((string Name, string Value) in AddedStringProps) >//", Indent: 5, Toggle: doDebug);
                 }
                 else
                 {
                     Debug.CheckNah(4,
                         $"{NATEQUIPMANAGER_STRINGPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}",
-                        Indent: 5);
+                        Indent: 5, Toggle: doDebug);
                 }
             }
             else
@@ -150,19 +152,19 @@ namespace XRL.World.Parts
                 {
                     Object.SetIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY, -ModPriority);
 
-                    Debug.Entry(4, $"> foreach ((string Name, int Value) in AddedIntProps", Indent: 5);
+                    Debug.Entry(4, $"> foreach ((string Name, int Value) in AddedIntProps", Indent: 5, Toggle: doDebug);
                     foreach ((string Name, int Value) in AddedIntProps)
                     {
-                        Debug.CheckYeh(4, $"{Name}", $"{Value}", Indent: 6);
+                        Debug.CheckYeh(4, $"{Name}", $"{Value}", Indent: 6, Toggle: doDebug);
                         Object.SetIntProperty(Name: Name, Value: Value, RemoveIfZero: true);
                     }
-                    Debug.Entry(4, $"x foreach ((string Name, int Value) in AddedIntProps) >//", Indent: 5);
+                    Debug.Entry(4, $"x foreach ((string Name, int Value) in AddedIntProps) >//", Indent: 5, Toggle: doDebug);
                 }
                 else
                 {
                     Debug.CheckNah(4, 
                         $"{NATEQUIPMANAGER_INTPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}", 
-                        Indent: 5);
+                        Indent: 5, Toggle: doDebug);
                 }
             }
             else
@@ -170,7 +172,7 @@ namespace XRL.World.Parts
                 Debug.CheckNah(4, $"No IntProps", Indent: 5);
             }
 
-            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4, Toggle: doDebug);
         }
 
 
@@ -188,7 +190,7 @@ namespace XRL.World.Parts
                     $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
                     $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " +
                     $"Failed to assign {GetSource()} as AssigningPart",
-                    Indent: 0);
+                    Indent: 0, Toggle: doDebug);
             }
             return base.BeingAppliedBy(obj, who);
         }
@@ -197,7 +199,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, 
                 $"@ {Name}[{GetSource()}]." + 
                 $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", 
-                Indent: 3);
+                Indent: 3, Toggle: doDebug);
 
             Object.GetPart<NaturalEquipmentManager>()
                 .AddShortDescriptionEntry(this);
@@ -207,7 +209,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, 
                 $"x {Name}[{GetSource()}]." + 
                 $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", 
-                Indent: 3);
+                Indent: 3, Toggle: doDebug);
             base.ApplyModification(Object);
         }
         public override string GetSource()

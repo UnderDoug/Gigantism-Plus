@@ -219,13 +219,19 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
-            GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
+            // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
             return base.Mutate(GO, Level);
         }
         public override bool Unmutate(GameObject GO)
         {
-            GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
+            NeedPartSupportEvent.Send(GO, "Digging", this);
+            // GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
             return base.Unmutate(GO);
+        }
+        public override void Remove()
+        {
+            NeedPartSupportEvent.Send(ParentObject, "Digging", this);
+            base.Remove();
         }
 
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level)
@@ -322,11 +328,18 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforeMutationAdded");
+            Registrar.Register("MutationAdded");
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == ManageDefaultEquipmentEvent.ID
-                || ID == UpdateNaturalEquipmentModsEvent.ID;
+                || ID == UpdateNaturalEquipmentModsEvent.ID
+                || ID == PartSupportEvent.ID;
         }
         public bool HandleEvent(ManageDefaultEquipmentEvent E)
         {
@@ -354,12 +367,18 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        public override bool HandleEvent(PartSupportEvent E)
         {
-            Registrar.Register("BeforeMutationAdded");
-            Registrar.Register("MutationAdded");
-            base.Register(Object, Registrar);
+            Debug.Entry(4,
+                $"@ {typeof(UD_ManagedBurrowingClaws).Name}."
+                + $"{nameof(HandleEvent)}({typeof(PartSupportEvent).Name} E)",
+                Indent: 0);
+
+            if (E.Skip != this && E.Type == "Digging" && IsMyActivatedAbilityToggledOn(EnableActivatedAbilityID))
+            {
+                return false;
+            }
+            return base.HandleEvent(E);
         }
         public override bool FireEvent(Event E)
         {

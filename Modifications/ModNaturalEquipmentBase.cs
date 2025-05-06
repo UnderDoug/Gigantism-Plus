@@ -14,6 +14,8 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {public abstract class ModNaturalEquipmentBase : IMeleeModification
     {
+        private static bool doDebug => false;
+
         [Serializable]
         public struct Adjustment
         {

@@ -313,10 +313,7 @@ namespace XRL.World.ZoneBuilders
                 }
                 if (UniqueGiant.TryGetPart(out StewBelly stewBelly))
                 {
-                    // UniqueGiant.RemovePart(stewBelly);
-                    // UniqueGiant.RequirePart(stewBelly);
                     stewBelly.ProcessStartingStews();
-
                 }
             }
             else 

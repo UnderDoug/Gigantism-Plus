@@ -14,6 +14,8 @@ namespace HNPS_GigantismPlus
     [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
     public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefaultEquipmentEvent>
     {
+        private static bool doDebug => false;
+
         public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 
         public GameObject Object;
@@ -63,7 +65,7 @@ namespace HNPS_GigantismPlus
                 $"! {typeof(BeforeManageDefaultEquipmentEvent).Name}." +
                 $"{nameof(Send)}(Object: {Manager.Wielder.ID}:{Manager.Wielder.ShortDisplayNameStripped}'s " + 
                 $"{Object?.ShortDisplayNameStripped}, Manager, BodyPart: [{BodyPart?.ID}:{BodyPart?.Type}])",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
             bool flag = true;
             BeforeManageDefaultEquipmentEvent E = new(Object, Manager, BodyPart);

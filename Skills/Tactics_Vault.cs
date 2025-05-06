@@ -52,6 +52,8 @@ namespace XRL.World.Parts.Skill
 
         public static readonly string COMMAND_TOGGLE = "CommandToggleTacticsVault";
 
+        private static readonly string BEGIN_ATTACK_EVENT = "BeginAttack";
+
         public Guid ActivatedAbilityID = Guid.Empty;
 
         public string ActiveAbilityName = GetActivatedAbilityName();
@@ -282,9 +284,8 @@ namespace XRL.World.Parts.Skill
 
             vaultSkill.Clear().Vomit(4, $"{nameof(AttemptVault)}", "Start", Indent: 1, Toggle: getDoDebug('V'));
 
-            if (DestinationCell != null 
-             && !IsTargetCellValidDestination(Vaulter, DestinationCell) 
-             && !TryGetValidDestinationCell(Vaulter, OriginCell, Vaultee, out DestinationCell))
+            if ((DestinationCell != null && !IsTargetCellValidDestination(Vaulter, DestinationCell))
+             || !TryGetValidDestinationCell(Vaulter, OriginCell, Vaultee, out DestinationCell))
             {
                 Debug.CheckNah(4, $"No DestinationCell", Indent: 2, Toggle: getDoDebug("AV"));
                 FromEvent?.RequestInterfaceExit();
@@ -567,6 +568,13 @@ namespace XRL.World.Parts.Skill
                     Debug.LoopItem(4, $"WasAutoActing", $"{vaultSkill.WasAutoActing}", Good: vaultSkill.WasAutoActing,
                         Indent: 2, Toggle: getDoDebug());
                 }
+                else
+                {
+                    Debug.CheckNah(4, $"AutoAct is Movement with \"M\" Setting", Indent: 2, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $" ] AutoAct.GetDescription", $"{AutoAct.GetDescription() ?? NULL}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $" ] AutoAct.Setting", $"{AutoAct.Setting ?? NULL}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $" ] AutoAct.ResumeSetting", $"{AutoAct.ResumeSetting ?? NULL}", Indent: 3, Toggle: getDoDebug());
+                }
 
                 Debug.LoopItem(4, $" ] Interrupting AutoAct...", Indent: 2, Toggle: getDoDebug());
                 AutoAct.Interrupt();
@@ -818,7 +826,7 @@ namespace XRL.World.Parts.Skill
                         $"Call to The.ActionManager.RunSegment() failed with {nameof(NullReferenceException)}", 
                         Indent: 0);
                 }
-                vaultSkill.Clear().Vomit(4, $"End of Method", nameof(ResumeAfterVault), Indent: 1, Toggle: getDoDebug());
+                vaultSkill.Clear().Vomit(4, nameof(ResumeAfterVault), $"End of Method (Success)", Indent: 1, Toggle: getDoDebug());
 
                 Debug.Entry(4,
                 $"x {nameof(Tactics_Vault)} "
@@ -828,6 +836,7 @@ namespace XRL.World.Parts.Skill
 
                 return true;
             }
+            vaultSkill.Clear().Vomit(4, nameof(ResumeAfterVault), $"End of Method (Failure)", Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4,
             $"x {nameof(Tactics_Vault)} "
@@ -848,8 +857,7 @@ namespace XRL.World.Parts.Skill
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
             Registrar.Register(COMMAND_TOGGLE);
-            Registrar.Register(EndTurnEvent.ID, EventOrder.EXTREMELY_EARLY);
-            Registrar.Register(EnteredCellEvent.ID, EventOrder.EXTREMELY_EARLY);
+            Registrar.Register("BeginAttack");
             Registrar.Register(ObjectLeavingCellEvent.ID, EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
         }
@@ -875,14 +883,14 @@ namespace XRL.World.Parts.Skill
                     .AppendLine()
                     .AppendColored("W", $"Cells and Vault State").AppendLine()
                     .Append(VANDR).Append($"[{MidVault.YehNah(true)}]{HONLY}MidVault: ").AppendColored("B", $"{MidVault}").AppendLine()
-                    .Append(VANDR).Append($"[{haveOrigin.YehNah(MidVault)}]{HONLY}Origin: [").AppendColored("g", $"{Origin?.Location}").Append($"]").AppendLine()
-                    .Append(VANDR).Append($"[{haveOver.YehNah(MidVault)}]{HONLY}Over: [").AppendColored("g", $"{Over?.Location}").Append($"]").AppendLine()
-                    .Append(VANDR).Append($"[{haveDestination.YehNah(MidVault)}]{HONLY}Destination: [").AppendColored("g",$"{Destination?.Location}").Append($"]").AppendLine()
-                    .Append(TANDR).Append($"[{Vaulted.YehNah(MidVault)}]{HONLY}Vaulted: ").AppendColored("B", $"{Vaulted}").AppendLine()
+                    .Append(VANDR).Append($"[{haveOrigin.YehNah(!MidVault)}]{HONLY}Origin: [").AppendColored("g", $"{Origin?.Location}").Append($"]").AppendLine()
+                    .Append(VANDR).Append($"[{haveOver.YehNah(!MidVault)}]{HONLY}Over: [").AppendColored("g", $"{Over?.Location}").Append($"]").AppendLine()
+                    .Append(VANDR).Append($"[{haveDestination.YehNah(!MidVault)}]{HONLY}Destination: [").AppendColored("g",$"{Destination?.Location}").Append($"]").AppendLine()
+                    .Append(TANDR).Append($"[{Vaulted.YehNah(!MidVault)}]{HONLY}Vaulted: ").AppendColored("B", $"{Vaulted}").AppendLine()
                     .AppendColored("W", $"AutoAct State").AppendLine()
                     .Append(VANDR).Append($"[{WantToVault.YehNah()}]{HONLY}WantToVault: ").AppendColored("B", $"{WantToVault}").AppendLine()
-                    .Append(VANDR).Append($"[{WasAutoActing.YehNah(!WantToVault)}]{HONLY}WasAutoActing: ").AppendColored("B", $"{WasAutoActing}").AppendLine()
-                    .Append(TANDR).Append($"[{haveAutoActSetting.YehNah(!WantToVault)}]{HONLY}AutoActSetting: ").AppendColored("o", $"{AutoActSetting?.Quote() ?? "null".Color("B")}").AppendLine();
+                    .Append(VANDR).Append($"[{WasAutoActing.YehNah(WantToVault)}]{HONLY}WasAutoActing: ").AppendColored("B", $"{WasAutoActing}").AppendLine()
+                    .Append(TANDR).Append($"[{haveAutoActSetting.YehNah(WantToVault)}]{HONLY}AutoActSetting: ").AppendColored("o", $"{AutoActSetting?.Quote() ?? "null".Color("B")}").AppendLine();
                     
                 E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
             }
@@ -909,50 +917,6 @@ namespace XRL.World.Parts.Skill
             if (E.IsRelevantCreature(ParentObject))
             {
                 E.Add("travel", 1);
-            }
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(EnteredCellEvent E)
-        {
-            bool zoneLoaded =
-                ParentObject != null
-             && ParentObject.CurrentZone == The.ActiveZone;
-
-            bool justVaulted =
-                Vaulted
-             && Destination != null;
-
-            bool wasJustAutoActing =
-                WasAutoActing
-             && !AutoActSetting.IsNullOrEmpty();
-
-            bool wantEnteredCell = zoneLoaded && (wasJustAutoActing || justVaulted);
-
-            if (false && wantEnteredCell && E.Actor == ParentObject)
-            {
-                ResumeAfterVault();
-            }
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(EndTurnEvent E)
-        {
-            bool zoneLoaded =
-                ParentObject != null
-             && ParentObject.CurrentZone == The.ActiveZone;
-
-            bool justVaulted =
-                Vaulted
-             && Destination != null;
-
-            bool wasJustAutoActing =
-                WasAutoActing
-             && !AutoActSetting.IsNullOrEmpty();
-
-            bool wantEndTurn = zoneLoaded && (wasJustAutoActing || justVaulted);
-
-            if (false && wantEndTurn)
-            {
-                ResumeAfterVault();
             }
             return base.HandleEvent(E);
         }
@@ -1065,9 +1029,22 @@ namespace XRL.World.Parts.Skill
             {
                 ToggleMyActivatedAbility(ActivatedAbilityID, null, Silent: true, null);
                 Debug.CheckYeh(3, 
-                    $"Tactics_Vault Toggled", 
+                    $"{nameof(Tactics_Vault)} Toggled", 
                     $"{WantToVault}", 
-                    Toggle: doDebug);
+                    Indent: 0, Toggle: getDoDebug());
+            }
+            if (E.ID == BEGIN_ATTACK_EVENT && WantToVault && ParentObject != null && ParentObject.IsPlayer() && AutoAct.IsAnyMovement())
+            {
+                Debug.Entry(4,
+                    $"@ {nameof(Tactics_Vault)}."
+                    + $"{nameof(FireEvent)}({nameof(Event)} E.ID: {BEGIN_ATTACK_EVENT})",
+                    Indent: 0, Toggle: getDoDebug());
+
+                Cell targetCell = E.GetParameter<Cell>("TargetCell");
+                if (!AutoAct.TryToMove(ParentObject, ParentObject.CurrentCell, targetCell, AllowDigging: false))
+                {
+                    return false;
+                }
             }
             return base.FireEvent(E);
         }

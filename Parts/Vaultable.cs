@@ -29,6 +29,8 @@ namespace XRL.World.Parts
         private static int InventoryActionDefault = 2;
         private static int InventoryActionCreatureOffset = 5;
 
+        public static readonly string COMMAND_VAULT_OVER_ME = "VaultOverMe";
+
         public bool SizeMatters;
         public bool RequiresJumpSkill;
 
@@ -37,10 +39,6 @@ namespace XRL.World.Parts
 
         public string OverridingParts;
         public List<string> OverridingPartsList;
-
-        public Dictionary<Cell, Cell> OriginDestinationPairs => GetVaultableCellPairs();
-
-        public bool HasAnyValidVaultCells => !OriginDestinationPairs.IsNullOrEmpty();
 
         public Vaultable() 
         {
@@ -67,33 +65,41 @@ namespace XRL.World.Parts
             }
         }
 
-        public Dictionary<Cell, Cell> GetVaultableCellPairs()
+        public Dictionary<Cell, Cell> GetVaultableCellPairs(GameObject For = null)
         {
-            return GetVaultableCellPairs(ParentObject.CurrentCell);
+            return GetVaultableCellPairs(ParentObject.CurrentCell, For);
         }
-        public static Dictionary<Cell, Cell> GetVaultableCellPairs(Cell Pivot)
+        public static Dictionary<Cell, Cell> GetVaultableCellPairs(Cell Pivot, GameObject For = null)
         {
             Dictionary<Cell, Cell> OriginDestinationPairs = new();
-            foreach (Cell cell in Pivot.GetEmptyAdjacentCells())
+            foreach (Cell cell in Pivot.GetLocalAdjacentCells())
             {
-                OriginDestinationPairs.TryAdd(cell, cell.GetCellOppositePivotCell(Pivot));
+                if (cell == Pivot || OriginDestinationPairs.ContainsKey(cell) || OriginDestinationPairs.ContainsValue(cell) || !IsValidDestination(cell, For))
+                    continue;
+
+                Cell cellOpposite = cell.GetCellOppositePivotCell(Pivot);
+                if (cellOpposite != null && IsValidDestination(cellOpposite, For))
+                {
+                    OriginDestinationPairs.TryAdd(cell, cellOpposite);
+                    OriginDestinationPairs.TryAdd(cellOpposite, cell);
+                }
+
             }
-
-            if (OriginDestinationPairs.IsNullOrEmpty()) return OriginDestinationPairs;
-
-            return new(
-                from KeyValuePair<Cell, Cell> cc 
-                in OriginDestinationPairs 
-                where IsValidDestination(cc.Key) && IsValidDestination(cc.Value) 
-                select cc);
+            return OriginDestinationPairs;
         }
 
-        public static bool IsValidDestination(Cell Destination)
+        public static bool IsValidDestination(Cell Destination, GameObject For = null)
         {
             if (Destination == null)
                 return false;
 
+            if (For != null && Destination == For.CurrentCell)
+                return true;
+
             if (Destination.GetDangerousOpenLiquidVolume() != null)
+                return false;
+
+            if (Destination.HasSwimmingDepthLiquid())
                 return false;
 
             if (!Destination.GetObjectsWithTagOrProperty("NoAutoWalk").IsNullOrEmpty())
@@ -102,7 +108,10 @@ namespace XRL.World.Parts
             if (Destination.HasCombatObject())
                 return false;
 
-            if (Destination.HasSwimmingDepthLiquid())
+            if (Destination.HasWall())
+                return false;
+
+            if (!Destination.IsEmptyOfSolid())
                 return false;
 
             return true;
@@ -141,6 +150,7 @@ namespace XRL.World.Parts
                 int navWeightAuto = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, true);
 
                 int navWeightThreshold = 25;
+                int navWeightAutoThreshold = 50;
 
                 string navWeightColor =
                     navWeight <= navWeightThreshold
@@ -150,7 +160,7 @@ namespace XRL.World.Parts
                         : "W"
                         ;
                 string navWeightAutoColor =
-                    navWeightAuto <= navWeightThreshold
+                    navWeightAuto <= navWeightAutoThreshold
                     ? "G"
                     : navWeightAuto == 100
                         ? "R"
@@ -159,10 +169,60 @@ namespace XRL.World.Parts
 
                 StringBuilder SB = Event.NewStringBuilder();
 
+                Cell parentCell = ParentObject.CurrentCell;
+                Dictionary<string, Cell> cellsByDirection = new()
+                {
+                    { "N", parentCell.GetCellFromDirection("N") },
+                    { "NE", parentCell.GetCellFromDirection("NE") },
+                    { "E", parentCell.GetCellFromDirection("E") },
+                    { "SE", parentCell.GetCellFromDirection("SE") },
+                    { "S", parentCell.GetCellFromDirection("S") },
+                    { "SW", parentCell.GetCellFromDirection("SW") },
+                    { "W", parentCell.GetCellFromDirection("W") },
+                    { "NW", parentCell.GetCellFromDirection("NW") },
+                };
+                Dictionary<string, (string C, string YN)> DI = new();
+
+                Dictionary<Cell, Cell> OriginDestinationPairs = GetVaultableCellPairs(The.Player);
+
+                foreach ((string direction, Cell cell) in cellsByDirection)
+                {
+                    (string Color, string yehNah) entry = ("R", CROSS);
+                    if (OriginDestinationPairs.ContainsKey(cell))
+                    {
+                        entry = ("G", TICK);
+                    }
+                    DI.TryAdd(direction, entry);
+                }
+
+                int validCellsCount = OriginDestinationPairs.Count / 2;
+                string cellCountColor =
+                    validCellsCount >= 2
+                    ? "G"
+                    : validCellsCount <= 0
+                        ? "R"
+                        : "W"
+                        ;
+
                 SB.AppendColored("M", $"Vaultable").Append(": ")
                     .AppendLine()
+                    .AppendColored("W", "Nav Weight")
+                    .AppendLine()
                     .Append(VANDR).Append("(").AppendColored(navWeightColor, $"{navWeight}").Append($"){HONLY}NavigationWeight").AppendLine()
-                    .Append(TANDR).Append("(").AppendColored(navWeightAutoColor, $"{navWeightAuto}".ToString()).Append($"){HONLY}NavigationWeight[AutoExplore]");
+                    .Append(TANDR).Append("(").AppendColored(navWeightAutoColor, $"{navWeightAuto}".ToString()).Append($"){HONLY}NavigationWeight [").AppendColored("K", "AutoExplore").Append("]")
+                    .AppendLine()
+                    .AppendColored("W", "Vaultable Cells (").AppendColored(cellCountColor, $"{validCellsCount}").AppendColored("W", ")")
+                    .AppendLine()
+                    .Append(VANDR).Append("[").AppendColored(DI["NW"].C, DI["NW"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["N"].C, DI["N"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["NE"].C, DI["NE"].YN).Append($"]").AppendLine()
+                    .Append(VANDR).Append("[").AppendColored(DI["W"].C, DI["W"].YN).Append($"]")
+                                  .Append("[").AppendColored("y", "o").Append($"]")
+                                  .Append("[").AppendColored(DI["E"].C, DI["E"].YN).Append($"]").AppendLine()
+                    .Append(TANDR).Append("[").AppendColored(DI["SW"].C, DI["SW"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["S"].C, DI["S"].YN).Append($"]")
+                                  .Append("[").AppendColored(DI["SE"].C, DI["SE"].YN).Append($"]").AppendLine();
+
                 E.Infix.AppendRules(Event.FinalizeString(SB));
             }
             return base.HandleEvent(E);
@@ -190,7 +250,7 @@ namespace XRL.World.Parts
                 E.AddAction(
                 Name: "Vault Over",
                 Display: "vault over",
-                Command: "VaultOverMe",
+                Command: COMMAND_VAULT_OVER_ME,
                 PreferToHighlight: null,
                 Key: 'v',
                 FireOnActor: false,
@@ -204,7 +264,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(InventoryActionEvent E)
         {
-            if (E.Command == "VaultOverMe" && E.Item == ParentObject)
+            if (E.Command == COMMAND_VAULT_OVER_ME && E.Item == ParentObject)
             {
                 GameObject vaulter = E.Actor;
                 GameObject vaultee = E.Item;
@@ -302,13 +362,31 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetNavigationWeightEvent E)
         {
-            if (HasAnyValidVaultCells && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null)
+            Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
+            bool hasAnyValidVaultCells = !originDestinationPairs.IsNullOrEmpty();
+
+            if (hasAnyValidVaultCells && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null)
             {
                 if (Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
                 {
-                    E.Uncacheable = true;
-                    E.MinWeight(2, 2);
-                    return false;
+                    int validPairs = originDestinationPairs.Count / 2;
+                    int baseWeight = validPairs switch
+                    {
+                        4 => 1,
+                        3 => 1,
+                        2 => 1,
+                        1 => 15,
+                        _ => 100,
+                    };
+
+                    int weight = Math.Min(100, baseWeight * (E.Autoexploring ? 5 : 1));
+                    int maxWeight = Math.Min(100, baseWeight * (E.Autoexploring ? 5 : 1));
+                    if (maxWeight < 100)
+                    {
+                        E.Uncacheable = true;
+                        E.MinWeight(weight, maxWeight);
+                        return false;
+                    }
                 }
             }
             return base.HandleEvent(E);
@@ -450,14 +528,26 @@ namespace XRL.World.Parts
 
                 if (shouldResumeAfterVault)
                 {
-                    vaultSkill.ResumeAfterVault();
 
-                    Debug.Entry(4,
+                    if (vaultSkill.ResumeAfterVault())
+                    {
+                        Debug.CheckYeh(4, $"Resume Successful, allowing through", Indent: 1, Toggle: doDebug);
+
+                        Debug.Entry(4,
                         $"x {nameof(Vaultable)}."
                         + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()}) @//",
                         Indent: 0, Toggle: doDebug);
-                    return false; // don't Reject entering cell
+
+                        return false; // don't Reject entering cell
+                    }
+
+                    Debug.CheckNah(4, $"Resume Failed, blocking", Indent: 1, Toggle: doDebug);
+
                 }
+                Debug.Entry(4,
+                    $"x {nameof(Vaultable)}."
+                    + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()}) @//",
+                    Indent: 0, Toggle: doDebug);
             }
             return base.FireEvent(E);
         }

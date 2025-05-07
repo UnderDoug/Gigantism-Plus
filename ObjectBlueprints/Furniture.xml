@@ -27,12 +27,16 @@
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
     <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   <object Name="RandomStatue" Load="Merge">
     <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
     <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   
   <object Name="Oboroqoru Statue" Load="Merge">
@@ -41,6 +45,8 @@
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
     <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   <object Name="NephilimShrine" Load="Merge">
     <part Name="ModGigantic" />
@@ -48,6 +54,8 @@
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
     <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   
   <object Name="Eater Hologram" Load="Merge">

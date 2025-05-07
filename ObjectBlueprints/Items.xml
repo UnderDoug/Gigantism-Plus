@@ -401,6 +401,8 @@ You cannot wear equipment on your body." />
   -->
   <object Name="LargeBoulder" Load="Merge">
     <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   <object Name="FoldingChair" Load="Merge">
     <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />

@@ -41,6 +41,26 @@
   <object Name="ReefOpenShaft" Load="Merge">
     <part Name="Vaultable" RequiresSkill="true" />
   </object>
+
+  <object Name="SolidFungus" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  
+  <object Name="Spotted Shagspook" Load="Merge">
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
+  </object>
+  <object Name="Dandy Cap" Load="Merge">
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
+  </object>
+  
+  <object Name="Gigantic Spotted Shagspook" Inherits="Spotted Shagspook">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Dandy Cap" Inherits="Dandy Cap">
+    <part Name="ModGigantic" />
+  </object>
   
   <object Name="TrainingMat" Inherits="ArenaFloor">
     <part Name="Render" DisplayName="" RenderString="." ColorString="&amp;K" TileColor="&amp;K" DetailColor="y" RenderLayer="0" Tile="Terrain/WrassleRing_Floor_03.png" />

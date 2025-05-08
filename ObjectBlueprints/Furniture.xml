@@ -2,9 +2,12 @@
 <objects>
 
   <object Name="Furniture" Load="Merge">
-    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
+  </object>
+
+  <object Name="Table" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
   </object>
   
   <object Name="Brinestalk Gate" Load="Merge">

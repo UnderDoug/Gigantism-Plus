@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AssemblyName>GigantismPus</AssemblyName>
+		<PackageId>GigantismPus</PackageId>
+		<Authors>hyd-n-plyn-syt, UnderDoug</Authors>
+		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+	</PropertyGroup>
+	<ItemGroup>
+	  <Folder Include="Secrets\Maps\" />
+	</ItemGroup>
+  <Import Project="../Mods.csproj" />
+</Project>

@@ -1,6 +1,6 @@
 /.vs
 /obj
+/Mods.csproj
 /GigantismPlus.csproj
 /GigantismPlus.sln
-/HNPS_GigantismPlus.csproj
-/HNPS_GigantismPlus.sln
+/bin/Debug/netstandard2.0

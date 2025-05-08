@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+    <object Name="Charge Boots" Inherits="BaseBoot">
+        <part Name="Armor" AV="1" DV="2" WornOn="Feet" />
+        <part Name="Render" 
+              DisplayName="charging boots" RenderString="]" 
+              ColorString="&amp;r" DetailColor="K" 
+              Tile="Items/sw_boots_hightier1.bmp" 
+              />
+        <part Name="Commerce" Value="100" />
+        <part Name="Description" 
+              Short="Grooved rubber treads grip the ground while synthetic supplementary tendons support the ankle allowing the wearer to quickly and confidently close distance." 
+              />
+        <part Name="RulesDescription" Text="Wearing these boots increases your charge range by 2." />
+        <part Name="Physics" Weight="7" />
+        <part Name="EquipmentPropertyModifier" Props="ChargeRangeModifier:2" />
+        <tag Name="Tier" Value="4" />
+        <part Name="Examiner" Complexity="4" />
+        <tag Name="EquipSound" Value="sfx_equip_armor_artifact_light" />
+        <stag Name="Movement" />
+      <tag Name="Mods" Value="Gigantify,BootMods,CommonMods" />
+    </object>
+</objects>

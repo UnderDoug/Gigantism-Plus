@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+  <!-- 
+      
+       1: Gigantic Exoframes
+       2: Modified BaseGame Natural Weapons
+       3: Modified BaseGame "Natural" Weapons
+       4: Sultan Masks
+       5: General GiganticEquippable Changes
+       6: Gigantic Modable Changes 
+       7: Gigantic Variants
+       8: Wrassle Gear
+       9: Weapon Elongating
+      10: Testing
+      
+  -->
+  <!-- 
+      
+      Gigantic Exoframes 
+      
+  -->
+  <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
+    <part Name="Physics" Weight="15" />
+    <part Name="Description" Short="" />
+    <part Name="Render" DisplayName="{{c|massive exoframe}}"
+          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
+          ColorString="&amp;c" DetailColor="r" />
+    <part Name="CyberneticsBaseItem"
+          Slots="Body" Cost="2"
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
+You cannot wear equipment on your body." />
+    <removepart Name="TinkerItem" />
+    <part Name="Metal" />
+    <part Name="NoDamage" />
+    <part Name="NoRust" />
+    <tag Name="CyberneticsUsesEqSlot" />
+    <tag Name="CyberneticsOneOnly" />
+    <part Name="CyberneticsGiganticExoframe"
+          Model="Alpha"
+          AugmentAdjectiveColor="b"
+          AugmentTile="NaturalWeapons/GiganticManipulator.png"
+          AugmentTileColorString="&amp;c"
+          AugmentTileDetailColor="b"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          JumpDistanceBonus="0"
+          StunningForceLevelFactor="0.5"/>
+    <part Name="ModGigantic" />
+    <part Name="ModImprovedGigantismPlus" Tier="1" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
+  </object>
+  
+  <!-- End Base -->
+  
+  <object Name="GiganticExoframeAlpha" Inherits="BaseGiganticExoframe">
+    <part Name="Physics" Weight="15" />
+    <part Name="Description"
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
+    <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}"
+          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
+          ColorString="&amp;c" DetailColor="b" />
+    <part Name="Armor" 
+          AV="2" 
+          DV="-5" />
+    <part Name="CyberneticsBaseItem"
+          Slots="Body" Cost="2"
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="Commerce" Value="120" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Alpha" 
+          AugmentAdjectiveColor="b" 
+          AugmentTileDetailColor="b" 
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
+          JumpDistanceBonus="0" 
+          StunningForceLevelFactor="0.5" />
+    <part Name="ModImprovedGigantismPlus" Tier="2" />
+    <tag Name="StartingCybernetic:General" />
+    <tag Name="Tier" Value="2" />
+  </object>
+
+  <object Name="GiganticExoframeDelta" Inherits="BaseGiganticExoframe">
+    <part Name="Physics" Weight="18" />
+    <part Name="Description"
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
+    <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}"
+          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
+          ColorString="&amp;c" DetailColor="K" />
+    <part Name="Armor" 
+          AV="5" 
+          DV="-4" />
+    <part Name="CyberneticsBaseItem"
+          Slots="Body" Cost="4"
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="Commerce" Value="240" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Delta"
+          AugmentAdjectiveColor="K"
+          AugmentTileDetailColor="K"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          JumpDistanceBonus="1"
+          StunningForceLevelFactor="0.67" />
+    <part Name="ModImprovedGigantismPlus" Tier="5" />
+    <tag Name="Tier" Value="4" />
+  </object>
+
+  <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
+    <part Name="Physics" Weight="9" />
+    <part Name="Description"
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
+    <part Name="Render" DisplayName="{{c|exoframe {{G|sigma}}}}"
+          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
+          ColorString="&amp;c" DetailColor="G" />
+    <part Name="Armor" 
+          AV="6" 
+          DV="-3" />
+    <part Name="CyberneticsBaseItem"
+          Slots="Body" Cost="8"
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="Commerce" Value="600" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Sigma"
+          AugmentAdjectiveColor="crysteel"
+          AugmentTileDetailColor="G"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_crysteel_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_crysteel_blocked"
+          AugmentAddParts="Crysteel"
+          AugmentAddProps="Flawless:1"
+          AugmentEquipmentFrameColors="KGKG"
+          JumpDistanceBonus="2"
+          StunningForceLevelFactor="0.75" />
+    <part Name="ModImprovedGigantismPlus" Tier="10" />
+    <part Name="Crysteel" />
+    <tag Name="Flawless" />
+    <tag Name="Tier" Value="6" />
+  </object>
+
+  <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
+    <part Name="Physics" Weight="6" />
+    <part Name="Description"
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
+    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}"
+          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
+          ColorString="&amp;c" DetailColor="M" />
+    <part Name="Armor" 
+          AV="8" 
+          DV="-2" />
+    <part Name="CyberneticsBaseItem"
+          Slots="Body" Cost="16"
+          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="Commerce" Value="2200" />
+    <part Name="CyberneticsGiganticExoframe" 
+          Model="Omega"
+          AugmentAdjectiveColor="zetachrome"
+          AugmentTileDetailColor="M"
+          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_onehanded_zetachrome_swing"
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
+          AugmentAddParts="Zetachrome"
+          AugmentEquipmentFrameColors="mCmC"
+          JumpDistanceBonus="3"
+          StunningForceLevelFactor="0.8" />
+    <part Name="ModImprovedGigantismPlus" Tier="16" />
+    <part Name="Zetachrome" />
+    <tag Name="Tier" Value="8" />
+  </object>
+
+  <!-- 
+  
+      Modified BaseGame Improvised Weapons 
+      
+  -->
+
+  <object Name="Item" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+  </object>
+
+  <object Name="NaturalWeapon" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+    <removetag Name="IsImprovisedMelee" />
+  </object>
+  
+  <object Name="FoldingChair" Load="Merge">
+    <removetag Name="IsImprovisedMelee" />
+    <removetag Name="IsImprovisedThrown" />
+    <intproperty Name="IsImprovisedMelee" Value="1" />
+    <intproperty Name="IsImprovisedThrown" Value="1" />
+  </object>
+  
+  <object Name="MeleeWeapon" Load="Merge">
+    <removetag Name="IsImprovisedMelee" />
+  </object>
+  
+  <object Name="BaseDagger" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="Vibro Dagger" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="Gaslight Dagger" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="BaseThrownWeapon" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="Geomagnetic Disc" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="ThrowingAxe" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="CastNet" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <object Name="BaseStone" Load="Merge">
+    <removetag Name="IsImprovisedThrown" />
+  </object>
+  
+  <!-- 
+  
+      Modified BaseGame Natural Weapons 
+      
+  -->
+  <object Name="Crystalline Point" Load="Merge">
+		<part Name="Render" DisplayName="{{crystallized|crystalline}} {{crystallized|point}}" />
+	</object>
+
+  <!-- 
+      
+      Modified BaseGame "Natural" Equipment 
+      
+  -->
+  <object Name="Fist of the Ape God" Load="Merge">
+    <part Name="Render" Tile="GiganticFist_Alt.png" />
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="FungalInfection" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+
+  <!-- 
+      
+      Sultan Masks 
+      - Making them Gigantic Equippable since Gigantism precludes you from them.
+      - These should be reverted once we have a cool in-game method of modifying them that isn't just a tier 3 modifier.
+        
+  -->
+  <object Name="The Kesil Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Shemesh Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Earth Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Levant Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Olive Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="The Nil Face" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  
+  <!-- 
+      
+      General GiganticEquippable Changes 
+        
+  -->
+  <object Name="BaseStone" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="Energy Cell" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  <object Name="BaseThrownWeapon" Load="Merge">
+    <tag Name="GiganticEquippable" />
+  </object>
+  
+  
+  <!-- 
+      
+      Gigantic Modable Changes 
+      
+  -->
+	<object Name="LightSource" Load="Merge">
+		<tag Name="Mods" Value="Gigantify" Load="Merge" />
+	</object>
+  
+  <object Name="Hoversled" Load="Merge">
+		<tag Name="Mods" Value="Gigantify" Load="Merge" />
+	</object>
+
+  <object Name="Helping Hands" Load="Merge">
+    <tag Name="Mods" Value="Gigantify" Load="Merge" />
+  </object>
+  
+  <!-- 
+      
+      Gigantic Variants 
+      
+  -->
+	<object Name="Gigantic FoldingChair" Inherits="FoldingChair">
+    <part Name="ModGigantic" />
+	</object>
+  
+  <!-- 
+      
+      Wrassle Gear 
+      
+  -->
+  
+  <object Name="FoldingChair" Load="Merge">
+    <part Name="WrassleGear" RandomizeTile="false" />
+  </object>
+  
+	<object Name="BaseWrassleGear" Inherits="Armor">
+    <part Name="Render" DisplayName="[WrassleGear]" 
+          RenderString="]" RenderColor="&amp;Y"
+          TileColor="&amp;Y" DetailColor="r" />
+    <part Name="Description" 
+          Short="Vibrant nanoweave material of variant colors has been sutured together into a gestalt display of unique flair." />
+    <part Name="Physics" Weight="1" />
+    <part Name="WrassleGear" RandomizeTile="true" />
+    <tag Name="BaseObject" Value="*noinherit" />
+	</object>
+	<object Name="WrassleFace" Inherits="BaseWrassleGear">
+    <part Name="Render" DisplayName="vibrant nanoweave mask" RenderString="W"
+          Tile="Items/Nanoweave_Mask_01.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Mask_~01-08~.png" />
+    <part Name="Armor" WornOn="Face" />
+	</object>
+	<object Name="WrassleSuit" Inherits="BaseWrassleGear">
+    <part Name="Render" DisplayName="vibrant nanoweave suit" RenderString="B"
+          Tile="Items/Nanoweave_Suit_01.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Suit_~01-07~.png" />
+    <part Name="Armor" WornOn="Body" />
+    <part Name="Physics" Weight="3" />
+	</object>
+	<object Name="WrassleCape" Inherits="BaseWrassleGear">
+    <part Name="Render" DisplayName="vibrant nanoweave cape" RenderString="U"
+          Tile="items/sw_cloak_fancy.bmp" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Cape_~01-07~.png" />
+    <part Name="Armor" WornOn="Back" />
+    <part Name="Physics" Weight="1" />
+	</object>
+	<object Name="WrassleGloves" Inherits="BaseWrassleGear">
+    <part Name="Render" DisplayName="vibrant nanoweave grips" RenderString="Z"
+          Tile="Items/Nanoweave_Mask_Grips.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Grips_~01-07~.png" />
+    <part Name="Armor" WornOn="Hands" />
+	</object>
+	<object Name="WrassleBoots" Inherits="BaseWrassleGear">
+    <part Name="Render" DisplayName="vibrant nanoweave botas" RenderString="M"
+          Tile="Items/Nanoweave_Botas_01.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Botas_~01-04~.png" />
+    <part Name="Armor" WornOn="Feet" />
+    <part Name="Physics" Weight="2" />
+	</object>
+	<object Name="BaseWrassleBoot" Inherits="WrassleBoots">
+    <part Name="Render" DisplayName="[BaseWrassleBoot]" RenderString="L"
+          Tile="Items/Nanoweave_Bota_01_Right.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Left.png,Items/Nanoweave_Bota_~01-04~_Right.png" />
+    <part Name="Armor" WornOn="Foot" />
+    <part Name="Physics" Weight="1" />
+    <tag Name="BaseObject" Value="*noinherit" />
+	</object>
+	<object Name="WrassleBootLeft" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_Bota_01_Left.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Left.png" />
+	</object>
+	<object Name="WrassleBootRight" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_Bota_01_Right.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Right.png" />
+	</object>
+	<object Name="WrassleBootTail" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_TailBota_01_Right.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_TailBota_~01-04~_Left.png,Items/Nanoweave_TailBota_~01-04~_Right.png" />
+    <part Name="Armor" WornOn="Tail" />
+	</object>
+  
+
+  <!-- 
+      
+      Vaultable Items
+      
+  -->
+  <object Name="LargeBoulder" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
+  </object>
+  <object Name="FoldingChair" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+
+  <!-- 
+      
+      Helper Parts 
+      
+  -->
+  <object Name="MeleeWeapon" Load="Merge">
+    <part Name="WeaponElongator" />
+  </object>
+  <object Name="Corpse" Load="Merge">
+    <part Name="CorpseGigantifier" />
+  </object>
+
+  <!-- 
+      
+      Testing 
+      
+  -->
+  <!-- object Name="Gigantism Giver Axe" Inherits="Battle Axe8">
+    <part Name="Render" DisplayName="{{zetachrome|zetachrome}} {{gigantic|gigantism}} giving battle axe" Tile="Items/sw_axe_7.bmp" ColorString="&amp;Z" DetailColor="y" />
+    <part Name="ModImprovedGigantismPlus" Tier="16" />
+    <tag Name="GiganticEquippable" />
+  </object-->
+  
+</objects>

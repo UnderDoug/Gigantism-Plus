@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+  <object Name="Bony Protrusion" Inherits="Armor">
+    <part Name="ModSturdy" />
+    <part Name="NoDamage" />
+    <part Name="Render" DisplayName="[Bony Protrusion]" Visible="false" RenderString="#" />
+    <part Name="Commerce" Value="50" />
+    <part Name="Description" Short="Thick and plated bonestuff protrudes from the limb." />
+    <part Name="Physics" IsReal="false" Solid="false" Takeable="true" Organic="true" Weight="0" Category="Natural Armor" FreezeTemperature="-99999" BrittleTemperature="-99999" FlameTemperature="99999" VaporTemperature="99999" />
+    <part Name="NaturalEquipment" />
+    <removepart Name="TinkerItem" />
+    <intproperty Name="Natural" Value="1" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <tag Name="ExcludeFromDynamicEncounters" />
+    <tag Name="NaturalGear" />
+    <tag Name="NeverStack" />
+    <tag Name="NoDefaultBehavior" />
+    <tag Name="NoSparkingQuest" />
+    <tag Name="ShowAsPhysicalFeature" />
+    <stag Name="Contemporary" />
+  </object>
+
+  <object Name="Bony Claws" Inherits="Bony Protrusion">
+    <part Name="Armor" AV="0" DV="0" WornOn="Hands" />
+    <part Name="Render" DisplayName="Bony Claws" Visible="true"
+          RenderString="W" Tile="Items/sw_gauntlets_hightier1.bmp"
+          ColorString="&amp;w" DetailColor="g" />
+    <part Name="Description" Short="Thick and plated bonestuff protrudes from the back of these claws." />
+  </object>
+
+  <object Name="Bony Corona" Inherits="Bony Protrusion">
+    <part Name="Armor" AV="0" DV="0" WornOn="Head" />
+    <part Name="Render" DisplayName="Bony Corona" Visible="true"
+          RenderString="W" Tile="Items/sw_wreath.bmp"
+          ColorString="&amp;w" DetailColor="g" />
+    <part Name="Description" Short="Thick and plated bonestuff protrude from the skull in a crude crown." />
+  </object>
+
+  <object Name="Bony Feet" Inherits="Bony Protrusion">
+    <part Name="Armor" AV="0" DV="0" WornOn="Feet" />
+    <part Name="Render" DisplayName="Bony Feet" Visible="true"
+          RenderString="W" Tile="Items/sw_boots_hightier1.bmp"
+          ColorString="&amp;w" DetailColor="g" />
+    <part Name="Description" Short="Thick and plated bonestuff protrudes from the top of these sturdy pads." />
+  </object>
+</objects>

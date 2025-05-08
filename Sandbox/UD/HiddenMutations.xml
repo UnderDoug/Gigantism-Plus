@@ -1,0 +1,5 @@
+<mutations Hidden="true" ExcludeFromPool="true">
+  <category Name="Physical">
+    <mutation Name="Bony Protrusions" Cost="1" Class="BonyProtrusions" Exclusions="Horns,Hooks for Feet" BearerDescription="those with bony protrusions" Tile="Items/gear_great_machine.png" />
+  </category>
+</mutations>

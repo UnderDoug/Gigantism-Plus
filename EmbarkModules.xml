@@ -11,7 +11,7 @@
 &amp;c&#249;&amp;y {{W|Highly survivable}} starting build
         </description>
       </pregen>
-      <pregen Name="Errant Giant Hunter" Genotype="True Kin" Tile="Creatures/Class_Errant_GiantHunter" Foreground="Y" Detail="r" Background="k">
+      <pregen Name="Errant Giant Hunter" Genotype="True Kin" Tile="Creatures/Class_Errant_GiantHunter.png" Foreground="Y" Detail="r" Background="k">
         <code>H4sIAAAAAAAACs1V22rbQBB9D+QfFtFHWdhuKUnAD46apq1TcGOTtpQQVtJEWrreFXtpKoL+vbOSHUkWxG2gxjZG0py5nDkzWj8eHxHipXQFv0BpJoV3RrxxMAzGw9PgzVvPr/DIMp60HEboMFxjK5lYDhrNP9wzIY/15QlaFjm4oG/XV0GYUUVjA+rcZdTBF5u43yUIadDtcxXgk6nWsIp4MQgXGJD75KauPWmY+SS03FgFEwHWKMp9MrcRZ/EMiqX8CWIiLOc1x4pMQg1FGk/s0PTK/Cu1d5ikR68pgjk3/i7tUlkgMyY6Dj0ZN1hZ35T+i2Vc2OhAVeww2y3i2t0lDTPMQ+Q9MRmQD0CVyfYl59QYxSJrQB+gotvkdos6l0wYPbcqzqiGpFvTiW4UiBTlPSOnfgeZpowzUyAw7gJLadNMgHZv/0kX+igMcM5SEDH0A78yznP5AKofeJFK59/YynYTNF/kIAx6DF6fdIFrWFEmmEgRHLahCNud5mjtRvzHzQmLCJQAw+JDXJ0eu927w518g1HbpIFDbLCD1tFffzprhZ5NPUfskqVU4P3Fb3mv8H9nyvOMev52jLTVlEfbwA1VjFaQdy6TwmvDZfNwu69JZ1JqWBg8l3DzrmRMnSSHOPRniP7FgbwV54p9knlO93IWz9z68BWYTCZ3dSPfpVXvWZqh492c0wIUtgJ8I/zzEUHCeTOLYVB9XzoIZ1235y63x0flH8bBTFtVCQAA</code>
         <description>
 &amp;c&#249;&amp;y Brawler: big hits, big damage

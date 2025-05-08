@@ -2178,5 +2178,17 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
+        public static bool HasDiggableVaultableObject(this Cell cell)
+        {
+            foreach (GameObject vaultable in cell.GetObjectsWithPart(nameof(Vaultable)))
+            {
+                if (vaultable.HasStringProperty("Diggable") || vaultable.HasStringProperty("WasDiggable"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     } //!-- Extensions
 }

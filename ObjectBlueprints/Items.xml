@@ -327,7 +327,7 @@ You cannot wear equipment on your body." />
   
 	<object Name="BaseWrassleGear" Inherits="Armor">
     <part Name="Render" DisplayName="[WrassleGear]" 
-          RenderString="]" RenderColor="&amp;Y"
+          RenderString="]" ColorString="&amp;Y"
           TileColor="&amp;Y" DetailColor="r" />
     <part Name="Description" 
           Short="Vibrant nanoweave material of variant colors has been sutured together into a gestalt display of unique flair." />

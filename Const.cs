@@ -69,5 +69,9 @@ namespace HNPS_GigantismPlus
         public const string GNT_PREDESC = "A creature of immensity mounts th" + HONLY + " actually, not quite... Though it {{Y|is}} massive. Biology strains itself against physics with the creature's every belief-challenging movement. Perspective shifts, and, seemingly the ground with it, as the realisation hits: this creature" + GNT_PREDESC_RPLC  + "is quite a distance further away than it first appeared...\n\n";
         public const string GNT_POUND = "\u00A3";
 
+        public const string DIGGABLE = "Diggable";
+        public const string WAS_DIGGABLE = "WasDiggable";
+
+
     } //!-- public static class Const
 }

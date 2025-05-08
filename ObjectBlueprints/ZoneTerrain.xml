@@ -11,35 +11,35 @@
 <objects>
 
   <object Name="Water" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
 
   <object Name="SlimyShaft" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="OpenShaft" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="OpenShaft2" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="Air" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="LazyAir" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="Pit" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="TombShaft" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="ElevatorShaft" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
   <object Name="ReefOpenShaft" Load="Merge">
-    <part Name="Vaultable" RequiresSkill="true" />
+    <part Name="Vaultable" RequiresJumpSkill="true" />
   </object>
 
   <object Name="SolidFungus" Load="Merge">

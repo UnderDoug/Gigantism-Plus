@@ -62,7 +62,6 @@
   </object>
   
   <object Name="Eater Hologram" Load="Merge">
-    <tag Name="Ornate" />
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
     <tag Name="Ornate" />

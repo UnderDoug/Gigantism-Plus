@@ -26,10 +26,6 @@ namespace XRL.World.Parts
     {
         private static bool doDebug => true;
 
-        private static int InventoryActionPriority = 0;
-        private static int InventoryActionDefault = 2;
-        private static int InventoryActionCreatureOffset = 5;
-
         public static readonly string COMMAND_VAULT_OVER_ME = "VaultOverMe";
 
         public bool SizeMatters;
@@ -244,9 +240,9 @@ namespace XRL.World.Parts
              && vaultSkill.CanNormallyVault(E.Object);
             if (wantInventoryAction)
             {
-                int priority = InventoryActionPriority;
-                priority -= E.Object.IsCreature ? InventoryActionCreatureOffset : 0;
-                int @default = InventoryActionDefault;
+                int priority = 0;
+                priority -= E.Object.IsCreature ? 5 : 0;
+                int @default = 2;
 
                 E.AddAction(
                 Name: "Vault Over",
@@ -311,6 +307,8 @@ namespace XRL.World.Parts
             bool canSmartUse =
                 E.Item == ParentObject
              && !E.Item.IsCreature
+             && !E.Item.HasPart<Container>()
+             && !E.Item.HasPart<Pettable>()
              && E.Actor.TryGetPart(out Tactics_Vault vaultSkill) 
              && vaultSkill.CanNormallyVault(E.Item);
 
@@ -332,7 +330,7 @@ namespace XRL.World.Parts
 
                 Debug.Entry(4,
                     $"@ {nameof(Vaultable)}."
-                    + $"{nameof(HandleEvent)}({nameof(CommandSmartUseEvent)} E)",
+                    + $"{nameof(HandleEvent)}({nameof(CommandSmartUseEvent)} E.MinPriority: {E.MinPriority})",
                     Indent: 0, Toggle: doDebug);
 
                 Debug.LoopItem(4, $"E.Item", $"{E.Item?.DebugName ?? NULL}", Good: E.Item != null,
@@ -558,22 +556,6 @@ namespace XRL.World.Parts
         {
             Vaultable vaultable = base.DeepCopy(Parent, MapInv) as Vaultable;
             return vaultable;
-        }
-
-        [WishCommand(Command = "via priority")]
-        public static void SetVaultInventoryActionPriority(string Value)
-        {
-            InventoryActionPriority = int.Parse(Value);
-        }
-        [WishCommand(Command = "via default")]
-        public static void SetVaultInventoryActionDefault(string Value)
-        {
-            InventoryActionDefault = int.Parse(Value);
-        }
-        [WishCommand(Command = "via co")]
-        public static void SetVaultInventoryActionCreatureOffset(string Value)
-        {
-            InventoryActionCreatureOffset = int.Parse(Value);
         }
 
     } //!-- public class Vaultable : IScribedPart

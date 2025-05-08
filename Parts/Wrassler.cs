@@ -316,7 +316,7 @@ namespace XRL.World.Parts
             if (E.Object != null && E.Object == ParentObject)
             {
                 GameObject Actor = E.Object;
-                if (Bestow && !Actor.InheritsFrom("BaseTemplar"))
+                if (Bestow && !ParentObject.HasTagOrProperty("NoWrassleGear") && !Actor.InheritsFrom("BaseTemplar"))
                 {
                     BestowWrassleGear(out BeenBestowed);
                 }

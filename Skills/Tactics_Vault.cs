@@ -1051,7 +1051,7 @@ namespace XRL.World.Parts.Skill
                     $"{WantToVault}", 
                     Indent: 0, Toggle: getDoDebug());
             }
-            if (E.ID == BEGIN_ATTACK_EVENT && WantToVault && ParentObject != null && ParentObject.IsPlayer() && AutoAct.IsAnyMovement())
+            if (false && E.ID == BEGIN_ATTACK_EVENT && WantToVault && ParentObject != null && ParentObject.IsPlayer() && AutoAct.IsAnyMovement())
             {
                 Debug.Entry(4,
                     $"@ {nameof(Tactics_Vault)}."

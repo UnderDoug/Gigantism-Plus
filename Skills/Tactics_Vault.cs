@@ -1136,7 +1136,7 @@ namespace XRL.World.Parts.Skill
                 Debug.LoopItem(4, $"AutoAct.IsAnyMovement", $"{AutoAct.IsAnyMovement()}",
                     Good: AutoAct.IsAnyMovement(), Indent: 1, Toggle: getDoDebug());
 
-                Debug.LoopItem(4, $"Checking adjacent cells for diggable vaultables...");
+                Debug.LoopItem(4, $"Checking adjacent cells for diggable vaultables...", Indent: 1);
                 foreach (Cell cell in ParentObject.CurrentCell.GetAdjacentCells())
                 {
                     if (cell != null && cell.HasDiggableVaultableObject())
@@ -1144,9 +1144,25 @@ namespace XRL.World.Parts.Skill
                         Debug.CheckYeh(4, $"Cell [{cell.Location}] contains a diggable vaultable", Indent: 1, Toggle: getDoDebug());
                         foreach (GameObject vaultable in cell.GetObjectsWithPart(nameof(Vaultable)))
                         {
-                            if (vaultable.HasIntProperty(DIGGABLE) 
-                                && CanVault(vaultable) 
-                                && vaultable.GetPart<Vaultable>().GetVaultableCellPairs().ContainsKey(Vaulter.CurrentCell))
+                            bool vaultableIsDiggable = vaultable.HasIntProperty(DIGGABLE);
+                            bool vaulterCanVaultVaultable = CanVault(vaultable);
+                            bool vaultableCellPairsContainsVaulter = vaultable.GetPart<Vaultable>().GetVaultableCellPairs().ContainsKey(E.Cell);
+                            bool swapDiggable =
+                                vaultableIsDiggable && vaulterCanVaultVaultable && vaultableCellPairsContainsVaulter;
+
+                            Debug.LoopItem(4, $"vaultableIsDiggable", $"{vaultableIsDiggable}",
+                                Good: vaultableIsDiggable, Indent: 2, Toggle: getDoDebug());
+
+                            Debug.LoopItem(4, $"vaulterCanVaultVaultable", $"{vaulterCanVaultVaultable}",
+                                Good: vaulterCanVaultVaultable, Indent: 2, Toggle: getDoDebug());
+
+                            Debug.LoopItem(4, $"vaultableCellPairsContainsVaulter", $"{vaultableCellPairsContainsVaulter}",
+                                Good: vaultableCellPairsContainsVaulter, Indent: 2, Toggle: getDoDebug());
+
+                            Debug.LoopItem(4, $"swapDiggable", $"{swapDiggable}",
+                                Good: swapDiggable, Indent: 1, Toggle: getDoDebug());
+                            Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: getDoDebug());
+                            if (swapDiggable)
                             {
                                 vaultable.SetIntProperty(WAS_DIGGABLE, 1);
                                 vaultable.SetIntProperty(DIGGABLE, 0, true);
@@ -1158,6 +1174,8 @@ namespace XRL.World.Parts.Skill
 
                                 Debug.LoopItem(4, $"WasDiggable".Quote(), $"{vaultable.HasIntProperty(WAS_DIGGABLE)}",
                                     Good: vaultable.HasIntProperty(WAS_DIGGABLE), Indent: 3, Toggle: getDoDebug());
+
+                                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: getDoDebug());
                             }
                         }
                     }

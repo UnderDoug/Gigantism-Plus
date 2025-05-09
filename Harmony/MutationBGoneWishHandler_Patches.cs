@@ -23,18 +23,20 @@ namespace HNPS_GigantismPlus.Harmony
             methodName: nameof(MutationBGoneWishHandler.MutationBGone),
             argumentTypes: new Type[] { typeof(string) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
-        public static bool MutationBGone_WorkOnEntryName_Prefix(string argument)
+        public static bool MutationBGone_WorkOnEntryName_Prefix(ref bool __result, string argument)
         {
             Debug.Entry(4,
                 $"# {nameof(MutationBGoneWishHandler_Patches)}." +
                 $"{nameof(MutationBGone_WorkOnEntryName_Prefix)}(string argument: {argument})",
                 Indent: 0);
 
-            Mutations mutations = The.Player.GetPart<Mutations>();
-            BaseMutation mutation = mutations.GetMutationByName(argument);
-            if (mutation != null)
+            Mutations mutations = MutationBGoneWishHandler.GetMutations();
+            BaseMutation baseMutation = mutations.GetMutationByName(argument);
+            if (baseMutation != null)
             {
-                argument = mutation.Name;
+                MutationBGoneWishHandler.RemoveMutation(mutations, baseMutation);
+                __result = true;
+                return false;
             }
             return true;
         }

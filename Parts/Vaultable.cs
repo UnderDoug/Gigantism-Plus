@@ -201,7 +201,7 @@ namespace XRL.World.Parts
                         : "W"
                         ;
 
-                SB.AppendColored("M", $"Vaultable").Append(": ")
+                SB.AppendColored("M", $"Vaultable").Append("[").AppendColored("g", $"{ParentObject?.CurrentCell?.Location}").Append("]").Append(": ")
                     .AppendLine()
                     .AppendColored("W", "Nav Weight")
                     .AppendLine()
@@ -320,7 +320,13 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(CommandSmartUseEvent E)
         {
-            if (E.Actor.TryGetPart(out Tactics_Vault vaultSkill) && vaultSkill.CanVault(E.Item))
+            bool shouldSmartUse =
+                !E.Item.IsCreature
+             && !E.Item.HasPart<Container>()
+             && !E.Item.HasPart<Pettable>()
+             && !E.Item.HasTagOrProperty("ForceSmartUse");
+
+            if (shouldSmartUse && E.Actor.TryGetPart(out Tactics_Vault vaultSkill) && vaultSkill.CanVault(E.Item))
             {
                 GameObject vaulter = E.Actor;
                 Cell origin = vaulter.CurrentCell;
@@ -333,13 +339,7 @@ namespace XRL.World.Parts
                     + $"{nameof(HandleEvent)}({nameof(CommandSmartUseEvent)} E.MinPriority: {E.MinPriority})",
                     Indent: 0, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"E.Item", $"{E.Item?.DebugName ?? NULL}", Good: E.Item != null,
-                    Indent: 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"ParentObject", $"{ParentObject?.DebugName ?? NULL}", Good: ParentObject != null,
-                    Indent: 1, Toggle: doDebug);
                 Debug.LoopItem(4, $"vaultee", $"{vaultee?.DebugName ?? NULL}", Good: vaultee != null,
-                    Indent: 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"E.Actor", $"{E.Actor?.DebugName ?? NULL}", Good: E.Actor != null,
                     Indent: 1, Toggle: doDebug);
                 Debug.LoopItem(4, $"vaulter", $"{vaulter?.DebugName ?? NULL}", Good: vaulter != null,
                     Indent: 1, Toggle: doDebug);
@@ -403,13 +403,14 @@ namespace XRL.World.Parts
                 + $" E.Object: {Vaultee?.DebugName ?? NULL}",
                 Indent: 0);
 
+            Tactics_Vault vaultSkill = null;
             bool vaulterNotNull = Vaulter != null;
             bool cellExists = E.Cell != null;
-            bool cellIsSolidForVaulter = E.Cell.IsSolidFor(Vaulter);
-            bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill);
-            bool wantToVault = vaultSkill.WantToVault;
-            bool midVault = vaultSkill.MidVault;
-            bool notPlayer = !Vaulter.IsPlayer();
+            bool cellIsSolidForVaulter = cellExists && E.Cell.IsSolidFor(Vaulter);
+            bool haveSkill = vaulterNotNull && Vaulter.TryGetPart(out vaultSkill);
+            bool wantToVault = haveSkill && vaultSkill.WantToVault;
+            bool midVault = haveSkill && vaultSkill.MidVault;
+            bool notPlayer = vaulterNotNull && !Vaulter.IsPlayer();
             bool autoActActive = AutoAct.IsActive();
             bool actingAutomatically = notPlayer || autoActActive;
 

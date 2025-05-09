@@ -2182,7 +2182,7 @@ namespace HNPS_GigantismPlus
         {
             foreach (GameObject vaultable in cell.GetObjectsWithPart(nameof(Vaultable)))
             {
-                if (vaultable.HasStringProperty("Diggable") || vaultable.HasStringProperty("WasDiggable"))
+                if (vaultable.HasTagOrProperty("Diggable") || vaultable.HasTagOrProperty("WasDiggable"))
                 {
                     return true;
                 }

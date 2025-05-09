@@ -233,6 +233,6 @@
         Vanilla Fixes
      -->
     <object Name="Scorpiock_Claws" Load="Merge">
-      <part Name="Render" DisplayName="claw" Load="Merge" />
+      <part Name="Render" DisplayName="claw" />
     </object>
 </objects>

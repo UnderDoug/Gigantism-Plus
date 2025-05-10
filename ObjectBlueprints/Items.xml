@@ -376,6 +376,11 @@ You cannot wear equipment on your body." />
     <part Name="Physics" Weight="1" />
     <tag Name="BaseObject" Value="*noinherit" />
 	</object>
+	<object Name="WrassleBoot" Inherits="BaseWrassleBoot">
+    <part Name="Render" DisplayName="vibrant nanoweave bota"
+          Tile="Items/Nanoweave_Bota_01_Left.png" />
+    <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Bota_~01-04~_Left.png,Items/Nanoweave_Bota_~01-04~_Right.png" />
+	</object>
 	<object Name="WrassleBootLeft" Inherits="BaseWrassleBoot">
     <part Name="Render" DisplayName="vibrant nanoweave bota"
           Tile="Items/Nanoweave_Bota_01_Left.png" />

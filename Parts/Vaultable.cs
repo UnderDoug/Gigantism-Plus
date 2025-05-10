@@ -122,6 +122,7 @@ namespace XRL.World.Parts
         {
             Registrar.Register("BeforePhysicsRejectObjectEntringCell");
             Registrar.Register(ParentObject, GetNavigationWeightEvent.ID, EventOrder.EXTREMELY_EARLY);
+            Registrar.Register(ParentObject, OkayToDamageEvent.ID, EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -189,6 +190,10 @@ namespace XRL.World.Parts
                     {
                         entry = ("G", TICK);
                     }
+                    if (cell == The.Player.CurrentCell)
+                    {
+                        entry = ("O", SMLE2);
+                    }
                     DI.TryAdd(direction, entry);
                 }
 
@@ -200,6 +205,9 @@ namespace XRL.World.Parts
                         ? "R"
                         : "W"
                         ;
+
+                bool isDiggable = ParentObject.HasIntProperty(DIGGABLE);
+                bool wasDiggable = ParentObject.HasIntProperty(WAS_DIGGABLE);
 
                 SB.AppendColored("M", $"Vaultable").Append("[").AppendColored("g", $"{ParentObject?.CurrentCell?.Location}").Append("]").Append(": ")
                     .AppendLine()
@@ -218,7 +226,13 @@ namespace XRL.World.Parts
                                   .Append("[").AppendColored(DI["E"].C, DI["E"].YN).Append($"]").AppendLine()
                     .Append(TANDR).Append("[").AppendColored(DI["SW"].C, DI["SW"].YN).Append($"]")
                                   .Append("[").AppendColored(DI["S"].C, DI["S"].YN).Append($"]")
-                                  .Append("[").AppendColored(DI["SE"].C, DI["SE"].YN).Append($"]").AppendLine();
+                                  .Append("[").AppendColored(DI["SE"].C, DI["SE"].YN).Append($"]")
+                    .AppendLine()
+                    //.AppendColored("W", "Diggable State")
+                    //.AppendLine()
+                    //.Append(VANDR).Append($"[{isDiggable.YehNah()}]{HONLY}isDiggable: ").AppendColored("B", $"{isDiggable}").AppendLine()
+                    //.Append(TANDR).Append($"[{wasDiggable.YehNah()}]{HONLY}wasDiggable: ").AppendColored("B", $"{wasDiggable}").AppendLine()
+                    ;
 
                 E.Infix.AppendRules(Event.FinalizeString(SB));
             }
@@ -465,6 +479,101 @@ namespace XRL.World.Parts
                 if (shouldBlock && vaultSkill.CanVault(Vaultee, Silent: false))
                 {
                     Debug.Entry(4, $"Preventing {Vaulter?.DebugName ?? NULL} from entering cell [{E?.Cell?.Location}]", Indent: 1);
+
+                    return false;
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(OkayToDamageEvent E)
+        {
+            GameObject Vaulter = E.Actor;
+            GameObject Vaultee = E.Object;
+
+            if (Vaulter.CurrentCell.GetAdjacentCells().Contains(Vaultee.CurrentCell))
+            {
+                Debug.Entry(4,
+                $"@ {nameof(Vaultable)}."
+                + $"{nameof(HandleEvent)}({nameof(OkayToDamageEvent)} E)"
+                + $" E.Actor: {Vaulter?.DebugName ?? NULL},"
+                + $" E.Object: {Vaultee?.DebugName ?? NULL}",
+                Indent: 0);
+
+                Tactics_Vault vaultSkill = null;
+
+                bool vaulterNotNull = Vaulter != null;
+
+                Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(Vaulter);
+
+                bool vaulteeHasValidCellPair = !originDestinationPairs.IsNullOrEmpty();
+
+                bool vaultableCellPairsContainsVaulter =
+                    vaulteeHasValidCellPair
+                    && vaulterNotNull
+                    && originDestinationPairs.ContainsKey(Vaulter.CurrentCell);
+
+                bool vaulterHasSkill =
+                    vaulterNotNull
+                    && Vaulter.TryGetPart(out vaultSkill);
+
+                bool vaulterCanVaultVaultee =
+                    vaulterHasSkill
+                    && vaultSkill.CanVault(Vaultee, Silent: true);
+
+                bool vaulterIsBurrowerWantsToVault =
+                    vaulterHasSkill
+                    && vaultSkill.IsBurrowerWantsToVault;
+
+                bool vaulterNotPlayer =
+                    vaulterNotNull
+                    && !Vaulter.IsPlayer();
+
+                bool autoActActive = AutoAct.IsActive();
+
+                bool actingAutomatically = vaulterNotPlayer || autoActActive;
+
+                bool notOkayToDamage =
+                    vaultableCellPairsContainsVaulter
+                 && vaulterCanVaultVaultee
+                 && vaulterIsBurrowerWantsToVault
+                 && actingAutomatically;
+
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}",
+                    Good: vaulterNotNull, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaulteeHasValidCellPair)}", $"{vaulteeHasValidCellPair}",
+                    Good: vaulteeHasValidCellPair, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaultableCellPairsContainsVaulter)}", $"{vaultableCellPairsContainsVaulter}",
+                    Good: vaultableCellPairsContainsVaulter, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaulterHasSkill)}", $"{vaulterHasSkill}",
+                    Good: vaulterHasSkill, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaulterCanVaultVaultee)}", $"{vaulterCanVaultVaultee}",
+                    Good: vaulterCanVaultVaultee, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaulterIsBurrowerWantsToVault)}", $"{vaulterIsBurrowerWantsToVault}",
+                    Good: vaulterIsBurrowerWantsToVault, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(actingAutomatically)}", $"{actingAutomatically}",
+                    Good: actingAutomatically, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(vaulterNotPlayer)}", $"{vaulterNotPlayer}",
+                    Good: vaulterNotPlayer, Indent: 2, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(autoActActive)}", $"{autoActActive}",
+                    Good: autoActActive, Indent: 2, Toggle: doDebug);
+
+                Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(notOkayToDamage)}", $"{notOkayToDamage}",
+                    Good: notOkayToDamage, Indent: 1, Toggle: doDebug);
+
+                if (notOkayToDamage)
+                {
+                    Debug.Entry(4, $"Dissallowing {Vaulter?.DebugName ?? NULL} from digging {Vaultee?.DebugName ?? NULL}", Indent: 1);
 
                     return false;
                 }

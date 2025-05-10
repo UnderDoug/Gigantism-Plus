@@ -224,13 +224,13 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool Unmutate(GameObject GO)
         {
-            NeedPartSupportEvent.Send(GO, "Digging", this);
+            NeedPartSupportEvent.Send(GO, "Digging");
             // GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
             return base.Unmutate(GO);
         }
         public override void Remove()
         {
-            NeedPartSupportEvent.Send(ParentObject, "Digging", this);
+            NeedPartSupportEvent.Send(ParentObject, "Digging");
             base.Remove();
         }
 

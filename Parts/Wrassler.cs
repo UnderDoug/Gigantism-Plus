@@ -240,10 +240,10 @@ namespace XRL.World.Parts
                     wrassleGear.WrassleID = WrassleID;
                     wrassleGear.RandomizeTile = true;
                     wrassleGear.ApplyFlair();
-                }
 
-                wrassleGearObjects.TryAdd(wrassleGearObject);
-                if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
+                    wrassleGearObjects.TryAdd(wrassleGearObject);
+                    if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
+                }
             }
 
             if (ParentObject.IsPlayer())

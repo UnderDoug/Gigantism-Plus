@@ -17,6 +17,8 @@ namespace HNPS_GigantismPlus
         public const string CROSS = "\u0058"; // X
         public const string BLOCK = "\u2588"; // █
         public const string STAR = "\u263C";  // ☼
+        public const string SMLE = "\u263A";  // ☺︎
+        public const string SMLE2 = "\u263B"; // ☻
 
         public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │

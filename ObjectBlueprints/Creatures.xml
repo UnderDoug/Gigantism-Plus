@@ -14,9 +14,11 @@
       <builder Name="Gigantified" ChanceOneIn="5000" />
       <skill Name="Tactics_Vault" />
     </object>
+  
     <object Name="Templar" Load="Merge">
       <builder Name="Gigantified" ChanceOneIn="500" />
     </object>
+  
     <object Name="Great Saltback" Load="Merge">
         <mutation Name="GigantismPlus" Level="3" />
         <removetag Name="Gigantic" />
@@ -70,6 +72,21 @@
     <object Name="Troll" Load="Merge">
         <mutation Name="GigantismPlus" Level="4" />
         <removetag Name="Gigantic" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
+    </object>
+  
+    <object Name="Mak" Load="Merge">
+        <mutation Name="GigantismPlus" Level="4" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
+    </object>
+  
+    <object Name="Goek" Load="Merge">
+        <mutation Name="GigantismPlus" Level="4" />
+        <tag Name="GigantismPlusColorChange" Value="false" />
+    </object>
+  
+    <object Name="Geeub" Load="Merge">
+        <mutation Name="GigantismPlus" Level="4" />
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
 

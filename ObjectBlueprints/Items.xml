@@ -22,6 +22,7 @@
      -->
   <object Name="Item" Load="Merge">
     <part Name="NaturalEquipmentManager" />
+    <part Name="UD_MeleeWeapon_StrBonusCapper" />
   </object>
   
   <!-- 

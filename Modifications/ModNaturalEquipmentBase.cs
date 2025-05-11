@@ -16,7 +16,7 @@ namespace XRL.World.Parts
     [Serializable]
     public abstract class ModNaturalEquipmentBase : IMeleeModification
     {
-        private static bool doDebug => false;
+        private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
         public struct Adjustment

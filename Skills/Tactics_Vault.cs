@@ -25,7 +25,7 @@ namespace XRL.World.Parts.Skill
     [Serializable]
     public class Tactics_Vault : BaseSkill
     {
-        private static bool doDebug => true;
+        private static bool doDebug => getClassDoDebug(nameof(Tactics_Vault));
         private static bool getDoDebug(object what = null)
         {
             List<object> doList = new()

@@ -19,7 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
 
         [HarmonyPrefix]
         [HarmonyPriority(800)]
-        [HarmonyPatch(nameof(Body.FireEventOnBodyparts))]
+        [HarmonyPatch((typeof(Body)), nameof(Body.FireEventOnBodyparts))]
         public static bool FireEventOnBodyparts_SendNaturalEquipmentEvent_Prefix(ref Body __instance, Event E, ref Event ___eBodypartsUpdated)
         {
             Body @this = __instance;
@@ -169,23 +169,12 @@ namespace HNPS_GigantismPlus.Harmony
 
         [HarmonyPostfix]
         [HarmonyPriority(1)]
-        [HarmonyPatch(nameof(Body.UpdateBodyParts))]
+        [HarmonyPatch((typeof(Body)), nameof(Body.UpdateBodyParts))]
         public static void UpdateBodyParts_SendAfterUpdateBodyPartsEvent_Postfix(ref Body __instance)
         {
             Body @this = __instance;
             if (@this.built)
             {
-                /*Debug.Entry(4,
-                    $"{typeof(Body_Patches).Name}." +
-                    $"{nameof(UpdateBodyParts_SendAfterUpdateBodyPartsEvent_Postfix)}(ref Actor __instance)",
-                    Indent: 0, Toggle: doDebug); 
-
-                string objectDesc = @this.ParentObject != null
-                    ? $"{@this.ParentObject?.ID}:{@this.ParentObject?.ShortDisplayNameStripped}"
-                    : "[null]";
-
-                Debug.Entry(4, $"Object is {objectDesc}", Indent: 1, Toggle: doDebug);*/
-
                 AfterBodyPartsUpdatedEvent.Send(@this.ParentObject);
             }
         }

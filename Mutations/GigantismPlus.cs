@@ -25,7 +25,7 @@ namespace XRL.World.Parts.Mutation
         , IModEventHandler<BeforeVaultEvent>
         , IModEventHandler<VaultedEvent>
     {
-        private static bool doDebug => false;
+        private static bool doDebug => getClassDoDebug(nameof(GigantismPlus));
 
         public static readonly int ICON_COLOR_PRIORITY = 81;
         public static readonly string ICON_COLOR = "&z";

@@ -38,6 +38,8 @@ namespace HNPS_GigantismPlus
 
         private static bool IncludeInMessage => Options.DebugIncludeInMessage;
 
+        public static int LastIndent = 0;
+
         private static void Message(string Text)
         {
             XRL.Messages.MessageQueue.AddPlayerMessage("{{Y|" + Text + "}}");
@@ -77,6 +79,7 @@ namespace HNPS_GigantismPlus
             {
                 indent += space;
             }
+            LastIndent = Spaces;
             string output = indent + Text;
             Log(output);
             if (IncludeInMessage)

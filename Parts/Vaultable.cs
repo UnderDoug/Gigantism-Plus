@@ -24,7 +24,7 @@ namespace XRL.World.Parts
         : IScribedPart
         , IModEventHandler<AutoActTryToMoveEvent>
     {
-        private static bool doDebug => true;
+        private static bool doDebug => getClassDoDebug(nameof(Vaultable));
 
         public static readonly string COMMAND_VAULT_OVER_ME = "VaultOverMe";
 

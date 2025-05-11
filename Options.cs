@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 
 using XRL;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using XRL.World.Parts;
+using XRL.World.Parts.Skill;
 
 namespace HNPS_GigantismPlus
 {
@@ -15,13 +17,18 @@ namespace HNPS_GigantismPlus
         // Per the wiki, code is taken 1:1
         private static string GetOption(string ID, string Default = "")
         {
-            return XRL.UI.Options.GetOption(ID, Default: Default);
+            return XRL.UI.Options.GetOption(ID, Default);
         }
 
         public static bool doDebug = true;
         public static Dictionary<string, bool> classDoDebug = new()
         {
             { nameof(NaturalEquipmentManager), true },
+            { nameof(ModNaturalEquipmentBase), true },
+            { "ModNaturalEquipment", true },
+            { nameof(GigantismPlus), true },
+            { nameof(Tactics_Vault), true },
+            { nameof(Vaultable), true },
         };
 
         public static bool getClassDoDebug(string Class)

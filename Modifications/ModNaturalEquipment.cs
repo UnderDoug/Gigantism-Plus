@@ -8,6 +8,7 @@ using XRL.World.Parts.Mutation;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
 
 using SerializeField = UnityEngine.SerializeField;
 
@@ -21,7 +22,7 @@ namespace XRL.World.Parts
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        private static bool doDebug => false;
+        private static bool doDebug => getClassDoDebug("ModNaturalEquipment");
 
         [SerializeField]
         private T _assigningPart = null;

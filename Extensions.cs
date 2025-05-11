@@ -1171,8 +1171,18 @@ namespace HNPS_GigantismPlus
 
         public static List<GameObject> GetNaturalEquipment(this Body Body)
         {
-            static bool filter(GameObject GO) { return GO.HasPart<NaturalEquipment>() || GO.HasTag("NaturalGear"); }
+            static bool filter(GameObject GO) { return GO.IsNaturalEquipment(); }
             return Body.GetEquippedObjects(filter);
+        }
+
+        public static bool IsNaturalEquipment(this GameObject @object)
+        {
+            return @object.HasPart<NaturalEquipment>()
+                || @object.HasTagOrProperty("NaturalGear")
+                || @object.HasTagOrProperty("MutationEquipment")
+                || @object.HasTagOrProperty("NoDefaultBehavior")
+                || @object.Physics.Category == "Natural Armor"
+                || @object.InheritsFrom("NaturalWeapon");
         }
 
         public static T DrawRandomElement<T>(this List<T> Bag, T ExceptForElement = null, List<T> ExceptForElements = null)

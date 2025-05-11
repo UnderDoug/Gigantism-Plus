@@ -14,13 +14,16 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch(typeof(GameObject))]
     public static class GameObject_Patches
     {
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         [HarmonyPatch(typeof(GameObject), nameof(GameObject.CheckDefaultBehaviorGiganticness))]
-        public static void CheckDefaultBehaviorGiganticness_ForceEquipped_Postfix(ref GameObject __instance, GameObject Equipper)
+        public static bool CheckDefaultBehaviorGiganticness_ForceEquipped_BlockHideAdjective_Prefix(ref GameObject __instance, GameObject Equipper)
         {
             GameObject @this = __instance;
-
-            if (@this.Physics.Equipped != Equipper) @this.Physics.Equipped = Equipper;
+            if (GameObject.Validate(ref Equipper))
+            {
+                if (@this.Physics.Equipped != Equipper) @this.Physics.Equipped = Equipper;
+            }
+            return false;
         }
 
         [HarmonyPostfix]

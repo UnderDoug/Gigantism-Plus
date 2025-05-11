@@ -5,6 +5,7 @@ using XRL;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
@@ -15,6 +16,20 @@ namespace HNPS_GigantismPlus
         private static string GetOption(string ID, string Default = "")
         {
             return XRL.UI.Options.GetOption(ID, Default: Default);
+        }
+
+        public static bool doDebug = true;
+        public static Dictionary<string, bool> classDoDebug = new()
+        {
+            { nameof(NaturalEquipmentManager), true },
+        };
+
+        public static bool getClassDoDebug(string Class)
+        {
+            if (classDoDebug.ContainsKey(Class)) 
+                return classDoDebug[Class];
+
+            return doDebug;
         }
 
         public static int Colorfulness

@@ -7,7 +7,8 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
-{
+{   
+    /*
     [HarmonyPatch(typeof(GameObject))]
     public static class PseudoGiganticCreature_GameObject_Patches
     {
@@ -85,7 +86,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
     } //!-- public static class PseudoGiganticCreature_GetMaxCarriedWeightEvent_Patches
-
+    */
 
     // Goal is to ensure that NaturalEquipment generated while having Gigantism actually get the gigantic modifier
     // including when the creature is PsuedoGigantic

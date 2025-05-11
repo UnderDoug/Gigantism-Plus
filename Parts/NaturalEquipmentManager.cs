@@ -10,6 +10,7 @@ using static XRL.World.Parts.ModNaturalEquipmentBase;
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Extensions;
 
 using SerializeField = UnityEngine.SerializeField;
@@ -22,7 +23,7 @@ namespace XRL.World.Parts
         , IModEventHandler<BeforeBodyPartsUpdatedEvent>
         , IModEventHandler<AfterBodyPartsUpdatedEvent>
     {
-        private static bool doDebug => false;
+        private static bool doDebug => getClassDoDebug(nameof(NaturalEquipmentManager));
 
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
@@ -57,8 +58,6 @@ namespace XRL.World.Parts
 
         public SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods;
 
-        public Dictionary<string, SortedDictionary<int, ModNaturalEquipmentBase>> NaturalEquipmentModsByPart;
-
         // Dictionary key is the Target, the Value Dictionary key is the field
         public Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entry)> AdjustmentTargets;
         // AdjustmentTargets: Dictionary,
@@ -78,7 +77,6 @@ namespace XRL.World.Parts
         public NaturalEquipmentManager()
         {
             NaturalEquipmentMods = new();
-            NaturalEquipmentModsByPart = new();
         }
 
         public override void Initialize()
@@ -494,15 +492,7 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && ParentObject != null)
             {
-                bool shouldRemove =
-                    !ParentObject.HasPart<NaturalEquipment>()
-                 && !ParentObject.HasTagOrProperty("NaturalGear")
-                 && !ParentObject.HasTagOrProperty("MutationEquipment")
-                 && !ParentObject.HasTagOrProperty("NoDefaultBehavior")
-                 && !(ParentObject.Physics.Category == "Natural Armor")
-                 && !ParentObject.InheritsFrom("NaturalWeapon");
-                
-                if (shouldRemove)
+                if (!ParentObject.IsNaturalEquipment())
                 {
                     ParentObject.RemovePart(this);
                 }

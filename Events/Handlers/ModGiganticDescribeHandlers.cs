@@ -59,7 +59,7 @@ namespace HNPS_GigantismPlus
 
         public static bool Register()
         {
-            The.Game?.RegisterEvent(Handler, DescribeModGiganticEvent.ID);
+            The.Game?.RegisterEvent(Handler, DescribeModGiganticEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
 
             return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModGiganticEvent>();
         }
@@ -158,7 +158,8 @@ namespace HNPS_GigantismPlus
             bool isFurniture = Object.InheritsFrom("Furniture");
             bool isWall = Object.InheritsFrom("Wall");
             bool isCorpse = Object.InheritsFrom("Corpse");
-            if (!isDefaultBehaviorOrFloating && !isOrnate && !isFurniture && !isWall && !isCorpse)
+            bool isNatural = Object.IsNaturalEquipment();
+            if (!isDefaultBehaviorOrFloating && !isOrnate && !isFurniture && !isWall && !isCorpse && !isNatural)
             {
                 if (Object.UsesSlots == null &&
                     (!(meleeWeapon != null && meleeWeapon.IsImprovised())

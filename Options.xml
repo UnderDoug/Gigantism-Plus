@@ -44,7 +44,7 @@
 	
   <option
         ID="Option_GigantismPlus_DebugIncludeVaultDebugDescriptions"
-        DisplayText="{{giant|Gigantism Plus}}: Show Tactics_Vault internal debug information in the [{{W|l}}]ook UI."
+        DisplayText="{{giant|Gigantism Plus}}: Show Tactics_Vault internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
         Category="Debug"
         Type="Checkbox"
         Default="No"

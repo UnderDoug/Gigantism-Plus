@@ -476,12 +476,46 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: 1, Toggle: doDebug);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("AdjustWeaponScore");
+            Registrar.Register("AdjustArmorScore");
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
+                || ID == AfterObjectCreatedEvent.ID
+                || ID == GetShortDescriptionEvent.ID
                 || ID == BeforeBodyPartsUpdatedEvent.ID
-                || ID == AfterBodyPartsUpdatedEvent.ID
-                || ID == GetShortDescriptionEvent.ID;
+                || ID == AfterBodyPartsUpdatedEvent.ID;
+        }
+        public override bool HandleEvent(AfterObjectCreatedEvent E)
+        {
+            if (E.Object == ParentObject && ParentObject != null)
+            {
+                bool shouldRemove =
+                    !ParentObject.HasPart<NaturalEquipment>()
+                 && !ParentObject.HasTagOrProperty("NaturalGear")
+                 && !ParentObject.HasTagOrProperty("MutationEquipment")
+                 && !ParentObject.HasTagOrProperty("NoDefaultBehavior")
+                 && !(ParentObject.Physics.Category == "Natural Armor")
+                 && !ParentObject.InheritsFrom("NaturalWeapon");
+                
+                if (shouldRemove)
+                {
+                    ParentObject.RemovePart(this);
+                }
+                else
+                {
+                    Debug.Entry(4,
+                        $"{nameof(NaturalEquipmentManager)}." + 
+                        $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E.Object: {E?.Object?.DebugName ?? NULL})" + 
+                        $" Kept {nameof(NaturalEquipmentManager)}",
+                        Indent: 0, Toggle: doDebug);
+                }
+            }
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
@@ -533,13 +567,6 @@ namespace XRL.World.Parts
             }
 
             return base.HandleEvent(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("AdjustWeaponScore");
-            Registrar.Register("AdjustArmorScore");
-            base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {

@@ -12,7 +12,9 @@ using static HNPS_GigantismPlus.Options;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
-{public abstract class ModNaturalEquipmentBase : IMeleeModification
+{
+    [Serializable]
+    public abstract class ModNaturalEquipmentBase : IMeleeModification
     {
         private static bool doDebug => false;
 

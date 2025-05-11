@@ -2,18 +2,28 @@
 <objects>
   <!-- 
       
-       1: Gigantic Exoframes
-       2: Modified BaseGame Natural Weapons
-       3: Modified BaseGame "Natural" Weapons
-       4: Sultan Masks
-       5: General GiganticEquippable Changes
-       6: Gigantic Modable Changes 
-       7: Gigantic Variants
-       8: Wrassle Gear
-       9: Weapon Elongating
-      10: Testing
+       1: Add NaturalEquipmentManager to Item
+       2: Gigantic Exoframes
+       3: Modified BaseGame Natural Weapons
+       4: Modified BaseGame "Natural" Weapons
+       5: Sultan Masks
+       6: General GiganticEquippable Changes
+       7: Gigantic Modable Changes 
+       8: Gigantic Variants
+       9: Wrassle Gear
+      10: Weapon Elongating
+      11: Testing
       
   -->
+  <!-- 
+  
+       Add NaturalEquipmentManager to Item
+       
+     -->
+  <object Name="Item" Load="Merge">
+    <part Name="NaturalEquipmentManager" />
+  </object>
+  
   <!-- 
       
       Gigantic Exoframes 

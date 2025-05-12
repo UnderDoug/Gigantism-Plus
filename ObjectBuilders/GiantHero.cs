@@ -229,6 +229,8 @@ namespace XRL.World.ObjectBuilders
                 staticFaction2Admiration = GNT_THICCBOI_ADMIREREASON;
             }
             Creature.SetStringProperty("staticFaction2", $"{staticFaction2Faction},friend,{staticFaction2Admiration}");
+
+            Creature.RandomlySpendPoints();
         }
     }
 }

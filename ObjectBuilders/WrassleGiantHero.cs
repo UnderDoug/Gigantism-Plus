@@ -57,6 +57,9 @@ namespace XRL.World.ObjectBuilders
         };
         public static List<string> UniqueHeroSkills => new()
         {
+            /* 
+             * Commented skills are the ones that appear in the above list 
+             */
             // "Acrobatics",
             // "Acrobatics_Jump",
             // "Endurance",
@@ -852,6 +855,8 @@ namespace XRL.World.ObjectBuilders
                 Debug.LoopItem(4, $" {skill.Name}", Indent: 3);
             }
 
+            Creature.RandomlySpendPoints();
+
             Creature.RequirePart<Interesting>();
             Debug.LoopItem(4, $"<Interesting>?", Good: Creature.HasPart<Interesting>(), Indent: 2);
 
@@ -924,7 +929,11 @@ namespace XRL.World.ObjectBuilders
             CreatureBlueprint.Tags["Culture"] = "Giant";
 
             if (!CreatureBlueprint.Tags.ContainsKey("Role")) CreatureBlueprint.Tags.Add("Role", "");
-            CreatureBlueprint.Tags["Role"] = $"Hero";
+            {
+                CreatureBlueprint.Tags["Role"] = $"Hero";
+            }
+
+            CreatureBlueprint.IntProps["WrassleGearBestowChance"] = 100;
 
             if (CreatureBlueprint.Tags.ContainsKey("NoHateFactions")) CreatureBlueprint.Tags.Remove("NoHateFactions");
             if (CreatureBlueprint.Tags.ContainsKey("staticFaction1")) CreatureBlueprint.Tags.Remove("staticFaction1");

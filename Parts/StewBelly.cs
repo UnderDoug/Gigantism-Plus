@@ -12,6 +12,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
 using XRL.Language;
+using XRL.Rules;
 
 namespace XRL.World.Parts
 {
@@ -36,6 +37,7 @@ namespace XRL.World.Parts
                 this.Hankering = Hankering;
             }
         }
+        public bool StartingStewsPocessed { get; private set; }
 
         [SerializeField]
         private int _Gains;
@@ -44,6 +46,7 @@ namespace XRL.World.Parts
             get => _Gains;
             private set => _Gains = Math.Max(0, value);
         }
+        public Guid mutationMod = Guid.Empty;
 
         [SerializeField]
         private int _StartingHankering;
@@ -65,11 +68,8 @@ namespace XRL.World.Parts
             private set => _Hankering = Math.Max(0, value);
         }
 
-        public Guid mutationMod = Guid.Empty;
-
         public bool Grumble;
         public int TurnsTillGrumble;
-        public bool StartingStewsPocessed { get; private set; }
 
         public StewBelly()
         {
@@ -217,13 +217,44 @@ namespace XRL.World.Parts
         public bool ProcessStartingStews()
         {
             bool did = false;
-            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews))
+            string StartingStewsProperty = ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0");
+            int StartingStews = 0;
+            if (StartingStewsProperty.Contains("-"))
             {
-                if (Stews < startingSews)
-                    Stews += startingSews;
+                if (StartingStewsProperty.StartsWith("-") || StartingStewsProperty.EndsWith("-"))
+                {
+                    StartingStewsProperty.Replace("-", "");
+                }
+                else
+                {
+                    string[] startingStewsPieces = StartingStewsProperty.Split("-");
+                    int Low = Math.Min(int.Parse(startingStewsPieces[0]), int.Parse(startingStewsPieces[1]));
+                    int High = Math.Max(int.Parse(startingStewsPieces[0]), int.Parse(startingStewsPieces[1]));
+                    StartingStewsProperty = $"{Stat.Roll(Low, High)}";
+                }
+            }
+            if (StartingStewsProperty.Contains("d"))
+            {
+                if (StartingStewsProperty.StartsWith("d") || StartingStewsProperty.EndsWith("d"))
+                {
+                    StartingStewsProperty.Replace("d", "");
+                }
+                else
+                {
+                    StartingStewsProperty = $"{Stat.Roll(StartingStewsProperty)}";
+                }
+            }
+            if (int.TryParse(StartingStewsProperty, out int startingStews))
+            {
+                StartingStews = startingStews;
+            }
+            if (StartingStews > 0)
+            {
+                if (Stews < StartingStews)
+                    Stews += StartingStews;
                 did = true;
             }
-            StartingStewsPocessed = Stews >= startingSews;
+            StartingStewsPocessed = Stews >= StartingStews;
             return StartingStewsPocessed && did;
         }
 

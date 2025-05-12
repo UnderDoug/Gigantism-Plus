@@ -316,7 +316,28 @@ namespace XRL.World.Parts
             if (E.Object != null && E.Object == ParentObject)
             {
                 GameObject Actor = E.Object;
-                if (Bestow && !ParentObject.HasTagOrProperty("NoWrassleGear") && !Actor.InheritsFrom("BaseTemplar"))
+
+                bool noWrassleGear = ParentObject.HasTagOrProperty("NoWrassleGear");
+                bool isTemplar = Actor.InheritsFrom("BaseTemplar");
+                
+                int bestowChance = ParentObject.GetIntProperty("WrassleGearBestowChance", -1);
+
+                if (bestowChance < 0 
+                 && (int.TryParse(ParentObject.GetStringProperty("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0)
+                 && (int.TryParse(ParentObject.GetTag("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0))
+                {
+                    bestowChance = 100;
+                }
+
+                bool bestowByChance = bestowChance.in100();
+
+                bool shouldBestow = 
+                    Bestow
+                 && bestowByChance
+                 && !noWrassleGear
+                 && !isTemplar;
+
+                if (shouldBestow)
                 {
                     BestowWrassleGear(out BeenBestowed);
                 }

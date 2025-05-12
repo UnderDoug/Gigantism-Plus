@@ -34,6 +34,7 @@ namespace XRL.World.Parts
             {
                 'R',    // Removal
                 "OC",   // ObjectCreation
+                "S"     // Serialisation
             };
 
             if (what != null && doList.Contains(what))
@@ -81,7 +82,7 @@ namespace XRL.World.Parts
         public SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods;
 
         // Dictionary key is the Target, the Value Dictionary key is the field
-        // [NonSerialized]
+        [NonSerialized]
         public Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entry)> AdjustmentTargets;
         // AdjustmentTargets: Dictionary,
         //      Key: string (name of target object)
@@ -100,6 +101,7 @@ namespace XRL.World.Parts
         public NaturalEquipmentManager()
         {
             NaturalEquipmentMods = new();
+            ShortDescriptions = new();
         }
 
         public override void Initialize()
@@ -231,8 +233,9 @@ namespace XRL.World.Parts
             Debug.LoopItem(4, $"{(flag ? "" : "Not ")}Replaced", Indent: 5, Good: flag, Toggle: doDebug);
             return flag;
         }
-        public void PrepareNaturalEquipmentModAdjustments(ModNaturalEquipmentBase NaturalWeaponMod)
+        public void PrepareNaturalEquipmentModAdjustments(ModNaturalEquipmentBase NaturalWeaponMod, bool Serialization = false)
         {
+            bool doDebug = !Serialization && getDoDebug();
             Debug.Entry(4, $"* {nameof(PrepareNaturalEquipmentModAdjustments)}(ModNaturalEquipmentBase NaturalWeaponMod: {NaturalWeaponMod.Name})", Indent: 1, Toggle: doDebug);
             if (NaturalWeaponMod?.Adjustments != null)
             {
@@ -623,22 +626,6 @@ namespace XRL.World.Parts
                 Writer.Write(priority);
                 naturalEquipmentMod.Write(Basis, Writer);
             }
-
-            /*
-            // Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entry)> AdjustmentTargets
-            Writer.Write(AdjustmentTargets.Count);
-            foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)
-            {
-                Writer.Write(Target);
-                Writer.Write(Entries.Count);
-                foreach ((string Field, (int Priority, string Value)) in Entries)
-                {
-                    Writer.Write(Field);
-                    Writer.Write(Priority);
-                    Writer.Write(Value);
-                }
-            }
-            */
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
@@ -657,27 +644,14 @@ namespace XRL.World.Parts
                 NaturalEquipmentMods.Add(Reader.ReadInt32(), (ModNaturalEquipmentBase)Reader.ReadObject());
             }
 
-            /*
             AdjustmentTargets = GetEmptyAdjustmentTargets();
-            int adjustmentTargetsCount = Reader.ReadInt32();
-            for (int i = 0; i < adjustmentTargetsCount; i++)
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                string Target = Reader.ReadString();
-                int entriesCount = Reader.ReadInt32();
-                for (int j = 0;  j < entriesCount; j++)
+                foreach ((_, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                 {
-                    string Field = Reader.ReadString();
-                    int Priority = Reader.ReadInt32();
-                    string Value = Reader.ReadString();
-                    (object TargetObject, Dictionary<string, (int, string)> _) = AdjustmentTargets[Target];
-                    Dictionary<string, (int Priority, string Value)> Entry = new()
-                    {
-                        { Field, (Priority, Value) }
-                    };
-                    AdjustmentTargets[Target] = (TargetObject, Entry);
+                    PrepareNaturalEquipmentModAdjustments(naturalEquipmentMod, true);
                 }
             }
-            */
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
@@ -685,6 +659,7 @@ namespace XRL.World.Parts
             naturalEquipmentManager.ShortDescriptions = null;
             naturalEquipmentManager._shortDescriptionCache = null;
             naturalEquipmentManager.NaturalEquipmentMods = null;
+            naturalEquipmentManager.AdjustmentTargets = null;
             return naturalEquipmentManager;
         }
 

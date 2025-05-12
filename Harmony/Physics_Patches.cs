@@ -18,7 +18,10 @@ namespace HNPS_GigantismPlus.Harmony
         static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, ref Physics __instance)
         {
             // goal: reduce the amount of thrown warnings when the FinalizeCopy patch sends an EquippedEvent
-            __instance._Equipped = null;
+            if (__instance._Equipped != null)
+            {
+                __instance._Equipped = null;
+            }
             return true;
         } //!-- static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E)
     }

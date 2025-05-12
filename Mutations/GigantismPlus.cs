@@ -35,7 +35,7 @@ namespace XRL.World.Parts.Mutation
 
         public float WeightFactor = 5.0f;
         public float CarryCapFactor => 2.0f;
-        public int CarryCapBonus;
+        public int CarryCapBonus = 8;
 
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
@@ -470,13 +470,14 @@ namespace XRL.World.Parts.Mutation
             // Hunch Over Penalties
             Debug.Entry(4, $"Values Before", Indent: 2, Toggle: doDebug);
             Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: doDebug);
             Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: doDebug);
             WeightFactor = GetWeightFactor(NewLevel);
             CarryCapBonus = GetCarryCapBonus(NewLevel);
             Debug.Entry(4, $"Values After", Indent: 2, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: doDebug);
+            Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: doDebug);
 
             Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: doDebug);
 
@@ -873,6 +874,32 @@ namespace XRL.World.Parts.Mutation
             return base.Unmutate(GO);
         }
 
+        public override bool Render(RenderEvent E)
+        {
+            if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
+            {
+                bool flag = true;
+                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+                {
+                    flag = MutationColor;
+                }
+                if (flag && !IsCyberGiant)
+                {
+                    string newColor = Colorfulness > 2 ? ICON_COLOR : ICON_COLOR_FALLBACK;
+                    E.ApplyColors(newColor, ICON_COLOR_PRIORITY);
+                }
+            }
+            return base.Render(E);
+        }
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register(COMMAND_NAME_HUNCH_OVER);
+            Registrar.Register(COMMAND_NAME_GROUND_POUND);
+            Registrar.Register(COMMAND_NAME_CLOSE_FIST);
+            Registrar.Register(GetIntrinsicWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+            Registrar.Register(GetMaxCarriedWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             bool wantAddGroundPound = GroundPoundActivatedAbilityID == Guid.Empty;
@@ -880,8 +907,6 @@ namespace XRL.World.Parts.Mutation
             bool wantJumped = true || ParentObject.HasPart<StunningForceOnJump>();
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
-                || ID == GetIntrinsicWeightEvent.ID
-                || ID == GetMaxCarriedWeightEvent.ID
                 || ID == BeforeRapidAdvancementEvent.ID
                 || ID == AfterRapidAdvancementEvent.ID
                 || ID == AfterLevelGainedEvent.ID
@@ -899,9 +924,12 @@ namespace XRL.World.Parts.Mutation
         {
             Debug.Entry(4,
                 $"{nameof(GigantismPlus)}." +
-                $"{nameof(HandleEvent)}({nameof(GetIntrinsicWeightEvent)} E.BaseWeight: {E.BaseWeight})",
+                $"{nameof(HandleEvent)}({nameof(GetIntrinsicWeightEvent)} E)",
                 Indent: 0, Toggle: doDebug);
+            Debug.Entry(4, $"Before: E.BaseWeight: {E.BaseWeight}, E.Weight: {E.Weight}", Indent: 1, Toggle: doDebug);
             E.BaseWeight *= WeightFactor;
+            E.Weight *= WeightFactor;
+            Debug.Entry(4, $" After: E.BaseWeight: {E.BaseWeight}, E.Weight: {E.Weight}", Indent: 1, Toggle: doDebug);
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetMaxCarriedWeightEvent E)
@@ -928,7 +956,6 @@ namespace XRL.World.Parts.Mutation
                 SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(AfterLevelGainedEvent E)
         {
             if (IsCyberGiant)
@@ -938,7 +965,6 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(CanEnterInteriorEvent E)
         {
             Debug.Entry(1, "Checking CanEnterInteriorEvent", Toggle: doDebug);
@@ -970,13 +996,11 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(1, "Sending to base CanEnterInteriorEvent", Toggle: doDebug);
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
             E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
             // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
@@ -992,7 +1016,6 @@ namespace XRL.World.Parts.Mutation
 
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             if (!E.Actor.HasBodyPart("Hand", false))
@@ -1056,6 +1079,9 @@ namespace XRL.World.Parts.Mutation
             {
                 CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
                 E.Vaulter.SetStringProperty("Flip_Ground_Pound", "Please");
+                float factor = 0.08f;
+                float max = 1.2f;
+                Rumble(Level, factor, max);
             }
             return base.HandleEvent(E);
         }
@@ -1067,32 +1093,6 @@ namespace XRL.World.Parts.Mutation
                     CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
             }
             return base.HandleEvent(E);
-        }
-
-        public override bool Render(RenderEvent E)
-        {
-            if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
-            {
-                bool flag = true;
-                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
-                {
-                    flag = MutationColor;
-                }
-                if (flag && !IsCyberGiant)
-                {
-                    string newColor = Colorfulness > 2 ? ICON_COLOR : ICON_COLOR_FALLBACK;
-                    E.ApplyColors(newColor, ICON_COLOR_PRIORITY);
-                }
-            }
-            return base.Render(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register(COMMAND_NAME_HUNCH_OVER);
-            Registrar.Register(COMMAND_NAME_GROUND_POUND);
-            Registrar.Register(COMMAND_NAME_CLOSE_FIST);
-            base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {

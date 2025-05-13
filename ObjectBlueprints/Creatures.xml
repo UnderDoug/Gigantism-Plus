@@ -265,6 +265,7 @@
         Vanilla Fixes
      -->
     <object Name="Scorpiock_Claws" Load="Merge">
-      <part Name="Render" DisplayName="claw" />
+      <!-- this object is both a plural and has DisplayName="claws" resulting in "clawss" -->
+      <part Name="Render" DisplayName="claw" Tile="Creatures/natural-weapon-claw.bmp" ColorString="&amp;w" />
     </object>
 </objects>

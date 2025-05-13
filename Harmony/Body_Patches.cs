@@ -148,7 +148,7 @@ namespace HNPS_GigantismPlus.Harmony
 
                 Debug.LoopItem(4, $"doReequip",
                     Indent: 2, Good: doReequip, Toggle: doDebug);
-                if (doReequip)
+                if (false && doReequip)
                 {
                     ParentObject.Brain.WantToReequip();
                 }

@@ -111,11 +111,31 @@
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
 
-    <!--object Name="Knight Templar" Load="Merge">
-        <part Name="CyberneticsHasImplants" Implants="GiganticExoframeDelta@body" />
-    </object-->
     <!-- End make creatures Gigantic -->
   
+    <!-- 
+        Swap Burrowing Claws mutation class for creatures that come with it.
+     -->
+  <object Name="MopangoCharioteer" Load="Merge">
+    <removemutation Name="BurrowingClaws" Level="4" />
+    <mutation Name="BurrowingClaws" Level="4" />
+  </object>
+  <object Name="MopangoPilgrim" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" Level="4" PathAsBurrower="false" />
+  </object>
+  <object Name="MopangoPilgrim Still" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" Level="4" PathAsBurrower="false" />
+  </object>
+  <object Name="MopangoTombdweller" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" Level="4" PathAsBurrower="false" />
+  </object>
+  <object Name="MopangoWatcher" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" Level="6" />
+  </object>
     <!-- 
         Make creatures Elongated: 
         - give mutation "ElongatedPaws" 

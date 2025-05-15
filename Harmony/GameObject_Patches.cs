@@ -21,6 +21,8 @@ namespace HNPS_GigantismPlus.Harmony
             GameObject @this = __instance;
             if (GameObject.Validate(ref Equipper))
             {
+                // this is an extremely important line of code that guarantees that default equipment is considered equipped.
+                // removing it completely breaks the NaturalEquipmentManager.
                 if (@this.Physics.Equipped != Equipper) @this.Physics.Equipped = Equipper;
             }
             return false;

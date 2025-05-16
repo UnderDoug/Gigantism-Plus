@@ -613,18 +613,26 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
+            ShortDescriptions ??= new();
             Writer.Write(ShortDescriptions.Count);
-            foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in ShortDescriptions)
+            if (!ShortDescriptions.IsNullOrEmpty())
             {
-                Writer.Write(priority);
-                naturalEquipmentMod.Write(Basis, Writer);
+                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in ShortDescriptions)
+                {
+                    Writer.Write(priority);
+                    naturalEquipmentMod.Write(Basis, Writer);
+                }
             }
 
+            NaturalEquipmentMods ??= new();
             Writer.Write(NaturalEquipmentMods.Count);
-            foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in  NaturalEquipmentMods)
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                Writer.Write(priority);
-                naturalEquipmentMod.Write(Basis, Writer);
+                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    Writer.Write(priority);
+                    naturalEquipmentMod.Write(Basis, Writer);
+                }
             }
         }
         public override void Read(GameObject Basis, SerializationReader Reader)

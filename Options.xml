@@ -73,7 +73,7 @@
   <option
 		  ID="Option_GigantismPlus_Colorfulness"
 	    DisplayText="Use colorful text strings throughout the mod"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
       Type="Slider"
       Default="3"
       Min="1"
@@ -94,7 +94,7 @@
 	<option 
 		  ID="Option_GigantismPlus_EnableGiganticStartingGear"
 	    DisplayText="{{gigantic|Gigantify}} starting equipment for {{gigantic|Gigantic}} ({{r|D}}) players ({{R|new save}})"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -110,7 +110,7 @@
 		  ID="Option_GigantismPlus_EnableGiganticStartingGear_Grenades"
 	    Requires="Option_GigantismPlus_EnableGiganticStartingGear==Yes"
 	    DisplayText="Include starting grenades ({{R|new save}})"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox" 
 			Default="No"
 	    >
@@ -124,7 +124,7 @@
 	<option
 		  ID="Option_GigantismPlus_EnableGigantismRapidAdvance"
 	    DisplayText="Make {{gigantic|Gigantism}} ({{r|D}}) eligible for rapid advancement"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -139,7 +139,7 @@
 	<option 
 		  ID="Option_GigantismPlus_SelectGiganticTinkering"
 	    DisplayText="Make the {{gigantic|gigantic}} modifier tinkerable"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -155,7 +155,7 @@
 	<option 
 		  ID="Option_GigantismPlus_SelectGiganticDerarification"
 	    DisplayText="Make {{gigantic|gigantic}} items slightly more common"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -171,7 +171,7 @@
   <option 
       ID="Option_GigantismPlus_EnableGiganticNPCGear"
       DisplayText="Make NPC Equipment {{gigantic|Gigantic}}"
-      Category="Mods: Gigantism Plus"
+      Category="Mod: Gigantism Plus"
       Type="Checkbox"
       Default="Yes"
       >
@@ -187,7 +187,7 @@
       ID="Option_GigantismPlus_EnableGiganticNPCGear_Grenades"
       Requires="Option_GigantismPlus_EnableGiganticNPCGear==Yes"
       DisplayText="Include NPC grenades"
-      Category="Mods: Gigantism Plus"
+      Category="Mod: Gigantism Plus"
       Type="Checkbox"
       Default="No"
       >
@@ -206,7 +206,7 @@
 		  ID="Option_GigantismPlus_ManagedVanilla"
 	    DisplayText="Use &quot;up-classed&quot; versions of vanilla mutations that have natural weapons ({{R|new save}})"
       Requires="OptionShowAdvancedOptions==Yes"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
       Type="Button"
       Default="Yes"
       OnClick="HNPS_GigantismPlus.Options.OnOptionManagedVanilla"

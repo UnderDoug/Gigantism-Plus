@@ -18,7 +18,10 @@ namespace HNPS_GigantismPlus.Harmony
     public static class ModGigantic_HandleEventDisplayName_Patch
     {
         // adds shader to ModGigantic adjective
-        [HarmonyPatch(typeof(ModGigantic), nameof(ModGigantic.HandleEvent), new Type[] { typeof(GetDisplayNameEvent) })]
+        [HarmonyPatch(
+            declaringType: typeof(ModGigantic),
+            methodName: nameof(ModGigantic.HandleEvent),
+            argumentTypes: new Type[] { typeof(GetDisplayNameEvent) })]
         [HarmonyPostfix]
         static void HandleEvent_GetDisplayName_Postfix(GetDisplayNameEvent E)
         {
@@ -45,7 +48,10 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class ModGigantic_ModificationApplied_Patch
     {
-        [HarmonyPatch(typeof(ModGigantic), nameof(ModGigantic.ApplyModification), new Type[] { typeof(GameObject) })]
+        [HarmonyPatch(
+            declaringType: typeof(ModGigantic),
+            methodName: nameof(ModGigantic.ApplyModification),
+            argumentTypes: new Type[] { typeof(GameObject) })]
         [HarmonyPrefix]
         static bool ModificationApplied_AdditionalEffects_Prefix(ref ModGigantic __instance, GameObject Object)
         {
@@ -71,7 +77,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(int), typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPrefix]
-        public static bool GetDescription_AdditionalEffects_Prefix(ref int Tier, ref GameObject Object, ref string __result)
+        public static bool GetDescription_AdditionalEffects_Prefix(int Tier, GameObject Object,  string __result)
         {
             if (Object == null)
             {

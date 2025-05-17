@@ -56,8 +56,8 @@ namespace HNPS_GigantismPlus
         public static bool EnableGiganticStartingGear_Grenades => GetOption("Option_GigantismPlus_EnableGiganticStartingGear_Grenades").EqualsNoCase("Yes");
         public static bool EnableGigantismRapidAdvance => GetOption("Option_GigantismPlus_EnableGigantismRapidAdvance").EqualsNoCase("Yes");
 
-        public static bool SelectGiganticTinkering => GetOption("Option_GigantismPlus_SelectGiganticTinkering").EqualsNoCase("Yes");
-        public static bool SelectGiganticDerarification => GetOption("Option_GigantismPlus_SelectGiganticDerarification").EqualsNoCase("Yes");
+        public static bool SelectGiganticTinkering => GetOption("Option_GigantismPlus_EnableGiganticTinkering").EqualsNoCase("Yes");
+        public static bool SelectGiganticDerarification => GetOption("Option_GigantismPlus_EnableGiganticDerarification").EqualsNoCase("Yes");
 
         // NPC equipment options
         public static bool EnableGiganticNPCGear => GetOption("Option_GigantismPlus_EnableGiganticNPCGear").EqualsNoCase("Yes");

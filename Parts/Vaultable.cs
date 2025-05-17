@@ -20,9 +20,7 @@ namespace XRL.World.Parts
 {
     [HasWishCommand]
     [Serializable]
-    public class Vaultable 
-        : IScribedPart
-        , IModEventHandler<AutoActTryToMoveEvent>
+    public class Vaultable : IScribedPart
     {
         private static bool doDebug => getClassDoDebug(nameof(Vaultable));
 

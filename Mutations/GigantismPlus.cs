@@ -939,6 +939,8 @@ namespace XRL.World.Parts.Mutation
                 $"{nameof(HandleEvent)}({nameof(GetMaxCarriedWeightEvent)} E.BaseWeight: {E.BaseWeight}, E.Weight: {E.Weight})",
                 Indent: 0, Toggle: doDebug);
             E.BaseWeight *= CarryCapFactor;
+            E.BaseWeight += CarryCapBonus;
+            E.Weight *= CarryCapFactor;
             E.Weight += CarryCapBonus;
             Debug.Entry(4, $"E.BaseWeight: {E.BaseWeight})", Indent: 1, Toggle: doDebug);
             Debug.Entry(4, $"E.Weight: {E.Weight})", Indent: 1, Toggle: doDebug);

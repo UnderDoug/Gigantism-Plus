@@ -11,8 +11,9 @@
        7: Gigantic Modable Changes 
        8: Gigantic Variants
        9: Wrassle Gear
-      10: Weapon Elongating
-      11: Testing
+      10: Helper Parts
+      11: Sundry
+      12: Testing
       
   -->
   <!-- 
@@ -310,7 +311,7 @@ You cannot wear equipment on your body." />
 	</object>
   
   <object Name="Hoversled" Load="Merge">
-		<tag Name="Mods" Value="Gigantify" Load="Merge" />
+    <tag Name="Mods" Value="Gigantify" Load="Merge" />
 	</object>
 
   <object Name="Helping Hands" Load="Merge">
@@ -434,6 +435,15 @@ You cannot wear equipment on your body." />
   </object>
   <object Name="Corpse" Load="Merge">
     <part Name="CorpseGigantifier" />
+  </object>
+
+  <!-- 
+      
+      Sundry 
+      
+  -->
+  <object Name="Phase Cannon" Load="Merge">
+    <tag Name="EquipmentFrameColors" Value="McMc" />
   </object>
 
   <!-- 

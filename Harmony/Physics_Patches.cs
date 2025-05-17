@@ -1,19 +1,21 @@
 ﻿using HarmonyLib;
-
 using System;
-
+using System.Diagnostics;
+using XRL.UI;
 using XRL.World;
 using XRL.World.Parts;
-
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
 {
     [HarmonyPatch]
     public static class Physics_Patches
     {
-        [HarmonyPatch(typeof(Physics), nameof(Physics.HandleEvent), new Type[] { typeof(EquippedEvent) })]
+        [HarmonyPatch(
+            declaringType: typeof(Physics), 
+            methodName: nameof(Physics.HandleEvent),
+            argumentTypes: new Type[] { typeof(EquippedEvent) })]
         [HarmonyPrefix]
         static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, ref Physics __instance)
         {

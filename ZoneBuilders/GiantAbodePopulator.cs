@@ -20,6 +20,27 @@ namespace XRL.World.ZoneBuilders
     public class GiantAbodePopulator
         : ZoneBuilderSandbox
     {
+        private static bool doDebug => getClassDoDebug(nameof(GiantAbodePopulator));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+                "CH",   // ObjectCreation
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         Dictionary<string, Dictionary<string, List<Cell>>> Regions;
 
         public string GiantID;
@@ -256,7 +277,7 @@ namespace XRL.World.ZoneBuilders
                 }
             }
 
-            if (false) // this is just to have an easy toggle
+            if (getDoDebug("CH"))
             {
                 foreach ((_, Dictionary<string, List<Cell>> Region) in Regions)
                 {

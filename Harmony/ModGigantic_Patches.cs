@@ -70,14 +70,15 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class ModGigantic_GetDescription_Patches
     {
-        // overwrites the entire GetDescrption method (it's not super easy to target specific locations throughout) to include the above additions
+        // overwrites the entire GetDescrption method (it's not super easy to target specific locations throughout) to include the
+        // additions from the above events.
         [HarmonyPatch(
             declaringType: typeof(ModGigantic),
             methodName: nameof(ModGigantic.GetDescription),
             argumentTypes: new Type[] { typeof(int), typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPrefix]
-        public static bool GetDescription_AdditionalEffects_Prefix(int Tier, GameObject Object,  string __result)
+        public static bool GetDescription_AdditionalEffects_Prefix(int Tier, GameObject Object, ref string __result)
         {
             if (Object == null)
             {

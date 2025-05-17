@@ -78,7 +78,7 @@ namespace HNPS_GigantismPlus
         }
 
         [VariableReplacer]
-        public static string OptionalColor(DelegateContext Context)
+        public static string optionalColor(DelegateContext Context)
         {
             string Text = string.Empty;
             string Color = string.Empty;
@@ -96,7 +96,7 @@ namespace HNPS_GigantismPlus
         }
 
         [VariableReplacer]
-        public static string OptionalColorYuge(DelegateContext Context)
+        public static string optionalColorYuge(DelegateContext Context)
         {
             string Text = string.Empty;
             if (!Context.Parameters.IsNullOrEmpty())
@@ -105,6 +105,18 @@ namespace HNPS_GigantismPlus
                     Text = Context.Parameters[0];
             }
             return Text.OptionalColorYuge(Colorfulness);
+        }
+
+        [VariableReplacer]
+        public static string optionalColorGigantic(DelegateContext Context)
+        {
+            string Text = string.Empty;
+            if (!Context.Parameters.IsNullOrEmpty())
+            {
+                if (Context.Parameters[0] != null)
+                    Text = Context.Parameters[0];
+            }
+            return Text.OptionalColorGigantic(Colorfulness);
         }
 
         public static bool RegisterGameLevelEventHandlers()

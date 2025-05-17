@@ -31,6 +31,24 @@ namespace XRL.World.Parts
 
             public string Value; // Value of the adjustment.
 
+            public Adjustment(Adjustment Source)
+            {
+                ID = Guid.NewGuid();
+                Target = new(Source.Target);
+                Field = new(Source.Field);
+                Priority = Source.Priority;
+                Value = new(Source.Value);
+            }
+
+            public Adjustment(string Target, string Field, int Priority, string Value)
+            {
+                ID = Guid.NewGuid();
+                this.Target = Target;
+                this.Field = Field;
+                this.Priority = Priority;
+                this.Value = Value;
+            }
+
             public override readonly string ToString()
             {
                 string output = string.Empty;
@@ -47,6 +65,12 @@ namespace XRL.World.Parts
                 if (ShowID)
                     output += $"[{(ID != null ? ID : "No ID")}]";
                 output += ToString();
+                return output;
+            }
+
+            public readonly Adjustment Copy(Adjustment Source)
+            {
+                Adjustment output = new(Source);
                 return output;
             }
 
@@ -69,6 +93,7 @@ namespace XRL.World.Parts
             }
         }
 
+        [NonSerialized]
         public List<Adjustment> Adjustments;
 
         public string BodyPartType;
@@ -198,14 +223,36 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
+
+            Adjustments ??= new();
+            Writer.Write(Adjustments.Count);
+            if (!Adjustments.IsNullOrEmpty())
+            {
+                foreach (Adjustment Adjustment in Adjustments)
+                {
+                    Adjustment.Write(Writer);
+                }
+            }
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+
+            Adjustments = new();
+            int adjustmentsCount = Reader.ReadInt32();
+            for (int i = 0; i < adjustmentsCount; i++)
+            {
+                Adjustments.Add((Adjustment)Reader.ReadObject());
+            }
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalEquipmentBase naturalEquipmentMod = base.DeepCopy(Parent, MapInv) as ModNaturalEquipmentBase;
+            naturalEquipmentMod.Adjustments = new();
+            foreach (Adjustment adjustment in Adjustments)
+            {
+                naturalEquipmentMod.Adjustments.Add(new(adjustment));
+            }
             return ClearForCopy(naturalEquipmentMod);
         }
         public static ModNaturalEquipmentBase ClearForCopy(ModNaturalEquipmentBase NaturalEquipmentMod)

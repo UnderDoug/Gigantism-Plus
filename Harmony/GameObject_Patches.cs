@@ -14,8 +14,10 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch(typeof(GameObject))]
     public static class GameObject_Patches
     {
+        [HarmonyPatch(
+            declaringType: typeof(GameObject), 
+            methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness))]
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(GameObject), nameof(GameObject.CheckDefaultBehaviorGiganticness))]
         public static bool CheckDefaultBehaviorGiganticness_ForceEquipped_BlockHideAdjective_Prefix(ref GameObject __instance, GameObject Equipper)
         {
             GameObject @this = __instance;
@@ -28,8 +30,10 @@ namespace HNPS_GigantismPlus.Harmony
             return false;
         }
 
+        [HarmonyPatch(
+            declaringType: typeof(GameObject), 
+            methodName: nameof(GameObject.FinalizeCopy))]
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(GameObject), nameof(GameObject.FinalizeCopy))]
         public static void FinalizeCopy_ReequipImprovedMutationMod_Postfix(GameObject __instance)
         {
             GameObject Object = __instance;
@@ -94,7 +98,7 @@ namespace HNPS_GigantismPlus.Harmony
                     }
                     if (doEquippedEvent)
                     {
-                        // EquippedEvent.Send(Object, equipment, part);
+                        EquippedEvent.Send(Object, equipment, part);
                         EffectAppliedEvent.Send(equipment, null, null, Object);
                         Debug.CheckYeh(4, $"{nameof(EquippedEvent)}", "Sent", Indent: 4);
                     }
@@ -110,9 +114,16 @@ namespace HNPS_GigantismPlus.Harmony
             }
             Debug.Divider(4, HONLY, Count: 25, Indent: 2);
             Debug.Entry(4, $"x foreach (BodyPart part in Object.Actor.LoopParts()) >//", Indent: 1);
+
             Debug.Entry(4, $"Updating Body Parts: Object.Body.UpdateBodyParts()", Indent: 1);
             Object.Body.UpdateBodyParts();
-            Debug.Entry(4, $"x {nameof(GameObject_Patches)}.{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}(GameObject __instance: {Object.DebugName}) #//", Indent: 0);
+
+            Debug.Entry(4, 
+                $"x {nameof(GameObject_Patches)}." 
+                + $"{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}" 
+                + $"(GameObject __instance: {Object.DebugName}) #//", 
+                Indent: 0);
+
             Debug.Divider(4, HONLY, Count: 40, Indent: 0);
         }
     }

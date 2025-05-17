@@ -71,9 +71,9 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject), typeof(double) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPrefix]
-        static void GetFor_GigantismPlus_Prefix(ref GameObject __state, ref GameObject __instance)
+        static void GetFor_GigantismPlus_Prefix(ref GameObject __state, GameObject Object)
         {
-            __state = __instance;
+            __state = Object;
             
             if (__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
             {
@@ -83,7 +83,7 @@ namespace HNPS_GigantismPlus.Harmony
                 $"# {nameof(GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches)}."
                 + $"{nameof(GetFor_GigantismPlus_Prefix)}" 
                 + $"(ref {nameof(GameObject)} {nameof(__state)},"
-                + $" ref {nameof(GameObject)} {nameof(__instance)})",
+                + $" {nameof(GameObject)} {nameof(Object)})",
                 Indent: 0, Toggle: Options.doDebug);
 
                 __state.IsGiganticCreature = false; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
@@ -129,7 +129,7 @@ namespace HNPS_GigantismPlus.Harmony
             declaringType: typeof(Body),
             methodName: nameof(Body.RegenerateDefaultEquipment))]
         [HarmonyPrefix]
-        static void RegenerateDefaultEquipment_Prefix(ref GameObject __state, Body __instance)
+        public static bool RegenerateDefaultEquipment_Prefix(ref GameObject __state, ref Body __instance)
         {
             __state = __instance.ParentObject;
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
@@ -146,13 +146,14 @@ namespace HNPS_GigantismPlus.Harmony
 
                 Debug.Entry(2, $"Trying to generate gigantic natural equipment while PseudoGigantic", Indent: 1);
             }
+            return true;
         }
 
         [HarmonyPatch(
             declaringType: typeof(Body),
             methodName: nameof(Body.RegenerateDefaultEquipment))]
         [HarmonyPostfix]
-        static void RegenerateDefaultEquipmentPostfix(ref GameObject __state)
+        public static void RegenerateDefaultEquipmentPostfix(ref GameObject __state)
         {
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
             if (IsPretendBig && __state.IsGiganticCreature)

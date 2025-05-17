@@ -50,6 +50,8 @@ namespace XRL.World.Parts
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
         
         public DieRoll DamageDie;
+
+        [NonSerialized]
         public (int Count, int Size, int Bonus) AccumulatedDamageDie;
         public int AccumulatedHitBonus;
         public int AccumulatedPenBonus;
@@ -613,6 +615,10 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
+            Writer.Write(AccumulatedDamageDie.Count);
+            Writer.Write(AccumulatedDamageDie.Size);
+            Writer.Write(AccumulatedDamageDie.Bonus);
+
             ShortDescriptions ??= new();
             Writer.Write(ShortDescriptions.Count);
             if (!ShortDescriptions.IsNullOrEmpty())
@@ -638,6 +644,11 @@ namespace XRL.World.Parts
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+
+            AccumulatedDamageDie.Count = Reader.ReadInt32();
+            AccumulatedDamageDie.Size = Reader.ReadInt32();
+            AccumulatedDamageDie.Bonus = Reader.ReadInt32();
+
             ShortDescriptions = new();
             int shortDescriptionsCount = Reader.ReadInt32();
             for (int i = 0; i < shortDescriptionsCount; i++)

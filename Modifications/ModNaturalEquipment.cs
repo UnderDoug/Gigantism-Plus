@@ -54,21 +54,10 @@ namespace XRL.World.Parts
 
         public override Guid AddAdjustment(string Target, string Field, string Value, int Priority)
         {
-            Guid guid = Guid.NewGuid();
-            Adjustment adjustment = default;
-
-            adjustment.ID = guid;
-            adjustment.Target = Target;
-            adjustment.Field = Field;
-            adjustment.Value = Value;
-            adjustment.Priority = Priority;
-
-            Adjustment item = adjustment;
-
-            Adjustments ??= new List<Adjustment>(1);
-
-            Adjustments.Add(item);
-            return guid;
+            Adjustment adjustment = new(Target, Field, Priority, Value);
+            Adjustments ??= new();
+            Adjustments.Add(adjustment);
+            return adjustment.ID;
         }
         public override Guid AddAdjustment(string Target, string Field, string Value, bool FlipPriority = false)
         {

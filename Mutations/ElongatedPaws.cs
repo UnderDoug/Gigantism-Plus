@@ -225,6 +225,6 @@ namespace XRL.World.Parts.Mutation
             return elongatedPaws;
         }
 
-    } //!-- public class ElongatedPaws : BaseDefaultEquipmentMutation
+    } //!-- public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
 
-} //!-- namespace XRL.World.Parts.Mutation
+}

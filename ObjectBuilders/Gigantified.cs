@@ -29,28 +29,48 @@ namespace XRL.World.ObjectBuilders
         }
         public Gigantified(string NamePrefix) 
         {
+            Initialize();
             this.NamePrefix = NamePrefix;
         }
 
         public override void Initialize()
         {
-            NamePrefix = "gigantic".MaybeColor("gigantic");
+            NamePrefix = GetNamePrefix();
         }
 
         public static string GetNamePrefix()
         {
-            Gigantified gigantified = new();
-            gigantified.Initialize();
-            return gigantified.NamePrefix;
+            return "gigantic".MaybeColor("gigantic");
         }
 
         public override void Apply(GameObject Object, string Context = "")
         {
-            int Level = ExplodingDie(1, "1d3", Step: 2, Limit: 16, Indent: 2);
-            int Stews = ExplodingDie(0, "1d2", Step: 1, Indent: 2);
-            int ObjectTier = (int)Math.Floor(Object.GetBlueprint().Stat("Level") / 5.0);
-            int Tier = ExplodingDie(ObjectTier, "1d3", Step: 1, Limit: 8, Indent: 2);
+            int Level = GetLevel();
+            int Stews = GetStews();
+            int ObjectTier = GetObjectTier(Object);
+            int Tier = GetTier(ObjectTier);
             Gigantify(Object, Level, Stews, Tier, NamePrefix, Context);
+        }
+
+        public static int GetLevel(int StartsAt = 1, string DieString = "1d3", int Step = 2, int Limit = 16, int Indent = 2)
+        {
+            return ExplodingDie(StartsAt, DieString, Step, Limit, Indent);
+        }
+        public static int GetStews(int StartsAt = 0, string DieString = "1d2", int Step = 1, int Limit = 0, int Indent = 2)
+        {
+            return ExplodingDie(StartsAt, DieString, Step, Limit, Indent);
+        }
+        public static int GetObjectTier(GameObject Object)
+        {
+            if (Object == null || Object.GetBlueprint() == null)
+            {
+                return 0;
+            }
+            return (int)Math.Floor(Object.GetBlueprint().Stat("Level") / 5.0);
+        }
+        public static int GetTier(int StartsAt = 0, string DieString = "1d3", int Step = 1, int Indent = 2)
+        {
+            return ExplodingDie(StartsAt, DieString, Step, 8, Indent);
         }
 
         public static bool GigantifyMutant(GameObject Creature, int Level = 1, int? Stews = null, string NamePrefix = "", string Context = "")
@@ -72,7 +92,7 @@ namespace XRL.World.ObjectBuilders
             gigantismPlus.BaseLevel = level;
             if (rapidAdvances > 0)
             {
-                gigantismPlus.SetRapidLevelAmount(rapidAdvances.RapidAdvancementCeiling(1), Sync: true);
+                gigantismPlus.SetRapidLevelAmount(rapidAdvances.RapidAdvancementCeiling(MinAdvances: 1), Sync: true);
             }
 
             int startingStews = Stews ?? Stat.Roll("2d2");
@@ -100,7 +120,7 @@ namespace XRL.World.ObjectBuilders
                 int exoframeTier = blueprint.Tier;
                 if (exoframeBlueprint == "THEGIGANTICEXOFRAME")
                 {
-                    if (!1.ChanceIn(100000))
+                    if (!1.ChanceIn(100000) && Context != "GODKING")
                     {
                         continue;
                     }
@@ -125,58 +145,73 @@ namespace XRL.World.ObjectBuilders
                     exoframe = exoframeBlueprint;
             }
 
-            string addImplant = exoframe + "@body";
-            Creature.RequirePart<CyberneticsHasImplants>();
-            CyberneticsHasImplants hasImplants = Creature.GetPart<CyberneticsHasImplants>();
+            GameObject exoframeObject = GameObjectFactory.Factory.CreateObject(exoframe);
+            CyberneticsGiganticExoframe exoframeCybernetic = exoframeObject.GetPart<CyberneticsGiganticExoframe>();
+            exoframeCybernetic.MapAugmentAdjustments();
 
-            if (hasImplants.Implants.IsNullOrEmpty())
+            NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
+
+            bool success = false;
+            if (Context == "Initialization" || Context == "GameStarted" || Context == "Wish" || Context == "Creation" || Context == "Sample")
             {
-                hasImplants.Implants = addImplant;
-            }
-            else if (hasImplants.Implants.Contains(","))
-            {
-                List<string> implants = new(hasImplants.Implants.Split(","));
-                bool found = false;
-                for (int i = 0; i < implants.Count(); i++)
+                string addImplant = exoframe + "@body";
+                Creature.RequirePart<CyberneticsHasImplants>();
+                CyberneticsHasImplants hasImplants = Creature.GetPart<CyberneticsHasImplants>();
+
+                if (hasImplants.Implants.IsNullOrEmpty())
                 {
-                    if (implants[i].Contains("@body"))
+                    hasImplants.Implants = addImplant;
+                }
+                else if (hasImplants.Implants.Contains(","))
+                {
+                    List<string> implants = new(hasImplants.Implants.Split(","));
+                    bool found = false;
+                    for (int i = 0; i < implants.Count(); i++)
                     {
-                        found = true;
-                        implants[i] = addImplant;
+                        if (implants[i].Contains("@body"))
+                        {
+                            found = true;
+                            implants[i] = addImplant;
+                        }
                     }
+                    if (!found)
+                    {
+                        implants.Add(addImplant);
+                    }
+                    hasImplants.Implants = implants.Join(",");
                 }
-                if (!found)
+                else
                 {
-                    implants.Add(addImplant);
+                    hasImplants.Implants = $"{addImplant},{hasImplants.Implants}";
                 }
-                hasImplants.Implants = implants.Join(",");
+                exoframeObject.Obliterate();
+                success = hasImplants.Implants.Contains(addImplant);
             }
             else
             {
-                hasImplants.Implants = $"{addImplant},{hasImplants.Implants}";
+                Creature.Body.GetBody().Implant(exoframeObject, Silent: true);
+                success = Creature.Body.HasInstalledCybernetics(exoframe);
             }
 
-            GameObject exoframeObject = GameObjectFactory.Factory.CreateSampleObject(exoframe);
-            CyberneticsGiganticExoframe exoframeCybernetic = exoframeObject.GetPart<CyberneticsGiganticExoframe>();
-            exoframeCybernetic.MapAugmentAdjustments();
-            NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
-            exoframeObject.Obliterate();
-
-            Render render = Creature.Render;
-            string tileColor = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor; ;
-            render.ColorString = "&" + exoframeCybernetic.AugmentTileDetailColor;
-            render.TileColor = "&" + exoframeCybernetic.AugmentTileDetailColor;
-            if (render.DetailColor == exoframeCybernetic.AugmentTileDetailColor)
+            if (success)
             {
-                render.DetailColor = ColorUtility.FindLastForeground(tileColor)?.ToString() ?? Crayons.GetRandomColor();
-            }
+                Render render = Creature.Render;
+                string tileColor = render.TileColor.IsNullOrEmpty() ? render.ColorString : render.TileColor; ;
+                render.ColorString = "&" + exoframeCybernetic.AugmentTileDetailColor;
+                render.TileColor = "&" + exoframeCybernetic.AugmentTileDetailColor;
 
-            if (!NamePrefix.IsNullOrEmpty())
-            {
-                Creature.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
-            }
+                if (render.DetailColor == exoframeCybernetic.AugmentTileDetailColor)
+                {
+                    render.DetailColor = ColorUtility.FindLastForeground(tileColor)?.ToString() ?? Crayons.GetRandomColor();
+                }
 
-            return hasImplants.Implants.Contains(addImplant);
+                if (!NamePrefix.IsNullOrEmpty())
+                {
+                    Creature.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
+                }
+            }
+            
+            return success;
         }
 
         public static bool Gigantify(GameObject Creature, int Level = 1, int Stews = 0, int Tier = 1, string NamePrefix = "", string Context = "")
@@ -194,6 +229,10 @@ namespace XRL.World.ObjectBuilders
                 $"{nameof(Gigantify)}(Object: {Creature.DebugName}, Level: {Level}, Tier: {Tier})");
 
             return gigantified;
+        }
+        public bool Gigantify(GameObject Creature, int Level = 1, int Stews = 0, int Tier = 1, string Context = "")
+        {
+            return Gigantify(Creature, Level, Stews, Tier, NamePrefix, Context);
         }
 
         [WishCommand("gigantic", null)]

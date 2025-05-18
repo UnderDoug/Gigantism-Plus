@@ -1337,6 +1337,7 @@ namespace XRL.World.Parts.Mutation
             base.Write(Basis, Writer);
             Writer.Write(HunchOverActivatedAbilityID);
             Writer.Write(GroundPoundActivatedAbilityID);
+            Writer.Write(CloseFistActivatedAbilityID);
         }
 
         public override void Read(GameObject Basis, SerializationReader Reader)
@@ -1344,6 +1345,7 @@ namespace XRL.World.Parts.Mutation
             base.Read(Basis, Reader);
             HunchOverActivatedAbilityID = Reader.ReadGuid();
             GroundPoundActivatedAbilityID = Reader.ReadGuid();
+            CloseFistActivatedAbilityID = Reader.ReadGuid();
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

@@ -156,16 +156,34 @@ namespace HNPS_GigantismPlus
                 $"SignedInt must be capable of conversion to int.");
         }
 
-        public static StringBuilder AppendGigantic(this StringBuilder sb, string value)
+        public static StringBuilder AppendGigantic(this StringBuilder SB, string String)
         {
-            sb.AppendColored("gigantic", value);
-            return sb;
+            SB.AppendColored("gigantic", String);
+            return SB;
         }
-        public static StringBuilder AppendRule(this StringBuilder sb, string value)
+        public static StringBuilder AppendRule(this StringBuilder SB, string String)
         {
             // different from AppendRules (plural) since this doesn't force a new-line.
-            sb.AppendColored("rules", value);
-            return sb;
+            SB.AppendColored("rules", String);
+            return SB;
+        }
+        public static StringBuilder AppendPens(this StringBuilder SB, string String = "")
+        {
+            SB.AppendColored("c", "\u001a");
+            if (!String.IsNullOrEmpty())
+            {
+                SB.Append(String);
+            }
+            return SB;
+        }
+        public static StringBuilder AppendDamage(this StringBuilder SB, string String = "")
+        {
+            SB.AppendColored("r", "\u0003");
+            if (!String.IsNullOrEmpty())
+            {
+                SB.Append(String);
+            }
+            return SB;
         }
 
         public static string MaybeColor(this string Text, string Color, bool Pretty = true)

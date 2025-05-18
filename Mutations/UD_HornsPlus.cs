@@ -1,16 +1,14 @@
+using HNPS_GigantismPlus;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-
-using XRL.World.Anatomy;
+using System.Text;
 using XRL.Language;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
+using XRL.World.Anatomy;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-
+using static HNPS_GigantismPlus.Utils;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts.Mutation
@@ -119,18 +117,23 @@ namespace XRL.World.Parts.Mutation
             Body body = ParentObject.Body;
             if (body != null && !Variant.IsNullOrEmpty())
             {
-                string targetBodyPart = GameObjectFactory.Factory.GetBlueprint(Variant).GetPartParameter("MeleeWeapon", "Slot", "Head");
-                BodyPart bodyPart = HornsObject?.DefaultOrEquippedPart() ?? body.GetFirstPart(targetBodyPart);
+                string bodyPartType = GameObjectFactory.Factory.GetBlueprint(Variant).GetPartParameter("MeleeWeapon", "Slot", "Head");
+
+                BodyPart bodyPart = RequireRegisteredSlot(body, bodyPartType);
 
                 if (bodyPart != null || HornsObject?.Blueprint != Variant)
                 {
-                    if (HornsObject != null && (!HornsObject.IsValid() || HornsObject.Blueprint != Variant))
+                    if (!GameObject.Validate(ref HornsObject) && HornsObject.Blueprint != Variant)
                     {
                         GameObject.Release(ref HornsObject);
                     }
 
                     HornsObject ??= GenerateHornsObject(Variant, bodyPart, Level);
 
+                    if (bodyPart.ForceUnequip(Silent: true) && !ParentObject.ForceEquipObject(HornsObject, bodyPart, Silent: true, 0))
+                    {
+                        MetricsManager.LogError("HooksForFeet force equip on " + (bodyPart?.Name ?? "NULL") + " failed");
+                    }
                     ParentObject.ForceEquipObject(HornsObject, bodyPart, Silent: true, 0);
 
                     DisplayName = GetVariantName() ?? DisplayName;
@@ -149,9 +152,9 @@ namespace XRL.World.Parts.Mutation
             hornsWeapon.Slot = BodyPart.Type;
             hornsWeapon.MaxStrengthBonus = MeleeWeapon.BONUS_CAP_UNLIMITED;
             hornsWeapon.BaseDamage = GetBaseDamage(Level);
-            Armor HornsArmor = hornsObject.GetPart<Armor>();
-            HornsArmor.WornOn = BodyPart.Type;
-            HornsArmor.AV = GetAV(Level);
+            Armor hornsArmor = hornsObject.GetPart<Armor>();
+            hornsArmor.WornOn = BodyPart.Type;
+            hornsArmor.AV = GetAV(Level);
 
             return hornsObject;
         }
@@ -218,6 +221,6 @@ namespace XRL.World.Parts.Mutation
             return hornsPlus;
         }
 
-    } //!-- public class HornsPlus : BaseDefaultEquipmentMutation
+    } //!-- public class UD_HornsPlus : BaseDefaultEquipmentMutation
 
 }

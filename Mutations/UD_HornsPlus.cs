@@ -1,14 +1,17 @@
-using HNPS_GigantismPlus;
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using XRL.Language;
+using XRL.Rules;
 using XRL.World.Anatomy;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
+
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts.Mutation
@@ -96,7 +99,9 @@ namespace XRL.World.Parts.Mutation
 
         public static string GetBaseDamage(int Level)
         {
-            return "2d" + (3 + Level / 3);
+            int dieSize = 3 + ((Level - 1) / 3);
+            DieRoll baseDamageDie = new(Type: 1, Left: 2, Right: dieSize);
+            return baseDamageDie.ToString();
         }
         public string GetBaseDamage()
         {
@@ -112,31 +117,40 @@ namespace XRL.World.Parts.Mutation
             }
         }
 
-        public void RegrowHorns()
+        public void RegrowHorns(Body body = null)
         {
-            Body body = ParentObject.Body;
+            body ??= ParentObject?.Body;
+            if (Variant.IsNullOrEmpty())
+            {
+                Variant = "Horns";
+                SetVariant(Variant);
+            }
             if (body != null && !Variant.IsNullOrEmpty())
             {
                 string bodyPartType = GameObjectFactory.Factory.GetBlueprint(Variant).GetPartParameter("MeleeWeapon", "Slot", "Head");
 
                 BodyPart bodyPart = RequireRegisteredSlot(body, bodyPartType);
 
-                if (bodyPart != null || HornsObject?.Blueprint != Variant)
+                if (bodyPart != null)
                 {
-                    if (!GameObject.Validate(ref HornsObject) && HornsObject.Blueprint != Variant)
+                    if (GameObject.Validate(ref HornsObject))
                     {
                         GameObject.Release(ref HornsObject);
                     }
 
-                    HornsObject ??= GenerateHornsObject(Variant, bodyPart, Level);
+                    HornsObject = GenerateHornsObject(Variant, bodyPart, Level);
 
                     if (bodyPart.ForceUnequip(Silent: true) && !ParentObject.ForceEquipObject(HornsObject, bodyPart, Silent: true, 0))
                     {
-                        MetricsManager.LogError("HooksForFeet force equip on " + (bodyPart?.Name ?? "NULL") + " failed");
+                        MetricsManager.LogError("Horns force equip on " + (bodyPart?.Name ?? "NULL") + " failed");
                     }
                     ParentObject.ForceEquipObject(HornsObject, bodyPart, Silent: true, 0);
 
                     DisplayName = GetVariantName() ?? DisplayName;
+                    if (HornsObject.IsPlural)
+                    {
+                        DisplayName = Grammar.Pluralize(DisplayName);
+                    }
                 }
             }
         }
@@ -171,6 +185,10 @@ namespace XRL.World.Parts.Mutation
                 Variant = GetVariants().GetRandomElement();
                 DisplayName = GetVariantName() ?? DisplayName;
             }
+            if (GO != null && GO.Body != null)
+            {
+                RegrowHorns(GO.Body);
+            }
             return base.Mutate(GO, Level);
         }
 
@@ -182,7 +200,7 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            RegrowHorns();
+            RegrowHorns(body);
             base.OnRegenerateDefaultEquipment(body);
         }
 

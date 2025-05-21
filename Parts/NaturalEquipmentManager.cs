@@ -360,7 +360,7 @@ namespace XRL.World.Parts
                     DamageDie = new(originalWeapon.BaseDamage);
                     DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
 
-                    if (!int.TryParse(DamageDie.ToString(), out int damageDieValue))
+                    if (DamageDie.FindType(TargetType: 1) != null && !int.TryParse(DamageDie.ToString(), out int damageDieValue))
                     {
                         if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
                         {
@@ -376,10 +376,32 @@ namespace XRL.World.Parts
                                     .Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
                             }
                         }
-                        AccumulatedDamageDie.Count = DamageDie.GetDieCount()
-                            .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
-                        AccumulatedDamageDie.Size = (DamageDie.LeftValue > 0 ? DamageDie.RightValue : DamageDie.Left.RightValue)
-                            .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2, Toggle: doDebug);
+
+                        DieRoll DamageDieTypeDie = DamageDie.FindType(TargetType: 1);
+
+                        if (DamageDieTypeDie != null)
+                        {
+                            AccumulatedDamageDie.Count = DamageDieTypeDie.GetDieCount()
+                                .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
+                            if (AccumulatedDamageDie.Count < 1)
+                            {
+                                AccumulatedDamageDie.Count = 1
+                                    .Vomit(4, "AccumulatedDamageDie.Count (default)", Indent: 3, Toggle: doDebug);
+                            }
+
+                            AccumulatedDamageDie.Size = DamageDieTypeDie.RightValue
+                                .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2, Toggle: doDebug);
+                            if (AccumulatedDamageDie.Size < 2)
+                            {
+                                AccumulatedDamageDie.Size = 2
+                                    .Vomit(4, "AccumulatedDamageDie.Size (default)", Indent: 3, Toggle: doDebug);
+                            }
+                        }
+                        else
+                        {
+                            AccumulatedDamageDie.Count.Vomit(4, "AccumulatedDamageDie.Count (base)", Indent: 2, Toggle: doDebug);
+                            AccumulatedDamageDie.Size.Vomit(4, "AccumulatedDamageDie.Size (base)", Indent: 2, Toggle: doDebug);
+                        }
 
                         bool dieBonusIsPenalty = DamageDie.FindTypeWithConstantRight(5) != null;
                         int dieBonus = (DamageDie.LeftValue > 0 ? 0 : DamageDie.RightValue);

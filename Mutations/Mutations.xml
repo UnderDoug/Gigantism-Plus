@@ -16,6 +16,7 @@
     <!-- "Fixed" vanilla mutations -->
     <category Name="Physical">
       <mutation Name="Horns" Class="UD_HornsPlus" />
+      <mutation Name="Quills" Class="UD_QuillsPlus" />
     </category>
   
 </mutations>

@@ -153,6 +153,42 @@ namespace XRL.World.Parts.Mutation
             return GetQuillPenetration(Level);
         }
 
+        public static string GetQuillBaseDamage(int Level)
+        {
+            return "1d3";
+        }
+        public string GetQuillBaseDamage()
+        {
+            return GetQuillBaseDamage(Level);
+        }
+
+        public static string GetBrokenQuillsDie(int Level)
+        {
+            return "1d4";
+        }
+        public string GetBrokenQuillsDie()
+        {
+            return GetBrokenQuillsDie(Level);
+        }
+
+        public int BreakQuills(int Level)
+        {
+            int brokenQuills = Stat.RollCached(GetBrokenQuillsDie(Level));
+            if (brokenQuills > nQuills)
+            {
+                brokenQuills = nQuills;
+            }
+            if (brokenQuills > 0)
+            {
+                nQuills -= brokenQuills;
+            }
+            return brokenQuills;
+        }
+        public int BreakQuills()
+        {
+            return BreakQuills(Level);
+        }
+
         public override void SetVariant(string Variant)
         {
             base.SetVariant(Variant);
@@ -174,6 +210,7 @@ namespace XRL.World.Parts.Mutation
             string quill = ObjectNameSingular;
             string quills = ObjectName;
             string quillPenetration = GetQuillPenetration(Level).ToString();
+            string quillDamage = GetQuillBaseDamage();
             int aVPenalty = GetAVPenalty(Level);
             int aV = GetAV(Level);
             float regenRate = GetRegenRate(Level);
@@ -191,7 +228,7 @@ namespace XRL.World.Parts.Mutation
             SB.Append(" ").Append(quills);
             SB.AppendLine();
             SB.Append("May expel 10% of your ").Append(quills).Append(" in a burst around yourself (");
-            SB.AppendPens().AppendRule(quillPenetration).Append(" ").AppendDamage().AppendDamage().Append("1d3)");
+            SB.AppendPens().AppendRule(quillPenetration).Append(" ").AppendDamage().Append(quillDamage).Append(")");
             SB.AppendLine();
             SB.Append("Regenerate ").Append(quills).Append(" at the approximate rate of ").AppendRule(regenRate.ToString()).Append(" per round");
             SB.AppendLine();
@@ -210,7 +247,6 @@ namespace XRL.World.Parts.Mutation
 
         public virtual Guid AddActivatedAbilityQuillFling(GameObject GO, bool Force = false, bool Silent = false)
         {
-            bool removed = RemoveActivatedAbilityQuillFling(GO);
             if (GO != null && QuillFlingActivatedAbilityID == Guid.Empty || Force)
             {
                 QuillFlingActivatedAbilityID =
@@ -219,8 +255,8 @@ namespace XRL.World.Parts.Mutation
                         Command: COMMAND_NAME, 
                         Class: "Physical Mutations", 
                         Description: null, 
-                        Icon: "*"
-                        );
+                        Icon: "*",
+                        Silent: Silent);
             }
             return QuillFlingActivatedAbilityID;
         }
@@ -247,31 +283,39 @@ namespace XRL.World.Parts.Mutation
 
         public void RegrowQuills(Body Body = null)
         {
-            Body ??= ParentObject.Body;
+            Body ??= ParentObject?.Body;
+            if (Variant.IsNullOrEmpty())
+            {
+                Variant = "Quills";
+                SetVariant(Variant);
+            }
             if (Body != null && !Variant.IsNullOrEmpty())
             {
                 string bodyPartType = Body?.GetBody()?.Type ?? Blueprint.GetPartParameter("Armor", "WornOn", "Body");
 
                 BodyPart bodyPart = RequireRegisteredSlot(Body, bodyPartType);
 
-                if (bodyPart != null || QuillsObject?.Blueprint != Variant)
+                if (bodyPart != null)
                 {
-                    if (!GameObject.Validate(ref QuillsObject) && QuillsObject.Blueprint != Variant)
+                    if (GameObject.Validate(ref QuillsObject))
                     {
                         GameObject.Release(ref QuillsObject);
                     }
 
-                    QuillsObject ??= GenerateQuillsObject(Variant, bodyPart, Level);
+                    QuillsObject = GenerateQuillsObject(Variant, bodyPart, Level);
 
                     if (bodyPart.ForceUnequip(Silent: true) && !ParentObject.ForceEquipObject(QuillsObject, bodyPart, Silent: true, 0))
                     {
-                        MetricsManager.LogError($"HooksForFeet force equip on {bodyPart?.Name ?? NULL} failed");
+                        MetricsManager.LogError($"Quills force equip on {bodyPart?.Name ?? NULL} failed");
                     }
                     ParentObject.ForceEquipObject(QuillsObject, bodyPart, Silent: true, 0);
 
                     DisplayName = GetVariantName() ?? DisplayName;
 
-                    AddActivatedAbilityQuillFling(Force: true, Silent: QuillFlingActivatedAbilityID != Guid.Empty);
+                    bool haveQuillFling = QuillFlingActivatedAbilityID != Guid.Empty;
+                    bool levelNotMin = Level > 1;
+                    bool isSilent = haveQuillFling || levelNotMin;
+                    AddActivatedAbilityQuillFling(Force: true, Silent: isSilent);
                 }
             }
         }
@@ -309,6 +353,10 @@ namespace XRL.World.Parts.Mutation
                 Variant = GetVariants().GetRandomElement();
                 DisplayName = GetVariantName() ?? DisplayName;
             }
+            if (GO != null && GO.Body != null)
+            {
+                RegrowQuills(GO.Body);
+            }
             return base.Mutate(GO, Level);
         }
 
@@ -335,20 +383,40 @@ namespace XRL.World.Parts.Mutation
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<CommandEvent>.ID
                 || ID == SingletonEvent<BeforeAbilityManagerOpenEvent>.ID
                 || ID == SingletonEvent<BeginTakeActionEvent>.ID
+                || ID == BeforeApplyDamageEvent.ID
                 || ID == TookDamageEvent.ID
+                || ID == PooledEvent<CommandEvent>.ID
                 || ID == AIGetOffensiveAbilityListEvent.ID;
         }
-
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             DescribeMyActivatedAbility(QuillFlingActivatedAbilityID, CollectStats);
             return base.HandleEvent(E);
         }
-
-
+        public override bool HandleEvent(BeginTakeActionEvent E)
+        {
+            float levelF = Level;
+            float willpowerFactor = (ParentObject.Stat("Willpower") - 16f) * 0.05f;
+            float addWillpowerFactor = 1f - willpowerFactor;
+            if ((double)addWillpowerFactor <= 0.2)
+            {
+                addWillpowerFactor = 0.2f;
+            }
+            if (willpowerFactor < 1f)
+            {
+                levelF *= 1f / addWillpowerFactor;
+            }
+            QuillRegenerationCounter += levelF;
+            if (QuillRegenerationCounter >= 4f)
+            {
+                int quillsToRegenerate = (int)(QuillRegenerationCounter / 4f);
+                nQuills = Math.Min(nMaxQuills, nQuills + quillsToRegenerate);
+                QuillRegenerationCounter -= 4 * quillsToRegenerate;
+            }
+            return base.HandleEvent(E);
+        }
         public override bool HandleEvent(BeforeApplyDamageEvent E)
         {
             Damage damage = E.Damage;
@@ -358,10 +426,20 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(TookDamageEvent E)
         {
-            if (E.Actor != null && E.Actor != ParentObject && !ParentObject.OnWorldMap() && !E.Actor.HasPart<Quills>() && E.Damage.Amount > 0 && !E.Damage.HasAttribute("reflected") && E.Damage.HasAttribute("Unarmed"))
+            bool actorNotNull = E.Actor != null;
+
+            bool actorNotParent = actorNotNull && E.Actor != ParentObject;
+
+            bool actorHasQuills = actorNotNull && E.Actor.HasPart<Quills>();
+
+            bool damageIsRelevant =
+                E.Damage.Amount > 0
+             && !E.Damage.HasAttribute("reflected")
+             && E.Damage.HasAttribute("Unarmed");
+
+            if (actorNotParent && !ParentObject.OnWorldMap() && !actorHasQuills && damageIsRelevant)
             {
                 int quillsBroken = (int)(nQuills * 0.01) + Stat.Random(1, 2) - 1;
                 nQuills -= quillsBroken;
@@ -374,41 +452,23 @@ namespace XRL.World.Parts.Mutation
                     }
                     if (quillsDamage > 0)
                     {
-                        if (ParentObject.IsPlayer())
+                        GameObject Defender = ParentObject;
+                        GameObject Attacker = E.Actor;
+
+                        string actorImapled = Attacker.Does("impale");
+                        string itself = Attacker.itself;
+                        string defendersQuills = Defender.poss(QuillsObject);
+                        string took = Attacker.GetVerb("take");
+                        string message = $"{actorImapled} {itself} on {defendersQuills} and {took} {quillsDamage} damage!";
+
+                        AddPlayerMessage(message, 'G');
+
+                        Event @event = new("TakeDamage");
+                        Damage damage = new(quillsDamage)
                         {
-                            GameObject Defender = null;
-                            GameObject Attacker = null;
+                            Attributes = new List<string>(E.Damage.Attributes)
+                        };
 
-                            string actorImapled = Attacker.Does("impale");
-                            string itself = Attacker.itself;
-                            string defendersQuills = Defender.poss(QuillsObject);
-                            string took = Attacker.GetVerb("take");
-                            string message = $"{actorImapled} {itself} on {defendersQuills} and {took} {quillsDamage} damage!";
-
-                            AddPlayerMessage(message, 'G');
-
-                        }
-                        else if (E.Actor != null)
-                        {
-                            if (E.Actor.IsPlayer())
-                            {
-                                AddPlayerMessage("You impale " + E.Actor.itself + " on " + ParentObject.poss(QuillsObject, Definite: true, null) + " and take " + quillsDamage + " damage!", 'R');
-                            }
-                            else if (Visible(E.Actor))
-                            {
-                                if (E.Actor.IsPlayerLed())
-                                {
-                                    AddPlayerMessage(E.Actor.Does("impale", int.MaxValue, null, null, null, AsIfKnown: false, Single: false, NoConfusion: false, NoColor: false, Stripped: false, WithoutTitles: true, Short: true, BaseOnly: false, WithIndefiniteArticle: false, null, IndicateHidden: false, Pronoun: false, SecondPerson: true, null) + " " + E.Actor.itself + " on " + ParentObject.poss(QuillsObject, Definite: true, null) + " and" + E.Actor.GetVerb("take") + " " + quillsDamage + " damage!", 'r');
-                                }
-                                else
-                                {
-                                    AddPlayerMessage(E.Actor.Does("impale", int.MaxValue, null, null, null, AsIfKnown: false, Single: false, NoConfusion: false, NoColor: false, Stripped: false, WithoutTitles: true, Short: true, BaseOnly: false, WithIndefiniteArticle: false, null, IndicateHidden: false, Pronoun: false, SecondPerson: true, null) + " " + E.Actor.itself + " on " + ParentObject.poss(QuillsObject, Definite: true, null) + " and" + E.Actor.GetVerb("take") + " " + quillsDamage + " damage!", 'g');
-                                }
-                            }
-                        }
-                        Event @event = new Event("TakeDamage");
-                        Damage damage = new Damage(quillsDamage);
-                        damage.Attributes = new List<string>(E.Damage.Attributes);
                         if (!damage.HasAttribute("reflected"))
                         {
                             damage.Attributes.Add("reflected");
@@ -424,34 +484,6 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-
-        public override bool HandleEvent(BeginTakeActionEvent E)
-        {
-            float num = base.Level;
-            float num2 = ((float)ParentObject.Stat("Willpower") - 16f) * 0.05f;
-            float num3 = 1f - num2;
-            if ((double)num3 <= 0.2)
-            {
-                num3 = 0.2f;
-            }
-            if (num2 < 1f)
-            {
-                num *= 1f / num3;
-            }
-            QuillRegenerationCounter += num;
-            if (QuillRegenerationCounter >= 4f)
-            {
-                int num4 = (int)(QuillRegenerationCounter / 4f);
-                nQuills += num4;
-                QuillRegenerationCounter -= 4 * num4;
-            }
-            if (nQuills > nMaxQuills)
-            {
-                nQuills = nMaxQuills;
-            }
-            return base.HandleEvent(E);
-        }
-
         public override bool HandleEvent(CommandEvent E)
         {
             if (E.Command == COMMAND_NAME)
@@ -465,23 +497,25 @@ namespace XRL.World.Parts.Mutation
                     return ParentObject.Fail("You cannot do that on the world map.");
                 }
                 string objectName = ObjectName;
-                if (nQuills < 80)
+                if (nQuills < MINIMUM_QUILLS_TO_FLING)
                 {
-                    return ParentObject.Fail($"You don't have enough {objectName}! You need at least {80} {objectName} to {AbilityName}.");
+                    return ParentObject.Fail($"You don't have enough {objectName}! You need at least {MINIMUM_QUILLS_TO_FLING} {objectName} to {AbilityName}.");
                 }
+
                 GameObject gameObject = null;
                 Engulfed effect = ParentObject.GetEffect((Engulfed sfx) => sfx.IsEngulfedByValid());
                 ParentObject.PlayWorldSound("Sounds/Abilities/sfx_ability_mutation_quills_expel");
+
+                int quills = (int)(nQuills * 0.1);
                 if (effect != null)
                 {
-                    int num = (int)(nQuills * 0.1);
-                    if (num <= 0)
+                    if (quills <= 0)
                     {
                         return false;
                     }
                     gameObject = effect.EngulfedBy;
-                    DidX("fling", ParentObject.its + " " + objectName, "!", null, null, ParentObject);
-                    QuillFling(gameObject.CurrentCell, num, UseQuills: true, Reactive: false, gameObject);
+                    DidX("fling", $"{ParentObject.its} {objectName}", "!", ColorAsGoodFor: ParentObject);
+                    QuillFling(gameObject.CurrentCell, quills, Target: gameObject);
                 }
                 else
                 {
@@ -490,26 +524,25 @@ namespace XRL.World.Parts.Mutation
                     {
                         return false;
                     }
-                    int num2 = (int)((double)nQuills * 0.1) / adjacentCells.Count;
-                    if (num2 <= 0)
+                    int quillsPerCell = quills / adjacentCells.Count;
+                    if (quillsPerCell <= 0)
                     {
                         return false;
                     }
-                    DidX("fling", ParentObject.its + " " + objectName + " everywhere", "!", null, null, ParentObject);
-                    foreach (Cell item in adjacentCells)
+                    DidX("fling", $"{ParentObject.its} {objectName} everywhere", "!", ColorAsGoodFor:ParentObject);
+                    foreach (Cell cell in adjacentCells)
                     {
-                        QuillFling(item, num2);
+                        QuillFling(cell, quillsPerCell);
                     }
                 }
                 UseEnergy(1000, "Physical Mutation Quills");
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(AIGetOffensiveAbilityListEvent E)
         {
             bool enoughQuills = 
-                nQuills >= 80 
+                nQuills >= MINIMUM_QUILLS_TO_FLING
              && nQuills > nMaxQuills * 0.65;
 
             bool closeEnough = 
@@ -580,7 +613,7 @@ namespace XRL.World.Parts.Mutation
                     nQuills = 0;
                 }
             }
-            bool flag = Cell.IsVisible();
+            bool canSee = Cell.IsVisible();
             if (Target == null)
             {
                 Target = Cell.GetCombatTarget(ParentObject, IgnoreFlight: true);
@@ -589,22 +622,22 @@ namespace XRL.World.Parts.Mutation
                     return;
                 }
             }
-            int num = 0;
+            int damageAmount = 0;
             TextConsole textConsole = Look._TextConsole;
             ScreenBuffer scrapBuffer = TextConsole.ScrapBuffer;
-            if (flag)
+            if (canSee)
             {
                 The.Core.RenderMapToBuffer(scrapBuffer);
             }
-            int num2 = Math.Min((base.Level - 1) / 2, 6);
+            int quillPenetrations = GetQuillPenetration();
             for (int i = 0; i < Quills; i++)
             {
-                int num3 = Stat.RollDamagePenetrations(Stats.GetCombatAV(Target), num2, num2);
-                if (num3 <= 0)
+                int penetrations = Stat.RollDamagePenetrations(Stats.GetCombatAV(Target), quillPenetrations, quillPenetrations);
+                if (penetrations <= 0)
                 {
                     continue;
                 }
-                if (flag)
+                if (canSee)
                 {
                     scrapBuffer.Goto(Cell.X, Cell.Y);
                     switch (Stat.Random(1, 4))
@@ -625,30 +658,22 @@ namespace XRL.World.Parts.Mutation
                     textConsole.DrawBuffer(scrapBuffer);
                     Thread.Sleep(10);
                 }
-                for (int j = 0; j < num3; j++)
+                for (int j = 0; j < penetrations; j++)
                 {
-                    num += Stat.Random(1, 3);
+                    damageAmount += Stat.RollCached(GetQuillBaseDamage());
                 }
             }
-            Target.TakeDamage(num, Accidental: Reactive, Attacker: ParentObject, Message: "from %t " + ObjectName + "!", Attributes: "Stabbing Quills");
+            Target.TakeDamage(damageAmount, Accidental: Reactive, Attacker: ParentObject, Message: $"from %t {ObjectName}!", Attributes: "Stabbing Quills");
         }
 
         public override bool FireEvent(Event E)
         {
             if (E.ID == "DefenderHit" && 5.in100())
             {
-                int num = Stat.Random(1, 4);
-                if (num > nQuills)
+                int brokenQuills = BreakQuills();
+                if (brokenQuills > 0 && ParentObject.IsPlayer())
                 {
-                    num = nQuills;
-                }
-                if (num > 0)
-                {
-                    if (ParentObject.IsPlayer())
-                    {
-                        IComponent<GameObject>.AddPlayerMessage("The attack breaks " + Grammar.Cardinal(num) + " " + ((num == 1) ? ObjectNameSingular : ObjectName) + "!");
-                    }
-                    nQuills -= num;
+                    AddPlayerMessage($"The attack breaks {Grammar.Cardinal(brokenQuills)} {brokenQuills.ThingsNoNum(ObjectNameSingular, ObjectName)}!");
                 }
             }
             return base.FireEvent(E);

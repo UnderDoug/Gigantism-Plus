@@ -22,6 +22,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using XRL.UI;
 using Microsoft.CodeAnalysis;
+using XRL.Language;
 
 namespace HNPS_GigantismPlus
 {
@@ -77,14 +78,15 @@ namespace HNPS_GigantismPlus
             {
                 return 0;
             }
+            if (DieRoll.Left != null)
+            {
+                return DieRoll.Left.GetDieCount();
+            }
             if (DieRoll.LeftValue > 0)
             {
                 return DieRoll.LeftValue;
             }
-            else
-            {
-                return DieRoll.Left.GetDieCount();
-            }
+            return 0;
         }
         public static int GetDieCount(this string DieRoll)
         {
@@ -937,7 +939,7 @@ namespace HNPS_GigantismPlus
             if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
             {
                 if (Object.HasPart<NaturalEquipmentManager>())
-                    return Object.Render.DisplayName;
+                    return Object.ShortDisplayNameSingleStripped;
 
                 if (Object.InheritsFrom("BaseCudgel"))
                     return "cudgel";
@@ -2204,6 +2206,27 @@ namespace HNPS_GigantismPlus
             }
 
             return output;
+        }
+
+        public static string ThingsNoNum(this int Number, string What, string WhatPlural = null)
+        {
+            if (Number == 1)
+                return What;
+            return WhatPlural ?? Grammar.Pluralize(What);
+        }
+
+        public static string ThingsNoNum(this float Number, string What, string WhatPlural = null)
+        {
+            if (Number == 1f)
+                return What;
+            return WhatPlural ?? Grammar.Pluralize(What);
+        }
+
+        public static string ThingsNoNum(this double Number, string What, string WhatPlural = null)
+        {
+            if (Number == 1.0)
+                return What;
+            return WhatPlural ?? Grammar.Pluralize(What);
         }
 
         public static bool HasDiggableVaultableObject(this Cell cell)

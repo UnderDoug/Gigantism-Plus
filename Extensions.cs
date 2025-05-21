@@ -939,7 +939,7 @@ namespace HNPS_GigantismPlus
             if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
             {
                 if (Object.HasPart<NaturalEquipmentManager>())
-                    return Object.ShortDisplayNameSingleStripped;
+                    return Object.Render.DisplayName;
 
                 if (Object.InheritsFrom("BaseCudgel"))
                     return "cudgel";

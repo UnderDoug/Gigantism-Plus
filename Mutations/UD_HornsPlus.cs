@@ -147,10 +147,6 @@ namespace XRL.World.Parts.Mutation
                     ParentObject.ForceEquipObject(HornsObject, bodyPart, Silent: true, 0);
 
                     DisplayName = GetVariantName() ?? DisplayName;
-                    if (HornsObject.IsPlural)
-                    {
-                        DisplayName = Grammar.Pluralize(DisplayName);
-                    }
                 }
             }
         }

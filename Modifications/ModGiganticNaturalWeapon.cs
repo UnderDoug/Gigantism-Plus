@@ -118,7 +118,7 @@ namespace XRL.World.Parts
             beforeEvent.Send();
             DescribeModGiganticEvent afterEvent = new(ParentObject, null, beforeEvent);
 
-            return afterEvent.Send().Process();
+            return afterEvent.Send().Process(PluralizeObject: false);
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

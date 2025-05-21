@@ -163,7 +163,7 @@ namespace HNPS_GigantismPlus
             return Output;
         }
 
-        public string Process()
+        public string Process(bool PluralizeObject = true)
         {
             List<List<string>> weaponDescriptions = new();
             List<List<string>> generalDescriptions = new();
@@ -196,7 +196,7 @@ namespace HNPS_GigantismPlus
             ObjectNoun ??= objectNoun;
 
             StringBuilder SB = Event.NewStringBuilder();
-            ObjectNoun = $"{(Object.IsPlural ? Grammar.Pluralize(ObjectNoun) : ObjectNoun)} ";
+            ObjectNoun = $"{(Object.IsPlural && PluralizeObject ? Grammar.Pluralize(ObjectNoun) : ObjectNoun)} ";
             string DemonstrativePronoun = $"{Grammar.MakeTitleCase(Object.NearDemonstrative())} ";
             SB.Append("Gigantic".OptionalColorGigantic(Colorfulness)).Append(": ")
                 .Append(DemonstrativePronoun).Append(ObjectNoun);

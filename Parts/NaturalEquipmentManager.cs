@@ -359,8 +359,8 @@ namespace XRL.World.Parts
                     MeleeWeapon originalWeapon = originalNaturalEquipment.GetPart<MeleeWeapon>();
                     DamageDie = new(originalWeapon.BaseDamage);
                     DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
-
-                    if (DamageDie.FindType(TargetType: 1) != null && !int.TryParse(DamageDie.ToString(), out int damageDieValue))
+                    int damageDieValue = 0;
+                    if (DamageDie.FindType(TargetType: 1) != null || !int.TryParse(DamageDie.ToString(), out damageDieValue))
                     {
                         if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
                         {

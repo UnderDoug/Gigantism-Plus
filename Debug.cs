@@ -22,6 +22,7 @@ using static HNPS_GigantismPlus.Const;
 
 using Debug = HNPS_GigantismPlus.Debug;
 using Options = HNPS_GigantismPlus.Options;
+using XRL.Rules;
 
 namespace HNPS_GigantismPlus
 {
@@ -361,6 +362,14 @@ namespace HNPS_GigantismPlus
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
+        public static DieRoll Vomit(this DieRoll DieRoll, int Verbosity, string Label = "", bool LoopItem = false, bool? Good = null, int Indent = 0, bool Toggle = true)
+        {
+            string dieRoll = $"{DieRoll} ({DieRoll.Min()}, {DieRoll.Average()}, {DieRoll.Max()})";
+            string Output = Label != "" ? $"{Label}: {dieRoll}" : dieRoll;
+            if (LoopItem) Debug.LoopItem(Verbosity, Output, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
+            return DieRoll;
+        }
         public static List<MutationEntry> Vomit(this List<MutationEntry> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
@@ -369,6 +378,18 @@ namespace HNPS_GigantismPlus
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, $"{item.Mutation.Name}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
                 else Entry(Verbosity, $"{item.Mutation.Name}", Indent: Indent + 1, Toggle: Toggle);
+            }
+            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
+            return List;
+        }
+        public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
+        {
+            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
+            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
+            foreach (BaseMutation item in List)
+            {
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1, Toggle: Toggle);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
@@ -393,18 +414,6 @@ namespace HNPS_GigantismPlus
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, $"{item.DebugName}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
                 else Entry(Verbosity, $"{item.DebugName}", Indent: Indent + 1, Toggle: Toggle);
-            }
-            if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
-            return List;
-        }
-        public static List<BaseMutation> Vomit(this List<BaseMutation> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
-        {
-            if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
-            else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
-            foreach (BaseMutation item in List)
-            {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item.GetMutationClass()}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
-                else Entry(Verbosity, $"{item.GetMutationClass()}", Indent: Indent + 1, Toggle: Toggle);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;

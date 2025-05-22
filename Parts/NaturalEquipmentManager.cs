@@ -52,9 +52,9 @@ namespace XRL.World.Parts
         public DieRoll DamageDie;
 
         [NonSerialized]
-        public (int Count, int Size, int Bonus) AccumulatedDamageDie;
-        public int AccumulatedHitBonus;
-        public int AccumulatedPenBonus;
+        public (int Count, int Size, int Bonus) AccumulatedDamageDie = (0, 0, 0);
+        public int AccumulatedHitBonus = 0;
+        public int AccumulatedPenBonus = 0;
 
         public bool DoDynamicTile = true;
 
@@ -83,32 +83,31 @@ namespace XRL.World.Parts
         [NonSerialized]
         public SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods;
 
-        // Dictionary key is the Target, the Value Dictionary key is the field
+        /// <summary>
+        /// Key: string (name of Target object) <br></br>
+        /// Value: Tuple( TargetObject, Entry ) <br></br>
+        /// - TargetObject: per Adjustment struct, one of: [GameObject] (the equipment itself), [Render], [MeleeWeapon], [Armor] <br></br>
+        /// - Entry: Dictionary, <br></br>
+        /// - - Key: string (field/property being targeted) <br></br>
+        /// - - Value: Tuple( Priority, Value ), <br></br>
+        /// - - - Priority: self-explanitory <br></br>
+        /// - - - Value: the value to which the field is to be set
+        /// </summary>
         [NonSerialized]
         public Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entry)> AdjustmentTargets;
-        // AdjustmentTargets: Dictionary,
-        //      Key: string (name of target object)
-        //      Value: Tuple( TargetObject, Entry ),
-        //          TargetObject: per Adjustment struct:
-        //              GameObject (the equipment itself),
-        //              Render,
-        //              MeleeWeapon,
-        //              Armor
-        //          Entry: Dictionary,
-        //              Key: string (field/property being targeted)
-        //              Value: Tuple( Priority, Value ),
-        //                  Priority: self-explanitory
-        //                  Value: the value to set the field as
 
         public NaturalEquipmentManager()
         {
+            AccumulatedDamageDie = (0, 0, 0);
+            AccumulatedHitBonus = 0;
+            AccumulatedPenBonus = 0;
             NaturalEquipmentMods = new();
             ShortDescriptions = new();
+            AdjustmentTargets = GetEmptyAdjustmentTargets();
         }
 
         public override void Initialize()
         {
-
             base.Initialize();
         }
         public override void Attach()
@@ -154,7 +153,7 @@ namespace XRL.World.Parts
         public void ClearAdjustmentTargets()
         {
             Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: 1, Toggle: getDoDebug('R'));
-            AdjustmentTargets = new();
+            AdjustmentTargets = GetEmptyAdjustmentTargets();
         }
         public void ResetShortDescriptions()
         {
@@ -269,8 +268,8 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4, $"* {nameof(AccumulateMeleeWeaponBonuses)}()", Indent: 2, Toggle: doDebug);
 
-            Debug.Entry(4, $"> foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 3, Toggle: doDebug);
-            Debug.Divider(4, "-", 25, Indent: 4, Toggle: doDebug);
+            Debug.Entry(4, $"> foreach ((_,{nameof(ModNaturalEquipmentBase)} naturalEquipmentMod) in {nameof(NaturalEquipmentMods)})", Indent: 3, Toggle: doDebug);
+            Debug.Divider(4, HONLY, 25, Indent: 4, Toggle: doDebug);
             foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
                 AccumulatedDamageDie.Count += naturalEquipmentMod.GetDamageDieCount();
@@ -286,12 +285,10 @@ namespace XRL.World.Parts
                 Debug.CheckYeh(4, $"HitBonus", $"      {naturalEquipmentMod.GetHitBonus().Signed()}", Indent: 4, Toggle: doDebug);
                 Debug.CheckYeh(4, $"PenBonus", $"      {naturalEquipmentMod.GetPenBonus().Signed()}", Indent: 4, Toggle: doDebug);
 
-                Debug.Divider(4, "-", 25, Indent: 4, Toggle: doDebug);
+                Debug.Divider(4, HONLY, 25, Indent: 4, Toggle: doDebug);
             }
-            Debug.Entry(4, $"x foreach ((_,ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"x foreach ((_,{nameof(ModNaturalEquipmentBase)} naturalEquipmentMod) in {nameof(NaturalEquipmentMods)}) >//", Indent: 3, Toggle: doDebug);
 
-            DamageDie = new(1, AccumulatedDamageDie.Count, AccumulatedDamageDie.Size);
-            DamageDie.AdjustResult(AccumulatedDamageDie.Bonus);
             Debug.Entry(4, $"x {nameof(AccumulateMeleeWeaponBonuses)}() *//", Indent: 2, Toggle: doDebug);
         }
 
@@ -355,88 +352,33 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1, Toggle: doDebug);
                 if (ParentMeleeWeapon != null)
                 {
-                    GameObject originalNaturalEquipment = GameObjectFactory.Factory.CreateSampleObject(OriginalNaturalEquipmentBlueprint);
-                    MeleeWeapon originalWeapon = originalNaturalEquipment.GetPart<MeleeWeapon>();
-                    DamageDie = new(originalWeapon.BaseDamage);
+
+                    DamageDie = new(ParentMeleeWeapon.BaseDamage);
                     DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
-                    int damageDieValue = 0;
-                    if (DamageDie.FindType(TargetType: 1) != null || !int.TryParse(DamageDie.ToString(), out damageDieValue))
-                    {
-                        if (ParentLimb.Type == "Hand" && DamageDie.ToString() == "1d3")
-                        {
-                            Debug.Entry(4, 
-                                $"Non-standard fist: {OriginalNaturalEquipmentBlueprint}, " + 
-                                $"attempting to adjust DamageDie", 
-                                Indent: 3, Toggle: doDebug);
-                            GameObject defaultFist = GameObjectFactory.Factory.CreateSampleObject(DefaultFistBlueprint);
-                            if (defaultFist.TryGetPart(out MeleeWeapon defaultFistWeapon))
-                            {
-                                DamageDie = new(defaultFistWeapon.BaseDamage);
-                                DamageDie.ToString()
-                                    .Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
-                            }
-                        }
+                    
 
-                        DieRoll DamageDieTypeDie = DamageDie.FindType(TargetType: 1);
-
-                        if (DamageDieTypeDie != null)
-                        {
-                            AccumulatedDamageDie.Count = DamageDieTypeDie.GetDieCount()
-                                .Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
-                            if (AccumulatedDamageDie.Count < 1)
-                            {
-                                AccumulatedDamageDie.Count = 1
-                                    .Vomit(4, "AccumulatedDamageDie.Count (default)", Indent: 3, Toggle: doDebug);
-                            }
-
-                            AccumulatedDamageDie.Size = DamageDieTypeDie.RightValue
-                                .Vomit(4, "AccumulatedDamageDie.Size", Indent: 2, Toggle: doDebug);
-                            if (AccumulatedDamageDie.Size < 2)
-                            {
-                                AccumulatedDamageDie.Size = 2
-                                    .Vomit(4, "AccumulatedDamageDie.Size (default)", Indent: 3, Toggle: doDebug);
-                            }
-                        }
-                        else
-                        {
-                            AccumulatedDamageDie.Count.Vomit(4, "AccumulatedDamageDie.Count (base)", Indent: 2, Toggle: doDebug);
-                            AccumulatedDamageDie.Size.Vomit(4, "AccumulatedDamageDie.Size (base)", Indent: 2, Toggle: doDebug);
-                        }
-
-                        bool dieBonusIsPenalty = DamageDie.FindTypeWithConstantRight(5) != null;
-                        int dieBonus = (DamageDie.LeftValue > 0 ? 0 : DamageDie.RightValue);
-                        if (dieBonus != 0 && dieBonusIsPenalty) dieBonus = -dieBonus;
-                        AccumulatedDamageDie.Bonus = dieBonus
-                                    .Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2, Toggle: doDebug);
-                    }
-                    else
-                    {
-                        Debug.Entry(4,
-                            $"Natural Equipment: {OriginalNaturalEquipmentBlueprint} " + 
-                            $"has static DamageDie value ({damageDieValue})",
-                            Indent: 3, Toggle: doDebug);
-                        AccumulatedDamageDie.Count = 0.Vomit(4, "AccumulatedDamageDie.Count", Indent: 2, Toggle: doDebug);
-                        AccumulatedDamageDie.Size = 0.Vomit(4, "AccumulatedDamageDie.Size", Indent: 2, Toggle: doDebug);
-                        AccumulatedDamageDie.Bonus = damageDieValue.Vomit(4, "AccumulatedDamageDie.Bonus", Indent: 2, Toggle: doDebug);
-                    }
-
-                    AccumulatedHitBonus = originalWeapon.HitBonus
-                            .Vomit(4, "AccumulatedHitBonus", Indent: 2, Toggle: doDebug);
-                    AccumulatedPenBonus = originalWeapon.PenBonus
-                        .Vomit(4, "AccumulatedPenBonus", Indent: 2, Toggle: doDebug);
-
+                    GameObject sampleNaturalEquipment = GameObjectFactory.Factory.CreateSampleObject(OriginalNaturalEquipmentBlueprint);
+                    MeleeWeapon originalWeapon = sampleNaturalEquipment.GetPart<MeleeWeapon>();
                     if (OriginalNaturalEquipmentBlueprint == DefaultFistBlueprint)
                     {
-                        AccumulatedDamageDie.Bonus = AccumulatedDamageDie.Bonus < 0 ? 0 : AccumulatedDamageDie.Bonus;
+                        Debug.Entry(4, $"{nameof(sampleNaturalEquipment)}", $"{sampleNaturalEquipment.Blueprint}", Indent: 2, Toggle: doDebug);
+                        AccumulatedDamageDie.Bonus += 1;
+                    }
+                    if (GameObject.Validate(ref sampleNaturalEquipment))
+                    {
+                        GameObject.Release(ref sampleNaturalEquipment);
                     }
 
                     AccumulateMeleeWeaponBonuses();
 
-                    ParentMeleeWeapon.BaseDamage = DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
+                    DamageDie.AdjustDieCount(AccumulatedDamageDie.Count.Vomit(4, "AdjustDieCount", Indent: 2, Toggle: doDebug));
+                    DamageDie.AdjustDieSize(AccumulatedDamageDie.Size.Vomit(4, "AdjustDieSize", Indent: 2, Toggle: doDebug));
+                    DamageDie.AdjustResult(AccumulatedDamageDie.Bonus.Vomit(4, "AdjustResult", Indent: 2, Toggle: doDebug));
+
+                    ParentMeleeWeapon.BaseDamage = DamageDie.Vomit(4, "Final DamageDie", Indent: 2, Toggle: doDebug).ToString();
                     ParentMeleeWeapon.HitBonus = AccumulatedHitBonus.Vomit(4, "AccumulatedHitBonus", Indent: 2, Toggle: doDebug);
                     ParentMeleeWeapon.PenBonus = AccumulatedPenBonus.Vomit(4, "AccumulatedPenBonus", Indent: 2, Toggle: doDebug);
 
-                    originalNaturalEquipment.Obliterate();
                 }
                 else
                 {
@@ -449,6 +391,7 @@ namespace XRL.World.Parts
                 // |__ Cycle through each Target's set of adjustments, applying them if possible 
                 //     |__ Where not possible, output a warning.
                 Debug.Entry(4, $"> foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)", Indent: 1, Toggle: doDebug);
+                Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
                 foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)
                 {
                     Debug.Entry(4, $"Target: {Target}", Indent: 2, Toggle: doDebug);
@@ -456,13 +399,16 @@ namespace XRL.World.Parts
                     {
                         Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3, Toggle: doDebug);
                         if (TargetObject.SetPropertyOrFieldValue(Field, Value))
+                        {
                             continue;
+                        }
                         Debug.Entry(2,
                             $"WARN: {typeof(NaturalEquipmentManager).Name}." +
                             $"{nameof(ManageNaturalEquipment)}()",
                             $"failed set Property or Field \"{Field}\" in {Target} to {Value}",
                             Indent: 4);
                     }
+                    Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
                 }
                 Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1, Toggle: doDebug);
                 
@@ -476,7 +422,7 @@ namespace XRL.World.Parts
 
                 if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))
                 {
-                    Debug.Entry(4, $"Attempting Dynamic Tile update", Indent: 1, Toggle: doDebug);
+                    Debug.Entry(4, $"Attempting Dynamic Tile update...", Indent: 1, Toggle: doDebug);
                     // This lets us check whether there's a Tile been provided anywhere in a fairly sizeable list of locations
                     // named "AdjectiveAdjectiveAdjectiveNoun", allowing for tiles to be added for an arbitrary set of combinations
                     // provided the order of the adjectives is consistent (which should definitely be the case with this mod.
@@ -488,11 +434,19 @@ namespace XRL.World.Parts
                     displayNameOnlySansRays.Replace(icyString, "");
                     displayNameOnlySansRays.Replace(flamingString, "");
 
-                    Debug.Divider(4, "-", 25, Indent: 2, Toggle: doDebug);
-                    if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath)) ParentRender.Tile = tilePath;
-                    Debug.Divider(4, "-", 25, Indent: 2, Toggle: doDebug);
-                    if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath)) ParentRender.Tile = tilePath;
-                    Debug.Divider(4, "-", 25, Indent: 2, Toggle: doDebug);
+                    if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath))
+                    {
+                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
+                        ParentRender.Tile = tilePath;
+                    }
+                    if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath))
+                    {
+                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
+                        ParentRender.Tile = tilePath;
+                    }
+                    Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
+
+                    Debug.Entry(4, $"Dynamic Tile update attempted", Indent: 1, Toggle: doDebug);
                 }
                 else
                 {

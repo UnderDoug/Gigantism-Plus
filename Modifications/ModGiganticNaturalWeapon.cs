@@ -69,7 +69,7 @@ namespace XRL.World.Parts
             if (E.Object == ParentObject)
             {
                 int dieCount = GetDamageDieCount();
-                int damageBonus = 2 + GetDamageBonus();
+                int damageBonus = GetDamageBonus();
                 int hitBonus = GetHitBonus();
                 int cleaveBonus = -damageBonus;
 

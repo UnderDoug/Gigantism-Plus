@@ -356,7 +356,6 @@ namespace XRL.World.Parts
                     DamageDie = new(ParentMeleeWeapon.BaseDamage);
                     DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
                     
-
                     GameObject sampleNaturalEquipment = GameObjectFactory.Factory.CreateSampleObject(OriginalNaturalEquipmentBlueprint);
                     MeleeWeapon originalWeapon = sampleNaturalEquipment.GetPart<MeleeWeapon>();
                     if (OriginalNaturalEquipmentBlueprint == DefaultFistBlueprint)

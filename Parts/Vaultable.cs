@@ -592,10 +592,10 @@ namespace XRL.World.Parts
 
                 bool vaulterNotNull = Vaulter != null;
                 bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill);
-                bool notMidVault = !vaultSkill.MidVault;
-                bool vaulted = vaultSkill.Vaulted;
-                bool wantToVault = vaultSkill.WantToVault;
-                bool isPlayer = Vaulter.IsPlayer();
+                bool notMidVault = haveSkill && !vaultSkill.MidVault;
+                bool vaulted = haveSkill && vaultSkill.Vaulted;
+                bool wantToVault = haveSkill && vaultSkill.WantToVault;
+                bool isPlayer = vaulterNotNull && Vaulter.IsPlayer();
                 bool autoActActive = AutoAct.IsActive();
                 bool actingAutomatically = isPlayer || autoActActive;
 

@@ -22,8 +22,6 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class UD_QuillsPlus : BaseDefaultEquipmentMutation
     {
-        public const string BASE_DISPLAY_NAME = "Quills";
-
         public const int MINIMUM_QUILLS_TO_FLING = 80;
 
         public static readonly string COMMAND_NAME = "CommandQuillFling";
@@ -89,7 +87,6 @@ namespace XRL.World.Parts.Mutation
 
         public UD_QuillsPlus()
         {
-            DisplayName = BASE_DISPLAY_NAME;
             Type = "Physical";
         }
         public override bool GeneratesEquipment()
@@ -310,7 +307,7 @@ namespace XRL.World.Parts.Mutation
                     }
                     ParentObject.ForceEquipObject(QuillsObject, bodyPart, Silent: true, 0);
 
-                    DisplayName = GetVariantName() ?? DisplayName;
+                    ResetDisplayName();
 
                     bool haveQuillFling = QuillFlingActivatedAbilityID != Guid.Empty;
                     bool levelNotMin = Level > 1;
@@ -351,7 +348,7 @@ namespace XRL.World.Parts.Mutation
             if (Variant.IsNullOrEmpty())
             {
                 Variant = GetVariants().GetRandomElement();
-                DisplayName = GetVariantName() ?? DisplayName;
+                ResetDisplayName();
             }
             if (GO != null && GO.Body != null)
             {

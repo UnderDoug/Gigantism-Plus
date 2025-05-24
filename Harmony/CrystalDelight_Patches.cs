@@ -12,6 +12,7 @@ using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony
 {
+    /*
     // Intercept the application of Crystallinity via Crystal Delight, apply the Mutations.xml version instead (much more compatible).
     [HarmonyPatch(typeof(CookingDomainSpecial_UnitCrystalTransform))]
     public static class CookingDomainSpecial_UnitCrystalTransform_Patches
@@ -20,7 +21,6 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
         static void ApplyTo_Postfix(GameObject Object)
         {
-
             if (!(bool)EnableManagedVanillaMutations) return; // Skip if Crystallinity isn't being merged into the extended class.
 
             if (Object.TryGetPart(out Crystallinity Crystallinity))
@@ -31,5 +31,5 @@ namespace HNPS_GigantismPlus.Harmony
             }
         }
     } //!-- public static class CookingDomainSpecial_UnitCrystalTransform_Patches
-
+    */
 }

@@ -10,6 +10,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using System.Text;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -23,50 +24,13 @@ namespace XRL.World.Parts.Mutation
         public Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods { get; set; }
         public ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod { get; set; }
 
-        private bool _HasGigantism = false;
-        public bool HasGigantism
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPart<GigantismPlus>();
-                return _HasGigantism;
-            }
-            set
-            {
-                _HasGigantism = value;
-            }
-        }
+        public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
-        private bool _HasElongated = false;
-        public bool HasElongated
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPart<ElongatedPaws>();
-                return _HasElongated;
-            }
-            set
-            {
-                _HasElongated = value;
-            }
-        }
+        public bool GiganticRefractAdded = false;
 
-        private bool _HasBurrowing = false;
-        public bool HasBurrowing
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPartDescendedFrom<BurrowingClaws>();
-                return _HasBurrowing;
-            }
-            set
-            {
-                _HasBurrowing = value;
-            }
-        }
+        public bool HasElongated => ParentObject != null && ParentObject.HasPart<ElongatedPaws>();
+
+        public bool HasBurrowing => ParentObject != null && ParentObject.HasPartDescendedFrom<BurrowingClaws>();
 
         public UD_ManagedCrystallinity()
             : base()
@@ -208,6 +172,24 @@ namespace XRL.World.Parts.Mutation
             return NaturalEquipmentMod.AddedIntProps;
         }
 
+        public static int GetRefractChance(int Level)
+        {
+            return 25;
+        }
+        public int GetRefractChance()
+        {
+            return GetRefractChance(Level);
+        }
+
+        public static float GetGigantismRefractFactor(int Level)
+        {
+            return 0.4f;
+        }
+        public float GetGigantismRefractFactor()
+        {
+            return GetGigantismRefractFactor(Level);
+        }
+
         public override bool Mutate(GameObject GO, int Level)
         {
             // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
@@ -215,7 +197,23 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool Unmutate(GameObject GO)
         {
-            // GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
+            if (GO.TryGetPart(out RefractLight refractLight))
+            {
+                if (RefractAdded)
+                {
+                    refractLight.Chance -= GetRefractChance();
+                    RefractAdded = false;
+                }
+                if (GiganticRefractAdded)
+                {
+                    refractLight.Chance -= (int)(GetRefractChance() * GetGigantismRefractFactor());
+                    GiganticRefractAdded = false;
+                }
+                if (refractLight.Chance < 1)
+                {
+                    GO.RemovePart(refractLight);
+                }
+            }
             return base.Unmutate(GO);
         }
 
@@ -236,6 +234,26 @@ namespace XRL.World.Parts.Mutation
         public override bool ChangeLevel(int NewLevel)
         {
             return base.ChangeLevel(NewLevel);
+        }
+        public override string GetLevelText(int Level)
+        {
+            string levelText = base.GetLevelText(Level);
+            if (ParentObject != null && ParentObject.TryGetPart(out GigantismPlus gigantism))
+            {
+                int baseRefractChance = GetRefractChance(Level);
+                int giganticBonusRefractChance = (int)(baseRefractChance * GetGigantismRefractFactor(Level));
+                int totalRefractChance = baseRefractChance + giganticBonusRefractChance;
+
+                StringBuilder SB = Event.NewStringBuilder();
+
+                SB.Append(totalRefractChance).Append("% chance to refract light-based attacks ");
+                SB.Append("(").Append(baseRefractChance).Append("% base chance ");
+                SB.AppendRule($"{giganticBonusRefractChance.Signed()}%").Append(" from ");
+                SB.Append(gigantism.GetDisplayName()).Append(")");
+
+                return levelText.Replace("25% chance to refract light-based attacks", Event.FinalizeString(SB));
+            }
+            return levelText;
         }
 
         public virtual bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
@@ -280,6 +298,28 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
+            if(ParentObject.Body == body)
+            {
+                if (!ParentObject.TryGetPart(out RefractLight refractLight))
+                {
+                    refractLight = ParentObject.RequirePart<RefractLight>();
+                }
+                if (!RefractAdded)
+                {
+                    refractLight.Chance += GetRefractChance();
+                    RefractAdded = true;
+                }
+                if (HasGigantism && !GiganticRefractAdded)
+                {
+                    refractLight.Chance += (int)(GetRefractChance() * GetGigantismRefractFactor());
+                    GiganticRefractAdded = true;
+                }
+                if (!HasGigantism && GiganticRefractAdded)
+                {
+                    refractLight.Chance -= (int)(GetRefractChance() * GetGigantismRefractFactor());
+                    GiganticRefractAdded = false;
+                }
+            }
             // base.OnRegenerateDefaultEquipment(body);
         }
         public override void OnDecorateDefaultEquipment(Body body)

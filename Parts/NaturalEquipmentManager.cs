@@ -486,6 +486,7 @@ namespace XRL.World.Parts
         {
             Registrar.Register("AdjustWeaponScore");
             Registrar.Register("AdjustArmorScore");
+            Registrar.Register("CanBeDisassembled");
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -511,6 +512,14 @@ namespace XRL.World.Parts
                         $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E.Object: {E?.Object?.DebugName ?? NULL})" + 
                         $" Kept {nameof(NaturalEquipmentManager)}",
                         Indent: 0, Toggle: getDoDebug("OC"));
+
+                    if (!ParentObject.TryGetPart(out TinkerItem tinkerItem))
+                    {
+                        tinkerItem = ParentObject.RequirePart<TinkerItem>(Creation: true);
+                    }
+                    tinkerItem.Bits = "";
+                    tinkerItem.CanDisassemble = false;
+                    tinkerItem.CanBuild = false;
                 }
             }
             return base.HandleEvent(E);
@@ -575,6 +584,10 @@ namespace XRL.World.Parts
                 Score = Math.Max(100, Score);
 
                 E.SetParameter("Score", Score);
+            }
+            if (E.ID == "CanBeDisassembled")
+            {
+                return false;
             }
             return base.FireEvent(E);
         }

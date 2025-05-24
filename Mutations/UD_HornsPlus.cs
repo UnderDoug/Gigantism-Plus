@@ -19,14 +19,11 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class UD_HornsPlus : BaseDefaultEquipmentMutation
     {
-        public const string BASE_DISPLAY_NAME = "Horns";
-
         [NonSerialized]
         public GameObject HornsObject;
 
         public UD_HornsPlus()
         {
-            DisplayName = BASE_DISPLAY_NAME;
             Type = "Physical";
         }
 
@@ -39,7 +36,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (Variant == null)
             {
-                return $"{DisplayName} jut out of your head.";
+                return $"{GetDisplayName()} jut out of your head.";
             }
             GameObjectBlueprint blueprint = GameObjectFactory.Factory.GetBlueprint(Variant);
             string gender = blueprint.GetPropertyOrTag("Gender");
@@ -72,7 +69,7 @@ namespace XRL.World.Parts.Mutation
                 SB.AppendRule("Increased bleeding save difficulty and intensity").AppendLine();
             }
             bool hornsPlural = true;
-            string hornsNoun = DisplayName;
+            string hornsNoun = GetDisplayName();
             if (Variant != null)
             {
                 GameObjectBlueprint blueprint = GameObjectFactory.Factory.GetBlueprint(Variant);
@@ -146,7 +143,7 @@ namespace XRL.World.Parts.Mutation
                     }
                     ParentObject.ForceEquipObject(HornsObject, bodyPart, Silent: true, 0);
 
-                    DisplayName = GetVariantName() ?? DisplayName;
+                    ResetDisplayName();
                 }
             }
         }
@@ -179,7 +176,7 @@ namespace XRL.World.Parts.Mutation
             if (Variant.IsNullOrEmpty())
             {
                 Variant = GetVariants().GetRandomElement();
-                DisplayName = GetVariantName() ?? DisplayName;
+                ResetDisplayName();
             }
             if (GO != null && GO.Body != null)
             {

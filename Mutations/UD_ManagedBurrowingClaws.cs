@@ -296,6 +296,7 @@ namespace XRL.World.Parts.Mutation
         public override void OnRegenerateDefaultEquipment(Body body)
         {
             // base.OnRegenerateDefaultEquipment(body);
+            return;
         }
         public override void OnDecorateDefaultEquipment(Body body)
         {

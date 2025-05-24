@@ -22,7 +22,7 @@ namespace XRL.World.Parts.Mutation
 
         public ElongatedPaws()
         {
-            DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
+            SetDisplayName("{{giant|Elongated Paws}}"); //.OptionalColorGiant(Colorfulness);
             Type = "Physical";
 
             NaturalEquipmentMod = new ModElongatedNaturalWeapon()

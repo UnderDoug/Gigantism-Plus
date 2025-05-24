@@ -66,12 +66,10 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, $"? if (!Creature.Is(null) and Creature.HasPart<Inventory>())", Indent: indent++, Toggle: doDebug);
             if (!Creature.Is(null) && Creature.HasPart<Inventory>())
             {
-                Debug.Entry(4, $"? if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint))", Indent: indent++, Toggle: doDebug);
+                Debug.Entry(4, $"? if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint) and Blueprint.Inventory != null)", Indent: indent++, Toggle: doDebug);
                 bool doReequip = false;
-                if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint))
+                if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint) && Blueprint.Inventory != null)
                 {
-                    if (Blueprint.Inventory.Is(null)) Blueprint.Inventory = new();
-
                     Debug.Entry(4, $"Getting list of blueprintItemBlueprints that are Natural", Indent: indent, Toggle: doDebug);
                     Dictionary<string, int> blueprintItemBlueprints = new();
                     Debug.Entry(4, $"> foreach (InventoryObject inventoryObject in Blueprint.Inventory)", Indent: indent++, Toggle: doDebug);
@@ -176,7 +174,7 @@ namespace HNPS_GigantismPlus.Harmony
                 {
                     Debug.CheckNah(4, $"Creature's Blueprint couldn't be retrieved", Indent: --indent, Toggle: doDebug);
                 }
-                Debug.Entry(4, $"x if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint)) ? //", Indent: indent, Toggle: doDebug);
+                Debug.Entry(4, $"x if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint) and Blueprint.Inventory != null)) ? //", Indent: indent, Toggle: doDebug);
 
                 Debug.LoopItem(4, $"nameof(doReequip)", $"{doReequip}",
                     Good: doReequip, Indent: indent--, Toggle: doDebug);

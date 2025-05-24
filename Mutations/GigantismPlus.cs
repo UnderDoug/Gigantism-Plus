@@ -126,7 +126,7 @@ namespace XRL.World.Parts.Mutation
 
         public GigantismPlus()
         {
-            DisplayName = "{{gigantic|Gigantism}} ({{r|D}})";
+            SetDisplayName("{{gigantic|Gigantism}} ({{r|D}})");
             Type = "Physical";
 
             ModGiganticNaturalWeapon GiganticFist = new()

@@ -27,7 +27,6 @@ namespace XRL.World.Parts.Mutation
 
         public BonyProtrusions()
         {
-            DisplayName = "Bony Protrusions";
             Type = "Physical";
         }
 

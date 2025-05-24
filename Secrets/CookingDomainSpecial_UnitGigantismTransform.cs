@@ -98,7 +98,7 @@ namespace XRL.World.Effects
                 Popup.Show("Your limbs suddenly feel constrained, like there's too much of them to fit in the space they occupy.");
                 Popup.Show("You buckle under the weight of your rapidly increasing mass. The ground under your feet gives way.");
                 Popup.Show("The world rushes away from you as your anatomy realizes its new stature.");
-                Popup.Show($"You gained the mutation {gigantism.DisplayName}!");
+                Popup.Show($"You gained the mutation {gigantism.GetDisplayName()}!");
                 JournalAPI.AddAccomplishment(
                     text: JournalTexts.GetRandomElement(), 
                     muralText: $"{JournalMuralPrefixs.GetRandomElement()}{JournalMuralInfix}{JournalMuralSuffixs.GetRandomElement()}",

@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
@@ -7,6 +7,8 @@ namespace HNPS_GigantismPlus
     public static class Const
     {
         public const string MOD_ID = "gigantism_Plus";
+
+        public const string UD_BLINK_MUTATION_MOD_ID = "UD_Blink_Mutation";
 
         public const string DEBUG_OBJECT_CREATION_ANALYSIS = "UD_Debug_DoObjectCreationAnalysis";
         public const string DEBUG_HIGHLIGHT_CELLS = "UD_Debug_HighlightCells";

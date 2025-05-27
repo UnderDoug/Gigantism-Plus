@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <mutations>
-    <category Name="Physical">
-        <mutation Name="Elongated Paws" Cost="4" MaxSelected="1" Class="ElongatedPaws" Exclusions="" BearerDescription="those with elongated paws" Tile="Mutations/ElongatedPaws.png" Hidden="false" ExcludeFromPool="false" />
-    </category>
     <category Name="PhysicalDefects">
-        <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" Exclusions="" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" />
+        <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" DisplayName="Gigantism" Exclusions="" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" />
     </category>
-
+  
+    <category Name="Physical">
+        <mutation Name="Elongated Paws" Cost="4" MaxSelected="1" Class="ElongatedPaws" DisplayName="Elongated Paws" Exclusions="" BearerDescription="those with elongated paws" Tile="Mutations/ElongatedPaws.png" Hidden="false" ExcludeFromPool="false" />
+      
     <!-- NaturalWeapon Managed vanilla mutations -->
-    <category Name="Physical">
-      <mutation Name="Burrowing Claws" Class="UD_ManagedBurrowingClaws" />
-      <mutation Name="Crystallinity" Class="UD_ManagedCrystallinity" />
-    </category>
 
+      <!--mutation Name="Crystallinity" Class="UD_ManagedCrystallinity" DisplayName="Crystallinity" / This mutation should be hidden/excluded-->
+      <mutation Name="Burrowing Claws" Class="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" />
+      
     <!-- "Fixed" vanilla mutations -->
-    <category Name="Physical">
-      <mutation Name="Horns" Class="UD_HornsPlus" />
-      <mutation Name="Quills" Class="UD_QuillsPlus" />
+      
+      <mutation Name="Horns" Class="UD_HornsPlus" DisplayName="Horns" />
+      <mutation Name="Quills" Class="UD_QuillsPlus" DisplayName="Quills" />
+      
     </category>
   
 </mutations>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,7 +11,6 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using System.Text;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -114,22 +114,25 @@ namespace XRL.World.Parts.Mutation
         {
             if (Parts == null) return false;
             NaturalEquipmentMod.AddedParts ??= new();
-            string[] parts = Parts.Split(',');
-            foreach (string part in parts)
+            if (Parts.Contains(","))
             {
-                NaturalEquipmentMod.AddedParts.Add(part);
+                string[] parts = Parts.Split(',');
+                foreach (string part in parts)
+                {
+                    NaturalEquipmentMod.AddedParts.TryAdd(part);
+                }
             }
-            return true;
+            else
+            {
+                NaturalEquipmentMod.AddedParts.TryAdd(Parts);
+            }
+            return !NaturalEquipmentMod.AddedParts.IsNullOrEmpty();
         }
         public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
-            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
-            {
-                NaturalEquipmentMod.AddedStringProps = StringProps;
-                NaturalEquipmentMod.AddedIntProps = IntProps;
-            }
-            return true;
+            Props.ParseProps(out NaturalEquipmentMod.AddedStringProps, out NaturalEquipmentMod.AddedIntProps);
+            return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalWeaponSubpart, int Level = 1)
@@ -220,8 +223,8 @@ namespace XRL.World.Parts.Mutation
         public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level)
         {
             Debug.Entry(4,
-                $"* {typeof(UD_ManagedCrystallinity).Name}."
-                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(UD_ManagedCrystallinity).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
+                $"* {nameof(UD_ManagedCrystallinity)}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{nameof(UD_ManagedCrystallinity)}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
                 Indent: 2);
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
@@ -259,7 +262,7 @@ namespace XRL.World.Parts.Mutation
         public virtual bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Debug.Entry(4,
-                $"@ {typeof(UD_ManagedCrystallinity).Name}."
+                $"@ {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(ProcessNaturalEquipment)}",
                 Indent: 1);
 
@@ -275,7 +278,7 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2);
             }
 
             if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
@@ -287,10 +290,10 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2);
             }
             Debug.Entry(4,
-                $"x {typeof(UD_ManagedCrystallinity).Name}."
+                $"x {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(ProcessNaturalEquipment)} @//",
                 Indent: 1);
             return true;
@@ -298,7 +301,7 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            if(ParentObject.Body == body)
+            if(body != null && ParentObject.Body == body)
             {
                 if (!ParentObject.TryGetPart(out RefractLight refractLight))
                 {
@@ -331,7 +334,7 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(UD_ManagedCrystallinity).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
+            Debug.Header(4, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnManageNaturalEquipment)}(body)");
             Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
 
             Debug.Divider(4, "-", Count: 25, Indent: 1);
@@ -339,7 +342,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Divider(4, "-", Count: 25, Indent: 1);
 
             Debug.Footer(4,
-                $"{typeof(UD_ManagedCrystallinity).Name}",
+                $"{nameof(UD_ManagedCrystallinity)}",
                 $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject?.Blueprint})");
         }
         public virtual void OnUpdateNaturalEquipmentMods()
@@ -362,33 +365,57 @@ namespace XRL.World.Parts.Mutation
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == ManageDefaultEquipmentEvent.ID
-                || ID == UpdateNaturalEquipmentModsEvent.ID;
+                || ID == UpdateNaturalEquipmentModsEvent.ID
+                || ID == ManageDefaultEquipmentEvent.ID;
         }
-        public bool HandleEvent(ManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
         {
             Debug.Entry(4,
-                $"@ {typeof(UD_ManagedCrystallinity).Name}."
-                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                $"@ {nameof(UD_ManagedCrystallinity)}."
+                + $"{nameof(HandleEvent)}({nameof(UpdateNaturalEquipmentModsEvent)} E)",
                 Indent: 0);
 
-            if (E.Wielder == ParentObject)
+            if (E.Creature == ParentObject)
+            {
+                OnUpdateNaturalEquipmentMods();
+            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(AfterBodyPartsUpdatedEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(BeforeManageDefaultEquipmentEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(ManageDefaultEquipmentEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {nameof(UD_ManagedCrystallinity)}."
+                + $"{nameof(HandleEvent)}({nameof(ManageDefaultEquipmentEvent)} E)",
+                Indent: 0);
+
+            if (E.Creature == ParentObject)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
             }
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
+        public virtual bool HandleEvent(AfterManageDefaultEquipmentEvent E)
         {
-            Debug.Entry(4,
-                $"@ {typeof(UD_ManagedCrystallinity).Name}."
-                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E)",
-                Indent: 0);
-
-            if (E.Actor == ParentObject)
-            {
-                OnUpdateNaturalEquipmentMods();
-            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(BeforeRapidAdvancementEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(AfterRapidAdvancementEvent E)
+        {
             return base.HandleEvent(E);
         }
         public override bool FireEvent(Event E)

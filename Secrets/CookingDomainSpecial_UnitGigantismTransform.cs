@@ -4,23 +4,25 @@ using System.Text;
 using System.Linq;
 using ConsoleLib.Console;
 
+using Qud.API;
+
 using XRL;
 using XRL.UI;
 using XRL.World;
-using XRL.World.WorldBuilders;
-using XRL.World.ZoneBuilders;
-using static XRL.World.ZoneBuilderPriority;
-using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.ObjectBuilders;
+using XRL.World.ZoneBuilders;
+using XRL.World.WorldBuilders;
 using XRL.Language;
 using XRL.Names;
-using Qud.API;
 
+using static XRL.World.ZoneBuilderPriority;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using HNPS_GigantismPlus;
 
 namespace XRL.World.Effects
 {

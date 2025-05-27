@@ -38,17 +38,38 @@ namespace HNPS_GigantismPlus
         }
         public static void Send(GameObject Object, ModGigantic Modification)
         {
-            BeforeModGiganticAppliedEvent beforeModGiganticAppliedEvent = FromPool(Object, Modification);
+            BeforeModGiganticAppliedEvent E = FromPool(Object, Modification);
 
-            bool flag = The.Game.HandleEvent(beforeModGiganticAppliedEvent) && Object.HandleEvent(beforeModGiganticAppliedEvent);
+            bool haveGame = The.Game != null;
+            bool haveObject = Object != null;
 
-            if (flag && Object.HasRegisteredEvent(typeof(BeforeModGiganticAppliedEvent).Name))
+            bool gameWants = haveGame && The.Game.WantEvent(ID, CascadeLevel);
+
+            bool objectWantsMin = haveObject && Object.WantEvent(ID, CascadeLevel);
+            bool objectWantsStr = haveObject && Object.HasRegisteredEvent(nameof(BeforeModGiganticAppliedEvent));
+
+            bool anyWants = gameWants || objectWantsMin || objectWantsStr;
+
+            bool proceed = anyWants;
+
+            if (proceed)
             {
-                Event @event = Event.New(typeof(BeforeModGiganticAppliedEvent).Name);
-                @event.SetParameter("Object", Object);
-                @event.SetParameter("Modification", Modification);
-                Object.FireEvent(@event);
-                @event.Clear();
+                if (proceed && gameWants)
+                {
+                    proceed = The.Game.HandleEvent(E);
+                }
+                if (proceed && objectWantsMin)
+                {
+                    proceed = Object.HandleEvent(E);
+                }
+                if (proceed && objectWantsStr)
+                {
+                    Event @event = Event.New(nameof(BeforeModGiganticAppliedEvent));
+                    @event.SetParameter("Object", Object);
+                    @event.SetParameter("Modification", Modification);
+                    proceed = Object.FireEvent(@event);
+                    @event.Clear();
+                }
             }
         }
     }

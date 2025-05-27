@@ -1,19 +1,23 @@
 using HarmonyLib;
 
-using XRL.World;
-using XRL.World.Parts;
-using XRL.World.Parts.Skill;
-
-using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
+using System;
 using System.Collections.Generic;
+
+using XRL.World;
 using XRL.World.Anatomy;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+
+using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(GameObject))]
+    [HarmonyPatch]
     public static class GameObject_Patches
     {
+        private static bool doDebug => true;
+
         [HarmonyPatch(
             declaringType: typeof(GameObject), 
             methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness))]
@@ -23,9 +27,33 @@ namespace HNPS_GigantismPlus.Harmony
             GameObject @this = __instance;
             if (GameObject.Validate(ref Equipper))
             {
+                int indent = Debug.LastIndent;
+                GameObject physicsEquipped = @this?.Physics?.Equipped;
+                Debug.Entry(4, 
+                    $"# {nameof(GameObject)}."
+                    + $"{nameof(GameObject.CheckDefaultBehaviorGiganticness)}("
+                    + $"{nameof(@this)}: {@this?.DebugName ?? NULL}, "
+                    + $"{nameof(Equipper)}: {Equipper?.DebugName ?? NULL}, "
+                    + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})", 
+                    Indent: indent, Toggle: doDebug);
+
                 // this is an extremely important line of code that guarantees that default equipment is considered equipped.
                 // removing it completely breaks the NaturalEquipmentManager.
-                if (@this.Physics.Equipped != Equipper) @this.Physics.Equipped = Equipper;
+                if (@this?.Physics != null && @this.Physics.Equipped != Equipper)
+                {
+                    physicsEquipped = @this.Physics.Equipped = Equipper;
+                    Debug.Entry(4, 
+                        $"{@this?.DebugName ?? NULL} is equipped by {@this?.Physics?.Equipped?.DebugName ?? NULL}", 
+                        Indent: indent + 1, Toggle: doDebug);
+                }
+                Debug.Entry(4,
+                    $"x {nameof(GameObject)}."
+                    + $"{nameof(GameObject.CheckDefaultBehaviorGiganticness)}("
+                    + $"{nameof(@this)}: {@this?.DebugName ?? NULL}, "
+                    + $"{nameof(Equipper)}: {Equipper?.DebugName ?? NULL}, "
+                    + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})"
+                    + $" #//",
+                    Indent: indent, Toggle: doDebug);
             }
             return false;
         }

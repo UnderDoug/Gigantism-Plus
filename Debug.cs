@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using Qud.API;
@@ -8,6 +6,7 @@ using Qud.API;
 using XRL;
 using XRL.UI;
 using XRL.Core;
+using XRL.Rules;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Skill;
@@ -22,7 +21,6 @@ using static HNPS_GigantismPlus.Const;
 
 using Debug = HNPS_GigantismPlus.Debug;
 using Options = HNPS_GigantismPlus.Options;
-using XRL.Rules;
 
 namespace HNPS_GigantismPlus
 {
@@ -116,13 +114,13 @@ namespace HNPS_GigantismPlus
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Divider(Verbosity, "\u003E", 25, Indent); // >
+            Divider(Verbosity, HONLY, 25, Indent + 1); // > "\u003E"
             Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
         }
         public static void DiveOut(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
             Entry(Verbosity, Text, Indent + 1);
-            Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
+            // Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
         }
 
         public static void Warn(int Verbosity, string ClassName, string MethodName, string Issue = null, int Indent = 0)

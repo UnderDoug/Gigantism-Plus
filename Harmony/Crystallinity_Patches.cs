@@ -19,6 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Crystallinity_Patches
     {
+        /*
         // Increase the chance to refract light-based attacks from 25% to 35% when GigantismPlus is present
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Crystallinity), nameof(Crystallinity.Mutate))]
@@ -60,5 +61,6 @@ namespace HNPS_GigantismPlus.Harmony
                 );
             }
         }
+        */
     }//!-- public static class Crystallinity_Patches
 }

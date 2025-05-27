@@ -15,6 +15,7 @@ using static HNPS_GigantismPlus.Options;
 namespace HNPS_GigantismPlus.Harmony
 {
     // Intercept the application of Burrowing Claws via Skulk_Tonic to apply the Mutations.xml version instead for compatibility.
+    [HarmonyPatch]
     public static class Skulk_Tonic_Patches
     {
         [HarmonyPatch(

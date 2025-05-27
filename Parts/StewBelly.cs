@@ -1,7 +1,8 @@
 ﻿using System;
-using SerializeField = UnityEngine.SerializeField;
 
 using XRL.UI;
+using XRL.Rules;
+using XRL.Language;
 using XRL.World.Parts.Mutation;
 using XRL.World.Skills.Cooking;
 using XRL.Wish;
@@ -11,8 +12,7 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
-using XRL.Language;
-using XRL.Rules;
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {

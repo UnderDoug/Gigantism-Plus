@@ -13,20 +13,20 @@ namespace XRL.World.Parts
     [Serializable]
     public class InventoryGigantifier : IScribedPart
     {
-        public bool IsMerchant => ParentObject.HasPart<GenericInventoryRestocker>();
-        public bool IsGigantic => ParentObject.HasPart<GigantismPlus>();
+        public bool IsMerchant => ParentObject != null && ParentObject.HasPart<GenericInventoryRestocker>();
+        public bool IsGigantic => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || (IsGigantic && !IsMerchant && ID == AfterObjectCreatedEvent.ID)
-                || (IsGigantic && IsMerchant && ID == PooledEvent<StockedEvent>.ID);
+                || (IsGigantic && IsMerchant && ID == StockedEvent.ID);
         }
 
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
             GameObject GO = E.Object;
-            if (GO != null && GO == ParentObject && GO.HasPart<GigantismPlus>())
+            if (GO != null && GO == ParentObject && IsGigantic)
             {
                 Debug.Header(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)");
                 Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
@@ -41,10 +41,10 @@ namespace XRL.World.Parts
         public override bool HandleEvent(StockedEvent E)
         {
             GameObject GO = E.Object;
-            if (GO != null && GO == ParentObject)
+            Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
+            if (GO != null && GO == ParentObject && IsMerchant)
             {
                 Debug.Header(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)");
-                Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
 
                 GO.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 

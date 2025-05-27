@@ -126,12 +126,27 @@ namespace XRL.World.Parts.Mutation
 
         public GigantismPlus()
         {
-            SetDisplayName("{{gigantic|Gigantism}} ({{r|D}})");
-            Type = "Physical";
+            // SetDisplayName("{{gigantic|Gigantism}} ({{r|D}})");
+            // Type = "Physical";
 
-            ModGiganticNaturalWeapon GiganticFist = new()
+            ModGiganticNaturalWeapon GiganticFist = NewGiganticFistMod(this);
+            NaturalEquipmentMods.Add(GiganticFist.BodyPartType, GiganticFist);
+
+            ModGiganticNaturalWeapon GiganticNoggin = NewGiganticNogginMod(this);
+            NaturalEquipmentMods.Add(GiganticNoggin.BodyPartType, GiganticNoggin);
+
+            ModGiganticNaturalWeapon GiganticMug = NewGiganticMugMod(this);
+            NaturalEquipmentMods.Add(GiganticMug.BodyPartType, GiganticMug);
+
+            ModNaturalEquipment<GigantismPlus> GiganticBod = NewGiganticBodMod(this);
+            NaturalEquipmentMods.Add(GiganticBod.BodyPartType, GiganticBod);
+        }
+
+        public static ModGiganticNaturalWeapon NewGiganticFistMod(GigantismPlus assigningPart)
+        {
+            ModGiganticNaturalWeapon giganticFistMod = new()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
                 ModPriority = 10,
@@ -154,21 +169,22 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
                 },
             };
-            GiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
-            GiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            giganticFistMod.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
+            giganticFistMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
-            GiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", true);
+            giganticFistMod.AddAdjustment(RENDER, "DisplayName", "fist", true);
 
-            GiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", true);
-            GiganticFist.AddAdjustment(RENDER, "ColorString", "&x", true);
-            GiganticFist.AddAdjustment(RENDER, "TileColor", "&x", true);
-            GiganticFist.AddAdjustment(RENDER, "DetailColor", "z", true);
-
-            NaturalEquipmentMods.Add(GiganticFist.BodyPartType, GiganticFist); 
-            
-            ModGiganticNaturalWeapon GiganticNoggin = new()
+            giganticFistMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", true);
+            giganticFistMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            giganticFistMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            giganticFistMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            return giganticFistMod;
+        }
+        public static ModGiganticNaturalWeapon NewGiganticNogginMod(GigantismPlus assigningPart)
+        {
+            ModGiganticNaturalWeapon giganticNogginMod = new()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Head",
 
                 ModPriority = 10,
@@ -186,17 +202,18 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            GiganticNoggin.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            giganticNogginMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
-            GiganticNoggin.AddAdjustment(RENDER, "ColorString", "&x", true);
-            GiganticNoggin.AddAdjustment(RENDER, "TileColor", "&x", true);
-            GiganticNoggin.AddAdjustment(RENDER, "DetailColor", "z", true);
-
-            NaturalEquipmentMods.Add(GiganticNoggin.BodyPartType, GiganticNoggin); 
-            
-            ModGiganticNaturalWeapon GiganticMug = new()
+            giganticNogginMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            giganticNogginMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            giganticNogginMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            return giganticNogginMod;
+        }
+        public static ModGiganticNaturalWeapon NewGiganticMugMod(GigantismPlus assigningPart)
+        {
+            ModGiganticNaturalWeapon giganticMugMod = new()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Face",
 
                 ModPriority = 10,
@@ -214,17 +231,18 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            GiganticNoggin.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            giganticMugMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
-            GiganticNoggin.AddAdjustment(RENDER, "ColorString", "&x", true);
-            GiganticNoggin.AddAdjustment(RENDER, "TileColor", "&x", true);
-            GiganticNoggin.AddAdjustment(RENDER, "DetailColor", "z", true);
-
-            NaturalEquipmentMods.Add(GiganticMug.BodyPartType, GiganticMug);
-
-            ModNaturalEquipment<GigantismPlus> GiganticBod = new()
+            giganticMugMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            giganticMugMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            return giganticMugMod;
+        }
+        public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
+        {
+            ModNaturalEquipment<GigantismPlus> giganticMugMod = new()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Body",
 
                 ModPriority = 10,
@@ -242,11 +260,10 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            GiganticBod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            GiganticBod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            GiganticBod.AddAdjustment(RENDER, "DetailColor", "z", true);
-
-            NaturalEquipmentMods.Add(GiganticBod.BodyPartType, GiganticBod);
+            giganticMugMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            giganticMugMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            return giganticMugMod;
         }
 
         public override bool CanLevel() { return true; }
@@ -465,7 +482,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "Start of Change Level updates", Indent: 1, Toggle: doDebug);
             // Start of Change Level updates.
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1);
             Debug.Entry(4, "Weight Factor and Carry Cap Bonus changes", Indent: 1, Toggle: doDebug);
             // Hunch Over Penalties
             Debug.Entry(4, $"Values Before", Indent: 2, Toggle: doDebug);
@@ -479,18 +496,18 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: doDebug);
             Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: doDebug);
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
 
             ApplyJumpRangeBonus(ParentObject, NewLevel);
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
 
             if (IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, ParentObject))
             {
                 ApplyStunningForceOnJump(ParentObject, NewLevel);
             }
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
             Debug.Entry(4, "Hunch Over Penalties", Indent: 1, Toggle: doDebug);
             // Hunch Over Penalties
             Debug.Entry(4, $"Values Before", Indent: 2, Toggle: doDebug);
@@ -505,7 +522,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: doDebug);
             Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: doDebug);
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
             Debug.Entry(4, "End of Change Level updates", Indent: 1, Toggle: doDebug);
             // End of Change Level updates
             Debug.Entry(4, "? if (WasHunched and !IsVehicleCreature)", Indent: 1, Toggle: doDebug);
@@ -538,6 +555,11 @@ namespace XRL.World.Parts.Mutation
             stats.Set("HunchedOverMS", HunchedOverMS);
 
             // Add stunning force on jump stats for the Ground Pound toggle.
+        }
+
+        protected override string GetBaseDisplayName()
+        {
+            return base.GetBaseDisplayName().OptionalColorGigantic(Colorfulness);
         }
 
         public override string GetDescription()
@@ -1020,23 +1042,21 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
-            if (!E.Actor.HasBodyPart("Hand", false))
+            if (!E.Creature.HasBodyPart("Hand", false))
             {
-                RemoveActivatedAbilityCloseFist(E.Actor, false);
+                RemoveActivatedAbilityCloseFist(E.Creature, false);
             }
             else
             {
-                AddActivatedAbilityCloseFist(E.Actor, false);
+                AddActivatedAbilityCloseFist(E.Creature, false);
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
             // DescribeMyActivatedAbility(HunchOverActivatedAbilityID, CollectStats);
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(AfterAddSkillEvent E)
         {
             bool includesJump = E.Skill.Name == nameof(Acrobatics_Jump);

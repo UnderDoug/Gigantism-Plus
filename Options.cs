@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 using XRL;
 using XRL.World.Parts;
+using XRL.World.Parts.Skill;
 using XRL.World.Parts.Mutation;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using XRL.World.Parts.Skill;
 
 namespace HNPS_GigantismPlus
 {

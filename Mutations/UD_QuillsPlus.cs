@@ -1,20 +1,22 @@
-using ConsoleLib.Console;
-using HNPS_GigantismPlus;
 using System;
-using System.Collections.Generic;
-using System.Drawing.Design;
-using System.Linq;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
-using XRL.Language;
-using XRL.Rules;
+using ConsoleLib.Console;
+
 using XRL.UI;
+using XRL.Rules;
+using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Effects;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
+
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts.Mutation

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Qud.API;
+using HistoryKit;
+
 using XRL.UI;
 using XRL.Names;
 using XRL.Rules;
@@ -19,7 +21,6 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using HistoryKit;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -968,17 +969,20 @@ namespace XRL.World.ObjectBuilders
 
             CreatureBlueprint.Tags["Culture"] = "WrassleGiant";
 
-            if (!CreatureBlueprint.Tags.ContainsKey("Role")) CreatureBlueprint.Tags.Add("Role", "");
+            if (!CreatureBlueprint.Tags.ContainsKey("Role"))
+            {
+                CreatureBlueprint.Tags.Add("Role", "");
+            }
             CreatureBlueprint.Tags["Role"] = $"Leader";
+
             GamePartBlueprint GameUniquePartBlueprint = new("XRL.World.Parts", nameof(GameUnique))
             {
                 Name = nameof(GameUnique),
+                Parameters = new()
+                {
+                    { "State", SCRT_GNT_UNQ_STATE },
+                }
             };
-            if (GameUniquePartBlueprint != null)
-            {
-                if (GameUniquePartBlueprint.Parameters.IsNullOrEmpty()) GameUniquePartBlueprint.Parameters = new();
-                GameUniquePartBlueprint.Parameters.TryAdd("State", SCRT_GNT_UNQ_STATE);
-            }
             
             if (CreatureBlueprint.HasPart(nameof(GameUnique)))
             {

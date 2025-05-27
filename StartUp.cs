@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 
 using XRL;
-using XRL.UI;
 using XRL.Core;
+using XRL.UI;
+using XRL.Collections;
+using XRL.Rules;
 using XRL.World;
+using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
-using XRL.World.Anatomy;
 using XRL.World.Tinkering;
 
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -194,14 +196,37 @@ namespace HNPS_GigantismPlus
                 : EnableManagedVanillaMutationsCurrent;
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             
-            // ManagedVanillaMutationOptionHandler();
-
             if (!GameLevelEventsRegistered)
             {
                 GameLevelEventsRegistered = RegisterGameLevelEventHandlers();
             }
 
             Gigantic_ModEntry_Adjustments.AdjustGiganticModifier();
+
+            try
+            {
+                if (false && Stat.Roll("1d2") != 3)
+                {
+                    Debug.Entry(4, $"{ThisMod.DisplayTitle} Files:", Indent: 0);
+                    Rack<ModFile> files = ThisMod.Files;
+                    if (!files.IsNullOrEmpty())
+                    {
+                        foreach (ModFile file in files)
+                        {
+                            Debug.LoopItem(4, $"Name:{file.Name}, Relative: {file.RelativeName}", Indent: 1);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, $"Rack is Empty", Indent: 1);
+                    }
+                    Debug.Entry(4, $"End of {ThisMod.DisplayTitle} Files.", Indent: 0);
+                }
+            }
+            catch (Exception x)
+            {
+                MetricsManager.LogException($"[{MOD_ID}] {nameof(GigantismPlusGameBasedInitialiser)}", x);
+            }
 
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 

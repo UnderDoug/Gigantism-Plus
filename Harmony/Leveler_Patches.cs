@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 
+using System;
+
 using XRL.World;
 using XRL.World.Parts;
 
@@ -8,21 +10,29 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(Leveler))]
+    [HarmonyPatch]
     public static class Leveler_Patches
     {
-        [HarmonyPrefix]
+        [HarmonyPatch(
+            declaringType: typeof(Leveler),
+            methodName: nameof(Leveler.RapidAdvancement),
+            argumentTypes: new Type[] { typeof(int), typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPriority(800)]
-        [HarmonyPatch(nameof(Leveler.RapidAdvancement))]
+        [HarmonyPrefix]
         public static bool RapidAdvancement_SendBeforeEvent_Prefix(int Amount, GameObject ParentObject)
         {
             BeforeRapidAdvancementEvent.Send(Amount, ParentObject);
             return true;
         }
 
-        [HarmonyPostfix]
+        [HarmonyPatch(
+            declaringType: typeof(Leveler),
+            methodName: nameof(Leveler.RapidAdvancement),
+            argumentTypes: new Type[] { typeof(int), typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPriority(1)]
-        [HarmonyPatch(nameof(Leveler.RapidAdvancement))]
+        [HarmonyPostfix]
         public static void RapidAdvancement_SendAfterEvent_Postfix(int Amount, GameObject ParentObject)
         {
             AfterRapidAdvancementEvent.Send(Amount, ParentObject);

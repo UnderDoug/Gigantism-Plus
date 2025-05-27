@@ -50,7 +50,7 @@
     <object Name="Star Kraken" Load="Merge">
         <mutation Name="GigantismPlus" Level="8" />
         <property Name="GenerateWithStews" Value="3d4" />
-        <property Name="RapidLevel_GigantismPlus" Value="3" />
+        <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
         <removetag Name="Gigantic" />
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
@@ -62,14 +62,14 @@
     <object Name="BaseNephal" Load="Merge">
         <mutation Name="GigantismPlus" Level="10" />
         <property Name="GenerateWithStews" Value="3d3" />
-        <property Name="RapidLevel_GigantismPlus" Value="6" />
+        <intproperty Name="RapidLevel_GigantismPlus" Value="6" />
         <removetag Name="Gigantic" />
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="BaseVehicleGolem" Load="Merge">
         <mutation Name="GigantismPlus" Level="5" />
         <property Name="GenerateWithStews" Value="2d3" />
-        <property Name="RapidLevel_GigantismPlus" Value="3" />
+        <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
         <removetag Name="Gigantic" />
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
@@ -81,14 +81,14 @@
     <object Name="Oboroqoru" Load="Merge">
         <mutation Name="GigantismPlus" Level="10" />
         <property Name="GenerateWithStews" Value="3d3" />
-        <property Name="RapidLevel_GigantismPlus" Value="6" />
+        <intproperty Name="RapidLevel_GigantismPlus" Value="6" />
         <removetag Name="Gigantic" />
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
     <object Name="Troll" Load="Merge">
         <mutation Name="GigantismPlus" Level="6" />
         <property Name="GenerateWithStews" Value="3d3" />
-        <property Name="RapidLevel_GigantismPlus" Value="3" />
+        <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
         <removetag Name="Gigantic" />
         <tag Name="GigantismPlusColorChange" Value="false" />
     </object>
@@ -117,31 +117,90 @@
         Swap Burrowing Claws mutation class for creatures that come with it.
      -->
   <object Name="MopangoCharioteer" Load="Merge">
-    <removemutation Name="BurrowingClaws" Level="4" />
-    <mutation Name="BurrowingClaws" Level="4" />
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" />
   </object>
   <object Name="MopangoPilgrim" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" Level="4" PathAsBurrower="false" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
   </object>
   <object Name="MopangoPilgrim Still" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" Level="4" PathAsBurrower="false" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
   </object>
   <object Name="MopangoTombdweller" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" Level="4" PathAsBurrower="false" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
   </object>
   <object Name="MopangoWatcher" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" Level="6" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="6" />
   </object>
+  
+    <!-- 
+        Swap Horns mutation class for creatures that come with it.
+     -->
+  <object Name="Horned Chameleon" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="1" Variant="Horns Single" />
+  </object>
+  <object Name="BaseHindren" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="3" Variant="Horns Antlers" />
+  </object>
+  <object Name="Fork-Horned Gnu" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="5" Variant="Horns" />
+  </object>
+  <object Name="Unimax" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="10" Variant="Horns Spiral" />
+    <intproperty Name="RapidLevel_UD_HornsPlus" Value="6" />
+  </object>
+  <object Name="Goat Golem" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="Horns" />
+  </object>
+  <object Name="Warden Yrame" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="Horns" />
+  </object>
+  
+    <!-- 
+        Swap Quills mutation class for creatures that come with it.
+     -->
+  <object Name="Prickler" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="1" />
+  </object>
+  <object Name="Quillipede" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="3" />
+  </object>
+  <object Name="Urshiib" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="6" />
+  </object>
+  <object Name="Urchin Golem" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="10" />
+  </object>
+  <object Name="Urshiib Golem" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="9" />
+    <intproperty Name="RapidLevel_UD_QuillsPlus" Value="3" />
+  </object>
+  <object Name="Dagasha" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="10" />
+  </object>
+  
     <!-- 
         Make creatures Elongated: 
         - give mutation "ElongatedPaws" 
      -->
     <object Name="Urshiib" Load="Merge">
-      <mutation Name="ElongatedPaws" />
+      <mutation Name="ElongatedPaws" DisplayName="Elongated Paws" />
     </object>
     <!-- End make creatures Elongated -->
 

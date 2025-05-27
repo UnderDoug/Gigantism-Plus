@@ -5,12 +5,14 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
-[GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
+[GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
 public class UpdateNaturalEquipmentModsEvent : ModPooledEvent<UpdateNaturalEquipmentModsEvent>
 {
-    public new static readonly int CascadeLevel = CASCADE_ALL; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
+    private static bool doDebug => true;
 
-    public GameObject Actor;
+    public new static readonly int CascadeLevel = CASCADE_NONE; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
+
+    public GameObject Creature;
 
     public override int GetCascadeLevel()
     {
@@ -19,32 +21,46 @@ public class UpdateNaturalEquipmentModsEvent : ModPooledEvent<UpdateNaturalEquip
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(UpdateNaturalEquipmentModsEvent).Name}";
+        return $"{nameof(UpdateNaturalEquipmentModsEvent)}";
     }
 
     public override void Reset()
     {
         base.Reset();
-        Actor = null;
+        Creature = null;
     }
 
-    public static void Send(GameObject Actor)
+    public static void Send(GameObject Creature)
     {
-        Debug.Entry(4, $"{typeof(UpdateNaturalEquipmentModsEvent).Name}.{nameof(Send)}(GameObject Object: {Actor?.DebugName})", Indent: 0);
-        bool flag = true;
+        Debug.Entry(4,
+        $"! {nameof(UpdateNaturalEquipmentModsEvent)}."
+        + $"{nameof(Send)}"
+        + $"(GameObject Object: {Creature?.DebugName ?? NULL})",
+        Indent: 0, Toggle: doDebug);
+
         UpdateNaturalEquipmentModsEvent E = FromPool();
-        if (GameObject.Validate(ref Actor))
+
+        bool validActor = Creature != null;
+
+        bool wantsMin = validActor && Creature.WantEvent(ID, E.GetCascadeLevel());
+        bool wantsStr = validActor && Creature.HasRegisteredEvent(E.GetRegisteredEventID());
+
+        bool anyWants = wantsMin || wantsStr;
+
+        bool proceed = validActor;
+        if (anyWants)
         {
-            if (Actor.WantEvent(ID, CascadeLevel))
+
+            if (proceed && wantsMin)
             {
-                E.Actor = Actor;
-                flag = Actor.HandleEvent(E);
+                E.Creature = Creature;
+                proceed = Creature.HandleEvent(E);
             }
-            if (flag && Actor.HasRegisteredEvent(E.GetRegisteredEventID()))
+            if (proceed && wantsStr)
             {
                 Event @event = Event.New(E.GetRegisteredEventID());
-                @event.SetParameter("Actor", Actor);
-                Actor.FireEvent(@event);
+                @event.SetParameter(nameof(Creature), Creature);
+                proceed = Creature.FireEvent(@event);
             }
         }
     }

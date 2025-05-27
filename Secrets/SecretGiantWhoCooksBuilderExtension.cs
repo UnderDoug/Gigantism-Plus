@@ -8,27 +8,27 @@ using HistoryKit;
 using Qud.API;
 
 using XRL;
+using XRL.UI;
+using XRL.Rules;
 using XRL.World;
-using XRL.World.WorldBuilders;
-using XRL.World.ZoneBuilders;
-using static XRL.World.ZoneBuilderPriority;
+using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
-using XRL.World.Conversations;
+using XRL.World.ZoneBuilders;
+using XRL.World.WorldBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Anatomy;
 using XRL.World.Skills.Cooking;
+using XRL.World.Conversations;
 using XRL.Language;
 using XRL.Names;
-using XRL.World.Capabilities;
-using XRL.Rules;
-using XRL.UI;
 using XRL.Wish;
+
+using static XRL.World.ZoneBuilderPriority;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using Sheeter;
 
 namespace HNPS_GigantismPlus
 {
@@ -84,7 +84,7 @@ namespace HNPS_GigantismPlus
 
             string MapFileName = SCRT_GNT_ZONE_MAP2_CENTRE;
 
-            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{ThisMod.Path}/Secrets/Maps/{MapFileName}");
+            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{MapFileName}");
             zoneManager.AddZonePostBuilder(SecretZoneId, "Music", "Track", "Music/Barathrums Study");
 
             zoneManager.AddZonePostBuilder(SecretZoneId, nameof(IsCheckpoint), "Key", SecretZoneId);

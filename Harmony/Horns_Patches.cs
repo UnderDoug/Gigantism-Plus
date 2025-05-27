@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 
+using System;
+
 using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
@@ -9,11 +11,15 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(Horns))]
+    [HarmonyPatch]
     public static class Horns_Patches
     {
+        [HarmonyPatch(
+            declaringType: typeof(Horns), 
+            methodName: nameof(Horns.RegrowHorns),
+            argumentTypes: new Type[] { typeof(bool) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        [HarmonyPatch(nameof(Horns.RegrowHorns))]
         static bool RegrowHorns_AlwaysForce_Prefix(ref Horns __instance, ref bool Force, ref GameObject ___HornsObject, ref string ___Variant)
         {
             Force = true;
@@ -21,8 +27,12 @@ namespace HNPS_GigantismPlus.Harmony
             return true;
         }
 
+        [HarmonyPatch(
+            declaringType: typeof(Horns),
+            methodName: nameof(Horns.RegrowHorns),
+            argumentTypes: new Type[] { typeof(bool) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(Horns.RegrowHorns))]
         static void RegrowHorns_MaxStrengthBonus_Postfix(ref GameObject ___HornsObject)
         {
             MeleeWeapon HornsWeapon = ___HornsObject.GetPart<MeleeWeapon>();

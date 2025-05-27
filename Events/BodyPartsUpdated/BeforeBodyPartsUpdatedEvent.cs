@@ -12,9 +12,11 @@ using static HNPS_GigantismPlus.Const;
 [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdatedEvent>
 {
+    private static bool doDebug => true;
+
     public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 
-    public GameObject Actor;
+    public GameObject Creature;
 
     public override int GetCascadeLevel()
     {
@@ -23,35 +25,45 @@ public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdated
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(BeforeBodyPartsUpdatedEvent).Name}";
+        return $"{nameof(BeforeBodyPartsUpdatedEvent)}";
     }
 
     public override void Reset()
     {
         base.Reset();
-        Actor = null;
+        Creature = null;
     }
 
-    public static void Send(GameObject Actor)
+    public static void Send(GameObject Creature)
     {
-        Debug.Entry(4, 
-            $"{typeof(BeforeBodyPartsUpdatedEvent).Name}." + 
-            $"{nameof(Send)}(GameObject Actor: {Actor?.DebugName})", 
-            Indent: 0);
-        
+        Debug.Entry(4,
+            $"! {nameof(BeforeBodyPartsUpdatedEvent)}."
+            + $"{nameof(Send)}(GameObject Creature: {Creature?.DebugName ?? NULL})",
+            Indent: 0, Toggle: doDebug);
+
         BeforeBodyPartsUpdatedEvent E = FromPool();
 
-        bool flag = true;
-        if (Actor.WantEvent(ID, CascadeLevel))
+        bool validCreature = Creature != null;
+
+        bool wantsMin = validCreature && Creature.WantEvent(ID, E.GetCascadeLevel());
+        bool wantsStr = validCreature && Creature.HasRegisteredEvent(E.GetRegisteredEventID());
+
+        bool anyWants = wantsMin || wantsStr;
+
+        bool proceed = validCreature;
+        if (anyWants)
         {
-            E.Actor = Actor;
-            flag = Actor.HandleEvent(E);
-        }
-        if (flag && Actor.HasRegisteredEvent(E.GetRegisteredEventID()))
-        {
-            Event @event = Event.New(E.GetRegisteredEventID());
-            @event.SetParameter(nameof(Actor), Actor);
-            Actor.FireEvent(@event);
+            if (proceed && wantsMin)
+            {
+                E.Creature = Creature;
+                proceed = Creature.HandleEvent(E);
+            }
+            if (proceed && wantsStr)
+            {
+                Event @event = Event.New(E.GetRegisteredEventID());
+                @event.SetParameter(nameof(Creature), Creature);
+                proceed = Creature.FireEvent(@event);
+            }
         }
     }
 }

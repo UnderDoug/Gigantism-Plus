@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 
+using System;
+
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
@@ -10,11 +12,15 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(BodyPart))]
+    [HarmonyPatch]
     public static class BodyPart_Patches
     {
+        [HarmonyPatch(
+            declaringType: typeof(BodyPart),
+            methodName: nameof(BodyPart.Implant),
+            argumentTypes: new Type[] { typeof(GameObject), typeof(bool), typeof(bool) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(BodyPart.Implant))]
         public static void Implant_UpdateBodyParts_Postfix(ref BodyPart __instance)
         {
             BodyPart @this = __instance;

@@ -17,12 +17,12 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class MutationBGoneWishHandler_Patches
     {
-        [HarmonyPrefix]
         [HarmonyPatch(
             declaringType: typeof(MutationBGoneWishHandler),
             methodName: nameof(MutationBGoneWishHandler.MutationBGone),
             argumentTypes: new Type[] { typeof(string) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
+        [HarmonyPrefix]
         public static bool MutationBGone_WorkOnEntryName_Prefix(ref bool __result, string argument)
         {
             Debug.Entry(4,

@@ -3,6 +3,7 @@ using XRL.World;
 
 namespace HNPS_GigantismPlus
 {
+    /*
     public class ExampleEvent : ModPooledEvent<ExampleEvent>
     {
 
@@ -52,4 +53,5 @@ namespace HNPS_GigantismPlus
             return true;
         }
     }
+    */
 }

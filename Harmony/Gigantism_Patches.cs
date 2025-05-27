@@ -1,12 +1,13 @@
 ﻿using HarmonyLib;
 
+using System;
+
 using XRL.World;
 using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using XRL.World.Parts.Mutation;
-using System;
 
 namespace HNPS_GigantismPlus.Harmony
 {   

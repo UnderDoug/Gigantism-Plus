@@ -11,7 +11,7 @@ namespace XRL.World.Parts
     {
         public void CapMaxStrengthBonus(ref GameObject Object)
         {
-            if (GameObject.Validate(ref Object) && GameObject.Validate(ParentObject) && Object == ParentObject)
+            if (Object != null && ParentObject != null && Object == ParentObject)
             {
                 if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.MaxStrengthBonus > MeleeWeapon.BONUS_CAP_UNLIMITED)
                 {

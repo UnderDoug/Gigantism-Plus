@@ -63,11 +63,12 @@ namespace HNPS_GigantismPlus.Harmony
 
         } //!-- static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = true)
 
-        [HarmonyPrefix]
         [HarmonyPatch(
-            typeof(CyberneticsTerminal2), 
-            nameof(CyberneticsTerminal2.HandleEvent), 
-            new Type[] { typeof(InventoryActionEvent) })]
+            declaringType: typeof(CyberneticsTerminal2), 
+            methodName: nameof(CyberneticsTerminal2.HandleEvent), 
+            argumentTypes: new Type[] { typeof(InventoryActionEvent) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
+        [HarmonyPrefix]
         static bool InventoryActionEvent_HunchOver_Prefix(InventoryActionEvent E)
         {
             if (E.Command.Is("InterfaceWithBecomingNook"))
@@ -84,11 +85,12 @@ namespace HNPS_GigantismPlus.Harmony
             return true;
         } //!-- static bool InventoryActionEvent_HunchOver_Prefix(InventoryActionEvent E)
 
-        [HarmonyPostfix]
         [HarmonyPatch(
-            typeof(CyberneticsTerminal2),
-            nameof(CyberneticsTerminal2.HandleEvent),
-            new Type[] { typeof(InventoryActionEvent) })]
+            declaringType: typeof(CyberneticsTerminal2),
+            methodName: nameof(CyberneticsTerminal2.HandleEvent),
+            argumentTypes: new Type[] { typeof(InventoryActionEvent) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
+        [HarmonyPostfix]
         static void InventoryActionEvent_HunchOver_Postfix(InventoryActionEvent E)
         {
             if (E.Command == "InterfaceWithBecomingNook")
@@ -104,8 +106,12 @@ namespace HNPS_GigantismPlus.Harmony
             }
         } //!-- static bool InventoryActionEvent_HunchOver_Postfix(InventoryActionEvent E)
 
+        [HarmonyPatch(
+            declaringType: typeof(CyberneticsTerminal2),
+            methodName: nameof(CyberneticsTerminal2.HandleEvent),
+            argumentTypes: new Type[] { typeof(CommandSmartUseEvent) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(CommandSmartUseEvent) })]
         static bool CommandSmartUseEvent_HunchOver_Prefix(CommandSmartUseEvent E)
         {
             Debug.Entry(3,
@@ -119,8 +125,12 @@ namespace HNPS_GigantismPlus.Harmony
             return true;
         } //!-- static bool CommandSmartUseEventPrefix(CommandSmartUseEvent E)
 
+        [HarmonyPatch(
+            declaringType: typeof(CyberneticsTerminal2),
+            methodName: nameof(CyberneticsTerminal2.HandleEvent),
+            argumentTypes: new Type[] { typeof(CommandSmartUseEvent) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(CyberneticsTerminal2), "HandleEvent", new Type[] { typeof(CommandSmartUseEvent) })]
         static void CommandSmartUseEvent_HunchOver_Postfix(CommandSmartUseEvent E)
         {
             Debug.Entry(3, "Patched method run", Indent: 1);

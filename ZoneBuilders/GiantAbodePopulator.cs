@@ -6,14 +6,15 @@ using System.Linq;
 
 using XRL.Rules;
 using XRL.World.Parts;
+using XRL.World.ObjectBuilders;
 using XRL.World.AI.Pathfinding;
+
 using static XRL.Core.XRLCore;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.World.ObjectBuilders;
 
 namespace XRL.World.ZoneBuilders
 {
@@ -26,10 +27,10 @@ namespace XRL.World.ZoneBuilders
             List<object> doList = new()
             {
                 'V',    // Vomit
+                "CH",   // ObjectCreation
             };
             List<object> dontList = new()
             {
-                "CH",   // ObjectCreation
             };
 
             if (what != null && doList.Contains(what))

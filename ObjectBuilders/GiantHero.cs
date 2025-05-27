@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 
 using XRL.Names;
-using XRL.World.ObjectBuilders;
-using XRL.World.Parts.Mutation;
-using XRL.World.Parts;
 using XRL.Rules;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+using XRL.World.ObjectBuilders;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;

@@ -14,6 +14,7 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Extensions;
 
 using SerializeField = UnityEngine.SerializeField;
+using XRL.World.Tinkering;
 
 namespace XRL.World.Parts
 {
@@ -29,11 +30,11 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
+                "OC",   // ObjectCreation
             };
             List<object> dontList = new()
             {
                 'R',    // Removal
-                "OC",   // ObjectCreation
                 "S"     // Serialisation
             };
 
@@ -45,6 +46,8 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
+
+        public bool WantsToManage => ParentObject != null && ParentObject.IsNaturalEquipment();
 
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
@@ -147,17 +150,17 @@ namespace XRL.World.Parts
         }
         public void ClearNaturalWeaponMods()
         {
-            Debug.Entry(4, $"* {nameof(ClearNaturalWeaponMods)}()", Indent: 1, Toggle: getDoDebug('R'));
+            Debug.Entry(4, $"* {nameof(ClearNaturalWeaponMods)}()", Indent: Debug.LastIndent, Toggle: getDoDebug('R'));
             NaturalEquipmentMods = new();
         }
         public void ClearAdjustmentTargets()
         {
-            Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: 1, Toggle: getDoDebug('R'));
+            Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: Debug.LastIndent, Toggle: getDoDebug('R'));
             AdjustmentTargets = GetEmptyAdjustmentTargets();
         }
         public void ResetShortDescriptions()
         {
-            Debug.Entry(4, $"* {nameof(ResetShortDescriptions)}()", Indent: 1, Toggle: getDoDebug('R'));
+            Debug.Entry(4, $"* {nameof(ResetShortDescriptions)}()", Indent: Debug.LastIndent, Toggle: getDoDebug('R'));
             ClearShortDescriptionCache();
             ClearShortDescriptions();
         }
@@ -313,20 +316,16 @@ namespace XRL.World.Parts
         public virtual void ManageNaturalEquipment()
         {
             Debug.Header(4, 
-                $"{typeof(NaturalEquipmentManager).Name}",
+                $"{nameof(NaturalEquipmentManager)}",
                 $"{nameof(ManageNaturalEquipment)}()", Toggle: doDebug);
 
-            string wielderString = 
-                Wielder != null 
-                ? Wielder.DebugName 
-                : $"[null]";
             string parentLimbString = 
                 ParentLimb != null 
                 ? $"[{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description}" 
                 : $"[null]";
 
             Debug.LoopItem(4, 
-                $" Wielder: {wielderString}", 
+                $" Wielder: {Wielder?.DebugName ?? NULL}", 
                 Indent: 0, Toggle: doDebug);
             Debug.LoopItem(4, 
                 $" ParentLimb: {parentLimbString}", 
@@ -433,17 +432,17 @@ namespace XRL.World.Parts
                     displayNameOnlySansRays.Replace(icyString, "");
                     displayNameOnlySansRays.Replace(flamingString, "");
 
+                    Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
                     if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath))
                     {
-                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
                         ParentRender.Tile = tilePath;
+                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
                     }
                     if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath))
                     {
-                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
                         ParentRender.Tile = tilePath;
+                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
                     }
-                    Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
 
                     Debug.Entry(4, $"Dynamic Tile update attempted", Indent: 1, Toggle: doDebug);
                 }
@@ -463,11 +462,13 @@ namespace XRL.World.Parts
             }
             else
             {
-                Debug.Entry(4, $"Nothing to Manage", Indent: 1, Toggle: doDebug);
+                Debug.Entry(4, 
+                    $"{ParentObject?.DebugName ?? NULL} has no {nameof(NaturalEquipmentMods)} to Manage", 
+                    Indent: 1, Toggle: doDebug);
             }
 
             Debug.Footer(4,
-                $"{typeof(NaturalEquipmentManager).Name}",
+                $"{nameof(NaturalEquipmentManager)}",
                 $"{nameof(ManageNaturalEquipment)}()", Toggle: doDebug);
         }
 
@@ -482,56 +483,79 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: 1, Toggle: doDebug);
         }
 
+        public static bool RemoveThisIfNotNatural(GameObject Equipment, NaturalEquipmentManager Manager)
+        {
+            if (Equipment == null) return false;
+
+            if (!Equipment.IsNaturalEquipment())
+            {
+                Equipment.RemovePart(Manager);
+                Debug.CheckNah(4,
+                    $"Removed {nameof(NaturalEquipmentManager)} from Object",
+                    Indent: 1, Toggle: getDoDebug("OC"));
+                return true;
+            }
+            else
+            {
+                Debug.CheckYeh(4,
+                    $"Kept {nameof(NaturalEquipmentManager)} on Object",
+                    Indent: 1, Toggle: getDoDebug("OC"));
+                
+                if (!Equipment.TryGetPart(out TinkerItem tinkerItem))
+                {
+                    tinkerItem = Equipment.RequirePart<TinkerItem>();
+                }
+                tinkerItem.Bits = "";
+                tinkerItem.CanDisassemble = false;
+                tinkerItem.CanBuild = false;
+
+                Debug.LoopItem(4,
+                    $"Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(Equipment)}",
+                    Good: !TinkeringHelpers.CanBeDisassembled(Equipment), Indent: 1, Toggle: getDoDebug("OC"));
+                return false;
+            }
+        }
+        public bool RemoveThisIfNotNatural(GameObject Equipment)
+        {
+            return RemoveThisIfNotNatural(Equipment, this);
+        }
+
+        public static List<string> WantStringEvents = new()
+        {
+            "AdjustWeaponScore",
+            "AdjustArmorScore",
+            "CanBeDisassembled",
+        };
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register("AdjustWeaponScore");
-            Registrar.Register("AdjustArmorScore");
-            Registrar.Register("CanBeDisassembled");
+            if (WantsToManage)
+            {
+                foreach (string EventID in WantStringEvents)
+                {
+                    Registrar.Register(EventID);
+                }
+            }
             base.Register(Object, Registrar);
         }
+        public static List<int> WantEvents = new()
+        {
+            GetShortDescriptionEvent.ID,
+            BeforeBodyPartsUpdatedEvent.ID,
+            AfterBodyPartsUpdatedEvent.ID,
+        };
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == AfterObjectCreatedEvent.ID
-                || ID == GetShortDescriptionEvent.ID
-                || ID == BeforeBodyPartsUpdatedEvent.ID
-                || ID == AfterBodyPartsUpdatedEvent.ID;
-        }
-        public override bool HandleEvent(AfterObjectCreatedEvent E)
-        {
-            if (GameObject.Validate(ParentObject) && E.Object == ParentObject)
-            {
-                if (!ParentObject.IsNaturalEquipment())
-                {
-                    ParentObject.RemovePart(this);
-                }
-                else
-                {
-                    Debug.Entry(4,
-                        $"{nameof(NaturalEquipmentManager)}." + 
-                        $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E.Object: {E?.Object?.DebugName ?? NULL})" + 
-                        $" Kept {nameof(NaturalEquipmentManager)}",
-                        Indent: 0, Toggle: getDoDebug("OC"));
-
-                    if (!ParentObject.TryGetPart(out TinkerItem tinkerItem))
-                    {
-                        tinkerItem = ParentObject.RequirePart<TinkerItem>(Creation: true);
-                    }
-                    tinkerItem.Bits = "";
-                    tinkerItem.CanDisassemble = false;
-                    tinkerItem.CanBuild = false;
-                }
-            }
-            return base.HandleEvent(E);
+                || (WantsToManage && WantEvents.Contains(ID));
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
             Debug.Entry(4,
-                $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.DebugName})",
-                Indent: 0, Toggle: doDebug);
+            $"@ {nameof(NaturalEquipmentManager)}."
+            + $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E: {E.Object.DebugName})",
+            Indent: 0, Toggle: doDebug);
 
-            if(E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
+            if (E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
             {
                 ShortDescriptions ??= new();
                 _shortDescriptionCache ??= ProcessShortDescription(ShortDescriptions);
@@ -543,14 +567,15 @@ namespace XRL.World.Parts
         public bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
-                $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E (Actor:{E?.Actor?.DebugName}))",
-                Indent: 0, Toggle: doDebug);
-            Debug.Entry(4,
-                $" Actor:{E?.Actor?.ShortDisplayName} | Limb: [{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description}",
-                Indent: 0, Toggle: doDebug);
+            $"@ {nameof(NaturalEquipmentManager)}."
+            + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E)",
+            Indent: 0, Toggle: doDebug);
 
-            if (E.Actor == Wielder)
+            Debug.Entry(4,
+                $"Creature: {E?.Creature?.DebugName ?? NULL} | Limb: [{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description ?? NULL}",
+                Indent: 1, Toggle: doDebug);
+
+            if (E.Creature == Wielder)
             {
                 ClearNaturalWeaponMods();
                 ClearAdjustmentTargets();
@@ -562,36 +587,52 @@ namespace XRL.World.Parts
         public bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
-                $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E (Actor:{E.Actor.DebugName}))",
-                Indent: 0, Toggle: doDebug);
+            $"@ {nameof(NaturalEquipmentManager)}."
+            + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E.Creature: {E.Creature?.DebugName})",
+            Indent: 0, Toggle: doDebug);
 
-            if (E.Actor == Wielder)
+            if (E.Creature != null)
             {
-                BeforeManageDefaultEquipmentEvent beforeEvent = BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
-                ManageDefaultEquipmentEvent manageEvent = ManageDefaultEquipmentEvent.Manage(beforeEvent, Wielder);
-                AfterManageDefaultEquipmentEvent.Send(manageEvent);
+                if (E.Creature == Wielder)
+                {
+                    BeforeManageDefaultEquipmentEvent beforeEvent = BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
+                    ManageDefaultEquipmentEvent manageEvent = ManageDefaultEquipmentEvent.Manage(beforeEvent, Wielder);
+                    AfterManageDefaultEquipmentEvent.Send(manageEvent);
+                }
             }
+
+            Debug.Entry(4,
+                $"x {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E.Creature: {E.Creature?.DebugName}) @//",
+                Indent: 0, Toggle: doDebug);
 
             return base.HandleEvent(E);
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
+            if (WantsToManage)
             {
-                GameObject User = E.GetGameObjectParameter("User");
-                int Score = E.GetIntParameter("Score");
-                Score = Math.Max(100, Score);
+                if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
+                {
+                    GameObject User = E.GetGameObjectParameter("User");
+                    int Score = E.GetIntParameter("Score");
+                    Score = Math.Max(100, Score);
 
-                E.SetParameter("Score", Score);
-            }
-            if (E.ID == "CanBeDisassembled")
-            {
-                return false;
+                    E.SetParameter("Score", Score);
+                }
+                if (E.ID == "CanBeDisassembled")
+                {
+                    return false;
+                }
             }
             return base.FireEvent(E);
         }
 
+        public override void ObjectLoaded()
+        {
+            base.ObjectLoaded();
+            RemoveThisIfNotNatural(ParentObject);
+        }
         public override void Remove()
         {
             ResetShortDescriptions();
@@ -670,5 +711,8 @@ namespace XRL.World.Parts
             return naturalEquipmentManager;
         }
 
-    } //!-- public class NaturalWeaponDescriber : IScribedPart
+    } //!-- public class NaturalEquipmentManager 
+      //: IScribedPart
+      //, IModEventHandler<BeforeBodyPartsUpdatedEvent>
+      //, IModEventHandler<AfterBodyPartsUpdatedEvent>
 }

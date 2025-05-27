@@ -5,9 +5,9 @@ using System.Collections;
 using System.Linq;
 
 using XRL.UI;
+using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
 using XRL.World.Capabilities;
-using XRL.World.Anatomy;
 using XRL.World.AI.Pathfinding;
 using XRL.Wish;
 

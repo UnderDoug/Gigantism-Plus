@@ -22,12 +22,17 @@ namespace XRL.World.Parts.Mutation
 
         public ElongatedPaws()
         {
-            SetDisplayName("{{giant|Elongated Paws}}"); //.OptionalColorGiant(Colorfulness);
-            Type = "Physical";
+            // SetDisplayName("{{giant|Elongated Paws}}"); //.OptionalColorGiant(Colorfulness);
+            // Type = "Physical";
 
-            NaturalEquipmentMod = new ModElongatedNaturalWeapon()
+            NaturalEquipmentMod = NewNaturalWeaponMod(this);
+        }
+
+        public static ModElongatedNaturalWeapon NewNaturalWeaponMod(ElongatedPaws assigningPart)
+        {
+            ModElongatedNaturalWeapon elongatedNaturalWeaponMod = new ()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
                 ModPriority = 20,
@@ -45,15 +50,16 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
                 },
             };
-            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
-            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
+            elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
 
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
+            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
 
-            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
+            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            return elongatedNaturalWeaponMod;
         }
 
         private bool _HasGigantism = false;
@@ -120,6 +126,11 @@ namespace XRL.World.Parts.Mutation
 
         public override bool AllowStaticRegistration() { return true; }
 
+        protected override string GetBaseDisplayName()
+        {
+            return base.GetBaseDisplayName().OptionalColorGiant(Colorfulness);
+        }
+
         public override string GetDescription()
         {
             return "An array of long, slender, digits fan from your paws, fluttering with composed and expert precision.\n\n"
@@ -154,21 +165,23 @@ namespace XRL.World.Parts.Mutation
         {
             if (E.Name == "Strength") // || E.Name == "Agility")
             {
-                Body body = E.Object.Body;
+                Body body = E.Object?.Body;
 
-                NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-
-                body?.UpdateBodyParts();
-
-
-                foreach (GameObject equipped in body.GetEquippedObjects())
+                if (body != null && NaturalEquipmentMod != null)
                 {
-                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                    NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
+
+                    body?.UpdateBodyParts();
+
+
+                    foreach (GameObject equipped in body.GetEquippedObjects())
                     {
-                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                        if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                        {
+                            weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                        }
                     }
                 }
-
             }
             return base.HandleEvent(E);
         }
@@ -183,11 +196,14 @@ namespace XRL.World.Parts.Mutation
         public override void AfterMutate()
         {
             GameObject GO = ParentObject;
-            foreach (GameObject equipped in GO.Body.GetEquippedObjects())
+            if (GO != null && GO.Body != null && !GO.Body.GetEquippedObjects().IsNullOrEmpty())
             {
-                if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                foreach (GameObject equipped in GO.Body.GetEquippedObjects())
                 {
-                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                    {
+                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    }
                 }
             }
             base.AfterMutate();
@@ -195,15 +211,19 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Unmutate(GameObject GO)
         {
-            foreach (GameObject equipped in GO.Body.GetEquippedObjects())
+            if (GO != null && GO.Body != null && !GO.Body.GetEquippedObjects().IsNullOrEmpty())
             {
-                if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                foreach (GameObject equipped in GO.Body.GetEquippedObjects())
                 {
-                    weaponElongator.UnapplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                    {
+                        weaponElongator.UnapplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    }
                 }
-            }
 
-            GO.CheckEquipmentSlots();
+                GO.CheckEquipmentSlots();
+            }
+            
 
             return base.Unmutate(GO);
         }

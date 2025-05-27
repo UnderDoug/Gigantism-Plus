@@ -33,30 +33,31 @@ namespace HNPS_GigantismPlus
         private static bool getDoDebug (string MethodName)
         {
             if (MethodName == nameof(TryGetTilePath))
-                return false;
+                return true;
 
             if (MethodName == nameof(AddAccumulatedNaturalEquipmentTo))
-                return false;
+                return true;
 
             if (MethodName == nameof(ExplodingDie))
-                return false;
+                return true;
 
             if (MethodName == nameof(SwapMutationEnrtyClass))
-                return false;
+                return true;
 
             if (MethodName == nameof(ManagedVanillaMutationOptionHandler))
-                return false;
+                return true;
 
             if (MethodName == nameof(SwapMutationCategory))
-                return false;
+                return true;
 
             if (MethodName == nameof(Rumble))
-                return false;
+                return true;
 
             return doDebug;
         }
 
         public static ModInfo ThisMod => ModManager.GetMod(MOD_ID);
+        public static ModInfo UD_Blink_Mutation => ModManager.GetMod(UD_BLINK_MUTATION_MOD_ID);
 
         public static Gigantified Gigantifier = new();
         public static GiantHero GiantHeroBuilder = new();

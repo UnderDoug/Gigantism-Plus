@@ -1,5 +1,7 @@
 using HarmonyLib;
 
+using System;
+
 using XRL.World.Parts;
 
 using static HNPS_GigantismPlus.Utils;
@@ -7,12 +9,15 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(MeleeWeapon))]
+    [HarmonyPatch]
     public static class MeleeWeapon_Patches
     {
-
+        [HarmonyPatch(
+            declaringType: typeof(MeleeWeapon), 
+            methodName: nameof(MeleeWeapon.GetSimplifiedStats),
+            argumentTypes: new Type[] { typeof(bool) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.GetSimplifiedStats))]
         public static bool GetSimplifiedStats_CapMaxStrBonus_Prefix(MeleeWeapon __instance)
         {
             // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
@@ -20,8 +25,10 @@ namespace HNPS_GigantismPlus.Harmony
             return true;
         }
 
+        [HarmonyPatch(
+            declaringType: typeof(MeleeWeapon), 
+            methodName: nameof(MeleeWeapon.GetDetailedStats))]
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.GetDetailedStats))]
         public static bool GetDetailedStats_CapMaxStrBonus_Prefix(MeleeWeapon __instance)
         {
             // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.
@@ -29,8 +36,12 @@ namespace HNPS_GigantismPlus.Harmony
             return true;
         }
 
+        [HarmonyPatch(
+            declaringType: typeof(MeleeWeapon), 
+            methodName: nameof(MeleeWeapon.AdjustBonusCap),
+            argumentTypes: new Type[] { typeof(int) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.AdjustBonusCap))]
         public static bool AdjustBonusCap_CapMaxStrBonus_Prefix(MeleeWeapon __instance)
         {
             // If the melee weapon's MaxStrengthBonus is greater than 999, cap it at that.

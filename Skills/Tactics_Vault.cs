@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using Genkit;
+
 using XRL.UI;
 using XRL.Core;
 using XRL.Rules;
-using XRL.World.Capabilities;
 using XRL.World.Anatomy;
+using XRL.World.Capabilities;
 using XRL.World.AI.Pathfinding;
 using XRL.Wish;
 
-using UnityEngine;
+using Mathf =  UnityEngine.Mathf;
 
 using HNPS_GigantismPlus;
 using Debug = HNPS_GigantismPlus.Debug;
@@ -36,7 +37,7 @@ namespace XRL.World.Parts.Skill
             };
             List<object> dontList = new()
             {
-                null, // place holder
+                // null, // place holder
             };
 
             if (what != null && doList.Contains(what))

@@ -3,16 +3,16 @@ using HarmonyLib;
 using System;
 using System.Collections.Generic;
 
+using XRL;
 using XRL.World;
 using XRL.World.Parts;
 using XRL.Language;
+using XRL.World.ObjectBuilders;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using XRL.World.ObjectBuilders;
-using XRL;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -28,7 +28,8 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(
             declaringType: typeof(ModGigantic),
             methodName: nameof(ModGigantic.HandleEvent),
-            argumentTypes: new Type[] { typeof(GetDisplayNameEvent) })]
+            argumentTypes: new Type[] { typeof(GetDisplayNameEvent) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
         static void HandleEvent_GetDisplayName_Postfix(GetDisplayNameEvent E)
         {
@@ -58,7 +59,8 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPatch(
             declaringType: typeof(ModGigantic),
             methodName: nameof(ModGigantic.ApplyModification),
-            argumentTypes: new Type[] { typeof(GameObject) })]
+            argumentTypes: new Type[] { typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
         static bool ModificationApplied_AdditionalEffects_Prefix(ref ModGigantic __instance, GameObject Object)
         {
@@ -71,7 +73,11 @@ namespace HNPS_GigantismPlus.Harmony
         /// </summary>
         /// <param name="__instance">The ModGigantic instance being applied.</param>
         /// <param name="Object">The object to which the modification is being applied.</param>
-        [HarmonyPatch(typeof(ModGigantic), nameof(ModGigantic.ApplyModification), new Type[] { typeof(GameObject) })]
+        [HarmonyPatch(
+            declaringType: typeof(ModGigantic), 
+            methodName: nameof(ModGigantic.ApplyModification), 
+            argumentTypes: new Type[] { typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
         static void ModificationApplied_AdditionalEffects_Postfix(ref ModGigantic __instance, GameObject Object)
         {

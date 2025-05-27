@@ -21,7 +21,7 @@ namespace XRL.World.Parts.Mutation
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        private static bool doDebug => false;
+        private static bool doDebug => true;
 
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
@@ -79,22 +79,25 @@ namespace XRL.World.Parts.Mutation
         {
             if (Parts == null) return false;
             NaturalEquipmentMod.AddedParts ??= new();
-            string[] parts = Parts.Split(',');
-            foreach (string part in parts)
+            if (Parts.Contains(","))
             {
-                NaturalEquipmentMod.AddedParts.Add(part);
+                string[] parts = Parts.Split(',');
+                foreach (string part in parts)
+                {
+                    NaturalEquipmentMod.AddedParts.TryAdd(part);
+                }
             }
-            return true;
+            else
+            {
+                NaturalEquipmentMod.AddedParts.TryAdd(Parts);
+            }
+            return !NaturalEquipmentMod.AddedParts.IsNullOrEmpty();
         }
         public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
-            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
-            {
-                NaturalEquipmentMod.AddedStringProps = StringProps;
-                NaturalEquipmentMod.AddedIntProps = IntProps;
-            }
-            return true;
+            Props.ParseProps(out NaturalEquipmentMod.AddedStringProps, out NaturalEquipmentMod.AddedIntProps);
+            return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
@@ -190,7 +193,7 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2, Toggle: doDebug);
             }
 
             if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
@@ -202,7 +205,7 @@ namespace XRL.World.Parts.Mutation
             }
             else
             {
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2, Toggle: doDebug);
             }
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
@@ -249,27 +252,21 @@ namespace XRL.World.Parts.Mutation
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == BeforeBodyPartsUpdatedEvent.ID
                 || ID == UpdateNaturalEquipmentModsEvent.ID
-                || ID == AfterBodyPartsUpdatedEvent.ID
-                || ID == BeforeManageDefaultEquipmentEvent.ID
-                || ID == ManageDefaultEquipmentEvent.ID
-                || ID == AfterManageDefaultEquipmentEvent.ID
-                || ID == BeforeRapidAdvancementEvent.ID
-                || ID == AfterRapidAdvancementEvent.ID;
+                || ID == ManageDefaultEquipmentEvent.ID;
         }
         public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
+        public virtual bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E )",
+                + $"{nameof(HandleEvent)}({nameof(UpdateNaturalEquipmentModsEvent)} E )",
                 Indent: 0, Toggle: doDebug);
 
-            if (E.Actor == ParentObject)
+            if (E.Creature == ParentObject)
             {
                 OnUpdateNaturalEquipmentMods();
             }
@@ -283,14 +280,14 @@ namespace XRL.World.Parts.Mutation
         {
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(ManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(ManageDefaultEquipmentEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
+                + $"{nameof(HandleEvent)}({nameof(ManageDefaultEquipmentEvent)} E)",
                 Indent: 0, Toggle: doDebug);
 
-            if (E.Wielder == ParentObject)
+            if (E.Creature == ParentObject)
             {
                 OnManageNaturalEquipment(E.Manager, E.BodyPart);
             }

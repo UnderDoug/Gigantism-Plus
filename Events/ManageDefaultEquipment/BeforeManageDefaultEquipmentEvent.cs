@@ -1,24 +1,23 @@
-﻿using System.Collections.Generic;
-using System;
-
+﻿using System;
+using System.Collections.Generic;
 using XRL;
+using XRL.UI;
 using XRL.World;
-using XRL.World.Parts;
 using XRL.World.Anatomy;
-
-using static HNPS_GigantismPlus.Utils;
+using XRL.World.Parts;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
+    [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
     public class BeforeManageDefaultEquipmentEvent : ModPooledEvent<BeforeManageDefaultEquipmentEvent>
     {
         private static bool doDebug => false;
 
-        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
+        public new static readonly int CascadeLevel = CASCADE_NONE; //CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 
-        public GameObject Object;
+        public GameObject Equipment;
 
         public NaturalEquipmentManager Manager;
 
@@ -28,16 +27,16 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public BeforeManageDefaultEquipmentEvent(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
+        public BeforeManageDefaultEquipmentEvent(GameObject Equipment, NaturalEquipmentManager Manager, BodyPart BodyPart)
             : this()
         {
-            BeforeManageDefaultEquipmentEvent @new = FromPool(Object, Manager, BodyPart);
-            this.Object = @new.Object;
+            BeforeManageDefaultEquipmentEvent @new = FromPool(Equipment, Manager, BodyPart);
+            this.Equipment = @new.Equipment;
             this.Manager = @new.Manager;
             this.BodyPart = @new.BodyPart;
         }
         public BeforeManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent Source)
-            : this(Source.Object, Source.Manager, Source.BodyPart)
+            : this(Source.Equipment, Source.Manager, Source.BodyPart)
         {
         }
 
@@ -48,39 +47,40 @@ namespace HNPS_GigantismPlus
 
         public virtual string GetRegisteredEventID()
         {
-            return $"{typeof(BeforeManageDefaultEquipmentEvent).Name}";
+            return $"{nameof(BeforeManageDefaultEquipmentEvent)}";
         }
 
         public override void Reset()
         {
             base.Reset();
-            Object = null;
+            Equipment = null;
             Manager = null;
             BodyPart = null;
         }
 
-        public static BeforeManageDefaultEquipmentEvent Send(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
+        public static BeforeManageDefaultEquipmentEvent Send(GameObject Equipment, NaturalEquipmentManager Manager, BodyPart BodyPart)
         {
             Debug.Entry(4,
-                $"! {typeof(BeforeManageDefaultEquipmentEvent).Name}." +
-                $"{nameof(Send)}(Object: {Manager.Wielder.ID}:{Manager.Wielder.ShortDisplayNameStripped}'s " + 
-                $"{Object?.ShortDisplayNameStripped}, Manager, BodyPart: [{BodyPart?.ID}:{BodyPart?.Type}])",
+                $"! {nameof(BeforeManageDefaultEquipmentEvent)}."
+                + $"{nameof(Send)}(Equipment: {Manager?.Wielder?.DebugName ?? NULL}'s "
+                + $"{Equipment?.DebugName ?? NULL}, Manager,"
+                + $" BodyPart: [{BodyPart?.ID}:{BodyPart?.Type}])",
                 Indent: 0, Toggle: doDebug);
 
-            bool flag = true;
-            BeforeManageDefaultEquipmentEvent E = new(Object, Manager, BodyPart);
-            if (GameObject.Validate(ref Object) && BodyPart != null)
-            {
-                flag = Object.HandleEvent(E);
+            BeforeManageDefaultEquipmentEvent E = new(Equipment, Manager, BodyPart);
 
-                if (flag && Object.HasRegisteredEvent(E.GetRegisteredEventID()))
-                {
-                    Event @event = Event.New(E.GetRegisteredEventID());
-                    @event.SetParameter("Object", Object);
-                    @event.SetParameter("Manager", Manager);
-                    @event.SetParameter("BodyPart", BodyPart);
-                    Object.FireEvent(@event);
-                }
+            bool progress = E.BodyPart != null && E.Equipment != null;
+            if (progress && E.Equipment.WantEvent(ID, CascadeLevel))
+            {
+                progress = E.Equipment.HandleEvent(E);
+            }
+            if (progress && Equipment.HasRegisteredEvent(E.GetRegisteredEventID()))
+            {
+                Event @event = Event.New(E.GetRegisteredEventID());
+                @event.SetParameter("Object", E.Equipment);
+                @event.SetParameter("Manager", E.Manager);
+                @event.SetParameter("BodyPart", E.BodyPart);
+                progress = Equipment.FireEvent(@event);
             }
             return E;
         }
@@ -88,7 +88,7 @@ namespace HNPS_GigantismPlus
         public static BeforeManageDefaultEquipmentEvent FromPool(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
         {
             BeforeManageDefaultEquipmentEvent beforeManageDefaultEquipmentEvent = FromPool();
-            beforeManageDefaultEquipmentEvent.Object = Object;
+            beforeManageDefaultEquipmentEvent.Equipment = Object;
             beforeManageDefaultEquipmentEvent.Manager = Manager;
             beforeManageDefaultEquipmentEvent.BodyPart = BodyPart;
             return beforeManageDefaultEquipmentEvent;

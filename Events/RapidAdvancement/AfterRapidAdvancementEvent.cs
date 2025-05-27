@@ -24,7 +24,7 @@ public class AfterRapidAdvancementEvent : ModPooledEvent<AfterRapidAdvancementEv
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(AfterRapidAdvancementEvent).Name}";
+        return $"{nameof(AfterRapidAdvancementEvent)}";
     }
 
     public override void Reset()
@@ -37,14 +37,14 @@ public class AfterRapidAdvancementEvent : ModPooledEvent<AfterRapidAdvancementEv
     public static void Send(int Amount, GameObject Actor)
     {
         Debug.Entry(4, 
-            $"{typeof(AfterRapidAdvancementEvent).Name}." +
+            $"{nameof(AfterRapidAdvancementEvent)}." +
             $"{nameof(Send)}(int Amount: {Amount}, GameObject Actor: {Actor?.DebugName})",
             Indent: 0);
 
         AfterRapidAdvancementEvent E = FromPool();
 
         bool flag = true;
-        if (Actor.WantEvent(ID, E.GetCascadeLevel()))
+        if (flag && Actor.WantEvent(ID, E.GetCascadeLevel()))
         {
             E.Amount = Amount;
             E.Actor = Actor;

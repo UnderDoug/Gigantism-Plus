@@ -66,59 +66,48 @@ namespace XRL.World.Parts
 
         public bool HandleEvent(BeforeDescribeModGiganticEvent E)
         {
-            if (E.Object == ParentObject)
+            if (E.Object == ParentObject && E.Context == "Natural Equipment")
             {
                 int dieCount = GetDamageDieCount();
                 int damageBonus = GetDamageBonus();
                 int hitBonus = GetHitBonus();
                 int cleaveBonus = -damageBonus;
 
-                if (dieCount > 0) E.WeaponDescriptions
-                        .Add(new() { "gain", $"{dieCount} additional damage die" });
-
-                if (damageBonus != 0) E.WeaponDescriptions
-                        .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
-
-                if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe") E.WeaponDescriptions
-                        .Add(new() { "has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV" });
-
-                if (hitBonus != 0) E.WeaponDescriptions
-                        .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
+                if (dieCount > 0)
+                {
+                    E.AddWeaponDescription("gain", $"{dieCount} additional damage die");
+                }
+                if (damageBonus != 0)
+                {
+                    E.AddWeaponDescription("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                }
+                if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
+                {
+                    E.AddWeaponDescription("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
+                }
+                if (hitBonus != 0)
+                {
+                    E.AddWeaponDescription("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
+                }
             }
             return base.HandleEvent(E);
         }
 
         public bool HandleEvent(DescribeModGiganticEvent E)
         {
-            if (E.Object == ParentObject)
+            if (E.Object == ParentObject && E.Context == "Natural Equipment")
             {
-                List<List<string>> elementsToRemove = new() 
-                {
-                    new List<string>() { "have", "+3 damage" },
-                    new List<string>() { "cleave", "for -3 AV" },
-                };
-                
-                int indexToRemove = 0;
-                List<List<string>> InumerateWeaponDescriptions = new(E.WeaponDescriptions); 
-                foreach (List<string> entry in InumerateWeaponDescriptions)
-                {
-                    if (elementsToRemove.Contains(entry))
-                        E.WeaponDescriptions.Remove(entry);
-
-                }
-                if (indexToRemove < E.WeaponDescriptions.Count)
-                    E.WeaponDescriptions.RemoveAt(indexToRemove);
+                E.RemoveWeaponDescription("have", "+3 damage");
+                E.RemoveWeaponDescription("cleave", "for -3 AV");
             }
             return base.HandleEvent(E);
         }
 
         public override string GetInstanceDescription()
         {
-            BeforeDescribeModGiganticEvent beforeEvent = new(ParentObject, null);
-            beforeEvent.Send();
-            DescribeModGiganticEvent afterEvent = new(ParentObject, null, beforeEvent);
+            BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(ParentObject, Context: "Natural Equipment");
+            return DescribeModGiganticEvent.Send(beforeEvent).Process(PluralizeObject: false);
 
-            return afterEvent.Send().Process(PluralizeObject: false);
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

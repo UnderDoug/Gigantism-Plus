@@ -17,7 +17,11 @@ namespace HNPS_GigantismPlus
     {
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
+        public static readonly string RegisteredEventID = GetRegisteredEventID();
+
         public GameObject Object;
+
+        public BeforeDescribeModGiganticEvent BeforeEvent;
 
         public string ObjectNoun;
 
@@ -25,178 +29,114 @@ namespace HNPS_GigantismPlus
 
         public List<List<string>> GeneralDescriptions;
 
-        private BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent;
+        public string Context;
 
         public DescribeModGiganticEvent()
         {
-        }
-
-        public DescribeModGiganticEvent(GameObject Object, string ObjectNoun)
-            : this()
-        {
-            DescribeModGiganticEvent @new = FromPool(Object, ObjectNoun, new(), new(), new());
-            this.Object = @new.Object;
-            this.ObjectNoun = @new.ObjectNoun;
-            WeaponDescriptions = @new.WeaponDescriptions;
-            GeneralDescriptions = @new.GeneralDescriptions;
-            BeforeDescribeModGiganticEvent = @new.BeforeDescribeModGiganticEvent;
-        }
-        public DescribeModGiganticEvent(GameObject Object, string ObjectNoun, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
-            : this(Object, ObjectNoun)
-        {
-            this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
-        }
-
-        public DescribeModGiganticEvent(
-            GameObject Object,
-            string ObjectNoun,
-            List<List<string>> WeaponDescriptions,
-            List<List<string>> GeneralDescriptions)
-            : this(Object, ObjectNoun)
-        {
-            this.WeaponDescriptions = WeaponDescriptions;
-            this.GeneralDescriptions = GeneralDescriptions;
-        }
-        public DescribeModGiganticEvent(
-            GameObject Object,
-            string ObjectNoun,
-            List<List<string>> WeaponDescriptions,
-            List<List<string>> GeneralDescriptions,
-            BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
-            : this(Object, ObjectNoun, WeaponDescriptions, GeneralDescriptions)
-        {
-            this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
-        }
-        public DescribeModGiganticEvent(DescribeModGiganticEvent Source)
-            : this()
-        {
-            Object = Source.Object;
-            ObjectNoun = Source.ObjectNoun;
-            WeaponDescriptions = Source.WeaponDescriptions;
-            GeneralDescriptions = Source.GeneralDescriptions;
-            BeforeDescribeModGiganticEvent = Source.BeforeDescribeModGiganticEvent;
-        }
-        public DescribeModGiganticEvent(BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
-            : this(BeforeDescribeModGiganticEvent.Object, BeforeDescribeModGiganticEvent.ObjectNoun)
-        {
-            this.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
         }
 
         public override int GetCascadeLevel()
         {
             return CascadeLevel;
         }
-
-        public virtual string GetRegisteredEventID()
+        public static string GetRegisteredEventID()
         {
-            return $"{typeof(DescribeModGiganticEvent).Name}";
+            return $"{nameof(DescribeModGiganticEvent)}";
         }
 
         public override void Reset()
         {
             base.Reset();
             Object = null;
+            BeforeEvent = null;
             ObjectNoun = null;
             WeaponDescriptions = null;
             GeneralDescriptions = null;
-            BeforeDescribeModGiganticEvent = null;
+            Context = null;
         }
 
-        public DescribeModGiganticEvent Send()
-        {
-            bool flag = The.Game.HandleEvent(this) && Object.HandleEvent(this);
-
-            if (flag && Object.HasRegisteredEvent(GetRegisteredEventID()))
-            {
-                Event @event = Event.New(GetRegisteredEventID());
-                @event.SetParameter("Object", Object);
-                @event.SetParameter("ObjectNoun", ObjectNoun);
-                @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
-                @event.SetParameter("GeneralDescriptions", GeneralDescriptions);
-                @event.SetParameter("BeforeDescribeModGiganticEvent", BeforeDescribeModGiganticEvent);
-                Object.FireEvent(@event);
-            }
-            return this;
-        }
-
-        public static DescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions, BeforeDescribeModGiganticEvent BeforeDescribeModGiganticEvent)
+        public static DescribeModGiganticEvent FromPool(BeforeDescribeModGiganticEvent BeforeEvent)
         {
             DescribeModGiganticEvent afterDescribeModGiganticEvent = FromPool();
-            afterDescribeModGiganticEvent.Object = Object;
-            afterDescribeModGiganticEvent.ObjectNoun = ObjectNoun;
-            afterDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions;
-            afterDescribeModGiganticEvent.GeneralDescriptions = GeneralDescriptions;
-            afterDescribeModGiganticEvent.BeforeDescribeModGiganticEvent = BeforeDescribeModGiganticEvent;
+            afterDescribeModGiganticEvent.Object = BeforeEvent.Object;
+            afterDescribeModGiganticEvent.ObjectNoun = BeforeEvent.ObjectNoun;
+            afterDescribeModGiganticEvent.WeaponDescriptions = new();
+            afterDescribeModGiganticEvent.GeneralDescriptions = new();
+            afterDescribeModGiganticEvent.Context = BeforeEvent.Context;
             return afterDescribeModGiganticEvent;
         }
 
-        public List<List<string>> IterateDataBucketTags(GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
+        public static DescribeModGiganticEvent Send(BeforeDescribeModGiganticEvent BeforeEvent)
         {
-            List<List<string>> Output = new();
-            foreach ((string location, string value) in GigantismPlusModGiganticDescriptions.Tags)
+            DescribeModGiganticEvent E = FromPool(BeforeEvent);
+            BeforeEvent.Reset();
+
+            bool haveGame = The.Game != null;
+            bool haveObject = E.Object != null;
+
+            bool gameWants = haveGame && The.Game.WantEvent(ID, CascadeLevel);
+
+            bool objectWantsMin = haveObject && E.Object.WantEvent(ID, CascadeLevel);
+            bool objectWantsStr = haveObject && E.Object.HasRegisteredEvent(RegisteredEventID);
+
+            bool anyWants = gameWants || objectWantsMin || objectWantsStr;
+
+            bool proceed = anyWants;
+
+            if (proceed)
             {
-                string[] locationArray = location.Split("::", StringSplitOptions.RemoveEmptyEntries);
-                if (locationArray.Length != 4) continue;
-
-                (string targetEvent, string targetList, string conditionPart, string who) = (locationArray[0], locationArray[1], locationArray[2], locationArray[2]);
-                if (targetEvent != When) continue;
-                if (targetList != "General" && targetList != "Weapon")
+                if (proceed && gameWants)
                 {
-                    Debug.Entry(1, $"WARN [{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
-                    continue;
+                    proceed = The.Game.HandleEvent(E);
                 }
-                if (!Object.HasPart(conditionPart)) continue;
-
-                string[] descriptionArray = value.Split(";", StringSplitOptions.RemoveEmptyEntries);
-                if (descriptionArray.Length != 2) continue;
-
-                if (descriptionArray[0] == "'null'") descriptionArray[0] = null;
-                List<string> description = new() { descriptionArray[0], descriptionArray[1] };
-                if (targetEvent == When)
+                if (proceed && objectWantsMin)
                 {
-                    if (targetList == Where)
-                    {
-                        Output.Add(description);
-                    }
+                    proceed = E.Object.HandleEvent(E);
+                }
+                if (proceed && objectWantsStr)
+                {
+                    Event @event = Event.New(RegisteredEventID);
+                    @event.SetParameter($"{nameof(E.Object)}", E.Object);
+                    @event.SetParameter($"{nameof(E.ObjectNoun)}", E.ObjectNoun);
+                    @event.SetParameter($"{nameof(E.WeaponDescriptions)}", E.WeaponDescriptions);
+                    @event.SetParameter($"{nameof(E.GeneralDescriptions)}", E.GeneralDescriptions);
+                    @event.SetParameter($"{nameof(E.Context)}", E.Context);
+                    proceed = E.Object.FireEvent(@event);
                 }
             }
-            return Output;
+            return E;
         }
-
         public string Process(bool PluralizeObject = true)
         {
             List<List<string>> weaponDescriptions = new();
             List<List<string>> generalDescriptions = new();
-            string objectNoun = Object.GetObjectNoun();
+            ObjectNoun ??= Object.GetObjectNoun();
 
-            if (BeforeDescribeModGiganticEvent != null)
+            if (BeforeEvent != null)
             {
-                if (BeforeDescribeModGiganticEvent.WeaponDescriptions != null)
+                if (!BeforeEvent.WeaponDescriptions.IsNullOrEmpty())
                 {
-                    weaponDescriptions.AddRange(BeforeDescribeModGiganticEvent.WeaponDescriptions);
+                    weaponDescriptions.AddRange(BeforeEvent.WeaponDescriptions);
                 }
-                if (BeforeDescribeModGiganticEvent.GeneralDescriptions != null)
+                if (!BeforeEvent.GeneralDescriptions.IsNullOrEmpty())
                 {
-                    generalDescriptions.AddRange(BeforeDescribeModGiganticEvent.GeneralDescriptions);
+                    generalDescriptions.AddRange(BeforeEvent.GeneralDescriptions);
                 }
             }
-            string beforeObjectNoun = BeforeDescribeModGiganticEvent.ObjectNoun;
-            objectNoun = beforeObjectNoun ?? objectNoun;
-
             GameObjectBlueprint GigantismPlusModGiganticDescriptions = GameObjectFactory.Factory.GetBlueprint(MODGIGANTIC_DESCRIPTIONBUCKET);
-            weaponDescriptions.AddRange(IterateDataBucketTags(GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
-            generalDescriptions.AddRange(IterateDataBucketTags(GigantismPlusModGiganticDescriptions, "Before", "General"));
+            weaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
+            generalDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "General"));
 
             weaponDescriptions.AddRange(WeaponDescriptions);
             generalDescriptions.AddRange(GeneralDescriptions);
 
-            weaponDescriptions.AddRange(IterateDataBucketTags(GigantismPlusModGiganticDescriptions, "After", "Weapon"));
-            generalDescriptions.AddRange(IterateDataBucketTags(GigantismPlusModGiganticDescriptions, "After", "General"));
-
-            ObjectNoun ??= objectNoun;
+            weaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "Weapon"));
+            generalDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "General"));
 
             StringBuilder SB = Event.NewStringBuilder();
-            ObjectNoun = $"{(Object.IsPlural && PluralizeObject ? Grammar.Pluralize(ObjectNoun) : ObjectNoun)} ";
+
+            bool isPlural = Object.IsPlural && PluralizeObject;
+            ObjectNoun = $"{(isPlural ? Grammar.Pluralize(ObjectNoun) : ObjectNoun)} ";
             string DemonstrativePronoun = $"{Grammar.MakeTitleCase(Object.NearDemonstrative())} ";
             SB.Append("Gigantic".OptionalColorGigantic(Colorfulness)).Append(": ")
                 .Append(DemonstrativePronoun).Append(ObjectNoun);
@@ -230,6 +170,67 @@ namespace HNPS_GigantismPlus
             }
 
             return Event.FinalizeString(SB);
+        }
+
+        public static List<List<string>> RemoveDescription(string Relationship, string Effect, List<List<string>> Descriptions)
+        {
+            List<List<string>> elementsToRemove = new()
+            {
+                new List<string>() { Relationship, Effect },
+            };
+            List<List<string>> InumerateDescriptions = new(Descriptions);
+            if (!InumerateDescriptions.IsNullOrEmpty())
+            {
+                foreach (List<string> entry in InumerateDescriptions)
+                {
+                    if (elementsToRemove.Contains(entry))
+                    {
+                        Descriptions.Remove(entry);
+                    }
+                }
+            }
+            return Descriptions;
+        }
+        public List<List<string>> RemoveWeaponDescription(string Relationship, string Effect)
+        {
+            return RemoveDescription(Relationship, Effect, WeaponDescriptions);
+        }
+        public List<List<string>> RemoveGeneralDescription(string Relationship, string Effect)
+        {
+            return RemoveDescription(Relationship, Effect, GeneralDescriptions);
+        }
+
+        public static List<List<string>> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
+        {
+            List<List<string>> Output = new();
+            foreach ((string location, string value) in GigantismPlusModGiganticDescriptions.Tags)
+            {
+                string[] locationArray = location.Split("::", StringSplitOptions.RemoveEmptyEntries);
+                if (locationArray.Length != 4) continue;
+
+                (string targetEvent, string targetList, string conditionPart, string who) = (locationArray[0], locationArray[1], locationArray[2], locationArray[2]);
+                if (targetEvent != When) continue;
+                if (targetList != "General" && targetList != "Weapon")
+                {
+                    Debug.Entry(1, $"WARN [{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
+                    continue;
+                }
+                if (!Object.HasPart(conditionPart)) continue;
+
+                string[] descriptionArray = value.Split(";", StringSplitOptions.RemoveEmptyEntries);
+                if (descriptionArray.Length != 2) continue;
+
+                if (descriptionArray[0] == "'null'") descriptionArray[0] = null;
+                List<string> description = new() { descriptionArray[0], descriptionArray[1] };
+                if (targetEvent == When)
+                {
+                    if (targetList == Where)
+                    {
+                        Output.Add(description);
+                    }
+                }
+            }
+            return Output;
         }
     }
 }

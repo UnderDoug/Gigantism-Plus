@@ -16,6 +16,8 @@ namespace HNPS_GigantismPlus
     {
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
+        public static readonly string RegisteredEventID = GetRegisteredEventID();
+
         public GameObject Object;
 
         public string ObjectNoun;
@@ -24,47 +26,19 @@ namespace HNPS_GigantismPlus
 
         public List<List<string>> GeneralDescriptions;
 
+        public string Context;
+
         public BeforeDescribeModGiganticEvent()
         {
-        }
-
-        public BeforeDescribeModGiganticEvent(GameObject Object, string ObjectNoun)
-            : this()
-        {
-            BeforeDescribeModGiganticEvent @new = FromPool(Object, ObjectNoun, new(), new());
-            this.Object = @new.Object;
-            this.ObjectNoun = @new.ObjectNoun;
-            WeaponDescriptions = @new.WeaponDescriptions;
-            GeneralDescriptions = @new.GeneralDescriptions;
-        }
-
-        public BeforeDescribeModGiganticEvent(
-            GameObject Object,
-            string ObjectNoun,
-            List<List<string>> WeaponDescriptions,
-            List<List<string>> GeneralDescriptions)
-            : this(Object, ObjectNoun)
-        {
-            this.WeaponDescriptions = WeaponDescriptions;
-            this.GeneralDescriptions = GeneralDescriptions;
-        }
-        public BeforeDescribeModGiganticEvent(BeforeDescribeModGiganticEvent Source)
-            : this()
-        {
-            Object = Source.Object;
-            ObjectNoun = Source.ObjectNoun;
-            WeaponDescriptions = Source.WeaponDescriptions;
-            GeneralDescriptions = Source.GeneralDescriptions;
         }
 
         public override int GetCascadeLevel()
         {
             return CascadeLevel;
         }
-
-        public virtual string GetRegisteredEventID()
+        public static string GetRegisteredEventID()
         {
-            return $"{typeof(BeforeDescribeModGiganticEvent).Name}";
+            return $"{nameof(BeforeDescribeModGiganticEvent)}";
         }
 
         public override void Reset()
@@ -74,33 +48,71 @@ namespace HNPS_GigantismPlus
             ObjectNoun = null;
             WeaponDescriptions = null;
             GeneralDescriptions = null;
+            Context = null;
         }
 
-        public BeforeDescribeModGiganticEvent Send()
-        {
-            bool flag = The.Game.HandleEvent(this) && Object.HandleEvent(this);
-            
-            if (flag && Object.HasRegisteredEvent(GetRegisteredEventID()))
-            {
-                Event @event = Event.New(GetRegisteredEventID());
-                @event.SetParameter("Object", Object);
-                @event.SetParameter("ObjectNoun", ObjectNoun);
-                @event.SetParameter("WeaponDescriptions", WeaponDescriptions);
-                @event.SetParameter("GeneralDescriptions", GeneralDescriptions);
-                Object.FireEvent(@event);
-            }
-
-            return this;
-        }
-
-        public static BeforeDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions)
+        public static BeforeDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions, string Context = null)
         {
             BeforeDescribeModGiganticEvent beforeDescribeModGiganticEvent = FromPool();
             beforeDescribeModGiganticEvent.Object = Object;
             beforeDescribeModGiganticEvent.ObjectNoun = ObjectNoun;
-            beforeDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions;
-            beforeDescribeModGiganticEvent.GeneralDescriptions = GeneralDescriptions;
+            beforeDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions ?? new();
+            beforeDescribeModGiganticEvent.GeneralDescriptions = GeneralDescriptions ?? new();
+            beforeDescribeModGiganticEvent.Context = Context;
             return beforeDescribeModGiganticEvent;
+        }
+        public static BeforeDescribeModGiganticEvent CollectFor(GameObject Object, string ObjectNoun = null, List<List<string>> WeaponDescriptions = null, List<List<string>> GeneralDescriptions = null, string Context = null)
+        {
+            BeforeDescribeModGiganticEvent E = FromPool(Object, ObjectNoun, WeaponDescriptions, GeneralDescriptions, Context);
+
+            bool haveGame = The.Game != null;
+            bool haveObject = Object != null;
+
+            bool gameWants = haveGame && The.Game.WantEvent(ID, CascadeLevel);
+
+            bool objectWantsMin = haveObject && Object.WantEvent(ID, CascadeLevel);
+            bool objectWantsStr = haveObject && Object.HasRegisteredEvent(RegisteredEventID);
+
+            bool anyWants = gameWants || objectWantsMin || objectWantsStr;
+
+            bool proceed = anyWants;
+
+            if (proceed)
+            {
+                if (proceed && gameWants)
+                {
+                    proceed = The.Game.HandleEvent(E);
+                }
+                if (proceed && objectWantsMin)
+                {
+                    proceed = Object.HandleEvent(E);
+                }
+                if (proceed && objectWantsStr)
+                {
+                    Event @event = Event.New(RegisteredEventID);
+                    @event.SetParameter($"{nameof(Object)}", Object);
+                    @event.SetParameter($"{nameof(ObjectNoun)}", ObjectNoun);
+                    @event.SetParameter($"{nameof(WeaponDescriptions)}", WeaponDescriptions);
+                    @event.SetParameter($"{nameof(GeneralDescriptions)}", GeneralDescriptions);
+                    @event.SetParameter($"{nameof(Context)}", Context);
+                    proceed = Object.FireEvent(@event);
+                }
+            }
+            return E;
+        }
+
+        public static List<List<string>> AddDescription(string Relationship, string Effect, List<List<string>> Descriptions)
+        {
+            Descriptions.Add(new() { Relationship, Effect });
+            return Descriptions;
+        }
+        public List<List<string>> AddWeaponDescription(string Relationship, string Effect)
+        {
+            return AddDescription(Relationship, Effect, WeaponDescriptions);
+        }
+        public List<List<string>> AddGeneralDescription(string Relationship, string Effect)
+        {
+            return AddDescription(Relationship, Effect, GeneralDescriptions);
         }
     }
 }

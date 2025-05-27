@@ -13,6 +13,8 @@ namespace HNPS_GigantismPlus
     {
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
+        public static readonly string RegisteredEventID = GetRegisteredEventID();
+
         public GameObject Object;
 
         public ModGigantic Modification;
@@ -20,6 +22,10 @@ namespace HNPS_GigantismPlus
         public override int GetCascadeLevel()
         {
             return CascadeLevel;
+        }
+        public static string GetRegisteredEventID()
+        {
+            return $"{nameof(BeforeModGiganticAppliedEvent)}";
         }
 
         public override void Reset()
@@ -46,7 +52,7 @@ namespace HNPS_GigantismPlus
             bool gameWants = haveGame && The.Game.WantEvent(ID, CascadeLevel);
 
             bool objectWantsMin = haveObject && Object.WantEvent(ID, CascadeLevel);
-            bool objectWantsStr = haveObject && Object.HasRegisteredEvent(nameof(BeforeModGiganticAppliedEvent));
+            bool objectWantsStr = haveObject && Object.HasRegisteredEvent(RegisteredEventID);
 
             bool anyWants = gameWants || objectWantsMin || objectWantsStr;
 

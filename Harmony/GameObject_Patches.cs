@@ -22,7 +22,7 @@ namespace HNPS_GigantismPlus.Harmony
             declaringType: typeof(GameObject), 
             methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness))]
         [HarmonyPrefix]
-        public static bool CheckDefaultBehaviorGiganticness_ForceEquipped_BlockHideAdjective_Prefix(ref GameObject __instance, GameObject Equipper)
+        public static bool CheckDefaultBehaviorGiganticness_ForceEquipped_BlockHideAdjective_Prefix(GameObject __instance, GameObject Equipper)
         {
             GameObject @this = __instance;
             if (GameObject.Validate(ref Equipper))

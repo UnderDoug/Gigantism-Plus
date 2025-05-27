@@ -54,7 +54,7 @@ namespace HNPS_GigantismPlus
         public override void OnAfterBuild(JoppaWorldBuilder builder)
         {
             Debug.Entry(4,
-                $"\u2666 {typeof(SecretGiantWhoCooksBuilderExtension).Name}." +
+                $"\u2666 {nameof(SecretGiantWhoCooksBuilderExtension)}." +
                 $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
                 Indent: 0);
 
@@ -107,9 +107,9 @@ namespace HNPS_GigantismPlus
             if (UniqueGiant == null)
             {
                 Debug.Entry(2,
-                    $"WARN: {typeof(SecretGiantWhoCooksBuilderExtension).Name}." +
-                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
-                    $"failed instantiate UniqueGiant. Placement aborted.",
+                    $"WARN: {nameof(SecretGiantWhoCooksBuilderExtension)}." +
+                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
+                    $"failed to instantiate UniqueGiant. Placement aborted.",
                     Indent: 0);
                 return;
             }

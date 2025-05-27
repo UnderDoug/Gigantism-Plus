@@ -89,7 +89,6 @@ namespace XRL.World.Parts.Mutation
 
         public UD_QuillsPlus()
         {
-            Type = "Physical";
         }
         public override bool GeneratesEquipment()
         {

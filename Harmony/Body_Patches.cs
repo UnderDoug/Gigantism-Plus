@@ -25,7 +25,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPriority(800)]
         [HarmonyPrefix]
-        public static bool FireEventOnBodyparts_SendNaturalEquipmentEvent_Prefix(ref Body __instance, Event E, ref Event ___eBodypartsUpdated)
+        public static bool FireEventOnBodyparts_SendNaturalEquipmentEvent_Prefix(Body __instance, Event E, ref Event ___eBodypartsUpdated)
         {
             Body @this = __instance;
             GameObject ParentObject = @this?.ParentObject;
@@ -236,8 +236,6 @@ namespace HNPS_GigantismPlus.Harmony
                         + $"{nameof(Body.UpdateBodyParts)}"
                         + $"(ref Body __instance) #//",
                         Indent: 0, Toggle: doDebug);
-
-                    Debug.Divider(4, HONLY, Count: 60, Indent: 0, Toggle: doDebug);
                 }
             }
         }

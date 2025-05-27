@@ -24,7 +24,6 @@ namespace XRL.World.Parts.Mutation
 
         public UD_HornsPlus()
         {
-            Type = "Physical";
         }
 
         public override bool GeneratesEquipment()

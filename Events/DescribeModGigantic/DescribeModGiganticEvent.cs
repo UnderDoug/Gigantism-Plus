@@ -19,9 +19,9 @@ namespace HNPS_GigantismPlus
 
         public static readonly string RegisteredEventID = GetRegisteredEventID();
 
-        public GameObject Object;
-
         public BeforeDescribeModGiganticEvent BeforeEvent;
+
+        public GameObject Object;
 
         public string ObjectNoun;
 
@@ -47,8 +47,8 @@ namespace HNPS_GigantismPlus
         public override void Reset()
         {
             base.Reset();
-            Object = null;
             BeforeEvent = null;
+            Object = null;
             ObjectNoun = null;
             WeaponDescriptions = null;
             GeneralDescriptions = null;
@@ -58,6 +58,7 @@ namespace HNPS_GigantismPlus
         public static DescribeModGiganticEvent FromPool(BeforeDescribeModGiganticEvent BeforeEvent)
         {
             DescribeModGiganticEvent afterDescribeModGiganticEvent = FromPool();
+            afterDescribeModGiganticEvent.BeforeEvent = BeforeEvent;
             afterDescribeModGiganticEvent.Object = BeforeEvent.Object;
             afterDescribeModGiganticEvent.ObjectNoun = BeforeEvent.ObjectNoun;
             afterDescribeModGiganticEvent.WeaponDescriptions = new();
@@ -69,7 +70,6 @@ namespace HNPS_GigantismPlus
         public static DescribeModGiganticEvent Send(BeforeDescribeModGiganticEvent BeforeEvent)
         {
             DescribeModGiganticEvent E = FromPool(BeforeEvent);
-            BeforeEvent.Reset();
 
             bool haveGame = The.Game != null;
             bool haveObject = E.Object != null;
@@ -169,6 +169,8 @@ namespace HNPS_GigantismPlus
                 SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
             }
 
+            BeforeEvent.Reset();
+            Reset();
             return Event.FinalizeString(SB);
         }
 

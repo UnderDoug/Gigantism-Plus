@@ -22,7 +22,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(EquippedEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, ref Physics __instance)
+        static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, Physics __instance)
         {
             // goal: reduce the amount of thrown warnings when the FinalizeCopy patch sends an EquippedEvent
 
@@ -39,6 +39,6 @@ namespace HNPS_GigantismPlus.Harmony
                 Debug.Entry(4, $"__instance._Equipped", __instance._Equipped?.DebugName ?? NULL, Indent: indent + 1, Toggle: doDebug);
             }
             return true;
-        } //!-- static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, ref Physics __instance)
+        } //!-- static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, Physics __instance)
     }
 }

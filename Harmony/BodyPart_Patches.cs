@@ -21,17 +21,13 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject), typeof(bool), typeof(bool) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPostfix]
-        public static void Implant_UpdateBodyParts_Postfix(ref BodyPart __instance)
+        public static void Implant_UpdateBodyParts_Postfix(BodyPart __instance)
         {
             BodyPart @this = __instance;
 
             Debug.Entry(4, $"{typeof(Body_Patches).Name}.{nameof(Implant_UpdateBodyParts_Postfix)}(ref Actor __instance)", Indent: 0);
 
-            string objectDesc = @this.ParentBody?.ParentObject != null 
-                ? $"{@this.ParentBody.ParentObject.ID}:{@this.ParentBody.ParentObject.ShortDisplayNameStripped}" 
-                : "[null]";
-
-            Debug.Entry(4, $"Object is {objectDesc}", Indent: 1);
+            Debug.Entry(4, $"Object is {@this.ParentBody?.ParentObject?.DebugName ?? NULL}", Indent: 1);
 
             @this?.ParentBody?.UpdateBodyParts();
         }

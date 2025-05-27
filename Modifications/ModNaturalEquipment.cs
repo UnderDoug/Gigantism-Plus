@@ -24,7 +24,7 @@ namespace XRL.World.Parts
     {
         private static bool doDebug => getClassDoDebug("ModNaturalEquipment");
 
-        [SerializeField]
+        [NonSerialized]
         private T _assigningPart = null;
 
         public T AssigningPart

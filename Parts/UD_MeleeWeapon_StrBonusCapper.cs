@@ -9,7 +9,7 @@ namespace XRL.World.Parts
     [Serializable]
     public class UD_MeleeWeapon_StrBonusCapper : IScribedPart
     {
-        public void CapMaxStrengthBonus(ref GameObject Object)
+        public void CapMaxStrengthBonus(GameObject Object, MinEvent FromEvent)
         {
             if (Object != null && ParentObject != null && Object == ParentObject)
             {
@@ -25,7 +25,6 @@ namespace XRL.World.Parts
             int Order = EventOrder.EXTREMELY_LATE + EventOrder.EXTREMELY_LATE;
             Registrar.Register(AfterObjectCreatedEvent.ID, Order);
             Registrar.Register(GetShortDescriptionEvent.ID, Order);
-            Registrar.Register(GetDisplayNameEvent.ID, Order);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -35,17 +34,18 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            CapMaxStrengthBonus(ref E.Object);
+            if (E.Context != "Sample" && E.Object == ParentObject)
+            {
+                CapMaxStrengthBonus(E.Object, E);
+            }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            CapMaxStrengthBonus(ref E.Object);
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
-            CapMaxStrengthBonus(ref E.Object);
+            if (E.Object == ParentObject)
+            {
+                CapMaxStrengthBonus(E.Object, E);
+            }
             return base.HandleEvent(E);
         }
     }

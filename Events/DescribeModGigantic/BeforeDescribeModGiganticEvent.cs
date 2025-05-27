@@ -101,18 +101,18 @@ namespace HNPS_GigantismPlus
             return E;
         }
 
-        public static List<List<string>> AddDescription(string Relationship, string Effect, List<List<string>> Descriptions)
+        public static List<List<string>> AddDescription(List<List<string>> Descriptions, string Relationship, string Effect)
         {
             Descriptions.Add(new() { Relationship, Effect });
             return Descriptions;
         }
         public List<List<string>> AddWeaponDescription(string Relationship, string Effect)
         {
-            return AddDescription(Relationship, Effect, WeaponDescriptions);
+            return AddDescription(WeaponDescriptions, Relationship, Effect);
         }
         public List<List<string>> AddGeneralDescription(string Relationship, string Effect)
         {
-            return AddDescription(Relationship, Effect, GeneralDescriptions);
+            return AddDescription(GeneralDescriptions, Relationship, Effect);
         }
     }
 }

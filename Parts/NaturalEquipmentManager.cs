@@ -491,33 +491,26 @@ namespace XRL.World.Parts
             {
                 Equipment.RemovePart(Manager);
                 Debug.CheckNah(4,
-                    $"Removed {nameof(NaturalEquipmentManager)} from Object",
+                    $"Removed {nameof(NaturalEquipmentManager)} from {Equipment?.DebugName}",
                     Indent: 1, Toggle: getDoDebug("OC"));
                 return true;
             }
             else
             {
                 Debug.CheckYeh(4,
-                    $"Kept {nameof(NaturalEquipmentManager)} on Object",
+                    $"Kept {nameof(NaturalEquipmentManager)} on {Equipment?.DebugName}",
                     Indent: 1, Toggle: getDoDebug("OC"));
                 
-                if (!Equipment.TryGetPart(out TinkerItem tinkerItem))
-                {
-                    tinkerItem = Equipment.RequirePart<TinkerItem>();
-                }
-                tinkerItem.Bits = "";
-                tinkerItem.CanDisassemble = false;
-                tinkerItem.CanBuild = false;
-
-                Debug.LoopItem(4,
-                    $"Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(Equipment)}",
-                    Good: !TinkeringHelpers.CanBeDisassembled(Equipment), Indent: 1, Toggle: getDoDebug("OC"));
                 return false;
             }
         }
         public bool RemoveThisIfNotNatural(GameObject Equipment)
         {
             return RemoveThisIfNotNatural(Equipment, this);
+        }
+        public bool RemoveThisIfNotNatural()
+        {
+            return RemoveThisIfNotNatural(ParentObject);
         }
 
         public static List<string> WantStringEvents = new()
@@ -595,6 +588,18 @@ namespace XRL.World.Parts
             {
                 if (E.Creature == Wielder)
                 {
+                    if (!ParentObject.TryGetPart(out TinkerItem tinkerItem))
+                    {
+                        tinkerItem = ParentObject.RequirePart<TinkerItem>();
+                    }
+                    tinkerItem.Bits = "";
+                    tinkerItem.CanDisassemble = false;
+                    tinkerItem.CanBuild = false;
+
+                    Debug.LoopItem(4,
+                        $"{ParentObject?.DebugName} Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(ParentObject)}",
+                        Good: !TinkeringHelpers.CanBeDisassembled(ParentObject), Indent: 1, Toggle: getDoDebug("OC"));
+
                     BeforeManageDefaultEquipmentEvent beforeEvent = BeforeManageDefaultEquipmentEvent.Send(ParentObject, this, ParentLimb);
                     ManageDefaultEquipmentEvent manageEvent = ManageDefaultEquipmentEvent.Manage(beforeEvent, Wielder);
                     AfterManageDefaultEquipmentEvent.Send(manageEvent);
@@ -628,11 +633,6 @@ namespace XRL.World.Parts
             return base.FireEvent(E);
         }
 
-        public override void ObjectLoaded()
-        {
-            base.ObjectLoaded();
-            RemoveThisIfNotNatural(ParentObject);
-        }
         public override void Remove()
         {
             ResetShortDescriptions();
@@ -640,6 +640,7 @@ namespace XRL.World.Parts
             ClearNaturalWeaponMods();
             base.Remove();
         }
+
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);

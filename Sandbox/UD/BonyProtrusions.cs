@@ -27,7 +27,6 @@ namespace XRL.World.Parts.Mutation
 
         public BonyProtrusions()
         {
-            Type = "Physical";
         }
 
         public override bool CanLevel() 

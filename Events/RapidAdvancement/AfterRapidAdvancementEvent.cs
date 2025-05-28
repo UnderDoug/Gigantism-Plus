@@ -6,12 +6,15 @@ using XRL.World.Parts;
 using XRL.World.Anatomy;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
 public class AfterRapidAdvancementEvent : ModPooledEvent<AfterRapidAdvancementEvent>
 {
+    private static bool doDebug => getClassDoDebug(nameof(AfterRapidAdvancementEvent));
+
     public new static readonly int CascadeLevel = CASCADE_ALL;
 
     public GameObject Actor;
@@ -39,7 +42,7 @@ public class AfterRapidAdvancementEvent : ModPooledEvent<AfterRapidAdvancementEv
         Debug.Entry(4, 
             $"{nameof(AfterRapidAdvancementEvent)}." +
             $"{nameof(Send)}(int Amount: {Amount}, GameObject Actor: {Actor?.DebugName})",
-            Indent: 0);
+            Indent: 0, Toggle: doDebug);
 
         AfterRapidAdvancementEvent E = FromPool();
 

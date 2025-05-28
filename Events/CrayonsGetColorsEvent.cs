@@ -6,13 +6,14 @@ using XRL.World;
 using XRL.World.Parts;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
 public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
 {
-    private static bool doDebug => false;
+    private static bool doDebug => getClassDoDebug(nameof(CrayonsGetColorsEvent));
 
     public new static readonly int CascadeLevel = CASCADE_ALL;
 

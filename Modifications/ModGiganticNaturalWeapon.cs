@@ -41,18 +41,7 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(GetCleaveAmountEvent E)
         {
-            bool isReady = IsReady(UseCharge: true,
-                                   IgnoreCharge: false,
-                                   IgnoreLiquid: false,
-                                   IgnoreBootSequence: false,
-                                   IgnoreBreakage: false,
-                                   IgnoreRust: false, IgnoreEMP: false,
-                                   IgnoreRealityStabilization: false,
-                                   IgnoreSubject: false,
-                                   IgnoreLocallyDefinedFailure: false, 1, null,
-                                   UseChargeIfUnpowered: false, 0L, null);
-
-            if (IsObjectActivePartSubject(E.Object) && isReady)
+            if (IsObjectActivePartSubject(E.Object))
             {
                 E.Amount += 1 + GetDamageBonus();
             }
@@ -106,7 +95,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription()
         {
             BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(ParentObject, Context: "Natural Equipment");
-            return DescribeModGiganticEvent.Send(beforeEvent).Process(PluralizeObject: false);
+            return DescribeModGiganticEvent.Send(beforeEvent).Process(PluralizeObject: true);
 
         }
 

@@ -6,19 +6,22 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Effects;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    /*
+    
     // Intercept the application of Crystallinity via Crystal Delight, apply the Mutations.xml version instead (much more compatible).
-    [HarmonyPatch(typeof(CookingDomainSpecial_UnitCrystalTransform))]
+    [HarmonyPatch]
     public static class CookingDomainSpecial_UnitCrystalTransform_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(CookingDomainSpecial_UnitCrystalTransform_Patches));
+
+        /*
+        [HarmonyPatch(typeof(CookingDomainSpecial_UnitCrystalTransform), nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
         [HarmonyPostfix]
-        [HarmonyPatch(nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
         static void ApplyTo_Postfix(GameObject Object)
         {
             if (!(bool)EnableManagedVanillaMutations) return; // Skip if Crystallinity isn't being merged into the extended class.
@@ -30,6 +33,6 @@ namespace HNPS_GigantismPlus.Harmony
                 Object.RequirePart<Mutations>().AddMutation(CrystallinityEntry);
             }
         }
+        */
     } //!-- public static class CookingDomainSpecial_UnitCrystalTransform_Patches
-    */
-}
+ }

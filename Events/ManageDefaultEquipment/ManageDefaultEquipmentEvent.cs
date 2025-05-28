@@ -6,6 +6,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Anatomy;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -14,7 +15,7 @@ namespace HNPS_GigantismPlus
     [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
     public class ManageDefaultEquipmentEvent : ModPooledEvent<ManageDefaultEquipmentEvent>
     {
-        private static bool doDebug => true;
+        private static bool doDebug => getClassDoDebug(nameof(ManageDefaultEquipmentEvent));
 
         public new static readonly int CascadeLevel = CASCADE_NONE; // CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 

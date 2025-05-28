@@ -6,6 +6,7 @@ using XRL.UI;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
 
@@ -14,7 +15,7 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Physics_Patches
     {
-        private static bool doDebug => true;
+        private static bool doDebug => getClassDoDebug(nameof(Physics_Patches));
 
         [HarmonyPatch(
             declaringType: typeof(Physics), 

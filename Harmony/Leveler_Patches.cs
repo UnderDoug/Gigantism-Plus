@@ -5,6 +5,7 @@ using System;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Leveler_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(Leveler_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(Leveler),
             methodName: nameof(Leveler.RapidAdvancement),

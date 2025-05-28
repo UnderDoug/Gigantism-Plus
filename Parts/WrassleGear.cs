@@ -6,6 +6,7 @@ using XRL.UI;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -16,6 +17,26 @@ namespace XRL.World.Parts
     [Serializable]
     public class WrassleGear : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(WrassleGear));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         [SerializeField]
         private Guid _WrassleID;
 
@@ -243,10 +264,10 @@ namespace XRL.World.Parts
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " + 
                     $"TileColor: &&{TileColor.Quote().Color("Y")}, DetailColor: {DetailColor.Quote().Color("Y")}",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"Tile: {Tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
 
                 ApplyFlair();
             }
@@ -266,7 +287,7 @@ namespace XRL.World.Parts
                         $"E.Item: [{Item.ID}:{Item.ShortDisplayNameStripped}] " +
                         $"E.Actor: [{Actor.ID}:{Actor.ShortDisplayNameStripped}]" +
                         $") WrassleID: {WrassleID}",
-                        Indent: 0);
+                        Indent: 0, Toggle: getDoDebug());
 
                     if (Actor.IsPlayer() && Item.TryGetPart(out Examiner examiner) && !(wrassler.KnowsChairs = Actor.Understood(examiner)))
                     {
@@ -358,17 +379,17 @@ namespace XRL.World.Parts
                 Debug.Entry(4, 
                     $"{typeof(WrassleGear).Name}." + 
                     $"{nameof(HandleEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
                 Damage damage = E.Damage;
                 GameObject attacker = E.Source;
 
-                Debug.Entry(4, $"Source: {attacker?.DebugName ?? "null"}", Indent: 1);
-                Debug.Entry(4, $"Damage Before: {damage.GetDebugInfo()}", Indent: 1);
+                Debug.Entry(4, $"Source: {attacker?.DebugName ?? "null"}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"Damage Before: {damage.GetDebugInfo()}", Indent: 1, Toggle: getDoDebug());
                 if (damage != null && (damage.Attributes.Contains("Concussion") || E.Indirect) || E.Source.HasPart<Wrassler>())
                 {
                     damage = new(0);
                 }
-                Debug.Entry(4, $"Damage  After: {damage.GetDebugInfo()}", Indent: 1);
+                Debug.Entry(4, $"Damage  After: {damage.GetDebugInfo()}", Indent: 1, Toggle: getDoDebug());
                 return false;
             }
             return base.HandleEvent(E);

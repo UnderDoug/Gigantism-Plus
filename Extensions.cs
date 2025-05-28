@@ -35,22 +35,22 @@ namespace HNPS_GigantismPlus
                 return true;
 
             if (MethodName == nameof(CheckEquipmentSlots))
-                return true;
+                return false;
 
             if (MethodName == nameof(TagIsIncludedOrNotExcluded))
-                return true;
+                return false;
 
             if (MethodName == nameof(MakeIncludeExclude))
-                return true;
+                return false;
 
             if (MethodName == nameof(PullInsideFromEdges))
-                return true;
+                return false;
 
             if (MethodName == nameof(PullInsideFromEdge))
-                return true;
+                return false;
 
             if (MethodName == nameof(GetNumberedTileVariants))
-                return true;
+                return false;
 
             return doDebug;
         }
@@ -939,7 +939,7 @@ namespace HNPS_GigantismPlus
                 return "missile weapon";
             }
 
-            if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
+            if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised() && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 if (Object.InheritsFrom("BaseBoulder"))
                     return "boulder";
@@ -956,10 +956,16 @@ namespace HNPS_GigantismPlus
                 return "thrown weapon";
             }
 
-            if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
+            if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised() && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 if (Object.HasPart<NaturalEquipmentManager>())
-                    return Object.Render.DisplayName;
+                    return Object.Render.DisplayName switch
+                    {
+                        "horns" => "horn",
+                        "quills" => "quill",
+                        "claws" => "claw",
+                        _ => Object.Render.DisplayName
+                    };
 
                 if (Object.InheritsFrom("BaseCudgel"))
                     return "cudgel";
@@ -2266,6 +2272,15 @@ namespace HNPS_GigantismPlus
         public static bool IsStock(this GameObject Item)
         {
             return Item.HasPropertyOrTag("_stock");
+        }
+
+        public static string Append(this string @string, string Text)
+        {
+            return @string + Text;
+        }
+        public static string AppendDefect(this string @string)
+        {
+            return @string.Append(" ({{R|D}})");
         }
 
     } //!-- Extensions

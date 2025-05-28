@@ -6,6 +6,7 @@ using XRL;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace HNPS_GigantismPlus
 {
     public class BeforeModGiganticAppliedHandler : IEventHandler, IModEventHandler<BeforeModGiganticAppliedEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(BeforeModGiganticAppliedEvent));
+
         private static readonly BeforeModGiganticAppliedHandler Handler = new();
 
         public static bool Register()
@@ -167,6 +170,8 @@ namespace HNPS_GigantismPlus
 
     public class AfterModGiganticAppliedHandler : IEventHandler, IModEventHandler<AfterModGiganticAppliedEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(AfterModGiganticAppliedHandler));
+
         private static readonly AfterModGiganticAppliedHandler Handler = new();
 
         public static bool Register()

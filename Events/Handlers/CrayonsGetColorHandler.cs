@@ -6,6 +6,7 @@ using XRL;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace HNPS_GigantismPlus
 {
     public class CrayonsGetColorHandler : IEventHandler, IModEventHandler<CrayonsGetColorsEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(CrayonsGetColorHandler));
+
         private static readonly CrayonsGetColorHandler Handler = new();
 
         public static bool Register()

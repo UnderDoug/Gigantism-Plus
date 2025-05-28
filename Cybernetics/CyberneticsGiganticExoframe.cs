@@ -19,6 +19,26 @@ namespace XRL.World.Parts
     public class CyberneticsGiganticExoframe 
         : BaseManagedDefaultEquipmentCybernetic<CyberneticsGiganticExoframe>
     {
+        private static bool doDebug => getClassDoDebug(nameof(CyberneticsGiganticExoframe));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         // XML Set Properties.
         public string Model = "Alpha";
         public string AugmentAdjectiveColor = "b";
@@ -70,7 +90,7 @@ namespace XRL.World.Parts
 
         public virtual void MapAugmentAdjustments()
         {
-            Debug.Entry(4, $"* {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}()", Indent: 1);
+            Debug.Entry(4, $"* {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}()", Indent: 1, Toggle: getDoDebug());
             
             NaturalEquipmentMod.AdjectiveColor = AugmentAdjectiveColor;
 
@@ -84,7 +104,7 @@ namespace XRL.World.Parts
             NaturalEquipmentMod.AddedStringProps["BlockedSound"] = AugmentBlockedSound;
             NaturalEquipmentMod.AddedStringProps["EquipmentFrameColors"] = AugmentEquipmentFrameColors;
 
-            NaturalEquipmentMod.Adjustments.Vomit(4, $"{ImplantObject?.DebugName} Adjustments", LoopItem: true, Indent:1);
+            NaturalEquipmentMod.Adjustments.Vomit(4, $"{ImplantObject?.DebugName} Adjustments", LoopItem: true, Indent:1, Toggle: getDoDebug());
 
             Debug.Entry(4, $"x {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}() *//", Indent: 1);
         }
@@ -96,24 +116,24 @@ namespace XRL.World.Parts
 
         public override void OnImplanted(GameObject Implantee, GameObject Implant)
         {
-            Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
+            Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})", Indent: 0, Toggle: getDoDebug());
 
             MapAugmentAdjustments();
 
             Become(Implantee, Model, Implant);
 
             base.OnImplanted(Implantee, Implant);
-            Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
+            Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//", Indent: 0, Toggle: getDoDebug());
         } //!--- public override void OnImplanted(GameObject Object)
 
         public override void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
-            Debug.Entry(3, $"* OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})");
+            Debug.Entry(3, $"* OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})", Indent: 0, Toggle: getDoDebug());
 
             // Implantee.CheckEquipmentSlots();
 
             Unbecome(Implantee, Model, ImplantObject);
-            Debug.Entry(3, $"x OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//");
+            Debug.Entry(3, $"x OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//", Indent: 0, Toggle: getDoDebug());
         } //!--- public override void OnUnimplanted(GameObject Object)
 
         public override bool WantEvent(int ID, int cascade)

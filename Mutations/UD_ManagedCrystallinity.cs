@@ -19,6 +19,26 @@ namespace XRL.World.Parts.Mutation
         : Crystallinity
         , IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>
     {
+        private static bool doDebug => getClassDoDebug(nameof(UD_ManagedCrystallinity));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
         public Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods { get; set; }
@@ -37,40 +57,7 @@ namespace XRL.World.Parts.Mutation
         {
             NaturalEquipmentMods = new();
 
-            NaturalEquipmentMod = new ModCrystallineNaturalWeapon()
-            {
-                AssigningPart = this,
-                BodyPartType = "Hand",
-
-                ModPriority = 40,
-                DescriptionPriority = 40,
-
-                Adjective = "crystalline",
-                AdjectiveColor = "crystallized",
-                AdjectiveColorFallback = "M",
-
-                Adjustments = new(),
-
-                AddedParts = new()
-                {
-                    "Inorganic",
-                },
-
-                AddedStringProps = new()
-                {
-                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
-                },
-            };
-            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
-            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength");
-
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "point", true);
-
-            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "Creatures/natural-weapon-claw.bmp", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&b", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&b", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "B", true);
+            NaturalEquipmentMod = NewCrystallinePointMod(this);
         }
         public UD_ManagedCrystallinity(
             Dictionary<string, ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods, 
@@ -108,6 +95,45 @@ namespace XRL.World.Parts.Mutation
         {
             Level = Crystallinity.Level;
             RefractAdded = Crystallinity.RefractAdded;
+        }
+
+        public static ModCrystallineNaturalWeapon NewCrystallinePointMod(UD_ManagedCrystallinity assigningPart)
+        {
+            ModCrystallineNaturalWeapon crystalinePointMod = new()
+            {
+                AssigningPart = assigningPart,
+                BodyPartType = "Hand",
+
+                ModPriority = 40,
+                DescriptionPriority = 40,
+
+                Adjective = "crystalline",
+                AdjectiveColor = "crystallized",
+                AdjectiveColorFallback = "M",
+
+                Adjustments = new(),
+
+                AddedParts = new()
+                {
+                    "Inorganic",
+                },
+
+                AddedStringProps = new()
+                {
+                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
+                },
+            };
+            crystalinePointMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
+            crystalinePointMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength");
+
+            crystalinePointMod.AddAdjustment(RENDER, "DisplayName", "point", true);
+
+            crystalinePointMod.AddAdjustment(RENDER, "Tile", "Creatures/natural-weapon-claw.bmp", true);
+            crystalinePointMod.AddAdjustment(RENDER, "ColorString", "&b", true);
+            crystalinePointMod.AddAdjustment(RENDER, "TileColor", "&b", true);
+            crystalinePointMod.AddAdjustment(RENDER, "DetailColor", "B", true);
+            return crystalinePointMod;
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Parts)
@@ -225,7 +251,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{nameof(UD_ManagedCrystallinity)}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
-                Indent: 2);
+                Indent: 2, Toggle: getDoDebug());
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
@@ -264,38 +290,38 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(ProcessNaturalEquipment)}",
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug());
 
             string targetType = TargetBodyPart.Type;
-            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2);
+            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2, Toggle: getDoDebug());
             ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = null;
             if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
             {
                 naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains entry for this BodyPart", Indent: 2);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
                 Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2);
+                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
             }
             else
             {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
             }
 
             if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
             {
                 naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains entry for this BodyPart", Indent: 2);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
                 Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2);
+                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
             }
             else
             {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
             }
             Debug.Entry(4,
                 $"x {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(ProcessNaturalEquipment)} @//",
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug());
             return true;
         }
 
@@ -334,26 +360,26 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnManageNaturalEquipment)}(body)");
-            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+            Debug.Header(4, $"{nameof(UD_ManagedCrystallinity)}", $"{nameof(OnManageNaturalEquipment)}(body)", Toggle: getDoDebug());
+            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: getDoDebug());
             ProcessNaturalEquipment(Manager, TargetBodyPart);
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: getDoDebug());
 
             Debug.Footer(4,
                 $"{nameof(UD_ManagedCrystallinity)}",
-                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject?.Blueprint})");
+                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject?.Blueprint})", Toggle: getDoDebug());
         }
         public virtual void OnUpdateNaturalEquipmentMods()
         {
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1, Toggle: getDoDebug());
             foreach ((_, ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
             }
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1, Toggle: getDoDebug());
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -377,7 +403,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(HandleEvent)}({nameof(UpdateNaturalEquipmentModsEvent)} E)",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)
             {
@@ -398,7 +424,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(HandleEvent)}({nameof(ManageDefaultEquipmentEvent)} E)",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)
             {

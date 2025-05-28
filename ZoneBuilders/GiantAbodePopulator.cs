@@ -27,10 +27,11 @@ namespace XRL.World.ZoneBuilders
             List<object> doList = new()
             {
                 'V',    // Vomit
-                "CH",   // ObjectCreation
+                '!',    // Warn
             };
             List<object> dontList = new()
             {
+                "CH",   // Cell Highlighting
             };
 
             if (what != null && doList.Contains(what))
@@ -54,9 +55,9 @@ namespace XRL.World.ZoneBuilders
         public bool BuildZone(Zone Z)
         {
             Debug.Entry(4,
-                $"\u2229 {typeof(GiantAbodePopulator).Name}." +
+                $"\u2229 {nameof(GiantAbodePopulator)}." +
                 $"{nameof(BuildZone)}(Zone Z: {Z.ZoneID})",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             zone = Z;
 
@@ -175,41 +176,41 @@ namespace XRL.World.ZoneBuilders
                 {
                     popRegionString += popRegionString == string.Empty ? $"[{popLocation}]" : $",[{popLocation}]";
                 }
-                Debug.Entry(4, $"populationRegion: {popRegionString}", Indent: 1);
+                Debug.Entry(4, $"populationRegion: {popRegionString}", Indent: 1, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"> foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()})",
-                    Indent: 1);
+                    Indent: 1, Toggle: getDoDebug());
                 foreach (PopulationResult item in PopulationManager.Generate(ContentsTable, "zonetier", Z.NewTier.ToString()))
                 {
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 1);
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
-                    Debug.Entry(4, $"item: {item.Blueprint}, number: {item.Number}", Indent: 1);
+                    Debug.Entry(4, $"item: {item.Blueprint}, number: {item.Number}", Indent: 1, Toggle: getDoDebug());
 
                     Debug.Entry(4,
                         $"> for (int num = 0; num < item.Number; num++)",
                         Indent: 2);
                     for (int num = 0; num < item.Number; num++)
                     {
-                        Debug.Divider(4, HONLY, Count: 25, Indent: 2);
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: getDoDebug());
                         Debug.Entry(4, 
                             $"item: {item.Blueprint}, " + 
                             $"number: {num + 1}/{item.Number}, " + 
                             $"hint: {item.Hint.Quote()}", 
-                            Indent: 3);
+                            Indent: 3, Toggle: getDoDebug());
 
                         GameObject gameObject = GameObjectFactory.Factory.CreateObject(item.Blueprint);
                         if (!PlaceObjectInArea(Z, new LocationList(popArea), gameObject, 0, 0, item.Hint))
-                            Debug.CheckNah(4, $"Failed to place [{num + 1}]{item.Blueprint}", Indent: 3);
+                            Debug.CheckNah(4, $"Failed to place [{num + 1}]{item.Blueprint}", Indent: 3, Toggle: getDoDebug());
 
-                        else Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3);
+                        else Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3, Toggle: getDoDebug());
                     }
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 2);
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: getDoDebug());
                     Debug.Entry(4,
                         $"x for (int num = 0; num < item.Number; num++) >//",
-                        Indent: 2);
+                        Indent: 2, Toggle: getDoDebug());
                 }
-                Debug.Divider(4, HONLY, Count: 25, Indent: 1);
-                Debug.Entry(4, $"x foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()}) >//", Indent: 1);
+                Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"x foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()}) >//", Indent: 1, Toggle: getDoDebug());
 
                 string abodeRegionString = string.Empty;
                 foreach ((string regionLabel, List<Cell> cells) in Region)
@@ -254,7 +255,10 @@ namespace XRL.World.ZoneBuilders
                     {
                         step.RequireObject("DirtPath");
                     }
-                    // step.HighlightBlue(12);
+                    if (getDoDebug("CH"))
+                    {
+                        step.HighlightBlue(12);
+                    }
                 }
             }
 
@@ -346,7 +350,7 @@ namespace XRL.World.ZoneBuilders
                     $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
                     $"in zone {zone.ZoneID} " + 
                     $"for cell [{giantLocation.Location}]",
-                    Indent: 1);
+                    Indent: 1, Toggle: getDoDebug('!'));
             }
 
             return true;

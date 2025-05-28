@@ -1,17 +1,16 @@
-﻿using System;
-
-using XRL.UI;
-using XRL.Rules;
+﻿using HNPS_GigantismPlus;
+using System;
+using System.Collections.Generic;
 using XRL.Language;
+using XRL.Rules;
+using XRL.UI;
+using XRL.Wish;
 using XRL.World.Parts.Mutation;
 using XRL.World.Skills.Cooking;
-using XRL.Wish;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Options;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -20,6 +19,26 @@ namespace XRL.World.Parts
     [Serializable]
     public class StewBelly : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(StewBelly));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         [SerializeField]
         private int _Stews;
         public int Stews // total number of times SeriouslyThickStew has been consumed.
@@ -300,12 +319,12 @@ namespace XRL.World.Parts
                 $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
                 Indent: 0);
 
-            Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1);
-            Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1);
-            Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1);
-            Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1);
-            Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1);
-            Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1);
+            Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1, Toggle: getDoDebug());
 
             if (Stews > 0)
             {

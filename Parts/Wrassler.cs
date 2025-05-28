@@ -14,6 +14,7 @@ using XRL.World.Tinkering;
 using XRL.Wish;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -25,6 +26,26 @@ namespace XRL.World.Parts
     [Serializable]
     public class Wrassler : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(Wrassler));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         public const int ICON_COLOR_PRIORITY = 110;
 
         [SerializeField]
@@ -189,7 +210,7 @@ namespace XRL.World.Parts
                 $"{typeof(Wrassler).Name}." +
                 $"{nameof(BestowWrassleGear)}() " + 
                 $"Actor: {Actor.DebugName}", 
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             string FootOrFeet = "Feet";
             if (feetCount * 2 < footCount) FootOrFeet = "Foot";
@@ -199,12 +220,12 @@ namespace XRL.World.Parts
                 $"handCount: {handCount}, " + 
                 $"feetCount: {feetCount}, " + 
                 $"footCount: {footCount}", 
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4, 
                 $"SeededBool: {WrassleID.SeededRandomBool()}, " + 
                 $"FootOrFeet: {FootOrFeet}", 
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug());
 
             List<GameObject> wrassleGearObjects = new();
             foreach (BodyPart bodyPart in Actor.Body.GetParts())
@@ -358,13 +379,13 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"{typeof(Wrassler).Name}." +
                     $"{nameof(HandleEvent)}({typeof(ObjectEnteredCellEvent).Name} E)",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"E.Object: {Actor.ShortDisplayName} in Cell:{E.Cell.Location}",
-                    Indent: 1);
+                    Indent: 1, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"Cell:{E.Cell}",
-                    Indent: 1);
+                    Indent: 1, Toggle: getDoDebug());
                 Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
 
                 List<GameObject> EquippedList = Actor.GetEquippedObjects();
@@ -390,7 +411,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"{typeof(Wrassler).Name}." +
                     $"{nameof(HandleEvent)}({typeof(ExamineSuccessEvent).Name} E)",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
 
                 if (E.Object.TryGetPart(out Examiner examiner))
                 {

@@ -4,6 +4,7 @@ using XRL;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -11,6 +12,8 @@ namespace HNPS_GigantismPlus
 {
     public class AfterModGiganticAppliedEvent : ModPooledEvent<AfterModGiganticAppliedEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(AfterModGiganticAppliedEvent));
+
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
         public static readonly string RegisteredEventID = GetRegisteredEventID();

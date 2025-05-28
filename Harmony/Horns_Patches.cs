@@ -6,6 +6,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -14,6 +15,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Horns_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(Horns_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(Horns), 
             methodName: nameof(Horns.RegrowHorns),

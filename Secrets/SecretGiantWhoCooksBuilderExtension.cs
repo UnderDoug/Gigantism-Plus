@@ -36,6 +36,27 @@ namespace HNPS_GigantismPlus
     [JoppaWorldBuilderExtension]
     public class SecretGiantWhoCooksBuilderExtension : IJoppaWorldBuilderExtension
     {
+        private static bool doDebug => getClassDoDebug(nameof(SecretGiantWhoCooksBuilderExtension));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+                '!',    // Alert
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         public static string SecretZoneId = string.Empty;
         public static JournalMapNote SecretMapNote = null;
         public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneId);
@@ -56,7 +77,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"\u2666 {nameof(SecretGiantWhoCooksBuilderExtension)}." +
                 $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
             SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
@@ -110,7 +131,7 @@ namespace HNPS_GigantismPlus
                     $"WARN: {nameof(SecretGiantWhoCooksBuilderExtension)}." +
                     $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
                     $"failed to instantiate UniqueGiant. Placement aborted.",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug('!'));
                 return;
             }
 

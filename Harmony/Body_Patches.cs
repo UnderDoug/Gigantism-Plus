@@ -7,6 +7,7 @@ using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using System;
@@ -16,7 +17,7 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Body_Patches
     {
-        private static bool doDebug => true;
+        private static bool doDebug => getClassDoDebug(nameof(Body_Patches));
 
         [HarmonyPatch(
             declaringType: typeof(Body),

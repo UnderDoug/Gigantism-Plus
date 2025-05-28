@@ -10,15 +10,17 @@ using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony
 {
     [HarmonyPatch]
     public static class Crystallinity_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(Crystallinity_Patches));
+
         /*
         // Increase the chance to refract light-based attacks from 25% to 35% when GigantismPlus is present
         [HarmonyPrefix]

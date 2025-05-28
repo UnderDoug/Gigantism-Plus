@@ -8,16 +8,17 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Effects;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    // Intercept the application of Burrowing Claws via Skulk_Tonic to apply the Mutations.xml version instead for compatibility.
     [HarmonyPatch]
     public static class Skulk_Tonic_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(Skulk_Tonic_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(Skulk_Tonic), 
             methodName: nameof(Skulk_Tonic.Apply),
@@ -26,6 +27,8 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         static void Apply_UseMutationEntry_Postfix(ref bool __result, ref Skulk_Tonic __instance, GameObject Object)
         {
+            // Intercept the application of Burrowing Claws via Skulk_Tonic to apply the Mutations.xml version instead for compatibility.
+
             if (__result && __instance.BurrowingClawsID != Guid.Empty)
             {
                 Mutations mutations = Object.RequirePart<Mutations>();

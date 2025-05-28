@@ -8,6 +8,7 @@ using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Anatomy;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -16,6 +17,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Brain_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(Brain_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(Brain),
             methodName: nameof(Brain.PreciseArmorScore),

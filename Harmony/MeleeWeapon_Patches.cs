@@ -4,6 +4,7 @@ using System;
 
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -12,6 +13,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class MeleeWeapon_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(MeleeWeapon_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(MeleeWeapon), 
             methodName: nameof(MeleeWeapon.GetSimplifiedStats),

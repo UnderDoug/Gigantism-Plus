@@ -15,6 +15,26 @@ namespace XRL.World.Parts.Mutation
     public class ElongatedPaws 
         : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ElongatedPaws));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
 
         public int StrengthModifier => ParentObject.StatMod("Strength");

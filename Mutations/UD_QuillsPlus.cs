@@ -24,6 +24,26 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class UD_QuillsPlus : BaseDefaultEquipmentMutation
     {
+        private static bool doDebug => getClassDoDebug(nameof(UD_QuillsPlus));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         public const int MINIMUM_QUILLS_TO_FLING = 80;
 
         public static readonly string COMMAND_NAME = "CommandQuillFling";

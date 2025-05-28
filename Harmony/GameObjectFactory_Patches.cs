@@ -8,6 +8,7 @@ using XRL.Rules;
 using XRL.World;
 using XRL.World.Loaders;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
 
@@ -16,7 +17,7 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class GameObjectFactory_Patches
     {
-        public static bool doDebug = false;
+        private static bool doDebug => getClassDoDebug(nameof(GameObjectFactory_Patches));
 
         private static readonly string TargetAttribute = "DisplayName";
 

@@ -21,7 +21,25 @@ namespace XRL.World.Parts.Mutation
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        private static bool doDebug => true;
+        private static bool doDebug => getClassDoDebug("BaseManagedDefaultEquipmentMutation");
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
 
         // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
         // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
@@ -148,7 +166,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
-                Indent: 2, Toggle: doDebug);
+                Indent: 2, Toggle: getDoDebug());
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
@@ -179,38 +197,38 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(ProcessNaturalEquipment)}",
-                Indent: 1, Toggle: doDebug);
+                Indent: 1, Toggle: getDoDebug());
 
             string targetType = TargetBodyPart.Type;
-            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2, Toggle: doDebug);
+            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2, Toggle: getDoDebug());
             ModNaturalEquipment<T> naturalEquipmentMod = null;
             if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
             {
                 naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains entry for this BodyPart", Indent: 2, Toggle: doDebug);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
                 Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: doDebug);
+                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
             }
             else
             {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
             }
 
             if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
             {
                 naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains entry for this BodyPart", Indent: 2, Toggle: doDebug);
+                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
                 Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: doDebug);
+                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
             }
             else
             {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
             }
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
                 + $"{nameof(ProcessNaturalEquipment)} @//",
-                Indent: 1, Toggle: doDebug);
+                Indent: 1, Toggle: getDoDebug());
             return true;
         }
 
@@ -227,26 +245,26 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageNaturalEquipment)}(body)", Toggle: doDebug);
-            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: doDebug);
+            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageNaturalEquipment)}(body)", Toggle: getDoDebug());
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
 
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
             ProcessNaturalEquipment(Manager, TargetBodyPart);
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})", Toggle: doDebug);
+                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject.Blueprint})", Toggle: getDoDebug());
         }
         public virtual void OnUpdateNaturalEquipmentMods()
         {
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1, Toggle: getDoDebug());
             foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
             {
                 UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
             }
             if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1, Toggle: getDoDebug());
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -264,7 +282,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}({nameof(UpdateNaturalEquipmentModsEvent)} E )",
-                Indent: 0, Toggle: doDebug);
+                Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)
             {
@@ -285,7 +303,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}({nameof(ManageDefaultEquipmentEvent)} E)",
-                Indent: 0, Toggle: doDebug);
+                Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)
             {

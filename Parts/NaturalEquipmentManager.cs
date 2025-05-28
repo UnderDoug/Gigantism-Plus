@@ -117,6 +117,13 @@ namespace XRL.World.Parts
         {
             base.Attach();
         }
+        public override void Remove()
+        {
+            ResetShortDescriptions();
+            ClearAdjustmentTargets();
+            ClearNaturalWeaponMods();
+            base.Remove();
+        }
 
         public string ProcessShortDescription(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions)
         {
@@ -631,14 +638,6 @@ namespace XRL.World.Parts
                 }
             }
             return base.FireEvent(E);
-        }
-
-        public override void Remove()
-        {
-            ResetShortDescriptions();
-            ClearAdjustmentTargets();
-            ClearNaturalWeaponMods();
-            base.Remove();
         }
 
         public override void Write(GameObject Basis, SerializationWriter Writer)

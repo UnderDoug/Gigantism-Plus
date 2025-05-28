@@ -26,6 +26,25 @@ namespace XRL.World.Parts.Mutation
         , IModEventHandler<VaultedEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(GigantismPlus));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+                "CL",    // Change Level
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
 
         public static readonly int ICON_COLOR_PRIORITY = 81;
         public static readonly string ICON_COLOR = "&z";
@@ -238,6 +257,41 @@ namespace XRL.World.Parts.Mutation
             giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
             return giganticMugMod;
         }
+        public static ModGiganticNaturalWeapon NewClosedFistMod(GigantismPlus assigningPart)
+        {
+            ModGiganticNaturalWeapon closedGiganticFist = new()
+            {
+                AssigningPart = assigningPart,
+                BodyPartType = "Hand",
+
+                ModPriority = -999999, // -999,999
+                DescriptionPriority = -999999, // -999,999
+
+                Adjective = "closed",
+                AdjectiveColor = "Y",
+                AdjectiveColorFallback = "y",
+
+                Adjustments = new(),
+
+                AddedIntProps = new()
+                    {
+                        { "ModGiganticNoShortDescription", 1 },
+                        { "ModGiganticNoDisplayName", 1 }
+                    },
+                AddedStringProps = new()
+                    {
+                        { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
+                        { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
+                    },
+            };
+            closedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", false);
+            closedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", false);
+
+            closedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", false);
+
+            closedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", false);
+            return closedGiganticFist;
+        }
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
         {
             ModNaturalEquipment<GigantismPlus> giganticMugMod = new()
@@ -354,27 +408,27 @@ namespace XRL.World.Parts.Mutation
             if (GO == null)
                 return false;
 
-            Debug.Entry(4, "Stunning Force", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "Stunning Force", Indent: 1, Toggle: getDoDebug("CH"));
             // Stunning Force
-            Debug.Entry(4, "? if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "? if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))", Indent: 1, Toggle: getDoDebug("CH"));
             if (!GO.TryGetPart(out StunningForceOnJump stunning))
             {
-                Debug.CheckNah(4, $"No StunningForceOnJump part", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, $"No StunningForceOnJump part", Indent: 2, Toggle: getDoDebug("CH"));
                 GO.RequirePart<StunningForceOnJump>();
-                Debug.Entry(4, $"GO.RequirePart<StunningForceOnJump>()", Indent: 3, Toggle: doDebug);
+                Debug.Entry(4, $"GO.RequirePart<StunningForceOnJump>()", Indent: 3, Toggle: getDoDebug("CH"));
             }
-            Debug.Entry(4, "x if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump)) ?//", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "x if (GO.TryGetPart(out StunningForceOnJump stunningForceOnJump)) ?//", Indent: 1, Toggle: getDoDebug("CH"));
 
             if (stunning != null)
             {
-                Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"stunningForceOnJump.Level: {(stunning?.Level != null ? stunning?.Level : "null")}", Indent: 2, Toggle: doDebug);
-                Debug.LoopItem(4, $"stunningForceOnJump.Distance: {(stunning?.Distance != null ? stunning?.Distance : "null")}", Indent: 2, Toggle: doDebug);
+                Debug.CheckYeh(4, $"Have StunningForceOnJump part", Indent: 1, Toggle: getDoDebug("CH"));
+                Debug.LoopItem(4, $"stunningForceOnJump.Level: {(stunning?.Level != null ? stunning?.Level : "null")}", Indent: 2, Toggle: getDoDebug("CH"));
+                Debug.LoopItem(4, $"stunningForceOnJump.Distance: {(stunning?.Distance != null ? stunning?.Distance : "null")}", Indent: 2, Toggle: getDoDebug("CH"));
                 stunning.Level = GetStunningForceLevel(Level); // Scale stunningForceOnJump force with mutation level
                 stunning.Distance = StunningForceDistance;
-                Debug.Entry(4, $"New values calculated and assigned", Indent: 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"stunningForceOnJump.Level: {stunning.Level}", Indent: 2, Toggle: doDebug);
-                Debug.LoopItem(4, $"stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2, Toggle: doDebug);
+                Debug.Entry(4, $"New values calculated and assigned", Indent: 1, Toggle: getDoDebug("CH"));
+                Debug.LoopItem(4, $"stunningForceOnJump.Level: {stunning.Level}", Indent: 2, Toggle: getDoDebug("CH"));
+                Debug.LoopItem(4, $"stunningForceOnJump.Distance: {stunning.Distance}", Indent: 2, Toggle: getDoDebug("CH"));
             }
 
             return true;
@@ -386,21 +440,21 @@ namespace XRL.World.Parts.Mutation
             if (GO == null) 
                 return false;
 
-            Debug.LoopItem(4, "Removing StunningForceOnJump", Indent: 2, Toggle: doDebug);
+            Debug.LoopItem(4, "Removing StunningForceOnJump", Indent: 2, Toggle: getDoDebug("CH"));
 
-            Debug.Entry(4, "? if (!GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))", Indent: 2, Toggle: doDebug);
+            Debug.Entry(4, "? if (!GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))", Indent: 2, Toggle: getDoDebug("CH"));
             if (!GO.TryGetPart(out StunningForceOnJump stunningForceOnJump))
             {
-                Debug.CheckNah(4, "No StunningForceOnJump part", Indent: 3, Toggle: doDebug);
-                Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, "No StunningForceOnJump part", Indent: 3, Toggle: getDoDebug("CH"));
+                Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2, Toggle: getDoDebug("CH"));
                 return false;
             }
             Debug.CheckYeh(4, "StunningForceOnJump part found", Indent: 3);
-            Debug.LoopItem(4, $"Found StunningForceOnJump: [Level: {stunningForceOnJump.Level}, Distance: {stunningForceOnJump.Distance}]", Indent: 3, Toggle: doDebug);
+            Debug.LoopItem(4, $"Found StunningForceOnJump: [Level: {stunningForceOnJump.Level}, Distance: {stunningForceOnJump.Distance}]", Indent: 3, Toggle: getDoDebug("CH"));
 
             GO.RemovePart(stunningForceOnJump);
-            Debug.LoopItem(4, $"StunningForceOnJump removed", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2, Toggle: doDebug);
+            Debug.LoopItem(4, $"StunningForceOnJump removed", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2, Toggle: getDoDebug("CH"));
 
             return true;
         }
@@ -415,27 +469,27 @@ namespace XRL.World.Parts.Mutation
             if (GO == null)
                 return false;
 
-            Debug.Entry(4, "Jump Bonus", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "Jump Bonus", Indent: 1, Toggle: getDoDebug("CH"));
             // Jump Bonus
-            Debug.Entry(4, "? if (AppliedJumpRangeBonus > 0 and UnapplyJumpRangeBonus())", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "? if (AppliedJumpRangeBonus > 0 and UnapplyJumpRangeBonus())", Indent: 1, Toggle: getDoDebug("CH"));
             if (AppliedJumpRangeBonus > 0 && UnapplyJumpRangeBonus(GO))
             {
-                Debug.Entry(4, $"JumpRangeModifier reduced to {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2, Toggle: doDebug);
+                Debug.Entry(4, $"JumpRangeModifier reduced to {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2, Toggle: getDoDebug("CH"));
             }
             else
             {
-                Debug.CheckNah(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2, Toggle: doDebug);
+                Debug.CheckNah(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2, Toggle: getDoDebug("CH"));
             }
-            Debug.Entry(4, "x if (AppliedJumpRangeBonus > 0 and UnapplyJumpRangeBonus()) ?//", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "x if (AppliedJumpRangeBonus > 0 and UnapplyJumpRangeBonus()) ?//", Indent: 1, Toggle: getDoDebug("CH"));
 
             AppliedJumpRangeBonus = GetJumpRangeBonus(Level);
 
-            Debug.Entry(4, $"Calculated new AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 1, Toggle: doDebug);
-            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, $"Calculated new AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 1, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 1, Toggle: getDoDebug("CH"));
 
             GO.ModIntProperty(JUMP_RANGE_MODIFIER, AppliedJumpRangeBonus);
 
-            Debug.Entry(4, $"JumpRangeModifier reduced to {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, $"JumpRangeModifier reduced to {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 1, Toggle: getDoDebug("CH"));
             Acrobatics_Jump.SyncAbility(GO);
 
             return true;
@@ -447,100 +501,100 @@ namespace XRL.World.Parts.Mutation
             if (GO == null)
                 return false;
 
-            Debug.CheckYeh(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2, Toggle: doDebug);
-            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2, Toggle: doDebug); 
+            Debug.CheckYeh(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2, Toggle: getDoDebug("CH")); 
             GO.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus, RemoveIfZero: true);
             AppliedJumpRangeBonus += -AppliedJumpRangeBonus;
             Acrobatics_Jump.SyncAbility(GO);
-            Debug.LoopItem(4, "JumpRangeModifier reverted", Indent: 2, Toggle: doDebug);
+            Debug.LoopItem(4, "JumpRangeModifier reverted", Indent: 2, Toggle: getDoDebug("CH"));
             return AppliedJumpRangeBonus == 0;
         }
 
         public override bool ChangeLevel(int NewLevel)
         {
-            Debug.Header(4, "GigantismPlus", $"ChangeLevel({NewLevel})", Toggle: doDebug);
+            Debug.Header(4, "GigantismPlus", $"ChangeLevel({NewLevel})", Toggle: getDoDebug("CH"));
             // Straighten up if hunching.
             // Hunch over if hunched before level up.
             bool WasHunched = false;
 
-            Debug.Entry(4, "? if (IsPseudoGiganticCreature and !IsVehicleCreature)", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "? if (IsPseudoGiganticCreature and !IsVehicleCreature)", Indent: 1, Toggle: getDoDebug("CH"));
             if (IsPseudoGiganticCreature && !IsVehicleCreature)
             {
-                Debug.CheckYeh(4, "Creature is PsuedoGigantic and not a Vehicle", Indent: 2, Toggle: doDebug);
-                Debug.Entry(4, "Sending StraightenUp (silent)", Indent: 2, Toggle: doDebug);
+                Debug.CheckYeh(4, "Creature is PsuedoGigantic and not a Vehicle", Indent: 2, Toggle: getDoDebug("CH"));
+                Debug.Entry(4, "Sending StraightenUp (silent)", Indent: 2, Toggle: getDoDebug("CH"));
                 WasHunched = true;
                 IsHunchFree = true;
                 StraightenUp(Message: false);
             }
             else
             {
-                Debug.LoopItem(4, $"IsPseudoGiganticCreature: {IsPseudoGiganticCreature}", Good: IsPseudoGiganticCreature, Indent: 2, Toggle: doDebug);
-                Debug.LoopItem(4, $"!IsVehicleCreature: {!IsVehicleCreature}", Good: !IsVehicleCreature, Indent: 2, Toggle: doDebug);
+                Debug.LoopItem(4, $"IsPseudoGiganticCreature: {IsPseudoGiganticCreature}", Good: IsPseudoGiganticCreature, Indent: 2, Toggle: getDoDebug("CH"));
+                Debug.LoopItem(4, $"!IsVehicleCreature: {!IsVehicleCreature}", Good: !IsVehicleCreature, Indent: 2, Toggle: getDoDebug("CH"));
             }
-            Debug.Entry(4, "x if (IsPseudoGiganticCreature and !IsVehicleCreature) ?//", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "x if (IsPseudoGiganticCreature and !IsVehicleCreature) ?//", Indent: 1, Toggle: getDoDebug("CH"));
 
-            Debug.Entry(4, "Start of Change Level updates", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "Start of Change Level updates", Indent: 1, Toggle: getDoDebug("CH"));
             // Start of Change Level updates.
 
             Debug.Divider(4, HONLY, Count: 25, Indent: 1);
-            Debug.Entry(4, "Weight Factor and Carry Cap Bonus changes", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "Weight Factor and Carry Cap Bonus changes", Indent: 1, Toggle: getDoDebug("CH"));
             // Hunch Over Penalties
-            Debug.Entry(4, $"Values Before", Indent: 2, Toggle: doDebug);
-            Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: doDebug);
-            Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"Values Before", Indent: 2, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: getDoDebug("CH"));
             WeightFactor = GetWeightFactor(NewLevel);
             CarryCapBonus = GetCarryCapBonus(NewLevel);
-            Debug.Entry(4, $"Values After", Indent: 2, Toggle: doDebug);
-            Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: doDebug);
-            Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"Values After", Indent: 2, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: getDoDebug("CH"));
 
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug("CH"));
 
             ApplyJumpRangeBonus(ParentObject, NewLevel);
 
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug("CH"));
 
             if (IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, ParentObject))
             {
                 ApplyStunningForceOnJump(ParentObject, NewLevel);
             }
 
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
-            Debug.Entry(4, "Hunch Over Penalties", Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, "Hunch Over Penalties", Indent: 1, Toggle: getDoDebug("CH"));
             // Hunch Over Penalties
-            Debug.Entry(4, $"Values Before", Indent: 2, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"Values Before", Indent: 2, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: getDoDebug("CH"));
             HunchedOverAVModifier = GetHunchedOverAVModifier(NewLevel);
             HunchedOverDVModifier = GetHunchedOverDVModifier(NewLevel);
             HunchedOverMSModifier = GetHunchedOverMSModifier(NewLevel);
-            Debug.Entry(4, $"Values After", Indent: 2, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: doDebug);
+            Debug.Entry(4, $"Values After", Indent: 2, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"HunchedOverAVModifier: {HunchedOverAVModifier}", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"HunchedOverDVModifier: {HunchedOverDVModifier}", Indent: 3, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, $"HunchedOverMSModifier: {HunchedOverMSModifier}", Indent: 3, Toggle: getDoDebug("CH"));
 
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
-            Debug.Entry(4, "End of Change Level updates", Indent: 1, Toggle: doDebug);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug("CH"));
+            Debug.Entry(4, "End of Change Level updates", Indent: 1, Toggle: getDoDebug("CH"));
             // End of Change Level updates
-            Debug.Entry(4, "? if (WasHunched and !IsVehicleCreature)", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "? if (WasHunched and !IsVehicleCreature)", Indent: 1, Toggle: getDoDebug("CH"));
             if (WasHunched && !IsVehicleCreature)
             {
-                Debug.CheckYeh(4, "Creature was Hunched and not a Vehicle", Indent: 1, Toggle: doDebug);
-                Debug.Entry(4, "Sending HunchOver (silent)", Indent: 1, Toggle: doDebug);
+                Debug.CheckYeh(4, "Creature was Hunched and not a Vehicle", Indent: 1, Toggle: getDoDebug("CH"));
+                Debug.Entry(4, "Sending HunchOver (silent)", Indent: 1, Toggle: getDoDebug("CH"));
                 IsHunchFree = true;
                 HunchOver(Message: false);
             }
             else
             {
-                Debug.LoopItem(4, $"WasHunched: {WasHunched}", Good: WasHunched, Indent: 2, Toggle: doDebug);
-                Debug.LoopItem(4, $"!IsVehicleCreature: {!IsVehicleCreature}", Good: !IsVehicleCreature, Indent: 2, Toggle: doDebug);
+                Debug.LoopItem(4, $"WasHunched: {WasHunched}", Good: WasHunched, Indent: 2, Toggle: getDoDebug("CH"));
+                Debug.LoopItem(4, $"!IsVehicleCreature: {!IsVehicleCreature}", Good: !IsVehicleCreature, Indent: 2, Toggle: getDoDebug("CH"));
             }
-            Debug.Entry(4, "x if (WasHunched and !IsVehicleCreature) ?//", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, "x if (WasHunched and !IsVehicleCreature) ?//", Indent: 1, Toggle: getDoDebug("CH"));
 
-            Debug.Footer(4, "GigantismPlus", $"ChangeLevel({NewLevel})", Toggle: doDebug);
+            Debug.Footer(4, "GigantismPlus", $"ChangeLevel({NewLevel})", Toggle: getDoDebug("CH"));
             return base.ChangeLevel(NewLevel);
         }
 
@@ -559,7 +613,7 @@ namespace XRL.World.Parts.Mutation
 
         protected override string GetBaseDisplayName()
         {
-            return base.GetBaseDisplayName().OptionalColorGigantic(Colorfulness);
+            return base.GetBaseDisplayName().OptionalColorGigantic(Colorfulness).AppendDefect();
         }
 
         public override string GetDescription()
@@ -1112,7 +1166,9 @@ namespace XRL.World.Parts.Mutation
             if (ParentObject != null && ParentObject == E.Vaulter && !IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, E.Vaulter))
             {
                 if (E.Vaulter.HasStringProperty("Flip_Ground_Pound"))
+                {
                     CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
+                }
             }
             return base.HandleEvent(E);
         }
@@ -1293,39 +1349,8 @@ namespace XRL.World.Parts.Mutation
             if (ToggledOn)
             {
                 Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
-                ModClosedGiganticNaturalWeapon ClosedGiganticFist = new()
-                {
-                    AssigningPart = this,
-                    BodyPartType = "Hand",
 
-                    ModPriority = -999999, // -999,999
-                    DescriptionPriority = -999999, // -999,999
-
-                    Adjective = "closed",
-                    AdjectiveColor = "Y",
-                    AdjectiveColorFallback = "y",
-
-                    Adjustments = new(),
-
-                    AddedIntProps = new()
-                    {
-                        { "ModGiganticNoShortDescription", 1 },
-                        { "ModGiganticNoDisplayName", 1 }
-                    },
-                        AddedStringProps = new()
-                    {
-                        { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
-                        { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
-                    },
-                };
-                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", false);
-                ClosedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", false);
-
-                ClosedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", false);
-
-                ClosedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", false);
-
-                NaturalEquipmentMod = ClosedGiganticFist;
+                NaturalEquipmentMod = NewClosedFistMod(this);
 
                 ToggledOn = true;
 

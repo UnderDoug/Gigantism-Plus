@@ -6,12 +6,15 @@ using XRL.World.Parts;
 using XRL.World.Anatomy;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
 public class VaultedEvent : ModPooledEvent<VaultedEvent>
 {
+    private static bool doDebug => getClassDoDebug(nameof(VaultedEvent));
+
     public new static readonly int CascadeLevel = CASCADE_NONE;
 
     public GameObject Vaulter;
@@ -47,7 +50,7 @@ public class VaultedEvent : ModPooledEvent<VaultedEvent>
             $" OriginCell: [{OriginCell?.Location}]," + 
             $" OverCell: [{OverCell?.Location}]," + 
             $" DestinationCell: [{DestinationCell?.Location}])", 
-            Indent: 0);
+            Indent: 0, Toggle: doDebug);
 
         VaultedEvent E = FromPool();
 

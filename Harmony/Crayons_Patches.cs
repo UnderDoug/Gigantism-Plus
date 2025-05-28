@@ -5,6 +5,7 @@ using System.Linq;
 
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class Crayons_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(Crayons_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(Crayons),
             methodName: nameof(Crayons.GetRandomColor),

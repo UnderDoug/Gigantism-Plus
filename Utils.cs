@@ -33,22 +33,22 @@ namespace HNPS_GigantismPlus
         private static bool getDoDebug (string MethodName)
         {
             if (MethodName == nameof(TryGetTilePath))
-                return true;
+                return false;
 
             if (MethodName == nameof(AddAccumulatedNaturalEquipmentTo))
-                return true;
+                return false;
 
             if (MethodName == nameof(ExplodingDie))
-                return true;
+                return false;
 
             if (MethodName == nameof(SwapMutationEnrtyClass))
-                return true;
+                return false;
 
             if (MethodName == nameof(ManagedVanillaMutationOptionHandler))
-                return true;
+                return false;
 
             if (MethodName == nameof(SwapMutationCategory))
-                return true;
+                return false;
 
             if (MethodName == nameof(Rumble))
                 return true;

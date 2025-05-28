@@ -2,13 +2,15 @@
 using XRL.World;
 
 using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
+
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Utils;
 
 [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
 public class UpdateNaturalEquipmentModsEvent : ModPooledEvent<UpdateNaturalEquipmentModsEvent>
 {
-    private static bool doDebug => true;
+    private static bool doDebug => getClassDoDebug(nameof(UpdateNaturalEquipmentModsEvent));
 
     public new static readonly int CascadeLevel = CASCADE_NONE; // CASCADE_EQUIPMENT + CASCADE_SLOTS + CASCADE_EXCEPT_THROWN_WEAPON;
 

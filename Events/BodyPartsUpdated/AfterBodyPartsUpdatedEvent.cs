@@ -6,13 +6,14 @@ using XRL.World.Parts;
 using XRL.World.Anatomy;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEvent>
 {
-    private static bool doDebug => true;
+    private static bool doDebug => getClassDoDebug(nameof(AfterBodyPartsUpdatedEvent));
 
     public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 

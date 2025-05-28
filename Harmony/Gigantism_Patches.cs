@@ -6,6 +6,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -15,6 +16,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class GigantismPlus_ControlledWeight_GameObject_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(GigantismPlus_ControlledWeight_GameObject_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(GameObject),
             methodName: nameof(GameObject.GetBodyWeight))]
@@ -30,12 +33,12 @@ namespace HNPS_GigantismPlus.Harmony
                 Debug.Entry(4,
                 $"# {nameof(GigantismPlus_ControlledWeight_GameObject_Patches)}."
                 + $"{nameof(GetBodyWeight_GigantismPlus_Prefix)}(ref GameObject __state, ref GameObject __instance)",
-                Indent: 0, Toggle: Options.doDebug);
+                Indent: 0, Toggle: doDebug);
                 __state.IsGiganticCreature = false; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
 
                 Debug.Entry(4,
                 $"Was gigantic, not now",
-                Indent: 1, Toggle: Options.doDebug);
+                Indent: 1, Toggle: doDebug);
             }
         }
 
@@ -66,6 +69,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(GetMaxCarriedWeightEvent),
             methodName: nameof(GetMaxCarriedWeightEvent.GetFor),
@@ -85,13 +90,13 @@ namespace HNPS_GigantismPlus.Harmony
                 + $"{nameof(GetFor_GigantismPlus_Prefix)}" 
                 + $"(ref {nameof(GameObject)} {nameof(__state)},"
                 + $" {nameof(GameObject)} {nameof(Object)})",
-                Indent: 0, Toggle: Options.doDebug);
+                Indent: 0, Toggle: doDebug);
 
                 __state.IsGiganticCreature = false; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
 
                 Debug.Entry(4,
                 $"Was gigantic, not now",
-                Indent: 1, Toggle: Options.doDebug);
+                Indent: 1, Toggle: doDebug);
             }
         }
 
@@ -126,6 +131,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(PseudoGiganticCreature_RegenerateDefaultEquipment_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(Body),
             methodName: nameof(Body.RegenerateDefaultEquipment))]
@@ -141,11 +148,11 @@ namespace HNPS_GigantismPlus.Harmony
                     $"{nameof(Body)}." + 
                     $"{nameof(Body.RegenerateDefaultEquipment)}() " + 
                     $"-> PseudoGigantic not Gigantic",
-                    Indent: 0);
+                    Indent: 0, Toggle: doDebug);
 
                 __state.IsGiganticCreature = true; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
 
-                Debug.Entry(2, $"Trying to generate gigantic natural equipment while PseudoGigantic", Indent: 1);
+                Debug.Entry(2, $"Trying to generate gigantic natural equipment while PseudoGigantic", Indent: 1, Toggle: doDebug);
             }
             return true;
         }
@@ -164,11 +171,11 @@ namespace HNPS_GigantismPlus.Harmony
                     $"{nameof(Body)}." +
                     $"{nameof(Body.RegenerateDefaultEquipment)}() " +
                     $"-> PseudoGigantic not Gigantic",
-                    Indent: 0);
+                    Indent: 0, Toggle: doDebug);
 
                 __state.IsGiganticCreature = false; // make the GameObject not Gigantic 
 
-                Debug.Entry(3, "Should have generated gigantic natural equipment while PseudoGigantic", Indent: 1);
+                Debug.Entry(3, "Should have generated gigantic natural equipment while PseudoGigantic", Indent: 1, Toggle: doDebug);
             }
         }
 

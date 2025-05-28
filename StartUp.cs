@@ -38,8 +38,8 @@ namespace HNPS_GigantismPlus
     {
         public static void AdjustGiganticModifier()
         {
-            bool ShouldDerarify = SelectGiganticDerarification;
-            bool ShouldGiganticTinkerable = SelectGiganticTinkering;
+            bool ShouldDerarify = EnableGiganticDerarification;
+            bool ShouldGiganticTinkerable = EnableGiganticTinkering;
             int indent = Debug.LastIndent;
             Debug.Entry(3,
                 $"@ {nameof(Gigantic_ModEntry_Adjustments)}."

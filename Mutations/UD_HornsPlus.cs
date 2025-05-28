@@ -19,6 +19,26 @@ namespace XRL.World.Parts.Mutation
     [Serializable]
     public class UD_HornsPlus : BaseDefaultEquipmentMutation
     {
+        private static bool doDebug => getClassDoDebug(nameof(UD_HornsPlus));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         [NonSerialized]
         public GameObject HornsObject;
 

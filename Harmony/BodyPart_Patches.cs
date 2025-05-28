@@ -7,6 +7,7 @@ using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -15,6 +16,8 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class BodyPart_Patches
     {
+        private static bool doDebug => getClassDoDebug(nameof(BodyPart_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(BodyPart),
             methodName: nameof(BodyPart.Implant),
@@ -25,9 +28,9 @@ namespace HNPS_GigantismPlus.Harmony
         {
             BodyPart @this = __instance;
 
-            Debug.Entry(4, $"{typeof(Body_Patches).Name}.{nameof(Implant_UpdateBodyParts_Postfix)}(ref Actor __instance)", Indent: 0);
+            Debug.Entry(4, $"{typeof(Body_Patches).Name}.{nameof(Implant_UpdateBodyParts_Postfix)}(ref Actor __instance)", Indent: 0, Toggle: doDebug);
 
-            Debug.Entry(4, $"Object is {@this.ParentBody?.ParentObject?.DebugName ?? NULL}", Indent: 1);
+            Debug.Entry(4, $"Object is {@this.ParentBody?.ParentObject?.DebugName ?? NULL}", Indent: 1, Toggle: doDebug);
 
             @this?.ParentBody?.UpdateBodyParts();
         }

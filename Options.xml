@@ -202,7 +202,7 @@
 
   <!-- Advanced Options -->
 
-  <option
+  <!--option
 		  ID="Option_GigantismPlus_ManagedVanilla"
 	    DisplayText="Use &quot;up-classed&quot; versions of vanilla mutations that have natural weapons ({{R|new save}})"
       Requires="OptionShowAdvancedOptions==Yes"
@@ -228,7 +228,7 @@
 
       The default is {{w|Enabled}}.
     </helptext>
-  </option>
+  </option-->
 	
   <!-- End of Mod Options -->
   

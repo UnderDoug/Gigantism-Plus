@@ -19,7 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class ModGigantic_Patches
     {
-        // adds shader to ModGigantic adjective
+        private static bool doDebug => getClassDoDebug(nameof(ModGigantic_Patches));
 
         /// <summary>
         /// Goal is to display the size adjective "gigantic" with the shader added by this mod.

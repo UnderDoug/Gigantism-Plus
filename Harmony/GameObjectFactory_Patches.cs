@@ -29,7 +29,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void LoadBakedXML_MutationEntryIfSupplied_Postfix(ref GameObjectFactory __instance, ref GameObjectBlueprint __result, ObjectBlueprintLoader.ObjectBlueprintXMLData node)
         {
-            if (Stat.Roll("1d2") > 2)
+            if (Stat.Roll("1d2") < 3)
             {
                 try
                 {
@@ -87,7 +87,7 @@ namespace HNPS_GigantismPlus.Harmony
                                 }
                             }
                         }
-                        Debug.Divider(4, HONLY, Count: 25, Indent: 2);
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: doDebug);
                         Debug.Entry(4,
                             $"x foreach ((string name, ObjectBlueprintLoader.ObjectBlueprintXMLChildNode childNode) in node.NamedNodes(\"mutation\")) >//",
                             Indent: 1, Toggle: doDebug);

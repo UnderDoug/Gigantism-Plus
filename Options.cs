@@ -229,7 +229,6 @@ namespace HNPS_GigantismPlus
             set => SetBoolOption(nameof(EnableGiganticNPCGear_Grenades), value);
         }
 
-
         // Advanced Settings
         public static bool EnableManagedVanillaMutationsCurrent => true; // GetOption("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
         public static bool? EnableManagedVanillaMutations = null;

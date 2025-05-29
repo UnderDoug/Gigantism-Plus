@@ -89,8 +89,8 @@ namespace XRL.World.ZoneBuilders
                 int y1 = cell.Y - radius;
                 int x2 = cell.X + radius;
                 int y2 = cell.Y + radius;
-                int doorXRnd = RndGP.Next(x1 + 1, x2 - 1);
-                int doorYRnd = RndGP.Next(y1 + 1, y2 - 1);
+                int doorXRnd = Stat.Roll(x1 + 1, x2 - 1);
+                int doorYRnd = Stat.Roll(y1 + 1, y2 - 1);
                 int doorX = Constrained ? doorXRnd : cell.X;
                 int doorY = Constrained ? doorYRnd : cell.Y;
                 Point2D doorLocation = DoorDirection switch

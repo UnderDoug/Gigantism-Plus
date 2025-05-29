@@ -279,7 +279,7 @@ namespace XRL.World.Parts
 
         public int GetTurnsTillGrumble()
         {
-            return RndGP.Next(1200, 8000);
+            return Stat.Roll(1200, 8000);
         }
 
         public override bool WantEvent(int ID, int cascade)

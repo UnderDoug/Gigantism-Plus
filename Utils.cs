@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using ConsoleLib.Console;
 
 using Kobold;
@@ -9,6 +8,7 @@ using Kobold;
 using XRL;
 using XRL.UI;
 using XRL.Rules;
+using XRL.Language;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
@@ -16,8 +16,6 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
 using XRL.World.AI.GoalHandlers;
-using XRL.Language;
-
 using XRL.World.Text.Delegates;
 using XRL.World.Text.Attributes;
 
@@ -259,8 +257,6 @@ namespace HNPS_GigantismPlus
 
             return output;
         }
-
-        public static Random RndGP = Stat.GetSeededRandomGenerator("HNPS_GigantismPlus");
 
         // !! This is currently not firing from any of the NaturalEquipmentMod Mutations but it has code that will make implementing the cybernetics adjustments easier.
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.

@@ -877,7 +877,26 @@ namespace XRL.World.ObjectBuilders
                 Debug.LoopItem(4, $" {skill.Name}", Indent: 3, Toggle: getDoDebug());
             }
 
+            int startingMP = Creature.Stat("MP");
+            if (startingMP > 0)
+            {
+                Debug.CheckYeh(4, $"Total MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
+                while (Creature.Stat("MP") > startingMP)
+                {
+                    int pointsToSpend = Stat.Roll($"1d{Math.Min(4, Creature.Stat("MP"))}");
+                    Creature.RandomlySpendPoints(maxAPtospend: 0, maxSPtospend: 0, maxMPtospend: pointsToSpend);
+                    Debug.LoopItem(4, $"Spent: {pointsToSpend} (Remaining: {Creature.Stat("MP")})", Indent: 3, Toggle: getDoDebug());
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
+            }
             Creature.RandomlySpendPoints();
+            Debug.LoopItem(4, $"AP", $"{Creature.Stat("AP")}", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"SP", $"{Creature.Stat("SP")}", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"MP", $"{Creature.Stat("MP")}", Indent: 2, Toggle: getDoDebug());
+
 
             Creature.RequirePart<Interesting>();
             Debug.LoopItem(4, $"<Interesting>?", Good: Creature.HasPart<Interesting>(), Indent: 2, Toggle: getDoDebug());

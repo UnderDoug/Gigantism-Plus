@@ -7,7 +7,6 @@ namespace HNPS_GigantismPlus
     public static class Const
     {
         public const string MOD_ID = "gigantism_Plus";
-
         public const string UD_BLINK_MUTATION_MOD_ID = "UD_Blink_Mutation";
 
         public const string DEBUG_OBJECT_CREATION_ANALYSIS = "UD_Debug_DoObjectCreationAnalysis";

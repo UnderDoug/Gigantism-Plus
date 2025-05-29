@@ -1459,7 +1459,7 @@ namespace HNPS_GigantismPlus
             {
                 weightMax += entryWeight;
             }
-            int ticket = RndGP.Next(1, weightMax);
+            int ticket = Stat.Roll(1, weightMax);
             int weightCurrent = 0;
             foreach ((T entryT, int entryWeight) in WeightedList)
             {

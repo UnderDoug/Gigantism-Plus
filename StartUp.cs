@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 
 using XRL;
-using XRL.Core;
 using XRL.UI;
-using XRL.Collections;
+using XRL.Core;
 using XRL.Rules;
+using XRL.Collections;
 using XRL.World;
-using XRL.World.Anatomy;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.Anatomy;
 using XRL.World.Tinkering;
 
 using static HNPS_GigantismPlus.Const;

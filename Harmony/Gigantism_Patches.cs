@@ -56,11 +56,11 @@ namespace HNPS_GigantismPlus.Harmony
 
                 Debug.Entry(4,
                 $"Wasn't gigantic, are now",
-                Indent: 1, Toggle: Options.doDebug);
+                Indent: 1, Toggle: doDebug);
                 Debug.Entry(4,
                 $"x {nameof(GigantismPlus_ControlledWeight_GameObject_Patches)}."
                 + $"{nameof(GetBodyWeight_GigantismPlus_Postfix)}(ref GameObject __state, ref GameObject __instance) #//",
-                Indent: 0, Toggle: Options.doDebug);
+                Indent: 0, Toggle: doDebug);
             }
         }
     } //!-- public static class GigantismPlus_ControlledWeight_GameObject_Patches
@@ -116,12 +116,12 @@ namespace HNPS_GigantismPlus.Harmony
 
                 Debug.Entry(4,
                 $"Wasn't gigantic, are now",
-                Indent: 1, Toggle: Options.doDebug);
+                Indent: 1, Toggle: doDebug);
                 Debug.Entry(4,
                 $"x {nameof(GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches)}."
                 + $"{nameof(GetFor_GigantismPlus_Prefix)}" 
                 + $"(ref {nameof(GameObject)} {nameof(__state)}) #//",
-                Indent: 0, Toggle: Options.doDebug);
+                Indent: 0, Toggle: doDebug);
             }
         }
     } //!-- public static class GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches

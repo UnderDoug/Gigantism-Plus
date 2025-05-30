@@ -448,8 +448,8 @@ namespace HNPS_GigantismPlus
             for (int i = 0; i < Number; i++)
             {
                 GameObjectBlueprint blueprint = Unique
-                    ? WrassleGiantHero.GetAUniqueGiantHeroBluePrintModel()
-                    : WrassleGiantHero.GetAGiantHeroBluePrintModel()
+                    ? WrassleGiantHero.GetAUniqueGiantHeroBlueprintModel()
+                    : WrassleGiantHero.GetAGiantHeroBlueprintModel()
                     ;
                 blueprintList.Add(blueprint);
             }

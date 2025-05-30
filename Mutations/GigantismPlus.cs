@@ -449,7 +449,7 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, "x if (GO.HasPart<StunningForceOnJump>()) ?//", Indent: 2, Toggle: getDoDebug("CH"));
                 return false;
             }
-            Debug.CheckYeh(4, "StunningForceOnJump part found", Indent: 3);
+            Debug.CheckYeh(4, "StunningForceOnJump part found", Indent: 3, Toggle: getDoDebug("CH"));
             Debug.LoopItem(4, $"Found StunningForceOnJump: [Level: {stunningForceOnJump.Level}, Distance: {stunningForceOnJump.Distance}]", Indent: 3, Toggle: getDoDebug("CH"));
 
             GO.RemovePart(stunningForceOnJump);

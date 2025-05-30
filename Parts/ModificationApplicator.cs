@@ -78,7 +78,7 @@ namespace XRL.World.Parts
                     E.Actor.Fail(ParentObject.Does("do", int.MaxValue, null, null, null, AsIfKnown: false, Single: false, NoConfusion: false, NoColor: false, Stripped: false, WithoutTitles: true, Short: true, BaseOnly: false, WithIndefiniteArticle: false, null, IndicateHidden: false, Pronoun: true, SecondPerson: true, null) + " nothing.");
                     return false;
                 }
-                List<GameObject> objects = E.Actor.Inventory.GetObjects((GameObject o) => CanApply(o, E.Actor));
+                List<GameObject> objects = E.Actor.GetInventoryAndEquipment(o => CanApply(o, E.Actor));
                 if (objects.Count == 0)
                 {
                     if (ParentObject.Understood())

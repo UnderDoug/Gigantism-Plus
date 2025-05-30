@@ -26,6 +26,14 @@ namespace XRL.World.ObjectBuilders
         {
             Context ??= "Hero";
 
+            Creature.SetStringProperty("Culture", "Giant");
+
+            Creature.SetStringProperty("Role", "Hero");
+
+            Creature.SetStringProperty("staticFaction1", null);
+            Creature.SetStringProperty("staticFaction2", null);
+            Creature.SetStringProperty("staticFaction3", null);
+
             int MentalMutations = 0;
             int PhysicalMutations = 0;
             bool MakeChimera = false;

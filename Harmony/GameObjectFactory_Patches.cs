@@ -123,7 +123,7 @@ namespace HNPS_GigantismPlus.Harmony
                                     }
                                 }
                             }
-                            Debug.Divider(4, HONLY, Count: 25, Indent: 2);
+                            Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: doDebug);
                             Debug.Entry(4,
                                 $"x foreach (ObjectBlueprintLoader.ObjectBlueprintXMLChildNode childNode in node.UnnamedNodes(\"mutation\")) >//",
                                 Indent: 1, Toggle: doDebug);
@@ -141,7 +141,7 @@ namespace HNPS_GigantismPlus.Harmony
                 }
                 catch (Exception x)
                 {
-                    MetricsManager.LogException($"[{MOD_ID}] {nameof(GameObjectFactory_Patches)}", x);
+                    MetricsManager.LogModError(ThisMod, $"{nameof(GameObjectFactory_Patches)}, x: {x}");
                 }
             }
         }

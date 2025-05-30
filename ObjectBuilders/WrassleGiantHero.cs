@@ -1,26 +1,24 @@
-﻿using System;
-using System.Text;
+﻿using HistoryKit;
+using HNPS_GigantismPlus;
+using Qud.API;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using Qud.API;
-using HistoryKit;
-
-using XRL.UI;
+using System.Text;
+using XRL.Language;
 using XRL.Names;
 using XRL.Rules;
-using XRL.Language;
+using XRL.UI;
+using XRL.Wish;
+using XRL.World.Capabilities;
+using XRL.World.Loaders;
+using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
-using XRL.World.ObjectBuilders;
-using XRL.World.Capabilities;
-using XRL.Wish;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -117,7 +115,7 @@ namespace XRL.World.ObjectBuilders
             Debug.Entry(4, 
                 $"{nameof(WrassleGiantHero)}." +
                 $"{nameof(Apply)}(" +
-                $"GameObject Creature: {Creature.ID}, " + 
+                $"GameObject Creature: {Creature?.DebugName ?? NULL}, " + 
                 $"string Context: {Context.Quote()})",
                 Indent: 0, Toggle: getDoDebug());
 
@@ -126,11 +124,11 @@ namespace XRL.World.ObjectBuilders
             bool Unique = Context == "Unique";
             if (Unique && The.Game.HasStringGameState(SCRT_GNT_UNQ_STATE) && false)
             {
-                Debug.Entry(4, 
-                    $"/!\\ " + 
-                    $"WARN: " + 
+                Debug.Warn(4, 
+                    $"{nameof(WrassleGiantHero)}", 
+                    $"{nameof(Apply)}", 
                     $"Attempted to create Unique {nameof(WrassleGiantHero)} while one already exists", 
-                    Indent: 1, Toggle: getDoDebug('!'));
+                    Indent: Debug.LastIndent + 1);
 
                 Context = "Hero";
                 Unique = false;
@@ -141,6 +139,26 @@ namespace XRL.World.ObjectBuilders
             string nameSpecial = Unique ? "Unique" : "Hero";
 
             Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: 1, Toggle: getDoDebug());
+
+            Creature.SetStringProperty("Culture", "WrassleGiant");
+
+            Creature.SetStringProperty("Role", Unique ? "Leader" : "Hero");
+
+            Creature.SetIntProperty("WrassleGearBestowChance", 100);
+
+            Creature.SetStringProperty("staticFaction1", null);
+            Creature.SetStringProperty("staticFaction2", null);
+            Creature.SetStringProperty("staticFaction3", null);
+
+            if (Creature.TryGetPart(out GameUnique gameUnique))
+            {
+                Creature.RemovePart(gameUnique);
+            }
+            gameUnique = new()
+            {
+                State = SCRT_GNT_UNQ_STATE,
+            };
+            Creature.AddPart(gameUnique, Creation: true);
 
             if (!Creature.TryGetPart(out Wrassler wrassler))
             {
@@ -727,14 +745,14 @@ namespace XRL.World.ObjectBuilders
                 Debug.LoopItem(4, $"MentalMutationLevelDie", $"{MentalMutationLevelDie}", Indent: 3, Toggle: getDoDebug());
 
                 Debug.LoopItem(4, $"Getting {MentalMutations.Things("Random Mental Mutation")}", Indent: 3, Toggle: getDoDebug());
-                Debug.Divider(4, "-", Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
             }
             for (int i = 0; i < MentalMutations; i++)
             {
                 BaseMutation randomMentalMutation;
                 do
                 {
-                    Debug.Divider(4, "-", Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
                     randomMentalMutation = MutationFactory.GetRandomMutation("Mental");
                     Debug.LoopItem(4, 
                         $"{randomMentalMutation.Name}", 
@@ -747,9 +765,9 @@ namespace XRL.World.ObjectBuilders
                     int randomMutationLevel = Stat.Roll(MentalMutationLevelDie);
                     mutations.AddMutation(randomMentalMutation, randomMutationLevel);
                     Debug.LoopItem(4, $"mutation added at level {randomMutationLevel}", Indent: 6, Toggle: getDoDebug());
-                    Debug.Divider(4, "-", Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
                 }
-                Debug.Divider(4, "-", Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
             }
 
             int PhysicalMutationLevelHigh = 2 + Math.Max(1, (int)Math.Floor(PhysicalMutations / 2.0));
@@ -760,14 +778,14 @@ namespace XRL.World.ObjectBuilders
                 Debug.LoopItem(4, $"PhysicalMutationLevelDie", $"{PhysicalMutationLevelDie}", Indent: 3, Toggle: getDoDebug());
 
                 Debug.LoopItem(4, $"Getting {PhysicalMutations.Things("Random Physical Mutation")}", Indent: 3, Toggle: getDoDebug());
-                Debug.Divider(4, "-", Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
             }
             for (int i = 0; i < PhysicalMutations; i++)
             {
                 BaseMutation randomPhysicalMutation;
                 do
                 {
-                    Debug.Divider(4, "-", Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
                     randomPhysicalMutation = MutationFactory.GetRandomMutation("Physical");
                     Debug.LoopItem(4, 
                         $"{randomPhysicalMutation.Name}", 
@@ -794,8 +812,9 @@ namespace XRL.World.ObjectBuilders
                             mutations.AddChimericBodyPart();
                         }
                     }
-                    Debug.Divider(4, "-", Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
                 }
+                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
             }
 
             Creature.RequirePart<Calming>();
@@ -881,11 +900,14 @@ namespace XRL.World.ObjectBuilders
             if (startingMP > 0)
             {
                 Debug.CheckYeh(4, $"Total MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 25, Indent: 3, Toggle: getDoDebug());
                 while (Creature.Stat("MP") > startingMP)
                 {
                     int pointsToSpend = Stat.Roll($"1d{Math.Min(4, Creature.Stat("MP"))}");
+                    Debug.LoopItem(4, $"Spending: {pointsToSpend}", Indent: 3, Toggle: getDoDebug());
                     Creature.RandomlySpendPoints(maxAPtospend: 0, maxSPtospend: 0, maxMPtospend: pointsToSpend);
-                    Debug.LoopItem(4, $"Spent: {pointsToSpend} (Remaining: {Creature.Stat("MP")})", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"Remaining: {Creature.Stat("MP")}", Indent: 4, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 3, Toggle: getDoDebug());
                 }
             }
             else
@@ -933,114 +955,48 @@ namespace XRL.World.ObjectBuilders
                 Indent: 2, Toggle: getDoDebug());
         }
 
-        public static GameObjectBlueprint GetGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
+        public static GameObjectBlueprint GetGiantEligibleBlueprintModel(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
         {
-            
-            GameObjectBlueprint creatureObjectBlueprint = 
+            GameObjectBlueprint creatureObjectBlueprint =
                 EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
                 => IsWrassleGiantEligible(blueprint, filter, Old, Unique));
             GameObjectBlueprint alternateCreatureObjectBlueprint = null;
-            
+
             int chance = Unique || Old ? 10 : 5;
             if (chance.in1000())
             {
                 alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero");
-                alternateCreatureObjectBlueprint?.Builders.Remove("TrollHero1");
             }
 
             return alternateCreatureObjectBlueprint ?? creatureObjectBlueprint;
         }
-        public static GameObjectBlueprint GetOldGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
+        public static GameObjectBlueprint GetAnOldGiantBlueprintModel(Predicate<GameObjectBlueprint> filter = null)
         {
-            return GetGiantEligibleBlueprint(filter, Old: true);
+            return GetGiantEligibleBlueprintModel(filter, Old: true);
         }
-        public static GameObjectBlueprint GetUniqueGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
+        public static GameObjectBlueprint GetAGiantHeroBlueprintModel(Predicate<GameObjectBlueprint> filter = null, bool Old = true)
         {
-            return GetGiantEligibleBlueprint(filter, Unique: true);
+            return GetGiantEligibleBlueprintModel(filter, Old);
         }
-        public static GameObjectBlueprint PrepareGiantBlueprint(GameObjectBlueprint CreatureBlueprint)
+        public static GameObjectBlueprint GetAUniqueGiantHeroBlueprintModel(Predicate<GameObjectBlueprint> filter = null)
         {
-            GamePartBlueprint WrassleGiantHeroPartBlueprint = new("XRL.World.ObjectBuilders", nameof(WrassleGiantHero))
-            {
-                Name = nameof(WrassleGiantHero),
-                ChanceOneIn = 1,
-            };
-            CreatureBlueprint.Builders[WrassleGiantHeroPartBlueprint.Name] = WrassleGiantHeroPartBlueprint;
-
-            CreatureBlueprint.Tags["Culture"] = "Giant";
-
-            if (!CreatureBlueprint.Tags.ContainsKey("Role")) CreatureBlueprint.Tags.Add("Role", "");
-            {
-                CreatureBlueprint.Tags["Role"] = $"Hero";
-            }
-
-            CreatureBlueprint.IntProps["WrassleGearBestowChance"] = 100;
-
-            if (CreatureBlueprint.Tags.ContainsKey("NoHateFactions")) CreatureBlueprint.Tags.Remove("NoHateFactions");
-            if (CreatureBlueprint.Tags.ContainsKey("staticFaction1")) CreatureBlueprint.Tags.Remove("staticFaction1");
-            if (CreatureBlueprint.Tags.ContainsKey("staticFaction2")) CreatureBlueprint.Tags.Remove("staticFaction2");
-            if (CreatureBlueprint.Tags.ContainsKey("staticFaction3")) CreatureBlueprint.Tags.Remove("staticFaction3");
-
-            if (!CreatureBlueprint.Tags.ContainsKey("SharesRecipe")) CreatureBlueprint.Tags.Add("SharesRecipe", "");
-
-            // Could possibly look at gigantifying them instead...
-            /*
-            creatureObjectBlueprint.Parts.RemoveAll((KeyValuePair<string, GamePartBlueprint> entry)
-                => entry.Key == typeof(DromadCaravan).Name
-                || entry.Key == typeof(EyelessKingCrabSkuttle1).Name
-                || entry.Key == typeof(SnapjawPack1).Name
-                || entry.Key == typeof(BaboonHero1Pack).Name
-                || entry.Key == typeof(GoatfolkClan1).Name
-                || entry.Key == typeof(HasGuards).Name
-                || entry.Key == typeof(HasThralls).Name
-                || entry.Key == typeof(HasSlaves).Name
-                || entry.Key == typeof(Leader).Name
-                || entry.Key == typeof(Followers).Name
-                || entry.Key == typeof(Breeder).Name
-                || entry.Key == typeof(GreaterVoider).Name
-                || entry.Key == typeof(Rummager).Name);
-            */
-
-            return CreatureBlueprint;
+            return GetGiantEligibleBlueprintModel(filter, Unique: true);
         }
-        public static GameObjectBlueprint PrepareUniqueGiantBlueprint(GameObjectBlueprint CreatureBlueprint)
+        public static string GetGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
         {
-            PrepareGiantBlueprint(CreatureBlueprint);
-
-            CreatureBlueprint.Tags["Culture"] = "WrassleGiant";
-
-            if (!CreatureBlueprint.Tags.ContainsKey("Role"))
-            {
-                CreatureBlueprint.Tags.Add("Role", "");
-            }
-            CreatureBlueprint.Tags["Role"] = $"Leader";
-
-            GamePartBlueprint GameUniquePartBlueprint = new("XRL.World.Parts", nameof(GameUnique))
-            {
-                Name = nameof(GameUnique),
-                Parameters = new()
-                {
-                    { "State", SCRT_GNT_UNQ_STATE },
-                }
-            };
-            
-            if (CreatureBlueprint.HasPart(nameof(GameUnique)))
-            {
-                CreatureBlueprint.RemovePart(nameof(GameUnique));
-            }
-            CreatureBlueprint.Parts.TryAdd(nameof(GameUnique), GameUniquePartBlueprint);
-
-            return CreatureBlueprint;
+            return GetGiantEligibleBlueprintModel(filter, Old, Unique).Name;
         }
-        public static GameObjectBlueprint GetAGiantHeroBluePrintModel(Predicate<GameObjectBlueprint> filter = null, bool Old = true)
+        public static string GetOldGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
         {
-            GameObjectBlueprint creatureBlueprint = GetGiantEligibleBlueprint(filter, Old);
-            return PrepareGiantBlueprint(creatureBlueprint);
+            return GetAnOldGiantBlueprintModel(filter).Name;
         }
-        public static GameObjectBlueprint GetAUniqueGiantHeroBluePrintModel(Predicate<GameObjectBlueprint> filter = null)
+        public static string GetGiantHeroEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = true)
         {
-            GameObjectBlueprint creatureBlueprint = GetUniqueGiantEligibleBlueprint(filter);
-            return PrepareUniqueGiantBlueprint(creatureBlueprint);
+            return GetAGiantHeroBlueprintModel(filter, Old).Name;
+        }
+        public static string GetUniqueGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
+        {
+            return GetAUniqueGiantHeroBlueprintModel(filter).Name;
         }
 
         public static bool IsWrassleGiantEligible(GameObjectBlueprint Blueprint, Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
@@ -1196,24 +1152,9 @@ namespace XRL.World.ObjectBuilders
         public static void Wish(string Blueprint)
         {
             WishResult wishResult = WishSearcher.SearchForBlueprint(Blueprint);
-            GameObject @object;
-            if (GameObjectFactory.Factory.Blueprints.TryGetValue(wishResult.Result, out GameObjectBlueprint blueprint))
-            {
-                GamePartBlueprint gigantifiedPartBlueprint = new("XRL.World.ObjectBuilders", nameof(WrassleGiantHero))
-                {
-                    Name = nameof(WrassleGiantHero),
-                    ChanceOneIn = 1
-                };
-                blueprint.Builders[gigantifiedPartBlueprint.Name] = gigantifiedPartBlueprint;
-                @object = GameObjectFactory.Factory.CreateObject(blueprint, 0, 0, null, null, null, "Wish");
-            }
-            else
-            {
-                @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
+            GameObject @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
+            @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
-                WrassleGiantHeroBuilder.Apply(@object, "Hero");
-                @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
-            }
             if (@object != null)
             {
                 The.PlayerCell.getClosestEmptyCell().AddObject(@object);

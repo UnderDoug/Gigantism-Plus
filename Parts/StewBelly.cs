@@ -238,39 +238,18 @@ namespace XRL.World.Parts
             bool did = false;
             string StartingStewsProperty = ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0");
             int StartingStews = 0;
-            if (StartingStewsProperty.Contains("-"))
+
+            DieRoll startingStewsDie = new(StartingStewsProperty);
+            if (startingStewsDie != null)
             {
-                if (StartingStewsProperty.StartsWith("-") || StartingStewsProperty.EndsWith("-"))
-                {
-                    StartingStewsProperty.Replace("-", "");
-                }
-                else
-                {
-                    string[] startingStewsPieces = StartingStewsProperty.Split("-");
-                    int Low = Math.Min(int.Parse(startingStewsPieces[0]), int.Parse(startingStewsPieces[1]));
-                    int High = Math.Max(int.Parse(startingStewsPieces[0]), int.Parse(startingStewsPieces[1]));
-                    StartingStewsProperty = $"{Stat.Roll(Low, High)}";
-                }
-            }
-            if (StartingStewsProperty.Contains("d"))
-            {
-                if (StartingStewsProperty.StartsWith("d") || StartingStewsProperty.EndsWith("d"))
-                {
-                    StartingStewsProperty.Replace("d", "");
-                }
-                else
-                {
-                    StartingStewsProperty = $"{Stat.Roll(StartingStewsProperty)}";
-                }
-            }
-            if (int.TryParse(StartingStewsProperty, out int startingStews))
-            {
-                StartingStews = startingStews;
+                StartingStews = Math.Max(0,startingStewsDie.Resolve());
             }
             if (StartingStews > 0)
             {
                 if (Stews < StartingStews)
+                {
                     Stews += StartingStews;
+                }
                 did = true;
             }
             StartingStewsPocessed = Stews >= StartingStews;
@@ -287,7 +266,7 @@ namespace XRL.World.Parts
             return base.WantEvent(ID, cascade)
                 || ID == EndTurnEvent.ID
                 || ID == GetShortDescriptionEvent.ID
-                || ((!StartingStewsPocessed || Stews <= 0) && ID == ObjectEnteredCellEvent.ID);
+                || ((!StartingStewsPocessed || Stews <= 0) && ID == EnteredCellEvent.ID);
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
@@ -340,7 +319,7 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-        public override bool HandleEvent(ObjectEnteredCellEvent E)
+        public override bool HandleEvent(EnteredCellEvent E)
         {
             ProcessStartingStews();
             return base.HandleEvent(E);

@@ -238,22 +238,15 @@ namespace XRL.World.ObjectBuilders
         [WishCommand("gigantic", null)]
         public static void Wish(string Blueprint)
         {
-            WishResult wishResult = WishSearcher.SearchForBlueprint(Blueprint);
-            GameObject @object;
-            if (GameObjectFactory.Factory.Blueprints.TryGetValue(wishResult.Result, out GameObjectBlueprint blueprint))
+            GameObject @object = The.Player;
+
+            if (Blueprint == null)
             {
-                GamePartBlueprint gigantifiedPartBlueprint = new("XRL.World.ObjectBuilders", nameof(Gigantified))
-                {
-                    Name = nameof(Gigantified),
-                    ChanceOneIn = 1
-                };
-                blueprint.Builders[gigantifiedPartBlueprint.Name] = gigantifiedPartBlueprint;
-                @object = GameObjectFactory.Factory.CreateObject(blueprint, 0, 0, null, null, null, "Wish");
-            }
-            else
-            {
+                WishResult wishResult = WishSearcher.SearchForBlueprint(Blueprint);
                 @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
-                
+            }
+            if (@object != null)
+            {
                 int Level = ExplodingDie(1, "1d2", Step: 1, Limit: 16, Indent: 2);
                 int Stews = ExplodingDie(0, "1d2", Step: 1, Indent: 2);
                 int objectTier = (int)Math.Floor(@object.GetBlueprint().Stat("Level") / 5.0);

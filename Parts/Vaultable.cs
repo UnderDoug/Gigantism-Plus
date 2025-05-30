@@ -184,13 +184,20 @@ namespace XRL.World.Parts
                 foreach ((string direction, Cell cell) in cellsByDirection)
                 {
                     (string Color, string yehNah) entry = ("R", CROSS);
-                    if (OriginDestinationPairs.ContainsKey(cell))
+                    if (cell != null)
                     {
-                        entry = ("G", TICK);
+                        if (OriginDestinationPairs.ContainsKey(cell))
+                        {
+                            entry = ("G", TICK);
+                        }
+                        if (cell == The.Player.CurrentCell)
+                        {
+                            entry = ("O", SMLE2);
+                        }
                     }
-                    if (cell == The.Player.CurrentCell)
+                    else
                     {
-                        entry = ("O", SMLE2);
+                        entry = ("K", SQR);
                     }
                     DI.TryAdd(direction, entry);
                 }

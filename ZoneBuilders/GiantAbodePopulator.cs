@@ -196,13 +196,17 @@ namespace XRL.World.ZoneBuilders
                             $"item: {item.Blueprint}, " + 
                             $"number: {num + 1}/{item.Number}, " + 
                             $"hint: {item.Hint.Quote()}", 
-                            Indent: 3, Toggle: getDoDebug());
+                            Indent: 2, Toggle: getDoDebug());
 
                         GameObject gameObject = GameObjectFactory.Factory.CreateObject(item.Blueprint);
                         if (!PlaceObjectInArea(Z, new LocationList(popArea), gameObject, 0, 0, item.Hint))
+                        {
                             Debug.CheckNah(4, $"Failed to place [{num + 1}]{item.Blueprint}", Indent: 3, Toggle: getDoDebug());
-
-                        else Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3, Toggle: getDoDebug());
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3, Toggle: getDoDebug());
+                        }
                     }
                     Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: getDoDebug());
                     Debug.Entry(4,
@@ -344,13 +348,13 @@ namespace XRL.World.ZoneBuilders
             }
             else 
             {
-                Debug.Entry(4,
-                    $"/!\\ " +
-                    $"WARN: " +
+                Debug.Warn(4,
+                    $"{nameof(GiantAbodePopulator)}",
+                    $"{nameof(BuildZone)}",
                     $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
-                    $"in zone {zone.ZoneID} " + 
-                    $"for cell [{giantLocation.Location}]",
-                    Indent: 1, Toggle: getDoDebug('!'));
+                    $"in zone {zone?.ZoneID} " + 
+                    $"for cell [{giantLocation?.Location}]",
+                    Indent: 1);
             }
 
             return true;

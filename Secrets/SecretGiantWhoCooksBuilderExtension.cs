@@ -127,11 +127,11 @@ namespace HNPS_GigantismPlus
 
             if (UniqueGiant == null)
             {
-                Debug.Entry(2,
-                    $"WARN: {nameof(SecretGiantWhoCooksBuilderExtension)}." +
+                Debug.Warn(2,
+                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
                     $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
                     $"failed to instantiate UniqueGiant. Placement aborted.",
-                    Indent: 0, Toggle: getDoDebug('!'));
+                    Indent: 0);
                 return;
             }
 
@@ -159,7 +159,6 @@ namespace HNPS_GigantismPlus
                 Key1: "Object", 
                 Value1: zoneManager.CacheObject(UniqueGiant)); */
 
-
         } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
 
         public static GameObject GetTheGiant()
@@ -170,16 +169,20 @@ namespace HNPS_GigantismPlus
         {
             GameObject creature;
             GameObjectBlueprint creatureBlueprint = Unique 
-                ? WrassleGiantHero.GetAUniqueGiantHeroBluePrintModel()
-                : WrassleGiantHero.GetAGiantHeroBluePrintModel()
+                ? WrassleGiantHero.GetAUniqueGiantHeroBlueprintModel()
+                : WrassleGiantHero.GetAGiantHeroBlueprintModel()
                 ;
 
+            void ApplyBuilder(GameObject Creature) 
+            { 
+                WrassleGiantHeroBuilder.Apply(Creature, Context: Unique ? "Unique" : "Hero"); 
+            }
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,
                     BonusModChance: 0,
                     SetModNumber: 0,
                     AutoMod: null,
-                    BeforeObjectCreated: null,
+                    BeforeObjectCreated: ApplyBuilder,
                     AfterObjectCreated: null,
                     Context: Unique ? "Unique" : "Hero",
                     ProvideInventory: null);
@@ -204,7 +207,7 @@ namespace HNPS_GigantismPlus
             Cell cell = The.Player.CurrentCell.getClosestEmptyCell();
             if (cell == null)
             {
-                Popup.Show($"No empty cells nearby to spawn giant {giant.DisplayNameStripped}");
+                Popup.Show($"No empty cells nearby to spawn giant {giant?.DebugName ?? NULL}");
                 return;
             }
             cell.AddObject(giant);

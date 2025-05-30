@@ -93,7 +93,7 @@ namespace HNPS_GigantismPlus
             { nameof(UD_HornsPlus), false },
             { nameof(UD_QuillsPlus), false },
             { nameof(CyberneticsGiganticExoframe), false },
-            { nameof(StewBelly), true },
+            { nameof(StewBelly), false },
             { nameof(Wrassler), true },
             { nameof(WrassleGear), true },
             { nameof(Tactics_Vault), true },

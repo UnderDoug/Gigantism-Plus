@@ -682,14 +682,18 @@ namespace XRL.World.Parts
             int shortDescriptionsCount = Reader.ReadInt32();
             for (int i = 0; i < shortDescriptionsCount; i++)
             {
-                ShortDescriptions.Add(Reader.ReadInt32(), (ModNaturalEquipmentBase)Reader.ReadObject());
+                int priority = Reader.ReadInt32();
+                ModNaturalEquipmentBase naturalEquipmentMod = Reader.ReadObject() as ModNaturalEquipmentBase;
+                ShortDescriptions.Add(priority, naturalEquipmentMod);
             }
 
             NaturalEquipmentMods = new();
             int naturalEquipmentModsCount = Reader.ReadInt32();
             for (int i = 0; i < naturalEquipmentModsCount; i++)
             {
-                NaturalEquipmentMods.Add(Reader.ReadInt32(), (ModNaturalEquipmentBase)Reader.ReadObject());
+                int priority = Reader.ReadInt32();
+                ModNaturalEquipmentBase naturalEquipmentMod = Reader.ReadObject() as ModNaturalEquipmentBase;
+                NaturalEquipmentMods.Add(priority, naturalEquipmentMod);
             }
 
             AdjustmentTargets = GetEmptyAdjustmentTargets();

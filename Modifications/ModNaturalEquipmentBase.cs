@@ -19,7 +19,7 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
-        public struct Adjustment
+        public class Adjustment : IScribedPart
         {
             public Guid ID;
 
@@ -27,7 +27,7 @@ namespace XRL.World.Parts
 
             public string Field; // Field/Property to adjust
 
-            public int Priority; // Priority of adjustment, lower number = higher priority
+            public new int Priority; // Priority of adjustment, lower number = higher priority
 
             public string Value; // Value of the adjustment.
 
@@ -49,7 +49,7 @@ namespace XRL.World.Parts
                 this.Value = Value;
             }
 
-            public override readonly string ToString()
+            public override string ToString()
             {
                 string output = string.Empty;
                 output += $"({(Priority != 0 ? Priority : "PriorityUnset")})";
@@ -59,7 +59,7 @@ namespace XRL.World.Parts
                 output += "\"";
                 return output;
             }
-            public readonly string ToString(bool ShowID)
+            public string ToString(bool ShowID)
             {
                 string output = string.Empty;
                 if (ShowID)
@@ -68,14 +68,25 @@ namespace XRL.World.Parts
                 return output;
             }
 
-            public readonly Adjustment Copy(Adjustment Source)
+            public Adjustment Copy(Adjustment Source)
             {
                 Adjustment output = new(Source);
                 return output;
             }
 
-            public readonly void Write(SerializationWriter Writer)
+            public override bool SameAs(IPart p)
             {
+                if (p is Adjustment adjustment)
+                {
+                    return ID == adjustment.ID && base.SameAs(p);
+                }
+                return false;
+            }
+
+            public override void Write(GameObject Basis, SerializationWriter Writer)
+            {
+                base.Write(Basis, Writer);
+
                 Writer.Write(ID);
                 Writer.Write(Target);
                 Writer.Write(Field);
@@ -83,8 +94,10 @@ namespace XRL.World.Parts
                 Writer.Write(Value);
             }
 
-            public void Read(SerializationReader Reader)
+            public override void Read(GameObject Basis, SerializationReader Reader)
             {
+                base.Read(Basis, Reader);
+
                 ID = Reader.ReadGuid();
                 Target = Reader.ReadString();
                 Field = Reader.ReadString();
@@ -223,27 +236,10 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-
-            Adjustments ??= new();
-            Writer.Write(Adjustments.Count);
-            if (!Adjustments.IsNullOrEmpty())
-            {
-                foreach (Adjustment Adjustment in Adjustments)
-                {
-                    Adjustment.Write(Writer);
-                }
-            }
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-
-            Adjustments = new();
-            int adjustmentsCount = Reader.ReadInt32();
-            for (int i = 0; i < adjustmentsCount; i++)
-            {
-                Adjustments.Add((Adjustment)Reader.ReadObject());
-            }
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

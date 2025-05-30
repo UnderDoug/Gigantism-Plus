@@ -2280,7 +2280,7 @@ namespace HNPS_GigantismPlus
         }
         public static string AppendDefect(this string @string)
         {
-            return @string.Append(" ({{R|D}})");
+            return @string.Append(" ({{r|D}})");
         }
 
     } //!-- Extensions

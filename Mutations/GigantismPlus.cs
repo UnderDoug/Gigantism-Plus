@@ -613,7 +613,7 @@ namespace XRL.World.Parts.Mutation
 
         protected override string GetBaseDisplayName()
         {
-            return base.GetBaseDisplayName().OptionalColorGigantic(Colorfulness).AppendDefect();
+            return base.GetBaseDisplayName().OptionalColorGigantic(Colorfulness);
         }
 
         public override string GetDescription()
@@ -1081,9 +1081,22 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
-            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable" with half the slots it would normally take, provided it's not now too small.
-            // exceptions are 
-            if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment && E.Object.HasTagOrProperty("GiganticEquippable"))
+            GameObject actor = E.Actor;
+            GameObject equipment = E.Object;
+
+            bool actorGiant = 
+                actor != null
+             && actor.IsGiganticCreature;
+
+            bool equipmentNotGiantButIsEquippable = 
+                equipment != null
+             && !equipment.IsGiganticEquipment
+             && equipment.HasTagOrProperty("GiganticEquippable");
+
+            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable"
+            // with half the slots it would normally take, provided it's not now too small.
+            // exceptions are Floating Nearby, Thrown Weapon, and Cybernetics.
+            if (actorGiant && equipmentNotGiantButIsEquippable && !E.SlotType.IsNullOrEmpty())
             {
                 E.Decreases++;
                 if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
@@ -1091,7 +1104,6 @@ namespace XRL.World.Parts.Mutation
                     E.CanBeTooSmall = true;
                 }
             }
-
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(BeforeBodyPartsUpdatedEvent E)

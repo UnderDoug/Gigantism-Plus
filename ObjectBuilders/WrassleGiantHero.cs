@@ -1,10 +1,11 @@
-﻿using HistoryKit;
-using HNPS_GigantismPlus;
-using Qud.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using HistoryKit;
+using Qud.API;
+
 using XRL.Language;
 using XRL.Names;
 using XRL.Rules;
@@ -16,6 +17,8 @@ using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -901,9 +904,9 @@ namespace XRL.World.ObjectBuilders
             {
                 Debug.CheckYeh(4, $"Total MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
                 Debug.Divider(4, HONLY, Count: 25, Indent: 3, Toggle: getDoDebug());
-                while (Creature.Stat("MP") > startingMP)
+                while (Creature.Stat("MP") > 0)
                 {
-                    int pointsToSpend = Stat.Roll($"1d{Math.Min(4, Creature.Stat("MP"))}");
+                    int pointsToSpend = Stat.Roll($"1d{Math.Max(1, Math.Min(Creature.Stat("MP"), 4))}");
                     Debug.LoopItem(4, $"Spending: {pointsToSpend}", Indent: 3, Toggle: getDoDebug());
                     Creature.RandomlySpendPoints(maxAPtospend: 0, maxSPtospend: 0, maxMPtospend: pointsToSpend);
                     Debug.LoopItem(4, $"Remaining: {Creature.Stat("MP")}", Indent: 4, Toggle: getDoDebug());

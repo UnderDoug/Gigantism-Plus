@@ -373,23 +373,54 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
+
+            NaturalEquipmentMods ??= new();
+            Writer.Write(NaturalEquipmentMods.Count);
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    Writer.WriteOptimized(bodyPartType);
+                    naturalEquipmentMod.Write(Basis, Writer);
+                }
+            }
+
+            NaturalEquipmentMod ??= new();
+            NaturalEquipmentMod.Write(Basis, Writer);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+
+            NaturalEquipmentMods = new();
+            int naturalEquipmentModsCount = Reader.ReadInt32();
+            for (int i = 0; i < naturalEquipmentModsCount; i++)
+            {
+                NaturalEquipmentMods.Add(Reader.ReadOptimizedString(), (ModNaturalEquipment<T>)Reader.ReadObject());
+            }
+
+            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentCybernetic<T> cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic<T>;
-            cybernetic.NaturalEquipmentMods = new();
-            foreach ((string type, ModNaturalEquipment<T> subpart) in NaturalEquipmentMods)
+
+            cybernetic.NaturalEquipmentMods = new(); 
+            NaturalEquipmentMods ??= new();
+            if (NaturalEquipmentMods.IsNullOrEmpty())
             {
-                cybernetic.NaturalEquipmentMods.Add(type, new(subpart, (T)cybernetic));
+                foreach ((string type, ModNaturalEquipment<T> subpart) in NaturalEquipmentMods)
+                {
+                    cybernetic.NaturalEquipmentMods.Add(type, new(subpart, (T)cybernetic));
+                }
             }
+
             NaturalEquipmentMod ??= new();
             cybernetic.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)cybernetic);
+
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;
+
             return cybernetic;
         }
     }

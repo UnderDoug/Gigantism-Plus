@@ -330,9 +330,7 @@ namespace XRL.World.Parts.Mutation
 
                     ResetDisplayName();
 
-                    bool haveQuillFling = QuillFlingActivatedAbilityID != Guid.Empty;
-                    bool levelNotMin = Level > 1;
-                    bool isSilent = haveQuillFling || levelNotMin;
+                    bool isSilent = RemoveActivatedAbilityQuillFling(Force: true);
                     AddActivatedAbilityQuillFling(Force: true, Silent: isSilent);
                 }
             }
@@ -702,7 +700,8 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
 
-            Writer.WriteGameObject(QuillsObject);
+            Writer.WriteGameObject(QuillsObject); 
+            Writer.Write(QuillFlingActivatedAbilityID);
         }
 
         public override void Read(GameObject Basis, SerializationReader Reader)
@@ -710,6 +709,7 @@ namespace XRL.World.Parts.Mutation
             base.Read(Basis, Reader);
 
             QuillsObject = Reader.ReadGameObject();
+            QuillFlingActivatedAbilityID = Reader.ReadGuid();
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

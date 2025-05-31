@@ -116,5 +116,33 @@ namespace HNPS_GigantismPlus
         {
             return AddDescription(GeneralDescriptions, Relationship, Effect);
         }
+
+        public static List<List<string>> RemoveDescription(string Relationship, string Effect, List<List<string>> Descriptions)
+        {
+            List<List<string>> elementsToRemove = new()
+            {
+                new List<string>() { Relationship, Effect },
+            };
+            List<List<string>> InumerateDescriptions = new(Descriptions);
+            if (!InumerateDescriptions.IsNullOrEmpty())
+            {
+                foreach (List<string> entry in InumerateDescriptions)
+                {
+                    if (elementsToRemove.Contains(entry))
+                    {
+                        Descriptions.Remove(entry);
+                    }
+                }
+            }
+            return Descriptions;
+        }
+        public List<List<string>> RemoveWeaponDescription(string Relationship, string Effect)
+        {
+            return RemoveDescription(Relationship, Effect, WeaponDescriptions);
+        }
+        public List<List<string>> RemoveGeneralDescription(string Relationship, string Effect)
+        {
+            return RemoveDescription(Relationship, Effect, GeneralDescriptions);
+        }
     }
 }

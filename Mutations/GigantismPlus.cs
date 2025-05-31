@@ -106,6 +106,8 @@ namespace XRL.World.Parts.Mutation
         public static readonly string COMMAND_NAME_GROUND_POUND = "CommandToggleGigantismPlusGroundPound";
         public static readonly string COMMAND_NAME_CLOSE_FIST = "CommandToggleGigantismPlusCloseFist";
 
+        public static readonly string FLIP_GROUND_POUND = "GigantismPlus_Flip_Ground_Pound";
+
         public int HunchedOverAVModifier = 4;
         public int HunchedOverDVModifier = -6;
         public int HunchedOverQNModifier = -60;
@@ -145,9 +147,6 @@ namespace XRL.World.Parts.Mutation
 
         public GigantismPlus()
         {
-            // SetDisplayName("{{gigantic|Gigantism}} ({{r|D}})");
-            // Type = "Physical";
-
             ModGiganticNaturalWeapon GiganticFist = NewGiganticFistMod(this);
             NaturalEquipmentMods.Add(GiganticFist.BodyPartType, GiganticFist);
 
@@ -1166,21 +1165,21 @@ namespace XRL.World.Parts.Mutation
             if (ParentObject != null && ParentObject == E.Vaulter && IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, E.Vaulter))
             {
                 CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
-                E.Vaulter.SetStringProperty("Flip_Ground_Pound", "Please");
-                float factor = 0.08f;
-                float max = 1.2f;
-                Rumble(Level, factor, max);
+                E.Vaulter.SetStringProperty(FLIP_GROUND_POUND, "Please");
             }
             return base.HandleEvent(E);
         }
         public bool HandleEvent(VaultedEvent E)
         {
-            if (ParentObject != null && ParentObject == E.Vaulter && !IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, E.Vaulter))
+            if (ParentObject != null && ParentObject == E.Vaulter)
             {
-                if (E.Vaulter.HasStringProperty("Flip_Ground_Pound"))
+                if (!IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID, E.Vaulter) && E.Vaulter.HasStringProperty(FLIP_GROUND_POUND))
                 {
                     CommandEvent.Send(E.Vaulter, COMMAND_NAME_GROUND_POUND);
                 }
+                float factor = 0.08f;
+                float max = 1.2f;
+                Rumble(Level, factor, max);
             }
             return base.HandleEvent(E);
         }
@@ -1346,7 +1345,7 @@ namespace XRL.World.Parts.Mutation
             {
                 ToggledOn = UnapplyStunningForceOnJump(GO);
             }
-            GO.SetStringProperty("Flip_Ground_Pound", null, true);
+            GO.SetStringProperty(FLIP_GROUND_POUND, null, true);
             return ToggledOn;
         }
 
@@ -1392,6 +1391,7 @@ namespace XRL.World.Parts.Mutation
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
+
             Writer.Write(HunchOverActivatedAbilityID);
             Writer.Write(GroundPoundActivatedAbilityID);
             Writer.Write(CloseFistActivatedAbilityID);
@@ -1400,6 +1400,7 @@ namespace XRL.World.Parts.Mutation
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+
             HunchOverActivatedAbilityID = Reader.ReadGuid();
             GroundPoundActivatedAbilityID = Reader.ReadGuid();
             CloseFistActivatedAbilityID = Reader.ReadGuid();

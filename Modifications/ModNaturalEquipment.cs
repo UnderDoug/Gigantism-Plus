@@ -185,7 +185,6 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4, Toggle: getDoDebug("APP"));
         }
 
-
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
             if(AssigningPart.Is(null))
@@ -288,28 +287,11 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-
-            Adjustments ??= new();
-            Writer.WriteOptimized(Adjustments.Count);
-            if (!Adjustments.IsNullOrEmpty())
-            {
-                foreach (Adjustment Adjustment in Adjustments)
-                {
-                    Adjustment.Write(Basis, Writer);
-                }
-            }
         }
 
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-
-            Adjustments = new();
-            int adjustmentsCount = Reader.ReadOptimizedInt32();
-            for (int i = 0; i < adjustmentsCount; i++)
-            {
-                Adjustments.Add((Adjustment)Reader.ReadObject());
-            }
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

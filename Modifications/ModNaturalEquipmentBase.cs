@@ -14,7 +14,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalEquipmentBase : IMeleeModification
+    public abstract class ModNaturalEquipmentBase : IModification
     {
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
@@ -141,7 +141,6 @@ namespace XRL.World.Parts
         public ModNaturalEquipmentBase(int Tier)
             : base(Tier)
         {
-            base.Tier = Tier;
         }
         public ModNaturalEquipmentBase(ModNaturalEquipmentBase Source)
             : this()
@@ -170,7 +169,6 @@ namespace XRL.World.Parts
 
         public override void Configure()
         {
-            base.Configure();
             WorksOnSelf = true;
         }
         public override int GetModificationSlotUsage()
@@ -236,19 +234,42 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
+
+            Adjustments ??= new();
+            Writer.WriteOptimized(Adjustments.Count);
+            if (!Adjustments.IsNullOrEmpty())
+            {
+                foreach (Adjustment Adjustment in Adjustments)
+                {
+                    Adjustment.Write(Basis, Writer);
+                }
+            }
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+
+            Adjustments = new();
+            int adjustmentsCount = Reader.ReadOptimizedInt32();
+            for (int i = 0; i < adjustmentsCount; i++)
+            {
+                Adjustments.Add((Adjustment)Reader.ReadObject());
+            }
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalEquipmentBase naturalEquipmentMod = base.DeepCopy(Parent, MapInv) as ModNaturalEquipmentBase;
+
             naturalEquipmentMod.Adjustments = new();
-            foreach (Adjustment adjustment in Adjustments)
+            Adjustments ??= new();
+            if (!Adjustments.IsNullOrEmpty())
             {
-                naturalEquipmentMod.Adjustments.Add(new(adjustment));
+                foreach (Adjustment adjustment in Adjustments)
+                {
+                    naturalEquipmentMod.Adjustments.Add(new(adjustment));
+                }
             }
+            
             return ClearForCopy(naturalEquipmentMod);
         }
         public static ModNaturalEquipmentBase ClearForCopy(ModNaturalEquipmentBase NaturalEquipmentMod)
@@ -257,5 +278,5 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod;
         }
 
-    } //!-- public class ModNaturalEquipmentBase : IMeleeModification
+    } //!-- public class ModNaturalEquipmentBase : IModification
 }

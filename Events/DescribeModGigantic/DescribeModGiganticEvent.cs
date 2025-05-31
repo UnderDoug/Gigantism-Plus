@@ -176,6 +176,20 @@ namespace HNPS_GigantismPlus
             return Event.FinalizeString(SB);
         }
 
+        public static List<List<string>> AddDescription(List<List<string>> Descriptions, string Relationship, string Effect)
+        {
+            Descriptions.Add(new() { Relationship, Effect });
+            return Descriptions;
+        }
+        public List<List<string>> AddWeaponDescription(string Relationship, string Effect)
+        {
+            return AddDescription(WeaponDescriptions, Relationship, Effect);
+        }
+        public List<List<string>> AddGeneralDescription(string Relationship, string Effect)
+        {
+            return AddDescription(GeneralDescriptions, Relationship, Effect);
+        }
+
         public static List<List<string>> RemoveDescription(string Relationship, string Effect, List<List<string>> Descriptions)
         {
             List<List<string>> elementsToRemove = new()

@@ -356,21 +356,51 @@ namespace XRL.World.Parts.Mutation
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
+
+            NaturalEquipmentMods ??= new();
+            Writer.Write(NaturalEquipmentMods.Count);
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    Writer.WriteOptimized(bodyPartType);
+                    naturalEquipmentMod.Write(Basis, Writer);
+                }
+            }
+
+            NaturalEquipmentMod ??= new();
+            NaturalEquipmentMod.Write(Basis, Writer);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+
+            NaturalEquipmentMods = new();
+            int naturalEquipmentModsCount = Reader.ReadInt32();
+            for (int i = 0; i < naturalEquipmentModsCount; i++)
+            {
+                NaturalEquipmentMods.Add(Reader.ReadOptimizedString(), (ModNaturalEquipment<T>)Reader.ReadObject());
+            }
+
+            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentMutation<T> mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation<T>;
+
             mutation.NaturalEquipmentMods = new();
-            foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
+            NaturalEquipmentMods ??= new();
+            if (NaturalEquipmentMods.IsNullOrEmpty())
             {
-                mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, (T)mutation));
+                foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, (T)mutation));
+                }
             }
+
             NaturalEquipmentMod ??= new();
             mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)mutation);
+
             return mutation;
         }
     }

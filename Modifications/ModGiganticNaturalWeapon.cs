@@ -30,15 +30,18 @@ namespace XRL.World.Parts
             base.ApplyModification(Object);
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register(BeforeDescribeModGiganticEvent.ID, EventOrder.EXTREMELY_EARLY);
+            Registrar.Register(DescribeModGiganticEvent.ID, EventOrder.EXTREMELY_LATE);
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == GetCleaveAmountEvent.ID
-                || ID == PooledEvent<GetDisplayNameEvent>.ID
-                || ID == BeforeDescribeModGiganticEvent.ID
-                || ID == DescribeModGiganticEvent.ID;
+                || ID == PooledEvent<GetDisplayNameEvent>.ID;
         }
-
         public override bool HandleEvent(GetCleaveAmountEvent E)
         {
             if (IsObjectActivePartSubject(E.Object))
@@ -47,12 +50,10 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
             return base.HandleEvent(E);
         }
-
         public bool HandleEvent(BeforeDescribeModGiganticEvent E)
         {
             if (E.Object == ParentObject && E.Context == "Natural Equipment")
@@ -81,7 +82,6 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-
         public bool HandleEvent(DescribeModGiganticEvent E)
         {
             if (E.Object == ParentObject && E.Context == "Natural Equipment")
@@ -91,7 +91,6 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-
         public override string GetInstanceDescription()
         {
             BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(ParentObject, Context: "Natural Equipment");

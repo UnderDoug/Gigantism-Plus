@@ -467,15 +467,54 @@ namespace XRL.World.Parts.Mutation
             return base.FireEvent(E);
         }
 
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+
+            NaturalEquipmentMods ??= new();
+            Writer.Write(NaturalEquipmentMods.Count);
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach ((string bodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    Writer.WriteOptimized(bodyPartType);
+                    naturalEquipmentMod.Write(Basis, Writer);
+                }
+            }
+
+            NaturalEquipmentMod ??= new();
+            NaturalEquipmentMod.Write(Basis, Writer);
+        }
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+
+            NaturalEquipmentMods = new();
+            int naturalEquipmentModsCount = Reader.ReadInt32();
+            for (int i = 0; i < naturalEquipmentModsCount; i++)
+            {
+                NaturalEquipmentMods.Add(Reader.ReadOptimizedString(), (ModNaturalEquipment<UD_ManagedCrystallinity>)Reader.ReadObject());
+            }
+
+            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedCrystallinity>)Reader.ReadObject();
+        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             UD_ManagedCrystallinity mutation = base.DeepCopy(Parent, MapInv) as UD_ManagedCrystallinity;
+
             mutation.NaturalEquipmentMods = new();
-            foreach ((string bodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod) in NaturalEquipmentMods)
+            NaturalEquipmentMods ??= new();
+            if (NaturalEquipmentMods.IsNullOrEmpty())
             {
-                mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, mutation));
+                foreach ((string bodyPartType, ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, mutation));
+                }
             }
+
+            NaturalEquipmentMod ??= new();
             mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, mutation);
+
             return mutation;
         }
     } //!-- public class UD_ManagedCrystallinity : Crystallinity, IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>

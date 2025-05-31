@@ -151,6 +151,10 @@ namespace XRL.World.Parts
         }
         private bool DetailColorIsBright => _DetailColor != null && DetailColor.Any(char.IsUpper);
 
+        // TopLeft, Left, Right, BottomRight
+        public string EquipmentFrameColor => $"{TileColor}{DetailColor}{TileColor}{DetailColor}";
+        public bool ColorEquipmentFrame;
+
         public WrassleGear()
         {
             WrassleID = Guid.NewGuid();
@@ -159,15 +163,16 @@ namespace XRL.World.Parts
             RandomizeTile = false;
             FillTileBag();
             ColorBag = NewColorBag();
+            ColorEquipmentFrame = true;
         }
 
         public override void Attach()
         {
-            base.Attach();
             if (ParentObject.TryGetPart(out MeleeWeapon meleeWeapon))
             {
                 MeleeWeaponCopy = meleeWeapon.DeepCopy(ParentObject) as MeleeWeapon;
             }
+            base.Attach();
         }
 
         public static Dictionary<string, List<string>> NewColorBag()
@@ -221,10 +226,25 @@ namespace XRL.World.Parts
             if (ParentObject != null && ParentObject.TryGetPart(out Render render))
             {
                 if (doTile && RandomizeTile && !Tile.IsNullOrEmpty())
+                {
                     render.Tile = Tile;
-                if (doTileColor) render.TileColor = $"&{TileColor}";
-                if (doDetailColor) render.DetailColor = DetailColor;
-                if (doColorString) render.ColorString = $"&{TileColor}";
+                }
+                if (doTileColor)
+                {
+                    render.TileColor = $"&{TileColor}";
+                }
+                if (doDetailColor)
+                {
+                    render.DetailColor = DetailColor;
+                }
+                if (doColorString)
+                {
+                    render.ColorString = $"&{TileColor}";
+                }
+                if (ColorEquipmentFrame)
+                {
+                    ParentObject.SetEquipmentFrameColors(EquipmentFrameColor);
+                }
             }
         }
 
@@ -412,7 +432,14 @@ namespace XRL.World.Parts
                     Score = Math.Max(100, Score);
                     if (wrassler.WrassleID == WrassleID)
                     {
+                        ParentObject.SetIntProperty("AlwaysEquipAsWeapon", 1);
+                        ParentObject.SetIntProperty("AlwaysEquipAsArmor", 1);
                         Score = Math.Max(150, Score + 50);
+                    }
+                    else
+                    {
+                        ParentObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
+                        ParentObject.SetIntProperty("AlwaysEquipAsArmor", 0, true);
                     }
                 }
                 E.SetParameter("Score", Score);

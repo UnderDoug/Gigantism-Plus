@@ -37,6 +37,28 @@ namespace HNPS_GigantismPlus
             }
             */
 
+            return true;
+        }
+
+    } //!-- public class BeforeDescribeModGiganticHandler : IEventHandler, IModEventHandler<BeforeDescribeModGiganticEvent>
+
+    public class DescribeModGiganticHandler : IEventHandler, IModEventHandler<DescribeModGiganticEvent>
+    {
+        private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticHandler));
+
+        private static readonly DescribeModGiganticHandler Handler = new();
+
+        public static bool Register()
+        {
+            The.Game?.RegisterEvent(Handler, DescribeModGiganticEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+
+            return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModGiganticEvent>();
+        }
+
+        public bool HandleEvent(DescribeModGiganticEvent E)
+        {
+            GameObject Object = E.Object;
+
             if (Object.InheritsFrom("FoldingChair"))
             {
                 E.AddWeaponDescription(null, "the ultimate in wrestling weapons");
@@ -45,7 +67,7 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<Chair>())
             {
                 if (!Object.InheritsFrom("FoldingChair"))
-                E.AddGeneralDescription("support", "gigantic rumps");
+                    E.AddGeneralDescription("support", "gigantic rumps");
             }
             if (Object.HasPart<Bed>())
             {
@@ -306,26 +328,6 @@ namespace HNPS_GigantismPlus
                 E.AddGeneralDescription("", "could probably make some seriously thick stew..");
             }
 
-            return true;
-        }
-
-    } //!-- public class BeforeDescribeModGiganticHandler : IEventHandler, IModEventHandler<BeforeDescribeModGiganticEvent>
-
-    public class DescribeModGiganticHandler : IEventHandler, IModEventHandler<DescribeModGiganticEvent>
-    {
-        private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticHandler));
-
-        private static readonly DescribeModGiganticHandler Handler = new();
-
-        public static bool Register()
-        {
-            The.Game?.RegisterEvent(Handler, DescribeModGiganticEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
-
-            return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModGiganticEvent>();
-        }
-
-        public bool HandleEvent(DescribeModGiganticEvent E)
-        {
             return true;
         }
     } //!-- public class DescribeModGiganticHandler : IEventHandler, IModEventHandler<DescribeModGiganticEvent>

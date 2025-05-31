@@ -255,6 +255,16 @@ namespace XRL.World.Parts
 
                 if (wrassleGearObject != null && wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
                 {
+                    if (wrassleGearObject.HasPart<MeleeWeapon>())
+                    {
+                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 1);
+                    }
+                    if (wrassleGearObject.HasPart<Armor>())
+                    {
+                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
+                        wrassleGearObject.SetIntProperty("AlwaysEquipAsArmor", 1);
+                    }
+
                     if (Actor.HasPart<GigantismPlus>())
                         wrassleGearObject.ApplyModification("ModGigantic", true, null, true);
 

@@ -56,9 +56,13 @@ namespace XRL.World.Parts
 
         public CyberneticsGiganticExoframe()
         {
-            NaturalEquipmentMod = new ModAugmentedNaturalWeapon()
+            NaturalEquipmentMod = NewAugmentedManipulatorMod(this);
+        }
+        public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(CyberneticsGiganticExoframe assigningPart)
+        {
+            ModAugmentedNaturalWeapon augmentedManipulator = new()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
                 ModPriority = -500,
@@ -70,7 +74,8 @@ namespace XRL.World.Parts
 
                 Adjustments = new(),
             };
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "manipulator");
+            augmentedManipulator.AddAdjustment(RENDER, "DisplayName", "manipulator");
+            return augmentedManipulator;
         }
 
         public string GetShortAugmentAdjective(bool Pretty = true)

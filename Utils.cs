@@ -590,43 +590,63 @@ namespace HNPS_GigantismPlus
         {
             Debug.Header(3, 
                 $"{MutationName}", 
-                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")", 
+                $"SwapMutationCategory(MutationName, " +
+                $"OutOfCategory: \"{OutOfCategory}\", " +
+                $"IntoCategory: \"{IntoCategory}\")", 
                 Toggle: getDoDebug(nameof(SwapMutationCategory)));
 
             MutationEntry MutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
 
-            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", 
+                Indent: 1, Toggle: getDoDebug(nameof(SwapMutationCategory)));
             foreach (MutationCategory category in MutationFactory.GetCategories())
             {
-                Debug.LoopItem(4, category.Name, Indent: 2);
+                Debug.LoopItem(4, category.Name, Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                 if (category.Name == IntoCategory)
                 {
-                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
 
-                    Debug.Entry(3, $"Adding \"{MutationEntry.Name}\" Mutation to \"{IntoCategory}\" Category", Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+                    Debug.Entry(3, $"Adding \"{MutationEntry.Name}\" Mutation to \"{IntoCategory}\" Category", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
                     category.Add(MutationEntry);
                     category.Entries.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
-                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                     foreach (MutationEntry entry in category.Entries)
                     {
                         Debug.LoopItem(4, entry.Name, Indent: 4, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                     }
-                    Debug.DiveOut(3, $"x {IntoCategory} //", Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
+                    Debug.DiveOut(3, $"x {IntoCategory} //", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                 }
                 if (category.Name == OutOfCategory)
                 {
-                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
-                    Debug.Entry(3, $"Removing \"{MutationEntry.Name}\" from \"{OutOfCategory}\" Category", Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+                    Debug.Entry(3, $"Removing \"{MutationEntry.Name}\" from \"{OutOfCategory}\" Category", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
                     category.Entries.RemoveAll(r => r == MutationEntry);
-                    Debug.DiveOut(3, $"x {OutOfCategory} //", Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
+                    Debug.DiveOut(3, $"x {OutOfCategory} //", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                 }
             }
-            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) >//", Indent: 1, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) >//", 
+                Indent: 1, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
             Debug.Footer(3, 
                 $"{MutationName}", 
-                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")", 
+                $"SwapMutationCategory(MutationName, " +
+                $"OutOfCategory: \"{OutOfCategory}\", " +
+                $"IntoCategory: \"{IntoCategory}\")", 
                 Toggle: getDoDebug(nameof(SwapMutationCategory)));
         } //!-- private void SwapMutationCategory(bool Before = true)
 

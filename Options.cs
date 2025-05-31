@@ -96,8 +96,8 @@ namespace HNPS_GigantismPlus
             { nameof(StewBelly), false },
             { nameof(Wrassler), true },
             { nameof(WrassleGear), true },
-            { nameof(Tactics_Vault), true },
-            { nameof(Vaultable), true },
+            { nameof(Tactics_Vault), false },
+            { nameof(Vaultable), false },
             { nameof(SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
             { nameof(WrassleGiantHero), true },
@@ -127,7 +127,7 @@ namespace HNPS_GigantismPlus
             { nameof(DescribeModGiganticHandler), false },
 
             // Harmony Patches
-            { nameof(Body_Patches), true },
+            { nameof(Body_Patches), false },
             { nameof(BodyPart_Patches), false },
             { nameof(Brain_Patches), false },
             { nameof(Crayons_Patches), false },
@@ -143,10 +143,10 @@ namespace HNPS_GigantismPlus
             { nameof(Leveler_Patches), false },
             { nameof(MeleeWeapon_Patches), false },
             { nameof(ModGigantic_Patches), false },
-            { nameof(MutationBGoneWishHandler_Patches), true },
+            { nameof(MutationBGoneWishHandler_Patches), false },
             { nameof(Physics_Patches), false },
             { nameof(Skulk_Tonic_Patches), true },
-            { nameof(Tinkering_Disassemble_Patches), true },
+            { nameof(Tinkering_Disassemble_Patches), false },
         };
 
         public static bool getClassDoDebug(string Class)

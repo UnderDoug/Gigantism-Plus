@@ -114,12 +114,12 @@ namespace HNPS_GigantismPlus
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Divider(Verbosity, HONLY, 25, Indent + 1); // > "\u003E"
+            Divider(Verbosity, HONLY, 25, Indent + 1, Toggle: Toggle); // > "\u003E"
             Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
         }
         public static void DiveOut(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Entry(Verbosity, Text, Indent + 1);
+            Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
             // Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
         }
 

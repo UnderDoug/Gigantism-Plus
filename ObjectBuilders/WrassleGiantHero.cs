@@ -915,13 +915,27 @@ namespace XRL.World.ObjectBuilders
             }
             else
             {
-                Debug.CheckNah(4, $"No MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"No MP to Spend", Indent: 2, Toggle: getDoDebug());
             }
             Creature.RandomlySpendPoints();
             Debug.LoopItem(4, $"AP", $"{Creature.Stat("AP")}", Indent: 2, Toggle: getDoDebug());
             Debug.LoopItem(4, $"SP", $"{Creature.Stat("SP")}", Indent: 2, Toggle: getDoDebug());
             Debug.LoopItem(4, $"MP", $"{Creature.Stat("MP")}", Indent: 2, Toggle: getDoDebug());
 
+            int rapidAdvancements = (int)Math.Floor((Creature.Level - 5) / 10.0);
+            if (rapidAdvancements > 0)
+            {
+                Debug.CheckYeh(4, $"Total Rapid Advancements", $"{rapidAdvancements}", Indent: 2, Toggle: getDoDebug());
+                for (int i = 0; i < rapidAdvancements; i++)
+                {
+                    Leveler.RapidAdvancement(3, Creature);
+                    Debug.LoopItem(4, $"Rapid Advancement {i + 1}", Indent: 3, Toggle: getDoDebug());
+                }
+            }
+            else
+            {
+                Debug.CheckYeh(4, $"No Rapid Advancements", Indent: 2, Toggle: getDoDebug());
+            }
 
             Creature.RequirePart<Interesting>();
             Debug.LoopItem(4, $"<Interesting>?", Good: Creature.HasPart<Interesting>(), Indent: 2, Toggle: getDoDebug());

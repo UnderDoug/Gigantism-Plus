@@ -6,6 +6,7 @@ using XRL.World.Parts.Mutation;
 using XRL.Language;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -14,6 +15,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModBurrowingNaturalWeapon : ModNaturalEquipment<UD_ManagedBurrowingClaws>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModBurrowingNaturalWeapon));
+
         public ModBurrowingNaturalWeapon()
         {
         }
@@ -70,7 +73,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"\u2666 {typeof(ModBurrowingNaturalWeapon).Name}." +
                 $"{nameof(ApplyModification)}(GameObject Object)",
-                Indent: 3);
+                Indent: 3, Toggle: doDebug);
             base.ApplyModification(Object);
 
             Object.RequirePart<BurrowingClawsProperties>();

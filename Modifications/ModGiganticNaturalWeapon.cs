@@ -5,6 +5,7 @@ using XRL.World.Parts.Mutation;
 using XRL.Language;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -16,6 +17,8 @@ namespace XRL.World.Parts
         , IModEventHandler<BeforeDescribeModGiganticEvent>
         , IModEventHandler<DescribeModGiganticEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModGiganticNaturalWeapon));
+
         public ModGiganticNaturalWeapon()
         {
         }

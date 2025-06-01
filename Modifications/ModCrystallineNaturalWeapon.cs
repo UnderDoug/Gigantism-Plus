@@ -6,6 +6,7 @@ using XRL.Language;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -14,6 +15,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModCrystallineNaturalWeapon : ModNaturalEquipment<UD_ManagedCrystallinity>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModCrystallineNaturalWeapon));
+
         public ModCrystallineNaturalWeapon()
         {
         }
@@ -78,7 +81,6 @@ namespace XRL.World.Parts
 
         public override string GetInstanceDescription()
         {
-
             string text = ParentObject.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string pluralPossessive = ParentObject.IsPlural ? "their" : "its";

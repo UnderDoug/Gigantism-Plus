@@ -30,7 +30,7 @@ namespace XRL
         [GameBasedCacheInit]
         public static void AdditionalSetup()
         {
-            The.Game.AddSystem(Instance);
+            The.Game?.AddSystem(Instance);
         }
     }
 }

@@ -403,9 +403,42 @@ namespace XRL.World.Parts
                 Damage damage = E.Damage;
                 GameObject attacker = E.Source;
 
+                bool haveDamage = damage != null;
+
+                bool sourceIsWrassler =
+                    E.Source != null
+                 && E.Source.HasPart<Wrassler>();
+
+                bool isRopes = E.Object.InheritsFrom("WrassleRingRopes");
+
+                bool isChair = E.Object.InheritsFrom("FoldingChair");
+
+                bool ropesSpecialCase =
+                    isRopes
+                 && damage.Attributes.Contains("Concussion")
+                 || (E.Indirect && sourceIsWrassler);
+
+                bool chairSpecialCase =
+                    isChair
+                 && (damage.Attributes.Contains("Concussion") || E.Indirect) 
+                 && sourceIsWrassler;
+
+                bool notJostled =
+                    haveDamage
+                 && !damage.Attributes.Contains("Jostle");
+
+                bool isAccidental =
+                    haveDamage
+                 && !(isChair || isRopes)
+                 && (E.Indirect || (damage.Attributes.Contains("Concussion") && sourceIsWrassler));
+
+                bool blockDamage =
+                    notJostled
+                 && (ropesSpecialCase || chairSpecialCase || isAccidental);
+
                 Debug.Entry(4, $"Source: {attacker?.DebugName ?? "null"}", Indent: 1, Toggle: getDoDebug());
                 Debug.Entry(4, $"Damage Before: {damage.GetDebugInfo()}", Indent: 1, Toggle: getDoDebug());
-                if (damage != null && (damage.Attributes.Contains("Concussion") || E.Indirect) || E.Source.HasPart<Wrassler>())
+                if (blockDamage)
                 {
                     damage = new(0);
                 }
@@ -423,7 +456,9 @@ namespace XRL.World.Parts
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
+            bool forWeapon = E.ID == "AdjustWeaponScore";
+            bool forArmor = E.ID == "AdjustArmorScore";
+            if (forWeapon || forArmor)
             {
                 GameObject User = E.GetGameObjectParameter("User");
                 int Score = E.GetIntParameter("Score");

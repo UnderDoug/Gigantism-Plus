@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Qud.API;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -12,6 +13,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class WallOrNot : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(WallOrNot));
+
         public string Blueprint;
         public int Chance;
 

@@ -535,7 +535,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, "Start of Change Level updates", Indent: 1, Toggle: getDoDebug("CH"));
             // Start of Change Level updates.
 
-            Debug.Divider(4, HONLY, Count: 25, Indent: 1);
+            Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug("CH"));
             Debug.Entry(4, "Weight Factor and Carry Cap Bonus changes", Indent: 1, Toggle: getDoDebug("CH"));
             // Hunch Over Penalties
             Debug.Entry(4, $"Values Before", Indent: 2, Toggle: getDoDebug("CH"));

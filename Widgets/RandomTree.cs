@@ -6,6 +6,7 @@ using Qud.API;
 using XRL.Rules;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -14,6 +15,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class RandomTree : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(RandomTree));
+
         public bool Nearby;
         public int Count;
         public bool Persist;

@@ -5,15 +5,17 @@ using XRL.World.Parts.Mutation;
 using XRL.Language;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModClosedGiganticNaturalWeapon 
-        : ModNaturalEquipment<GigantismPlus>
+    public class ModClosedGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModClosedGiganticNaturalWeapon));
+
         public ModClosedGiganticNaturalWeapon()
         {
         }
@@ -66,5 +68,5 @@ namespace XRL.World.Parts
             return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
 
-    } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
+    } //!-- public class ModClosedGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
 }

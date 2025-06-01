@@ -959,6 +959,11 @@ namespace HNPS_GigantismPlus
             if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised() && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 if (Object.HasPart<NaturalEquipmentManager>())
+                {
+                    if (Object.IsPlural && Object.HasPropertyOrTag("DisplayNameSingular"))
+                    {
+                        return Object.GetPropertyOrTag("DisplayNameSingular");
+                    }
                     return Object.Render.DisplayName switch
                     {
                         "horns" => "horn",
@@ -966,6 +971,7 @@ namespace HNPS_GigantismPlus
                         "claws" => "claw",
                         _ => Object.Render.DisplayName
                     };
+                }
 
                 if (Object.InheritsFrom("BaseCudgel"))
                     return "cudgel";

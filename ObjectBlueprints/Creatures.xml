@@ -344,18 +344,30 @@
   </object>
 
   <!-- 
-      Vanilla Fixes
+      Vanilla "Fixes"
     -->
   <object Name="Scorpiock_Claws" Load="Merge">
     <!-- this object is both a plural and has DisplayName="claws" resulting in "clawss" -->
     <part Name="Render" DisplayName="claws" />
+    <tag Name="DisplayNameSingular" Value="claw" />
   </object>
   <object Name="Horns" Load="Merge">
     <!-- this object is both a plural and has DisplayName="claws" resulting in "hornses" -->
-    <part Name="Render" DisplayName="horns" />
+    <tag Name="DisplayNameSingular" Value="horn" />
   </object>
   <object Name="Horns Antlers" Load="Merge">
     <!-- this object is both a plural and has DisplayName="antlers" resulting in "antlerses" -->
-    <part Name="Render" DisplayName="antlers" />
+    <tag Name="DisplayNameSingular" Value="antler" />
   </object>
+
+  <object Name="Horns Single" Load="Merge">
+    <removetag Name="DisplayNameSingular" />
+  </object>
+  <object Name="Horns Casque" Load="Merge">
+    <removetag Name="DisplayNameSingular" />
+  </object>
+  <object Name="Horns Spiral" Load="Merge">
+    <removetag Name="DisplayNameSingular" />
+  </object>
+  
 </objects>

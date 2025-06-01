@@ -83,6 +83,12 @@ namespace HNPS_GigantismPlus
             // General
             { nameof(NaturalEquipmentManager), false },
             { nameof(ModNaturalEquipmentBase), false },
+            { nameof(ModGiganticNaturalWeapon), false },
+            { nameof(ModClosedGiganticNaturalWeapon), false },
+            { nameof(ModElongatedNaturalWeapon), false },
+            { nameof(ModBurrowingNaturalWeapon), false },
+            { nameof(ModCrystallineNaturalWeapon), false },
+            { nameof(ModAugmentedNaturalWeapon), false },
             { "ModNaturalEquipment", false },
             { "BaseManagedDefaultEquipmentMutation", false },
             { "BaseManagedDefaultEquipmentCybernetic", false },
@@ -147,6 +153,12 @@ namespace HNPS_GigantismPlus
             { nameof(Physics_Patches), false },
             { nameof(Skulk_Tonic_Patches), true },
             { nameof(Tinkering_Disassemble_Patches), false },
+
+            // Widgets
+            { nameof(RandomDebris), false },
+            { nameof(RandomTree), false },
+            { nameof(WallOrDebris), false },
+            { nameof(WallOrNot), false },
         };
 
         public static bool getClassDoDebug(string Class)

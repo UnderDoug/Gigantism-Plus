@@ -7,6 +7,7 @@ using Qud.API;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -15,6 +16,7 @@ namespace XRL.World.Parts
     [Serializable]
     public class WallOrDebris : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(WallOrDebris));
 
         public int WallChance;
         public bool SmallBoulders;
@@ -53,13 +55,13 @@ namespace XRL.World.Parts
             {
                 string debugHeader = 
                     $"[{ParentObject.ID}:{ParentObject.Blueprint}] -> " + 
-                    $"{typeof(WallOrDebris).Name}." +
-                    $"{nameof(HandleEvent)}({typeof(ObjectCreatedEvent).Name} E)";
+                    $"{nameof(WallOrDebris)}." +
+                    $"{nameof(HandleEvent)}({nameof(ObjectCreatedEvent)} E)";
 
                 if (WallChance.in100())
                 {
                     Blueprint = Wall;
-                    Debug.Entry(4, $"{debugHeader} resolved into {Blueprint}", Indent: 0);
+                    Debug.Entry(4, $"{debugHeader} resolved into {Blueprint}", Indent: 0, Toggle: doDebug);
                 }
                 else
                 {
@@ -68,13 +70,16 @@ namespace XRL.World.Parts
 
                     if (Blueprint.IsNullOrEmpty())
                     {
-                        Debug.Entry(4, 
-                            $"WARN: {typeof(WallOrDebris).Name} Failed to get Debris from weighted list. " + 
-                            $"Blueprint set by fallback to Wall \n{Wall}\n", 
+                        Debug.Warn(4, 
+                            $"{nameof(WallOrDebris)}",
+                            $"{nameof(HandleEvent)}({nameof(ObjectCreatedEvent)})",
+                            $"Failed to get Debris from weighted list. " + 
+                            $"Blueprint set by fallback to Wall {Wall.Quote()}", 
                             Indent: 0);
                         Blueprint = Wall;
                     }
-                    Debug.Entry(4, $"{debugHeader} resolved into {debrisBlueprint}, {Blueprint} is what we got", Indent: 0);
+                    Debug.Entry(4, $"{debugHeader} resolved into {debrisBlueprint}, {Blueprint} is what we got", 
+                        Indent: 0, Toggle: doDebug);
                 }
 
                 GameObject newObject = GameObjectFactory.Factory.CreateObject(Blueprint);
@@ -114,9 +119,17 @@ namespace XRL.World.Parts
         {
             if (E.ID == "EnteredCell" && ParentObject.CurrentZone != null)
             {
-                string thing = Blueprint  ?? "Wall or Debris";
-                Debug.Entry(4, $"WARN: {typeof(WallOrDebris).Name} Failed to create {thing}", Indent: 0);
-                ParentObject.Obliterate();
+                string thing = Blueprint ?? "Wall or Debris";
+                Debug.Warn(4,
+                    $"{nameof(WallOrDebris)}",
+                    $"{nameof(HandleEvent)}({nameof(ObjectCreatedEvent)})",
+                    $"Failed to create {thing}",
+                    Indent: 0);
+                
+                if (ParentObject.Obliterate())
+                {
+                    return false;
+                }
             }
             return base.FireEvent(E);
         }

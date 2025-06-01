@@ -5,6 +5,7 @@ using XRL.Language;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModAugmentedNaturalWeapon : ModNaturalEquipment<CyberneticsGiganticExoframe>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModAugmentedNaturalWeapon));
+
         public ModAugmentedNaturalWeapon()
         {
         }

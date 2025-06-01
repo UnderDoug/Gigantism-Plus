@@ -716,20 +716,20 @@ namespace XRL.World.Parts
                     $"% {typeof(ObjectCreationAnalyzer).Name}." +
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}])",
-                    Indent: 0);
-                Debug.Divider(4, HONLY, Count: 60, Indent: 1);
+                    Indent: 0, Toggle: Options.doDebug);
+                Debug.Divider(4, HONLY, Count: 60, Indent: 1, Toggle: Options.doDebug);
 
-                Debug.LoopItem(4, $"E.Context: {E.Context}", Indent: 1);
+                Debug.LoopItem(4, $"E.Context: {E.Context}", Indent: 1, Toggle: Options.doDebug);
                 string ROIDString = E.ReplacementObject != null ? E.ReplacementObject.ID : "null";
                 string RODisplayNameString = E.ReplacementObject != null ? E.ReplacementObject.ShortDisplayNameStripped : "null";
-                Debug.LoopItem(4, $"E.ReplacementObject: [{ROIDString}:{RODisplayNameString}]", Indent: 1);
+                Debug.LoopItem(4, $"E.ReplacementObject: [{ROIDString}:{RODisplayNameString}]", Indent: 1, Toggle: Options.doDebug);
 
-                Debug.Divider(4, HONLY, Count: 60, Indent: 1);
+                Debug.Divider(4, HONLY, Count: 60, Indent: 1, Toggle: Options.doDebug);
                 Debug.Entry(4,
                     $"x {typeof(ObjectCreationAnalyzer).Name}." +
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) %//",
-                    Indent: 0);
+                    Indent: 0, Toggle: Options.doDebug);
             }
             return base.HandleEvent(E);
         }

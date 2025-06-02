@@ -21,6 +21,8 @@ namespace XRL.World.ObjectBuilders
     [HasWishCommand]
     public class Gigantified : IObjectBuilder
     {
+        private static bool doDebug => getClassDoDebug(nameof(Gigantified));
+
         public string NamePrefix;
 
         public Gigantified() 
@@ -218,7 +220,8 @@ namespace XRL.World.ObjectBuilders
         {
             Debug.Header(4, 
                 $"{nameof(Gigantified)}", 
-                $"{nameof(Gigantify)}(Object: {Creature.DebugName}, Level: {Level}, Tier: {Tier})");
+                $"{nameof(Gigantify)}(Object: {Creature.DebugName}, Level: {Level}, Tier: {Tier})",
+                Toggle: doDebug);
 
             bool gigantified = 
                 GigantifyMutant(Creature, Level, Stews, NamePrefix, Context) 
@@ -226,7 +229,8 @@ namespace XRL.World.ObjectBuilders
             
             Debug.Footer(4, 
                 $"{nameof(Gigantified)}", 
-                $"{nameof(Gigantify)}(Object: {Creature.DebugName}, Level: {Level}, Tier: {Tier})");
+                $"{nameof(Gigantify)}(Object: {Creature.DebugName}, Level: {Level}, Tier: {Tier})",
+                Toggle: doDebug);
 
             return gigantified;
         }

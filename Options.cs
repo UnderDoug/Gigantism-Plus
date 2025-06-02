@@ -104,6 +104,7 @@ namespace HNPS_GigantismPlus
             { nameof(WrassleGear), true },
             { nameof(Tactics_Vault), false },
             { nameof(Vaultable), false },
+            { nameof(Gigantified), false },
             { nameof(SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
             { nameof(WrassleGiantHero), true },

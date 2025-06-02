@@ -420,7 +420,7 @@ namespace XRL.World.Parts
                 + $" E.Cell: [{E?.Cell?.Location}],"
                 + $" E.Actor: {Vaulter?.DebugName ?? NULL},"
                 + $" E.Object: {Vaultee?.DebugName ?? NULL}",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
             Tactics_Vault vaultSkill = null;
             bool vaulterNotNull = Vaulter != null;

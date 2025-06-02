@@ -31,13 +31,12 @@ namespace XRL.World.Parts.Skill
         {
             List<object> doList = new()
             {
-                'V',    // Vomit
-                "AV",   // AttemptVault
                 "SD",   // ShortDescription
             };
             List<object> dontList = new()
             {
-                // null, // place holder
+                'V',    // Vomit
+                "AV",   // AttemptVault
             };
 
             if (what != null && doList.Contains(what))

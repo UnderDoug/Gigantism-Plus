@@ -89,7 +89,7 @@ namespace XRL.World.Parts
         /// <summary>
         /// Key: string (name of Target object) <br></br>
         /// Value: Tuple( TargetObject, Entry ) <br></br>
-        /// - TargetObject: per Adjustment struct, one of: [GameObject] (the equipment itself), [Render], [MeleeWeapon], [Armor] <br></br>
+        /// - TargetObject: per ModNaturalEquipmentBase.HNPS_Adjustment class, one of: [GameObject] (the equipment itself), [Render], [MeleeWeapon], [Armor] <br></br>
         /// - Entry: Dictionary, <br></br>
         /// - - Key: string (field/property being targeted) <br></br>
         /// - - Value: Tuple( Priority, Value ), <br></br>
@@ -176,21 +176,22 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(AddNaturalEquipmentMod)}(NaturalWeaponMod: {NaturalEquipmentMod.Name})",
+                + $"{nameof(AddNaturalEquipmentMod)}"
+                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name})",
                 Indent: 3, Toggle: doDebug);
 
             NaturalEquipmentMods ??= new();
             if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
             {
-                Debug.Entry(2,
-                    $"WARN: {typeof(NaturalEquipmentManager).Name}." +
+                Debug.Warn(2,
+                    $"{nameof(NaturalEquipmentManager)}",
                     $"{nameof(AddNaturalEquipmentMod)}()",
                     $"[{NaturalEquipmentMod.ModPriority}]" + 
                     $"{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " + 
                     $"in {nameof(NaturalEquipmentMods)} overwritten: Same ModPriority",
                     Indent: 4);
             }
-            NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = NaturalEquipmentMod;
+            NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = NaturalEquipmentMod.Copy();
             Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 4, Toggle: doDebug);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
@@ -198,7 +199,8 @@ namespace XRL.World.Parts
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(AddNaturalEquipmentMod)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}) @//",
+                + $"{nameof(AddNaturalEquipmentMod)}"
+                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name}) @//",
                 Indent: 3, Toggle: doDebug);
         }
 
@@ -210,7 +212,7 @@ namespace XRL.World.Parts
                 Indent: 4, Toggle: doDebug);
 
             ShortDescriptions ??= new();
-            ShortDescriptions[NaturalEquipmentMod.DescriptionPriority] = NaturalEquipmentMod;
+            ShortDescriptions[NaturalEquipmentMod.DescriptionPriority] = NaturalEquipmentMod.Copy();
             Debug.Entry(4, $"ShortDescriptions:", Indent: 5, Toggle: doDebug);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
@@ -222,7 +224,7 @@ namespace XRL.World.Parts
                 Indent: 4, Toggle: doDebug);
         }
 
-        public bool RaplacedBasedOnPriority(Dictionary<string, (int Priority, string Value)> Dictionary, Adjustment Adjustment)
+        public bool RaplacedBasedOnPriority(Dictionary<string, (int Priority, string Value)> Dictionary, HNPS_Adjustment Adjustment)
         {
             Debug.Entry(4, 
                 $"* {nameof(RaplacedBasedOnPriority)}" + 
@@ -252,7 +254,7 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(4, $"NaturalWeaponMod?.Adjustments != null", Indent: 2, Toggle: doDebug);
                 Debug.Entry(4, $"> foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments)", Indent: 2, Toggle: doDebug);
-                foreach (Adjustment adjustment in NaturalWeaponMod.Adjustments)
+                foreach (HNPS_Adjustment adjustment in NaturalWeaponMod.Adjustments)
                 {
                     string target = adjustment.Target;
                     Debug.LoopItem(4, $"target", $"{target}", Indent: 3, Toggle: doDebug);

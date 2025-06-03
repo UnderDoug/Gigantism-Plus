@@ -313,9 +313,9 @@ namespace XRL.World.Parts.Skill
             }
             vaultSkill.Vomit(4, $"{nameof(AttemptVault)}", "Immediately Post-Vault", Indent: 1, Toggle: getDoDebug('V'));
 
-            Debug.LoopItem(4, $" ] Requesting Interface Exit from event (if present)", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $" ] Requesting Interface Exit from event (if present)", Indent: 2, Toggle: getDoDebug("AV"));
             FromEvent?.RequestInterfaceExit();
-            Debug.LoopItem(4, $"FromEvent not null", $"{FromEvent != null}", Good: FromEvent != null, Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"FromEvent not null", $"{FromEvent != null}", Good: FromEvent != null, Indent: 2, Toggle: getDoDebug("AV"));
 
             Debug.Entry(4,
                 $"x {nameof(Tactics_Vault)}."
@@ -326,7 +326,7 @@ namespace XRL.World.Parts.Skill
                 + $" DestinationCell: [{DestinationCell?.Location}],"
                 + $" FromEvent: {FromEvent?.GetType()?.Name ?? NULL},"
                 + $" Silent: {Silent}) *//",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug("AV"));
 
             return true;
         }

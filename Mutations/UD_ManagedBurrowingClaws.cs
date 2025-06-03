@@ -256,25 +256,25 @@ namespace XRL.World.Parts.Mutation
             if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
             {
                 naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
                 Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
                 Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
             }
             else
             {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
             }
 
             if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
             {
                 naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
                 Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
                 Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
             }
             else
             {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
             }
             Debug.Entry(4,
                 $"x {nameof(UD_ManagedBurrowingClaws)}."

@@ -19,7 +19,7 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
-        public class Adjustment : IScribedPart
+        public class HNPS_Adjustment : IScribedPart
         {
             public Guid ID;
 
@@ -31,7 +31,7 @@ namespace XRL.World.Parts
 
             public string Value; // Value of the adjustment.
 
-            public Adjustment(Adjustment Source)
+            public HNPS_Adjustment(HNPS_Adjustment Source)
             {
                 ID = Guid.NewGuid();
                 Target = new(Source.Target);
@@ -40,7 +40,7 @@ namespace XRL.World.Parts
                 Value = new(Source.Value);
             }
 
-            public Adjustment(string Target, string Field, int Priority, string Value)
+            public HNPS_Adjustment(string Target, string Field, int Priority, string Value)
             {
                 ID = Guid.NewGuid();
                 this.Target = Target;
@@ -55,7 +55,7 @@ namespace XRL.World.Parts
                 output += $"({(Priority != 0 ? Priority : "PriorityUnset")})";
                 output += $"{Target ?? "NoTarget?"}.";
                 output += $"{Field ?? "NoField?"} = \"";
-                output += Value ?? "null?";
+                output += Value ?? "Value?";
                 output += "\"";
                 return output;
             }
@@ -68,46 +68,42 @@ namespace XRL.World.Parts
                 return output;
             }
 
-            public Adjustment Copy(Adjustment Source)
-            {
-                Adjustment output = new(Source);
-                return output;
-            }
-
             public override bool SameAs(IPart p)
             {
-                if (p is Adjustment adjustment)
+                if (p is HNPS_Adjustment a)
                 {
-                    return ID == adjustment.ID && base.SameAs(p);
+                    return ID == a.ID && base.SameAs(p);
                 }
                 return false;
             }
 
+            public HNPS_Adjustment Copy(HNPS_Adjustment Source)
+            {
+                HNPS_Adjustment output = new(Source);
+                return output;
+            }
+
             public override void Write(GameObject Basis, SerializationWriter Writer)
             {
-                base.Write(Basis, Writer);
-
                 Writer.Write(ID);
                 Writer.Write(Target);
                 Writer.Write(Field);
-                Writer.WriteOptimized(Priority);
+                Writer.Write(Priority);
                 Writer.Write(Value);
             }
 
             public override void Read(GameObject Basis, SerializationReader Reader)
             {
-                base.Read(Basis, Reader);
-
                 ID = Reader.ReadGuid();
                 Target = Reader.ReadString();
                 Field = Reader.ReadString();
-                Priority = Reader.ReadOptimizedInt32();
+                Priority = Reader.ReadInt32();
                 Value = Reader.ReadString();
             }
         }
 
         [NonSerialized]
-        public List<Adjustment> Adjustments;
+        public List<HNPS_Adjustment> Adjustments;
 
         public string BodyPartType;
 
@@ -137,15 +133,17 @@ namespace XRL.World.Parts
 
         public ModNaturalEquipmentBase()
         {
+            Adjustments = new();
         }
         public ModNaturalEquipmentBase(int Tier)
             : base(Tier)
         {
+            Adjustments = new();
         }
         public ModNaturalEquipmentBase(ModNaturalEquipmentBase Source)
             : this()
         {
-            Adjustments = new List<Adjustment>(Source.Adjustments ??= new());
+            Adjustments = new(Source.Adjustments ??= new());
 
             BodyPartType = Source.BodyPartType;
 
@@ -162,10 +160,11 @@ namespace XRL.World.Parts
             AdjectiveColor = Source.AdjectiveColor;
             AdjectiveColorFallback = Source.AdjectiveColorFallback;
 
-            AddedParts = new List<string>(Source.AddedParts);
-            AddedStringProps = new Dictionary<string, string>(Source.AddedStringProps);
-            AddedIntProps = new Dictionary<string, int>(Source.AddedIntProps);
+            AddedParts = new(Source.AddedParts ?? new());
+            AddedStringProps = new(Source.AddedStringProps ?? new());
+            AddedIntProps = new(Source.AddedIntProps ?? new());
         }
+        public abstract ModNaturalEquipmentBase Copy();
 
         public override void Configure()
         {
@@ -236,10 +235,10 @@ namespace XRL.World.Parts
             base.Write(Basis, Writer);
 
             Adjustments ??= new();
-            Writer.WriteOptimized(Adjustments.Count);
+            Writer.Write(Adjustments.Count);
             if (!Adjustments.IsNullOrEmpty())
             {
-                foreach (Adjustment Adjustment in Adjustments)
+                foreach (HNPS_Adjustment Adjustment in Adjustments)
                 {
                     Adjustment.Write(Basis, Writer);
                 }
@@ -250,10 +249,10 @@ namespace XRL.World.Parts
             base.Read(Basis, Reader);
 
             Adjustments = new();
-            int adjustmentsCount = Reader.ReadOptimizedInt32();
+            int adjustmentsCount = Reader.ReadInt32();
             for (int i = 0; i < adjustmentsCount; i++)
             {
-                Adjustments.Add((Adjustment)Reader.ReadObject());
+                Adjustments.Add((HNPS_Adjustment)Reader.ReadObject());
             }
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
@@ -264,7 +263,7 @@ namespace XRL.World.Parts
             Adjustments ??= new();
             if (!Adjustments.IsNullOrEmpty())
             {
-                foreach (Adjustment adjustment in Adjustments)
+                foreach (HNPS_Adjustment adjustment in Adjustments)
                 {
                     naturalEquipmentMod.Adjustments.Add(new(adjustment));
                 }

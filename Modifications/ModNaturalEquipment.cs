@@ -72,9 +72,14 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
+        public override ModNaturalEquipmentBase Copy()
+        {
+            return new ModNaturalEquipment<T>(this);
+        }
+
         public override Guid AddAdjustment(string Target, string Field, string Value, int Priority)
         {
-            Adjustment adjustment = new(Target, Field, Priority, Value);
+            HNPS_Adjustment adjustment = new(Target, Field, Priority, Value);
             Adjustments ??= new();
             Adjustments.Add(adjustment);
             return adjustment.ID;
@@ -193,11 +198,11 @@ namespace XRL.World.Parts
             }
             if(AssigningPart.Is(null))
             {
-                Debug.Entry(2,
-                    $"WARN",
-                    $"{typeof(ModNaturalEquipment<T>).Name}<{typeof(T).Name}>.{nameof(BeingAppliedBy)} (" +
-                    $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
-                    $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " +
+                Debug.Warn(2,
+                    $"{typeof(ModNaturalEquipment<T>).Name}<{GetSource()}>",
+                    $"{nameof(BeingAppliedBy)}(" +
+                    $"obj: {obj?.DebugName ?? NULL}, " +
+                    $"who: {who?.DebugName ?? NULL})",
                     $"Failed to assign {GetSource()} as AssigningPart",
                     Indent: 0);
             }
@@ -207,7 +212,7 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4, 
                 $"@ {Name}[{GetSource()}]." + 
-                $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", 
+                $"{nameof(ApplyModification)}(Object: \"{Object.BaseDisplayName}\")", 
                 Indent: 3, Toggle: getDoDebug("AM"));
 
             Object.GetPart<NaturalEquipmentManager>()
@@ -217,7 +222,7 @@ namespace XRL.World.Parts
 
             Debug.Entry(4, 
                 $"x {Name}[{GetSource()}]." + 
-                $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", 
+                $"{nameof(ApplyModification)}(Object: \"{Object.BaseDisplayName}\") @//", 
                 Indent: 3, Toggle: getDoDebug("AM"));
             base.ApplyModification(Object);
         }
@@ -288,7 +293,6 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
         }
-
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
@@ -304,10 +308,10 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod;
         }
 
-    } //!-- public class ModNaturalEquipment<E>
+    } //!-- public class ModNaturalEquipment<T>
       //        : ModNaturalEquipmentBase
-      //        where E
+      //        where T
       //        : IPart
-      //        , IManagedDefaultNaturalEquipment<E>
+      //        , IManagedDefaultNaturalEquipment<T>
       //        , new()
 }

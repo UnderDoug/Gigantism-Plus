@@ -215,8 +215,7 @@ namespace XRL.World.Parts
                 $"{nameof(ApplyModification)}(Object: \"{Object.BaseDisplayName}\")", 
                 Indent: 3, Toggle: getDoDebug("AM"));
 
-            Object.GetPart<NaturalEquipmentManager>()
-                .AddShortDescriptionEntry(this);
+            Object.GetPart<NaturalEquipmentManager>().AddShortDescriptionEntry(this);
             
             ApplyPartAndPropChanges(Object);
 
@@ -250,18 +249,18 @@ namespace XRL.World.Parts
         {
             return Adjective ?? typeof(T).Name;
         }
-        public override string GetInstanceDescription()
+        public override string GetInstanceDescription(GameObject Object = null)
         {
-            string text = ParentObject.GetObjectNoun();
+            Object ??= ParentObject;
+            string text = Object?.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
             int dieCount = GetDamageDieCount();
             int dieSize = GetDamageDieSize();
             int damageBonus = GetDamageBonus();
             int hitBonus = GetHitBonus();
             int penBonus = GetPenBonus();
             string description = $"{descriptionName}: ";
-            description += ParentObject.IsPlural
+            description += Object != null && Object.IsPlural
                         ? ("These " + Grammar.Pluralize(text) + " ")
                         : ("This " + text + " ");
             
@@ -299,8 +298,13 @@ namespace XRL.World.Parts
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            ModNaturalEquipment<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;
-            return ClearForCopy(modNaturalWeaponBase);
+            ModNaturalEquipment<T> modNaturalEquipment = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;
+            return ClearForCopy(modNaturalEquipment);
+        }
+        public override IPart DeepCopy(GameObject Parent)
+        {
+            ModNaturalEquipment<T> naturalEquipmentMod = base.DeepCopy(Parent) as ModNaturalEquipment<T>;
+            return ClearForCopy(naturalEquipmentMod);
         }
         public static ModNaturalEquipment<T> ClearForCopy(ModNaturalEquipment<T> NaturalEquipmentMod)
         {

@@ -177,11 +177,8 @@ namespace XRL.World.Parts
 
         public override bool ModificationApplicable(GameObject Object)
         {
-            if (!Object.HasPart<Physics>() && !Object.HasPart<NaturalEquipment>())
-            {
-                return false;
-            }
-            return true;
+            return Object.HasPart<Physics>() 
+                && Object.IsNaturalEquipment();
         }
 
         public abstract Guid AddAdjustment(string Target, string Field, string Value, int Priority);
@@ -218,7 +215,7 @@ namespace XRL.World.Parts
             return GetAdjective().OptionalColor(AdjectiveColor, AdjectiveColorFallback, Colorfulness);
         }
 
-        public abstract string GetInstanceDescription();
+        public abstract string GetInstanceDescription(GameObject Object = null);
 
         public virtual int GetDescriptionPriority()
         {
@@ -269,6 +266,33 @@ namespace XRL.World.Parts
                 }
             }
             
+            return ClearForCopy(naturalEquipmentMod);
+        }
+        public override IPart DeepCopy(GameObject Parent)
+        {
+            ModNaturalEquipmentBase naturalEquipmentMod = base.DeepCopy(Parent) as ModNaturalEquipmentBase;
+
+            naturalEquipmentMod.Adjustments = new(Adjustments ??= new());
+
+            naturalEquipmentMod.BodyPartType = BodyPartType;
+
+            naturalEquipmentMod.ModPriority = ModPriority;
+            naturalEquipmentMod.DescriptionPriority = DescriptionPriority;
+
+            naturalEquipmentMod.DamageDieCount = DamageDieCount;
+            naturalEquipmentMod.DamageDieSize = DamageDieSize;
+            naturalEquipmentMod.DamageBonus = DamageBonus;
+            naturalEquipmentMod.HitBonus = HitBonus;
+            naturalEquipmentMod.PenBonus = PenBonus;
+
+            naturalEquipmentMod.Adjective = Adjective;
+            naturalEquipmentMod.AdjectiveColor = AdjectiveColor;
+            naturalEquipmentMod.AdjectiveColorFallback = AdjectiveColorFallback;
+
+            naturalEquipmentMod.AddedParts = new(AddedParts ?? new());
+            naturalEquipmentMod.AddedStringProps = new(AddedStringProps ?? new());
+            naturalEquipmentMod.AddedIntProps = new(AddedIntProps ?? new());
+
             return ClearForCopy(naturalEquipmentMod);
         }
         public static ModNaturalEquipmentBase ClearForCopy(ModNaturalEquipmentBase NaturalEquipmentMod)

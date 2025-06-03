@@ -35,7 +35,7 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
-        private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
+        private static string[] AffectedSlotTypes => new string[3] { "Hand", "Hands", "Missile Weapon" };
 
         public int StrengthModifier => ParentObject.StatMod("Strength");
         public int AgilityModifier => ParentObject.StatMod("Agility");
@@ -82,50 +82,11 @@ namespace XRL.World.Parts.Mutation
             return elongatedNaturalWeaponMod;
         }
 
-        private bool _HasGigantism = false;
-        public bool HasGigantism
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPart<GigantismPlus>();
-                return _HasGigantism;
-            }
-            set
-            {
-                _HasGigantism = value;
-            }
-        }
 
-        private bool _HasBurrowing = false;
-        public bool HasBurrowing
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPartDescendedFrom<BurrowingClaws>();
-                return _HasBurrowing;
-            }
-            set
-            {
-                _HasBurrowing = value;
-            }
-        }
+        public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
+        public bool HasBurrowing => ParentObject != null && ParentObject.HasPartDescendedFrom<BurrowingClaws>();
+        public bool HasCrystallinity => ParentObject != null && ParentObject.HasPartDescendedFrom<Crystallinity>();
 
-        private bool _HasCrystallinity = false;
-        public bool HasCrystallinity
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPartDescendedFrom<Crystallinity>();
-                return _HasCrystallinity;
-            }
-            set
-            {
-                _HasCrystallinity = value;
-            }
-        }
 
         public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
@@ -191,8 +152,7 @@ namespace XRL.World.Parts.Mutation
                 {
                     NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
 
-                    body?.UpdateBodyParts();
-
+                    body.UpdateBodyParts();
 
                     foreach (GameObject equipped in body.GetEquippedObjects())
                     {
@@ -243,7 +203,6 @@ namespace XRL.World.Parts.Mutation
 
                 GO.CheckEquipmentSlots();
             }
-            
 
             return base.Unmutate(GO);
         }

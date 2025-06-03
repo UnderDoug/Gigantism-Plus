@@ -136,7 +136,7 @@ namespace XRL.World.Parts
 
             foreach ((int priority, ModNaturalEquipmentBase mod) in ShortDescriptions)
             {
-                StringBuilder.AppendRules(mod.GetInstanceDescription());
+                StringBuilder.AppendRules(mod.GetInstanceDescription(ParentObject));
                 Debug.CheckYeh(4, $"{priority}::{mod.GetSource()}:Description Appended", Indent: 1, Toggle: doDebug);
             }
 
@@ -191,7 +191,8 @@ namespace XRL.World.Parts
                     $"in {nameof(NaturalEquipmentMods)} overwritten: Same ModPriority",
                     Indent: 4);
             }
-            NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = NaturalEquipmentMod.Copy();
+            ModNaturalEquipmentBase naturalEquipmentModCopy = NaturalEquipmentMod.DeepCopy(ParentObject) as ModNaturalEquipmentBase;
+            NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = naturalEquipmentModCopy;
             Debug.Entry(4, $"NaturalEquipmentMods:", Indent: 4, Toggle: doDebug);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
@@ -211,8 +212,9 @@ namespace XRL.World.Parts
                 + $"{nameof(AddShortDescriptionEntry)}(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.GetAdjective()}])",
                 Indent: 4, Toggle: doDebug);
 
-            ShortDescriptions ??= new();
-            ShortDescriptions[NaturalEquipmentMod.DescriptionPriority] = NaturalEquipmentMod.Copy();
+            ShortDescriptions ??= new(); 
+            ModNaturalEquipmentBase naturalEquipmentModCopy = NaturalEquipmentMod.DeepCopy(ParentObject) as ModNaturalEquipmentBase;
+            ShortDescriptions[NaturalEquipmentMod.DescriptionPriority] = naturalEquipmentModCopy;
             Debug.Entry(4, $"ShortDescriptions:", Indent: 5, Toggle: doDebug);
             foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
@@ -488,6 +490,7 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(4, $"Applying {naturalEquipmentMod.Name} to {ParentObject?.ShortDisplayNameStripped}", Indent: 2, Toggle: doDebug);
                 ParentObject.ApplyNaturalEquipmentModification(naturalEquipmentMod, Wielder);
+                naturalEquipmentMod.ParentObject = ParentObject;
             }
             Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: 1, Toggle: doDebug);
         }

@@ -94,9 +94,10 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-        public override string GetInstanceDescription()
+        public override string GetInstanceDescription(GameObject Object = null)
         {
-            BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(ParentObject, Context: "Natural Equipment");
+            Object ??= ParentObject;
+            BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(Object, Context: "Natural Equipment");
             return DescribeModGiganticEvent.Send(beforeEvent).Process(PluralizeObject: true);
 
         }

@@ -190,7 +190,7 @@ namespace HNPS_GigantismPlus
             return AddDescription(GeneralDescriptions, Relationship, Effect);
         }
 
-        public static List<List<string>> RemoveDescription(string Relationship, string Effect, List<List<string>> Descriptions)
+        public static List<List<string>> RemoveDescription(List<List<string>> Descriptions, string Relationship, string Effect)
         {
             List<List<string>> elementsToRemove = new()
             {
@@ -211,11 +211,11 @@ namespace HNPS_GigantismPlus
         }
         public List<List<string>> RemoveWeaponDescription(string Relationship, string Effect)
         {
-            return RemoveDescription(Relationship, Effect, WeaponDescriptions);
+            return RemoveDescription(WeaponDescriptions, Relationship, Effect);
         }
         public List<List<string>> RemoveGeneralDescription(string Relationship, string Effect)
         {
-            return RemoveDescription(Relationship, Effect, GeneralDescriptions);
+            return RemoveDescription(GeneralDescriptions, Relationship, Effect);
         }
 
         public static List<List<string>> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)

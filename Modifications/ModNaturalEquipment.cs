@@ -254,30 +254,42 @@ namespace XRL.World.Parts
             Object ??= ParentObject;
             string text = Object?.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
+            string description = $"{descriptionName}: ";
+            description += Object != null && Object.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
+
             int dieCount = GetDamageDieCount();
             int dieSize = GetDamageDieSize();
             int damageBonus = GetDamageBonus();
             int hitBonus = GetHitBonus();
             int penBonus = GetPenBonus();
-            string description = $"{descriptionName}: ";
-            description += Object != null && Object.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " ")
-                        : ("This " + text + " ");
             
             List<List<string>> descriptions = new();
-            if (dieCount != 0) descriptions
-                    .Add(new() { "gain", $"{dieCount} additional damage die" });
-            if (dieSize != 0) descriptions
-                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
-            if (damageBonus != 0) descriptions
-                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
-            if (hitBonus != 0) descriptions
-                    .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
-            if (penBonus != 0) descriptions
-                    .Add(new() { "have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}" });
-            if (descriptions.IsNullOrEmpty()) descriptions
-                    .Add(new() { "gain", "some manner of adjustments" });
-
+            if (dieCount != 0)
+            {
+                descriptions.AddDescription("gain", $"{dieCount} additional damage die");
+            }
+            if (dieSize != 0)
+            {
+                descriptions.AddDescription("gain", $"{dieSize.Signed()} damage die size");
+            }
+            if (damageBonus != 0)
+            {
+                descriptions.AddDescription("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+            }
+            if (hitBonus != 0)
+            {
+                descriptions.AddDescription("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
+            }
+            if (penBonus != 0)
+            {
+                descriptions.AddDescription("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
+            }
+            if (descriptions.IsNullOrEmpty())
+            {
+                descriptions.AddDescription("gain", "some manner of adjustments");
+            }
 
             List<string> processedDescriptions = new();
             foreach (List<string> entry in descriptions)
@@ -287,7 +299,8 @@ namespace XRL.World.Parts
 
             return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
-
+        
+        /*
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
@@ -296,6 +309,7 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
         }
+        */
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalEquipment<T> modNaturalEquipment = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;

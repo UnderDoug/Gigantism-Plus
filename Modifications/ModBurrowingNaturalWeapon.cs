@@ -92,31 +92,39 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public override string GetInstanceDescription()
+        public override string GetInstanceDescription(GameObject Object = null)
         {
-            string text = ParentObject.GetObjectNoun();
+            Object ??= ParentObject;
+            string text = Object?.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            int dieSize = GetDamageDieSize(); 
-            int wallBonusPenetration = UD_ManagedBurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
-            int wallHitsRequired = UD_ManagedBurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
             string description = $"{descriptionName}: ";
-            description += ParentObject.IsPlural
+            description += Object != null && Object.IsPlural
                         ? ("These " + Grammar.Pluralize(text) + " ")
                         : ("This " + text + " ");
 
+            string pluralPossessive = Object.IsPlural ? "their" : "its";
+            int dieSize = GetDamageDieSize(); 
+            int wallBonusPenetration = UD_ManagedBurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+            int wallHitsRequired = UD_ManagedBurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
+           
             List<List<string>> descriptions = new();
-            if (dieSize != 0) descriptions
-                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
-            if (wallBonusPenetration != 0) descriptions
-                    .Add(new() { "get", $"{wallBonusPenetration.Signed()} penetration vs. walls" });
-            if (wallHitsRequired != 0) descriptions
-                    .Add(new() { "destroy", $"walls after {wallHitsRequired} penetrating hits" });
+            if (dieSize != 0)
+            {
+                descriptions.AddDescription("gain", $"{dieSize.Signed()} damage die size");
+            }
+            if (wallBonusPenetration != 0)
+            {
+                descriptions.AddDescription("get", $"{wallBonusPenetration.Signed()} penetration vs. walls");
+            }
+            if (wallHitsRequired != 0)
+            {
+                descriptions.AddDescription("destroy", $"walls after {wallHitsRequired} penetrating hits");
+            }
 
             List<string> processedDescriptions = new();
             foreach (List<string> entry in descriptions)
             {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, Object));
             }
 
             return description += Grammar.MakeAndList(processedDescriptions) + ".";

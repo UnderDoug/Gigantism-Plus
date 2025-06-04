@@ -1388,23 +1388,24 @@ namespace XRL.World.Parts.Mutation
             return ToggledOn;
         }
 
+        /*
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
 
-            Writer.Write(HunchOverActivatedAbilityID);
-            Writer.Write(GroundPoundActivatedAbilityID);
-            Writer.Write(CloseFistActivatedAbilityID);
+            // Writer.Write(HunchOverActivatedAbilityID);
+            // Writer.Write(GroundPoundActivatedAbilityID);
+            // Writer.Write(CloseFistActivatedAbilityID);
         }
-
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
 
-            HunchOverActivatedAbilityID = Reader.ReadGuid();
-            GroundPoundActivatedAbilityID = Reader.ReadGuid();
-            CloseFistActivatedAbilityID = Reader.ReadGuid();
+            // HunchOverActivatedAbilityID = Reader.ReadGuid();
+            // GroundPoundActivatedAbilityID = Reader.ReadGuid();
+            // CloseFistActivatedAbilityID = Reader.ReadGuid();
         }
+        */
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

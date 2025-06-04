@@ -41,31 +41,37 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public override string GetInstanceDescription()
+        public override string GetInstanceDescription(GameObject Object = null)
         {
-            string text = ParentObject.GetObjectNoun();
+            Object ??= ParentObject;
+            string text = Object?.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            int dieSize = GetDamageDieSize();
-            int damageBonus = GetDamageBonus();
             string description = $"{descriptionName}: ";
-            description += ParentObject.IsPlural
+            description += Object != null && Object.IsPlural
                         ? ("These " + Grammar.Pluralize(text) + " ")
                         : ("This " + text + " ");
 
-            List<List<string>> descriptions = new();
-            if (dieSize > 0 && (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())) descriptions
-                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
+            string pluralPossessive = Object.IsPlural ? "their" : "its";
+            int dieSize = GetDamageDieSize();
+            int damageBonus = GetDamageBonus();
 
-            if (damageBonus != 0) descriptions
-                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
-            descriptions
-                    .Add(new() { "", $"{pluralPossessive} bonus damage scales by half {pluralPossessive} wielder's Strength Modifier" });
+            List<List<string>> descriptions = new();
+            if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
+            {
+                descriptions.AddDescription("gain", $"{dieSize.Signed()} damage die size");
+            }
+
+            if (damageBonus != 0)
+            {
+                descriptions.AddDescription("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+            }
+
+            descriptions.AddDescription("", $"{pluralPossessive} bonus damage scales by half {pluralPossessive} wielder's Strength Modifier");
 
             List<string> processedDescriptions = new();
             foreach(List<string> entry in descriptions)
             {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, Object));
             }
 
             return description += Grammar.MakeAndList(processedDescriptions) + ".";

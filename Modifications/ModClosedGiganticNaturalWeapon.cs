@@ -44,14 +44,15 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public override string GetInstanceDescription()
+        public override string GetInstanceDescription(GameObject Object = null)
         {
-            string objectNoun = ParentObject.GetObjectNoun();
+            Object ??= ParentObject;
+            string text = Object?.GetObjectNoun();
             string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
             string description = $"{descriptionName}: ";
-            description += ParentObject.IsPlural
-                        ? ("These " + Grammar.Pluralize(objectNoun) + " ")
-                        : ("This " + objectNoun + " ");
+            description += Object != null && Object.IsPlural
+                        ? ("These " + Grammar.Pluralize(text) + " ")
+                        : ("This " + text + " ");
 
             List<List<string>> descriptions = new()
             {
@@ -62,7 +63,7 @@ namespace XRL.World.Parts
             List<string> processedDescriptions = new();
             foreach (List<string> entry in descriptions)
             {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
+                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, Object));
             }
 
             return description += Grammar.MakeAndList(processedDescriptions) + ".";

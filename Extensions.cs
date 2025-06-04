@@ -2289,5 +2289,30 @@ namespace HNPS_GigantismPlus
             return @string.Append(" ({{r|D}})");
         }
 
+        public static List<List<string>> AddDescription(this List<List<string>> Descriptions, string Relationship, string Effect)
+        {
+            Descriptions.Add(new() { Relationship, Effect });
+            return Descriptions;
+        }
+        public static List<List<string>> RemoveDescription(this List<List<string>> Descriptions, string Relationship, string Effect)
+        {
+            List<List<string>> elementsToRemove = new()
+            {
+                new List<string>() { Relationship, Effect },
+            };
+            List<List<string>> InumerateDescriptions = new(Descriptions);
+            if (!InumerateDescriptions.IsNullOrEmpty())
+            {
+                foreach (List<string> entry in InumerateDescriptions)
+                {
+                    if (elementsToRemove.Contains(entry))
+                    {
+                        Descriptions.Remove(entry);
+                    }
+                }
+            }
+            return Descriptions;
+        }
+
     } //!-- Extensions
 }

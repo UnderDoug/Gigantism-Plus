@@ -363,7 +363,7 @@ namespace XRL.World.Parts.Mutation
             {
                 foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
                 {
-                    Writer.WriteOptimized(bodyPartType);
+                    Writer.Write(bodyPartType);
                     naturalEquipmentMod.Write(Basis, Writer);
                 }
             }
@@ -379,7 +379,7 @@ namespace XRL.World.Parts.Mutation
             int naturalEquipmentModsCount = Reader.ReadInt32();
             for (int i = 0; i < naturalEquipmentModsCount; i++)
             {
-                NaturalEquipmentMods.Add(Reader.ReadOptimizedString(), (ModNaturalEquipment<T>)Reader.ReadObject());
+                NaturalEquipmentMods.Add(Reader.ReadString(), (ModNaturalEquipment<T>)Reader.ReadObject());
             }
 
             NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject();

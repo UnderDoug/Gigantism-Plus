@@ -98,8 +98,13 @@ namespace XRL.World.Parts.Mutation
             set => _giganticExoframe = value;
         }
 
+        [NonSerialized]
         public Guid HunchOverActivatedAbilityID = Guid.Empty;
+
+        [NonSerialized]
         public Guid GroundPoundActivatedAbilityID = Guid.Empty;
+
+        [NonSerialized]
         public Guid CloseFistActivatedAbilityID = Guid.Empty;
 
         public static readonly string COMMAND_NAME_HUNCH_OVER = "CommandToggleGigantismPlusHunchOver";
@@ -1388,35 +1393,41 @@ namespace XRL.World.Parts.Mutation
             return ToggledOn;
         }
 
-        /*
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
 
-            // Writer.Write(HunchOverActivatedAbilityID);
-            // Writer.Write(GroundPoundActivatedAbilityID);
-            // Writer.Write(CloseFistActivatedAbilityID);
+            Writer.Write(HunchOverActivatedAbilityID);
+            Writer.Write(GroundPoundActivatedAbilityID);
+            Writer.Write(CloseFistActivatedAbilityID);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
 
-            // HunchOverActivatedAbilityID = Reader.ReadGuid();
-            // GroundPoundActivatedAbilityID = Reader.ReadGuid();
-            // CloseFistActivatedAbilityID = Reader.ReadGuid();
+            HunchOverActivatedAbilityID = Reader.ReadGuid();
+            GroundPoundActivatedAbilityID = Reader.ReadGuid();
+            CloseFistActivatedAbilityID = Reader.ReadGuid();
         }
-        */
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             GigantismPlus gigantism = base.DeepCopy(Parent, MapInv) as GigantismPlus;
+
             gigantism.NaturalEquipmentMods = new();
-            foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
+            NaturalEquipmentMods ??= new();
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                gigantism.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, gigantism));
+                foreach ((_, ModNaturalEquipment<GigantismPlus> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    gigantism.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, gigantism));
+                }
             }
-            gigantism.NaturalEquipmentMod = new(NaturalEquipmentMod, gigantism);
+
+            gigantism.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), gigantism);
+
             gigantism.GiganticExoframe = null;
+
             return gigantism;
         }
 

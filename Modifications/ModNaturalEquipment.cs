@@ -44,7 +44,6 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        [NonSerialized]
         private T _assigningPart = null;
 
         public T AssigningPart

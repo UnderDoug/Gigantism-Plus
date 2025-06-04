@@ -1,14 +1,16 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
 
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
+
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
@@ -41,29 +43,25 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        // Dictionary holds a BodyPart.Type string as Key, and naturalEquipmentMod for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via naturalEquipmentMod.Type).
+        [SerializeField]
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
+
+        [SerializeField]
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+
         public int Level { get; set; }
 
         private GameObject _implantee = null;
         public GameObject Implantee
         {
-            get
-            {
-                return _implantee ??= ImplantObject?.Equipped;
-            }
+            get => _implantee ??= ImplantObject?.Equipped;
             set => _implantee = value == null ? null : _implantee;
         }
 
         private GameObject _implantObject = null;
         public GameObject ImplantObject
         {
-            get
-            {
-                return _implantObject ??= ParentObject;
-            }
+            get =>_implantObject ??= ParentObject;
             set => _implantObject = value == null ? null : _implantObject;
         }
 
@@ -374,16 +372,7 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
-            NaturalEquipmentMods ??= new();
-            Writer.Write(NaturalEquipmentMods.Count);
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
-            {
-                foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    Writer.WriteOptimized(bodyPartType);
-                    naturalEquipmentMod.Write(Basis, Writer);
-                }
-            }
+            Writer.Write(NaturalEquipmentMods ??= new());
 
             NaturalEquipmentMod ??= new();
             NaturalEquipmentMod.Write(Basis, Writer);
@@ -392,14 +381,8 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
 
-            NaturalEquipmentMods = new();
-            int naturalEquipmentModsCount = Reader.ReadInt32();
-            for (int i = 0; i < naturalEquipmentModsCount; i++)
-            {
-                NaturalEquipmentMods.Add(Reader.ReadOptimizedString(), (ModNaturalEquipment<T>)Reader.ReadObject());
-            }
-
-            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject();
+            NaturalEquipmentMods = Reader.ReadDictionary<string, ModNaturalEquipment<T>>() ?? new();
+            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject() ?? new();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
@@ -415,8 +398,7 @@ namespace XRL.World.Parts
                 }
             }
 
-            NaturalEquipmentMod ??= new();
-            cybernetic.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)cybernetic);
+            cybernetic.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), (T)cybernetic);
 
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;

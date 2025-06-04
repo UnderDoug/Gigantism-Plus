@@ -679,9 +679,8 @@ namespace HNPS_GigantismPlus
 
         public static IPart ConvertToPart(this string Part)
         {
-            GamePartBlueprint gamePartBlueprint = new(Part);
-            IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
-            return part;
+            GamePartBlueprint gamePartBlueprint = new (Part);
+            return gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
         }
 
         public static IModification ConvertToModification(this string ModPartName)
@@ -690,7 +689,7 @@ namespace HNPS_GigantismPlus
             Type type = ModManager.ResolveType("XRL.World.Parts." + ModPartName);
             if (type == null)
             {
-                MetricsManager.LogError("ConvertToModification", "Couldn'type resolve unknown mod part: " + ModPartName);
+                MetricsManager.LogError(nameof(ConvertToModification), "Couldn't resolve unknown mod part: " + ModPartName);
                 return null;
             }
             ModPart = Activator.CreateInstance(type) as IModification;
@@ -710,7 +709,11 @@ namespace HNPS_GigantismPlus
         }
 
         public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
-            where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
+            where T 
+            : IPart
+            , IModEventHandler<ManageDefaultEquipmentEvent>
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
         {
             IModification ModPart = ModPartName.ConvertToModification();
             return (ModNaturalEquipment<T>)ModPart;

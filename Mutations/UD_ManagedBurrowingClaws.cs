@@ -422,16 +422,7 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
 
-            NaturalEquipmentMods ??= new();
-            Writer.Write(NaturalEquipmentMods.Count);
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
-            {
-                foreach ((string bodyPartType, ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    Writer.WriteOptimized(bodyPartType);
-                    naturalEquipmentMod.Write(Basis, Writer);
-                }
-            }
+            Writer.Write(NaturalEquipmentMods ??= new());
 
             NaturalEquipmentMod ??= new();
             NaturalEquipmentMod.Write(Basis, Writer);
@@ -440,14 +431,8 @@ namespace XRL.World.Parts.Mutation
         {
             base.Read(Basis, Reader);
 
-            NaturalEquipmentMods = new();
-            int naturalEquipmentModsCount = Reader.ReadInt32();
-            for (int i = 0; i < naturalEquipmentModsCount; i++)
-            {
-                NaturalEquipmentMods.Add(Reader.ReadOptimizedString(), (ModNaturalEquipment<UD_ManagedBurrowingClaws>)Reader.ReadObject());
-            }
-
-            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedBurrowingClaws>)Reader.ReadObject();
+            NaturalEquipmentMods = Reader.ReadDictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>>() ?? new();
+            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedBurrowingClaws>)Reader.ReadObject() ?? new();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
@@ -463,8 +448,7 @@ namespace XRL.World.Parts.Mutation
                 }
             }
 
-            NaturalEquipmentMod ??= new();
-            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, mutation);
+            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), mutation);
 
             return mutation;
         }

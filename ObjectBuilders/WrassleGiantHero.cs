@@ -902,11 +902,26 @@ namespace XRL.World.ObjectBuilders
             int startingMP = Creature.Stat("MP");
             if (startingMP > 0)
             {
+                int lastRemaining = 0;
+                int lastPoints = 0;
+                bool stuck = false;
+                int maxAttempts = 200;
                 Debug.CheckYeh(4, $"Total MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
                 Debug.Divider(4, HONLY, Count: 25, Indent: 3, Toggle: getDoDebug());
-                while (Creature.Stat("MP") > 0)
+                while (Creature.Stat("MP") > 0 && Creature.Stat("MP") != lastRemaining && !stuck && --maxAttempts > 0)
                 {
                     int pointsToSpend = Stat.Roll($"1d{Math.Max(1, Math.Min(Creature.Stat("MP"), 4))}");
+                    if (lastRemaining == Creature.Stat("MP"))
+                    {
+                        stuck = true;
+                        pointsToSpend += lastPoints;
+                    }
+                    else
+                    {
+                        stuck = false;
+                    }
+                    lastPoints = pointsToSpend;
+                    lastRemaining = Creature.Stat("MP");
                     Debug.LoopItem(4, $"Spending: {pointsToSpend}", Indent: 3, Toggle: getDoDebug());
                     Creature.RandomlySpendPoints(maxAPtospend: 0, maxSPtospend: 0, maxMPtospend: pointsToSpend);
                     Debug.LoopItem(4, $"Remaining: {Creature.Stat("MP")}", Indent: 4, Toggle: getDoDebug());

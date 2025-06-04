@@ -215,12 +215,19 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
+
             elongatedPaws.NaturalEquipmentMods = new();
-            foreach ((_, ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod) in NaturalEquipmentMods)
+            NaturalEquipmentMods ??= new();
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                elongatedPaws.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, elongatedPaws));
+                foreach ((_, ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    elongatedPaws.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, elongatedPaws));
+                }
             }
-            elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
+
+            elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), elongatedPaws);
+
             return elongatedPaws;
         }
 

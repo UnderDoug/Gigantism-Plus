@@ -653,50 +653,23 @@ namespace XRL.World.Parts
             Writer.Write(AccumulatedDamageDie.Size);
             Writer.Write(AccumulatedDamageDie.Bonus);
 
-            ShortDescriptions ??= new();
-            Writer.Write(ShortDescriptions.Count);
-            if (!ShortDescriptions.IsNullOrEmpty())
-            {
-                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in ShortDescriptions)
-                {
-                    Writer.Write(priority);
-                    naturalEquipmentMod.Write(Basis, Writer);
-                }
-            }
-
-            NaturalEquipmentMods ??= new();
-            Writer.Write(NaturalEquipmentMods.Count);
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
-            {
-                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    Writer.Write(priority);
-                    naturalEquipmentMod.Write(Basis, Writer);
-                }
-            }
+            Writer.Write(ShortDescriptions ??= new());
+            Writer.Write(NaturalEquipmentMods ??= new());
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
 
-            AccumulatedDamageDie.Count = Reader.ReadInt32();
-            AccumulatedDamageDie.Size = Reader.ReadInt32();
-            AccumulatedDamageDie.Bonus = Reader.ReadInt32();
-
-            ShortDescriptions = new();
-            int shortDescriptionsCount = Reader.ReadInt32();
-            for (int i = 0; i < shortDescriptionsCount; i++)
+            AccumulatedDamageDie = new()
             {
-                ShortDescriptions.Add(Reader.ReadInt32(), (ModNaturalEquipmentBase)Reader.ReadObject());
-            }
+                Count = Reader.ReadInt32(),
+                Size = Reader.ReadInt32(),
+                Bonus = Reader.ReadInt32()
+            };
 
-            NaturalEquipmentMods = new();
-            int naturalEquipmentModsCount = Reader.ReadInt32();
-            for (int i = 0; i < naturalEquipmentModsCount; i++)
-            {
-                NaturalEquipmentMods.Add(Reader.ReadInt32(), (ModNaturalEquipmentBase)Reader.ReadObject());
-            }
-
+            ShortDescriptions = new SortedDictionary<int, ModNaturalEquipmentBase>(Reader.ReadDictionary<int, ModNaturalEquipmentBase>()) ?? new();
+            NaturalEquipmentMods = new SortedDictionary<int, ModNaturalEquipmentBase>(Reader.ReadDictionary<int, ModNaturalEquipmentBase>()) ?? new();
+            
             AdjustmentTargets = GetEmptyAdjustmentTargets();
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {

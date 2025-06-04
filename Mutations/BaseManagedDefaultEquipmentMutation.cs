@@ -10,6 +10,8 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 
+using SerializeField = UnityEngine.SerializeField;
+
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
@@ -41,9 +43,10 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
-        // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
+        [SerializeField]
         public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
+
+        [SerializeField]
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
 
         public BaseManagedDefaultEquipmentMutation()
@@ -357,17 +360,8 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
 
-            NaturalEquipmentMods ??= new();
-            Writer.Write(NaturalEquipmentMods.Count);
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
-            {
-                foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    Writer.Write(bodyPartType);
-                    naturalEquipmentMod.Write(Basis, Writer);
-                }
-            }
-
+            Writer.Write(NaturalEquipmentMods ??= new());
+            
             NaturalEquipmentMod ??= new();
             NaturalEquipmentMod.Write(Basis, Writer);
         }
@@ -375,14 +369,8 @@ namespace XRL.World.Parts.Mutation
         {
             base.Read(Basis, Reader);
 
-            NaturalEquipmentMods = new();
-            int naturalEquipmentModsCount = Reader.ReadInt32();
-            for (int i = 0; i < naturalEquipmentModsCount; i++)
-            {
-                NaturalEquipmentMods.Add(Reader.ReadString(), (ModNaturalEquipment<T>)Reader.ReadObject());
-            }
-
-            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject();
+            NaturalEquipmentMods = Reader.ReadDictionary<string, ModNaturalEquipment<T>>() ?? new();
+            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject() ?? new();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
@@ -398,8 +386,7 @@ namespace XRL.World.Parts.Mutation
                 }
             }
 
-            NaturalEquipmentMod ??= new();
-            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)mutation);
+            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), (T)mutation);
 
             return mutation;
         }

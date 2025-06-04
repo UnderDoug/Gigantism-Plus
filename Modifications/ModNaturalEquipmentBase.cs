@@ -19,7 +19,7 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
-        public class HNPS_Adjustment : IScribedPart
+        public class HNPS_Adjustment : IScribedPart, IComposite
         {
             public Guid ID;
 
@@ -30,6 +30,15 @@ namespace XRL.World.Parts
             public new int Priority; // Priority of adjustment, lower number = higher priority
 
             public string Value; // Value of the adjustment.
+
+            public HNPS_Adjustment()
+            {
+                ID = Guid.Empty;
+                Target = string.Empty;
+                Field = string.Empty;
+                Priority = 0;
+                Value = string.Empty;
+            }
 
             public HNPS_Adjustment(HNPS_Adjustment Source)
             {
@@ -76,30 +85,6 @@ namespace XRL.World.Parts
                 }
                 return false;
             }
-
-            public HNPS_Adjustment Copy(HNPS_Adjustment Source)
-            {
-                HNPS_Adjustment output = new(Source);
-                return output;
-            }
-
-            public override void Write(GameObject Basis, SerializationWriter Writer)
-            {
-                Writer.Write(ID);
-                Writer.Write(Target);
-                Writer.Write(Field);
-                Writer.Write(Priority);
-                Writer.Write(Value);
-            }
-
-            public override void Read(GameObject Basis, SerializationReader Reader)
-            {
-                ID = Reader.ReadGuid();
-                Target = Reader.ReadString();
-                Field = Reader.ReadString();
-                Priority = Reader.ReadInt32();
-                Value = Reader.ReadString();
-            }
         }
 
         [NonSerialized]
@@ -127,8 +112,13 @@ namespace XRL.World.Parts
         public string AdjectiveColor;
         public string AdjectiveColorFallback;
 
+        [NonSerialized]
         public List<string> AddedParts = new();
+
+        [NonSerialized]
         public Dictionary<string, string> AddedStringProps = new();
+
+        [NonSerialized]
         public Dictionary<string, int> AddedIntProps = new();
 
         public ModNaturalEquipmentBase()
@@ -195,12 +185,15 @@ namespace XRL.World.Parts
         }
         public abstract string GetSource();
 
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetDisplayNameEvent>.ID;
         }
-
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
             return base.HandleEvent(E);
@@ -222,35 +215,23 @@ namespace XRL.World.Parts
             return DescriptionPriority;
         }
 
-        public override bool AllowStaticRegistration()
-        {
-            return true;
-        }
-
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
 
-            Adjustments ??= new();
-            Writer.Write(Adjustments.Count);
-            if (!Adjustments.IsNullOrEmpty())
-            {
-                foreach (HNPS_Adjustment Adjustment in Adjustments)
-                {
-                    Adjustment.Write(Basis, Writer);
-                }
-            }
+            Writer.Write(Adjustments ??= new());
+            Writer.Write(AddedParts ??= new());
+            Writer.Write(AddedStringProps ??= new());
+            Writer.Write(AddedIntProps ??= new());
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
 
-            Adjustments = new();
-            int adjustmentsCount = Reader.ReadInt32();
-            for (int i = 0; i < adjustmentsCount; i++)
-            {
-                Adjustments.Add((HNPS_Adjustment)Reader.ReadObject());
-            }
+            Adjustments = Reader.ReadList<HNPS_Adjustment>() ?? new();
+            AddedParts = Reader.ReadList<string>() ?? new();
+            AddedStringProps = Reader.ReadDictionary<string, string>() ?? new();
+            AddedIntProps = Reader.ReadDictionary<string, int>() ?? new();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

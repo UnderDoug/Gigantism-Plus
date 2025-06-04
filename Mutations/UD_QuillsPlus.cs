@@ -48,6 +48,7 @@ namespace XRL.World.Parts.Mutation
 
         public static readonly string COMMAND_NAME = "CommandQuillFling";
 
+        [NonSerialized]
         public Guid QuillFlingActivatedAbilityID = Guid.Empty;
 
         [NonSerialized]

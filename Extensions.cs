@@ -134,14 +134,22 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static int GetNaturalWeaponModsCount(this GameObject GO)
+        public static int GetNaturalEquipmentModsCount(this GameObject GO)
         {
             List<ModNaturalEquipmentBase> naturalEquipmentMods = GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
             return naturalEquipmentMods.Count;
         }
-        public static bool HasNaturalWeaponMods(this GameObject GO)
+        public static bool HasNaturalEquipmentMods(this GameObject GO)
         {
             return GO.HasPartDescendedFrom<ModNaturalEquipmentBase>();
+        }
+        public static List<ModNaturalEquipmentBase> GetNaturalEquipmentMods(this GameObject GO)
+        {
+            return GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
+        }
+        public static List<ModNaturalEquipmentBase> GetPrioritisedNaturalEquipmentMods(this GameObject GO)
+        {
+            return GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
         }
 
         public static string BonusOrPenalty(this int Int) 
@@ -711,7 +719,7 @@ namespace HNPS_GigantismPlus
         public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
             where T 
             : IPart
-            , IModEventHandler<ManageDefaultEquipmentEvent>
+            , IModEventHandler<ManageDefaultNaturalEquipmentEvent>
             , IManagedDefaultNaturalEquipment<T>
             , new()
         {

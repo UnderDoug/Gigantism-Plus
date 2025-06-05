@@ -14,9 +14,9 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
-    public class AfterManageDefaultEquipmentEvent : ModPooledEvent<AfterManageDefaultEquipmentEvent>
+    public class AfterManageDefaultNaturalEquipmentEvent : ModPooledEvent<AfterManageDefaultNaturalEquipmentEvent>
     {
-        private static bool doDebug => getClassDoDebug(nameof(AfterManageDefaultEquipmentEvent));
+        private static bool doDebug => getClassDoDebug(nameof(AfterManageDefaultNaturalEquipmentEvent));
 
         public new static readonly int CascadeLevel = CASCADE_NONE; // CASCADE_ALL;
 
@@ -26,26 +26,26 @@ namespace HNPS_GigantismPlus
 
         public BodyPart BodyPart;
 
-        public AfterManageDefaultEquipmentEvent()
+        public AfterManageDefaultNaturalEquipmentEvent()
         {
         }
 
-        public AfterManageDefaultEquipmentEvent(GameObject Equipment, NaturalEquipmentManager Manager, BodyPart BodyPart)
+        public AfterManageDefaultNaturalEquipmentEvent(GameObject Equipment, NaturalEquipmentManager Manager, BodyPart BodyPart)
             : this()
         {
-            AfterManageDefaultEquipmentEvent @new = FromPool(Equipment, Manager, BodyPart);
+            AfterManageDefaultNaturalEquipmentEvent @new = FromPool(Equipment, Manager, BodyPart);
             this.Equipment = @new.Equipment;
             this.Manager = @new.Manager;
             this.BodyPart = @new.BodyPart;
         }
-        public AfterManageDefaultEquipmentEvent(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
+        public AfterManageDefaultNaturalEquipmentEvent(ManageDefaultNaturalEquipmentEvent ManageDefaultEquipmentEvent)
             : this(
                   Equipment: ManageDefaultEquipmentEvent.Equipment, 
                   Manager: ManageDefaultEquipmentEvent.Manager, 
                   BodyPart: ManageDefaultEquipmentEvent.BodyPart)
         {
         }
-        public AfterManageDefaultEquipmentEvent(AfterManageDefaultEquipmentEvent Source)
+        public AfterManageDefaultNaturalEquipmentEvent(AfterManageDefaultNaturalEquipmentEvent Source)
             : this(Source.Equipment, Source.Manager, Source.BodyPart)
         {
         }
@@ -56,7 +56,7 @@ namespace HNPS_GigantismPlus
 
         public virtual string GetRegisteredEventID()
         {
-            return $"{nameof(AfterManageDefaultEquipmentEvent)}";
+            return $"{nameof(AfterManageDefaultNaturalEquipmentEvent)}";
         }
 
         public override void Reset()
@@ -67,17 +67,17 @@ namespace HNPS_GigantismPlus
             BodyPart = null;
         }
 
-        public static void Send(ManageDefaultEquipmentEvent ManageDefaultEquipmentEvent)
+        public static void Send(ManageDefaultNaturalEquipmentEvent ManageDefaultEquipmentEvent)
         {
             GameObject Creature = ManageDefaultEquipmentEvent?.Creature;
             GameObject Equipment = ManageDefaultEquipmentEvent?.Equipment;
             Debug.Entry(4,
-                $"! {nameof(AfterManageDefaultEquipmentEvent)}."
-                + $"{nameof(Send)}({typeof(ManageDefaultEquipmentEvent).Name}) for "
+                $"! {nameof(AfterManageDefaultNaturalEquipmentEvent)}."
+                + $"{nameof(Send)}({typeof(ManageDefaultNaturalEquipmentEvent).Name}) for "
                 + $"{Creature?.DebugName ?? NULL}'s {Equipment?.DebugName ?? NULL}",
                 Indent: 0, Toggle: doDebug);
 
-            AfterManageDefaultEquipmentEvent E = new(ManageDefaultEquipmentEvent);
+            AfterManageDefaultNaturalEquipmentEvent E = new(ManageDefaultEquipmentEvent);
 
             bool validEquipment = E.Equipment != null;
             bool limbExists = E.BodyPart != null;
@@ -110,9 +110,9 @@ namespace HNPS_GigantismPlus
             E.Reset();
         }
 
-        public static AfterManageDefaultEquipmentEvent FromPool(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
+        public static AfterManageDefaultNaturalEquipmentEvent FromPool(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
         {
-            AfterManageDefaultEquipmentEvent afterManageDefaultEquipmentEvent = FromPool();
+            AfterManageDefaultNaturalEquipmentEvent afterManageDefaultEquipmentEvent = FromPool();
             afterManageDefaultEquipmentEvent.Equipment = Object;
             afterManageDefaultEquipmentEvent.Manager = Manager;
             afterManageDefaultEquipmentEvent.BodyPart = BodyPart;

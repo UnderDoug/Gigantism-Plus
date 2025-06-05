@@ -54,7 +54,7 @@ namespace HNPS_GigantismPlus.Harmony
                 BeforeBodyPartsUpdatedEvent.Send(@this.ParentObject);
 
                 // This one tells each ManagedNaturalEquipment source to update its stored NaturalEquipmentMods
-                UpdateNaturalEquipmentModsEvent.Send(@this.ParentObject);
+                // UpdateNaturalEquipmentModsEvent.Send(@this.ParentObject);
             }
 
             Debug.Entry(4,

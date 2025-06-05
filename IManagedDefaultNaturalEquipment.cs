@@ -19,7 +19,7 @@ namespace XRL.World
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
+        public List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
         public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
 
         public abstract bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts);
@@ -42,23 +42,25 @@ namespace XRL.World
 
         public abstract Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod);
 
-        public abstract bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
+        public abstract List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null);
+
+        public abstract ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
+
+        public abstract List<ModNaturalEquipment<T>> UpdateNaturalEquipmentMods(List<ModNaturalEquipment<T>> NaturalEquipmentMods, int Level = 1);
     }
 
     public interface IManagedDefaultNaturalEquipment 
         : IModEventHandler<BeforeBodyPartsUpdatedEvent>
-        , IModEventHandler<UpdateNaturalEquipmentModsEvent>
         , IModEventHandler<AfterBodyPartsUpdatedEvent>
-        , IModEventHandler<BeforeManageDefaultEquipmentEvent>
-        , IModEventHandler<ManageDefaultEquipmentEvent>
-        , IModEventHandler<AfterManageDefaultEquipmentEvent>
+        , IModEventHandler<GetPrioritisedNaturalEquipmentModsEvent>
+        , IModEventHandler<BeforeManageDefaultNaturalEquipmentEvent>
+        , IModEventHandler<ManageDefaultNaturalEquipmentEvent>
+        , IModEventHandler<AfterManageDefaultNaturalEquipmentEvent>
         , IModEventHandler<BeforeRapidAdvancementEvent>
         , IModEventHandler<AfterRapidAdvancementEvent>
     {
         public int Level { get; set; }
 
-        public abstract bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart);
-        public abstract void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart);
-        public abstract void OnUpdateNaturalEquipmentMods();
+        public abstract void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart);
     }
 }

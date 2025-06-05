@@ -42,9 +42,6 @@ namespace XRL.World.Parts.Mutation
 
         public ElongatedPaws()
         {
-            // SetDisplayName("{{giant|Elongated Paws}}"); //.OptionalColorGiant(Colorfulness);
-            // Type = "Physical";
-
             NaturalEquipmentMod = NewNaturalWeaponMod(this);
         }
 
@@ -216,17 +213,10 @@ namespace XRL.World.Parts.Mutation
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
 
-            elongatedPaws.NaturalEquipmentMods = new();
-            NaturalEquipmentMods ??= new();
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            if (NaturalEquipmentMod != null)
             {
-                foreach ((_, ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    elongatedPaws.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, elongatedPaws));
-                }
+                elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
             }
-
-            elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), elongatedPaws);
 
             return elongatedPaws;
         }

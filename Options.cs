@@ -114,9 +114,9 @@ namespace HNPS_GigantismPlus
             { nameof(BeforeBodyPartsUpdatedEvent), false },
             { nameof(BeforeDescribeModGiganticEvent), false },
             { nameof(DescribeModGiganticEvent), false },
-            { nameof(AfterManageDefaultEquipmentEvent), false },
-            { nameof(BeforeManageDefaultEquipmentEvent), false },
-            { nameof(ManageDefaultEquipmentEvent), false },
+            { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
+            { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
+            { nameof(ManageDefaultNaturalEquipmentEvent), false },
             { nameof(AfterModGiganticAppliedEvent), false },
             { nameof(BeforeModGiganticAppliedEvent), false },
             { nameof(AfterRapidAdvancementEvent), false },
@@ -124,7 +124,7 @@ namespace HNPS_GigantismPlus
             { nameof(BeforeVaultEvent), false },
             { nameof(VaultedEvent), false },
             { nameof(CrayonsGetColorsEvent), false },
-            { nameof(UpdateNaturalEquipmentModsEvent), false },
+            { nameof(GetPrioritisedNaturalEquipmentModsEvent), false },
 
             // Handlers
             { nameof(CrayonsGetColorHandler), false },

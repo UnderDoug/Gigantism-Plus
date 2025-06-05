@@ -38,9 +38,7 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
-        // Dictionary holds a BodyPart.Type string as Key, and NaturalEquipmentMod for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via NaturalEquipmentMod.Type).
-        public Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods { get; set; }
+        public List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods => GetNaturalEquipmentMods();
         public ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod { get; set; }
 
         public UD_ManagedBurrowingClaws NaturalWeaponManager { get; set; }
@@ -54,37 +52,13 @@ namespace XRL.World.Parts.Mutation
         public UD_ManagedBurrowingClaws()
             : base()
         {
-            NaturalEquipmentMods = new();
-
             NaturalEquipmentMod = NewBurrowingClawMod(this);
-        }
-        public UD_ManagedBurrowingClaws(
-            Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods, 
-            UD_ManagedBurrowingClaws NewParent)
-            : this()
-        {
-            Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> NewNaturalEquipmentMods = new();
-            foreach ((string BodyPartType, ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
-                NewNaturalEquipmentMods.Add(BodyPartType, naturalEquipmentMod);
-            }
-            this.NaturalEquipmentMods = NewNaturalEquipmentMods;
         }
 
         public UD_ManagedBurrowingClaws(
             ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, 
             UD_ManagedBurrowingClaws NewParent)
             : this()
-        {
-            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
-        }
-
-        public UD_ManagedBurrowingClaws(
-            Dictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods,
-            ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod,
-            UD_ManagedBurrowingClaws NewParent)
-            : this(NaturalEquipmentMods, NewParent)
         {
             this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
@@ -116,13 +90,13 @@ namespace XRL.World.Parts.Mutation
 
                 AddedParts = new()
                 {
-                    "DiggingTool"
+                    nameof(DiggingTool),
                 },
 
                 AddedStringProps = new()
                 {
                     { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" }
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
                 },
             };
             burrowingClawsMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
@@ -206,6 +180,17 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedIntProps;
         }
+        public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, UD_ManagedBurrowingClaws NewAssigner = null)
+        {
+            NewAssigner ??= this;
+            List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentModsList = new();
+            if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
+            {
+                NaturalEquipmentMod.AssigningPart = NewAssigner;
+                naturalEquipmentModsList.Add(NaturalEquipmentMod);
+            }
+            return naturalEquipmentModsList;
+        }
 
         public override bool Mutate(GameObject GO, int Level)
         {
@@ -224,7 +209,7 @@ namespace XRL.World.Parts.Mutation
             base.Remove();
         }
 
-        public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level)
+        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level)
         {
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
@@ -236,51 +221,30 @@ namespace XRL.World.Parts.Mutation
             NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
-            return true;
+
+            return NaturalEquipmentMod;
         }
+        public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> UpdateNaturalEquipmentMods(List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods, int Level)
+        {
+            Debug.Entry(4,
+                $"* {nameof(UD_ManagedBurrowingClaws)}."
+                + $"{nameof(UpdateNaturalEquipmentMods)}(List<ModNaturalEquipment<{nameof(UD_ManagedBurrowingClaws)}> NaturalEquipmentMods, int Level: {Level})",
+                Indent: 2, Toggle: getDoDebug());
+
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach (ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod in NaturalEquipmentMods)
+                {
+                    UpdateNaturalEquipmentMod(naturalEquipmentMod, Level);
+                }
+            }
+
+            return NaturalEquipmentMods;
+        }
+
         public override bool ChangeLevel(int NewLevel)
         {
             return base.ChangeLevel(NewLevel);
-        }
-
-        public virtual bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
-        {
-            Debug.Entry(4,
-                $"@ {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(ProcessNaturalEquipment)}",
-                Indent: 1, Toggle: getDoDebug());
-
-            string targetType = TargetBodyPart.Type;
-            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2, Toggle: getDoDebug());
-            ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = null;
-            if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
-            {
-                naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
-                Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
-            }
-            else
-            {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Property does not contain an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
-            }
-
-            if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
-            {
-                naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
-                Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2, Toggle: getDoDebug());
-            }
-            else
-            {
-                Debug.CheckNah(4, $"NaturalEquipmentMod Dictionary does not contain an entry for this BodyPart", Indent: 2, Toggle: getDoDebug());
-            }
-            Debug.Entry(4,
-                $"x {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(ProcessNaturalEquipment)} @//",
-                Indent: 1, Toggle: getDoDebug());
-            return true;
         }
 
         public override void OnRegenerateDefaultEquipment(Body body)
@@ -292,31 +256,21 @@ namespace XRL.World.Parts.Mutation
         {
             base.OnDecorateDefaultEquipment(body);
         }
-        public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
+        public virtual void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{nameof(UD_ManagedBurrowingClaws)}", $"{nameof(OnManageNaturalEquipment)}(body)", Toggle: getDoDebug());
+            Debug.Header(4, $"{nameof(UD_ManagedBurrowingClaws)}", $"{nameof(OnManageDefaultNaturalEquipment)}(body)", Toggle: getDoDebug());
             Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: getDoDebug());
-            ProcessNaturalEquipment(Manager, TargetBodyPart);
-            Debug.Divider(4, "-", Count: 25, Indent: 1, Toggle: getDoDebug());
+            // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
+
+            // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
             Debug.Footer(4,
                 $"{nameof(UD_ManagedBurrowingClaws)}",
-                $"{nameof(OnManageNaturalEquipment)}(body of: {ParentObject?.Blueprint})", Toggle: getDoDebug());
-        }
-        public virtual void OnUpdateNaturalEquipmentMods()
-        {
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1, Toggle: getDoDebug());
-            foreach ((_, ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            }
-            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1, Toggle: getDoDebug());
+                $"{nameof(OnManageDefaultNaturalEquipment)}(body of: {ParentObject?.Blueprint})", Toggle: getDoDebug());
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -328,49 +282,45 @@ namespace XRL.World.Parts.Mutation
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == UpdateNaturalEquipmentModsEvent.ID
-                || ID == ManageDefaultEquipmentEvent.ID
+                || ID == GetPrioritisedNaturalEquipmentModsEvent.ID
+                || ID == ManageDefaultNaturalEquipmentEvent.ID
                 || ID == PartSupportEvent.ID;
         }
         public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
-        {
-            Debug.Entry(4,
-                $"@ {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(HandleEvent)}({nameof(UpdateNaturalEquipmentModsEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
-
-            if (E.Creature == ParentObject)
-            {
-                OnUpdateNaturalEquipmentMods();
-            }
-            return base.HandleEvent(E);
-        }
         public virtual bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(BeforeManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)
+        {
+            List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentMods = UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(mod => mod.BodyPartType == E.TargetBodyPart.Type), Level);
+            foreach (ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod in naturalEquipmentMods)
+            {
+                E.AddNaturalEquipmentMod(naturalEquipmentMod);
+            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(BeforeManageDefaultNaturalEquipmentEvent E)
         {
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(ManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(ManageDefaultNaturalEquipmentEvent E)
         {
             Debug.Entry(4,
                 $"@ {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(HandleEvent)}({nameof(ManageDefaultEquipmentEvent)} E)",
+                + $"{nameof(HandleEvent)}({nameof(ManageDefaultNaturalEquipmentEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)
             {
-                OnManageNaturalEquipment(E.Manager, E.BodyPart);
+                OnManageDefaultNaturalEquipment(E.Manager, E.BodyPart);
             }
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(AfterManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)
         {
             return base.HandleEvent(E);
         }
@@ -422,33 +372,23 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
 
-            Writer.Write(NaturalEquipmentMods ??= new());
-
-            NaturalEquipmentMod ??= new();
             NaturalEquipmentMod.Write(Basis, Writer);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
 
-            NaturalEquipmentMods = Reader.ReadDictionary<string, ModNaturalEquipment<UD_ManagedBurrowingClaws>>() ?? new();
-            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedBurrowingClaws>)Reader.ReadObject() ?? new();
+            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedBurrowingClaws>)Reader.ReadObject();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             UD_ManagedBurrowingClaws mutation = base.DeepCopy(Parent, MapInv) as UD_ManagedBurrowingClaws;
 
-            mutation.NaturalEquipmentMods = new();
-            NaturalEquipmentMods ??= new();
-            if (NaturalEquipmentMods.IsNullOrEmpty())
+            mutation.NaturalEquipmentMod = null;
+            if (NaturalEquipmentMod != null)
             {
-                foreach ((string bodyPartType, ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    mutation.NaturalEquipmentMods.Add(bodyPartType, new(naturalEquipmentMod, mutation));
-                }
+                mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, mutation);
             }
-
-            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), mutation);
 
             return mutation;
         }

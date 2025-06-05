@@ -71,19 +71,14 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
-        public override ModNaturalEquipmentBase Copy()
+        public override Guid AddAdjustment<V>(string Target, string Field, V Value, int Priority)
         {
-            return new ModNaturalEquipment<T>(this);
-        }
-
-        public override Guid AddAdjustment(string Target, string Field, string Value, int Priority)
-        {
-            HNPS_Adjustment adjustment = new(Target, Field, Priority, Value);
+            HNPS_Adjustment<V> adjustment = new(Target, Field, Priority, Value);
             Adjustments ??= new();
             Adjustments.Add(adjustment);
             return adjustment.ID;
         }
-        public override Guid AddAdjustment(string Target, string Field, string Value, bool FlipPriority = false)
+        public override Guid AddAdjustment<V>(string Target, string Field, V Value, bool FlipPriority = false)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddAdjustment(Target, Field, Value, modPriority);
@@ -210,17 +205,18 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, 
-                $"@ {Name}[{GetSource()}]." + 
-                $"{nameof(ApplyModification)}(Object: \"{Object.BaseDisplayName}\")", 
+                $"@ {Name}[{GetSource()}]."
+                + $"{nameof(ApplyModification)}"
+                + $"(Object: \"{Object.BaseDisplayName}\")", 
                 Indent: 3, Toggle: getDoDebug("AM"));
-
-            Object.GetPart<NaturalEquipmentManager>().AddShortDescriptionEntry(this);
             
             ApplyPartAndPropChanges(Object);
 
             Debug.Entry(4, 
-                $"x {Name}[{GetSource()}]." + 
-                $"{nameof(ApplyModification)}(Object: \"{Object.BaseDisplayName}\") @//", 
+                $"x {Name}[{GetSource()}]."
+                + $"{nameof(ApplyModification)}"
+                + $"(Object: \"{Object.BaseDisplayName}\")"
+                + $" @//", 
                 Indent: 3, Toggle: getDoDebug("AM"));
             base.ApplyModification(Object);
         }

@@ -71,14 +71,14 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
-        public override Guid AddAdjustment<V>(string Target, string Field, V Value, int Priority)
+        public override Guid AddAdjustment(string Target, string Field, object Value, int Priority)
         {
-            HNPS_Adjustment<V> adjustment = new(Target, Field, Priority, Value);
+            HNPS_Adjustment adjustment = new(Target, Field, Priority, Value);
             Adjustments ??= new();
             Adjustments.Add(adjustment);
             return adjustment.ID;
         }
-        public override Guid AddAdjustment<V>(string Target, string Field, V Value, bool FlipPriority = false)
+        public override Guid AddAdjustment(string Target, string Field, object Value, bool FlipPriority = false)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddAdjustment(Target, Field, Value, modPriority);
@@ -295,16 +295,6 @@ namespace XRL.World.Parts
             return description += Grammar.MakeAndList(processedDescriptions) + ".";
         }
         
-        /*
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-        }
-        */
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalEquipment<T> modNaturalEquipment = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;

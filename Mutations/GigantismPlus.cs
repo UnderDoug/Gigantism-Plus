@@ -31,10 +31,10 @@ namespace XRL.World.Parts.Mutation
             List<object> doList = new()
             {
                 'V',    // Vomit
+                "CL",    // Change Level
             };
             List<object> dontList = new()
             {
-                "CL",    // Change Level
             };
 
             if (what != null && doList.Contains(what))
@@ -250,6 +250,33 @@ namespace XRL.World.Parts.Mutation
             giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
             return giganticMugMod;
         }
+        public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
+        {
+            ModNaturalEquipment<GigantismPlus> giganticMugMod = new()
+            {
+                AssigningPart = assigningPart,
+                BodyPartType = "Body",
+
+                ModPriority = 10,
+                DescriptionPriority = 10,
+
+                Adjective = "gigantic",
+                AdjectiveColor = "gigantic",
+                AdjectiveColorFallback = "w",
+
+                Adjustments = new(),
+
+                AddedIntProps = new()
+                {
+                    { "ModGiganticNoShortDescription", 1 },
+                    { "ModGiganticNoDisplayName", 1 }
+                },
+            };
+            giganticMugMod.AddAdjustment(RENDER, "ColorString", "&x", true);
+            giganticMugMod.AddAdjustment(RENDER, "TileColor", "&x", true);
+            giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            return giganticMugMod;
+        }
         public static ModGiganticNaturalWeapon NewClosedFistMod(GigantismPlus assigningPart)
         {
             ModGiganticNaturalWeapon closedGiganticFist = new()
@@ -285,32 +312,13 @@ namespace XRL.World.Parts.Mutation
             closedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", false);
             return closedGiganticFist;
         }
-        public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
+        public override ModNaturalEquipment<GigantismPlus> NewNaturalEquipmentMod(GigantismPlus NewAssigner = null)
         {
-            ModNaturalEquipment<GigantismPlus> giganticMugMod = new()
+            if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID))
             {
-                AssigningPart = assigningPart,
-                BodyPartType = "Body",
-
-                ModPriority = 10,
-                DescriptionPriority = 10,
-
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
-
-                Adjustments = new(),
-
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                },
-            };
-            giganticMugMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            giganticMugMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
-            return giganticMugMod;
+                return NewClosedFistMod(NewAssigner);
+            }
+            return base.NewNaturalEquipmentMod(NewAssigner);
         }
 
         public override bool CanLevel() { return true; }
@@ -1370,8 +1378,6 @@ namespace XRL.World.Parts.Mutation
             {
                 Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
 
-                NaturalEquipmentMod = base.UpdateNaturalEquipmentMod(NewClosedFistMod(this), Level);
-
                 ToggledOn = true;
 
                 if (NaturalEquipmentMod == null)
@@ -1410,11 +1416,6 @@ namespace XRL.World.Parts.Mutation
             HunchOverActivatedAbilityID = Reader.ReadGuid();
             GroundPoundActivatedAbilityID = Reader.ReadGuid();
             CloseFistActivatedAbilityID = Reader.ReadGuid();
-
-            if(IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID, ParentObject))
-            {
-                NaturalEquipmentMod = base.UpdateNaturalEquipmentMod(NewClosedFistMod(this), Level);
-            }
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

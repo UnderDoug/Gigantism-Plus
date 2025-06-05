@@ -39,7 +39,7 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        // XML Set Properties.
+        // XML Set Fields.
         public string Model = "Alpha";
         public string AugmentAdjectiveColor = "b";
         public string AugmentTile = "NaturalWeapons/GiganticManipulator.png";
@@ -56,7 +56,7 @@ namespace XRL.World.Parts
 
         public CyberneticsGiganticExoframe()
         {
-            NaturalEquipmentMod = NewAugmentedManipulatorMod(this);
+
         }
         public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(CyberneticsGiganticExoframe assigningPart)
         {
@@ -189,7 +189,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
-            exoframe.NaturalEquipmentMod = new(NaturalEquipmentMod, exoframe);
+            
             return exoframe;
         }
     }

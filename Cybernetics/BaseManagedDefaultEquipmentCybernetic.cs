@@ -43,7 +43,7 @@ namespace XRL.World.Parts
             return doDebug;
         }
         public List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+        public ModNaturalEquipment<T> NaturalEquipmentMod => NewNaturalEquipmentMod();
 
         public int Level { get; set; }
 
@@ -64,7 +64,6 @@ namespace XRL.World.Parts
         public BaseManagedDefaultEquipmentCybernetic()
         {
             Level = 1;
-            NaturalEquipmentMod = null;
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
@@ -124,6 +123,11 @@ namespace XRL.World.Parts
         public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedIntProps;
+        }
+
+        public virtual ModNaturalEquipment<T> NewNaturalEquipmentMod(T NewAssigner = null)
+        {
+            return null;
         }
         public virtual List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
@@ -299,27 +303,9 @@ namespace XRL.World.Parts
             return base.FireEvent(E);
         }
 
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-
-            NaturalEquipmentMod.Write(Basis, Writer);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-
-            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject() ?? new();
-        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentCybernetic<T> cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic<T>;
-
-            cybernetic.NaturalEquipmentMod = null;
-            if (NaturalEquipmentMod != null)
-            {
-                cybernetic.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)cybernetic);
-            }
 
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;

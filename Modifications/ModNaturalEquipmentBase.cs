@@ -20,34 +20,53 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
-        public abstract class HNPS_AdjustmentBase : IComposite
+        public class HNPS_Adjustment : IComposite
         {
             public Guid ID;
 
-            public string Target; // GameObject (the equipment itself), Render, MeleeWeapon, Armor
+            public bool Applied; // Whether the adjustment has been applied.
+
+            public string Target; // Render, MeleeWeapon, Armor, etc.
 
             public string Field; // Field/Property to adjust
 
             public int Priority; // Priority of adjustment, lower number = higher priority
 
-            public HNPS_AdjustmentBase()
+            public object Value; // Value to adjust the Field to.
+
+            public HNPS_Adjustment()
             {
                 ID = Guid.NewGuid();
+                Applied = false;
                 Target = string.Empty;
                 Field = string.Empty;
                 Priority = 0;
+                Value = null;
             }
 
-            public HNPS_AdjustmentBase(string Target, string Field, int Priority)
+            public HNPS_Adjustment(string Target, string Field, int Priority, object Value)
+                : this ()
             {
                 this.Target = Target;
                 this.Field = Field;
                 this.Priority = Priority;
+                this.Value = Value;
             }
 
-            public HNPS_AdjustmentBase(HNPS_AdjustmentBase Source)
-                : this (Source.Target, Source.Field, Source.Priority)
+            public HNPS_Adjustment(HNPS_Adjustment Source)
+                : this (Source.Target, Source.Field, Source.Priority, Source.Value)
             {
+            }
+            public HNPS_Adjustment(string Address)
+                : this ()
+            {
+                SetAddress(Address);
+            }
+            public HNPS_Adjustment(string Address, int Priority, object Value)
+                : this (Address)
+            {
+                this.Priority = Priority;
+                this.Value = Value;
             }
 
             public override string ToString()
@@ -56,6 +75,9 @@ namespace XRL.World.Parts
                 output += $"({(Priority != 0 ? Priority : "PriorityUnset")})";
                 output += $"{Target ?? "NoTarget?"}.";
                 output += $"{Field ?? "NoField?"}";
+                output += $" = \"";
+                output += Value != null ? Value.ToString() : "Value?";
+                output += "\"";
                 return output;
             }
             public virtual string ToString(bool ShowID)
@@ -67,12 +89,12 @@ namespace XRL.World.Parts
                 return output;
             }
 
-            public bool HasSameTargetAs(HNPS_AdjustmentBase OtherAdjustment)
+            public bool HasSameTargetAs(HNPS_Adjustment OtherAdjustment)
             {
-                return Target == OtherAdjustment.Target && Field == OtherAdjustment.Field;
+                return GetAddress() == OtherAdjustment.GetAddress();
             }
 
-            public bool TryGetHigherPriorityAdjustment(HNPS_AdjustmentBase OtherAdjustment, out HNPS_AdjustmentBase HigherProrityAdjustment)
+            public bool TryGetHigherPriorityAdjustment(HNPS_Adjustment OtherAdjustment, out HNPS_Adjustment HigherProrityAdjustment)
             {
                 HigherProrityAdjustment = null;
                 if (HasSameTargetAs(OtherAdjustment))
@@ -83,101 +105,31 @@ namespace XRL.World.Parts
                 return false;
             }
 
-            public virtual bool SameAs(HNPS_AdjustmentBase a)
+            public bool SameAs(HNPS_Adjustment a)
             {
                 return ID == a.ID;
             }
 
-            public abstract object GetValue();
-            public abstract bool TrySetValue(object Value);
-            public abstract void SetValue(object Value);
-
-            public abstract HNPS_AdjustmentBase Copy();
-
-            public abstract bool Apply(GameObject Object);
-        }
-
-        [Serializable]
-        public class HNPS_Adjustment<V> : HNPS_AdjustmentBase
-        {
-            protected V Value; // Value of the adjustment.
-
-            private static List<Type> AllowedTypes => new()
+            public string GetAddress()
             {
-                typeof(int),
-                typeof(double),
-                typeof(float),
-                typeof(long),
-                typeof(char),
-                typeof(string),
-            };
-            public HNPS_Adjustment()
-                : base()
-            {
-            }
-            public HNPS_Adjustment(HNPS_Adjustment<V> Source)
-                : base(Source)
-            {
-                SetValue(Source.Value);
-            }
-            public HNPS_Adjustment(HNPS_AdjustmentBase Source)
-                : base(Source)
-            {
+                return $"{Target}.{Field}";
             }
 
-            public HNPS_Adjustment(string Target, string Field, int Priority, V Value)
-                : base(Target, Field, Priority)
+            public bool SetAddress(string Address)
             {
-                SetValue(Value);
-            }
-
-            public override string ToString()
-            {
-                string output = base.ToString();
-                output += $" = \"";
-                output += Value != null ? Value.ToString() : "Value?";
-                output += "\"";
-                return output;
-            }
-            public override string ToString(bool ShowID)
-            {
-                string output = string.Empty;
-                if (ShowID)
-                    output += $"[{(ID != null ? ID : "No ID")}]";
-                output += ToString();
-                return output;
-            }
-
-            public override object GetValue()
-            {
-                return Value;
-            }
-            public override bool TrySetValue(object Value)
-            {
-                if (AllowedTypes.Contains(Value.GetType()))
+                if (!Address.IsNullOrEmpty() && Address.Contains('.'))
                 {
-                    this.Value = (V)Value;
+                    string[] pieces = Address.Split('.');
+                    Target = pieces[0];
+                    Field = pieces[1];
+                    return true;
                 }
-                return this.Value.Equals((V)Value);
-            }
-            public override void SetValue(object Value)
-            {
-                TrySetValue((V)Value);
+                return false;
             }
 
-            public override HNPS_AdjustmentBase Copy()
+            public bool Apply(GameObject Object)
             {
-                return new HNPS_Adjustment<V>(this);
-            }
-
-            public virtual bool SameAs(HNPS_Adjustment<V> a)
-            {
-                return Value.Equals(a.Value) && base.SameAs(a);
-            }
-
-            public override bool Apply(GameObject Object)
-            {
-                if (Object != null)
+                if (Object != null && !Applied)
                 {
                     IPart targetPart = Object.GetPart(Target);
                     if (targetPart != null)
@@ -185,18 +137,21 @@ namespace XRL.World.Parts
                         Traverse targetPartTraverse = new(targetPart);
                         Traverse targetProperty = targetPartTraverse.Property(Field);
                         Traverse targetField = targetPartTraverse.Field(Field);
+                        Type valueType = Value.GetType();
                         try
                         {
-                            if (targetProperty.PropertyExists())
+                            if (targetProperty.PropertyExists() && targetProperty.GetValueType() == valueType)
                             {
                                 targetProperty.SetValue(Value);
-                                
+
+                                Applied = true;
                                 return targetProperty.GetValue().Equals(Value);
                             }
-                            if (targetField.PropertyExists())
+                            if (targetField.PropertyExists() && targetField.GetValueType() == valueType)
                             {
                                 targetField.SetValue(Value);
-                                
+
+                                Applied = true;
                                 return targetField.GetValue().Equals(Value);
                             }
                         }
@@ -206,13 +161,17 @@ namespace XRL.World.Parts
                             return false;
                         }
                     }
+                    Applied = true;
                 }
                 return false;
             }
+
+
+
         }
 
         [NonSerialized]
-        public List<HNPS_AdjustmentBase> Adjustments;
+        public List<HNPS_Adjustment> Adjustments;
 
         public string BodyPartType;
 
@@ -294,8 +253,8 @@ namespace XRL.World.Parts
                 && Object.IsNaturalEquipment();
         }
 
-        public abstract Guid AddAdjustment<V>(string Target, string Field, V Value, int Priority);
-        public abstract Guid AddAdjustment<V>(string Target, string Field, V Value, bool FlipPriority = false);
+        public abstract Guid AddAdjustment(string Target, string Field, object Value, int Priority);
+        public abstract Guid AddAdjustment(string Target, string Field, object Value, bool FlipPriority = false);
         public abstract int GetDamageDieCount();
         public abstract int GetDamageDieSize();
         public abstract int GetDamageBonus();
@@ -351,7 +310,7 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
 
-            Adjustments = Reader.ReadList<HNPS_AdjustmentBase>() ?? new();
+            Adjustments = Reader.ReadList<HNPS_Adjustment>() ?? new();
             AddedParts = Reader.ReadList<string>() ?? new();
             AddedStringProps = Reader.ReadDictionary<string, string>() ?? new();
             AddedIntProps = Reader.ReadDictionary<string, int>() ?? new();
@@ -364,9 +323,9 @@ namespace XRL.World.Parts
             Adjustments ??= new();
             if (!Adjustments.IsNullOrEmpty())
             {
-                foreach (HNPS_AdjustmentBase adjustment in Adjustments)
+                foreach (HNPS_Adjustment adjustment in Adjustments)
                 {
-                    naturalEquipmentMod.Adjustments.Add(adjustment.Copy());
+                    naturalEquipmentMod.Adjustments.Add(new(adjustment));
                 }
             }
             

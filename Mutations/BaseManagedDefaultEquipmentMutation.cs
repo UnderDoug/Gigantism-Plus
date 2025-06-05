@@ -44,28 +44,10 @@ namespace XRL.World.Parts.Mutation
         }
 
         public List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+        public ModNaturalEquipment<T> NaturalEquipmentMod => NewNaturalEquipmentMod();
 
         public BaseManagedDefaultEquipmentMutation()
         {
-            NaturalEquipmentMod = null;
-        }
-        public BaseManagedDefaultEquipmentMutation(T NewAssigner)
-            : this()
-        {
-            foreach (ModNaturalEquipment<T> naturalEquipmentMod in NaturalEquipmentMods)
-            {
-                naturalEquipmentMod.AssigningPart = NewAssigner;
-            }
-            NaturalEquipmentMod.AssigningPart = NewAssigner;
-        }
-
-        public BaseManagedDefaultEquipmentMutation(
-            ModNaturalEquipment<T> NaturalEquipmentMod, 
-            T NewAssigner)
-            : this(NewAssigner)
-        {
-            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewAssigner);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
@@ -125,6 +107,11 @@ namespace XRL.World.Parts.Mutation
         public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
             return NaturalEquipmentMod.AddedIntProps;
+        }
+
+        public virtual ModNaturalEquipment<T> NewNaturalEquipmentMod(T NewAssigner = null)
+        {
+            return null;
         }
         public virtual List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
@@ -303,29 +290,9 @@ namespace XRL.World.Parts.Mutation
             return base.FireEvent(E);
         }
 
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-
-            Writer.Write(NaturalEquipmentMods);
-            
-            NaturalEquipmentMod.Write(Basis, Writer);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-
-            NaturalEquipmentMod = (ModNaturalEquipment<T>)Reader.ReadObject() ?? new();
-        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentMutation<T> mutation = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentMutation<T>;
-
-            mutation.NaturalEquipmentMod = null;
-            if (NaturalEquipmentMod != null)
-            {
-                mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)mutation);
-            }
 
             return mutation;
         }

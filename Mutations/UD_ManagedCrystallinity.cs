@@ -40,7 +40,7 @@ namespace XRL.World.Parts.Mutation
         }
 
         public List<ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod { get; set; }
+        public ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod => NewNaturalEquipmentMod();
 
         public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
@@ -53,15 +53,6 @@ namespace XRL.World.Parts.Mutation
         public UD_ManagedCrystallinity()
             : base()
         {
-            NaturalEquipmentMod = NewCrystallinePointMod(this);
-        }
-
-        public UD_ManagedCrystallinity(
-            ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, 
-            UD_ManagedCrystallinity NewParent)
-            : this()
-        {
-            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
         public UD_ManagedCrystallinity(Crystallinity Crystallinity)
@@ -108,6 +99,10 @@ namespace XRL.World.Parts.Mutation
             crystalinePointMod.AddAdjustment(RENDER, "TileColor", "&b", true);
             crystalinePointMod.AddAdjustment(RENDER, "DetailColor", "B", true);
             return crystalinePointMod;
+        }
+        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> NewNaturalEquipmentMod(UD_ManagedCrystallinity NewAssigner = null)
+        {
+            return NewCrystallinePointMod(NewAssigner ?? this);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Parts)
@@ -417,23 +412,9 @@ namespace XRL.World.Parts.Mutation
             return base.FireEvent(E);
         }
 
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-
-            NaturalEquipmentMod.Write(Basis, Writer);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-
-            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedCrystallinity>)Reader.ReadObject();
-        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             UD_ManagedCrystallinity mutation = base.DeepCopy(Parent, MapInv) as UD_ManagedCrystallinity;
-
-            mutation.NaturalEquipmentMod = new(NaturalEquipmentMod ??= new(), mutation);
 
             return mutation;
         }

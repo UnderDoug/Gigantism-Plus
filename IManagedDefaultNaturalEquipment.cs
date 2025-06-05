@@ -20,7 +20,7 @@ namespace XRL.World
         , new()
     {
         public List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+        public ModNaturalEquipment<T> NaturalEquipmentMod => NewNaturalEquipmentMod();
 
         public abstract bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts);
 
@@ -43,6 +43,8 @@ namespace XRL.World
         public abstract Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod);
 
         public abstract List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null);
+
+        public abstract ModNaturalEquipment<T> NewNaturalEquipmentMod(T NewAssigner = null);
 
         public abstract ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 

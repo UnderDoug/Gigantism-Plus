@@ -42,10 +42,9 @@ namespace XRL.World.Parts.Mutation
 
         public ElongatedPaws()
         {
-            NaturalEquipmentMod = NewNaturalWeaponMod(this);
         }
 
-        public static ModElongatedNaturalWeapon NewNaturalWeaponMod(ElongatedPaws assigningPart)
+        public static ModElongatedNaturalWeapon NewElongatedWeaponMod(ElongatedPaws assigningPart)
         {
             ModElongatedNaturalWeapon elongatedNaturalWeaponMod = new ()
             {
@@ -77,6 +76,10 @@ namespace XRL.World.Parts.Mutation
             elongatedNaturalWeaponMod.AddAdjustment(RENDER, "TileColor", "&x", true);
             elongatedNaturalWeaponMod.AddAdjustment(RENDER, "DetailColor", "z", true);
             return elongatedNaturalWeaponMod;
+        }
+        public override ModNaturalEquipment<ElongatedPaws> NewNaturalEquipmentMod(ElongatedPaws NewAssigner = null)
+        {
+            return NewElongatedWeaponMod(NewAssigner ?? this);
         }
 
 
@@ -212,11 +215,6 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-
-            if (NaturalEquipmentMod != null)
-            {
-                elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
-            }
 
             return elongatedPaws;
         }

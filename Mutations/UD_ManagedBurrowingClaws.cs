@@ -39,7 +39,7 @@ namespace XRL.World.Parts.Mutation
         }
 
         public List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod { get; set; }
+        public ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod => NewNaturalEquipmentMod();
 
         public UD_ManagedBurrowingClaws NaturalWeaponManager { get; set; }
 
@@ -52,15 +52,6 @@ namespace XRL.World.Parts.Mutation
         public UD_ManagedBurrowingClaws()
             : base()
         {
-            NaturalEquipmentMod = NewBurrowingClawMod(this);
-        }
-
-        public UD_ManagedBurrowingClaws(
-            ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, 
-            UD_ManagedBurrowingClaws NewParent)
-            : this()
-        {
-            this.NaturalEquipmentMod = new(NaturalEquipmentMod, NewParent);
         }
 
         public UD_ManagedBurrowingClaws(BurrowingClaws BurrowingClaws)
@@ -72,7 +63,7 @@ namespace XRL.World.Parts.Mutation
             EnableActivatedAbilityID = BurrowingClaws.EnableActivatedAbilityID;
         }
 
-        public static ModBurrowingNaturalWeapon NewBurrowingClawMod(UD_ManagedBurrowingClaws assigningPart)
+        public static ModBurrowingNaturalWeapon NewBurrowingWeaponMod(UD_ManagedBurrowingClaws assigningPart)
         {
             ModBurrowingNaturalWeapon burrowingClawsMod = new()
             {
@@ -109,6 +100,10 @@ namespace XRL.World.Parts.Mutation
             burrowingClawsMod.AddAdjustment(RENDER, "TileColor", "&w", true);
             burrowingClawsMod.AddAdjustment(RENDER, "DetailColor", "W", true);
             return burrowingClawsMod;
+        }
+        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> NewNaturalEquipmentMod(UD_ManagedBurrowingClaws NewAssigner = null)
+        {
+            return NewBurrowingWeaponMod(NewAssigner ?? this);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, string Parts)
@@ -368,27 +363,9 @@ namespace XRL.World.Parts.Mutation
             return base.FireEvent(E);
         }
 
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-
-            NaturalEquipmentMod.Write(Basis, Writer);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-
-            NaturalEquipmentMod = (ModNaturalEquipment<UD_ManagedBurrowingClaws>)Reader.ReadObject();
-        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             UD_ManagedBurrowingClaws mutation = base.DeepCopy(Parent, MapInv) as UD_ManagedBurrowingClaws;
-
-            mutation.NaturalEquipmentMod = null;
-            if (NaturalEquipmentMod != null)
-            {
-                mutation.NaturalEquipmentMod = new(NaturalEquipmentMod, mutation);
-            }
 
             return mutation;
         }

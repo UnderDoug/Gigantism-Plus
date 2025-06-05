@@ -18,28 +18,19 @@ namespace HNPS_GigantismPlus
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeManageDefaultNaturalEquipmentEvent));
 
-        public new static readonly int CascadeLevel = CASCADE_NONE; //CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
+        public new static readonly int CascadeLevel = CASCADE_NONE;
+
+        public static readonly string RegisteredEventID = nameof(BeforeManageDefaultNaturalEquipmentEvent);
 
         public GameObject Equipment;
+
+        public GameObject Creature;
 
         public NaturalEquipmentManager Manager;
 
         public BodyPart BodyPart;
 
         public BeforeManageDefaultNaturalEquipmentEvent()
-        {
-        }
-
-        public BeforeManageDefaultNaturalEquipmentEvent(GameObject Equipment, NaturalEquipmentManager Manager, BodyPart BodyPart)
-            : this()
-        {
-            BeforeManageDefaultNaturalEquipmentEvent @new = FromPool(Equipment, Manager, BodyPart);
-            this.Equipment = @new.Equipment;
-            this.Manager = @new.Manager;
-            this.BodyPart = @new.BodyPart;
-        }
-        public BeforeManageDefaultNaturalEquipmentEvent(ManageDefaultNaturalEquipmentEvent Source)
-            : this(Source.Equipment, Source.Manager, Source.BodyPart)
         {
         }
 
@@ -50,51 +41,82 @@ namespace HNPS_GigantismPlus
 
         public virtual string GetRegisteredEventID()
         {
-            return $"{nameof(BeforeManageDefaultNaturalEquipmentEvent)}";
+            return RegisteredEventID;
         }
 
         public override void Reset()
         {
             base.Reset();
             Equipment = null;
+            Creature = null;
             Manager = null;
             BodyPart = null;
         }
 
-        public static BeforeManageDefaultNaturalEquipmentEvent Send(GameObject Equipment, NaturalEquipmentManager Manager, BodyPart BodyPart)
+        public static void Send(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager)
         {
             Debug.Entry(4,
                 $"! {nameof(BeforeManageDefaultNaturalEquipmentEvent)}."
-                + $"{nameof(Send)}(Equipment: {Manager?.Wielder?.DebugName ?? NULL}'s "
-                + $"{Equipment?.DebugName ?? NULL}, Manager,"
-                + $" BodyPart: [{BodyPart?.ID}:{BodyPart?.Type}])",
+                + $"{nameof(Send)}("
+                + $"{nameof(Equipment)}: {Equipment?.DebugName}, "
+                + $"{nameof(Creature)}: {Creature?.DebugName}, "
+                + $"{nameof(BodyPart)}: {BodyPart?.DebugName()}, "
+                + $"{nameof(Manager)})",
                 Indent: 0, Toggle: doDebug);
 
-            BeforeManageDefaultNaturalEquipmentEvent E = new(Equipment, Manager, BodyPart);
+            BeforeManageDefaultNaturalEquipmentEvent E = FromPool();
 
-            bool progress = E.BodyPart != null && E.Equipment != null;
-            if (progress && E.Equipment.WantEvent(ID, CascadeLevel))
-            {
-                progress = E.Equipment.HandleEvent(E);
-            }
-            if (progress && Equipment.HasRegisteredEvent(E.GetRegisteredEventID()))
-            {
-                Event @event = Event.New(E.GetRegisteredEventID());
-                @event.SetParameter("Object", E.Equipment);
-                @event.SetParameter("Manager", E.Manager);
-                @event.SetParameter("BodyPart", E.BodyPart);
-                progress = Equipment.FireEvent(@event);
-            }
-            return E;
-        }
+            E.Equipment = Equipment;
+            E.Creature = Creature;
+            E.BodyPart = BodyPart;
+            E.Manager = Manager;
 
-        public static BeforeManageDefaultNaturalEquipmentEvent FromPool(GameObject Object, NaturalEquipmentManager Manager, BodyPart BodyPart)
-        {
-            BeforeManageDefaultNaturalEquipmentEvent beforeManageDefaultEquipmentEvent = FromPool();
-            beforeManageDefaultEquipmentEvent.Equipment = Object;
-            beforeManageDefaultEquipmentEvent.Manager = Manager;
-            beforeManageDefaultEquipmentEvent.BodyPart = BodyPart;
-            return beforeManageDefaultEquipmentEvent;
+            bool haveCreature = E.Creature != null;
+            bool haveEquipment = E.Equipment != null;
+
+            bool creatureWantsMin = haveCreature && E.Creature.WantEvent(ID, CascadeLevel);
+            bool equipmentWantsMin = haveEquipment && E.Equipment.WantEvent(ID, CascadeLevel);
+
+            bool creatureWantsStr = haveCreature && E.Creature.HasRegisteredEvent(RegisteredEventID);
+            bool equipmentWantsStr = haveEquipment && E.Equipment.HasRegisteredEvent(RegisteredEventID);
+
+            bool anyWantsMin = creatureWantsMin || equipmentWantsMin;
+            bool anyWantsStr = creatureWantsStr || equipmentWantsStr;
+
+            bool anyWant = anyWantsMin || anyWantsStr;
+
+            bool proceed = anyWant;
+            if (proceed)
+            {
+                if (proceed && anyWantsMin)
+                {
+                    if (proceed && creatureWantsMin)
+                    {
+                        proceed = E.Creature.HandleEvent(E);
+                    }
+                    if (proceed && equipmentWantsMin)
+                    {
+                        proceed = E.Equipment.HandleEvent(E);
+                    }
+                }
+                if (proceed && anyWantsStr)
+                {
+                    Event @event = Event.New(E.GetRegisteredEventID());
+                    @event.SetParameter(nameof(Equipment), E.Equipment);
+                    @event.SetParameter(nameof(Creature), E.Creature);
+                    @event.SetParameter(nameof(BodyPart), E.BodyPart);
+                    @event.SetParameter(nameof(Manager), E.Manager);
+
+                    if (proceed && creatureWantsStr)
+                    {
+                        proceed = E.Creature.FireEvent(@event);
+                    }
+                    if (proceed && equipmentWantsStr)
+                    {
+                        proceed = E.Equipment.FireEvent(@event);
+                    }
+                }
+            }
         }
     }
 }

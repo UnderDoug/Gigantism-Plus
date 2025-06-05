@@ -17,7 +17,9 @@ namespace HNPS_GigantismPlus
     {
         private static bool doDebug => getClassDoDebug(nameof(ManageDefaultNaturalEquipmentEvent));
 
-        public new static readonly int CascadeLevel = CASCADE_NONE; // CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
+        public new static readonly int CascadeLevel = CASCADE_NONE;
+
+        public static readonly string RegisteredEventID = nameof(ManageDefaultNaturalEquipmentEvent);
 
         public GameObject Equipment;
 
@@ -31,26 +33,6 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public ManageDefaultNaturalEquipmentEvent(GameObject Equipment, GameObject Creature, NaturalEquipmentManager Manager, BodyPart BodyPart)
-            : this()
-        {
-            ManageDefaultNaturalEquipmentEvent @new = FromPool(Equipment, Creature, Manager, BodyPart);
-            this.Equipment = @new.Equipment;
-            this.Creature = @new.Creature;
-            this.Manager = @new.Manager;
-            this.BodyPart = @new.BodyPart;
-        }
-        public ManageDefaultNaturalEquipmentEvent(BeforeManageDefaultNaturalEquipmentEvent beforeManageDefaultEquipmentEvent, GameObject Wielder)
-            : this(beforeManageDefaultEquipmentEvent.Equipment, 
-                  Wielder, 
-                  beforeManageDefaultEquipmentEvent.Manager, 
-                  beforeManageDefaultEquipmentEvent.BodyPart)
-        {
-        }
-        public ManageDefaultNaturalEquipmentEvent(ManageDefaultNaturalEquipmentEvent Source)
-            : this(Source.Equipment, Source.Creature, Source.Manager, Source.BodyPart)
-        {
-        }
         public override int GetCascadeLevel()
         {
             return CascadeLevel;
@@ -58,7 +40,7 @@ namespace HNPS_GigantismPlus
 
         public virtual string GetRegisteredEventID()
         {
-            return $"{nameof(ManageDefaultNaturalEquipmentEvent)}";
+            return RegisteredEventID;
         }
 
         public override void Reset()
@@ -70,133 +52,71 @@ namespace HNPS_GigantismPlus
             BodyPart = null;
         }
 
-        public static ManageDefaultNaturalEquipmentEvent Manage(BeforeManageDefaultNaturalEquipmentEvent BeforeManageDefaultEquipmentEvent, GameObject Wielder)
+        public static bool CheckFor(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager)
         {
             Debug.Entry(4,
                 $"! {nameof(ManageDefaultNaturalEquipmentEvent)}."
-                + $"{nameof(Manage)}({typeof(BeforeManageDefaultNaturalEquipmentEvent).Name}) "
-                + $"for {Wielder?.DebugName ?? NULL}",
+                + $"{nameof(CheckFor)}("
+                + $"{nameof(Equipment)}: {Equipment?.DebugName}, "
+                + $"{nameof(Creature)}: {Creature?.DebugName}, "
+                + $"{nameof(BodyPart)}: {BodyPart?.DebugName()}, "
+                + $"{nameof(Manager)})",
                 Indent: 0, Toggle: doDebug);
             
-            ManageDefaultNaturalEquipmentEvent E = new(BeforeManageDefaultEquipmentEvent, Wielder);
+            ManageDefaultNaturalEquipmentEvent E = FromPool();
 
-            bool validWielder = E.Creature != null;
-            bool validObject = E.Equipment != null;
+            E.Equipment = Equipment;
+            E.Creature = Creature;
+            E.BodyPart = BodyPart;
+            E.Manager = Manager;
 
-            bool wielderWantsMin = validWielder && E.Creature.WantEvent(ID, CascadeLevel);
-            bool objectWantsMin = validObject && E.Equipment.WantEvent(ID, CascadeLevel);
+            bool haveCreature = E.Creature != null;
+            bool haveEquipment = E.Equipment != null;
 
-            bool wielderWantsStr = validWielder && E.Creature.HasRegisteredEvent(E.GetRegisteredEventID());
-            bool objectWantsStr = validObject && E.Equipment.HasRegisteredEvent(E.GetRegisteredEventID());
+            bool creatureWantsMin = haveCreature && E.Creature.WantEvent(ID, CascadeLevel);
+            bool equipmentWantsMin = haveEquipment && E.Equipment.WantEvent(ID, CascadeLevel);
 
-            bool anyWantsMin = wielderWantsMin || objectWantsMin;
-            bool anyWantsStr = wielderWantsStr || objectWantsStr;
+            bool creatureWantsStr = haveCreature && E.Creature.HasRegisteredEvent(RegisteredEventID);
+            bool equipmentWantsStr = haveEquipment && E.Equipment.HasRegisteredEvent(RegisteredEventID);
 
-            bool proceed = true;
-            if (proceed && anyWantsMin)
+            bool anyWantsMin = creatureWantsMin || equipmentWantsMin;
+            bool anyWantsStr = creatureWantsStr || equipmentWantsStr;
+
+            bool anyWant = anyWantsMin || anyWantsStr;
+
+            bool proceed = anyWant;
+            if (proceed)
             {
-                if (proceed && wielderWantsMin)
+                if (proceed && anyWantsMin)
                 {
-                    proceed = E.Creature.HandleEvent(E);
+                    if (proceed && creatureWantsMin)
+                    {
+                        proceed = E.Creature.HandleEvent(E);
+                    }
+                    if (proceed && equipmentWantsMin)
+                    {
+                        proceed = E.Equipment.HandleEvent(E);
+                    }
                 }
-                if (proceed && objectWantsMin)
-                {
-                    proceed = E.Equipment.HandleEvent(E);
-                }
-
                 if (proceed && anyWantsStr)
                 {
                     Event @event = Event.New(E.GetRegisteredEventID());
-                    @event.SetParameter("Object", E.Equipment);
-                    @event.SetParameter("Wielder", E.Creature);
-                    @event.SetParameter("Manager", E.Manager);
-                    @event.SetParameter("BodyPart", E.BodyPart);
+                    @event.SetParameter(nameof(Equipment), E.Equipment);
+                    @event.SetParameter(nameof(Creature), E.Creature);
+                    @event.SetParameter(nameof(BodyPart), E.BodyPart);
+                    @event.SetParameter(nameof(Manager), E.Manager);
 
-                    if (proceed && wielderWantsStr)
+                    if (proceed && creatureWantsStr)
                     {
                         proceed = E.Creature.FireEvent(@event);
                     }
-                    if (proceed && objectWantsStr)
+                    if (proceed && equipmentWantsStr)
                     {
                         proceed = E.Equipment.FireEvent(@event);
                     }
                 }
             }
-            if (proceed)
-            {
-                E.Manager.ManageNaturalEquipment();
-            }
-            BeforeManageDefaultEquipmentEvent.Reset();
-            return E;
-        }
-        public static ManageDefaultNaturalEquipmentEvent Send(NaturalEquipmentManager Manager, GameObject Wielder)
-        {
-            Debug.Entry(4,
-                $"! {nameof(ManageDefaultNaturalEquipmentEvent)}."
-                + $"{nameof(Manage)}({typeof(BeforeManageDefaultNaturalEquipmentEvent).Name}) "
-                + $"for {Wielder?.DebugName ?? NULL}",
-                Indent: 0, Toggle: doDebug);
-            
-            ManageDefaultNaturalEquipmentEvent E = new(Manager, Wielder);
-
-            bool validWielder = E.Creature != null;
-            bool validObject = E.Equipment != null;
-
-            bool wielderWantsMin = validWielder && E.Creature.WantEvent(ID, CascadeLevel);
-            bool objectWantsMin = validObject && E.Equipment.WantEvent(ID, CascadeLevel);
-
-            bool wielderWantsStr = validWielder && E.Creature.HasRegisteredEvent(E.GetRegisteredEventID());
-            bool objectWantsStr = validObject && E.Equipment.HasRegisteredEvent(E.GetRegisteredEventID());
-
-            bool anyWantsMin = wielderWantsMin || objectWantsMin;
-            bool anyWantsStr = wielderWantsStr || objectWantsStr;
-
-            bool proceed = true;
-            if (proceed && anyWantsMin)
-            {
-                if (proceed && wielderWantsMin)
-                {
-                    proceed = E.Creature.HandleEvent(E);
-                }
-                if (proceed && objectWantsMin)
-                {
-                    proceed = E.Equipment.HandleEvent(E);
-                }
-
-                if (proceed && anyWantsStr)
-                {
-                    Event @event = Event.New(E.GetRegisteredEventID());
-                    @event.SetParameter("Object", E.Equipment);
-                    @event.SetParameter("Wielder", E.Creature);
-                    @event.SetParameter("Manager", E.Manager);
-                    @event.SetParameter("BodyPart", E.BodyPart);
-
-                    if (proceed && wielderWantsStr)
-                    {
-                        proceed = E.Creature.FireEvent(@event);
-                    }
-                    if (proceed && objectWantsStr)
-                    {
-                        proceed = E.Equipment.FireEvent(@event);
-                    }
-                }
-            }
-            if (proceed)
-            {
-                E.Manager.ManageNaturalEquipment();
-            }
-            BeforeManageDefaultEquipmentEvent.Reset();
-            return E;
-        }
-
-        public static ManageDefaultNaturalEquipmentEvent FromPool(GameObject Object, GameObject Creature, NaturalEquipmentManager Manager, BodyPart BodyPart)
-        {
-            ManageDefaultNaturalEquipmentEvent manageDefaultEquipmentEvent = FromPool();
-            manageDefaultEquipmentEvent.Equipment = Object;
-            manageDefaultEquipmentEvent.Creature = Creature;
-            manageDefaultEquipmentEvent.Manager = Manager;
-            manageDefaultEquipmentEvent.BodyPart = BodyPart;
-            return manageDefaultEquipmentEvent;
+            return proceed;
         }
     }
 }

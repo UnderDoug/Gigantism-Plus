@@ -29,11 +29,11 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
+                'R',    // Removal
+                "S"     // Serialisation
             };
             List<object> dontList = new()
             {
-                'R',    // Removal
-                "S"     // Serialisation
             };
 
             if (what != null && doList.Contains(what))
@@ -77,12 +77,8 @@ namespace XRL.World.Parts
         private Armor _parentArmor = null;
         public Armor ParentArmor => _parentArmor ??= ParentObject?.GetPart<Armor>();
 
-        [NonSerialized]
-        public SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions;
-
         [SerializeField]
         private string _shortDescriptionCache = null;
-
 
         /// <summary>
         /// Key: string (name of Target object) <br></br>
@@ -102,9 +98,6 @@ namespace XRL.World.Parts
             AccumulatedDamageDie = (0, 0, 0);
             AccumulatedHitBonus = 0;
             AccumulatedPenBonus = 0;
-            NaturalEquipmentMods = new();
-            ShortDescriptions = new();
-            // AdjustmentTargets = GetEmptyAdjustmentTargets();
         }
 
         public override void Initialize()
@@ -117,67 +110,37 @@ namespace XRL.World.Parts
         }
         public override void Remove()
         {
-            ResetShortDescriptions();
-            ClearAdjustmentTargets();
-            ClearNaturalWeaponMods();
+            ClearShortDescriptionCache();
             base.Remove();
         }
 
         public SortedDictionary<int, ModNaturalEquipmentBase> GetShortDescriptionEntries()
         {
-            Debug.Entry(4,
-                $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(GetShortDescriptionEntries)}()",
-                Indent: 4, Toggle: doDebug);
-            SortedDictionary<int, ModNaturalEquipmentBase> shortDescriptions = new();
-            List<ModNaturalEquipmentBase> attachedNaturalEquipmentMods = ParentObject.GetNaturalEquipmentMods();
-            if (attachedNaturalEquipmentMods != null)
-            {
-                foreach (ModNaturalEquipmentBase attachedNaturalEquipmentMod in attachedNaturalEquipmentMods)
-                {
-                    Debug.Entry(4,
-                        $"NaturalWeaponMod: {attachedNaturalEquipmentMod.Name}[{attachedNaturalEquipmentMod.GetAdjective()}])",
-                        Indent: 4, Toggle: doDebug);
-
-                    ShortDescriptions[attachedNaturalEquipmentMod.DescriptionPriority] = attachedNaturalEquipmentMod;
-                    Debug.Entry(4, $"ShortDescriptions:", Indent: 5, Toggle: doDebug);
-
-                    foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
-                    {
-                        Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: 5, Toggle: doDebug);
-                    }
-                }
-            }
-            Debug.Entry(4,
-                $"x {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(GetShortDescriptionEntries)}()"
-                + $" @//",
-                Indent: 4, Toggle: doDebug);
-
-            return shortDescriptions;
+            return ParentObject.GetPrioritisedNaturalEquipmentMods(ForDescriptions: true);
         }
-        public string ProcessShortDescription(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions)
+        public string ProcessShortDescription(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions = null)
         {
             Debug.Entry(4,
                 $"* {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(ProcessShortDescription)}(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions)",
-                Indent: 1, Toggle: doDebug);
+                Indent: 1, Toggle: getDoDebug());
 
             StringBuilder StringBuilder = Event.NewStringBuilder();
 
+            ShortDescriptions ??= GetShortDescriptionEntries();
             if (!ShortDescriptions.IsNullOrEmpty())
             {
                 foreach ((int priority, ModNaturalEquipmentBase mod) in ShortDescriptions)
                 {
                     StringBuilder.AppendRules(mod.GetInstanceDescription(ParentObject));
-                    Debug.CheckYeh(4, $"{priority}::{mod.GetSource()}:Description Appended", Indent: 1, Toggle: doDebug);
+                    Debug.CheckYeh(4, $"{priority}::{mod.GetSource()}:Description Appended", Indent: 1, Toggle: getDoDebug());
                 }
             }
             
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(ProcessShortDescription)}(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions) *//",
-                Indent: 1, Toggle: doDebug);
+                Indent: 1, Toggle: getDoDebug());
             return Event.FinalizeString(StringBuilder);
         }
 
@@ -185,32 +148,12 @@ namespace XRL.World.Parts
         {
             _shortDescriptionCache = null;
         }
-        public void ClearShortDescriptions()
-        {
-            ShortDescriptions = new();
-        }
-        public void ClearNaturalWeaponMods()
-        {
-            // Debug.Entry(4, $"* {nameof(ClearNaturalWeaponMods)}()", Indent: Debug.LastIndent, Toggle: getDoDebug('R'));
-            // NaturalEquipmentMods = new();
-        }
-        public void ClearAdjustmentTargets()
-        {
-            // Debug.Entry(4, $"* {nameof(ClearAdjustmentTargets)}()", Indent: Debug.LastIndent, Toggle: getDoDebug('R'));
-            // AdjustmentTargets = GetEmptyAdjustmentTargets();
-        }
-        public void ResetShortDescriptions()
-        {
-            Debug.Entry(4, $"* {nameof(ResetShortDescriptions)}()", Indent: Debug.LastIndent, Toggle: getDoDebug('R'));
-            ClearShortDescriptionCache();
-            ClearShortDescriptions();
-        }
 
         public SortedDictionary<int, ModNaturalEquipmentBase> GetNaturalEquipmentMods()
         {
             return GetPrioritisedNaturalEquipmentModsEvent.GetFor(Wielder, ParentObject, ParentLimb);
         }
-        public List<HNPS_AdjustmentBase> GetPrioritisedNaturalEquipmentModAdjustments(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
+        public List<HNPS_Adjustment> GetPrioritisedNaturalEquipmentModAdjustments(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, 
@@ -218,16 +161,16 @@ namespace XRL.World.Parts
                 + $"(List<ModNaturalEquipmentBase> NaturalEquipmentMods)", 
                 Indent: indent, Toggle: getDoDebug());
 
-            List<HNPS_AdjustmentBase> Adjustments = new();
+            List<HNPS_Adjustment> Adjustments = new();
 
             if (HasManaged)
             {
-                NaturalEquipmentMods ??= ParentObject.GetNaturalEquipmentMods();
+                NaturalEquipmentMods ??= ParentObject.GetPrioritisedNaturalEquipmentMods();
             }
             if (NaturalEquipmentMods != null)
             {
                 Debug.Entry(4, $"> foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)", Indent: indent + 1, Toggle: getDoDebug());
-                foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
+                foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                 {
                     Debug.Divider(4, HONLY, Count: 60, Indent: indent + 2, Toggle: getDoDebug());
                     Debug.Entry(4, $"naturalEquipmentMod", naturalEquipmentMod.GetAdjective(), Indent: indent + 2, Toggle: getDoDebug());
@@ -235,7 +178,7 @@ namespace XRL.World.Parts
                     {
                         Debug.CheckYeh(4, $"Have Adjustments", Indent: indent + 3, Toggle: getDoDebug());
                         Debug.Entry(4, $"> foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments)", Indent: indent + 3, Toggle: getDoDebug());
-                        foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments)
+                        foreach (HNPS_Adjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
                             Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
                             Debug.LoopItem(4, $"Target: {adjustment.Target}, Field: {adjustment.Target}", Indent: indent + 4, Toggle: getDoDebug());
@@ -248,16 +191,16 @@ namespace XRL.World.Parts
                                 };
                                 continue;
                             }
-                            List<HNPS_AdjustmentBase> storedAdjustments = new(Adjustments);
+                            List<HNPS_Adjustment> storedAdjustments = new(Adjustments);
 
                             bool didStore = false;
                             Debug.Entry(4, $"> foreach (HNPS_AdjustmentBase storedAdjustment in storedAdjustments)", Indent: indent + 4, Toggle: getDoDebug());
-                            foreach (HNPS_AdjustmentBase storedAdjustment in storedAdjustments)
+                            foreach (HNPS_Adjustment storedAdjustment in storedAdjustments)
                             {
                                 Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
-                                Debug.Entry(4, $"Proposed", $"{adjustment}", Indent: indent + 5, Toggle: doDebug);
-                                Debug.Entry(4, $"Existing", $"{storedAdjustment}", Indent: indent + 5, Toggle: doDebug);
-                                if (adjustment.TryGetHigherPriorityAdjustment(storedAdjustment, out HNPS_AdjustmentBase replacementAdjustment))
+                                Debug.Entry(4, $"Proposed", $"{adjustment}", Indent: indent + 5, Toggle: getDoDebug());
+                                Debug.Entry(4, $"Existing", $"{storedAdjustment}", Indent: indent + 5, Toggle: getDoDebug());
+                                if (adjustment.TryGetHigherPriorityAdjustment(storedAdjustment, out HNPS_Adjustment replacementAdjustment))
                                 {
                                     string debugText = $"Existing Adjustment is Higher Priority";
                                     if (storedAdjustment != replacementAdjustment)
@@ -346,7 +289,7 @@ namespace XRL.World.Parts
                     },
                 };
         }
-        public virtual void ManageNaturalEquipment()
+        public virtual void ManageNaturalEquipment(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
             Debug.Header(4, 
                 $"{nameof(NaturalEquipmentManager)}",
@@ -364,9 +307,7 @@ namespace XRL.World.Parts
                 $" ParentLimb: {parentLimbString}", 
                 Indent: 0, Toggle: doDebug);
 
-            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = GetNaturalEquipmentMods();
-
-            if (!naturalEquipmentMods.IsNullOrEmpty())
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
                 // Collect the "starting" values for damage if the NaturalEquipment is a defaultFistWeapon
                 // Accumulate bonuses from NaturalEquipmentMods
@@ -391,7 +332,7 @@ namespace XRL.World.Parts
                         GameObject.Release(ref sampleNaturalEquipment);
                     }
 
-                    AccumulateMeleeWeaponBonuses(naturalEquipmentMods);
+                    AccumulateMeleeWeaponBonuses(NaturalEquipmentMods);
 
                     DamageDie.AdjustDieCount(AccumulatedDamageDie.Count.Vomit(4, "AdjustDieCount", Indent: 2, Toggle: doDebug));
                     DamageDie.AdjustDieSize(AccumulatedDamageDie.Size.Vomit(4, "AdjustDieSize", Indent: 2, Toggle: doDebug));
@@ -412,30 +353,45 @@ namespace XRL.World.Parts
                 // Cycle through the AdjustmentTargets (GameObject, Render, MeleeWeapon, Armor)
                 // |__ Cycle through each Target's set of adjustments, applying them if possible 
                 //     |__ Where not possible, output a warning.
-                Debug.Entry(4, $"> foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets)", Indent: 1, Toggle: doDebug);
+                
+
                 Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
-                foreach (HNPS_AdjustmentBase adjustment in GetPrioritisedNaturalEquipmentModAdjustments(naturalEquipmentMods))
+                List<HNPS_Adjustment> prioritisedAdjustments = GetPrioritisedNaturalEquipmentModAdjustments(NaturalEquipmentMods);
+                if (!prioritisedAdjustments.IsNullOrEmpty())
                 {
-                    Debug.Entry(4, $"Target: {Target}", Indent: 2, Toggle: doDebug);
-                    foreach ((string Field, (int Priority, string Value)) in Entries)
+                    Debug.Entry(4,
+                    $"> foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments)",
+                    Indent: 1, Toggle: doDebug);
+                    foreach (HNPS_Adjustment adjustment in prioritisedAdjustments)
                     {
-                        Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3, Toggle: doDebug);
-                        if (TargetObject.SetPropertyOrFieldValue(Field, Value))
+                        /*
+                        Debug.Entry(4, $"Target: {Target}", Indent: 2, Toggle: doDebug);
+                        foreach ((string Field, (int Priority, string Value)) in Entries)
                         {
-                            continue;
+                            Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3, Toggle: doDebug);
+                            if (TargetObject.SetPropertyOrFieldValue(Field, Value))
+                            {
+                                continue;
+                            }
+                            Debug.Warn(2,
+                                $"{nameof(NaturalEquipmentManager)}",
+                                $"{nameof(ManageNaturalEquipment)}()",
+                                $"failed set Property or Field \"{Field}\" in {Target} to {Value}",
+                                Indent: Debug.LastIndent + 1);
                         }
-                        Debug.Warn(2,
-                            $"{nameof(NaturalEquipmentManager)}",
-                            $"{nameof(ManageNaturalEquipment)}()",
-                            $"failed set Property or Field \"{Field}\" in {Target} to {Value}",
-                            Indent: Debug.LastIndent + 1);
+                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                        */
+
+                        bool applied = adjustment.Apply(ParentObject);
+                        Debug.LoopItem(4, $"Applied {adjustment}", Good: applied, Indent: 2, Toggle: doDebug);
                     }
-                    Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                    Debug.Entry(4,
+                        $"x foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments) >//",
+                        Indent: 1, Toggle: doDebug);
                 }
-                Debug.Entry(4, $"x foreach ((string Target, (object TargetObject, Dictionary<string, (int Priority, string Value)> Entries)) in AdjustmentTargets) >//", Indent: 1, Toggle: doDebug);
                 
                 // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
-                ApplyNaturalEquipmentMods();
+                ApplyNaturalEquipmentMods(NaturalEquipmentMods);
 
                 if (ParentObject.TryGetPart(out MakersMark makersMark))
                 {
@@ -482,12 +438,12 @@ namespace XRL.World.Parts
                 ParentObject.SetIntProperty("UndesirableWeapon", 0);
                 ParentObject.SetStringProperty("TemporaryDefaultBehavior", "NaturalEquipmentManager", false);
 
-                _shortDescriptionCache = ProcessShortDescription(ShortDescriptions);
+                _shortDescriptionCache = ProcessShortDescription(GetShortDescriptionEntries());
             }
             else
             {
                 Debug.Entry(4, 
-                    $"{ParentObject?.DebugName ?? NULL} has no {nameof(naturalEquipmentMods)} to Manage", 
+                    $"{ParentObject?.DebugName ?? NULL} has no {nameof(NaturalEquipmentMods)} to Manage", 
                     Indent: 1, Toggle: doDebug);
             }
 
@@ -496,7 +452,7 @@ namespace XRL.World.Parts
                 $"{nameof(ManageNaturalEquipment)}()", Toggle: doDebug);
         }
 
-        public virtual void ApplyNaturalEquipmentMods()
+        public virtual void ApplyNaturalEquipmentMods(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
             Debug.Entry(4, $"* {nameof(ApplyNaturalEquipmentMods)}()", Indent: 1, Toggle: doDebug);
             foreach ((_, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
@@ -575,8 +531,7 @@ namespace XRL.World.Parts
 
             if (E.Object.HasPartDescendedFrom<ModNaturalEquipmentBase>())
             {
-                ShortDescriptions ??= new();
-                _shortDescriptionCache ??= ProcessShortDescription(ShortDescriptions);
+                _shortDescriptionCache ??= ProcessShortDescription();
                 E.Postfix.AppendRules(_shortDescriptionCache);
             }
 
@@ -595,9 +550,7 @@ namespace XRL.World.Parts
 
             if (E.Creature == Wielder)
             {
-                ClearNaturalWeaponMods();
-                ClearAdjustmentTargets();
-                ResetShortDescriptions();
+                ClearShortDescriptionCache();
             }
 
             return base.HandleEvent(E);
@@ -625,9 +578,12 @@ namespace XRL.World.Parts
                         $"{ParentObject?.DebugName} Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(ParentObject)}",
                         Good: !TinkeringHelpers.CanBeDisassembled(ParentObject), Indent: 1, Toggle: getDoDebug());
 
-                    BeforeManageDefaultNaturalEquipmentEvent beforeEvent = BeforeManageDefaultNaturalEquipmentEvent.Send(ParentObject, this, ParentLimb);
-                    ManageDefaultNaturalEquipmentEvent manageEvent = ManageDefaultNaturalEquipmentEvent.Manage(beforeEvent, Wielder);
-                    AfterManageDefaultNaturalEquipmentEvent.Send(manageEvent);
+                    BeforeManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this);
+                    if (ManageDefaultNaturalEquipmentEvent.CheckFor(ParentObject, Wielder, ParentLimb, this))
+                    {
+                        ManageNaturalEquipment(GetNaturalEquipmentMods());
+                    }
+                    AfterManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this);
                 }
             }
 
@@ -665,9 +621,6 @@ namespace XRL.World.Parts
             Writer.Write(AccumulatedDamageDie.Count);
             Writer.Write(AccumulatedDamageDie.Size);
             Writer.Write(AccumulatedDamageDie.Bonus);
-
-            Writer.Write(ShortDescriptions ??= new());
-            Writer.Write(NaturalEquipmentMods ??= new());
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
@@ -679,26 +632,11 @@ namespace XRL.World.Parts
                 Size = Reader.ReadInt32(),
                 Bonus = Reader.ReadInt32()
             };
-
-            ShortDescriptions = new SortedDictionary<int, ModNaturalEquipmentBase>(Reader.ReadDictionary<int, ModNaturalEquipmentBase>()) ?? new();
-            NaturalEquipmentMods = new SortedDictionary<int, ModNaturalEquipmentBase>(Reader.ReadDictionary<int, ModNaturalEquipmentBase>()) ?? new();
-            
-            AdjustmentTargets = GetEmptyAdjustmentTargets();
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
-            {
-                foreach ((_, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
-                {
-                    GetNaturalEquipmentModAdjustments(naturalEquipmentMod, Serialization: true);
-                }
-            }
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             NaturalEquipmentManager naturalEquipmentManager = base.DeepCopy(Parent, MapInv) as NaturalEquipmentManager;
-            naturalEquipmentManager.ShortDescriptions = null;
             naturalEquipmentManager._shortDescriptionCache = null;
-            naturalEquipmentManager.NaturalEquipmentMods = null;
-            naturalEquipmentManager.AdjustmentTargets = null;
             return naturalEquipmentManager;
         }
 

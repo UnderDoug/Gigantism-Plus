@@ -215,10 +215,11 @@ namespace XRL.World.Parts
                             }
                         }
                         Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
-                        Debug.Entry(4, $"x foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments) >//", Indent: 3, Toggle: getDoDebug());
+                        Debug.Entry(4, $"x foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments) >//", Indent: indent + 3, Toggle: getDoDebug());
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 60, Indent: indent + 2, Toggle: getDoDebug());
+                Debug.Entry(4, $"x foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods) >//", Indent: indent + 1, Toggle: getDoDebug());
             }
 
             Debug.Entry(4,

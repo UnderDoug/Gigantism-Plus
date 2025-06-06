@@ -153,7 +153,7 @@ namespace XRL.World.Parts
         {
             return GetPrioritisedNaturalEquipmentModsEvent.GetFor(Wielder, ParentObject, ParentLimb);
         }
-        public List<HNPS_Adjustment> GetPrioritisedNaturalEquipmentModAdjustments(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
+        public Dictionary<string, PartAdjustment> GetPrioritisedNaturalEquipmentModAdjustments(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, 
@@ -161,7 +161,7 @@ namespace XRL.World.Parts
                 + $"(List<ModNaturalEquipmentBase> NaturalEquipmentMods)", 
                 Indent: indent, Toggle: getDoDebug());
 
-            List<HNPS_Adjustment> Adjustments = new();
+            Dictionary<string, PartAdjustment> adjustments = new();
 
             if (HasManaged)
             {
@@ -178,54 +178,44 @@ namespace XRL.World.Parts
                     {
                         Debug.CheckYeh(4, $"Have Adjustments", Indent: indent + 3, Toggle: getDoDebug());
                         Debug.Entry(4, $"> foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments)", Indent: indent + 3, Toggle: getDoDebug());
-                        foreach (HNPS_Adjustment adjustment in naturalEquipmentMod.Adjustments)
+                        foreach (PartAdjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
                             Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
-                            Debug.LoopItem(4, $"Target: {adjustment.Target}, Field: {adjustment.Target}", Indent: indent + 4, Toggle: getDoDebug());
-                            if (Adjustments.IsNullOrEmpty())
+                            Debug.LoopItem(4, $"Adjustment: {adjustment}", Indent: indent + 4, Toggle: getDoDebug());
+                            if (adjustments.IsNullOrEmpty())
                             {
                                 Debug.CheckYeh(4, $"Adjustments Empty, Adding {adjustment}", Indent: indent + 4, Toggle: getDoDebug());
-                                Adjustments = new()
+                                adjustments = new()
                                 {
-                                    adjustment
+                                    { adjustment.GetAddress(), adjustment }
                                 };
                                 continue;
                             }
-                            List<HNPS_Adjustment> storedAdjustments = new(Adjustments);
-
-                            bool didStore = false;
-                            Debug.Entry(4, $"> foreach (HNPS_AdjustmentBase storedAdjustment in storedAdjustments)", Indent: indent + 4, Toggle: getDoDebug());
-                            foreach (HNPS_Adjustment storedAdjustment in storedAdjustments)
+                            Debug.Entry(4, $"Proposed", $"{adjustment}", Indent: indent + 4, Toggle: getDoDebug());
+                            if (adjustments.ContainsKey(adjustment.GetAddress()))
                             {
-                                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
-                                Debug.Entry(4, $"Proposed", $"{adjustment}", Indent: indent + 5, Toggle: getDoDebug());
+                                PartAdjustment storedAdjustment = adjustments[adjustment.GetAddress()];
                                 Debug.Entry(4, $"Existing", $"{storedAdjustment}", Indent: indent + 5, Toggle: getDoDebug());
-                                if (adjustment.TryGetHigherPriorityAdjustment(storedAdjustment, out HNPS_Adjustment replacementAdjustment))
+                                if (adjustment.TryGetHigherPriorityAdjustment(storedAdjustment, out PartAdjustment replacementAdjustment))
                                 {
                                     string debugText = $"Existing Adjustment is Higher Priority";
                                     if (storedAdjustment != replacementAdjustment)
                                     {
                                         debugText = $"Proposed Adjustment is Higher Priority";
-                                        Adjustments.Remove(storedAdjustment);
-                                        Adjustments.TryAdd(replacementAdjustment);
                                     }
+                                    adjustments[adjustment.GetAddress()] = replacementAdjustment;
                                     Debug.LoopItem(4, debugText, $"{replacementAdjustment}",
                                         Good: storedAdjustment != replacementAdjustment, Indent: indent + 6, Toggle: getDoDebug());
-
-                                    didStore = true;
-                                    break;
                                 }
-                                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
-                                Debug.Entry(4, $"x foreach (HNPS_AdjustmentBase storedAdjustment in storedAdjustments) >//", Indent: indent + 4, Toggle: getDoDebug());
                             }
-                            if (!didStore)
+                            else
                             {
-                                Debug.CheckYeh(4, $"No Competing Adjustments, Adding {adjustment}", Indent: indent + 4, Toggle: getDoDebug());
-                                Adjustments.TryAdd(adjustment);
+                                Debug.CheckYeh(4, $"No Competing Adjustments, Adding {adjustment}", Indent: indent + 5, Toggle: getDoDebug());
+                                adjustments[adjustment.GetAddress()] = adjustment;
                             }
                         }
                         Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
-                        Debug.Entry(4, $"x foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments) >//", Indent: 2, Toggle: getDoDebug());
+                        Debug.Entry(4, $"x foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments) >//", Indent: 3, Toggle: getDoDebug());
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 60, Indent: indent + 2, Toggle: getDoDebug());
@@ -238,7 +228,7 @@ namespace XRL.World.Parts
                 Indent: indent, Toggle: getDoDebug());
 
             Debug.LastIndent = indent;
-            return Adjustments;
+            return adjustments;
         }
 
         public virtual SortedDictionary<int, ModNaturalEquipmentBase> AccumulateMeleeWeaponBonuses(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
@@ -271,24 +261,6 @@ namespace XRL.World.Parts
             return NaturalEquipmentMods;
         }
 
-        public Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, object Value)> Entry)> GetEmptyAdjustmentTargets()
-        {
-            return new()
-                {
-                    { GAMEOBJECT,
-                        ( ParentObject, new() )
-                    },
-                    { RENDER,
-                        ( ParentRender, new() )
-                    },
-                    { MELEEWEAPON,
-                        ( ParentMeleeWeapon, new() )
-                    },
-                    { ARMOR,
-                        ( ParentArmor, new() )
-                    },
-                };
-        }
         public virtual void ManageNaturalEquipment(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
             Debug.Header(4, 
@@ -316,7 +288,6 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1, Toggle: doDebug);
                 if (ParentMeleeWeapon != null)
                 {
-
                     DamageDie = new(ParentMeleeWeapon.BaseDamage);
                     DamageDie.ToString().Vomit(4, "DamageDie", Indent: 2, Toggle: doDebug);
                     
@@ -350,38 +321,15 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"x if (ParentMeleeWeapon != null) ?//", Indent: 1, Toggle: doDebug);
 
                 Debug.Entry(4, $"Cycling Adjustments, Applying where applicable", Indent: 1, Toggle: doDebug);
-                // Cycle through the AdjustmentTargets (GameObject, Render, MeleeWeapon, Armor)
-                // |__ Cycle through each Target's set of adjustments, applying them if possible 
-                //     |__ Where not possible, output a warning.
-                
-
                 Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
-                List<HNPS_Adjustment> prioritisedAdjustments = GetPrioritisedNaturalEquipmentModAdjustments(NaturalEquipmentMods);
+                Dictionary<string, PartAdjustment> prioritisedAdjustments = GetPrioritisedNaturalEquipmentModAdjustments(NaturalEquipmentMods);
                 if (!prioritisedAdjustments.IsNullOrEmpty())
                 {
                     Debug.Entry(4,
                     $"> foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments)",
                     Indent: 1, Toggle: doDebug);
-                    foreach (HNPS_Adjustment adjustment in prioritisedAdjustments)
+                    foreach ((string _, PartAdjustment adjustment) in prioritisedAdjustments)
                     {
-                        /*
-                        Debug.Entry(4, $"Target: {Target}", Indent: 2, Toggle: doDebug);
-                        foreach ((string Field, (int Priority, string Value)) in Entries)
-                        {
-                            Debug.Entry(4, $"{Target}.{Field} = {Value}", Indent: 3, Toggle: doDebug);
-                            if (TargetObject.SetPropertyOrFieldValue(Field, Value))
-                            {
-                                continue;
-                            }
-                            Debug.Warn(2,
-                                $"{nameof(NaturalEquipmentManager)}",
-                                $"{nameof(ManageNaturalEquipment)}()",
-                                $"failed set Property or Field \"{Field}\" in {Target} to {Value}",
-                                Indent: Debug.LastIndent + 1);
-                        }
-                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
-                        */
-
                         bool applied = adjustment.Apply(ParentObject);
                         Debug.LoopItem(4, $"Applied {adjustment}", Good: applied, Indent: 2, Toggle: doDebug);
                     }
@@ -412,16 +360,17 @@ namespace XRL.World.Parts
                     displayNameOnlySansRays.Replace(icyString, "");
                     displayNameOnlySansRays.Replace(flamingString, "");
 
-                    Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
+                    bool tilePathDebugToggle = HNPS_GigantismPlus.Extensions.getDoDebug(nameof(TryGetTilePath));
+                    Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                     if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath))
                     {
                         ParentRender.Tile = tilePath;
-                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
+                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                     }
                     if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath))
                     {
                         ParentRender.Tile = tilePath;
-                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: doDebug);
+                        Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                     }
 
                     Debug.Entry(4, $"Dynamic Tile update attempted", Indent: 1, Toggle: doDebug);

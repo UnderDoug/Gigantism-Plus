@@ -59,8 +59,16 @@ namespace XRL.World.Parts
         }
         public bool HandleEvent(BeforeDescribeModGiganticEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"{nameof(ModGiganticNaturalWeapon)}." +
+                $"{nameof(HandleEvent)}({nameof(DescribeModGiganticEvent)} E.Context: {E.Context})",
+                Indent: indent + 1, Toggle: doDebug);
+
             if (E.Object == ParentObject && E.Context == "Natural Equipment")
             {
+                Debug.CheckYeh(4, $"Ye", Indent: indent + 2, Toggle: doDebug);
+
                 int dieCount = GetDamageDieCount();
                 int damageBonus = GetDamageBonus();
                 int hitBonus = GetHitBonus();
@@ -83,15 +91,25 @@ namespace XRL.World.Parts
                     E.AddWeaponDescription("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
                 }
             }
+
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public bool HandleEvent(DescribeModGiganticEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"{nameof(ModGiganticNaturalWeapon)}." +
+                $"{nameof(HandleEvent)}({nameof(DescribeModGiganticEvent)} E.Context: {E.Context})",
+                Indent: indent + 1, Toggle: doDebug);
+
             if (E.Object == ParentObject && E.Context == "Natural Equipment")
             {
+                Debug.CheckYeh(4, $"Ye", Indent: indent + 2, Toggle: doDebug);
                 E.RemoveWeaponDescription("have", "+3 damage");
                 E.RemoveWeaponDescription("cleave", "for -3 AV");
             }
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public override string GetInstanceDescription(GameObject Object = null)
@@ -99,7 +117,6 @@ namespace XRL.World.Parts
             Object ??= ParentObject;
             BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(Object, Context: "Natural Equipment");
             return DescribeModGiganticEvent.Send(beforeEvent).Process(PluralizeObject: true);
-
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

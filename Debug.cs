@@ -416,11 +416,11 @@ namespace HNPS_GigantismPlus
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<HNPS_Adjustment> Vomit(this List<HNPS_Adjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
+        public static List<PartAdjustment> Vomit(this List<PartAdjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
-            foreach (HNPS_Adjustment item in List)
+            foreach (PartAdjustment item in List)
             {
                 if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
                 else Entry(Verbosity, $"{item}", Indent: Indent + 1, Toggle: Toggle);

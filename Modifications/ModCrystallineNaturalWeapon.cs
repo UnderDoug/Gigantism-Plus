@@ -31,7 +31,7 @@ namespace XRL.World.Parts
             Wielder = Conversion.Wielder;
 
             Adjustments = new();
-            foreach (HNPS_Adjustment adjustment in Conversion.Adjustments)
+            foreach (PartAdjustment adjustment in Conversion.Adjustments)
             {
                 Adjustments.Add(adjustment);
             }

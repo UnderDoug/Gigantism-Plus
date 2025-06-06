@@ -294,7 +294,7 @@ namespace XRL.World.Parts
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
             Debug.Entry(4,
-                $"{nameof(StewBelly)}" + 
+                $"{nameof(StewBelly)}." + 
                 $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
                 Indent: 0);
 

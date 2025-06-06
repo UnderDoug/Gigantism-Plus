@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-
+﻿using System;
+using System.Collections.Generic;
+using XRL.World;
+using XRL.World.Parts;
 using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
@@ -37,10 +39,10 @@ namespace HNPS_GigantismPlus
 
         public const string JUMP_RANGE_MODIFIER = "JumpRangeModifier";
 
-        public const string GAMEOBJECT = "GameObject";
-        public const string RENDER = "Render";
-        public const string MELEEWEAPON = "MeleeWeapon";
-        public const string ARMOR = "Armor";
+        public static readonly Type GAMEOBJECT = typeof(GameObject);
+        public static readonly Type RENDER = typeof(Render);
+        public static readonly Type MELEEWEAPON = typeof(MeleeWeapon);
+        public static readonly Type ARMOR = typeof(Armor);
 
         public const string NATEQUIPMANAGER_STRINGPROP_PRIORITY = "NaturalEquipmentManager::StringProp:Priority";
         public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentManager::IntProp:Priority";

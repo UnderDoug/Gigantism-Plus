@@ -17,6 +17,69 @@ namespace HNPS_GigantismPlus
     {
         private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticEvent));
 
+        public struct DescriptionElement
+        {
+            private static bool doDebug => getClassDoDebug(nameof(DescriptionElement));
+
+            public string Verb;
+            public string Effect;
+
+            public DescriptionElement(string Verb, string Effect)
+            {
+                this.Verb = Verb;
+                this.Effect = Effect;
+            }
+
+            public DescriptionElement(List<string> Source)
+            {
+                Verb = null;
+                Effect = null;
+                if (!Source.IsNullOrEmpty())
+                {
+                    Verb = Source[0];
+                    if (Source.Count > 1)
+                    {
+                        Effect = Source[1];
+                    }
+                }
+            }
+
+            public readonly List<string> ToList()
+            {
+                return new List<string>()
+                {
+                    Verb,
+                    Effect,
+                };
+            }
+
+            public override readonly string ToString()
+            {
+                if (Verb == "")
+                {
+                    return  "It " + Effect;
+                }
+                if (Verb == null)
+                {
+                    return "It is " + Effect;
+                }
+                return Grammar.ThirdPerson(Verb, PrependSpace: false) + " " + Effect;
+            }
+
+            public readonly string ToString(GameObject Object)
+            {
+                if (Verb == "")
+                {
+                    return Object.It + " " + Effect;
+                }
+                if (Verb == null)
+                {
+                    return Object.Itis + " " + Effect;
+                }
+                return Object.GetVerb(Verb, PrependSpace: false) + " " + Effect;
+            }
+        }
+
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
         public static readonly string RegisteredEventID = GetRegisteredEventID();
@@ -27,9 +90,9 @@ namespace HNPS_GigantismPlus
 
         public string ObjectNoun;
 
-        public List<List<string>> WeaponDescriptions;
+        public List<DescriptionElement> WeaponDescriptions;
 
-        public List<List<string>> GeneralDescriptions;
+        public List<DescriptionElement> GeneralDescriptions;
 
         public string Context;
 
@@ -71,6 +134,8 @@ namespace HNPS_GigantismPlus
 
         public static DescribeModGiganticEvent Send(BeforeDescribeModGiganticEvent BeforeEvent)
         {
+            int indent = Debug.LastIndent;
+
             DescribeModGiganticEvent E = FromPool(BeforeEvent);
 
             bool haveGame = The.Game != null;
@@ -89,11 +154,15 @@ namespace HNPS_GigantismPlus
             {
                 if (proceed && gameWants)
                 {
+                    Debug.Entry(4, $"{nameof(gameWants)}", Indent: indent + 1, Toggle: doDebug);
                     proceed = The.Game.HandleEvent(E);
+                    Debug.Entry(4, $"{proceed}", Indent: indent + 2, Toggle: doDebug);
                 }
                 if (proceed && objectWantsMin)
                 {
+                    Debug.Entry(4, $"{nameof(objectWantsMin)}", Indent: indent + 1, Toggle: doDebug);
                     proceed = E.Object.HandleEvent(E);
+                    Debug.Entry(4, $"{proceed}", Indent: indent + 2, Toggle: doDebug);
                 }
                 if (proceed && objectWantsStr)
                 {
@@ -104,14 +173,18 @@ namespace HNPS_GigantismPlus
                     @event.SetParameter($"{nameof(E.GeneralDescriptions)}", E.GeneralDescriptions);
                     @event.SetParameter($"{nameof(E.Context)}", E.Context);
                     proceed = E.Object.FireEvent(@event);
+                    E.WeaponDescriptions = @event.GetParameter(nameof(E.WeaponDescriptions)) as List<DescriptionElement>;
+                    E.GeneralDescriptions = @event.GetParameter(nameof(E.GeneralDescriptions)) as List<DescriptionElement>;
                 }
             }
+
+            Debug.LastIndent = indent;
             return E;
         }
         public string Process(bool PluralizeObject = true)
         {
-            List<List<string>> weaponDescriptions = new();
-            List<List<string>> generalDescriptions = new();
+            List<DescriptionElement> weaponDescriptions = new();
+            List<DescriptionElement> generalDescriptions = new();
             ObjectNoun ??= Object.GetObjectNoun();
 
             if (BeforeEvent != null)
@@ -125,29 +198,28 @@ namespace HNPS_GigantismPlus
                     generalDescriptions.AddRange(BeforeEvent.GeneralDescriptions);
                 }
             }
-            GameObjectBlueprint GigantismPlusModGiganticDescriptions = GameObjectFactory.Factory.GetBlueprint(MODGIGANTIC_DESCRIPTIONBUCKET);
-            weaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
-            generalDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "General"));
 
-            weaponDescriptions.AddRange(WeaponDescriptions);
-            generalDescriptions.AddRange(GeneralDescriptions);
-
-            weaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "Weapon"));
-            generalDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "General"));
+            if (!WeaponDescriptions.IsNullOrEmpty())
+            {
+                weaponDescriptions.AddRange(WeaponDescriptions);
+            }
+            if (!GeneralDescriptions.IsNullOrEmpty())
+            {
+                generalDescriptions.AddRange(GeneralDescriptions);
+            }
 
             StringBuilder SB = Event.NewStringBuilder();
 
             bool isPlural = Object.IsPlural && PluralizeObject;
             ObjectNoun = $"{(isPlural ? Grammar.Pluralize(ObjectNoun) : ObjectNoun)} ";
-            string DemonstrativePronoun = $"{Grammar.MakeTitleCase(Object.NearDemonstrative())} ";
             SB.Append("Gigantic".OptionalColorGigantic(Colorfulness)).Append(": ")
-                .Append(DemonstrativePronoun).Append(ObjectNoun);
+                .Append(Object.IndicativeProximal).Append(" ").Append(ObjectNoun);
 
             bool capitalizeSecondList = false;
             if (weaponDescriptions.Count != 0)
             {
                 List<string> processedWeaponDescription = new();
-                foreach (List<string> weaponEnrty in weaponDescriptions)
+                foreach (DescriptionElement weaponEnrty in weaponDescriptions)
                 {
                     processedWeaponDescription.Add(weaponEnrty.GetProcessedItem(second: false, weaponDescriptions, Object));
                 }
@@ -158,7 +230,7 @@ namespace HNPS_GigantismPlus
                 }
             }
             List<string> processedGeneralDescription = new();
-            foreach (List<string> entry in generalDescriptions)
+            foreach (DescriptionElement entry in generalDescriptions)
             {
                 processedGeneralDescription.Add(entry.GetProcessedItem(second: capitalizeSecondList, generalDescriptions, Object));
             }
@@ -176,51 +248,80 @@ namespace HNPS_GigantismPlus
             return Event.FinalizeString(SB);
         }
 
-        public static List<List<string>> AddDescription(List<List<string>> Descriptions, string Relationship, string Effect)
+        public static List<DescriptionElement> AddDescription(List<DescriptionElement> Descriptions, string Verb, string Effect)
         {
-            Descriptions.Add(new() { Relationship, Effect });
+            Descriptions.Add(new(Verb, Effect));
             return Descriptions;
         }
-        public List<List<string>> AddWeaponDescription(string Relationship, string Effect)
+        public List<DescriptionElement> AddWeaponDescription(string Verb, string Effect)
         {
-            return AddDescription(WeaponDescriptions, Relationship, Effect);
+            return WeaponDescriptions = AddDescription(WeaponDescriptions, Verb, Effect);
         }
-        public List<List<string>> AddGeneralDescription(string Relationship, string Effect)
+        public List<DescriptionElement> AddGeneralDescription(string Verb, string Effect)
         {
-            return AddDescription(GeneralDescriptions, Relationship, Effect);
+            return GeneralDescriptions = AddDescription(GeneralDescriptions, Verb, Effect);
+        }
+        public List<DescriptionElement> AddWeaponDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return AddDescription(WeaponDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddGeneralDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return AddDescription(GeneralDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddWeaponDescription(DescriptionElement DescriptionElement)
+        {
+            return AddDescription(WeaponDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddGeneralDescription(DescriptionElement DescriptionElement)
+        {
+            return AddDescription(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
         }
 
-        public static List<List<string>> RemoveDescription(List<List<string>> Descriptions, string Relationship, string Effect)
+        public static List<DescriptionElement> RemoveDescription(List<DescriptionElement> Descriptions, string Verb, string Effect)
         {
-            List<List<string>> elementsToRemove = new()
-            {
-                new List<string>() { Relationship, Effect },
-            };
-            List<List<string>> InumerateDescriptions = new(Descriptions);
-            if (!InumerateDescriptions.IsNullOrEmpty())
-            {
-                foreach (List<string> entry in InumerateDescriptions)
-                {
-                    if (elementsToRemove.Contains(entry))
-                    {
-                        Descriptions.Remove(entry);
-                    }
-                }
-            }
+            int indent = Debug.LastIndent;
+
+            Debug.Entry(4,
+                $"{nameof(BeforeDescribeModGiganticEvent)}." +
+                $"{nameof(RemoveDescription)}(Verb: {Verb ?? NULL}, Effect: {Effect ?? NULL})",
+                Indent: indent + 1, Toggle: doDebug);
+
+            Descriptions.RemoveAll(x => x.Verb == Verb && x.Effect == Effect);
             return Descriptions;
         }
-        public List<List<string>> RemoveWeaponDescription(string Relationship, string Effect)
+        public List<DescriptionElement> RemoveWeaponDescription(string Verb, string Effect)
         {
-            return RemoveDescription(WeaponDescriptions, Relationship, Effect);
+            return WeaponDescriptions = RemoveDescription(WeaponDescriptions, Verb, Effect);
         }
-        public List<List<string>> RemoveGeneralDescription(string Relationship, string Effect)
+        public List<DescriptionElement> RemoveGeneralDescription(string Verb, string Effect)
         {
-            return RemoveDescription(GeneralDescriptions, Relationship, Effect);
+            return GeneralDescriptions = RemoveDescription(GeneralDescriptions, Verb, Effect);
+        }
+        public List<DescriptionElement> RemoveWeaponDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return WeaponDescriptions = RemoveDescription(WeaponDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> RemoveGeneralDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return GeneralDescriptions = RemoveDescription(GeneralDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> RemoveWeaponDescription(DescriptionElement DescriptionElement)
+        {
+            return WeaponDescriptions = RemoveDescription(WeaponDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+        public List<DescriptionElement> RemoveGeneralDescription(DescriptionElement DescriptionElement)
+        {
+            return GeneralDescriptions = RemoveDescription(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
         }
 
-        public static List<List<string>> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
+        public static List<DescriptionElement> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
         {
-            List<List<string>> Output = new();
+            List<DescriptionElement> Output = new();
             foreach ((string location, string value) in GigantismPlusModGiganticDescriptions.Tags)
             {
                 string[] locationArray = location.Split("::", StringSplitOptions.RemoveEmptyEntries);
@@ -230,7 +331,10 @@ namespace HNPS_GigantismPlus
                 if (targetEvent != When) continue;
                 if (targetList != "General" && targetList != "Weapon")
                 {
-                    Debug.Entry(1, $"WARN [{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
+                    Debug.Warn(1, 
+                        nameof(DescribeModGiganticEvent), 
+                        nameof(IterateDataBucketTags), 
+                        $"[{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
                     continue;
                 }
                 if (!Object.HasPart(conditionPart)) continue;
@@ -239,7 +343,7 @@ namespace HNPS_GigantismPlus
                 if (descriptionArray.Length != 2) continue;
 
                 if (descriptionArray[0] == "'null'") descriptionArray[0] = null;
-                List<string> description = new() { descriptionArray[0], descriptionArray[1] };
+                DescriptionElement description = new(descriptionArray[0], descriptionArray[1]);
                 if (targetEvent == When)
                 {
                     if (targetList == Where)

@@ -71,14 +71,14 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
-        public override Guid AddAdjustment(string Target, string Field, object Value, int Priority)
+        public override Guid AddAdjustment(Type Target, string Field, object Value, int Priority)
         {
-            HNPS_Adjustment adjustment = new(Target, Field, Priority, Value);
+            PartAdjustment adjustment = new(Target, Field, Priority, Value);
             Adjustments ??= new();
             Adjustments.Add(adjustment);
             return adjustment.ID;
         }
-        public override Guid AddAdjustment(string Target, string Field, object Value, bool FlipPriority = false)
+        public override Guid AddAdjustment(Type Target, string Field, object Value, bool FlipPriority = false)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddAdjustment(Target, Field, Value, modPriority);

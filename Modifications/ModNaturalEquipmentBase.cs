@@ -1,15 +1,13 @@
 ﻿using HarmonyLib;
 using HNPS_GigantismPlus;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Reflection;
 using XRL.Language;
 using XRL.World.Anatomy;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -20,13 +18,15 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
-        public class HNPS_Adjustment : IComposite
+        public class PartAdjustment : IComposite
         {
+            private static bool doDebug => getClassDoDebug(nameof(PartAdjustment));
+
             public Guid ID;
 
             public bool Applied; // Whether the adjustment has been applied.
 
-            public string Target; // Render, MeleeWeapon, Armor, etc.
+            public Type Target; // Render, MeleeWeapon, Armor, etc.
 
             public string Field; // Field/Property to adjust
 
@@ -34,17 +34,17 @@ namespace XRL.World.Parts
 
             public object Value; // Value to adjust the Field to.
 
-            public HNPS_Adjustment()
+            public PartAdjustment()
             {
                 ID = Guid.NewGuid();
                 Applied = false;
-                Target = string.Empty;
+                Target = null;
                 Field = string.Empty;
                 Priority = 0;
                 Value = null;
             }
 
-            public HNPS_Adjustment(string Target, string Field, int Priority, object Value)
+            public PartAdjustment(Type Target, string Field, int Priority, object Value)
                 : this ()
             {
                 this.Target = Target;
@@ -53,16 +53,16 @@ namespace XRL.World.Parts
                 this.Value = Value;
             }
 
-            public HNPS_Adjustment(HNPS_Adjustment Source)
+            public PartAdjustment(PartAdjustment Source)
                 : this (Source.Target, Source.Field, Source.Priority, Source.Value)
             {
             }
-            public HNPS_Adjustment(string Address)
+            public PartAdjustment(string Address)
                 : this ()
             {
                 SetAddress(Address);
             }
-            public HNPS_Adjustment(string Address, int Priority, object Value)
+            public PartAdjustment(string Address, int Priority, object Value)
                 : this (Address)
             {
                 this.Priority = Priority;
@@ -73,7 +73,7 @@ namespace XRL.World.Parts
             {
                 string output = string.Empty;
                 output += $"({(Priority != 0 ? Priority : "PriorityUnset")})";
-                output += $"{Target ?? "NoTarget?"}.";
+                output += $"{Target.Name ?? "NoTarget?"}.";
                 output += $"{Field ?? "NoField?"}";
                 output += $" = \"";
                 output += Value != null ? Value.ToString() : "Value?";
@@ -89,12 +89,12 @@ namespace XRL.World.Parts
                 return output;
             }
 
-            public bool HasSameTargetAs(HNPS_Adjustment OtherAdjustment)
+            public bool HasSameTargetAs(PartAdjustment OtherAdjustment)
             {
                 return GetAddress() == OtherAdjustment.GetAddress();
             }
 
-            public bool TryGetHigherPriorityAdjustment(HNPS_Adjustment OtherAdjustment, out HNPS_Adjustment HigherProrityAdjustment)
+            public bool TryGetHigherPriorityAdjustment(PartAdjustment OtherAdjustment, out PartAdjustment HigherProrityAdjustment)
             {
                 HigherProrityAdjustment = null;
                 if (HasSameTargetAs(OtherAdjustment))
@@ -105,7 +105,7 @@ namespace XRL.World.Parts
                 return false;
             }
 
-            public bool SameAs(HNPS_Adjustment a)
+            public bool SameAs(PartAdjustment a)
             {
                 return ID == a.ID;
             }
@@ -119,8 +119,9 @@ namespace XRL.World.Parts
             {
                 if (!Address.IsNullOrEmpty() && Address.Contains('.'))
                 {
+                    Assembly asm = Target.Assembly;
                     string[] pieces = Address.Split('.');
-                    Target = pieces[0];
+                    Target = asm.GetType("XRL.World.Parts." + pieces[0]);
                     Field = pieces[1];
                     return true;
                 }
@@ -131,47 +132,71 @@ namespace XRL.World.Parts
             {
                 if (Object != null && !Applied)
                 {
-                    IPart targetPart = Object.GetPart(Target);
+                    int indent = Debug.LastIndent;
+                    Debug.Divider(4, HONLY, Count: 60, Indent: indent, Toggle: doDebug);
+                    Debug.Entry(4, 
+                        $": {nameof(PartAdjustment)}."
+                        + $"{nameof(Apply)}"
+                        + $"(Object: {Object.DebugName})"
+                        + $" {ToString()}", Indent: indent + 1, Toggle: doDebug);
+
+                    object targetPart = Target == typeof(GameObject) ? Object : Object.GetPart(Target);
+                    Debug.Entry(4, $"{targetPart?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: doDebug);
                     if (targetPart != null)
                     {
+                        Debug.CheckYeh(4, $"{targetPart.GetType().Name}", Indent: indent + 2, Toggle: doDebug);
                         Traverse targetPartTraverse = new(targetPart);
                         Traverse targetProperty = targetPartTraverse.Property(Field);
                         Traverse targetField = targetPartTraverse.Field(Field);
                         Type valueType = Value.GetType();
+                        Debug.Entry(4, $"Value Type: {valueType?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
+                        Debug.Entry(4, $"{nameof(targetProperty)}.GetValueType: {targetProperty?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
+                        Debug.Entry(4, $"{nameof(targetField)}.GetValueType: {targetField?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
                         try
                         {
                             if (targetProperty.PropertyExists() && targetProperty.GetValueType() == valueType)
                             {
+                                Debug.CheckYeh(4, $"{nameof(targetProperty)}", Indent: indent + 3, Toggle: doDebug);
+                                Debug.Entry(4, $"Property Type: {targetProperty.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
                                 targetProperty.SetValue(Value);
 
                                 Applied = true;
+                                Debug.Entry(4, $"Value: {targetProperty.GetValue()}", Indent: indent + 4, Toggle: doDebug);
+                                Debug.LastIndent = indent;
                                 return targetProperty.GetValue().Equals(Value);
                             }
-                            if (targetField.PropertyExists() && targetField.GetValueType() == valueType)
+                            if (targetField.FieldExists() && targetField.GetValueType() == valueType)
                             {
+                                Debug.CheckYeh(4, $"{nameof(targetField)}", Indent: indent + 3, Toggle: doDebug);
+                                Debug.Entry(4, $"Field Type: {targetField.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
                                 targetField.SetValue(Value);
 
                                 Applied = true;
+                                Debug.Entry(4, $"Value: {targetField.GetValue()}", Indent: indent + 4, Toggle: doDebug);
+                                Debug.LastIndent = indent;
                                 return targetField.GetValue().Equals(Value);
                             }
                         }
                         catch (Exception e)
                         {
                             MetricsManager.LogModError(ThisMod, e);
+                            Debug.LastIndent = indent;
                             return false;
                         }
                     }
-                    Applied = true;
+                    else 
+                    { 
+                        Debug.CheckNah(4, $"Object has no {Target.Name} IPart", Indent: indent + 2, Toggle: doDebug);
+                        Applied = true;
+                    }
+                    Debug.LastIndent = indent;
                 }
                 return false;
             }
-
-
-
         }
 
         [NonSerialized]
-        public List<HNPS_Adjustment> Adjustments;
+        public List<PartAdjustment> Adjustments;
 
         public string BodyPartType;
 
@@ -253,8 +278,8 @@ namespace XRL.World.Parts
                 && Object.IsNaturalEquipment();
         }
 
-        public abstract Guid AddAdjustment(string Target, string Field, object Value, int Priority);
-        public abstract Guid AddAdjustment(string Target, string Field, object Value, bool FlipPriority = false);
+        public abstract Guid AddAdjustment(Type Target, string Field, object Value, int Priority);
+        public abstract Guid AddAdjustment(Type Target, string Field, object Value, bool FlipPriority = false);
         public abstract int GetDamageDieCount();
         public abstract int GetDamageDieSize();
         public abstract int GetDamageBonus();
@@ -310,7 +335,7 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
 
-            Adjustments = Reader.ReadList<HNPS_Adjustment>() ?? new();
+            Adjustments = Reader.ReadList<PartAdjustment>() ?? new();
             AddedParts = Reader.ReadList<string>() ?? new();
             AddedStringProps = Reader.ReadDictionary<string, string>() ?? new();
             AddedIntProps = Reader.ReadDictionary<string, int>() ?? new();
@@ -323,7 +348,7 @@ namespace XRL.World.Parts
             Adjustments ??= new();
             if (!Adjustments.IsNullOrEmpty())
             {
-                foreach (HNPS_Adjustment adjustment in Adjustments)
+                foreach (PartAdjustment adjustment in Adjustments)
                 {
                     naturalEquipmentMod.Adjustments.Add(new(adjustment));
                 }

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
-
+using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -57,7 +56,18 @@ namespace HNPS_GigantismPlus
 
         public bool HandleEvent(DescribeModGiganticEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {nameof(The)}.{nameof(The.Game)}"
+                + $"{nameof(HandleEvent)}({nameof(DescribeModGiganticEvent)}"
+                + $" E.Context: {E.Context})",
+                Indent: indent + 1, Toggle: doDebug);
+
             GameObject Object = E.Object;
+
+            GameObjectBlueprint GigantismPlusModGiganticDescriptions = GameObjectFactory.Factory.GetBlueprint(MODGIGANTIC_DESCRIPTIONBUCKET);
+            E.WeaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
+            E.GeneralDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "General"));
 
             if (Object.InheritsFrom("FoldingChair"))
             {
@@ -328,6 +338,16 @@ namespace HNPS_GigantismPlus
                 E.AddGeneralDescription("", "could probably make some seriously thick stew..");
             }
 
+            E.WeaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "Weapon"));
+            E.GeneralDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "General"));
+
+            Debug.Entry(4,
+                $"x {nameof(The)}.{nameof(The.Game)}"
+                + $"{nameof(HandleEvent)}({nameof(DescribeModGiganticEvent)}"
+                + $" E.Context: {E.Context})"
+                + $" @//",
+                Indent: indent + 1, Toggle: doDebug);
+            Debug.LastIndent = indent;
             return true;
         }
     } //!-- public class DescribeModGiganticHandler : IEventHandler, IModEventHandler<DescribeModGiganticEvent>

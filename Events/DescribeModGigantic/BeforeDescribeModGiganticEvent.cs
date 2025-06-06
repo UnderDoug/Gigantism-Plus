@@ -6,9 +6,10 @@ using XRL.Language;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.DescribeModGiganticEvent;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -24,9 +25,9 @@ namespace HNPS_GigantismPlus
 
         public string ObjectNoun;
 
-        public List<List<string>> WeaponDescriptions;
+        public List<DescriptionElement> WeaponDescriptions;
 
-        public List<List<string>> GeneralDescriptions;
+        public List<DescriptionElement> GeneralDescriptions;
 
         public string Context;
 
@@ -53,7 +54,7 @@ namespace HNPS_GigantismPlus
             Context = null;
         }
 
-        public static BeforeDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<List<string>> WeaponDescriptions, List<List<string>> GeneralDescriptions, string Context = null)
+        public static BeforeDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<DescriptionElement> WeaponDescriptions, List<DescriptionElement> GeneralDescriptions, string Context = null)
         {
             BeforeDescribeModGiganticEvent beforeDescribeModGiganticEvent = FromPool();
             beforeDescribeModGiganticEvent.Object = Object;
@@ -63,7 +64,7 @@ namespace HNPS_GigantismPlus
             beforeDescribeModGiganticEvent.Context = Context;
             return beforeDescribeModGiganticEvent;
         }
-        public static BeforeDescribeModGiganticEvent CollectFor(GameObject Object, string ObjectNoun = null, List<List<string>> WeaponDescriptions = null, List<List<string>> GeneralDescriptions = null, string Context = null)
+        public static BeforeDescribeModGiganticEvent CollectFor(GameObject Object, string ObjectNoun = null, List<DescriptionElement> WeaponDescriptions = null, List<DescriptionElement> GeneralDescriptions = null, string Context = null)
         {
             BeforeDescribeModGiganticEvent E = FromPool(Object, ObjectNoun, WeaponDescriptions, GeneralDescriptions, Context);
 
@@ -92,57 +93,88 @@ namespace HNPS_GigantismPlus
                 if (proceed && objectWantsStr)
                 {
                     Event @event = Event.New(RegisteredEventID);
-                    @event.SetParameter($"{nameof(Object)}", Object);
-                    @event.SetParameter($"{nameof(ObjectNoun)}", ObjectNoun);
-                    @event.SetParameter($"{nameof(WeaponDescriptions)}", WeaponDescriptions);
-                    @event.SetParameter($"{nameof(GeneralDescriptions)}", GeneralDescriptions);
-                    @event.SetParameter($"{nameof(Context)}", Context);
+                    @event.SetParameter($"{nameof(E.Object)}", E.Object);
+                    @event.SetParameter($"{nameof(E.Object)}", E.Object);
+                    @event.SetParameter($"{nameof(E.WeaponDescriptions)}", E.WeaponDescriptions);
+                    @event.SetParameter($"{nameof(E.GeneralDescriptions)}", E.GeneralDescriptions);
+                    @event.SetParameter($"{nameof(E.Context)}", E.Context);
                     proceed = Object.FireEvent(@event);
+                    E.WeaponDescriptions = @event.GetParameter(nameof(E.WeaponDescriptions)) as List<DescriptionElement>;
+                    E.GeneralDescriptions = @event.GetParameter(nameof(E.GeneralDescriptions)) as List<DescriptionElement>;
                 }
             }
             return E;
         }
 
-        public static List<List<string>> AddDescription(List<List<string>> Descriptions, string Relationship, string Effect)
+        public static List<DescriptionElement> AddDescription(List<DescriptionElement> Descriptions, string Verb, string Effect)
         {
-            Descriptions.Add(new() { Relationship, Effect });
+            Descriptions.Add(new(Verb, Effect));
             return Descriptions;
         }
-        public List<List<string>> AddWeaponDescription(string Relationship, string Effect)
+        public List<DescriptionElement> AddWeaponDescription(string Verb, string Effect)
         {
-            return AddDescription(WeaponDescriptions, Relationship, Effect);
+            return AddDescription(WeaponDescriptions, Verb, Effect);
         }
-        public List<List<string>> AddGeneralDescription(string Relationship, string Effect)
+        public List<DescriptionElement> AddGeneralDescription(string Verb, string Effect)
         {
-            return AddDescription(GeneralDescriptions, Relationship, Effect);
+            return AddDescription(GeneralDescriptions, Verb, Effect);
+        }
+        public List<DescriptionElement> AddWeaponDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return AddDescription(WeaponDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddGeneralDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return AddDescription(GeneralDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddWeaponDescription(DescriptionElement DescriptionElement)
+        {
+            return AddDescription(WeaponDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddGeneralDescription(DescriptionElement DescriptionElement)
+        {
+            return AddDescription(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
         }
 
-        public static List<List<string>> RemoveDescription(string Relationship, string Effect, List<List<string>> Descriptions)
+        public static List<DescriptionElement> RemoveDescription(List<DescriptionElement> Descriptions, string Verb, string Effect)
         {
-            List<List<string>> elementsToRemove = new()
-            {
-                new List<string>() { Relationship, Effect },
-            };
-            List<List<string>> InumerateDescriptions = new(Descriptions);
-            if (!InumerateDescriptions.IsNullOrEmpty())
-            {
-                foreach (List<string> entry in InumerateDescriptions)
-                {
-                    if (elementsToRemove.Contains(entry))
-                    {
-                        Descriptions.Remove(entry);
-                    }
-                }
-            }
+            int indent = Debug.LastIndent;
+
+            Debug.Entry(4,
+                $"{nameof(BeforeDescribeModGiganticEvent)}." +
+                $"{nameof(RemoveDescription)}(Verb: {Verb ?? NULL}, Effect: {Effect ?? NULL})",
+                Indent: indent + 1, Toggle: doDebug);
+
+            Descriptions.RemoveAll(x => x.Verb == Verb && x.Effect == Effect);
             return Descriptions;
         }
-        public List<List<string>> RemoveWeaponDescription(string Relationship, string Effect)
+        public List<DescriptionElement> RemoveWeaponDescription(string Verb, string Effect)
         {
-            return RemoveDescription(Relationship, Effect, WeaponDescriptions);
+            return WeaponDescriptions = RemoveDescription(WeaponDescriptions, Verb, Effect);
         }
-        public List<List<string>> RemoveGeneralDescription(string Relationship, string Effect)
+        public List<DescriptionElement> RemoveGeneralDescription(string Verb, string Effect)
         {
-            return RemoveDescription(Relationship, Effect, GeneralDescriptions);
+            return GeneralDescriptions = RemoveDescription(GeneralDescriptions, Verb, Effect);
+        }
+        public List<DescriptionElement> RemoveWeaponDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return WeaponDescriptions = RemoveDescription(WeaponDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> RemoveGeneralDescription(List<string> Entry)
+        {
+            DescriptionElement descriptionElement = new(Entry);
+            return GeneralDescriptions = RemoveDescription(GeneralDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+        }
+        public List<DescriptionElement> RemoveWeaponDescription(DescriptionElement DescriptionElement)
+        {
+            return WeaponDescriptions = RemoveDescription(WeaponDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+        public List<DescriptionElement> RemoveGeneralDescription(DescriptionElement DescriptionElement)
+        {
+            return GeneralDescriptions = RemoveDescription(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
         }
     }
 }

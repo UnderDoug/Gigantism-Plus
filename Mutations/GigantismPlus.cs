@@ -277,9 +277,9 @@ namespace XRL.World.Parts.Mutation
             giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
             return giganticMugMod;
         }
-        public static ModGiganticNaturalWeapon NewClosedFistMod(GigantismPlus assigningPart)
+        public static ModClosedGiganticNaturalWeapon NewClosedFistMod(GigantismPlus assigningPart)
         {
-            ModGiganticNaturalWeapon closedGiganticFist = new()
+            ModClosedGiganticNaturalWeapon closedGiganticFist = new()
             {
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
@@ -343,11 +343,18 @@ namespace XRL.World.Parts.Mutation
         }
         public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
-            if (NaturalEquipmentMod.Adjective == "closed") return 0;
-            double perLevel = 3.0;
-            int levelOffset = MinDamageBonusIncrease * (int)perLevel;
-            if (NaturalEquipmentMod.BodyPartType == "Head") return 5;
-            if (NaturalEquipmentMod.BodyPartType == "Hand") return (int)Math.Max(1, Math.Floor((Level - levelOffset) / perLevel));
+            if (NaturalEquipmentMod.Adjective == "closed") 
+                return 0;
+
+            if (NaturalEquipmentMod.BodyPartType == "Head") 
+                return 5;
+
+            if (NaturalEquipmentMod.BodyPartType == "Hand")
+            {
+                double perLevel = 3.0;
+                int levelOffset = MinDamageBonusIncrease * (int)perLevel;
+                return (int)Math.Max(MinDamageBonusIncrease, Math.Floor((Level - levelOffset) / perLevel));
+            }
             return 0;
         }
         public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)

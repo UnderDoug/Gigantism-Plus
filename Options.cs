@@ -1,16 +1,16 @@
-﻿using System;
+﻿using HNPS_GigantismPlus.Harmony;
+using System;
 using System.Collections.Generic;
-
 using XRL;
+using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
-using XRL.World.ObjectBuilders;
 using XRL.World.ZoneBuilders;
-
-using HNPS_GigantismPlus.Harmony;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static HNPS_GigantismPlus.Utils;
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 namespace HNPS_GigantismPlus
 {
@@ -83,6 +83,7 @@ namespace HNPS_GigantismPlus
             // General
             { nameof(NaturalEquipmentManager), true },
             { nameof(ModNaturalEquipmentBase), true },
+            { nameof(PartAdjustment), true },
             { nameof(ModGiganticNaturalWeapon), true },
             { nameof(ModClosedGiganticNaturalWeapon), true },
             { nameof(ModElongatedNaturalWeapon), true },
@@ -112,8 +113,9 @@ namespace HNPS_GigantismPlus
             // Events
             { nameof(AfterBodyPartsUpdatedEvent), false },
             { nameof(BeforeBodyPartsUpdatedEvent), false },
-            { nameof(BeforeDescribeModGiganticEvent), false },
-            { nameof(DescribeModGiganticEvent), false },
+            { nameof(BeforeDescribeModGiganticEvent), true },
+            { nameof(DescribeModGiganticEvent), true },
+            { nameof(DescriptionElement), true },
             { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
             { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
             { nameof(ManageDefaultNaturalEquipmentEvent), false },

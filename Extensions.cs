@@ -21,16 +21,16 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
 
+using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using PlayFab.ClientModels;
 
 namespace HNPS_GigantismPlus
 {
     public static class Extensions
     {
         private static bool doDebug => true;
-        private static bool getDoDebug(string MethodName)
+        public static bool getDoDebug(string MethodName)
         {
             if (MethodName == nameof(GigantifyInventory))
                 return true;
@@ -924,6 +924,50 @@ namespace HNPS_GigantismPlus
                 return obj.It + obj.GetVerb(item[0]) + " " + item[1];
             }
             return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
+        }
+
+        public static string GetProcessedItem(this DescriptionElement DescriptionElement, bool second, List<DescriptionElement> DescriptionElements, GameObject obj)
+        {
+            string verb = DescriptionElement.Verb;
+            string effect = DescriptionElement.Effect;
+
+            if (verb == "")
+            {
+                if (second && DescriptionElement.Equals(DescriptionElements[0]))
+                {
+                    return obj.It + " " + effect;
+                }
+                return effect;
+            }
+            if (verb == null)
+            {
+                if (second && DescriptionElement.Equals(DescriptionElements[0]))
+                {
+                    return obj.Itis + " " + effect;
+                }
+                if (!DescriptionElement.Equals(DescriptionElements[0]))
+                {
+                    bool flag = true;
+                    foreach (DescriptionElement descriptionElement in DescriptionElements)
+                    {
+                        if (descriptionElement.Verb != null)
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        return effect;
+                    }
+                }
+                return obj.GetVerb("are", PrependSpace: false) + " " + effect;
+            }
+            if (second && DescriptionElement.Equals(DescriptionElements[0]))
+            {
+                return obj.It + obj.GetVerb(verb) + " " + effect;
+            }
+            return obj.GetVerb(verb, PrependSpace: false) + " " + effect;
         }
 
         public static string GetObjectNoun(this GameObject Object)

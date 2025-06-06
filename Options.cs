@@ -8,8 +8,8 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using XRL.World.ZoneBuilders;
 using static HNPS_GigantismPlus.Const;
-using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 namespace HNPS_GigantismPlus

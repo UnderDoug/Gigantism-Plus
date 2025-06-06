@@ -13,6 +13,7 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class DescribeModGiganticEvent : ModPooledEvent<DescribeModGiganticEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticEvent));
@@ -122,14 +123,14 @@ namespace HNPS_GigantismPlus
 
         public static DescribeModGiganticEvent FromPool(BeforeDescribeModGiganticEvent BeforeEvent)
         {
-            DescribeModGiganticEvent afterDescribeModGiganticEvent = FromPool();
-            afterDescribeModGiganticEvent.BeforeEvent = BeforeEvent;
-            afterDescribeModGiganticEvent.Object = BeforeEvent.Object;
-            afterDescribeModGiganticEvent.ObjectNoun = BeforeEvent.ObjectNoun;
-            afterDescribeModGiganticEvent.WeaponDescriptions = new();
-            afterDescribeModGiganticEvent.GeneralDescriptions = new();
-            afterDescribeModGiganticEvent.Context = BeforeEvent.Context;
-            return afterDescribeModGiganticEvent;
+            DescribeModGiganticEvent E = FromPool();
+            E.BeforeEvent = BeforeEvent;
+            E.Object = BeforeEvent.Object;
+            E.ObjectNoun = BeforeEvent.ObjectNoun;
+            E.WeaponDescriptions = new();
+            E.GeneralDescriptions = new();
+            E.Context = BeforeEvent.Context;
+            return E;
         }
 
         public static DescribeModGiganticEvent Send(BeforeDescribeModGiganticEvent BeforeEvent)

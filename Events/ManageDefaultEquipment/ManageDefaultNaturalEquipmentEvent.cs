@@ -17,8 +17,6 @@ namespace HNPS_GigantismPlus
     {
         private static bool doDebug => getClassDoDebug(nameof(ManageDefaultNaturalEquipmentEvent));
 
-        public new static readonly int CascadeLevel = CASCADE_NONE;
-
         public static readonly string RegisteredEventID = nameof(ManageDefaultNaturalEquipmentEvent);
 
         public GameObject Equipment;

@@ -49,9 +49,7 @@ namespace XRL.World.Parts.Skill
         }
 
         public static readonly string COMMAND_NAME = "CommandTacticsVault";
-
         public static readonly string COMMAND_TOGGLE = "CommandToggleTacticsVault";
-
         private static readonly string BEGIN_ATTACK_EVENT = "BeginAttack";
 
         public Guid ActivatedAbilityID = Guid.Empty;
@@ -130,14 +128,8 @@ namespace XRL.World.Parts.Skill
                         Class: "Skills",
                         Description: null,
                         Icon: "\xE3", // π
-                        DisabledMessage: null,
                         Toggleable: true,
                         DefaultToggleState: true,
-                        ActiveToggle: false,
-                        IsAttack: false,
-                        IsRealityDistortionBased: false,
-                        IsWorldMapUsable: false,
-                        Silent: false,
                         AlwaysAllowToggleOff: true
                         );
             return true;

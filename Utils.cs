@@ -28,7 +28,7 @@ namespace HNPS_GigantismPlus
     public static class Utils
     {
         private static bool doDebug => true;
-        private static bool getDoDebug (string MethodName)
+        public static bool getDoDebug (string MethodName)
         {
             if (MethodName == nameof(TryGetTilePath))
                 return false;

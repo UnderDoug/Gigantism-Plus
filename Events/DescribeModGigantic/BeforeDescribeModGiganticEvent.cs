@@ -13,11 +13,10 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class BeforeDescribeModGiganticEvent : ModPooledEvent<BeforeDescribeModGiganticEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModGiganticEvent));
-
-        public new static readonly int CascadeLevel = CASCADE_ALL;
 
         public static readonly string RegisteredEventID = GetRegisteredEventID();
 
@@ -56,13 +55,13 @@ namespace HNPS_GigantismPlus
 
         public static BeforeDescribeModGiganticEvent FromPool(GameObject Object, string ObjectNoun, List<DescriptionElement> WeaponDescriptions, List<DescriptionElement> GeneralDescriptions, string Context = null)
         {
-            BeforeDescribeModGiganticEvent beforeDescribeModGiganticEvent = FromPool();
-            beforeDescribeModGiganticEvent.Object = Object;
-            beforeDescribeModGiganticEvent.ObjectNoun = ObjectNoun;
-            beforeDescribeModGiganticEvent.WeaponDescriptions = WeaponDescriptions ?? new();
-            beforeDescribeModGiganticEvent.GeneralDescriptions = GeneralDescriptions ?? new();
-            beforeDescribeModGiganticEvent.Context = Context;
-            return beforeDescribeModGiganticEvent;
+            BeforeDescribeModGiganticEvent E = FromPool();
+            E.Object = Object;
+            E.ObjectNoun = ObjectNoun;
+            E.WeaponDescriptions = WeaponDescriptions ?? new();
+            E.GeneralDescriptions = GeneralDescriptions ?? new();
+            E.Context = Context;
+            return E;
         }
         public static BeforeDescribeModGiganticEvent CollectFor(GameObject Object, string ObjectNoun = null, List<DescriptionElement> WeaponDescriptions = null, List<DescriptionElement> GeneralDescriptions = null, string Context = null)
         {

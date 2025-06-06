@@ -361,7 +361,7 @@ namespace XRL.World.Parts
                     displayNameOnlySansRays.Replace(icyString, "");
                     displayNameOnlySansRays.Replace(flamingString, "");
 
-                    bool tilePathDebugToggle = HNPS_GigantismPlus.Extensions.getDoDebug(nameof(TryGetTilePath));
+                    bool tilePathDebugToggle = Utils.getDoDebug(nameof(TryGetTilePath));
                     Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                     if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath))
                     {

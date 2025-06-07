@@ -106,8 +106,7 @@ namespace HNPS_GigantismPlus.Harmony
                 return true;
             }
 
-            BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(Object);
-            __result = DescribeModGiganticEvent.Send(beforeEvent).Process();
+            __result = DescribeModGiganticEvent.Send(Object).Process();
 
             return false;
         }

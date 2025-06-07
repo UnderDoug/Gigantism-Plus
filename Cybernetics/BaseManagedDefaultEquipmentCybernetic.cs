@@ -143,10 +143,13 @@ namespace XRL.World.Parts
 
         public virtual ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
         {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
-                Indent: 2, Toggle: getDoDebug());
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
@@ -154,14 +157,28 @@ namespace XRL.World.Parts
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
+            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return NaturalEquipmentMod;
         }
         public virtual List<ModNaturalEquipment<T>> UpdateNaturalEquipmentMods(List<ModNaturalEquipment<T>> NaturalEquipmentMods, int Level)
         {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(UpdateNaturalEquipmentMods)}(List<ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMods, int Level: {Level})",
-                Indent: 2, Toggle: getDoDebug());
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
@@ -171,6 +188,15 @@ namespace XRL.World.Parts
                 }
             }
 
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return NaturalEquipmentMods;
         }
 
@@ -187,10 +213,14 @@ namespace XRL.World.Parts
         public virtual void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = Implantee.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageDefaultNaturalEquipment)}(body)", Toggle: getDoDebug());
-            Debug.Entry(4, $"TARGET {Implantee.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
+            string InstanceObjectZoneID = InstanceObjectZone?.ZoneID ?? "[Pre-build]";
+
+            Debug.Header(4, 
+                $"{typeof(T).Name}", 
+                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"(body)", Toggle: getDoDebug());
+
+            Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
@@ -198,7 +228,8 @@ namespace XRL.World.Parts
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageDefaultNaturalEquipment)}(body of: {Implantee.Blueprint})", Toggle: getDoDebug());
+                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"(body of: {Implantee.Blueprint})", Toggle: getDoDebug());
         }
 
         public override bool WantEvent(int ID, int cascade)

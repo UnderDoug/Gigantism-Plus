@@ -84,6 +84,7 @@ namespace HNPS_GigantismPlus
             { nameof(NaturalEquipmentManager), true },
             { nameof(ModNaturalEquipmentBase), true },
             { nameof(PartAdjustment), true },
+            { nameof(DescriptionElement), true },
             { nameof(ModGiganticNaturalWeapon), true },
             { nameof(ModClosedGiganticNaturalWeapon), true },
             { nameof(ModElongatedNaturalWeapon), true },
@@ -105,7 +106,7 @@ namespace HNPS_GigantismPlus
             { nameof(WrassleGear), true },
             { nameof(Tactics_Vault), false },
             { nameof(Vaultable), false },
-            { nameof(Gigantified), false },
+            { nameof(Gigantified), true },
             { nameof(SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
             { nameof(WrassleGiantHero), true },
@@ -113,9 +114,9 @@ namespace HNPS_GigantismPlus
             // Events
             { nameof(AfterBodyPartsUpdatedEvent), false },
             { nameof(BeforeBodyPartsUpdatedEvent), false },
+            { "IDescribeModGiganticEvent", false },
             { nameof(BeforeDescribeModGiganticEvent), true },
             { nameof(DescribeModGiganticEvent), true },
-            { nameof(DescriptionElement), true },
             { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
             { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
             { nameof(ManageDefaultNaturalEquipmentEvent), false },
@@ -126,7 +127,7 @@ namespace HNPS_GigantismPlus
             { nameof(BeforeVaultEvent), false },
             { nameof(VaultedEvent), false },
             { nameof(CrayonsGetColorsEvent), false },
-            { nameof(GetPrioritisedNaturalEquipmentModsEvent), false },
+            { nameof(GetPrioritisedNaturalEquipmentModsEvent), true },
 
             // Handlers
             { nameof(CrayonsGetColorHandler), false },

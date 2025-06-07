@@ -11,7 +11,9 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    public class BeforeDescribeModGiganticHandler : IEventHandler, IModEventHandler<BeforeDescribeModGiganticEvent>
+    public class BeforeDescribeModGiganticHandler 
+        : IEventHandler
+        , IModEventHandler<BeforeDescribeModGiganticEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModGiganticHandler));
 
@@ -26,6 +28,14 @@ namespace HNPS_GigantismPlus
 
         public bool HandleEvent(BeforeDescribeModGiganticEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {nameof(The)}.{nameof(The.Game)}."
+                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $" E.Object: {E.Object?.DebugName ?? NULL},"
+                + $" E.Context: {E.Context})",
+                Indent: indent + 1, Toggle: doDebug);
+
             GameObject Object = E.Object;
 
             /* Check out ObjectBlueprints/Data.xml -> GigantismPlusModGiganticDescriptions
@@ -36,12 +46,24 @@ namespace HNPS_GigantismPlus
             }
             */
 
+            Debug.Entry(4,
+                $"x {nameof(The)}.{nameof(The.Game)}"
+                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $" E.Object: {E.Object?.DebugName ?? NULL},"
+                + $" E.Context: {E.Context})"
+                + $" @//",
+                Indent: indent + 1, Toggle: doDebug);
+            Debug.LastIndent = indent;
             return true;
         }
 
-    } //!-- public class BeforeDescribeModGiganticHandler : IEventHandler, IModEventHandler<BeforeDescribeModGiganticEvent>
+    } //!-- public class BeforeDescribeModGiganticHandler
+      //        : IEventHandler
+      //        , IModEventHandler<BeforeDescribeModGiganticEvent>
 
-    public class DescribeModGiganticHandler : IEventHandler, IModEventHandler<DescribeModGiganticEvent>
+    public class DescribeModGiganticHandler 
+        : IEventHandler
+        , IModEventHandler<DescribeModGiganticEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticHandler));
 
@@ -58,8 +80,9 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"@ {nameof(The)}.{nameof(The.Game)}"
-                + $"{nameof(HandleEvent)}({nameof(DescribeModGiganticEvent)}"
+                $"@ {nameof(The)}.{nameof(The.Game)}."
+                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $" E.Object: {E.Object?.DebugName ?? NULL},"
                 + $" E.Context: {E.Context})",
                 Indent: indent + 1, Toggle: doDebug);
 
@@ -343,12 +366,15 @@ namespace HNPS_GigantismPlus
 
             Debug.Entry(4,
                 $"x {nameof(The)}.{nameof(The.Game)}"
-                + $"{nameof(HandleEvent)}({nameof(DescribeModGiganticEvent)}"
+                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $" E.Object: {E.Object?.DebugName ?? NULL},"
                 + $" E.Context: {E.Context})"
                 + $" @//",
                 Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return true;
         }
-    } //!-- public class DescribeModGiganticHandler : IEventHandler, IModEventHandler<DescribeModGiganticEvent>
+    } //!-- public class DescribeModGiganticHandler
+      //        : IEventHandler
+      //        , IModEventHandler<DescribeModGiganticEvent>
 }

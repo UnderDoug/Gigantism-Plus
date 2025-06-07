@@ -26,11 +26,6 @@ namespace HNPS_GigantismPlus
 
         public SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods;
 
-        public override int GetCascadeLevel()
-        {
-            return CascadeLevel;
-        }
-
         public virtual string GetRegisteredEventID()
         {
             return RegisteredEventID;
@@ -59,7 +54,9 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"@ {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
                 + $"{nameof(AddNaturalEquipmentMod)}"
-                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name})",
+                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name})"
+                + $" Creature: {Creature?.DebugName ?? NULL},"
+                + $" Equipment: {Equipment?.DebugName ?? NULL}",
                 Indent: indent, Toggle: doDebug);
 
             NaturalEquipmentMods ??= new();

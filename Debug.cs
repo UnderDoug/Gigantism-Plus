@@ -197,37 +197,119 @@ namespace HNPS_GigantismPlus
             indent++;
             foreach (string category in Categories)
             {
-                if (@default.Contains(category)) Entry(Verbosity, $"{category}", indent, Toggle: Toggle);
+                if (@default.Contains(category)) Entry(Verbosity, $"{category}", Indent: indent, Toggle: Toggle);
                 indent++;
                 switch (category)
                 {
                     case "Damage":
-                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "BaseDamage", $"{MeleeWeapon.BaseDamage}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "MaxStrengthBonus", $"{MeleeWeapon.MaxStrengthBonus}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "HitBonus", $"{MeleeWeapon.HitBonus}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "PenBonus", $"{MeleeWeapon.PenBonus}", Indent: indent, Toggle: Toggle);
                         break;
                     case "Combat":
-                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Stat", $"{MeleeWeapon.Stat}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Skill", $"{MeleeWeapon.Skill}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Slot", $"{MeleeWeapon.Slot}", Indent: indent, Toggle: Toggle);
                         break;
                     case "Render":
                         Render Render = MeleeWeapon.ParentObject.Render;
-                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DisplayName", $"{Render.DisplayName}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Tile", $"{Render.Tile}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "ColorString", $"{Render.ColorString}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "DetailColor", $"{Render.DetailColor}", Indent: indent, Toggle: Toggle);
                         break;
                     case "etc":
-                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", indent, Toggle: Toggle);
-                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "Ego", $"{MeleeWeapon.Ego}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "IsEquippedOnPrimary", $"{MeleeWeapon.IsEquippedOnPrimary()}", Indent: indent, Toggle: Toggle);
+                        LoopItem(Verbosity, "IsImprovisedWeapon", $"{MeleeWeapon.IsImprovisedWeapon()}", Indent: indent, Toggle: Toggle);
                         break;
                 }
                 indent--;
             }
             return MeleeWeapon;
+        }
+
+        public static ModNaturalEquipmentBase Vomit(this ModNaturalEquipmentBase NaturalEquipmentMod, int Verbosity, string Title = null, bool DamageOnly = false, int Indent = 0, bool Toggle = true)
+        {
+            int indent = Indent;
+            Vomit(Verbosity, $"{nameof(NaturalEquipmentMod)}[{NaturalEquipmentMod.GetSource()}]", Title, Indent: Indent, Toggle: Toggle);
+            
+            if (!DamageOnly)
+            {
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.BodyPartType)}", $"{NaturalEquipmentMod.BodyPartType}", Indent: indent + 1, Toggle: Toggle);
+
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.ModPriority)}", $"{NaturalEquipmentMod.ModPriority}", Indent: indent + 1, Toggle: Toggle);
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DescriptionPriority)}", $"{NaturalEquipmentMod.DescriptionPriority}", Indent: indent + 1, Toggle: Toggle);
+            }
+
+            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DamageDieCount)}", $"{NaturalEquipmentMod.DamageDieCount}", Indent: indent + 1, Toggle: Toggle);
+            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DamageDieSize)}", $"{NaturalEquipmentMod.DamageDieSize}", Indent: indent + 1, Toggle: Toggle);
+            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DamageBonus)}", $"{NaturalEquipmentMod.DamageBonus}", Indent: indent + 1, Toggle: Toggle);
+            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.HitBonus)}", $"{NaturalEquipmentMod.HitBonus}", Indent: indent + 1, Toggle: Toggle);
+            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.PenBonus)}", $"{NaturalEquipmentMod.PenBonus}", Indent: indent + 1, Toggle: Toggle);
+
+            if (!DamageOnly)
+            {
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.Adjective)}", $"{NaturalEquipmentMod.Adjective}", Indent: indent + 1, Toggle: Toggle);
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AdjectiveColor)}", $"{NaturalEquipmentMod.AdjectiveColor}", Indent: indent + 1, Toggle: Toggle);
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AdjectiveColorFallback)}", $"{NaturalEquipmentMod.AdjectiveColorFallback}", Indent: indent + 1, Toggle: Toggle);
+
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.Adjustments)}", Indent: indent + 1, Toggle: Toggle);
+                if (!NaturalEquipmentMod.Adjustments.IsNullOrEmpty())
+                {
+                    foreach (PartAdjustment partAdjustment in NaturalEquipmentMod.Adjustments)
+                    {
+                        LoopItem(Verbosity, partAdjustment.ToString(), Indent: indent + 2, Toggle: Toggle);
+                    }
+                }
+                else
+                {
+                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
+                }
+
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AddedParts)}", Indent: indent + 1, Toggle: Toggle);
+                if (!NaturalEquipmentMod.AddedParts.IsNullOrEmpty())
+                {
+                    foreach (string addedPart in NaturalEquipmentMod.AddedParts)
+                    {
+                        LoopItem(Verbosity, addedPart, Indent: indent + 2, Toggle: Toggle);
+                    }
+                }
+                else
+                {
+                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
+                }
+
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AddedStringProps)}", Indent: indent + 1, Toggle: Toggle);
+                if (!NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty())
+                {
+                    foreach ((string prop, string value) in NaturalEquipmentMod.AddedStringProps)
+                    {
+                        LoopItem(Verbosity, prop, value, Indent: indent + 2, Toggle: Toggle);
+                    }
+                }
+                else
+                {
+                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
+                }
+
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AddedIntProps)}", Indent: indent + 1, Toggle: Toggle);
+                if (!NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty())
+                {
+                    foreach ((string prop, int value) in NaturalEquipmentMod.AddedIntProps)
+                    {
+                        LoopItem(Verbosity, prop, $"{value}", Indent: indent + 2, Toggle: Toggle);
+                    }
+                }
+                else
+                {
+                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
+                }
+            }
+
+            Debug.LastIndent = Indent;
+            return NaturalEquipmentMod;
         }
 
         public static GameObject VaultVomit(this GameObject Vaulter, int Verbosity, string Method = null, string Context = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
@@ -244,7 +326,7 @@ namespace HNPS_GigantismPlus
         {
             if (!Method.IsNullOrEmpty()) Method = $".{Method}";
             Method = $"{nameof(Tactics_Vault)}{Method}";
-            Vomit(Verbosity, Method, Context, Indent, Toggle);
+            Vomit(Verbosity, Method, Context, Indent: Indent, Toggle);
             Divider(Verbosity, HONLY, Count: 40, Indent: Indent, Toggle: Toggle);
 
             int indent = Indent;
@@ -265,11 +347,11 @@ namespace HNPS_GigantismPlus
             bool vaulted = VaultSkill.Vaulted;
 
             Entry(Verbosity, $"Cells and Vault State", indent++, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.MidVault)}", $"{midVault}", indent, Good: midVault, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.Vaulted)}", $"{vaulted}", indent, Good: vaulted, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.Origin)}", $"[{origin?.Location}]", indent, Good: haveOrigin, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.Over)}", $"[{over?.Location}]", indent, Good: haveOver, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.Destination)}", $"[{destination?.Location}]", indent, Good: haveDestination, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.MidVault)}", $"{midVault}", Indent: indent, Good: midVault, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Vaulted)}", $"{vaulted}", Indent: indent, Good: vaulted, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Origin)}", $"[{origin?.Location}]", Indent: indent, Good: haveOrigin, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Over)}", $"[{over?.Location}]", Indent: indent, Good: haveOver, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.Destination)}", $"[{destination?.Location}]", Indent: indent, Good: haveDestination, Toggle);
             Divider(Verbosity, HONLY, Count: 25, Indent: --indent, Toggle: Toggle);
 
             bool wasAutoActing = VaultSkill.WasAutoActing;
@@ -277,9 +359,9 @@ namespace HNPS_GigantismPlus
             bool haveAutoActSetting = !autoActSetting.IsNullOrEmpty();
 
             Entry(Verbosity, $"AutoAct State", indent++, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.WantToVault)}", $"{wantToVault}", indent, Good: wantToVault, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.WasAutoActing)}", $"{wasAutoActing}", indent, Good: wasAutoActing, Toggle);
-            LoopItem(Verbosity, $"{nameof(VaultSkill.AutoActSetting)}", $"{autoActSetting}", indent, Good: haveAutoActSetting, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.WantToVault)}", $"{wantToVault}", Indent: indent, Good: wantToVault, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.WasAutoActing)}", $"{wasAutoActing}", Indent: indent, Good: wasAutoActing, Toggle);
+            LoopItem(Verbosity, $"{nameof(VaultSkill.AutoActSetting)}", $"{autoActSetting}", Indent: indent, Good: haveAutoActSetting, Toggle);
             Divider(Verbosity, HONLY, Count: 40, Indent: Indent, Toggle: Toggle);
 
             return VaultSkill;

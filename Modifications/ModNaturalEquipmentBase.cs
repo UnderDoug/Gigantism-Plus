@@ -288,7 +288,42 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
+            if (Object.HasPartDescendedFrom<ModNaturalEquipmentBase>() && !Object.GetPartsDescendedFrom<ModNaturalEquipmentBase>(p => SameModification(p, false)).IsNullOrEmpty())
+            {
+                return;
+            }
             base.ApplyModification(Object);
+        }
+        public virtual bool SameModification(ModNaturalEquipmentBase m, bool Strict = true, bool? DescriptionOnly = null)
+        {
+            bool sameBodyPartType = BodyPartType == m.BodyPartType;
+            bool sameModPriority = ModPriority == m.ModPriority;
+            bool sameDescriptionPriority = DescriptionPriority == m.DescriptionPriority;
+            bool sameAdjective = Adjective == m.Adjective;
+            bool sameSource = GetSource() == m.GetSource();
+
+            bool sameGenerally = sameBodyPartType && sameAdjective && sameSource;
+            bool sameForDescription = sameGenerally && sameDescriptionPriority;
+            bool sameForMod = sameGenerally && sameModPriority;
+
+            bool sameStrictly = sameForDescription && sameForMod;
+
+            if (!Strict)
+            {
+                if (DescriptionOnly != null)
+                {
+                    if ((bool)DescriptionOnly)
+                    {
+                        return sameForDescription;
+                    }
+                    else
+                    {
+                        return sameForMod;
+                    }
+                }
+                return sameGenerally;
+            }
+            return sameStrictly;
         }
         public abstract string GetSource();
 
@@ -344,16 +379,12 @@ namespace XRL.World.Parts
         {
             ModNaturalEquipmentBase naturalEquipmentMod = base.DeepCopy(Parent, MapInv) as ModNaturalEquipmentBase;
 
-            naturalEquipmentMod.Adjustments = new();
-            Adjustments ??= new();
-            if (!Adjustments.IsNullOrEmpty())
-            {
-                foreach (PartAdjustment adjustment in Adjustments)
-                {
-                    naturalEquipmentMod.Adjustments.Add(new(adjustment));
-                }
-            }
-            
+            naturalEquipmentMod.Adjustments = new(Adjustments ??= new());
+
+            naturalEquipmentMod.AddedParts = new(AddedParts ?? new());
+            naturalEquipmentMod.AddedStringProps = new(AddedStringProps ?? new());
+            naturalEquipmentMod.AddedIntProps = new(AddedIntProps ?? new());
+
             return ClearForCopy(naturalEquipmentMod);
         }
         public override IPart DeepCopy(GameObject Parent)

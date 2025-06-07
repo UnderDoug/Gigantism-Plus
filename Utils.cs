@@ -61,6 +61,105 @@ namespace HNPS_GigantismPlus
         public static GiantHero GiantHeroBuilder = new();
         public static WrassleGiantHero WrassleGiantHeroBuilder = new();
 
+        public struct DescriptionElement
+        {
+            private static bool doDebug => getClassDoDebug(nameof(DescriptionElement));
+
+            public string Verb;
+            public string Effect;
+
+            public DescriptionElement(string Verb, string Effect)
+            {
+                this.Verb = Verb;
+                this.Effect = Effect;
+            }
+
+            public DescriptionElement(List<string> Source)
+            {
+                Verb = null;
+                Effect = null;
+                if (!Source.IsNullOrEmpty())
+                {
+                    Verb = Source[0];
+                    if (Source.Count > 1)
+                    {
+                        Effect = Source[1];
+                    }
+                }
+            }
+
+            public readonly List<string> ToList()
+            {
+                return new List<string>()
+                {
+                    Verb,
+                    Effect,
+                };
+            }
+
+            public override readonly string ToString()
+            {
+                if (Verb == "")
+                {
+                    return "It " + Effect;
+                }
+                if (Verb == null)
+                {
+                    return "It is " + Effect;
+                }
+                return Grammar.ThirdPerson(Verb, PrependSpace: false) + " " + Effect;
+            }
+
+            public readonly string ToString(GameObject Object)
+            {
+                if (Verb == "")
+                {
+                    return Object.It + " " + Effect;
+                }
+                if (Verb == null)
+                {
+                    return Object.Itis + " " + Effect;
+                }
+                return Object.GetVerb(Verb, PrependSpace: false) + " " + Effect;
+            }
+        }
+
+        public static List<DescriptionElement> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
+        {
+            List<DescriptionElement> Output = new();
+            foreach ((string location, string value) in GigantismPlusModGiganticDescriptions.Tags)
+            {
+                string[] locationArray = location.Split("::", StringSplitOptions.RemoveEmptyEntries);
+                if (locationArray.Length != 4) continue;
+
+                (string targetEvent, string targetList, string conditionPart, string who) = (locationArray[0], locationArray[1], locationArray[2], locationArray[2]);
+                if (targetEvent != When) continue;
+                if (targetList != "General" && targetList != "Weapon")
+                {
+                    Debug.Warn(1,
+                        nameof(DescribeModGiganticEvent),
+                        nameof(IterateDataBucketTags),
+                        $"[{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
+                    continue;
+                }
+                if (!Object.HasPart(conditionPart)) continue;
+
+                string[] descriptionArray = value.Split(";", StringSplitOptions.RemoveEmptyEntries);
+                if (descriptionArray.Length != 2) continue;
+
+                if (descriptionArray[0] == "'null'") descriptionArray[0] = null;
+                DescriptionElement description = new(descriptionArray[0], descriptionArray[1]);
+                if (targetEvent == When)
+                {
+                    if (targetList == Where)
+                    {
+                        Output.Add(description);
+                    }
+                }
+            }
+            return Output;
+        }
+
         [VariableReplacer]
         public static string nbsp(DelegateContext Context)
         {

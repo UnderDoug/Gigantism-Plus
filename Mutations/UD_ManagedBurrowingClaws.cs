@@ -206,10 +206,13 @@ namespace XRL.World.Parts.Mutation
 
         public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level)
         {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{nameof(UD_ManagedBurrowingClaws)}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
-                Indent: 2, Toggle: getDoDebug());
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
@@ -217,14 +220,28 @@ namespace XRL.World.Parts.Mutation
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
+            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+
+            Debug.Entry(4,
+                $"x {nameof(UD_ManagedBurrowingClaws)}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return NaturalEquipmentMod;
         }
         public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> UpdateNaturalEquipmentMods(List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods, int Level)
         {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(UpdateNaturalEquipmentMods)}(List<ModNaturalEquipment<{nameof(UD_ManagedBurrowingClaws)}> NaturalEquipmentMods, int Level: {Level})",
-                Indent: 2, Toggle: getDoDebug());
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
@@ -234,6 +251,15 @@ namespace XRL.World.Parts.Mutation
                 }
             }
 
+            Debug.Entry(4,
+                $"x {nameof(UD_ManagedBurrowingClaws)}."
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return NaturalEquipmentMods;
         }
 

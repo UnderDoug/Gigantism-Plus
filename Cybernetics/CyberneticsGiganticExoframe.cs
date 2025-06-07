@@ -69,15 +69,36 @@ namespace XRL.World.Parts
                 DescriptionPriority = -500,
 
                 Adjective = "augmented",
-                AdjectiveColor = "C",
+                AdjectiveColor = assigningPart.AugmentAdjectiveColor,
                 AdjectiveColorFallback = "c",
 
                 Adjustments = new(),
+
+                AddedParts = new(),
+
+                AddedIntProps = new(),
+                AddedStringProps = new(),
             };
             augmentedManipulator.AddAdjustment(RENDER, "DisplayName", "manipulator");
+
+            augmentedManipulator.AddAdjustment(RENDER, "Tile", assigningPart.AugmentTile);
+            augmentedManipulator.AddAdjustment(RENDER, "ColorString", assigningPart.AugmentTileColorString);
+            augmentedManipulator.AddAdjustment(RENDER, "DetailColor", assigningPart.AugmentTileDetailColor);
+
+            assigningPart.ProcessNaturalEquipmentAddedParts(augmentedManipulator, assigningPart.AugmentAddParts);
+            assigningPart.ProcessNaturalEquipmentAddedProps(augmentedManipulator, assigningPart.AugmentAddProps);
+
+            augmentedManipulator.AddedStringProps["SwingSound"] = assigningPart.AugmentSwingSound;
+            augmentedManipulator.AddedStringProps["BlockedSound"] = assigningPart.AugmentBlockedSound;
+            augmentedManipulator.AddedStringProps["EquipmentFrameColors"] = assigningPart.AugmentEquipmentFrameColors;
+
             return augmentedManipulator;
         }
 
+        public override ModNaturalEquipment<CyberneticsGiganticExoframe> NewNaturalEquipmentMod(CyberneticsGiganticExoframe NewAssigner = null)
+        {
+            return NewAugmentedManipulatorMod(NewAssigner);
+        }
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
             return Pretty ? NaturalEquipmentMod.Adjective.OptionalColor(NaturalEquipmentMod.AdjectiveColor, NaturalEquipmentMod.AdjectiveColorFallback, Colorfulness) : NaturalEquipmentMod.Adjective;
@@ -93,27 +114,6 @@ namespace XRL.World.Parts
             return output.Color("Y");
         }
 
-        public virtual void MapAugmentAdjustments()
-        {
-            Debug.Entry(4, $"* {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}()", Indent: 1, Toggle: getDoDebug());
-            
-            NaturalEquipmentMod.AdjectiveColor = AugmentAdjectiveColor;
-
-            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", AugmentTile);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", AugmentTileColorString);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", AugmentTileDetailColor);
-
-            ProcessNaturalEquipmentAddedParts(NaturalEquipmentMod, AugmentAddParts);
-            ProcessNaturalEquipmentAddedProps(NaturalEquipmentMod, AugmentAddProps);
-            NaturalEquipmentMod.AddedStringProps["SwingSound"] = AugmentSwingSound;
-            NaturalEquipmentMod.AddedStringProps["BlockedSound"] = AugmentBlockedSound;
-            NaturalEquipmentMod.AddedStringProps["EquipmentFrameColors"] = AugmentEquipmentFrameColors;
-
-            NaturalEquipmentMod.Adjustments.Vomit(4, $"{ImplantObject?.DebugName} Adjustments", LoopItem: true, Indent:1, Toggle: getDoDebug());
-
-            Debug.Entry(4, $"x {typeof(CyberneticsGiganticExoframe).Name}.{nameof(MapAugmentAdjustments)}() *//", Indent: 1);
-        }
-
         public override void Attach()
         {
             base.Attach();
@@ -122,8 +122,6 @@ namespace XRL.World.Parts
         public override void OnImplanted(GameObject Implantee, GameObject Implant)
         {
             Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})", Indent: 0, Toggle: getDoDebug());
-
-            MapAugmentAdjustments();
 
             Become(Implantee, Model, Implant);
 
@@ -152,10 +150,13 @@ namespace XRL.World.Parts
             if (E.Object == ImplantObject && E.Object.HasPart<CyberneticsBaseItem>())
             {
                 if (!E.Actor.IsGiganticCreature && E.Object.IsGiganticEquipment)
+                {
                     E.Decreases++;
+                }
                 else if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
-                    E.Increases++;
-
+                { 
+                    E.Increases++; 
+                }
                 E.CanBeTooSmall = false;
             }
             return base.HandleEvent(E);

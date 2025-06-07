@@ -136,10 +136,13 @@ namespace XRL.World.Parts.Mutation
 
         public virtual ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
         {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
-                Indent: 2, Toggle: getDoDebug());
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
@@ -147,14 +150,28 @@ namespace XRL.World.Parts.Mutation
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
+            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return NaturalEquipmentMod;
         }
         public virtual List<ModNaturalEquipment<T>> UpdateNaturalEquipmentMods(List<ModNaturalEquipment<T>> NaturalEquipmentMods, int Level)
         {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(UpdateNaturalEquipmentMods)}(List<ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMods, int Level: {Level})",
-                Indent: 2, Toggle: getDoDebug());
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
@@ -164,22 +181,20 @@ namespace XRL.World.Parts.Mutation
                 }
             }
 
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return NaturalEquipmentMods;
         }
 
         public override bool ChangeLevel(int NewLevel)
         {
-            /*
-            Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}", Toggle: doDebug);
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1, Toggle: doDebug);
-            foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
-            }
-            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, NewLevel);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> NaturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1, Toggle: doDebug);
-            Debug.Header(4, $"BaseManagedDefaultEquipmentMutation<{typeof(T).Name}>", $"{nameof(ChangeLevel)}", Toggle: doDebug);
-            */
             return base.ChangeLevel(NewLevel);
         }
 

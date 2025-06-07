@@ -97,8 +97,11 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription(GameObject Object = null)
         {
             Object ??= ParentObject;
-            BeforeDescribeModGiganticEvent beforeEvent = BeforeDescribeModGiganticEvent.CollectFor(Object, Context: "Natural Equipment");
-            return DescribeModGiganticEvent.Send(beforeEvent).Process(PluralizeObject: true);
+            if (Object == null)
+            {
+                return base.GetInstanceDescription(Object);
+            }
+            return DescribeModGiganticEvent.Send(Object, Context: "Natural Equipment").Process(PluralizeObject: true);
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

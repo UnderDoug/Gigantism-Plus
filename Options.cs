@@ -9,7 +9,6 @@ using XRL.World.Parts.Skill;
 using XRL.World.ZoneBuilders;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 namespace HNPS_GigantismPlus
@@ -17,7 +16,6 @@ namespace HNPS_GigantismPlus
     [HasModSensitiveStaticCache]
     public static class Options
     {
-        // Per the wiki, code is taken 1:1
         private static string GetOption(string ID, string Default = "")
         {
             return XRL.UI.Options.GetOption(ID, Default);
@@ -100,7 +98,7 @@ namespace HNPS_GigantismPlus
             { nameof(UD_ManagedCrystallinity), true },
             { nameof(UD_HornsPlus), false },
             { nameof(UD_QuillsPlus), false },
-            { nameof(CyberneticsGiganticExoframe), false },
+            { nameof(CyberneticsGiganticExoframe), true },
             { nameof(StewBelly), false },
             { nameof(Wrassler), true },
             { nameof(WrassleGear), true },
@@ -114,9 +112,6 @@ namespace HNPS_GigantismPlus
             // Events
             { nameof(AfterBodyPartsUpdatedEvent), false },
             { nameof(BeforeBodyPartsUpdatedEvent), false },
-            { "IDescribeModGiganticEvent", false },
-            { nameof(BeforeDescribeModGiganticEvent), true },
-            { nameof(DescribeModGiganticEvent), true },
             { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
             { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
             { nameof(ManageDefaultNaturalEquipmentEvent), false },
@@ -128,6 +123,11 @@ namespace HNPS_GigantismPlus
             { nameof(VaultedEvent), false },
             { nameof(CrayonsGetColorsEvent), false },
             { nameof(GetPrioritisedNaturalEquipmentModsEvent), true },
+
+            { "IDescribeModificationEvent", false },
+
+            { nameof(BeforeDescribeModificationEvent<ModGigantic>), true },
+            { nameof(DescribeModificationEvent<ModGigantic>), true },
 
             // Handlers
             { nameof(CrayonsGetColorHandler), false },

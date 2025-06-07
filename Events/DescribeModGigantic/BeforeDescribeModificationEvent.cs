@@ -13,25 +13,29 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-    public class BeforeDescribeModGiganticEvent : IDescribeModGiganticEvent<BeforeDescribeModGiganticEvent>
+    public class BeforeDescribeModificationEvent<T> : IDescribeModificationEvent<BeforeDescribeModificationEvent<T>, T> 
+        where T 
+        : IModification
     {
-        private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModGiganticEvent));
+        private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModificationEvent<T>));
 
-        public BeforeDescribeModGiganticEvent()
+        public BeforeDescribeModificationEvent()
         {
         }
 
-        public static BeforeDescribeModGiganticEvent FromPool(
-            GameObject Object, 
-            string ObjectNoun, 
-            List<DescriptionElement> WeaponDescriptions, 
-            List<DescriptionElement> GeneralDescriptions, 
+        public static BeforeDescribeModificationEvent<T> FromPool(
+            GameObject Object,
+            string Adjective,
+            string ObjectNoun,
+            List<DescriptionElement> WeaponDescriptions,
+            List<DescriptionElement> GeneralDescriptions,
             string Context = null)
         {
-            BeforeDescribeModGiganticEvent E = FromPool();
+            BeforeDescribeModificationEvent<T> E = FromPool();
             if (E !=null)
             {
                 E.Object = Object;
+                E.Adjective = Adjective;
                 E.ObjectNoun = ObjectNoun;
                 E.WeaponDescriptions = WeaponDescriptions ?? new();
                 E.GeneralDescriptions = GeneralDescriptions ?? new();
@@ -39,15 +43,17 @@ namespace HNPS_GigantismPlus
             }
             return E;
         }
-        public static BeforeDescribeModGiganticEvent Send(
+        public static BeforeDescribeModificationEvent<T> Send(
             GameObject Object,
+            string Adjective,
             string ObjectNoun = null,
             List<DescriptionElement> WeaponDescriptions = null,
             List<DescriptionElement> GeneralDescriptions = null,
             string Context = null)
         {
             return FromPool(
-                Object: Object, 
+                Object: Object,
+                Adjective: Adjective, 
                 ObjectNoun: ObjectNoun, 
                 WeaponDescriptions: WeaponDescriptions, 
                 GeneralDescriptions: GeneralDescriptions, 

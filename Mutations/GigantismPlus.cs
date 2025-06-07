@@ -316,7 +316,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID))
             {
-                return NewClosedFistMod(NewAssigner);
+                return NewClosedFistMod(NewAssigner ?? this);
             }
             return base.NewNaturalEquipmentMod(NewAssigner);
         }

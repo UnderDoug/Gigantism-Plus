@@ -13,12 +13,12 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
+    [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS, Cache = Cache.Pool)]
     public class AfterManageDefaultNaturalEquipmentEvent : ModPooledEvent<AfterManageDefaultNaturalEquipmentEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(AfterManageDefaultNaturalEquipmentEvent));
 
-        public new static readonly int CascadeLevel = CASCADE_NONE;
+        public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS;
 
         public static readonly string RegisteredEventID = nameof(AfterManageDefaultNaturalEquipmentEvent);
 

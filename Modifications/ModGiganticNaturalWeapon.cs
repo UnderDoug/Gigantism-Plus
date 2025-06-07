@@ -1,21 +1,20 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
-
-using XRL.World.Parts.Mutation;
 using XRL.Language;
-
-using HNPS_GigantismPlus;
+using XRL.World.Anatomy;
+using XRL.World.Parts.Mutation;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
 
 namespace XRL.World.Parts
 {
     [Serializable]
     public class ModGiganticNaturalWeapon 
         : ModNaturalEquipment<GigantismPlus>
-        , IModEventHandler<BeforeDescribeModGiganticEvent>
-        , IModEventHandler<DescribeModGiganticEvent>
+        , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
+        , IModEventHandler<DescribeModificationEvent<ModGigantic>>
     {
         private static bool doDebug => getClassDoDebug(nameof(ModGiganticNaturalWeapon));
 
@@ -35,62 +34,58 @@ namespace XRL.World.Parts
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register(BeforeDescribeModGiganticEvent.ID, EventOrder.EXTREMELY_EARLY);
-            Registrar.Register(DescribeModGiganticEvent.ID, EventOrder.EXTREMELY_LATE);
+            Registrar.Register(BeforeDescribeModificationEvent<ModGigantic>.ID, EventOrder.EXTREMELY_EARLY);
+            Registrar.Register(DescribeModificationEvent<ModGigantic>.ID, EventOrder.EXTREMELY_LATE);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == GetCleaveAmountEvent.ID
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+                || ID == GetCleaveAmountEvent.ID;
         }
         public override bool HandleEvent(GetCleaveAmountEvent E)
         {
             if (IsObjectActivePartSubject(E.Object))
             {
-                E.Amount += 1 + GetDamageBonus();
+                E.Amount += GetDamageBonus() - 2;
             }
             return base.HandleEvent(E);
         }
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
-            return base.HandleEvent(E);
-        }
-        public bool HandleEvent(BeforeDescribeModGiganticEvent E)
+        public bool HandleEvent(BeforeDescribeModificationEvent<ModGigantic> E)
         {
             if (E.Object == ParentObject && E.Context == "Natural Equipment")
             {
                 int dieCount = GetDamageDieCount();
                 int damageBonus = GetDamageBonus();
                 int hitBonus = GetHitBonus();
-                int cleaveBonus = -damageBonus;
+                int cleaveBonus = -(damageBonus - 2);
 
                 if (dieCount > 0)
                 {
-                    E.AddWeaponDescription("gain", $"{dieCount} additional damage die");
+                    E.AddWeaponElement("gain", $"{dieCount} additional damage die");
                 }
                 if (damageBonus != 0)
                 {
-                    E.AddWeaponDescription("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
                 }
                 if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
                 {
-                    E.AddWeaponDescription("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
+                    E.AddWeaponElement("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
                 }
                 if (hitBonus != 0)
                 {
-                    E.AddWeaponDescription("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
+                    E.AddWeaponElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
                 }
             }
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(DescribeModGiganticEvent E)
+        public virtual bool HandleEvent(DescribeModificationEvent<ModGigantic> E)
         {
-            if (E.Object == ParentObject && E.Context == "Natural Equipment")
+            if (E.Object == ParentObject 
+                && E.Context == "Natural Equipment")
             {
-                E.RemoveWeaponDescription("have", "+3 damage");
-                E.RemoveWeaponDescription("cleave", "for -3 AV");
+                E.RemoveWeaponElement("have", "+3 damage");
+                E.RemoveWeaponElement("cleave", "for -3 AV");
             }
             return base.HandleEvent(E);
         }
@@ -101,7 +96,9 @@ namespace XRL.World.Parts
             {
                 return base.GetInstanceDescription(Object);
             }
-            return DescribeModGiganticEvent.Send(Object, Context: "Natural Equipment").Process(PluralizeObject: true);
+            return DescribeModificationEvent<ModGigantic>
+                .Send(Object, GetColoredAdjective(), Context: "Natural Equipment")
+                .Process(PluralizeObject: true);
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

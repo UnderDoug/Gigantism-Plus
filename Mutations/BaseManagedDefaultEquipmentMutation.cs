@@ -115,6 +115,14 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(GetNaturalEquipmentMods)}("
+                + $"{nameof(Filter)}, "
+                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                Indent: indent + 1, Toggle: getDoDebug());
+
             NewAssigner ??= (T)this;
             List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
             if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
@@ -122,6 +130,8 @@ namespace XRL.World.Parts.Mutation
                 NaturalEquipmentMod.AssigningPart = NewAssigner;
                 naturalEquipmentModsList.Add(NaturalEquipmentMod);
             }
+
+            Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }
 
@@ -223,6 +233,12 @@ namespace XRL.World.Parts.Mutation
                 $"{nameof(OnManageDefaultNaturalEquipment)}(body of: {ParentObject.Blueprint})", Toggle: getDoDebug());
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("BeforeMutationAdded");
+            Registrar.Register("MutationAdded");
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -239,6 +255,11 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}({nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
+                Indent: 0, Toggle: getDoDebug());
+
             List<ModNaturalEquipment<T>> naturalEquipmentMods = UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(mod => mod.BodyPartType == E.TargetBodyPart.Type), Level);
             foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
             {
@@ -274,13 +295,6 @@ namespace XRL.World.Parts.Mutation
         public virtual bool HandleEvent(AfterRapidAdvancementEvent E)
         {
             return base.HandleEvent(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("BeforeMutationAdded");
-            Registrar.Register("MutationAdded");
-            base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {

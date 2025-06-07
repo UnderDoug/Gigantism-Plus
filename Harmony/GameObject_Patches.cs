@@ -108,7 +108,7 @@ namespace HNPS_GigantismPlus.Harmony
                 }
                 else if (cybernetics != null)
                 {
-                    Debug.CheckNah(4, $"No IModification", Indent: 4, Toggle: doDebug);
+                    Debug.CheckNah(4, $"No ModPart", Indent: 4, Toggle: doDebug);
                 }
 
                 GameObject equipment = part.Equipped;
@@ -138,7 +138,7 @@ namespace HNPS_GigantismPlus.Harmony
                 }
                 else if (equipment != null)
                 {
-                    Debug.CheckNah(4, $"No IModification or item is Cybernetics", Indent: 4, Toggle: doDebug);
+                    Debug.CheckNah(4, $"No ModPart or item is Cybernetics", Indent: 4, Toggle: doDebug);
                 }
             }
             Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: doDebug);

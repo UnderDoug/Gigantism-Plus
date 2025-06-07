@@ -131,6 +131,14 @@ namespace XRL.World.Parts
         }
         public virtual List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(GetNaturalEquipmentMods)}("
+                + $"{nameof(Filter)}, "
+                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                Indent: indent + 1, Toggle: getDoDebug());
+
             NewAssigner ??= (T)this;
             List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
             if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
@@ -138,6 +146,8 @@ namespace XRL.World.Parts
                 NaturalEquipmentMod.AssigningPart = NewAssigner;
                 naturalEquipmentModsList.Add(NaturalEquipmentMod);
             }
+
+            Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }
 
@@ -202,7 +212,7 @@ namespace XRL.World.Parts
 
         public virtual void OnImplanted(GameObject Implantee, GameObject Implant)
         {
-            Implantee.Body.UpdateBodyParts();
+            Implantee?.Body?.UpdateBodyParts();
         } //!-- public override void OnImplanted(GameObject Object)
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
@@ -260,6 +270,11 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}({typeof(GetPrioritisedNaturalEquipmentModsEvent).Name} E)",
+                Indent: 0, Toggle: getDoDebug());
+
             List<ModNaturalEquipment<T>> naturalEquipmentMods = UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(mod => mod.BodyPartType == E.TargetBodyPart.Type), Level);
             foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
             {
@@ -278,7 +293,7 @@ namespace XRL.World.Parts
                 + $"{nameof(HandleEvent)}({typeof(ManageDefaultNaturalEquipmentEvent).Name} E)",
                 Indent: 0, Toggle: getDoDebug());
 
-            if (E.Creature.Is(Implantee) && E.Equipment.HasPart<NaturalEquipmentManager>())
+            if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentManager>())
             {
                 OnManageDefaultNaturalEquipment(E.Manager, E.BodyPart);
             }

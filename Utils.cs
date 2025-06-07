@@ -137,7 +137,7 @@ namespace HNPS_GigantismPlus
                 if (targetList != "General" && targetList != "Weapon")
                 {
                     Debug.Warn(1,
-                        nameof(DescribeModGiganticEvent),
+                        nameof(Utils),
                         nameof(IterateDataBucketTags),
                         $"[{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
                     continue;

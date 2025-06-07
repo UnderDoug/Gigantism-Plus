@@ -82,11 +82,9 @@ namespace XRL.World.Parts.Mutation
             return NewElongatedWeaponMod(NewAssigner ?? this);
         }
 
-
         public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
         public bool HasBurrowing => ParentObject != null && ParentObject.HasPartDescendedFrom<BurrowingClaws>();
         public bool HasCrystallinity => ParentObject != null && ParentObject.HasPartDescendedFrom<Crystallinity>();
-
 
         public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
@@ -132,7 +130,6 @@ namespace XRL.World.Parts.Mutation
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
                 || ID == StatChangeEvent.ID;
         }
-
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
             if (Array.IndexOf(AffectedSlotTypes, E.SlotType) >= 0 && E.Actor == ParentObject)
@@ -141,7 +138,6 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(StatChangeEvent E)
         {
             if (E.Name == "Strength") // || E.Name == "Agility")

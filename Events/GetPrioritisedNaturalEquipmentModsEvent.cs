@@ -11,10 +11,12 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class GetPrioritisedNaturalEquipmentModsEvent : ModPooledEvent<GetPrioritisedNaturalEquipmentModsEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(GetPrioritisedNaturalEquipmentModsEvent));
+
+        public new static readonly int CascadeLevel = CASCADE_ALL; // CASCADE_EQUIPMENT | CASCADE_SLOTS;
 
         public static readonly string RegisteredEventID = nameof(GetPrioritisedNaturalEquipmentModsEvent);
 
@@ -54,7 +56,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"@ {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
                 + $"{nameof(AddNaturalEquipmentMod)}"
-                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name})"
+                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.Adjective}])"
                 + $" Creature: {Creature?.DebugName ?? NULL},"
                 + $" Equipment: {Equipment?.DebugName ?? NULL}",
                 Indent: indent, Toggle: doDebug);
@@ -106,8 +108,8 @@ namespace HNPS_GigantismPlus
 
             bool haveCreature = Creature != null;
 
-            bool wantsMin = haveCreature && Creature.WantEvent(ID, CascadeLevel);
-            bool wantsStr = haveCreature && Creature.HasRegisteredEvent(RegisteredEventID);
+            bool wantsMin = haveCreature && E.Creature.WantEvent(ID, CascadeLevel);
+            bool wantsStr = haveCreature && E.Creature.HasRegisteredEvent(RegisteredEventID);
 
             bool anyWants = wantsMin || wantsStr;
 
@@ -116,14 +118,14 @@ namespace HNPS_GigantismPlus
             {
                 if (proceed && wantsMin)
                 {
-                    proceed = Creature.HandleEvent(E);
+                    proceed = E.Creature.HandleEvent(E);
                 }
                 if (proceed && wantsStr)
                 {
                     Event @event = Event.New(E.GetRegisteredEventID());
-                    @event.SetParameter(nameof(Creature), E.Creature);
-                    @event.SetParameter(nameof(Equipment), E.Equipment);
-                    @event.SetParameter(nameof(TargetBodyPart), E.TargetBodyPart);
+                    @event.SetParameter(nameof(E.Creature), E.Creature);
+                    @event.SetParameter(nameof(E.Equipment), E.Equipment);
+                    @event.SetParameter(nameof(E.TargetBodyPart), E.TargetBodyPart);
                     @event.SetParameter(nameof(NaturalEquipmentMods), E.NaturalEquipmentMods);
                     proceed = Creature.FireEvent(@event);
                     E.NaturalEquipmentMods = @event.GetParameter(nameof(NaturalEquipmentMods)) as SortedDictionary<int, ModNaturalEquipmentBase>;

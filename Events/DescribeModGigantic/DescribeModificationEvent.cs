@@ -14,13 +14,14 @@ using static HNPS_GigantismPlus.Const;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-    public class DescribeModGiganticEvent : IDescribeModGiganticEvent<DescribeModGiganticEvent>
+    public class DescribeModificationEvent<T> : IDescribeModificationEvent<DescribeModificationEvent<T>, T>
+        where T : IModification
     {
-        private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticEvent));
+        private static bool doDebug => getClassDoDebug(nameof(DescribeModificationEvent<T>));
 
-        public BeforeDescribeModGiganticEvent BeforeEvent;
+        public BeforeDescribeModificationEvent<T> BeforeEvent;
 
-        public DescribeModGiganticEvent()
+        public DescribeModificationEvent()
         {
         }
 
@@ -34,31 +35,34 @@ namespace HNPS_GigantismPlus
             }
         }
 
-        public static DescribeModGiganticEvent FromPool(BeforeDescribeModGiganticEvent BeforeEvent)
+        public static DescribeModificationEvent<T> FromPool(BeforeDescribeModificationEvent<T> BeforeEvent)
         {
             if (BeforeEvent == null)
             {
                 return null;
             }
-            DescribeModGiganticEvent E = FromPool(
-                Object: BeforeEvent.Object, 
+            DescribeModificationEvent<T> E = FromPool(
+                Object: BeforeEvent.Object,
+                Adjective: BeforeEvent.Adjective,
                 ObjectNoun: BeforeEvent.ObjectNoun,
                 Context: BeforeEvent.Context);
             E.BeforeEvent = BeforeEvent;
             return E;
         }
-        public static DescribeModGiganticEvent FromPool(
-            GameObject Object, 
-            string ObjectNoun = null, 
-            List<DescriptionElement> WeaponDescriptions = null, 
-            List<DescriptionElement> GeneralDescriptions = null, 
+        public static DescribeModificationEvent<T> FromPool(
+            GameObject Object,
+            string Adjective,
+            string ObjectNoun = null,
+            List<DescriptionElement> WeaponDescriptions = null,
+            List<DescriptionElement> GeneralDescriptions = null,
             string Context = null)
         {
-            DescribeModGiganticEvent E = FromPool();
+            DescribeModificationEvent<T> E = FromPool();
             if (E != null)
             {
                 E.BeforeEvent = null;
                 E.Object = Object;
+                E.Adjective = Adjective;
                 E.ObjectNoun = ObjectNoun;
                 E.WeaponDescriptions = WeaponDescriptions ?? new();
                 E.GeneralDescriptions = GeneralDescriptions ?? new();
@@ -67,18 +71,20 @@ namespace HNPS_GigantismPlus
             return E;
         }
 
-        public static DescribeModGiganticEvent Send(BeforeDescribeModGiganticEvent BeforeEvent)
+        public static DescribeModificationEvent<T> Send(BeforeDescribeModificationEvent<T> BeforeEvent)
         {
             return FromPool(BeforeEvent)?.Send();
         }
-        public static DescribeModGiganticEvent Send(
+        public static DescribeModificationEvent<T> Send(
             GameObject Object,
+            string Adjective,
             string ObjectNoun = null,
             string Context = null)
         {
             return Send(
-                BeforeDescribeModGiganticEvent.Send(
+                BeforeDescribeModificationEvent<T>.Send(
                     Object: Object,
+                    Adjective: Adjective,
                     ObjectNoun: ObjectNoun,
                     Context: Context)
                 );
@@ -112,10 +118,14 @@ namespace HNPS_GigantismPlus
 
             StringBuilder SB = Event.NewStringBuilder();
 
-            bool isPlural = Object.IsPlural && PluralizeObject;
-            ObjectNoun = $"{(isPlural ? Grammar.Pluralize(ObjectNoun) : ObjectNoun)} ";
-            SB.Append("Gigantic".OptionalColorGigantic(Colorfulness)).Append(": ")
-                .Append(Object.IndicativeProximal).Append(" ").Append(ObjectNoun);
+            string adjective = Grammar.MakeTitleCase(Adjective).Color('y');
+
+            string objectNoun = Object != null && Object.IsPlural ? Grammar.Pluralize(ObjectNoun) : ObjectNoun;
+
+            SB.Append(adjective).Append(": "); // "Gigantic: "
+            SB.Append(Object?.IndicativeProximal).Append(" "); // "This "
+            SB.Append(objectNoun).Append(" "); // "fist "
+            // "Gigantic: This fist "
 
             bool capitalizeSecondList = false;
             if (weaponDescriptions.Count != 0)
@@ -142,7 +152,14 @@ namespace HNPS_GigantismPlus
             }
             else if (weaponDescriptions.Count == 0)
             {
-                SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
+                if (typeof(T) == typeof(ModGigantic))
+                {
+                    SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
+                }
+                else
+                {
+                    SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
+                }
             }
 
             BeforeEvent.Reset();

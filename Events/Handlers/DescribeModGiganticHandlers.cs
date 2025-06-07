@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL;
 using XRL.World;
+using XRL.World.Anatomy;
 using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+
 using static HNPS_GigantismPlus.Const;
-using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 
@@ -13,7 +16,8 @@ namespace HNPS_GigantismPlus
 {
     public class BeforeDescribeModGiganticHandler 
         : IEventHandler
-        , IModEventHandler<BeforeDescribeModGiganticEvent>
+        , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
+
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModGiganticHandler));
 
@@ -21,20 +25,22 @@ namespace HNPS_GigantismPlus
 
         public static bool Register()
         {
-            The.Game?.RegisterEvent(Handler, BeforeDescribeModGiganticEvent.ID);
+            The.Game?.RegisterEvent(Handler, BeforeDescribeModificationEvent<ModGigantic>.ID);
 
-            return (bool)The.Game?.WasModEventHandlerRegistered<BeforeDescribeModGiganticHandler, BeforeDescribeModGiganticEvent>();
+            return (bool)The.Game?.WasModEventHandlerRegistered<BeforeDescribeModGiganticHandler, BeforeDescribeModificationEvent<ModGigantic>>();
         }
 
-        public bool HandleEvent(BeforeDescribeModGiganticEvent E)
+        public bool HandleEvent(BeforeDescribeModificationEvent<ModGigantic> E)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"@ {nameof(The)}.{nameof(The.Game)}."
-                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $"{nameof(HandleEvent)}({E.GetType().Name},"
                 + $" E.Object: {E.Object?.DebugName ?? NULL},"
                 + $" E.Context: {E.Context})",
                 Indent: indent + 1, Toggle: doDebug);
+
+            // BeforeDescribeModification(E, E.ModPart);
 
             GameObject Object = E.Object;
 
@@ -48,7 +54,7 @@ namespace HNPS_GigantismPlus
 
             Debug.Entry(4,
                 $"x {nameof(The)}.{nameof(The.Game)}"
-                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $"{nameof(HandleEvent)}({E.GetType().Name},"
                 + $" E.Object: {E.Object?.DebugName ?? NULL},"
                 + $" E.Context: {E.Context})"
                 + $" @//",
@@ -56,14 +62,24 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return true;
         }
-
+        public static void BeforeDescribeModification(BeforeDescribeModificationEvent<ModGigantic> E, IModification ModPart)
+        {
+            if (ModPart.InheritsFrom<ModGigantic>() || ModPart.InheritsFrom<ModNaturalEquipment<GigantismPlus>>())
+            {
+                BeforeDescribeModGigantic(E);
+            }
+        }
+        public static void BeforeDescribeModGigantic(BeforeDescribeModificationEvent<ModGigantic> E)
+        {
+            // GameObject Object = E.Object;
+        }
     } //!-- public class BeforeDescribeModGiganticHandler
       //        : IEventHandler
-      //        , IModEventHandler<BeforeDescribeModGiganticEvent>
+      //        , IModEventHandler<BeforeDescribeModificationEvent>
 
     public class DescribeModGiganticHandler 
         : IEventHandler
-        , IModEventHandler<DescribeModGiganticEvent>
+        , IModEventHandler<DescribeModificationEvent<ModGigantic>>
     {
         private static bool doDebug => getClassDoDebug(nameof(DescribeModGiganticHandler));
 
@@ -71,17 +87,17 @@ namespace HNPS_GigantismPlus
 
         public static bool Register()
         {
-            The.Game?.RegisterEvent(Handler, DescribeModGiganticEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+            The.Game?.RegisterEvent(Handler, DescribeModificationEvent<ModGigantic>.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
 
-            return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModGiganticEvent>();
+            return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModificationEvent<ModGigantic>>();
         }
 
-        public bool HandleEvent(DescribeModGiganticEvent E)
+        public bool HandleEvent(DescribeModificationEvent<ModGigantic> E)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"@ {nameof(The)}.{nameof(The.Game)}."
-                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $"{nameof(HandleEvent)}({E.GetType().Name},"
                 + $" E.Object: {E.Object?.DebugName ?? NULL},"
                 + $" E.Context: {E.Context})",
                 Indent: indent + 1, Toggle: doDebug);
@@ -94,76 +110,76 @@ namespace HNPS_GigantismPlus
 
             if (Object.InheritsFrom("FoldingChair"))
             {
-                E.AddWeaponDescription(null, "the ultimate in wrestling weapons");
+                E.AddWeaponElement(null, "the ultimate in wrestling weapons");
             }
 
             if (Object.HasPart<Chair>())
             {
                 if (!Object.InheritsFrom("FoldingChair"))
-                    E.AddGeneralDescription("support", "gigantic rumps");
+                    E.AddGeneralElement("support", "gigantic rumps");
             }
             if (Object.HasPart<Bed>())
             {
-                E.AddWeaponDescription("support", "gigantic sleepers");
+                E.AddWeaponElement("support", "gigantic sleepers");
             }
 
             if (Object.LiquidVolume != null)
             {
-                E.AddGeneralDescription("hold", "twice as much liquid");
+                E.AddGeneralElement("hold", "twice as much liquid");
             }
             if (Object.HasPart<EnergyCell>())
             {
-                E.AddGeneralDescription("have", "twice the energy capacity");
+                E.AddGeneralElement("have", "twice the energy capacity");
             }
             if (Object.HasPartDescendedFrom<IGrenade>())
             {
-                E.AddGeneralDescription("have", "twice as large a radius of effect");
+                E.AddGeneralElement("have", "twice as large a radius of effect");
             }
             if (Object.HasPart<Tonic>())
             {
-                E.AddGeneralDescription("contain", "double the tonic dosage");
+                E.AddGeneralElement("contain", "double the tonic dosage");
             }
             if (Object.GetIntProperty("Currency") > 0)
             {
-                E.AddGeneralDescription(null, "much more valuable");
+                E.AddGeneralElement(null, "much more valuable");
             }
             if (Object.HasPart<Container>())
             {
-                E.AddGeneralDescription("store", "twice as many things (don't ask, it's fine)");
+                E.AddGeneralElement("store", "twice as many things (don't ask, it's fine)");
             }
             if (Object.HasPart<Enclosing>())
             {
-                E.AddGeneralDescription("provide", "twice as much AV");
-                E.AddGeneralDescription("penalise", "DV half again as much");
-                E.AddGeneralDescription("have", "+3 higher save to exit");
+                E.AddGeneralElement("provide", "twice as much AV");
+                E.AddGeneralElement("penalise", "DV half again as much");
+                E.AddGeneralElement("have", "+3 higher save to exit");
             }
             if (Object.TryGetPart(out Chat chat) && chat.ShowInShortDescription)
             {
-                E.AddGeneralDescription("convey", "its message with substantially more clarity");
+                E.AddGeneralElement("convey", "its message with substantially more clarity");
             }
             if (Object.HasPart<Tombstone>() || Object.HasTagOrProperty("Burial"))
             {
-                E.AddGeneralDescription("inspire", "greater sorrow");
+                E.AddGeneralElement("inspire", "greater sorrow");
             }
 
             if (Object.HasPart<Backpack>())
             {
-                E.AddGeneralDescription("support", "twice and a half as much weight");
+                E.AddGeneralElement("support", "twice and a half as much weight");
             }
 
             if (Object.HasPart<Armor>() && Object.GetPart<Armor>().CarryBonus > 0)
             {
-                E.AddGeneralDescription("have", "a quarter more carry capcity");
+                E.AddGeneralElement("have", "a quarter more carry capcity");
             }
 
             if (Object.HasTagOrProperty("Ornate") || Object.HasTagOrProperty("Door"))
             {
-                E.AddGeneralDescription("inspire", "awe with its immensity");
+                E.AddGeneralElement("inspire", "awe with its immensity");
             }
 
             if (Object.HasTagOrProperty("Wall"))
             {
-                E.AddGeneralDescription("stand", "much taller than usual");
+                E.AddGeneralElement("stand", "much taller than usual");
             }
 
             MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
@@ -171,25 +187,25 @@ namespace HNPS_GigantismPlus
             bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
             if (meleeWeapon != null && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
-                E.AddWeaponDescription("have", "+3 damage");
+                E.AddWeaponElement("have", "+3 damage");
                 if (meleeWeapon.Skill == "Cudgel")
                 {
-                    E.AddWeaponDescription(null, $"twice as effective when you Slam with {Object.them}");
+                    E.AddWeaponElement(null, $"twice as effective when you Slam with {Object.them}");
                 }
                 else if (meleeWeapon.Skill == "Axe")
                 {
-                    E.AddWeaponDescription("cleave", "for -3 AV");
+                    E.AddWeaponElement("cleave", "for -3 AV");
                 }
             }
             else if (Object.HasPart<MissileWeapon>())
             {
-                E.AddWeaponDescription("have", "+3 damage");
+                E.AddWeaponElement("have", "+3 damage");
             }
             else if (Object.HasPart<ThrownWeapon>())
             {
                 if (!Object.HasPartDescendedFrom<IGrenade>())
                 {
-                    E.AddWeaponDescription("have", "+3 damage");
+                    E.AddWeaponElement("have", "+3 damage");
                 }
             }
 
@@ -207,77 +223,77 @@ namespace HNPS_GigantismPlus
                     || Object.HasPart<Shield>()))
                 {
                     string effect = $"must be wielded {(Object.UsesTwoSlots ? "four" : "two")}-handed by non-gigantic creatures";
-                    E.AddGeneralDescription("", effect);
+                    E.AddGeneralElement("", effect);
                 }
                 else
                 {
-                    E.AddGeneralDescription("", "can only be equipped by gigantic creatures");
+                    E.AddGeneralElement("", "can only be equipped by gigantic creatures");
                 }
             }
 
             if (Object.HasPart<DiggingTool>() || Object.HasPart<Drill>())
             {
-                E.AddWeaponDescription("dig", "twice as fast");
+                E.AddWeaponElement("dig", "twice as fast");
             }
 
             if (Object.HasPart<DeploymentMaintainer>() && isFurniture)
             {
-                E.AddGeneralDescription("enforce", "its effect twice far");
+                E.AddGeneralElement("enforce", "its effect twice far");
             }
 
             if (Object.TryGetPart(out LiquidProducer liquidProducer) && liquidProducer.Rate != 0 && isFurniture)
             {
-                E.AddGeneralDescription("produce", "liquid twice as fast");
+                E.AddGeneralElement("produce", "liquid twice as fast");
             }
 
             if (Object.TryGetPart(out ItemConvertor itemConvertor) && isFurniture)
             {
                 if (itemConvertor.ConversionTag == "RockTumblerOutput")
                 {
-                    E.AddGeneralDescription("process", "rocks twice as effectively");
+                    E.AddGeneralElement("process", "rocks twice as effectively");
                 }
                 if (itemConvertor.ConversionTag == "WireExtruderOutput")
                 {
-                    E.AddGeneralDescription("extrudes", "double the additional wire from gigantic materials");
+                    E.AddGeneralElement("extrudes", "double the additional wire from gigantic materials");
                 }
             }
 
             if (Object.HasPart<Fan>() && isFurniture)
             {
-                E.AddGeneralDescription("blow", "with twice the strength");
-                E.AddGeneralDescription("blow", "half again as far");
+                E.AddGeneralElement("blow", "with twice the strength");
+                E.AddGeneralElement("blow", "half again as far");
             }
 
             if (Object.HasPart<LiquidPump>() && isFurniture)
             {
-                E.AddGeneralDescription("pump", "five times as much liquid");
+                E.AddGeneralElement("pump", "five times as much liquid");
             }
 
             if (Object.HasPart<Capacitor>() && isFurniture)
             {
-                E.AddGeneralDescription("hold", "twice the maximum charge");
+                E.AddGeneralElement("hold", "twice the maximum charge");
             }
 
             if (Object.HasPart<RegenTank>() && isFurniture)
             {
-                E.AddGeneralDescription("require", "twice the minimum liquid to operate");
+                E.AddGeneralElement("require", "twice the minimum liquid to operate");
             }
 
             if (Object.TryGetPart(out TemperatureAdjuster temperatureAdjuster) && isFurniture)
             {
                 if (temperatureAdjuster.TemperatureAmount != 0)
                 {
-                    E.AddGeneralDescription("affect", "temperature twice as effectively");
+                    E.AddGeneralElement("affect", "temperature twice as effectively");
                 }
                 if (temperatureAdjuster.TemperatureThreshold != 0)
                 {
-                    E.AddGeneralDescription("have", "half again its temperature threshold");
+                    E.AddGeneralElement("have", "half again its temperature threshold");
                 }
             }
 
             if (Object.HasPart<DamageContents>() && isFurniture)
             {
-                E.AddGeneralDescription(null, "twice as destructive to its contents");
+                E.AddGeneralElement(null, "twice as destructive to its contents");
             }
 
             bool chargeUseIncreased2x = isFurniture && (
@@ -315,7 +331,7 @@ namespace HNPS_GigantismPlus
                     && liquidProducer.ChargeUse != 0));
             if (chargeUseIncreased2x)
             {
-                E.AddGeneralDescription("draw", "twice the charge to power");
+                E.AddGeneralElement("draw", "twice the charge to power");
             }
 
             bool chargeRateIncreased2x = isFurniture && (
@@ -333,7 +349,7 @@ namespace HNPS_GigantismPlus
                     && electricalPowerTransmission.ChargeRate != 0 && electricalPowerTransmission.IsConsumer));
             if (chargeRateIncreased2x)
             {
-                E.AddGeneralDescription("charge", "at twice the rate");
+                E.AddGeneralElement("charge", "at twice the rate");
             }
 
             bool chargeTransmissionIncreased2x = isFurniture && (
@@ -345,28 +361,30 @@ namespace HNPS_GigantismPlus
                     && mechanicalPowerTransmission.ChargeRate != 0 && !mechanicalPowerTransmission.IsConsumer));
             if (chargeTransmissionIncreased2x)
             {
-                E.AddGeneralDescription("transmit", "power at twice the rate");
+                E.AddGeneralElement("transmit", "power at twice the rate");
             }
 
             if (!isDefaultBehavior)
             {
-                E.AddGeneralDescription(null, "much heavier than usual");
+                E.AddGeneralElement(null, "much heavier than usual");
             }
             else
             {
-                E.AddGeneralDescription(null, "unusually large");
+                E.AddGeneralElement(null, "unusually large");
             }
             if (Object.HasPart<Campfire>())
             {
-                E.AddGeneralDescription("", "could probably make some seriously thick stew..");
+                E.AddGeneralElement("", "could probably make some seriously thick stew..");
             }
 
             E.WeaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "Weapon"));
             E.GeneralDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "General"));
 
+            // DescribeModification(E, E.ModPart);
+
             Debug.Entry(4,
                 $"x {nameof(The)}.{nameof(The.Game)}"
-                + $"{nameof(HandleEvent)}({E.GetType().Name}"
+                + $"{nameof(HandleEvent)}({E.GetType().Name},"
                 + $" E.Object: {E.Object?.DebugName ?? NULL},"
                 + $" E.Context: {E.Context})"
                 + $" @//",
@@ -374,7 +392,20 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return true;
         }
+
+        public static void DescribeModification(DescribeModificationEvent<ModGigantic> E, IModification ModPart)
+        {
+            if (ModPart.InheritsFrom<ModGigantic>() || ModPart.InheritsFrom<ModNaturalEquipment<GigantismPlus>>())
+            {
+                DescribeModGigantic(E);
+            }
+        }
+        public static void DescribeModGigantic(DescribeModificationEvent<ModGigantic> E)
+        {
+            
+        }
+
     } //!-- public class DescribeModGiganticHandler
       //        : IEventHandler
-      //        , IModEventHandler<DescribeModGiganticEvent>
+      //        , IModEventHandler<DescribeModificationEvent>
 }

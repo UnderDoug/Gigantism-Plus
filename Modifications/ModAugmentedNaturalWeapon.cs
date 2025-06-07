@@ -33,31 +33,20 @@ namespace XRL.World.Parts
             }
             base.ApplyModification(Object);
         }
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
 
         public override string GetColoredAdjective()
         {
             return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
         }
 
-        public override string GetInstanceDescription(GameObject Object = null)
+
+        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsGiganticExoframe>> E)
         {
-            Object ??= ParentObject;
-            string text = Object?.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string description = $"{descriptionName}: ";
-            description += Object != null && Object.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " have ")
-                        : ("This " + text + " has ");
+            string cyberneticsObject = AssigningPart?.ImplantObject?.ShortDisplayName;
 
-            string cyberneticsObject = AssigningPart.ImplantObject.ShortDisplayName;
+            E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
 
-            description += $"some of its bonuses applied by an implanted {cyberneticsObject}.";
-            return description;
+            return base.HandleEvent(E);
         }
     } //!-- public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>
 }

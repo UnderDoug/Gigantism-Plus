@@ -13,6 +13,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Extensions;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -33,20 +34,20 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         static void HandleEvent_GetDisplayName_Postfix(GetDisplayNameEvent E)
         {
-            string Adjective = "gigantic";
-            int Priority = 30;
-            bool IncludeProperName = false;
-            if (E.Object.HasProperName && !IncludeProperName) return; // skip for Proper Named items, unless including them.
+            string adjective = "gigantic";
+            int priority = 30;
+            bool includeProperName = false;
+            if (E.Object.HasProperName && !includeProperName) return; // skip for Proper Named items, unless including them.
             if (E.Object.HasTagOrProperty("ModGiganticNoDisplayName")) return; // skip for items that explicitly hide the adjective
             if (E.Object.HasTagOrProperty("ModGiganticNoUnknownDisplayName")) return; // skip for unknown items that explicitly hide the adjective
 
-            if (E.DB.SizeAdjective == Adjective && E.DB.SizeAdjectivePriority == Priority)
+            if (E.DB.SizeAdjective == adjective && E.DB.SizeAdjectivePriority == priority)
             {
                 // The base event runs every game tick for equipped range weapons.
                 // possibly due to the item being displayed in the UI (bottom right)
                 // Any form of output here will completely clog up the logs.
 
-                E.DB.SizeAdjective = Adjective.OptionalColorGigantic(Colorfulness);
+                E.DB.SizeAdjective = adjective.OptionalColorGigantic(Colorfulness);
             }
         } //!-- public static class ModGigantic_HandleEventDisplayName_Patches
 
@@ -106,7 +107,11 @@ namespace HNPS_GigantismPlus.Harmony
                 return true;
             }
 
-            __result = DescribeModGiganticEvent.Send(Object).Process();
+            string gigantic = "gigantic";
+
+            __result = DescribeModificationEvent<ModGigantic>
+                .Send(Object, gigantic.OptionalColorGiant(Colorfulness))
+                .Process();
 
             return false;
         }

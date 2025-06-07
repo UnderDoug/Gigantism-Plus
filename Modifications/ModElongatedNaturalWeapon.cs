@@ -25,56 +25,25 @@ namespace XRL.World.Parts
         {
         }
 
-        public override void ApplyModification(GameObject Object)
+        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
         {
-            base.ApplyModification(Object);
-        }
+            E.BeforeEvent.ClearDescriptionElements();
 
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
-
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
-            return base.HandleEvent(E);
-        }
-
-        public override string GetInstanceDescription(GameObject Object = null)
-        {
-            Object ??= ParentObject;
-            string text = Object?.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string description = $"{descriptionName}: ";
-            description += Object != null && Object.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " ")
-                        : ("This " + text + " ");
-
-            string pluralPossessive = Object.IsPlural ? "their" : "its";
             int dieSize = GetDamageDieSize();
             int damageBonus = GetDamageBonus();
 
-            List<List<string>> descriptions = new();
             if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
             {
-                descriptions.AddDescription("gain", $"{dieSize.Signed()} damage die size");
+                E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
             }
-
             if (damageBonus != 0)
             {
-                descriptions.AddDescription("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
             }
+            E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's Strength Modifier");
 
-            descriptions.AddDescription("", $"{pluralPossessive} bonus damage scales by half {pluralPossessive} wielder's Strength Modifier");
-
-            List<string> processedDescriptions = new();
-            foreach(List<string> entry in descriptions)
-            {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, Object));
-            }
-
-            return description += Grammar.MakeAndList(processedDescriptions) + ".";
+            return base.HandleEvent(E);
         }
+
     } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
 }

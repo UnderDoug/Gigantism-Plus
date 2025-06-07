@@ -41,6 +41,7 @@ namespace XRL.World.Parts
 
         // XML Set Fields.
         public string Model = "Alpha";
+        public string Material = "carbide";
         public string AugmentAdjectiveColor = "b";
         public string AugmentTile = "NaturalWeapons/GiganticManipulator.png";
         public string AugmentTileColorString = "&c";
@@ -56,7 +57,6 @@ namespace XRL.World.Parts
 
         public CyberneticsGiganticExoframe()
         {
-
         }
         public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(CyberneticsGiganticExoframe assigningPart)
         {
@@ -94,11 +94,11 @@ namespace XRL.World.Parts
 
             return augmentedManipulator;
         }
-
         public override ModNaturalEquipment<CyberneticsGiganticExoframe> NewNaturalEquipmentMod(CyberneticsGiganticExoframe NewAssigner = null)
         {
-            return NewAugmentedManipulatorMod(NewAssigner);
+            return NewAugmentedManipulatorMod(NewAssigner ?? this);
         }
+
         public string GetShortAugmentAdjective(bool Pretty = true)
         {
             return Pretty ? NaturalEquipmentMod.Adjective.OptionalColor(NaturalEquipmentMod.AdjectiveColor, NaturalEquipmentMod.AdjectiveColorFallback, Colorfulness) : NaturalEquipmentMod.Adjective;
@@ -139,10 +139,20 @@ namespace XRL.World.Parts
             Debug.Entry(3, $"x OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//", Indent: 0, Toggle: getDoDebug());
         } //!--- public override void OnUnimplanted(GameObject Object)
 
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("CanBeDisassembled");
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID;
+                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == AfterObjectCreatedEvent.ID;
         }
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
@@ -154,29 +164,24 @@ namespace XRL.World.Parts
                     E.Decreases++;
                 }
                 else if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
-                { 
-                    E.Increases++; 
+                {
+                    E.Increases++;
                 }
                 E.CanBeTooSmall = false;
             }
             return base.HandleEvent(E);
         }
-
-        public override bool AllowStaticRegistration()
+        public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            return true;
-        }
-
-        // These prevent the cybernetic in question from being disassembled.
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("CanBeDisassembled");
-            base.Register(Object, Registrar);
-        }
-        public void CanBeDisassembled()
-        {
-            Event CanBeDisassembled = Event.New("CanBeDisassembled");
-            ParentObject.FireEvent(CanBeDisassembled);
+            if (E.Object == ImplantObject)
+            {
+                if (E.Object.TryGetPart(out Description description))
+                {
+                    string material = Material.Color(AugmentAdjectiveColor);
+                    description._Short = description._Short.Replace("*material*", material);
+                }
+            }
+            return base.HandleEvent(E);
         }
         public override bool FireEvent(Event E)
         {
@@ -187,6 +192,13 @@ namespace XRL.World.Parts
 
             return base.FireEvent(E);
         }
+        // These prevent the cybernetic in question from being disassembled.
+        public void CanBeDisassembled()
+        {
+            Event CanBeDisassembled = Event.New("CanBeDisassembled");
+            ParentObject.FireEvent(CanBeDisassembled);
+        }
+
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;

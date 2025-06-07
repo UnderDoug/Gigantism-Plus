@@ -350,6 +350,18 @@ namespace XRL.World.Parts
             return GetAdjective().OptionalColor(AdjectiveColor, AdjectiveColorFallback, Colorfulness);
         }
 
+        public virtual string GetAdjectiveIndicativeNoun(GameObject Object = null)
+        {
+            Object ??= ParentObject;
+
+            string adjective = Grammar.MakeTitleCase(GetColoredAdjective());
+
+            string objectNoun = Object?.GetObjectNoun();
+            objectNoun = Object != null && Object.IsPlural ? Grammar.Pluralize(objectNoun) : objectNoun;
+
+            return $"{adjective}: {Object?.IndicativeProximal} {objectNoun} ";
+        }
+
         public abstract string GetInstanceDescription(GameObject Object = null);
 
         public virtual int GetDescriptionPriority()
@@ -420,5 +432,5 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod;
         }
 
-    } //!-- public class ModNaturalEquipmentBase : IModification
+    } //!-- public class ModNaturalEquipmentBase : ModPart
 }

@@ -17,6 +17,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModNaturalEquipment<T> 
         : ModNaturalEquipmentBase
+        , IModEventHandler<BeforeDescribeModificationEvent<ModNaturalEquipment<T>>>
+        , IModEventHandler<DescribeModificationEvent<ModNaturalEquipment<T>>>
         where T 
         : IPart
         , IManagedDefaultNaturalEquipment<T>
@@ -225,18 +227,63 @@ namespace XRL.World.Parts
             return typeof(T).Name;
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register(DescribeModificationEvent<ModNaturalEquipment<T>>.ID, EventOrder.EXTREMELY_EARLY);
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+                || ID == BeforeDescribeModificationEvent<ModNaturalEquipment<T>>.ID;
         }
-
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
             if (!E.Object.HasProperName)
             {
                 E.AddAdjective(GetColoredAdjective(), ModPriority);
             }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<T>> E)
+        {
+            if (E.Adjective == GetColoredAdjective())
+            {
+                int dieCount = GetDamageDieCount();
+                int dieSize = GetDamageDieSize();
+                int damageBonus = GetDamageBonus();
+                int hitBonus = GetHitBonus();
+                int penBonus = GetPenBonus();
+
+                if (dieCount != 0)
+                {
+                    E.AddWeaponElement("gain", $"{dieCount} additional damage die");
+                }
+                if (dieSize != 0)
+                {
+                    E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
+                }
+                if (damageBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                }
+                if (hitBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
+                }
+                if (penBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
+                }
+                if (E.WeaponDescriptions.IsNullOrEmpty() && E.GeneralDescriptions.IsNullOrEmpty())
+                {
+                    E.AddWeaponElement("gain", "some manner of adjustments");
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<T>> E)
+        {
             return base.HandleEvent(E);
         }
 
@@ -246,53 +293,9 @@ namespace XRL.World.Parts
         }
         public override string GetInstanceDescription(GameObject Object = null)
         {
-            Object ??= ParentObject;
-            string text = Object?.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string description = $"{descriptionName}: ";
-            description += Object != null && Object.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " ")
-                        : ("This " + text + " ");
-
-            int dieCount = GetDamageDieCount();
-            int dieSize = GetDamageDieSize();
-            int damageBonus = GetDamageBonus();
-            int hitBonus = GetHitBonus();
-            int penBonus = GetPenBonus();
-            
-            List<List<string>> descriptions = new();
-            if (dieCount != 0)
-            {
-                descriptions.AddDescription("gain", $"{dieCount} additional damage die");
-            }
-            if (dieSize != 0)
-            {
-                descriptions.AddDescription("gain", $"{dieSize.Signed()} damage die size");
-            }
-            if (damageBonus != 0)
-            {
-                descriptions.AddDescription("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
-            }
-            if (hitBonus != 0)
-            {
-                descriptions.AddDescription("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
-            }
-            if (penBonus != 0)
-            {
-                descriptions.AddDescription("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
-            }
-            if (descriptions.IsNullOrEmpty())
-            {
-                descriptions.AddDescription("gain", "some manner of adjustments");
-            }
-
-            List<string> processedDescriptions = new();
-            foreach (List<string> entry in descriptions)
-            {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
-            }
-
-            return description += Grammar.MakeAndList(processedDescriptions) + ".";
+            return DescribeModificationEvent<ModNaturalEquipment<T>>
+                .Send(Object, GetColoredAdjective(), Context: "Natural Equipment")
+                .Process();
         }
         
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

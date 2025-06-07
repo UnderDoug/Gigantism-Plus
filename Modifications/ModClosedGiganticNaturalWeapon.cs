@@ -34,39 +34,16 @@ namespace XRL.World.Parts
             base.ApplyModification(Object);
         }
 
-        public override bool WantEvent(int ID, int cascade)
+        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>> E)
         {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
-            return base.HandleEvent(E);
-        }
-
-        public override string GetInstanceDescription(GameObject Object = null)
-        {
-            Object ??= ParentObject;
-            string text = Object?.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string description = $"{descriptionName}: ";
-            description += Object != null && Object.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " ")
-                        : ("This " + text + " ");
-
-            List<List<string>> descriptions = new()
+            if (E.Adjective == GetColoredAdjective())
             {
-                new() { null, $"tightly clenched" },
-                new() { "", $"functions as a cudgel" }
-            };
+                E.BeforeEvent.ClearDescriptionElements();
 
-            List<string> processedDescriptions = new();
-            foreach (List<string> entry in descriptions)
-            {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, Object));
+                E.BeforeEvent.AddGeneralElement(null, $"tightly clenched");
+                E.BeforeEvent.AddGeneralElement("", $"functions as a cudgel");
             }
-
-            return description += Grammar.MakeAndList(processedDescriptions) + ".";
+            return base.HandleEvent(E);
         }
 
     } //!-- public class ModClosedGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

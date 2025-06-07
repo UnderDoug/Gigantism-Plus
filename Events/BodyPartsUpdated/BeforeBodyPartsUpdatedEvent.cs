@@ -19,6 +19,8 @@ public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdated
 
     public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
 
+    public static readonly string RegisteredEventID = nameof(BeforeBodyPartsUpdatedEvent);
+
     public GameObject Creature;
 
     public override int GetCascadeLevel()
@@ -28,7 +30,7 @@ public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdated
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{nameof(BeforeBodyPartsUpdatedEvent)}";
+        return RegisteredEventID;
     }
 
     public override void Reset()
@@ -48,8 +50,10 @@ public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdated
 
         bool validCreature = Creature != null;
 
-        bool wantsMin = validCreature && Creature.WantEvent(ID, E.GetCascadeLevel());
-        bool wantsStr = validCreature && Creature.HasRegisteredEvent(E.GetRegisteredEventID());
+        E.Creature = Creature;
+
+        bool wantsMin = validCreature && E.Creature.WantEvent(ID, E.GetCascadeLevel());
+        bool wantsStr = validCreature && E.Creature.HasRegisteredEvent(E.GetRegisteredEventID());
 
         bool anyWants = wantsMin || wantsStr;
 
@@ -58,13 +62,12 @@ public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdated
         {
             if (proceed && wantsMin)
             {
-                E.Creature = Creature;
-                proceed = Creature.HandleEvent(E);
+                proceed = E.Creature.HandleEvent(E);
             }
             if (proceed && wantsStr)
             {
                 Event @event = Event.New(E.GetRegisteredEventID());
-                @event.SetParameter(nameof(Creature), Creature);
+                @event.SetParameter(nameof(E.Creature), E.Creature);
                 proceed = Creature.FireEvent(@event);
             }
         }

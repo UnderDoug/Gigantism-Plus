@@ -75,7 +75,7 @@ namespace HNPS_GigantismPlus
                 {
                     Event @event = Event.New(nameof(BeforeModGiganticAppliedEvent));
                     @event.SetParameter("Object", Object);
-                    @event.SetParameter("Modification", Modification);
+                    @event.SetParameter("ModPart", Modification);
                     proceed = Object.FireEvent(@event);
                     @event.Clear();
                 }

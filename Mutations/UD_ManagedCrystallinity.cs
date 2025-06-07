@@ -171,6 +171,14 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual List<ModNaturalEquipment<UD_ManagedCrystallinity>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, UD_ManagedCrystallinity NewAssigner = null)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(UD_ManagedCrystallinity)}."
+                + $"{nameof(GetNaturalEquipmentMods)}("
+                + $"{nameof(Filter)}, "
+                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                Indent: indent + 1, Toggle: getDoDebug());
+
             NewAssigner ??= this;
             List<ModNaturalEquipment<UD_ManagedCrystallinity>> naturalEquipmentModsList = new();
             if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
@@ -178,6 +186,8 @@ namespace XRL.World.Parts.Mutation
                 NaturalEquipmentMod.AssigningPart = NewAssigner;
                 naturalEquipmentModsList.Add(NaturalEquipmentMod);
             }
+
+            Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }
 

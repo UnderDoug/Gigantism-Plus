@@ -32,8 +32,8 @@
       
   -->
   <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
-    <part Name="Physics" Weight="15" />
-    <part Name="Description" Short="" />
+    <part Name="Description"
+          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and *material* plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
     <part Name="Render" DisplayName="{{c|massive exoframe}}"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="r" />
@@ -49,6 +49,7 @@ You cannot wear equipment on your body." />
     <tag Name="CyberneticsOneOnly" />
     <part Name="CyberneticsGiganticExoframe"
           Model="Alpha"
+          Material="carbide"
           AugmentAdjectiveColor="b"
           AugmentTile="NaturalWeapons/GiganticManipulator.png"
           AugmentTileColorString="&amp;c"
@@ -67,20 +68,15 @@ You cannot wear equipment on your body." />
   
   <object Name="GiganticExoframeAlpha" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="15" />
-    <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{b|carbide}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}"
-          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="b" />
+    <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}" DetailColor="b" />
     <part Name="Armor" 
           AV="2" 
           DV="-5" />
-    <part Name="CyberneticsBaseItem"
-          Slots="Body" Cost="2"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="CyberneticsBaseItem" Slots="Body" Cost="2" />
     <part Name="Commerce" Value="120" />
     <part Name="CyberneticsGiganticExoframe" 
-          Model="Alpha" 
+          Model="Alpha"
+          Material="carbide"
           AugmentAdjectiveColor="b" 
           AugmentTileDetailColor="b" 
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
@@ -94,20 +90,15 @@ You cannot wear equipment on your body." />
 
   <object Name="GiganticExoframeDelta" Inherits="BaseGiganticExoframe">
     <part Name="Physics" Weight="18" />
-    <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|fullerite}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}"
-          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="K" />
+    <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}" DetailColor="K" />
     <part Name="Armor" 
           AV="5" 
           DV="-4" />
-    <part Name="CyberneticsBaseItem"
-          Slots="Body" Cost="4"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="CyberneticsBaseItem" Slots="Body" Cost="4" />
     <part Name="Commerce" Value="240" />
-    <part Name="CyberneticsGiganticExoframe" 
+    <part Name="CyberneticsGiganticExoframe"
           Model="Delta"
+          Material="fullerite"
           AugmentAdjectiveColor="K"
           AugmentTileDetailColor="K"
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
@@ -122,15 +113,11 @@ You cannot wear equipment on your body." />
     <part Name="Physics" Weight="9" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{G|sigma}}}}"
-          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="G" />
+    <part Name="Render" DisplayName="{{c|exoframe {{G|sigma}}}}" DetailColor="G" />
     <part Name="Armor" 
           AV="6" 
           DV="-3" />
-    <part Name="CyberneticsBaseItem"
-          Slots="Body" Cost="8"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="CyberneticsBaseItem" Slots="Body" Cost="8" />
     <part Name="Commerce" Value="600" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Sigma"
@@ -153,15 +140,11 @@ You cannot wear equipment on your body." />
     <part Name="Physics" Weight="6" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}"
-          RenderString="M" Tile="Items/sw_exoskeleton.bmp"
-          ColorString="&amp;c" DetailColor="M" />
+    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}" DetailColor="M" />
     <part Name="Armor" 
           AV="8" 
           DV="-2" />
-    <part Name="CyberneticsBaseItem"
-          Slots="Body" Cost="16"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.\nYou cannot wear equipment on your body." />
+    <part Name="CyberneticsBaseItem" Slots="Body" Cost="16" />
     <part Name="Commerce" Value="2200" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Omega"

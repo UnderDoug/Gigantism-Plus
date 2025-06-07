@@ -21,7 +21,6 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
 
-using static HNPS_GigantismPlus.DescribeModGiganticEvent;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -758,7 +757,7 @@ namespace HNPS_GigantismPlus
                 }
                 else
                 {
-                    MetricsManager.LogError(type?.ToString() + " is not an IModification");
+                    MetricsManager.LogError(type?.ToString() + " is not an ModPart");
                 }
                 return null;
             }
@@ -1509,7 +1508,7 @@ namespace HNPS_GigantismPlus
 
         public static string DebugName(this BodyPart BodyPart)
         {
-            return $"[{BodyPart.ID}:{BodyPart.Name}]::{BodyPart.Description}";
+            return $"[{BodyPart.ID}:{BodyPart.Name}]:{BodyPart.Description}::{BodyPart.Type}";
         }
 
         public static int Between(this int @int, int Min, int Max)
@@ -2393,12 +2392,17 @@ namespace HNPS_GigantismPlus
             return @string.Append(" ({{r|D}})");
         }
 
-        public static List<List<string>> AddDescription(this List<List<string>> Descriptions, string Relationship, string Effect)
+        public static List<List<string>> AddElement(this List<List<string>> Descriptions, string Relationship, string Effect)
         {
             Descriptions.Add(new() { Relationship, Effect });
             return Descriptions;
         }
-        public static List<List<string>> RemoveDescription(this List<List<string>> Descriptions, string Relationship, string Effect)
+        public static List<DescriptionElement> AddElement(this List<DescriptionElement> Descriptions, string Relationship, string Effect)
+        {
+            Descriptions.Add(new(Relationship, Effect));
+            return Descriptions;
+        }
+        public static List<List<string>> RemoveElement(this List<List<string>> Descriptions, string Relationship, string Effect)
         {
             List<List<string>> elementsToRemove = new()
             {
@@ -2416,6 +2420,26 @@ namespace HNPS_GigantismPlus
                 }
             }
             return Descriptions;
+        }
+        public static List<DescriptionElement> RemoveElement(this List<DescriptionElement> Descriptions, string Verb, string Effect)
+        {
+            Descriptions.RemoveAll(x => x.Verb == Verb && x.Effect == Effect);
+            return Descriptions;
+        }
+
+        public static bool IsAssignableFrom(this IPart @this, IPart Part)
+        {
+            return @this.GetType().IsAssignableFrom(Part.GetType());
+        }
+
+        public static bool InheritsFrom(this IPart @this, Type Type)
+        {
+            return Type.IsAssignableFrom(@this.GetType());
+        }
+        public static bool InheritsFrom<T>(this IPart @this)
+            where T : IModification
+        {
+            return typeof(T).IsAssignableFrom(@this.GetType());
         }
 
     } //!-- Extensions

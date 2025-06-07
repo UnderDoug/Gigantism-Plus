@@ -79,13 +79,13 @@ namespace XRL.World.Parts.Mutation
             SecondDetailColor = "R",  // If the tile is already the above color, this get used instead
         };
 
-        // Required by IManagedDefaultNaturalWeapon and allows the Modification to get the above part from the mutation.
+        // Required by IManagedDefaultNaturalWeapon and allows the ModPart to get the above part from the mutation.
         public virtual IManagedDefaultNaturalWeapon.INaturalWeapon GetNaturalWeapon()
         {
             return NaturalWeapon;
         }
 
-        // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the Modification.
+        // Required by IManagedDefaultNaturalWeapon and can be used further down to easily reference the ModPart.
         public virtual string GetNaturalEquipmentModName(bool Managed = true)
         {
             return "Mod" + Grammar.MakeTitleCase(NaturalWeapon.GetAdjective()) + "NaturalEquipmentMod" + (!Managed ? "Unmanaged" : "");

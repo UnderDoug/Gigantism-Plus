@@ -54,9 +54,9 @@ namespace XRL.World.Parts
             {
                 E.AddGeneralElement("destroy", $"walls after {wallHitsRequired} penetrating hits");
             }
-            if (AssigningPart.IsMyActivatedAbilityToggledOn(AssigningPart.EnableActivatedAbilityID))
+            if (AssigningPart.HasGigantism && !(AssigningPart.HasElongated || AssigningPart.HasCrystallinity))
             {
-                E.AddGeneralElement("allow", "pathing through diggable walls");
+                E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
             }
 
             return base.HandleEvent(E);

@@ -50,7 +50,7 @@ namespace XRL.World.Parts
         private GameObject _implantee = null;
         public GameObject Implantee
         {
-            get => _implantee ??= ImplantObject?.Equipped;
+            get => _implantee ??= ImplantObject?.Implantee;
             set => _implantee = value == null ? null : _implantee;
         }
 
@@ -217,7 +217,7 @@ namespace XRL.World.Parts
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
-            Implantee.Body.UpdateBodyParts();
+            Implantee?.Body?.UpdateBodyParts();
         } //!-- public override void OnUnimplanted(GameObject Object)
 
         public virtual void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
@@ -250,7 +250,7 @@ namespace XRL.World.Parts
                 ManageDefaultNaturalEquipmentEvent.ID,
             };
         }
-        public virtual void RegisterImplanteeEvents()
+        public virtual void RegisterImplanteeEvents(GameObject Implantee)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"{nameof(RegisterImplanteeEvents)}", Indent: indent + 1, Toggle: getDoDebug('R'));
@@ -260,14 +260,14 @@ namespace XRL.World.Parts
             {
                 foreach (int eventID in eventIDs)
                 {
-                    Implantee.RegisterEvent(this, eventID);
+                    Implantee?.RegisterEvent(this, eventID);
                     Debug.LoopItem(4, $"Registered {nameof(eventID)}: {eventID}]", Indent: indent + 2, Toggle: getDoDebug('R'));
                 }
             }
 
             Debug.LastIndent = indent;
         }
-        public virtual void UnregisterImplanteeEvents()
+        public virtual void UnregisterImplanteeEvents(GameObject Implantee)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"{nameof(UnregisterImplanteeEvents)}", Indent: indent + 1, Toggle: getDoDebug('R'));
@@ -301,11 +301,9 @@ namespace XRL.World.Parts
                 + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            Implantee = E.Implantee;
-            ImplantObject = E.Item;
-            RegisterImplanteeEvents();
+            RegisterImplanteeEvents(E.Implantee);
 
-            OnImplanted(Implantee, ImplantObject);
+            OnImplanted(E.Implantee, E.Item);
 
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
@@ -330,9 +328,9 @@ namespace XRL.World.Parts
                 + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            UnregisterImplanteeEvents();
+            UnregisterImplanteeEvents(E.Implantee);
 
-            OnUnimplanted(Implantee, ImplantObject);
+            OnUnimplanted(E.Implantee, E.Item);
 
             Debug.Entry(4,
                 $"x {typeof(T).Name}."

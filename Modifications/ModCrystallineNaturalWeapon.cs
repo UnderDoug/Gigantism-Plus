@@ -29,7 +29,10 @@ namespace XRL.World.Parts
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<UD_ManagedCrystallinity>> E)
         {
             E.BeforeEvent.AddGeneralElement(null, $"inorganic");
-
+            if (AssigningPart.HasGigantism && (AssigningPart.HasElongated || AssigningPart.HasBurrowing))
+            {
+                E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size and damage bonus");
+            }
             return base.HandleEvent(E);
         }
     } //!-- public class ModCrystallineNaturalWeapon : ModNaturalWeaponBase<UD_ManagedCrystallinity>

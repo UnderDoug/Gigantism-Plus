@@ -69,8 +69,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
-                ModPriority = 40,
-                DescriptionPriority = 40,
+                ModPriority = 100,
+                DescriptionPriority = 100,
 
                 Adjective = "crystalline",
                 AdjectiveColor = "crystallized",
@@ -90,7 +90,6 @@ namespace XRL.World.Parts.Mutation
                 },
             };
             crystalinePointMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
-            crystalinePointMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength");
 
             crystalinePointMod.AddAdjustment(RENDER, "DisplayName", "point", true);
 

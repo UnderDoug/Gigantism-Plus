@@ -32,6 +32,10 @@ namespace XRL.World.Parts
             int dieSize = GetDamageDieSize();
             int damageBonus = GetDamageBonus();
 
+            if (E.Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.Skill == "Agility")
+            {
+                E.AddWeaponElement("scale", $"bonus penetration from Agility");
+            }
             if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
             {
                 E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
@@ -47,6 +51,10 @@ namespace XRL.World.Parts
             else
             {
                 E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's Strength Modifier");
+            }
+            if (AssigningPart.HasGigantism || AssigningPart.HasBurrowing)
+            {
+                E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
             }
             return base.HandleEvent(E);
         }

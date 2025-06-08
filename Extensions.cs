@@ -21,6 +21,7 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -55,22 +56,42 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
-        // checks if part is managed externally
-        public static bool IsExternallyManagedLimb(this BodyPart part)  // Renamed method
+        // checks if BodyPart is managed externally
+        public static bool IsExternallyManagedLimb(this BodyPart BodyPart)  // Renamed method
         {
-            if (part?.Manager == null) return false;
+            if (BodyPart?.Manager == null) return false;
 
+            GameObject Creature = BodyPart.ParentBody.ParentObject;
+
+            if (Creature == null) return false;
+            /*
+            string bodyPartManager = BodyPart.Manager;
+            if (Creature.TryGetPart(out Mutations mutations))
+            {
+                List<string> bodyPartManagers = new();
+                if (mutations.HasMutation(nameof(MultipleArms)))
+                {
+                    foreach (Mutations.MutationModifierTracker mutationModTracker in mutations.MutationMods)
+                    {
+                        if (mutationModTracker.mutationName ==  nameof(MultipleArms))
+                        {
+                            bodyPartManagers.TryAdd(mutationModTracker.sourceName);
+                        }
+                    }
+                }
+            }
+            */
             // Check for HelpingHands or AgolgotChord managed parts
-            if (part.Manager.EndsWith("::HelpingHands") || part.Manager.EndsWith("::AgolgotChord"))
+            if (BodyPart.Manager.EndsWith("::HelpingHands") || BodyPart.Manager.EndsWith("::AgolgotChord"))
                 return true;
 
             // Check for Nephal claws (Agolgot parts that don't use the manager)
-            if (!string.IsNullOrEmpty(part.DefaultBehaviorBlueprint) &&
-                part.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
+            if (!string.IsNullOrEmpty(BodyPart.DefaultBehaviorBlueprint) &&
+                BodyPart.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
                 return true;
 
             return false;
-        } //!-- public static bool IsExternallyManagedLimb(BodyPart part)
+        } //!-- public static bool IsExternallyManagedLimb(BodyPart BodyPart)
 
         public static int GetDieCount(this DieRoll DieRoll)
         {
@@ -250,27 +271,28 @@ namespace HNPS_GigantismPlus
             return Text;
         }
 
-        public static string OptionalColor(this string Text, string Color, string FallbackColor = "", int Option = 3)
+        public static string OptionalColor(this string Text, string Color, string FallbackColor = "", int Option = 0)
         {
             // 3: Most Colorful
             // 2: Vanilla Only
             // 1: Plain Text
+            Option = Option == 0 ? Colorfulness : Option;
             return Text.MaybeColor(Color, Option > 2).MaybeColor(FallbackColor, Option > 1);
         }
-        public static string OptionalColorGigantic(this string Text, int Option = 3)
+        public static string OptionalColorGigantic(this string Text, int Option = 0)
         {
             return Text.OptionalColor(Color: "gigantic", FallbackColor: "w", Option);
         }
-        public static string OptionalColorYuge(this string Text, int Option = 3)
+        public static string OptionalColorYuge(this string Text, int Option = 0)
         {
             return Text.OptionalColor(Color: "yuge", FallbackColor: "w", Option);
         }
-        public static string OptionalColorGiant(this string Text, int Option = 3)
+        public static string OptionalColorGiant(this string Text, int Option = 0)
         {
             return Text.OptionalColor(Color: "giant", FallbackColor: "w", Option);
         }
 
-        // ripped from the CyberneticPropertyModifier part, converted into extension.
+        // ripped from the CyberneticPropertyModifier BodyPart, converted into extension.
         // Props must equal "string:int;string:int;string:int" where
         // string   is an IntProperty
         // int      is the value
@@ -745,7 +767,7 @@ namespace HNPS_GigantismPlus
             Type type = ModManager.ResolveType("XRL.World.Parts." + ModPartName);
             if (type == null)
             {
-                MetricsManager.LogError(nameof(ConvertToModification), "Couldn't resolve unknown mod part: " + ModPartName);
+                MetricsManager.LogError(nameof(ConvertToModification), "Couldn't resolve unknown mod BodyPart: " + ModPartName);
                 return null;
             }
             ModPart = Activator.CreateInstance(type) as IModification;
@@ -810,12 +832,10 @@ namespace HNPS_GigantismPlus
             {
                 foreach (BodyPart part in body.LoopParts())
                 {
-                    if (part.DefaultBehavior == Object)
+                    if (part.DefaultBehavior == Object || part.Equipped == Object || part.Cybernetics == Object)
+                    {
                         return part;
-                    if (part.Equipped == Object)
-                        return part;
-                    if (part.Cybernetics == Object)
-                        return part;
+                    }
                 }
             }
             return null;

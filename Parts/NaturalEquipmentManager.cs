@@ -45,7 +45,11 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public bool WantsToManage => ParentObject != null && ParentObject.IsNaturalEquipment();
+        public bool WantsToManage => 
+            ParentObject != null 
+         && ParentObject.IsNaturalEquipment()
+         && ParentLimb != null
+         && !ParentLimb.Extrinsic;
 
         public bool HasManaged = false;
 
@@ -66,7 +70,7 @@ namespace XRL.World.Parts
         public BodyPart ParentLimb => _parentLimb ??= ParentObject?.EquippingPart();
 
         private GameObject _wielder = null;
-        public GameObject Wielder => _wielder ??= ParentObject?.Equipped;
+        public GameObject Wielder => _wielder ??= ParentObject?.Equipped ?? ParentObject?.Implantee;
 
         private Render _parentRender = null;
         public Render ParentRender => _parentRender ??= ParentObject?.GetPart<Render>();
@@ -79,6 +83,8 @@ namespace XRL.World.Parts
 
         [SerializeField]
         private string _shortDescriptionCache = null;
+
+        public List<string> AppliedAdjustments;
 
         /// <summary>
         /// Key: string (name of Target object) <br></br>
@@ -98,6 +104,7 @@ namespace XRL.World.Parts
             AccumulatedDamageDie = (0, 0, 0);
             AccumulatedHitBonus = 0;
             AccumulatedPenBonus = 0;
+            AppliedAdjustments = new();
         }
 
         public override void Initialize()
@@ -342,15 +349,25 @@ namespace XRL.World.Parts
                         Debug.Entry(4,
                         $"> foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments)",
                         Indent: 1, Toggle: doDebug);
+                        Debug.LastIndent++;
+
+                        AppliedAdjustments ??= new();
                         foreach ((string _, PartAdjustment adjustment) in prioritisedAdjustments)
                         {
                             bool applied = adjustment.Apply(ParentObject);
+                            AppliedAdjustments.TryAdd($"{adjustment.ParentNaturalEquipmentMod}::{adjustment.ToString()}");
                             Debug.LoopItem(4, $"Applied {adjustment}", Good: applied, Indent: 2, Toggle: doDebug);
                         }
                         Debug.Divider(4, HONLY, 40, Indent: 1, Toggle: doDebug);
                         Debug.Entry(4,
                             $"x foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments) >//",
                             Indent: 1, Toggle: doDebug);
+                    }
+
+                    Debug.Entry(4, $"Applied Adjustments:", Indent: 1, Toggle: doDebug);
+                    foreach (string appliedAdjustment in AppliedAdjustments)
+                    {
+                        Debug.LoopItem(4, $"{appliedAdjustment}]", Indent: 2, Toggle: doDebug);
                     }
 
                     if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))
@@ -588,6 +605,7 @@ namespace XRL.World.Parts
             Writer.Write(AccumulatedDamageDie.Count);
             Writer.Write(AccumulatedDamageDie.Size);
             Writer.Write(AccumulatedDamageDie.Bonus);
+            Writer.Write(AppliedAdjustments);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
@@ -597,8 +615,9 @@ namespace XRL.World.Parts
             {
                 Count = Reader.ReadInt32(),
                 Size = Reader.ReadInt32(),
-                Bonus = Reader.ReadInt32()
+                Bonus = Reader.ReadInt32(),
             };
+            AppliedAdjustments = Reader.ReadList<string>();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

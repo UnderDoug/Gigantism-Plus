@@ -3,17 +3,18 @@
   <!-- 
       
        1: Add NaturalEquipmentManager to Item
-       2: Gigantic Exoframes
-       3: Modified BaseGame Natural Weapons
-       4: Modified BaseGame "Natural" Weapons
-       5: Sultan Masks
-       6: General GiganticEquippable Changes
-       7: Gigantic Modable Changes 
-       8: Gigantic Variants
-       9: Wrassle Gear
-      10: Helper Parts
-      11: Sundry
-      12: Testing
+       2: GiganticExoframes
+       3: HandBones
+       4: Modified BaseGame Natural Weapons
+       5: Modified BaseGame "Natural" Weapons
+       6: Sultan Masks
+       7: General GiganticEquippable Changes
+       8: Gigantic Modable Changes 
+       9: Gigantic Variants
+      10: Wrassle Gear
+      11: Helper Parts
+      12: Sundry
+      13: Testing
       
   -->
   <!-- 
@@ -28,7 +29,7 @@
   
   <!-- 
       
-      Gigantic Exoframes 
+      GiganticExoframes 
       
   -->
   <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
@@ -161,6 +162,76 @@ You cannot wear equipment on your body." />
     <tag Name="Tier" Value="8" />
   </object>
 
+  <!-- 
+      
+      HandBones 
+      
+  -->
+  <object Name="CarbideHandBones" Load="Merge">
+    <part Name="Description" Short="Blue *material* merely dents where weak collagen would be smashed to bits." />
+    <part Name="Render" DisplayName="{{b|carbide}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" />
+    <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 1 additional damage die and +1 damage die size." />
+    <removepart Name="CyberneticsFistReplacement" />
+    <part Name="CyberneticsManagedHandBones"
+          Material="carbide"
+          BonesAdjectiveColor="b"
+          BonesTile="Items/sw_carbidehand.bmp"
+          BonesTileColorString="&amp;K"
+          BonesTileDetailColor="b"
+          BonesDamageDieCount="1"
+          BonesDamageDieSize="1" />
+  </object>
+  <object Name="FulleriteHandBones" Load="Merge">
+    <part Name="Description" Short="Black *material* merely dents where weak collagen would be smashed to bits." />
+    <part Name="Render" DisplayName="{{K|fullerite}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" TileColor="&amp;K" DetailColor="r" />
+    <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 1 additional damage die, +2 damage die size and +1 bonus damage." />
+    <removepart Name="CyberneticsFistReplacement" />
+    <part Name="CyberneticsManagedHandBones"
+          Material="fullerite"
+          BonesAdjectiveColor="K"
+          BonesTile="Items/sw_carbidehand.bmp"
+          BonesTileColorString="&amp;K"
+          BonesTileDetailColor="K"
+          BonesDamageDieCount="1"
+          BonesDamageDieSize="2"
+          BonesDamageBonus="1" />
+  </object>
+  <object Name="CrysteelHandBones" Load="Merge">
+    <part Name="Description" Short="Dappled *material* merely dents where weak collagen would be smashed to bits." />
+    <part Name="Render" DisplayName="{{crysteel|crysteel}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" TileColor="&amp;G" DetailColor="r" />
+    <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 2 additional damage die and +2 damage die size." />
+    <removepart Name="CyberneticsFistReplacement" />
+    <part Name="CyberneticsManagedHandBones"
+          Material="crysteel"
+          BonesAdjectiveColor="crysteel"
+          BonesTile="Items/sw_carbidehand.bmp"
+          BonesTileColorString="&amp;K"
+          BonesTileDetailColor="G"
+          BonesAddParts="Crysteel"
+          BonesAddProps="Flawless:1"
+          BonesEquipmentFrameColors="KGKG"
+          BonesDamageDieCount="2"
+          BonesDamageDieSize="2" />
+    <part Name="Crysteel" />
+    <tag Name="Flawless" />
+  </object>
+  <object Name="RealHomosapien_ZetachromeFist" Load="Merge">
+    <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 3 additional damage die, +3 damage die size and +1 bonus damage." />
+    <removepart Name="CyberneticsFistReplacement" />
+    <part Name="CyberneticsManagedHandBones"
+          Material="zetachrome"
+          BonesAdjectiveColor="zetachrome"
+          BonesTile="Items/sw_carbidehand.bmp"
+          BonesTileColorString="&amp;K"
+          BonesTileDetailColor="M"
+          BonesAddParts="Zetachrome"
+          BonesEquipmentFrameColors="mCmC"
+          BonesDamageDieCount="3"
+          BonesDamageDieSize="3"
+          BonesDamageBonus="1" />
+    <part Name="Zetachrome" />
+  </object>
+  
   <!-- 
   
       Modified BaseGame Improvised Weapons 

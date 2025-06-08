@@ -51,8 +51,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
-                ModPriority = 20,
-                DescriptionPriority = 20,
+                ModPriority = 60,
+                DescriptionPriority = 60,
 
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
@@ -67,7 +67,7 @@ namespace XRL.World.Parts.Mutation
                 },
             };
             elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
-            elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Stat", "Agility", -120);
 
             elongatedNaturalWeaponMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
 

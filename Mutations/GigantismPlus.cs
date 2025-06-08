@@ -161,8 +161,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
-                ModPriority = 10,
-                DescriptionPriority = 10,
+                ModPriority = 40,
+                DescriptionPriority = 40,
 
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
@@ -182,7 +182,7 @@ namespace XRL.World.Parts.Mutation
                 },
             };
             giganticFistMod.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
-            giganticFistMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            giganticFistMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", -100);
 
             giganticFistMod.AddAdjustment(RENDER, "DisplayName", "fist", true);
 
@@ -199,8 +199,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Head",
 
-                ModPriority = 10,
-                DescriptionPriority = 10,
+                ModPriority = 40,
+                DescriptionPriority = 40,
 
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
@@ -228,8 +228,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Face",
 
-                ModPriority = 10,
-                DescriptionPriority = 10,
+                ModPriority = 40,
+                DescriptionPriority = 40,
 
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
@@ -257,8 +257,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Body",
 
-                ModPriority = 10,
-                DescriptionPriority = 10,
+                ModPriority = 40,
+                DescriptionPriority = 40,
 
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",

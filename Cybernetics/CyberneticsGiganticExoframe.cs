@@ -16,8 +16,7 @@ using static HNPS_GigantismPlus.SecretGiganticExoframe;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class CyberneticsGiganticExoframe 
-        : BaseManagedDefaultEquipmentCybernetic<CyberneticsGiganticExoframe>
+    public class CyberneticsGiganticExoframe : BaseManagedDefaultEquipmentCybernetic<CyberneticsGiganticExoframe>
     {
         private static bool doDebug => getClassDoDebug(nameof(CyberneticsGiganticExoframe));
         private static bool getDoDebug(object what = null)
@@ -82,15 +81,25 @@ namespace XRL.World.Parts
             augmentedManipulator.AddAdjustment(RENDER, "DisplayName", "manipulator");
 
             augmentedManipulator.AddAdjustment(RENDER, "Tile", assigningPart.AugmentTile);
-            augmentedManipulator.AddAdjustment(RENDER, "ColorString", assigningPart.AugmentTileColorString);
+            augmentedManipulator.AddAdjustment(RENDER, "ColorString", assigningPart.AugmentTileColorString, true);
+            augmentedManipulator.AddAdjustment(RENDER, "TileColor", assigningPart.AugmentTileColorString, true);
             augmentedManipulator.AddAdjustment(RENDER, "DetailColor", assigningPart.AugmentTileDetailColor);
 
             assigningPart.ProcessNaturalEquipmentAddedParts(augmentedManipulator, assigningPart.AugmentAddParts);
             assigningPart.ProcessNaturalEquipmentAddedProps(augmentedManipulator, assigningPart.AugmentAddProps);
 
-            augmentedManipulator.AddedStringProps["SwingSound"] = assigningPart.AugmentSwingSound;
-            augmentedManipulator.AddedStringProps["BlockedSound"] = assigningPart.AugmentBlockedSound;
-            augmentedManipulator.AddedStringProps["EquipmentFrameColors"] = assigningPart.AugmentEquipmentFrameColors;
+            if (!assigningPart.AugmentSwingSound.IsNullOrEmpty())
+            {
+                augmentedManipulator.AddedStringProps["SwingSound"] = assigningPart.AugmentSwingSound;
+            }
+            if (!assigningPart.AugmentBlockedSound.IsNullOrEmpty())
+            {
+                augmentedManipulator.AddedStringProps["BlockedSound"] = assigningPart.AugmentBlockedSound;
+            }
+            if (!assigningPart.AugmentEquipmentFrameColors.IsNullOrEmpty())
+            {
+                augmentedManipulator.AddedStringProps["EquipmentFrameColors"] = assigningPart.AugmentEquipmentFrameColors;
+            }
 
             return augmentedManipulator;
         }
@@ -112,11 +121,6 @@ namespace XRL.World.Parts
             string output = $"E{"F".Color("c")}-";
             output += NaturalEquipmentMod.Adjective.OptionalColor(NaturalEquipmentMod.AdjectiveColor, NaturalEquipmentMod.AdjectiveColorFallback, Colorfulness);
             return output.Color("Y");
-        }
-
-        public override void Attach()
-        {
-            base.Attach();
         }
 
         public override void OnImplanted(GameObject Implantee, GameObject Implant)
@@ -157,6 +161,8 @@ namespace XRL.World.Parts
             // Implantee.CheckEquipmentSlots();
 
             Unbecome(Implantee, Model, ImplantObject);
+
+            base.OnUnimplanted(Implantee, Implant);
 
             Debug.Entry(2,
                 $"x {nameof(CyberneticsGiganticExoframe)}."

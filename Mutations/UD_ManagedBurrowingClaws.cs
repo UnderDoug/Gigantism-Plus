@@ -70,8 +70,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
-                ModPriority = 30,
-                DescriptionPriority = 30,
+                ModPriority = 80,
+                DescriptionPriority = 80,
 
                 Adjective = "burrowing",
                 AdjectiveColor = "W",
@@ -91,7 +91,6 @@ namespace XRL.World.Parts.Mutation
                 },
             };
             burrowingClawsMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
-            burrowingClawsMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength");
 
             burrowingClawsMod.AddAdjustment(RENDER, "DisplayName", "claw", true);
 
@@ -140,7 +139,9 @@ namespace XRL.World.Parts.Mutation
             if (HasGigantism)
             {
                 if (HasElongated || HasCrystallinity)
+                {
                     return 0;
+                }
                 return 1;
             }
             DieRoll baseDamage = new(GetClawsDamage(Level));

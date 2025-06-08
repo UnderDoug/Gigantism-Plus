@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
 
+using System;
+
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
@@ -12,27 +14,21 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    
-    // Intercept the application of Crystallinity via Crystal Delight, apply the Mutations.xml version instead (much more compatible).
     [HarmonyPatch]
     public static class CookingDomainSpecial_UnitCrystalTransform_Patches
     {
         private static bool doDebug => getClassDoDebug(nameof(CookingDomainSpecial_UnitCrystalTransform_Patches));
 
-        /*
-        [HarmonyPatch(typeof(CookingDomainSpecial_UnitCrystalTransform), nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo))]
+        // Calls UpdateBodyParts on recently transformed crytalline beings to ensure they get their funky new manipulators.
+        [HarmonyPatch(
+            declaringType: typeof(CookingDomainSpecial_UnitCrystalTransform), 
+            methodName: nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo),
+            argumentTypes: new Type[] { typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void ApplyTo_Postfix(GameObject Object)
+        static void ApplyTo_CallUpdateBodyParts_Postfix(GameObject Object)
         {
-            if (!(bool)EnableManagedVanillaMutations) return; // Skip if Crystallinity isn't being merged into the extended class.
-
-            if (Object.TryGetPart(out Crystallinity Crystallinity))
-            {
-                Object.RequirePart<Mutations>().RemoveMutation(Crystallinity);
-                MutationEntry CrystallinityEntry = MutationFactory.GetMutationEntryByName("Crystallinity");
-                Object.RequirePart<Mutations>().AddMutation(CrystallinityEntry);
-            }
+            Object?.Body?.UpdateBodyParts();
         }
-        */
     } //!-- public static class CookingDomainSpecial_UnitCrystalTransform_Patches
  }

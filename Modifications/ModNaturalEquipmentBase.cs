@@ -142,54 +142,64 @@ namespace XRL.World.Parts
                 {
                     int indent = Debug.LastIndent;
                     Debug.Divider(4, HONLY, Count: 60, Indent: indent, Toggle: doDebug);
-                    Debug.Entry(4, 
-                        $": {nameof(PartAdjustment)}."
-                        + $"{nameof(Apply)}"
-                        + $"(Object: {Equipment.DebugName})"
-                        + $" {ToString()}", Indent: indent + 1, Toggle: doDebug);
+                    Debug.LoopItem(4, 
+                        $":] " +
+                        $"{nameof(PartAdjustment)}." +
+                        $"{nameof(Apply)}" +
+                        $"(Object: {Equipment.DebugName})" +
+                        $" {ToString()}", Indent: indent, Toggle: doDebug);
 
                     object targetPart = Target == typeof(GameObject) ? Equipment : Equipment.GetPart(Target);
                     Debug.Entry(4, $"{targetPart?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: doDebug);
-                    if (targetPart != null && BeforeApplyPartAdjustmentEvent.Send(Equipment, ParentNaturalEquipmentMod, Target, Field, ref Value))
+                    if (targetPart != null)
                     {
-                        Debug.CheckYeh(4, $"{targetPart.GetType().Name}", Indent: indent + 2, Toggle: doDebug);
-                        Traverse targetPartTraverse = new(targetPart);
-                        Traverse targetProperty = targetPartTraverse.Property(Field);
-                        Traverse targetField = targetPartTraverse.Field(Field);
-                        Type valueType = Value.GetType();
-                        Debug.Entry(4, $"Value Type: {valueType?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
-                        Debug.Entry(4, $"{nameof(targetProperty)}.GetValueType: {targetProperty?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
-                        Debug.Entry(4, $"{nameof(targetField)}.GetValueType: {targetField?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
-                        try
+                        if (BeforeApplyPartAdjustmentEvent.Send(Equipment, ParentNaturalEquipmentMod, Target, Field, ref Value))
                         {
-                            if (targetProperty.PropertyExists() && targetProperty.GetValueType() == valueType)
+                            Debug.CheckYeh(4, $"{targetPart.GetType().Name}", Indent: indent + 2, Toggle: doDebug);
+                            Traverse targetPartTraverse = new(targetPart);
+                            Traverse targetProperty = targetPartTraverse.Property(Field);
+                            Traverse targetField = targetPartTraverse.Field(Field);
+                            Type valueType = Value.GetType();
+                            Debug.Entry(4, $"Value Type: {valueType?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
+                            Debug.Entry(4, $"{nameof(targetProperty)}.GetValueType: {targetProperty?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
+                            Debug.Entry(4, $"{nameof(targetField)}.GetValueType: {targetField?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
+                            try
                             {
-                                Debug.CheckYeh(4, $"{nameof(targetProperty)}", Indent: indent + 3, Toggle: doDebug);
-                                Debug.Entry(4, $"Property Type: {targetProperty.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
-                                targetProperty.SetValue(Value);
+                                if (targetProperty.PropertyExists() && targetProperty.GetValueType() == valueType)
+                                {
+                                    Debug.CheckYeh(4, $"{nameof(targetProperty)}", Indent: indent + 3, Toggle: doDebug);
+                                    Debug.Entry(4, $"Property Type: {targetProperty.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
+                                    targetProperty.SetValue(Value);
 
-                                Applied = true;
-                                Debug.Entry(4, $"Value: {targetProperty.GetValue()}", Indent: indent + 4, Toggle: doDebug);
-                                Debug.LastIndent = indent;
-                                return targetProperty.GetValue().Equals(Value);
+                                    Applied = true;
+                                    Debug.Entry(4, $"Value: {targetProperty.GetValue()}", Indent: indent + 4, Toggle: doDebug);
+                                    Debug.LastIndent = indent;
+                                    return targetProperty.GetValue().Equals(Value);
+                                }
+                                if (targetField.FieldExists() && targetField.GetValueType() == valueType)
+                                {
+                                    Debug.CheckYeh(4, $"{nameof(targetField)}", Indent: indent + 3, Toggle: doDebug);
+                                    Debug.Entry(4, $"Field Type: {targetField.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
+                                    targetField.SetValue(Value);
+
+                                    Applied = true;
+                                    Debug.Entry(4, $"Value: {targetField.GetValue()}", Indent: indent + 4, Toggle: doDebug);
+                                    Debug.LastIndent = indent;
+                                    return targetField.GetValue().Equals(Value);
+                                }
                             }
-                            if (targetField.FieldExists() && targetField.GetValueType() == valueType)
+                            catch (Exception e)
                             {
-                                Debug.CheckYeh(4, $"{nameof(targetField)}", Indent: indent + 3, Toggle: doDebug);
-                                Debug.Entry(4, $"Field Type: {targetField.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
-                                targetField.SetValue(Value);
-
-                                Applied = true;
-                                Debug.Entry(4, $"Value: {targetField.GetValue()}", Indent: indent + 4, Toggle: doDebug);
+                                MetricsManager.LogModError(ThisMod, e);
                                 Debug.LastIndent = indent;
-                                return targetField.GetValue().Equals(Value);
+                                return false;
                             }
                         }
-                        catch (Exception e)
+                        else
                         {
-                            MetricsManager.LogModError(ThisMod, e);
-                            Debug.LastIndent = indent;
-                            return false;
+                            Debug.CheckNah(4, $"Blocked by {nameof(BeforeApplyPartAdjustmentEvent)}.Send() returning false", 
+                                Indent: indent + 2, Toggle: doDebug);
+                            Applied = true;
                         }
                     }
                     else 

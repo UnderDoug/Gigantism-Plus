@@ -8,6 +8,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using UnityEngine.UIElements;
 
 namespace XRL.World.Parts
 {
@@ -46,6 +47,25 @@ namespace XRL.World.Parts
             E.BeforeEvent.ClearDescriptionElements();
             E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
 
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
+        {
+            if (E.NaturalEquipmentMod == nameof(ModClosedGiganticNaturalWeapon) && E.Target == RENDER && E.Field == "Tile")
+            {
+                Debug.Entry(4, $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {E.Field} Adjustment", 
+                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
+                Debug.LastIndent--;
+
+                foreach (PartAdjustment adjustment in Adjustments)
+                {
+                    if (adjustment.Field == E.Field && adjustment.Target == E.Target)
+                    {
+                        E.Value = adjustment.Value;
+                    }
+                }
+            }
             return base.HandleEvent(E);
         }
     } //!-- public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>

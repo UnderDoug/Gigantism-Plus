@@ -364,8 +364,8 @@ namespace XRL.World.Parts
 
             List<ModNaturalEquipment<T>> naturalEquipmentMods = 
                 UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
-                    mod => mod.BodyPartType == E.TargetBodyPart.Type
-                    ), Level);
+                    mod => mod.BodyPartType == E.TargetBodyPart.Type), 
+                    Level);
 
             foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
             {

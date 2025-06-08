@@ -40,8 +40,14 @@ namespace XRL.World.Parts
             {
                 E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
             }
-            E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's Strength Modifier");
-
+            if (E.WeaponDescriptions.IsNullOrEmpty())
+            {
+                E.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's Strength Modifier");
+            }
+            else
+            {
+                E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's Strength Modifier");
+            }
             return base.HandleEvent(E);
         }
 

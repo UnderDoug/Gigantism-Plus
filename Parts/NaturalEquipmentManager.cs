@@ -326,6 +326,14 @@ namespace XRL.World.Parts
                     }
                     Debug.Entry(4, $"x if (ParentMeleeWeapon != null) ?//", Indent: 1, Toggle: doDebug);
 
+                    // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
+                    ApplyNaturalEquipmentMods(NaturalEquipmentMods);
+
+                    if (ParentObject.TryGetPart(out MakersMark makersMark))
+                    {
+                        ParentObject.RemovePart(makersMark);
+                    }
+
                     Debug.Entry(4, $"Cycling Adjustments, Applying where applicable", Indent: 1, Toggle: doDebug);
                     Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
                     Dictionary<string, PartAdjustment> prioritisedAdjustments = GetPrioritisedNaturalEquipmentModAdjustments(NaturalEquipmentMods);
@@ -343,14 +351,6 @@ namespace XRL.World.Parts
                         Debug.Entry(4,
                             $"x foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments) >//",
                             Indent: 1, Toggle: doDebug);
-                    }
-
-                    // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
-                    ApplyNaturalEquipmentMods(NaturalEquipmentMods);
-
-                    if (ParentObject.TryGetPart(out MakersMark makersMark))
-                    {
-                        ParentObject.RemovePart(makersMark);
                     }
 
                     if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))

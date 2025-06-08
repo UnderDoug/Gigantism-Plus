@@ -13,7 +13,9 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalEquipmentBase : IModification
+    public abstract class ModNaturalEquipmentBase 
+        : IModification
+        , IModEventHandler<BeforeApplyPartAdjustmentEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
@@ -25,6 +27,8 @@ namespace XRL.World.Parts
             public Guid ID;
 
             public bool Applied; // Whether the adjustment has been applied.
+
+            public string ParentNaturalEquipmentMod; // String name of the NaturalEquipmentMod this part adjust belongs to.
 
             public Type Target; // Render, MeleeWeapon, Armor, etc.
 
@@ -38,15 +42,17 @@ namespace XRL.World.Parts
             {
                 ID = Guid.NewGuid();
                 Applied = false;
+                ParentNaturalEquipmentMod = string.Empty;
                 Target = null;
                 Field = string.Empty;
                 Priority = 0;
                 Value = null;
             }
 
-            public PartAdjustment(Type Target, string Field, int Priority, object Value)
+            public PartAdjustment(string ParentNaturalEquipmentMod, Type Target, string Field, int Priority, object Value)
                 : this ()
             {
+                this.ParentNaturalEquipmentMod = ParentNaturalEquipmentMod;
                 this.Target = Target;
                 this.Field = Field;
                 this.Priority = Priority;
@@ -54,7 +60,7 @@ namespace XRL.World.Parts
             }
 
             public PartAdjustment(PartAdjustment Source)
-                : this (Source.Target, Source.Field, Source.Priority, Source.Value)
+                : this (Source.ParentNaturalEquipmentMod, Source.Target, Source.Field, Source.Priority, Source.Value)
             {
             }
             public PartAdjustment(string Address)
@@ -84,7 +90,9 @@ namespace XRL.World.Parts
             {
                 string output = string.Empty;
                 if (ShowID)
-                    output += $"[{(ID != null ? ID : "No ID")}]";
+                {
+                    output += $"[{(ID != null ? ID : "No ID")}::{ParentNaturalEquipmentMod}]";
+                }
                 output += ToString();
                 return output;
             }
@@ -128,21 +136,21 @@ namespace XRL.World.Parts
                 return false;
             }
 
-            public bool Apply(GameObject Object)
+            public bool Apply(GameObject Equipment)
             {
-                if (Object != null && !Applied)
+                if (Equipment != null && !Applied)
                 {
                     int indent = Debug.LastIndent;
                     Debug.Divider(4, HONLY, Count: 60, Indent: indent, Toggle: doDebug);
                     Debug.Entry(4, 
                         $": {nameof(PartAdjustment)}."
                         + $"{nameof(Apply)}"
-                        + $"(Object: {Object.DebugName})"
+                        + $"(Object: {Equipment.DebugName})"
                         + $" {ToString()}", Indent: indent + 1, Toggle: doDebug);
 
-                    object targetPart = Target == typeof(GameObject) ? Object : Object.GetPart(Target);
+                    object targetPart = Target == typeof(GameObject) ? Equipment : Equipment.GetPart(Target);
                     Debug.Entry(4, $"{targetPart?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: doDebug);
-                    if (targetPart != null)
+                    if (targetPart != null && BeforeApplyPartAdjustmentEvent.Send(Equipment, ParentNaturalEquipmentMod, Target, Field, ref Value))
                     {
                         Debug.CheckYeh(4, $"{targetPart.GetType().Name}", Indent: indent + 2, Toggle: doDebug);
                         Traverse targetPartTraverse = new(targetPart);
@@ -334,9 +342,10 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+                || ID == PooledEvent<GetDisplayNameEvent>.ID
+                || ID == BeforeApplyPartAdjustmentEvent.ID;
         }
-        public override bool HandleEvent(GetDisplayNameEvent E)
+        public virtual bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
         {
             return base.HandleEvent(E);
         }

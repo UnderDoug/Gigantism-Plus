@@ -29,6 +29,8 @@ namespace XRL.World.Parts.Mutation
             List<object> doList = new()
             {
                 'V',    // Vomit
+                'R',    // Register
+                'M',    // Manage
             };
             List<object> dontList = new()
             {
@@ -221,8 +223,12 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageDefaultNaturalEquipment)}(body)", Toggle: getDoDebug());
-            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
+            Debug.Header(4, 
+                $"{typeof(T).Name}", 
+                $"{nameof(OnManageDefaultNaturalEquipment)}(body)", 
+                Toggle: getDoDebug('M'));
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", 
+                Indent: 0, Toggle: getDoDebug('M'));
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
@@ -230,7 +236,9 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageDefaultNaturalEquipment)}(body of: {ParentObject.Blueprint})", Toggle: getDoDebug());
+                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"(body of: {ParentObject.Blueprint})", 
+                Toggle: getDoDebug('M'));
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -257,10 +265,15 @@ namespace XRL.World.Parts.Mutation
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
-            List<ModNaturalEquipment<T>> naturalEquipmentMods = UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(mod => mod.BodyPartType == E.TargetBodyPart.Type), Level);
+            List<ModNaturalEquipment<T>> naturalEquipmentMods = 
+                UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
+                    mod => mod.BodyPartType == E.TargetBodyPart.Type), 
+                    Level);
+
             foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
             {
                 E.AddNaturalEquipmentMod(naturalEquipmentMod);
@@ -275,7 +288,8 @@ namespace XRL.World.Parts.Mutation
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({nameof(ManageDefaultNaturalEquipmentEvent)} E)",
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)

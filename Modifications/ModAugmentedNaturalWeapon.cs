@@ -39,11 +39,11 @@ namespace XRL.World.Parts
             return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
         }
 
-
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsGiganticExoframe>> E)
         {
             string cyberneticsObject = AssigningPart?.ImplantObject?.ShortDisplayName;
 
+            E.BeforeEvent.ClearDescriptionElements();
             E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
 
             return base.HandleEvent(E);

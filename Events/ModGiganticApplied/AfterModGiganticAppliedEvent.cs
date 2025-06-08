@@ -10,13 +10,14 @@ using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class AfterModGiganticAppliedEvent : ModPooledEvent<AfterModGiganticAppliedEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(AfterModGiganticAppliedEvent));
 
         public new static readonly int CascadeLevel = CASCADE_ALL;
 
-        public static readonly string RegisteredEventID = GetRegisteredEventID();
+        public static readonly string RegisteredEventID = nameof(AfterModGiganticAppliedEvent);
 
         public GameObject Object;
 
@@ -26,9 +27,9 @@ namespace HNPS_GigantismPlus
         {
             return CascadeLevel;
         }
-        public static string GetRegisteredEventID()
+        public virtual string GetRegisteredEventID()
         {
-            return $"{nameof(AfterModGiganticAppliedEvent)}";
+            return RegisteredEventID;
         }
 
         public override void Reset()
@@ -40,10 +41,10 @@ namespace HNPS_GigantismPlus
 
         public static AfterModGiganticAppliedEvent FromPool(GameObject Object, ModGigantic Modification)
         {
-            AfterModGiganticAppliedEvent afterModGiganticAppliedEvent = FromPool();
-            afterModGiganticAppliedEvent.Object = Object;
-            afterModGiganticAppliedEvent.Modification = Modification;
-            return afterModGiganticAppliedEvent;
+            AfterModGiganticAppliedEvent E = FromPool();
+            E.Object = Object;
+            E.Modification = Modification;
+            return E;
         }
         public static void Send(GameObject Object, ModGigantic Modification)
         {
@@ -52,7 +53,7 @@ namespace HNPS_GigantismPlus
             bool haveGame = The.Game != null;
             bool haveObject = Object != null;
 
-            bool gameWants = haveGame && The.Game.WantEvent(ID, CascadeLevel);
+            bool gameWants = haveGame && haveObject && The.Game.WantEvent(ID, CascadeLevel);
 
             bool objectWantsMin = haveObject && Object.WantEvent(ID, CascadeLevel);
             bool objectWantsStr = haveObject && Object.HasRegisteredEvent(RegisteredEventID);

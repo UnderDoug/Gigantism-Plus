@@ -110,19 +110,20 @@ namespace HNPS_GigantismPlus
             { nameof(WrassleGiantHero), true },
 
             // Events
-            { nameof(AfterBodyPartsUpdatedEvent), false },
             { nameof(BeforeBodyPartsUpdatedEvent), false },
-            { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
+            { nameof(AfterBodyPartsUpdatedEvent), false },
+            { nameof(GetPrioritisedNaturalEquipmentModsEvent), true },
             { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
             { nameof(ManageDefaultNaturalEquipmentEvent), false },
-            { nameof(AfterModGiganticAppliedEvent), false },
+            { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
+            { nameof(BeforeApplyPartAdjustmentEvent), false },
             { nameof(BeforeModGiganticAppliedEvent), false },
-            { nameof(AfterRapidAdvancementEvent), false },
+            { nameof(AfterModGiganticAppliedEvent), false },
             { nameof(BeforeRapidAdvancementEvent), false },
+            { nameof(AfterRapidAdvancementEvent), false },
             { nameof(BeforeVaultEvent), false },
             { nameof(VaultedEvent), false },
             { nameof(CrayonsGetColorsEvent), false },
-            { nameof(GetPrioritisedNaturalEquipmentModsEvent), true },
 
             { "IDescribeModificationEvent", false },
 

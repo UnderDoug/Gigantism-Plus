@@ -121,22 +121,52 @@ namespace XRL.World.Parts
 
         public override void OnImplanted(GameObject Implantee, GameObject Implant)
         {
-            Debug.Entry(2, $"* OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})", Indent: 0, Toggle: getDoDebug());
+            int indent = Debug.LastIndent;
+            Debug.Entry(2,
+                $"* {nameof(CyberneticsGiganticExoframe)}."
+                + $"{nameof(OnImplanted)}("
+                + $" {nameof(Implantee)}: {Implantee?.DebugName ?? NULL}"
+                + $" {nameof(Implant)}: {Implant?.DebugName ?? NULL})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             Become(Implantee, Model, Implant);
 
             base.OnImplanted(Implantee, Implant);
-            Debug.Entry(2, $"x OnImplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//", Indent: 0, Toggle: getDoDebug());
+
+            Debug.Entry(2,
+                $"x {nameof(CyberneticsGiganticExoframe)}."
+                + $"{nameof(OnImplanted)}("
+                + $" {nameof(Implantee)}: {Implantee?.DebugName ?? NULL}"
+                + $" {nameof(Implant)}: {Implant?.DebugName ?? NULL})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
         } //!--- public override void OnImplanted(GameObject Object)
 
         public override void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
-            Debug.Entry(3, $"* OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName})", Indent: 0, Toggle: getDoDebug());
+            int indent = Debug.LastIndent;
+            Debug.Entry(2,
+                $"* {nameof(CyberneticsGiganticExoframe)}."
+                + $"{nameof(OnUnimplanted)}("
+                + $" {nameof(Implantee)}: {Implantee?.DebugName ?? NULL}"
+                + $" {nameof(Implant)}: {Implant?.DebugName ?? NULL})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             // Implantee.CheckEquipmentSlots();
 
             Unbecome(Implantee, Model, ImplantObject);
-            Debug.Entry(3, $"x OnUnimplanted({Implantee.ShortDisplayName}, {Implant.ShortDisplayName}) *//", Indent: 0, Toggle: getDoDebug());
+
+            Debug.Entry(2,
+                $"x {nameof(CyberneticsGiganticExoframe)}."
+                + $"{nameof(OnUnimplanted)}("
+                + $" {nameof(Implantee)}: {Implantee?.DebugName ?? NULL}"
+                + $" {nameof(Implant)}: {Implant?.DebugName ?? NULL})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
         } //!--- public override void OnUnimplanted(GameObject Object)
 
         public override bool AllowStaticRegistration()
@@ -145,7 +175,6 @@ namespace XRL.World.Parts
         }
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register("CanBeDisassembled");
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -185,18 +214,7 @@ namespace XRL.World.Parts
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "CanBeDisassembled")
-            {
-                return false;
-            }
-
             return base.FireEvent(E);
-        }
-        // These prevent the cybernetic in question from being disassembled.
-        public void CanBeDisassembled()
-        {
-            Event CanBeDisassembled = Event.New("CanBeDisassembled");
-            ParentObject.FireEvent(CanBeDisassembled);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

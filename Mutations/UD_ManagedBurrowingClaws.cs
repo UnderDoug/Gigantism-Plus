@@ -292,8 +292,12 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{nameof(UD_ManagedBurrowingClaws)}", $"{nameof(OnManageDefaultNaturalEquipment)}(body)", Toggle: getDoDebug());
-            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
+            Debug.Header(4, 
+                $"{nameof(UD_ManagedBurrowingClaws)}", 
+                $"{nameof(OnManageDefaultNaturalEquipment)}(body)", 
+                Toggle: getDoDebug());
+            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", 
+                Indent: 0, Toggle: getDoDebug());
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
@@ -301,7 +305,9 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Footer(4,
                 $"{nameof(UD_ManagedBurrowingClaws)}",
-                $"{nameof(OnManageDefaultNaturalEquipment)}(body of: {ParentObject?.Blueprint})", Toggle: getDoDebug());
+                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"(body of: {ParentObject?.Blueprint})", 
+                Toggle: getDoDebug());
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -327,7 +333,17 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)
         {
-            List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentMods = UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(mod => mod.BodyPartType == E.TargetBodyPart.Type), Level);
+            Debug.Entry(4,
+                $"@ {nameof(UD_ManagedBurrowingClaws)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
+                Indent: 0, Toggle: getDoDebug());
+
+            List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentMods = 
+                UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
+                    mod => mod.BodyPartType == E.TargetBodyPart.Type), 
+                    Level);
+
             foreach (ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod in naturalEquipmentMods)
             {
                 E.AddNaturalEquipmentMod(naturalEquipmentMod);
@@ -342,7 +358,8 @@ namespace XRL.World.Parts.Mutation
         {
             Debug.Entry(4,
                 $"@ {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(HandleEvent)}({nameof(ManageDefaultNaturalEquipmentEvent)} E)",
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == ParentObject)
@@ -367,7 +384,8 @@ namespace XRL.World.Parts.Mutation
         {
             Debug.Entry(4,
                 $"@ {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(HandleEvent)}({typeof(PartSupportEvent).Name} E)",
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(PartSupportEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             if (E.Skip != this && E.Type == "Digging" && IsMyActivatedAbilityToggledOn(EnableActivatedAbilityID))

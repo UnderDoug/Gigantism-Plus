@@ -75,7 +75,7 @@ namespace XRL.World.Parts
 
         public override Guid AddAdjustment(Type Target, string Field, object Value, int Priority)
         {
-            PartAdjustment adjustment = new(Target, Field, Priority, Value);
+            PartAdjustment adjustment = new(typeof(ModNaturalEquipment<T>).Name, Target, Field, Priority, Value);
             Adjustments ??= new();
             Adjustments.Add(adjustment);
             return adjustment.ID;

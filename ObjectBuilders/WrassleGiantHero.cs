@@ -983,13 +983,14 @@ namespace XRL.World.ObjectBuilders
                     ;
 
             string preDesc = Unique ? SCRT_GNT_UNQ_PREDESC : GNT_PREDESC;
-            preDesc = preDesc.Replace(GNT_PREDESC_RPLC, aCreature);
+            aCreature = Unique ? Creature.An(Stripped: true, BaseOnly: true) : Creature.an(Stripped: true, BaseOnly: true);
+            preDesc = preDesc.Replace("*creature.an*", aCreature);
 
             description.Short = preDesc + description._Short;
 
             Debug.LoopItem(4, 
                 $"<Description>?", 
-                Good: description.Short.Contains($"{creatureArticle} {creatureNoun}"), 
+                Good: description.Short.Contains($"{preDesc}"), 
                 Indent: 2, Toggle: getDoDebug());
         }
 

@@ -229,8 +229,8 @@ namespace XRL.World.Parts
                 $"{typeof(T).Name}", 
                 $"{nameof(OnManageDefaultNaturalEquipment)}" +
                 $"(body)", Toggle: getDoDebug());
-
-            Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", Indent: 0, Toggle: getDoDebug());
+            Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", 
+                Indent: 0, Toggle: getDoDebug());
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
@@ -242,22 +242,108 @@ namespace XRL.World.Parts
                 $"(body of: {Implantee.Blueprint})", Toggle: getDoDebug());
         }
 
+        public virtual List<int> GetImplanteeRegisteredEventIDs()
+        {
+            return new()
+            {
+                GetPrioritisedNaturalEquipmentModsEvent.ID,
+                ManageDefaultNaturalEquipmentEvent.ID,
+            };
+        }
+        public virtual void RegisterImplanteeEvents()
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"{nameof(RegisterImplanteeEvents)}", Indent: indent + 1, Toggle: getDoDebug('R'));
+
+            List<int> eventIDs = GetImplanteeRegisteredEventIDs();
+            if (!eventIDs.IsNullOrEmpty())
+            {
+                foreach (int eventID in eventIDs)
+                {
+                    Implantee.RegisterEvent(this, eventID);
+                    Debug.LoopItem(4, $"Registered {nameof(eventID)}: {eventID}]", Indent: indent + 2, Toggle: getDoDebug('R'));
+                }
+            }
+
+            Debug.LastIndent = indent;
+        }
+        public virtual void UnregisterImplanteeEvents()
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"{nameof(UnregisterImplanteeEvents)}", Indent: indent + 1, Toggle: getDoDebug('R'));
+
+            List<int> eventIDs = GetImplanteeRegisteredEventIDs();
+            if (!eventIDs.IsNullOrEmpty())
+            {
+                foreach (int eventID in eventIDs)
+                {
+                    Implantee.UnregisterEvent(this, eventID);
+                    Debug.LoopItem(4, $"Unregistered {nameof(eventID)}: {eventID}]", Indent: indent + 2, Toggle: getDoDebug('R'));
+                }
+            }
+
+            Debug.LastIndent = indent;
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == ImplantedEvent.ID
-                || ID == GetPrioritisedNaturalEquipmentModsEvent.ID
-                || ID == ManageDefaultNaturalEquipmentEvent.ID;
+                || ID == UnimplantedEvent.ID;
         }
         public override bool HandleEvent(ImplantedEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ImplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}",
+                Indent: indent + 1, Toggle: getDoDebug());
+
             Implantee = E.Implantee;
             ImplantObject = E.Item;
+            RegisterImplanteeEvents();
+
             OnImplanted(Implantee, ImplantObject);
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ImplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}"
+                + $" @//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(UnimplantedEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(UnimplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            UnregisterImplanteeEvents();
+
+            OnUnimplanted(Implantee, ImplantObject);
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(UnimplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}"
+                + $" @//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
@@ -272,10 +358,15 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({typeof(GetPrioritisedNaturalEquipmentModsEvent).Name} E)",
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
-            List<ModNaturalEquipment<T>> naturalEquipmentMods = UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(mod => mod.BodyPartType == E.TargetBodyPart.Type), Level);
+            List<ModNaturalEquipment<T>> naturalEquipmentMods = 
+                UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
+                    mod => mod.BodyPartType == E.TargetBodyPart.Type
+                    ), Level);
+
             foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
             {
                 E.AddNaturalEquipmentMod(naturalEquipmentMod);
@@ -290,7 +381,8 @@ namespace XRL.World.Parts
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({typeof(ManageDefaultNaturalEquipmentEvent).Name} E)",
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentManager>())
@@ -314,12 +406,18 @@ namespace XRL.World.Parts
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
+            Registrar.Register("CanBeDisassembled"); // This prevents the cybernetic from being disassembled.
             Registrar.Register("BeforeMutationAdded");
             Registrar.Register("MutationAdded");
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {
+            if (E.ID == "CanBeDisassembled")
+            {
+                return false; // This prevents the cybernetic from being disassembled.
+            }
+
             if (E.ID == "BeforeMutationAdded")
             {
                 GameObject Actor = E.GetParameter("Object") as GameObject;
@@ -347,6 +445,12 @@ namespace XRL.World.Parts
                 }
             }
             return base.FireEvent(E);
+        }
+        // This prevents the cybernetic from being disassembled.
+        public virtual void CanBeDisassembled()
+        {
+            Event CanBeDisassembled = Event.New("CanBeDisassembled");
+            ParentObject.FireEvent(CanBeDisassembled);
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

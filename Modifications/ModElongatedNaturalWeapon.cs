@@ -32,9 +32,9 @@ namespace XRL.World.Parts
             int dieSize = GetDamageDieSize();
             int damageBonus = GetDamageBonus();
 
-            if (E.Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.Skill == "Agility")
+            if (E.Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.Stat == "Agility")
             {
-                E.AddWeaponElement("scale", $"bonus penetration from Agility");
+                E.AddWeaponElement("get", $"bonus penetration from Agility");
             }
             if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
             {

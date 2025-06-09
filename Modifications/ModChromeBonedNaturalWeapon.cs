@@ -9,6 +9,7 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using UnityEngine.UIElements;
+using XRL.World.Anatomy;
 
 namespace XRL.World.Parts
 {
@@ -28,7 +29,15 @@ namespace XRL.World.Parts
 
         public override string GetColoredAdjective()
         {
-            return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
+            bool inorganic = ParentObject != null && !ParentObject.IsOrganic;
+            bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Manager.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Inorganic: inorganic, Metalic: metalic) ?? base.GetColoredAdjective();
+        }
+        public override string GetAdjective()
+        {
+            bool inorganic = ParentObject != null && !ParentObject.IsOrganic;
+            bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Manager.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1, Inorganic: inorganic, Metalic: metalic).Strip() ?? base.GetAdjective();
         }
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsManagedHandBones>> E)

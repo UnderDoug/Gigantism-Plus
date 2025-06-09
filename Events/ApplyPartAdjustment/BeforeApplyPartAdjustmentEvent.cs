@@ -30,6 +30,8 @@ namespace HNPS_GigantismPlus
 
         public object Value;
 
+        public Func<GameObject, bool> Condition;
+
         public override int GetCascadeLevel()
         {
             return CascadeLevel;
@@ -46,9 +48,10 @@ namespace HNPS_GigantismPlus
             NaturalEquipmentMod = null;
             Target = null;
             Field = null;
+            Condition = null;
         }
 
-        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value)
+        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, Func<GameObject, bool> Condition)
         {
             BeforeApplyPartAdjustmentEvent E = FromPool();
             E.Equipment = Equipment;
@@ -56,11 +59,12 @@ namespace HNPS_GigantismPlus
             E.Target = Target;
             E.Field = Field;
             E.Value = Value;
+            E.Condition = Condition;
             return E;
         }
-        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value)
+        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, Func<GameObject, bool> Condition)
         {
-            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Target, Field, ref Value);
+            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Target, Field, ref Value, Condition);
 
             bool haveObject = Equipment != null;
 
@@ -82,10 +86,11 @@ namespace HNPS_GigantismPlus
                 {
                     Event @event = Event.New(nameof(BeforeApplyPartAdjustmentEvent));
                     @event.SetParameter(nameof(Equipment), Equipment);
+                    @event.SetParameter(nameof(NaturalEquipmentMod), NaturalEquipmentMod);
                     @event.SetParameter(nameof(Target), Target);
                     @event.SetParameter(nameof(Field), Field);
                     @event.SetParameter(nameof(Value), E.Value);
-                    @event.SetParameter(nameof(NaturalEquipmentMod), NaturalEquipmentMod);
+                    @event.SetParameter(nameof(Condition), Condition);
                     proceed = Equipment.FireEvent(@event);
                     Value = @event.GetParameter(nameof(Value), E.Value);
                     @event.Clear();

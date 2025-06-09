@@ -73,6 +73,7 @@ namespace XRL.World.Parts
                 Adjective = "boned",
                 AdjectiveColor = assigningPart.BonesAdjectiveColor,
                 AdjectiveColorFallback = assigningPart.BonesAdjectiveColor,
+                ExludeFromDynamicTile = true,
 
                 Adjustments = new(),
 
@@ -81,10 +82,23 @@ namespace XRL.World.Parts
                 AddedIntProps = new(),
                 AddedStringProps = new(),
             };
-            chromeBonedNaturalWeapon.AddAdjustment(RENDER, "Tile", assigningPart.BonesTile);
-            chromeBonedNaturalWeapon.AddAdjustment(RENDER, "ColorString", assigningPart.BonesTileColorString);
-            chromeBonedNaturalWeapon.AddAdjustment(RENDER, "TileColor", assigningPart.BonesTileColorString);
-            chromeBonedNaturalWeapon.AddAdjustment(RENDER, "DetailColor", assigningPart.BonesTileDetailColor, true);
+
+            static bool cosmeticCondition(GameObject Equipment)
+            {
+                int indent = Debug.LastIndent;
+                bool blueprintNotNull = Equipment?.Blueprint != null;
+                bool blueprintIsDefaultFist = blueprintNotNull && Equipment.Blueprint == "DefaultFist";
+
+                Debug.LoopItem(4, $"{nameof(blueprintNotNull)}", $"{blueprintNotNull}", Good: blueprintNotNull, Indent: indent + 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(blueprintIsDefaultFist)}", $"{blueprintIsDefaultFist}", Good: blueprintIsDefaultFist, Indent: indent + 1, Toggle: doDebug);
+
+                Debug.LastIndent = indent;
+                return blueprintIsDefaultFist;
+            };
+            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, Condition: cosmeticCondition);
+            chromeBonedNaturalWeapon.AddColorStringAdjustment(assigningPart.BonesTileColorString);
+            chromeBonedNaturalWeapon.AddTileColorAdjustment(assigningPart.BonesTileColorString);
+            chromeBonedNaturalWeapon.AddDetailColorAdjustment(assigningPart.BonesTileDetailColor, true);
 
             assigningPart.ProcessNaturalEquipmentAddedParts(chromeBonedNaturalWeapon, assigningPart.BonesAddParts);
             assigningPart.ProcessNaturalEquipmentAddedProps(chromeBonedNaturalWeapon, assigningPart.BonesAddProps);
@@ -104,9 +118,10 @@ namespace XRL.World.Parts
 
             return chromeBonedNaturalWeapon;
         }
-        public override ModNaturalEquipment<CyberneticsManagedHandBones> NewNaturalEquipmentMod(CyberneticsManagedHandBones NewAssigner = null)
+        public override ModNaturalEquipment<CyberneticsManagedHandBones> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<CyberneticsManagedHandBones>> Filter = null, CyberneticsManagedHandBones NewAssigner = null)
         {
-            return NewChromeBonedNaturalWeaponMod(NewAssigner ?? this);
+            ModNaturalEquipment<CyberneticsManagedHandBones> naturalEquipmentMod = NewChromeBonedNaturalWeaponMod(NewAssigner ?? this);
+            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
         public string GetMaterialAdjective(int Colorfulness = 0)
@@ -115,15 +130,26 @@ namespace XRL.World.Parts
             string material = Material;
             return $"{material.OptionalColor(materialColor, materialColor, Colorfulness)}";
         }
-        public string GetBonedAdjective(int Colorfulness = 0)
+        public string GetBonedAdjective(int Colorfulness = 0, bool Inorganic = false, bool Metalic = false)
         {
+            Inorganic = Metalic ? Metalic : Inorganic;
             string bonesColor = "r";
             string adjective = NaturalEquipmentMod.Adjective;
+            if (Inorganic)
+            {
+                bonesColor = "K";
+                adjective = "reinforced";
+            }
+            if (Metalic)
+            {
+                bonesColor = "c";
+                adjective = "infused";
+            }
             return $"{adjective.OptionalColor(bonesColor, bonesColor, Colorfulness)}";
         }
-        public virtual string GetNaturalEquipmentColoredAdjective(int Colorfulness = 0)
+        public virtual string GetNaturalEquipmentColoredAdjective(int Colorfulness = 0, bool Inorganic = false, bool Metalic = false)
         {
-            string output = $"{GetMaterialAdjective(Colorfulness)}-{GetBonedAdjective(Colorfulness)}";
+            string output = $"{GetMaterialAdjective(Colorfulness)}-{GetBonedAdjective(Colorfulness, Inorganic, Metalic)}";
             return output.Color("y");
         }
         public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<CyberneticsManagedHandBones> NaturalEquipmentMod, int Level = 1)

@@ -1,12 +1,15 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.Rules;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
 using static HNPS_GigantismPlus.Options;
@@ -44,6 +47,8 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
+
+        public Guid ManagerID = Guid.Empty;
 
         public bool WantsToManage => 
             ParentObject != null 
@@ -97,10 +102,11 @@ namespace XRL.World.Parts
         /// - - - Value: the value to which the field is to be set
         /// </summary>
         // [NonSerialized]
-        // public Dictionary<string, (object TargetObject, Dictionary<string, (int Priority, object Value)> Entry)> AdjustmentTargets;
+        // public Dictionary<string, (object TargetObject, Dictionary<string, (int AdjustmentPriority, object Value)> Entry)> AdjustmentTargets;
 
         public NaturalEquipmentManager()
         {
+            ManagerID = Guid.NewGuid();
             AccumulatedDamageDie = (0, 0, 0);
             AccumulatedHitBonus = 0;
             AccumulatedPenBonus = 0;
@@ -141,7 +147,7 @@ namespace XRL.World.Parts
                 foreach ((int priority, ModNaturalEquipmentBase mod) in ShortDescriptions)
                 {
                     StringBuilder.AppendRules(mod.GetInstanceDescription(ParentObject));
-                    Debug.CheckYeh(4, $"{priority}::{mod.GetSource()}:Description Appended", Indent: indent + 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Appended: ({priority})::{mod.GetSource()}:Description", Indent: indent + 2, Toggle: getDoDebug());
                 }
             }
             
@@ -204,22 +210,22 @@ namespace XRL.World.Parts
                             if (adjustments.ContainsKey(adjustment.GetAddress()))
                             {
                                 PartAdjustment storedAdjustment = adjustments[adjustment.GetAddress()];
-                                Debug.Entry(4, $"Existing", $"{storedAdjustment}", Indent: indent + 5, Toggle: getDoDebug());
-                                if (adjustment.TryGetHigherPriorityAdjustment(storedAdjustment, out PartAdjustment replacementAdjustment))
+                                Debug.Entry(4, $"Existing", $"{storedAdjustment}", Indent: indent + 4, Toggle: getDoDebug());
+                                if (adjustment.TryGetHigherPriorityAdjustment(ParentObject, storedAdjustment, out PartAdjustment replacementAdjustment))
                                 {
-                                    string debugText = $"Existing Adjustment is Higher Priority";
+                                    string debugText = $"Existing Adjustment is Higher AdjustmentPriority Skipping";
                                     if (storedAdjustment != replacementAdjustment)
                                     {
-                                        debugText = $"Proposed Adjustment is Higher Priority";
+                                        debugText = $"Proposed Adjustment is Higher AdjustmentPriority, Adding";
                                     }
                                     adjustments[adjustment.GetAddress()] = replacementAdjustment;
                                     Debug.LoopItem(4, debugText, $"{replacementAdjustment}",
-                                        Good: storedAdjustment != replacementAdjustment, Indent: indent + 6, Toggle: getDoDebug());
+                                        Good: storedAdjustment != replacementAdjustment, Indent: indent + 4, Toggle: getDoDebug());
                                 }
                             }
                             else
                             {
-                                Debug.CheckYeh(4, $"No Competing Adjustments, Adding {adjustment}", Indent: indent + 5, Toggle: getDoDebug());
+                                Debug.CheckYeh(4, $"No Competing Adjustments, Adding {adjustment}", Indent: indent + 4, Toggle: getDoDebug());
                                 adjustments[adjustment.GetAddress()] = adjustment;
                             }
                         }
@@ -325,7 +331,6 @@ namespace XRL.World.Parts
                         ParentMeleeWeapon.BaseDamage = DamageDie.Vomit(4, "Final DamageDie", Indent: 2, Toggle: doDebug).ToString();
                         ParentMeleeWeapon.HitBonus = AccumulatedHitBonus.Vomit(4, "AccumulatedHitBonus", Indent: 2, Toggle: doDebug);
                         ParentMeleeWeapon.PenBonus = AccumulatedPenBonus.Vomit(4, "AccumulatedPenBonus", Indent: 2, Toggle: doDebug);
-
                     }
                     else
                     {
@@ -335,6 +340,7 @@ namespace XRL.World.Parts
 
                     // Cycle the NaturalEquipmentMods, applying each one to the NaturalEquipment
                     ApplyNaturalEquipmentMods(NaturalEquipmentMods);
+                    NaturalEquipmentMods = ParentObject.GetPrioritisedNaturalEquipmentMods();
 
                     if (ParentObject.TryGetPart(out MakersMark makersMark))
                     {
@@ -355,7 +361,7 @@ namespace XRL.World.Parts
                         foreach ((string _, PartAdjustment adjustment) in prioritisedAdjustments)
                         {
                             bool applied = adjustment.Apply(ParentObject);
-                            AppliedAdjustments.TryAdd($"{adjustment.ParentNaturalEquipmentMod}::{adjustment.ToString()}");
+                            AppliedAdjustments.TryAdd($"{adjustment.ParentNaturalEquipmentMod}::{adjustment}");
                             Debug.LoopItem(4, $"Applied {adjustment}", Good: applied, Indent: 2, Toggle: doDebug);
                         }
                         Debug.Divider(4, HONLY, 40, Indent: 1, Toggle: doDebug);
@@ -378,6 +384,17 @@ namespace XRL.World.Parts
                         // provided the order of the adjectives is consistent (which should definitely be the case with this mod.
                         //  - "icy" and "flaming" were breaking it when the player also has flaming or freezing ray, so this will
                         //    check without them first, applying that, then checking with them for the edge-case it's been included
+
+                        string tileName = string.Empty;
+                        foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                        {
+                            if (!naturalEquipmentMod.ExludeFromDynamicTile)
+                            {
+                                tileName += naturalEquipmentMod.GetAdjective();
+                            }
+                        }
+                        tileName += ParentRender?.DisplayName;
+
                         string icyString = "{{icy|icy}}";
                         string flamingString = "{{fiery|flaming}}";
                         string displayNameOnlySansRays = ParentObject.DisplayNameOnly;
@@ -385,31 +402,44 @@ namespace XRL.World.Parts
                         displayNameOnlySansRays.Replace(flamingString, "");
 
                         bool tilePathDebugToggle = Utils.getDoDebug(nameof(TryGetTilePath));
+                        bool gotTileFromSansRays = false;
+                        bool gotTileFromTileName = false;
                         Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
-                        if (TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays), out string tilePath))
+                        if (gotTileFromSansRays = TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays.Strip()), out string tilePath))
                         {
                             ParentRender.Tile = tilePath;
                             Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                         }
-                        if (TryGetTilePath(BuildCustomTilePath(ParentObject.DisplayNameOnly), out tilePath))
+                        Debug.LoopItem(4, $"Checked {nameof(displayNameOnlySansRays)}", $"{displayNameOnlySansRays}]", Good: gotTileFromSansRays, Indent: 2, Toggle: doDebug);
+                        if (gotTileFromTileName = TryGetTilePath(BuildCustomTilePath(tileName), out tilePath))
                         {
                             ParentRender.Tile = tilePath;
                             Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                         }
+                        Debug.LoopItem(4, $"Checked {nameof(tileName)}", $"{tileName}]", Good: gotTileFromTileName, Indent: 2, Toggle: doDebug);
 
-                        Debug.Entry(4, $"Dynamic Tile update attempted", Indent: 1, Toggle: doDebug);
+                        Debug.Entry(4, $"Dynamic Tile update attempted...", Indent: 1, Toggle: doDebug);
+                        bool gotTile = gotTileFromSansRays || gotTileFromTileName;
+                        Debug.LoopItem(4, $"{nameof(gotTile)}", $"{gotTile}", Good: gotTile, Indent: 2, Toggle: doDebug);
                     }
                     else
                     {
-                        Debug.Entry(4, "DynamicTile search/application overriden", Indent: 2, Toggle: doDebug);
+                        Debug.Entry(4, $"DynamicTile search/application overriden...", Indent: 1, Toggle: doDebug);
                     }
 
                     // We want these sick as, modified Natural Equipments to show up as a physical feature.
-                    // The check for a defaultFistWeapon being undesirable unfortunately targets tags, but we set the IntProp to 0 just in case it changes
+                    // The check for a defaultFistWeapon being undesirable unfortunately targets tags, but we set the StringProp to "No" just in case it changes
                     // These are always temporary DefaultBehaviors and should be completely refreshed any time something would normally
+
+                    Debug.Entry(4, $"Setting to ShowAsPhysicalFeature...", Indent: 1, Toggle: doDebug);
                     ParentObject.SetIntProperty("ShowAsPhysicalFeature", 1);
-                    ParentObject.SetIntProperty("UndesirableWeapon", 0);
-                    ParentObject.SetStringProperty("TemporaryDefaultBehavior", "NaturalEquipmentManager", false);
+
+                    Debug.Entry(4, $"Setting UndesirableWeapon to \"No\" in case it changes...", Indent: 1, Toggle: doDebug);
+                    ParentObject.SetStringProperty("UndesirableWeapon", "No");
+
+                    string temporaryDefaultBehaviorID = $"NaturalEquipmentManager::{ManagerID}";
+                    Debug.Entry(4, $"Setting TemporaryDefaultBehavior to [{temporaryDefaultBehaviorID}]...", Indent: 1, Toggle: doDebug);
+                    ParentObject.SetStringProperty("TemporaryDefaultBehavior", $"NaturalEquipmentManager::{ManagerID}", false);
 
                     _shortDescriptionCache = ProcessShortDescription(GetShortDescriptionEntries());
                 }
@@ -602,6 +632,7 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
+            Writer.Write(ManagerID);
             Writer.Write(AccumulatedDamageDie.Count);
             Writer.Write(AccumulatedDamageDie.Size);
             Writer.Write(AccumulatedDamageDie.Bonus);
@@ -611,6 +642,7 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
 
+            ManagerID = Reader.ReadGuid();
             AccumulatedDamageDie = new()
             {
                 Count = Reader.ReadInt32(),
@@ -622,6 +654,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             NaturalEquipmentManager naturalEquipmentManager = base.DeepCopy(Parent, MapInv) as NaturalEquipmentManager;
+            naturalEquipmentManager.ManagerID = Guid.NewGuid();
             naturalEquipmentManager._shortDescriptionCache = null;
             return naturalEquipmentManager;
         }

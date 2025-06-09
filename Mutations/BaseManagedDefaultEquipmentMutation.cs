@@ -45,8 +45,8 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
-        public List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<T> NaturalEquipmentMod => NewNaturalEquipmentMod();
+        public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
+        public virtual ModNaturalEquipment<T> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public BaseManagedDefaultEquipmentMutation()
         {
@@ -111,7 +111,7 @@ namespace XRL.World.Parts.Mutation
             return NaturalEquipmentMod.AddedIntProps;
         }
 
-        public virtual ModNaturalEquipment<T> NewNaturalEquipmentMod(T NewAssigner = null)
+        public virtual ModNaturalEquipment<T> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
             return null;
         }
@@ -127,23 +127,14 @@ namespace XRL.World.Parts.Mutation
 
             NewAssigner ??= (T)this;
             List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
-            if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
+            ModNaturalEquipment<T> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
+            if (naturalEquipmentMod != null)
             {
-                NaturalEquipmentMod.AssigningPart = NewAssigner;
-                naturalEquipmentModsList.Add(NaturalEquipmentMod);
+                naturalEquipmentModsList.Add(naturalEquipmentMod);
             }
 
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
-        }
-
-        public override bool Mutate(GameObject GO, int Level)
-        {
-            return base.Mutate(GO, Level);
-        }
-        public override bool Unmutate(GameObject GO)
-        {
-            return base.Unmutate(GO);
         }
 
         public virtual ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
@@ -152,22 +143,25 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}("
-                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{NaturalEquipmentMod?.GetType()?.Name}[{typeof(T).Name}], "
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
+            if (NaturalEquipmentMod != null)
+            {
+                NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
+                NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
+                NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
+                NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
+                NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
-            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+                NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+            }
 
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}("
-                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{NaturalEquipmentMod?.GetType()?.Name}[{typeof(T).Name}], "
                 + $"{nameof(Level)}: {Level})"
                 + $" *//",
                 Indent: indent + 1, Toggle: getDoDebug());
@@ -203,6 +197,15 @@ namespace XRL.World.Parts.Mutation
 
             Debug.LastIndent = indent;
             return NaturalEquipmentMods;
+        }
+
+        public override bool Mutate(GameObject GO, int Level)
+        {
+            return base.Mutate(GO, Level);
+        }
+        public override bool Unmutate(GameObject GO)
+        {
+            return base.Unmutate(GO);
         }
 
         public override bool ChangeLevel(int NewLevel)

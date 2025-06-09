@@ -42,8 +42,8 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
-        public List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<T> NaturalEquipmentMod => NewNaturalEquipmentMod();
+        public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
+        public virtual ModNaturalEquipment<T> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public int Level { get; set; }
 
@@ -125,7 +125,7 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod.AddedIntProps;
         }
 
-        public virtual ModNaturalEquipment<T> NewNaturalEquipmentMod(T NewAssigner = null)
+        public virtual ModNaturalEquipment<T> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
             return null;
         }
@@ -141,10 +141,10 @@ namespace XRL.World.Parts
 
             NewAssigner ??= (T)this;
             List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
-            if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
+            ModNaturalEquipment<T> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
+            if (naturalEquipmentMod != null)
             {
-                NaturalEquipmentMod.AssigningPart = NewAssigner;
-                naturalEquipmentModsList.Add(NaturalEquipmentMod);
+                naturalEquipmentModsList.Add(naturalEquipmentMod);
             }
 
             Debug.LastIndent = indent;

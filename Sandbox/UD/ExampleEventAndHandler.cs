@@ -43,7 +43,7 @@ namespace HNPS_GigantismPlus
 
         public static void Register()
         {
-            // The.Game.RegisterEvent(Instance, ExampleEvent.ID);
+            // The.Game.RegisterEvent(Instance, ExampleEvent.ManagerID);
         }
 
         public bool HandleEvent(ExampleEvent E)

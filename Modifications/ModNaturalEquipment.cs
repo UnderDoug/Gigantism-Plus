@@ -1,15 +1,13 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using Sheeter;
+using System;
 using System.Collections.Generic;
-
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-
+using static HNPS_GigantismPlus.Utils;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -73,46 +71,10 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
-        public override Guid AddAdjustment(Type Target, string Field, object Value, int Priority)
-        {
-            PartAdjustment adjustment = new(GetType().Name, Target, Field, Priority, Value);
-            Adjustments ??= new();
-            Adjustments.Add(adjustment);
-            return adjustment.ID;
-        }
-        public override Guid AddAdjustment(Type Target, string Field, object Value, bool FlipPriority = false)
-        {
-            int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddAdjustment(Target, Field, Value, modPriority);
-        }
-
-        public override int GetDamageDieCount()
-        {
-            return DamageDieCount;
-        }
-        public override int GetDamageDieSize()
-        {
-            return DamageDieSize;
-        }
-
-        public override int GetDamageBonus()
-        {
-            return DamageBonus;
-        }
-
-        public override int GetHitBonus()
-        {
-            return HitBonus;
-        }
-        public override int GetPenBonus()
-        {
-            return PenBonus;
-        }
-
         public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
             Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4, Toggle: getDoDebug("APP"));
-            Debug.Entry(4, $"{AssigningPart.Name}; Level: {AssigningPart.Level}", Indent: 5, Toggle: getDoDebug("APP"));
+            Debug.Entry(4, $"{AssigningPart?.Name}; Level: {(int)AssigningPart?.Level}", Indent: 5, Toggle: getDoDebug("APP"));
 
             if (AddedParts != null)
             {

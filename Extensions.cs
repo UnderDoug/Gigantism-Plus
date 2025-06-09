@@ -64,30 +64,15 @@ namespace HNPS_GigantismPlus
             GameObject Creature = BodyPart.ParentBody.ParentObject;
 
             if (Creature == null) return false;
-            /*
-            string bodyPartManager = BodyPart.Manager;
-            if (Creature.TryGetPart(out Mutations mutations))
-            {
-                List<string> bodyPartManagers = new();
-                if (mutations.HasMutation(nameof(MultipleArms)))
-                {
-                    foreach (Mutations.MutationModifierTracker mutationModTracker in mutations.MutationMods)
-                    {
-                        if (mutationModTracker.mutationName ==  nameof(MultipleArms))
-                        {
-                            bodyPartManagers.TryAdd(mutationModTracker.sourceName);
-                        }
-                    }
-                }
-            }
-            */
+
             // Check for HelpingHands or AgolgotChord managed parts
-            if (BodyPart.Manager.EndsWith("::HelpingHands") || BodyPart.Manager.EndsWith("::AgolgotChord"))
+            if (BodyPart.Manager.EndsWith("::HelpingHands") || BodyPart.Manager.EndsWith("::AgolgotsChord"))
                 return true;
 
             // Check for Nephal claws (Agolgot parts that don't use the manager)
-            if (!string.IsNullOrEmpty(BodyPart.DefaultBehaviorBlueprint) &&
-                BodyPart.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
+            if (!Creature.InheritsFrom("BaseNephal") 
+             && !BodyPart.DefaultBehaviorBlueprint.IsNullOrEmpty() 
+             && BodyPart.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
                 return true;
 
             return false;
@@ -168,7 +153,7 @@ namespace HNPS_GigantismPlus
         {
             return GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
         }
-        public static SortedDictionary<int, ModNaturalEquipmentBase> GetPrioritisedNaturalEquipmentMods(this GameObject GO, bool ForDescriptions = false)
+        public static SortedDictionary<int, ModNaturalEquipmentBase> GetPrioritisedNaturalEquipmentMods(this GameObject Equipment, bool ForDescriptions = false)
         {
             int indent = Debug.LastIndent;
 
@@ -177,43 +162,54 @@ namespace HNPS_GigantismPlus
                 + $"(ForDescriptions: {ForDescriptions})",
                 Indent: indent + 1, Toggle: doDebug);
 
-            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = new();
-            foreach (ModNaturalEquipmentBase attachedNaturalEquipmentMod in GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>())
-            {
-                Debug.Entry(4,
-                    $"NaturalWeaponMod: {attachedNaturalEquipmentMod.Name}" +
-                    $"[{attachedNaturalEquipmentMod.GetAdjective()}])",
-                    Indent: indent + 2, Toggle: doDebug);
-
-                int priority = ForDescriptions 
-                    ? attachedNaturalEquipmentMod.DescriptionPriority 
-                    : attachedNaturalEquipmentMod.ModPriority
-                    ;
-                string priorityString = ForDescriptions
-                    ? nameof(attachedNaturalEquipmentMod.DescriptionPriority)
-                    : nameof(attachedNaturalEquipmentMod.ModPriority)
-                    ;
-                if (naturalEquipmentMods.ContainsKey(priority))
-                {
-                    Debug.Warn(2,
-                        $"{nameof(Extensions)}",
-                        $"{nameof(GetPrioritisedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
-                        $"[{priority}]" +
-                        $"{naturalEquipmentMods[priority]} " +
-                        $"in {nameof(naturalEquipmentMods)} overwritten: Same {priorityString}",
-                        Indent: indent + 2);
-                }
-                naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
-            }
-
             string label = ForDescriptions
                 ? "Descriptions"
                 : "EquipmentMods"
                 ;
-            Debug.Entry(4, $"{label}:", Indent: indent + 2, Toggle: doDebug);
-            foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in naturalEquipmentMods)
+
+            Debug.Entry(4, $"{label}:", Indent: indent + 1, Toggle: doDebug);
+
+            List<ModNaturalEquipmentBase> naturalEquipmentModList = Equipment?.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
+            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = new();
+            if(Equipment != null && !naturalEquipmentModList.IsNullOrEmpty())
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}[{naturalEquipmentMod.GetAdjective()}]", Indent: indent + 3, Toggle: doDebug);
+                foreach (ModNaturalEquipmentBase attachedNaturalEquipmentMod in naturalEquipmentModList)
+                {
+                    int priority = ForDescriptions
+                        ? attachedNaturalEquipmentMod.DescriptionPriority
+                        : attachedNaturalEquipmentMod.ModPriority
+                        ;
+                    string priorityString = ForDescriptions
+                        ? nameof(attachedNaturalEquipmentMod.DescriptionPriority)
+                        : nameof(attachedNaturalEquipmentMod.ModPriority)
+                        ;
+
+                    if (naturalEquipmentMods.ContainsKey(priority))
+                    {
+                        Debug.Warn(2,
+                            $"{nameof(Extensions)}",
+                            $"{nameof(GetPrioritisedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                            $"[{priority}]" +
+                            $"{naturalEquipmentMods[priority]} " +
+                            $"in {nameof(naturalEquipmentMods)} overwritten: Same {priorityString}",
+                            Indent: indent + 2);
+                    }
+
+                    naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
+
+                    Debug.LoopItem(4,
+                        $"{attachedNaturalEquipmentMod.Name}" +
+                        $"[{attachedNaturalEquipmentMod.GetAdjective()}])",
+                        Good: naturalEquipmentMods[priority] != null, Indent: indent + 2, Toggle: doDebug);
+                }
+            }
+            else
+            {
+                Debug.Warn(2,
+                    $"{nameof(Extensions)}",
+                    $"{nameof(GetPrioritisedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                    $"{nameof(Equipment)} {Equipment?.DebugName ?? NULL} has no {nameof(naturalEquipmentMods)} when it was expected {Equipment?.it ?? "it"} would",
+                    Indent: indent + 2);
             }
 
             Debug.LastIndent = indent;

@@ -38,10 +38,8 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
-        public List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod => NewNaturalEquipmentMod();
-
-        public UD_ManagedBurrowingClaws NaturalWeaponManager { get; set; }
+        public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods => GetNaturalEquipmentMods();
+        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public bool HasGigantism =>  ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
@@ -73,6 +71,9 @@ namespace XRL.World.Parts.Mutation
                 ModPriority = 80,
                 DescriptionPriority = 80,
 
+                ForceNoun = true,
+                Noun = "claw",
+
                 Adjective = "burrowing",
                 AdjectiveColor = "W",
                 AdjectiveColorFallback = "y",
@@ -90,19 +91,15 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
                 },
             };
-            burrowingClawsMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
+            burrowingClawsMod.AddSkillAdjustment("ShortBlades", true);
 
-            burrowingClawsMod.AddAdjustment(RENDER, "DisplayName", "claw", true);
+            burrowingClawsMod.AddNounAdjustment(true);
 
-            burrowingClawsMod.AddAdjustment(RENDER, "Tile", "Creatures/natural-weapon-claw.bmp", true);
-            burrowingClawsMod.AddAdjustment(RENDER, "ColorString", "&w", true);
-            burrowingClawsMod.AddAdjustment(RENDER, "TileColor", "&w", true);
-            burrowingClawsMod.AddAdjustment(RENDER, "DetailColor", "W", true);
+            burrowingClawsMod.AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true);
+            burrowingClawsMod.AddColorStringAdjustment("&w", true);
+            burrowingClawsMod.AddTileColorAdjustment("&w", true);
+            burrowingClawsMod.AddDetailColorAdjustment("W", true);
             return burrowingClawsMod;
-        }
-        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> NewNaturalEquipmentMod(UD_ManagedBurrowingClaws NewAssigner = null)
-        {
-            return NewBurrowingWeaponMod(NewAssigner ?? this);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, string Parts)
@@ -176,6 +173,11 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedIntProps;
         }
+        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, UD_ManagedBurrowingClaws NewAssigner = null)
+        {
+            ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = NewBurrowingWeaponMod(NewAssigner ?? this);
+            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : null;
+        }
         public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, UD_ManagedBurrowingClaws NewAssigner = null)
         {
             int indent = Debug.LastIndent;
@@ -188,33 +190,15 @@ namespace XRL.World.Parts.Mutation
 
             NewAssigner ??= this;
             List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentModsList = new();
-            if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
+            ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
+            if (naturalEquipmentMod != null)
             {
-                NaturalEquipmentMod.AssigningPart = NewAssigner;
-                naturalEquipmentModsList.Add(NaturalEquipmentMod);
+                naturalEquipmentModsList.Add(naturalEquipmentMod);
             }
 
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }
-
-        public override bool Mutate(GameObject GO, int Level)
-        {
-            // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
-            return base.Mutate(GO, Level);
-        }
-        public override bool Unmutate(GameObject GO)
-        {
-            NeedPartSupportEvent.Send(GO, "Digging");
-            // GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ID);
-            return base.Unmutate(GO);
-        }
-        public override void Remove()
-        {
-            NeedPartSupportEvent.Send(ParentObject, "Digging");
-            base.Remove();
-        }
-
         public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level)
         {
             int indent = Debug.LastIndent;
@@ -272,6 +256,23 @@ namespace XRL.World.Parts.Mutation
 
             Debug.LastIndent = indent;
             return NaturalEquipmentMods;
+        }
+
+        public override bool Mutate(GameObject GO, int Level)
+        {
+            // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ManagerID, 0, Serialize: true);
+            return base.Mutate(GO, Level);
+        }
+        public override bool Unmutate(GameObject GO)
+        {
+            NeedPartSupportEvent.Send(GO, "Digging");
+            // GO.UnregisterEvent(this, ManageDefaultEquipmentEvent.ManagerID);
+            return base.Unmutate(GO);
+        }
+        public override void Remove()
+        {
+            NeedPartSupportEvent.Send(ParentObject, "Digging");
+            base.Remove();
         }
 
         public override bool ChangeLevel(int NewLevel)

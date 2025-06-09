@@ -42,6 +42,10 @@ namespace XRL.World.Parts
 
                 E.BeforeEvent.AddGeneralElement(null, $"tightly clenched");
                 E.BeforeEvent.AddGeneralElement("", $"functions as a cudgel");
+                if (ParentObject.HasPart<ModElongatedNaturalWeapon>())
+                {
+                    E.AddWeaponElement("get", $"bonus penetration from Strength");
+                }
             }
             return base.HandleEvent(E);
         }

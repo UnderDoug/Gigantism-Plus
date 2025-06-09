@@ -37,7 +37,11 @@ namespace XRL.World.Parts
 
         public override string GetColoredAdjective()
         {
-            return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness) ?? base.GetColoredAdjective();
+        }
+        public override string GetAdjective()
+        {
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1).Strip() ?? base.GetAdjective();
         }
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsGiganticExoframe>> E)
@@ -62,7 +66,10 @@ namespace XRL.World.Parts
                 {
                     if (adjustment.Field == E.Field && adjustment.Target == E.Target)
                     {
-                        E.Value = adjustment.Value;
+                        if (adjustment.CheckCondition(E.Equipment))
+                        {
+                            E.Value = adjustment.Value;
+                        }
                     }
                 }
             }

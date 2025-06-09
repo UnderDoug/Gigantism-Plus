@@ -385,7 +385,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"x {typeof(WrassleGear).Name}." 
                     + $"{nameof(HandleEvent)}({typeof(GetKineticResistanceEvent).Name} " 
-                    + $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
+                    + $"E.Object: [{Object.ManagerID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
                     Indent: 0);
                 */
                 return false;
@@ -497,14 +497,12 @@ namespace XRL.World.Parts
             base.Read(Basis, Reader);
             _WrassleID = Reader.ReadGuid();
         }
-        /*
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             WrassleGear wrassleGear = base.DeepCopy(Parent, MapInv) as WrassleGear;
-            wrassleGear._WrassleID = Guid.NewGuid();
+            // wrassleGear._WrassleID = Guid.NewGuid();
             return wrassleGear;
         }
-        */
 
     } //!-- public class Source : IScribedPart
 }

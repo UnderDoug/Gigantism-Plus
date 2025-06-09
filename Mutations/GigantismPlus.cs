@@ -164,6 +164,8 @@ namespace XRL.World.Parts.Mutation
                 ModPriority = 40,
                 DescriptionPriority = 40,
 
+                Noun = "fist",
+
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
@@ -181,15 +183,27 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
                 },
             };
-            giganticFistMod.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", true);
-            giganticFistMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", -100);
+            giganticFistMod.AddSkillAdjustment("Cudgel", true);
+            giganticFistMod.AddStatAdjustment("Strength", -100);
 
-            giganticFistMod.AddAdjustment(RENDER, "DisplayName", "fist", true);
+            static bool cosmeticCondition(GameObject Equipment)
+            {
+                int indent = Debug.LastIndent;
+                bool blueprintNotNull = Equipment?.Blueprint != null;
+                bool blueprintIsDefaultFist = blueprintNotNull && Equipment.Blueprint == "DefaultFist";
 
-            giganticFistMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", true);
-            giganticFistMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            giganticFistMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            giganticFistMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+                Debug.LoopItem(4, $"{nameof(blueprintNotNull)}", $"{blueprintNotNull}", Good: blueprintNotNull, Indent: indent + 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(blueprintIsDefaultFist)}", $"{blueprintIsDefaultFist}", Good: blueprintIsDefaultFist, Indent: indent + 1, Toggle: doDebug);
+
+                Debug.LastIndent = indent;
+                return blueprintIsDefaultFist;
+            };
+            giganticFistMod.AddNounAdjustment(true, Condition: cosmeticCondition);
+
+            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: cosmeticCondition);
+            giganticFistMod.AddColorStringAdjustment("&x", true);
+            giganticFistMod.AddTileColorAdjustment("&x", true);
+            giganticFistMod.AddDetailColorAdjustment("z", true);
             return giganticFistMod;
         }
         public static ModGiganticNaturalWeapon NewGiganticNogginMod(GigantismPlus assigningPart)
@@ -214,11 +228,11 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            giganticNogginMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            giganticNogginMod.AddStatAdjustment("Strength", -100);
 
-            giganticNogginMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            giganticNogginMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            giganticNogginMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            giganticNogginMod.AddColorStringAdjustment("&x", true);
+            giganticNogginMod.AddTileColorAdjustment("&x", true);
+            giganticNogginMod.AddDetailColorAdjustment("z", true);
             return giganticNogginMod;
         }
         public static ModGiganticNaturalWeapon NewGiganticMugMod(GigantismPlus assigningPart)
@@ -243,16 +257,16 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            giganticMugMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            giganticMugMod.AddStatAdjustment("Strength", -100);
 
-            giganticMugMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            giganticMugMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            giganticMugMod.AddColorStringAdjustment("&x", true);
+            giganticMugMod.AddTileColorAdjustment("&x", true);
+            giganticMugMod.AddDetailColorAdjustment("z", true);
             return giganticMugMod;
         }
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
         {
-            ModNaturalEquipment<GigantismPlus> giganticMugMod = new()
+            ModNaturalEquipment<GigantismPlus> giganticBodMod = new()
             {
                 AssigningPart = assigningPart,
                 BodyPartType = "Body",
@@ -272,10 +286,12 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            giganticMugMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            giganticMugMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            giganticMugMod.AddAdjustment(RENDER, "DetailColor", "z", true);
-            return giganticMugMod;
+            giganticBodMod.AddStatAdjustment("Strength", -100);
+
+            giganticBodMod.AddColorStringAdjustment("&x", true);
+            giganticBodMod.AddTileColorAdjustment("&x", true);
+            giganticBodMod.AddDetailColorAdjustment("z", true);
+            return giganticBodMod;
         }
         public static ModClosedGiganticNaturalWeapon NewClosedFistMod(GigantismPlus assigningPart)
         {
@@ -286,6 +302,9 @@ namespace XRL.World.Parts.Mutation
 
                 ModPriority = -999999, // -999,999
                 DescriptionPriority = -999999, // -999,999
+
+                ForceNoun = true,
+                Noun = "fist",
 
                 Adjective = "closed",
                 AdjectiveColor = "Y",
@@ -304,21 +323,22 @@ namespace XRL.World.Parts.Mutation
                         { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
                     },
             };
-            closedGiganticFist.AddAdjustment(MELEEWEAPON, "Skill", "Cudgel", false);
-            closedGiganticFist.AddAdjustment(MELEEWEAPON, "Stat", "Strength", false);
+            closedGiganticFist.AddSkillAdjustment("Cudgel", false);
+            closedGiganticFist.AddStatAdjustment("Strength", false);
 
-            closedGiganticFist.AddAdjustment(RENDER, "DisplayName", "fist", false);
+            closedGiganticFist.AddNounAdjustment();
 
-            closedGiganticFist.AddAdjustment(RENDER, "Tile", "NaturalWeapons/GiganticFist.png", false);
+            closedGiganticFist.AddTileAdjustment("NaturalWeapons/GiganticFist.png", false);
             return closedGiganticFist;
         }
-        public override ModNaturalEquipment<GigantismPlus> NewNaturalEquipmentMod(GigantismPlus NewAssigner = null)
+        public override ModNaturalEquipment<GigantismPlus> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<GigantismPlus>> Filter = null, GigantismPlus NewAssigner = null)
         {
-            if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID))
+            ModNaturalEquipment<GigantismPlus> naturalEquipmentMod = NewClosedFistMod(NewAssigner ?? this);
+            if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID) && (Filter == null || Filter(naturalEquipmentMod)))
             {
-                return NewClosedFistMod(NewAssigner ?? this);
+                return naturalEquipmentMod;
             }
-            return base.NewNaturalEquipmentMod(NewAssigner);
+            return base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
         public override bool CanLevel() { return true; }

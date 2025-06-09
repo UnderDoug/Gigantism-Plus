@@ -42,7 +42,7 @@ namespace XRL.World.Parts
         public string Model = "Alpha";
         public string Material = "carbide";
         public string AugmentAdjectiveColor = "b";
-        public string AugmentTile = "NaturalWeapons/GiganticManipulator.png";
+        public string AugmentTile = "NaturalWeapons/EF-AugmentedGiganticManipulator.png";
         public string AugmentTileColorString = "&c";
         public string AugmentTileDetailColor = "b";
         public string AugmentSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
@@ -67,6 +67,9 @@ namespace XRL.World.Parts
                 ModPriority = -500,
                 DescriptionPriority = -500,
 
+                ForceNoun = true,
+                Noun = "manipulator",
+
                 Adjective = "augmented",
                 AdjectiveColor = assigningPart.AugmentAdjectiveColor,
                 AdjectiveColorFallback = "c",
@@ -78,12 +81,12 @@ namespace XRL.World.Parts
                 AddedIntProps = new(),
                 AddedStringProps = new(),
             };
-            augmentedManipulator.AddAdjustment(RENDER, "DisplayName", "manipulator");
+            augmentedManipulator.AddNounAdjustment();
 
-            augmentedManipulator.AddAdjustment(RENDER, "Tile", assigningPart.AugmentTile);
-            augmentedManipulator.AddAdjustment(RENDER, "ColorString", assigningPart.AugmentTileColorString, true);
-            augmentedManipulator.AddAdjustment(RENDER, "TileColor", assigningPart.AugmentTileColorString, true);
-            augmentedManipulator.AddAdjustment(RENDER, "DetailColor", assigningPart.AugmentTileDetailColor);
+            augmentedManipulator.AddTileAdjustment(assigningPart.AugmentTile);
+            augmentedManipulator.AddColorStringAdjustment(assigningPart.AugmentTileColorString, true);
+            augmentedManipulator.AddTileColorAdjustment(assigningPart.AugmentTileColorString, true);
+            augmentedManipulator.AddDetailColorAdjustment(assigningPart.AugmentTileDetailColor);
 
             assigningPart.ProcessNaturalEquipmentAddedParts(augmentedManipulator, assigningPart.AugmentAddParts);
             assigningPart.ProcessNaturalEquipmentAddedProps(augmentedManipulator, assigningPart.AugmentAddProps);
@@ -103,24 +106,29 @@ namespace XRL.World.Parts
 
             return augmentedManipulator;
         }
-        public override ModNaturalEquipment<CyberneticsGiganticExoframe> NewNaturalEquipmentMod(CyberneticsGiganticExoframe NewAssigner = null)
+        public override ModNaturalEquipment<CyberneticsGiganticExoframe> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<CyberneticsGiganticExoframe>> Filter = null, CyberneticsGiganticExoframe NewAssigner = null)
         {
-            return NewAugmentedManipulatorMod(NewAssigner ?? this);
+            ModNaturalEquipment<CyberneticsGiganticExoframe> naturalEquipmentMod = NewAugmentedManipulatorMod(NewAssigner ?? this);
+            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
-        public string GetShortAugmentAdjective(bool Pretty = true)
+        public string GetAugmentAdjective(int Colorfulness = 0)
         {
-            return Pretty ? NaturalEquipmentMod.Adjective.OptionalColor(NaturalEquipmentMod.AdjectiveColor, NaturalEquipmentMod.AdjectiveColorFallback, Colorfulness) : NaturalEquipmentMod.Adjective;
+            string augmentedColor = NaturalEquipmentMod.AdjectiveColor;
+            string augmentedColorFallback = NaturalEquipmentMod.AdjectiveColorFallback;
+            string adjective = NaturalEquipmentMod.Adjective;
+            return adjective.OptionalColor(augmentedColor, augmentedColorFallback, Colorfulness);
         }
-        public string GetAugmentAdjective(bool Pretty = true)
+        public string GetAugmentPrefix(int Colorfulness = 0)
         {
-            return Pretty ? GetNaturalEquipmentColoredAdjective() : $"EF-" + GetShortAugmentAdjective(Pretty);
+            string prefixColor = "c";
+            string prefix = "E" + "F".OptionalColor(prefixColor, prefixColor, Colorfulness);
+            return prefix;
         }
-        public virtual string GetNaturalEquipmentColoredAdjective()
+        public virtual string GetNaturalEquipmentColoredAdjective(int Colorfulness = 0)
         {
-            string output = $"E{"F".Color("c")}-";
-            output += NaturalEquipmentMod.Adjective.OptionalColor(NaturalEquipmentMod.AdjectiveColor, NaturalEquipmentMod.AdjectiveColorFallback, Colorfulness);
-            return output.Color("Y");
+            string output = $"{GetAugmentPrefix(Colorfulness)}-{GetAugmentAdjective(Colorfulness)}";
+            return output.Color("y");
         }
 
         public override void OnImplanted(GameObject Implantee, GameObject Implant)

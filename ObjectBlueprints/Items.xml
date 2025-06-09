@@ -52,7 +52,7 @@ You cannot wear equipment on your body." />
           Model="Alpha"
           Material="carbide"
           AugmentAdjectiveColor="b"
-          AugmentTile="NaturalWeapons/GiganticManipulator.png"
+          AugmentTile="NaturalWeapons/EF-AugmentedGiganticManipulator.png"
           AugmentTileColorString="&amp;c"
           AugmentTileDetailColor="b"
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
@@ -215,7 +215,7 @@ You cannot wear equipment on your body." />
     <part Name="Crysteel" />
     <tag Name="Flawless" />
   </object>
-  <object Name="RealHomosapien_ZetachromeFist" Load="Merge">
+  <object Name="RealHomosapien_ZetachromeHandBones" Load="Merge">
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 3 additional damage die, +3 damage die size and +1 bonus damage." />
     <removepart Name="CyberneticsFistReplacement" />
     <part Name="CyberneticsManagedHandBones"

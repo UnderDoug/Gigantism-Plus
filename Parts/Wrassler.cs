@@ -470,6 +470,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             Wrassler wrassler = base.DeepCopy(Parent, MapInv) as Wrassler;
+            // wrassler._WrassleID = Guid.NewGuid();
             return wrassler;
         }
 

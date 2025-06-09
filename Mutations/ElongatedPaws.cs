@@ -46,13 +46,15 @@ namespace XRL.World.Parts.Mutation
 
         public static ModElongatedNaturalWeapon NewElongatedWeaponMod(ElongatedPaws assigningPart)
         {
-            ModElongatedNaturalWeapon elongatedNaturalWeaponMod = new ()
+            ModElongatedNaturalWeapon elongatedNaturalWeaponMod = new()
             {
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
                 ModPriority = 60,
                 DescriptionPriority = 60,
+
+                Noun = "paw",
 
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
@@ -66,20 +68,33 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
                 },
             };
-            elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
-            elongatedNaturalWeaponMod.AddAdjustment(MELEEWEAPON, "Stat", "Agility", -120);
+            elongatedNaturalWeaponMod.AddSkillAdjustment("ShortBlades", true);
+            elongatedNaturalWeaponMod.AddStatAdjustment("Agility", -120);
 
-            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
+            static bool cosmeticCondition(GameObject Equipment)
+            {
+                int indent = Debug.LastIndent;
+                bool blueprintNotNull = Equipment?.Blueprint != null;
+                bool blueprintIsDefaultFist = blueprintNotNull && Equipment.Blueprint == "DefaultFist";
 
-            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
-            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            elongatedNaturalWeaponMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+                Debug.LoopItem(4, $"{nameof(blueprintNotNull)}", $"{blueprintNotNull}", Good: blueprintNotNull, Indent: indent + 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(blueprintIsDefaultFist)}", $"{blueprintIsDefaultFist}", Good: blueprintIsDefaultFist, Indent: indent + 1, Toggle: doDebug);
+
+                Debug.LastIndent = indent;
+                return blueprintIsDefaultFist;
+            };
+            elongatedNaturalWeaponMod.AddNounAdjustment(true, Condition: cosmeticCondition);
+
+            elongatedNaturalWeaponMod.AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: cosmeticCondition);
+            elongatedNaturalWeaponMod.AddColorStringAdjustment("&x", true);
+            elongatedNaturalWeaponMod.AddTileColorAdjustment("&x", true);
+            elongatedNaturalWeaponMod.AddDetailColorAdjustment("z", true);
             return elongatedNaturalWeaponMod;
         }
-        public override ModNaturalEquipment<ElongatedPaws> NewNaturalEquipmentMod(ElongatedPaws NewAssigner = null)
+        public override ModNaturalEquipment<ElongatedPaws> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<ElongatedPaws>> Filter = null, ElongatedPaws NewAssigner = null)
         {
-            return NewElongatedWeaponMod(NewAssigner ?? this);
+            ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod = NewElongatedWeaponMod(NewAssigner ?? this);
+            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
         public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();

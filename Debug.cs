@@ -375,16 +375,16 @@ namespace HNPS_GigantismPlus
             E e = new();
             if (Game != null && Game.RegisteredEvents.ContainsKey(e.ID))
             {
-                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2, Toggle: Toggle);
+                Entry(2, $"Registered", $"{typeof(H).Name} ({typeof(E).Name}.ManagerID: {e.ID})", Indent: 2, Toggle: Toggle);
                 flag = true;
             }
             else if (Game != null)
             {
-                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2, Toggle: Toggle);
+                Entry(2, $"Failed to register {typeof(H).Name} ({typeof(E).Name}.ManagerID: {e.ID})", Indent: 2, Toggle: Toggle);
             }
             else
             {
-                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ID: {e.ID})", Indent: 2, Toggle: Toggle);
+                Entry(2, $"The.Game null, couldn't register {typeof(H).Name} ({typeof(E).Name}.ManagerID: {e.ID})", Indent: 2, Toggle: Toggle);
             }
             return flag;
         }

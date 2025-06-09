@@ -39,8 +39,8 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
-        public List<ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod => NewNaturalEquipmentMod();
+        public virtual List<ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods => GetNaturalEquipmentMods();
+        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
@@ -72,6 +72,9 @@ namespace XRL.World.Parts.Mutation
                 ModPriority = 100,
                 DescriptionPriority = 100,
 
+                ForceNoun = true,
+                Noun = "point",
+
                 Adjective = "crystalline",
                 AdjectiveColor = "crystallized",
                 AdjectiveColorFallback = "M",
@@ -89,19 +92,15 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
                 },
             };
-            crystalinePointMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades");
+            crystalinePointMod.AddSkillAdjustment("ShortBlades", true);
 
-            crystalinePointMod.AddAdjustment(RENDER, "DisplayName", "point", true);
+            crystalinePointMod.AddNounAdjustment(true);
 
-            crystalinePointMod.AddAdjustment(RENDER, "Tile", "Creatures/natural-weapon-claw.bmp", true);
-            crystalinePointMod.AddAdjustment(RENDER, "ColorString", "&b", true);
-            crystalinePointMod.AddAdjustment(RENDER, "TileColor", "&b", true);
-            crystalinePointMod.AddAdjustment(RENDER, "DetailColor", "B", true);
+            crystalinePointMod.AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true);
+            crystalinePointMod.AddColorStringAdjustment("&b", true);
+            crystalinePointMod.AddTileColorAdjustment("&b", true);
+            crystalinePointMod.AddDetailColorAdjustment("B", true);
             return crystalinePointMod;
-        }
-        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> NewNaturalEquipmentMod(UD_ManagedCrystallinity NewAssigner = null)
-        {
-            return NewCrystallinePointMod(NewAssigner ?? this);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Parts)
@@ -168,6 +167,11 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedIntProps;
         }
+        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, UD_ManagedCrystallinity NewAssigner = null)
+        {
+            ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = NewCrystallinePointMod(NewAssigner ?? this);
+            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : null;
+        }
         public virtual List<ModNaturalEquipment<UD_ManagedCrystallinity>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, UD_ManagedCrystallinity NewAssigner = null)
         {
             int indent = Debug.LastIndent;
@@ -180,61 +184,15 @@ namespace XRL.World.Parts.Mutation
 
             NewAssigner ??= this;
             List<ModNaturalEquipment<UD_ManagedCrystallinity>> naturalEquipmentModsList = new();
-            if (NaturalEquipmentMod != null && (Filter == null || Filter(NaturalEquipmentMod)))
+            ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
+            if (naturalEquipmentMod != null)
             {
-                NaturalEquipmentMod.AssigningPart = NewAssigner;
-                naturalEquipmentModsList.Add(NaturalEquipmentMod);
+                naturalEquipmentModsList.Add(naturalEquipmentMod);
             }
 
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }
-
-        public static int GetRefractChance(int Level)
-        {
-            return 25;
-        }
-        public int GetRefractChance()
-        {
-            return GetRefractChance(Level);
-        }
-
-        public static float GetGigantismRefractFactor(int Level)
-        {
-            return 0.4f;
-        }
-        public float GetGigantismRefractFactor()
-        {
-            return GetGigantismRefractFactor(Level);
-        }
-
-        public override bool Mutate(GameObject GO, int Level)
-        {
-            // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ID, 0, Serialize: true);
-            return base.Mutate(GO, Level);
-        }
-        public override bool Unmutate(GameObject GO)
-        {
-            if (GO.TryGetPart(out RefractLight refractLight))
-            {
-                if (RefractAdded)
-                {
-                    refractLight.Chance -= GetRefractChance();
-                    RefractAdded = false;
-                }
-                if (GiganticRefractAdded)
-                {
-                    refractLight.Chance -= (int)(GetRefractChance() * GetGigantismRefractFactor());
-                    GiganticRefractAdded = false;
-                }
-                if (refractLight.Chance < 1)
-                {
-                    GO.RemovePart(refractLight);
-                }
-            }
-            return base.Unmutate(GO);
-        }
-
         public virtual ModNaturalEquipment<UD_ManagedCrystallinity> UpdateNaturalEquipmentMod(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, int Level)
         {
             int indent = Debug.LastIndent;
@@ -292,6 +250,51 @@ namespace XRL.World.Parts.Mutation
 
             Debug.LastIndent = indent;
             return NaturalEquipmentMods;
+        }
+
+        public static int GetRefractChance(int Level)
+        {
+            return 25;
+        }
+        public int GetRefractChance()
+        {
+            return GetRefractChance(Level);
+        }
+
+        public static float GetGigantismRefractFactor(int Level)
+        {
+            return 0.4f;
+        }
+        public float GetGigantismRefractFactor()
+        {
+            return GetGigantismRefractFactor(Level);
+        }
+
+        public override bool Mutate(GameObject GO, int Level)
+        {
+            // GO.RegisterEvent(this, ManageDefaultEquipmentEvent.ManagerID, 0, Serialize: true);
+            return base.Mutate(GO, Level);
+        }
+        public override bool Unmutate(GameObject GO)
+        {
+            if (GO.TryGetPart(out RefractLight refractLight))
+            {
+                if (RefractAdded)
+                {
+                    refractLight.Chance -= GetRefractChance();
+                    RefractAdded = false;
+                }
+                if (GiganticRefractAdded)
+                {
+                    refractLight.Chance -= (int)(GetRefractChance() * GetGigantismRefractFactor());
+                    GiganticRefractAdded = false;
+                }
+                if (refractLight.Chance < 1)
+                {
+                    GO.RemovePart(refractLight);
+                }
+            }
+            return base.Unmutate(GO);
         }
 
         public override bool ChangeLevel(int NewLevel)

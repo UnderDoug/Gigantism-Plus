@@ -1413,7 +1413,7 @@ namespace XRL.World.Parts.Skill
             {
                 Debug.Entry(4,
                     $"@ {nameof(Tactics_Vault)}."
-                    + $"{nameof(FireEvent)}({nameof(Event)} E.ID: {BEGIN_ATTACK_EVENT})",
+                    + $"{nameof(FireEvent)}({nameof(Event)} E.ManagerID: {BEGIN_ATTACK_EVENT})",
                     Indent: 0, Toggle: getDoDebug());
 
                 Cell targetCell = E.GetParameter<Cell>("TargetCell");

@@ -14,36 +14,19 @@ namespace XRL.World.Parts
         private GameObject _wielder = null;
         public GameObject Wielder
         {
-            get
-            {
-                return _wielder ??= ParentObject?.Equipped;
-            }
-            set
-            {
-                _wielder = value;
-            }
+            get => _wielder ??= ParentObject?.Equipped;
+            set => _wielder = value;
         }
 
         private ElongatedPaws _elongatedPaws = null;
         public ElongatedPaws ElongatedPaws
         {
-            get
-            {
-                return _elongatedPaws ??= Wielder?.GetPart<ElongatedPaws>();
-            }
+            get => _elongatedPaws ??= Wielder?.GetPart<ElongatedPaws>();
             set
             {
                 _elongatedPaws = value;
                 if (Wielder == null) _elongatedPaws = null;
             }
-        } 
-
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == StatChangeEvent.ID
-                || ID == UnequippedEvent.ID
-                || ID == EquippedEvent.ID;
         }
 
         public int AppliedElongatedBonusCap = 0;
@@ -51,28 +34,45 @@ namespace XRL.World.Parts
         public void ApplyElongatedBonusCap(MeleeWeapon Weapon)
         {
             Debug.Entry(4, $"* {nameof(ApplyElongatedBonusCap)}(MeleeWeapon Weapon)", Indent: 3);
-            if (ElongatedPaws != null)
+
+            ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod = 
+                ElongatedPaws?.UpdateNaturalEquipmentMod(
+                    ElongatedPaws?.GetNaturalEquipmentMod(), 
+                    (int)ElongatedPaws?.Level);
+
+            if (ElongatedPaws != null && naturalEquipmentMod != null)
             {
                 UnapplyElongatedBonusCap(Weapon);
-                AppliedElongatedBonusCap = ElongatedPaws.NaturalEquipmentMod.GetDamageBonus();
+                AppliedElongatedBonusCap = naturalEquipmentMod.GetDamageBonus();
                 Weapon.AdjustBonusCap(AppliedElongatedBonusCap);
-                Debug.LoopItem(4, $"New AppliedElongatedBonusCap: {AppliedElongatedBonusCap}", Indent: 4);
+                Debug.LoopItem(4, $"New AppliedElongatedBonusCap", $"{AppliedElongatedBonusCap}", Indent: 4);
             }
             else
             {
-                Debug.LoopItem(4, $"ElongatedPaws was null, no adjustments possible", Indent: 4);
+                Debug.LoopItem(4, $"{nameof(ElongatedPaws)} or its {nameof(naturalEquipmentMod)} was null, no adjustments possible", Indent: 4);
             }
             Debug.Entry(4, $"x {nameof(ApplyElongatedBonusCap)}(MeleeWeapon Weapon) *//", Indent: 3);
         }
-
         public void UnapplyElongatedBonusCap(MeleeWeapon Weapon)
         {
             Debug.Entry(4, $"* {nameof(UnapplyElongatedBonusCap)}(MeleeWeapon Weapon)", Indent: 4);
-            Debug.LoopItem(4, $"Old AppliedElongatedBonusCap: {AppliedElongatedBonusCap}", Indent: 5);
+            Debug.LoopItem(4, $"Old AppliedElongatedBonusCap", $"{AppliedElongatedBonusCap}", Indent: 5);
             Weapon.AdjustBonusCap(-AppliedElongatedBonusCap);
             AppliedElongatedBonusCap = 0;
+            Debug.Entry(4, $"x {nameof(UnapplyElongatedBonusCap)}(MeleeWeapon Weapon) *//", Indent: 4);
         }
 
+        public override bool AllowStaticRegistration()
+        {
+            return true;
+        }
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade)
+                || ID == StatChangeEvent.ID
+                || ID == UnequippedEvent.ID
+                || ID == EquippedEvent.ID;
+        }
         public override bool HandleEvent(EquippedEvent E)
         {
             GameObject item = E.Item;
@@ -83,7 +83,7 @@ namespace XRL.World.Parts
                     if (ElongatedPaws != null)
                     {
                         Debug.Entry(4, $"* {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(EquippedEvent)} E)", Indent: 2);
-                        Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                        Debug.LoopItem(4, $"Item: {item?.DebugName ?? NULL}", Indent: 3);
                         ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
                         Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(EquippedEvent)} E) *//", Indent: 2);
                     }
@@ -101,7 +101,7 @@ namespace XRL.World.Parts
             if (item.Is(ParentObject) && !Wielder.Is(null) && !ElongatedPaws.Is(null))
             {
                 Debug.Entry(4, $"@ {nameof(WeaponElongator)}.{nameof(HandleEvent)}({nameof(UnequippedEvent)} E)", Indent: 2);
-                Debug.LoopItem(4, $"Item: {item.ShortDisplayNameStripped}", Indent: 3);
+                Debug.LoopItem(4, $"Item: {item?.DebugName ?? NULL}", Indent: 3);
                 UnapplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
                 Debug.Entry(4, $"x {nameof(WeaponElongator)}", $"{nameof(HandleEvent)}({nameof(UnequippedEvent)} E) @//", Indent: 2);
 
@@ -122,12 +122,6 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-
-        public override bool AllowStaticRegistration()
-        {
-            return true;
-        }
-
     } //!-- public class WeaponElongator : IScribedPart
 
 }

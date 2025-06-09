@@ -120,7 +120,7 @@ namespace HNPS_GigantismPlus.Harmony
         /// Goal is to make ModGigantic objects simulate being built with the Gigantified object builder.
         /// </summary>
         /// <param name="__instance">The ModGigantic instance upon which the event was fired.</param>
-        /// <param name="E">The event which we're checking for an additional condition.</param>
+        /// <param name="E">The event which we're checking for an additional cosmeticCondition.</param>
         /// <returns>true, allowing the event to continue on its way being handled.</returns>
         [HarmonyPatch(
             declaringType: typeof(ModGigantic),

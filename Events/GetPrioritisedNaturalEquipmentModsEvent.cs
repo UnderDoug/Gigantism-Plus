@@ -56,7 +56,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"@ {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
                 + $"{nameof(AddNaturalEquipmentMod)}"
-                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.Adjective}])"
+                + $"(NaturalEquipmentMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.Adjective}])"
                 + $" Creature: {Creature?.DebugName ?? NULL},"
                 + $" Equipment: {Equipment?.DebugName ?? NULL}",
                 Indent: indent, Toggle: doDebug);
@@ -82,7 +82,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"x {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
                 + $"{nameof(AddNaturalEquipmentMod)}"
-                + $"(NaturalWeaponMod: {NaturalEquipmentMod.Name}) @//",
+                + $"(NaturalEquipmentMod: {NaturalEquipmentMod.Name}) @//",
                 Indent: indent, Toggle: doDebug);
 
             Debug.LastIndent = indent;

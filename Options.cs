@@ -141,6 +141,7 @@ namespace HNPS_GigantismPlus
             { nameof(Body_Patches), false },
             { nameof(BodyPart_Patches), false },
             { nameof(Brain_Patches), false },
+            { nameof(Carapace_Patches), true },
             { nameof(Crayons_Patches), false },
             { nameof(CookingDomainSpecial_UnitCrystalTransform_Patches), false },
             { nameof(Crystallinity_Patches), false },

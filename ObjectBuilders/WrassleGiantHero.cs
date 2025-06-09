@@ -1,24 +1,23 @@
-﻿using System;
+﻿using HistoryKit;
+using HNPS_GigantismPlus;
+using Qud.API;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using HistoryKit;
-using Qud.API;
-
+using System.Xml;
 using XRL.Language;
 using XRL.Names;
 using XRL.Rules;
 using XRL.UI;
 using XRL.Wish;
 using XRL.World.Capabilities;
+using XRL.World.Effects;
 using XRL.World.Loaders;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
-
-using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -157,11 +156,14 @@ namespace XRL.World.ObjectBuilders
             {
                 Creature.RemovePart(gameUnique);
             }
-            gameUnique = new()
+            if (Unique)
             {
-                State = SCRT_GNT_UNQ_STATE,
-            };
-            Creature.AddPart(gameUnique, Creation: true);
+                gameUnique = new()
+                {
+                    State = SCRT_GNT_UNQ_STATE,
+                };
+                Creature.AddPart(gameUnique, Creation: true);
+            }
 
             if (!Creature.TryGetPart(out Wrassler wrassler))
             {
@@ -189,7 +191,7 @@ namespace XRL.World.ObjectBuilders
             }
             Creature.SetStringProperty("NoHateFactions", noHateFactionsList.Join(","));
             Debug.LoopItem(4, 
-                $"NoHateFactions: {Creature.GetStringProperty("NoHateFactions")}", 
+                $"NoHateFactions", $"{Creature.GetStringProperty("NoHateFactions")}", 
                 Good: !Creature.GetStringProperty("NoHateFactions").IsNullOrEmpty(), 
                 Indent: 1, Toggle: getDoDebug());
 
@@ -203,15 +205,17 @@ namespace XRL.World.ObjectBuilders
                     ? StaticFactionAdmirations
                     : 0
                 ;
+
             List<string> factionAdmirationBag = new(FactionAdmirationBag);
-            Dictionary<int, string> factionAdmiration = new()
+            Dictionary<int, string> factionAdmirationList = new()
             {
                 { 1, factionAdmirationBag.DrawRandomElement() },
                 { 2, factionAdmirationBag.DrawRandomElement() },
                 { 3, factionAdmirationBag.DrawRandomElement() },
             };
 
-            for (int i = 1; i <= StaticFactionAdmirations; i++)
+            Debug.LoopItem(4, $"Setting StaticFactions", Indent: 1, Toggle: getDoDebug());
+            for (int i = 1; i < 4; i++)
             {
                 string faction = "";
                 string feeling = "friend";
@@ -228,8 +232,15 @@ namespace XRL.World.ObjectBuilders
                     feeling = "hate";
                     reason = SCRT_GNT_UNQ_TEMPLAR_HATEREASON;
                 }
-                Creature.SetStringProperty($"staticFaction{i}", $"{faction},{feeling},{reason}");
-                Debug.Entry(4, $"staticFaction{i}", $"{faction},{feeling},{reason}", Indent: 1, Toggle: getDoDebug());
+                string factionAdmiration = $"{faction},{feeling},{reason}";
+                if (i > StaticFactionAdmirations)
+                {
+                    factionAdmiration = null;
+                }
+                Creature.SetStringProperty($"staticFaction{i}", factionAdmiration, RemoveIfNull: true);
+
+                Debug.LoopItem(4, $"staticFaction{i}", Creature.GetStringProperty($"staticFaction{i}") ?? NULL, 
+                    Good: Creature.HasStringProperty($"staticFaction{i}"), Indent: 2, Toggle: getDoDebug());
             }
 
             if (Unique)
@@ -288,32 +299,52 @@ namespace XRL.World.ObjectBuilders
                 }
             }
 
+            Debug.LoopItem(4, $"Configuring Brain", Indent: 1, Toggle: getDoDebug());
+
             Creature.Brain.Mobile = true;
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}", 
+                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+
             Creature.Brain.Wanders = true;
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
+                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+
             Creature.Brain.WandersRandomly = true;
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
+                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+
             Creature.Brain.Factions = "";
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
+                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+
             Creature.Brain.Allegiance.Clear();
             Creature.Brain.Allegiance.Add("WrassleGiants", 800);
             Creature.Brain.Allegiance.Add("Giants", 600);
+
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Allegiance)}", Indent: 2, Toggle: getDoDebug());
+            foreach ((string creatureFaction, int creatureRep) in Creature.Brain.Allegiance)
+            {
+                Debug.LoopItem(4, $"{creatureFaction}", $"{creatureRep}", Indent: 3, Toggle: getDoDebug());
+            }
 
             int MentalMutations = 0;
             int PhysicalMutations = 0;
             bool MakeChimera = false;
             string Epithet = NameMaker.MakeEpithet(
-                For: null, 
-                Genotype: null, 
-                Subtype: null, 
-                Species: null, 
-                Culture: null, 
-                Faction: "WrassleGiants", 
-                Region: null, 
-                Gender: null, 
-                Mutations: null, 
-                Tag: null, 
-                Special: nameSpecial, 
-                NamingContext: null, 
-                SpecialFaildown: true, 
-                HasHonorific: null, 
+                For: null,
+                Genotype: null,
+                Subtype: null,
+                Species: null,
+                Culture: null,
+                Faction: "WrassleGiants",
+                Region: null,
+                Gender: null,
+                Mutations: null,
+                Tag: null,
+                Special: nameSpecial,
+                NamingContext: null,
+                SpecialFaildown: true,
+                HasHonorific: null,
                 HasEpithet: null);
 
             Debug.LoopItem(4, $"Epithet", Epithet ?? "null", Good: Epithet != null, Indent: 1, Toggle: getDoDebug());
@@ -337,8 +368,17 @@ namespace XRL.World.ObjectBuilders
 
             Debug.LoopItem(4, $"CreatureName", CreatureName ?? "null", Good: CreatureName != null, Indent: 1, Toggle: getDoDebug());
 
+            if (CreatureName.Contains("NameGenFail"))
+            {
+                CreatureName = null;
+            }
+            else
+            {
+                CreatureName = CreatureName.OptionalColorYuge();
+            }
+
             Creature.GiveProperName(
-                Name: CreatureName.OptionalColorYuge(),
+                Name: CreatureName,
                 Force: true,
                 Special: nameSpecial,
                 SpecialFaildown: true,
@@ -825,7 +865,11 @@ namespace XRL.World.ObjectBuilders
 
             if (!Creature.TryGetPart(out GivesRep givesRep))
             {
-                givesRep = Creature.RequirePart<GivesRep>();
+                givesRep = Creature.RequirePart<GivesRep>(true);
+            }
+            else
+            {
+                givesRep.ResetRelatedFactions();
             }
             givesRep.repValue = Unique ? 400 : 200;
             Debug.LoopItem(4, 
@@ -971,22 +1015,18 @@ namespace XRL.World.ObjectBuilders
             string creatureBlueprint = Creature?.GetBlueprint()?.DisplayName();
 
             string creatureNoun = creatureSubtype ?? creatureType ?? creatureBlueprint ?? null;
-            string creatureArticle = Grammar.IndefiniteArticle(creatureNoun);
+            string creatureArticle = Grammar.IndefiniteArticle(creatureNoun, Unique);
             creatureArticle = Unique ? creatureArticle.Capitalize() : creatureArticle;
 
             string aCreature = creatureNoun != null ? $"{creatureArticle} {creatureNoun}" : "";
-            aCreature = Unique
-                ? $"{aCreature}, "
-                : !aCreature.IsNullOrEmpty()
-                    ? $", {aCreature}, "
-                    : ""
-                    ;
-
+            
             string preDesc = Unique ? SCRT_GNT_UNQ_PREDESC : GNT_PREDESC;
-            aCreature = Unique ? Creature.An(Stripped: true, BaseOnly: true) : Creature.an(Stripped: true, BaseOnly: true);
-            preDesc = preDesc.Replace("*creature.an*", aCreature);
 
-            description.Short = preDesc + description._Short;
+            // aCreature = Unique ? Creature.An(Stripped: true, BaseOnly: true) : Creature.an(Stripped: true, BaseOnly: true);
+
+            description.Short = preDesc.Replace("*creature.an*", aCreature) + description._Short;
+
+            Creature.SetStringProperty("GigantismPlusColorChange", "true");
 
             Debug.LoopItem(4, 
                 $"<Description>?", 
@@ -1190,8 +1230,18 @@ namespace XRL.World.ObjectBuilders
         [WishCommand("wrassler", null)]
         public static void Wish(string Blueprint)
         {
+            if (Blueprint == "random")
+            {
+                Blueprint = GetAGiantHeroBlueprintModel().Name;
+            }
             WishResult wishResult = WishSearcher.SearchForBlueprint(Blueprint);
-            GameObject @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
+
+            void ApplyBuilder(GameObject Creature)
+            {
+                WrassleGiantHeroBuilder.Apply(Creature, Context: "Hero");
+            }
+            GameObject @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, ApplyBuilder, null, "Wish");
+
             @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
             if (@object != null)

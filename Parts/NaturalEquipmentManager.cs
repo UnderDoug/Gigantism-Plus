@@ -16,6 +16,7 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 using SerializeField = UnityEngine.SerializeField;
+using XRL.Language;
 
 namespace XRL.World.Parts
 {
@@ -32,11 +33,13 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
-                'R',    // Removal
-                "S"     // Serialisation
             };
             List<object> dontList = new()
             {
+                nameof(BeforeBodyPartsUpdatedEvent),
+                nameof(AfterBodyPartsUpdatedEvent),
+                'R',    // Removal
+                "S"     // Serialisation
             };
 
             if (what != null && doList.Contains(what))
@@ -193,7 +196,7 @@ namespace XRL.World.Parts
                     if (naturalEquipmentMod?.Adjustments != null)
                     {
                         Debug.CheckYeh(4, $"Have Adjustments", Indent: indent + 3, Toggle: getDoDebug());
-                        Debug.Entry(4, $"> foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments)", Indent: indent + 3, Toggle: getDoDebug());
+                        Debug.Entry(4, $"> foreach (PartAdjustment adjustment in naturalEquipmentMod.Adjustments)", Indent: indent + 3, Toggle: getDoDebug());
                         foreach (PartAdjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
                             Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
@@ -230,7 +233,7 @@ namespace XRL.World.Parts
                             }
                         }
                         Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
-                        Debug.Entry(4, $"x foreach (HNPS_AdjustmentBase adjustment in naturalEquipmentMod.Adjustments) >//", Indent: indent + 3, Toggle: getDoDebug());
+                        Debug.Entry(4, $"x foreach (PartAdjustment adjustment in naturalEquipmentMod.Adjustments) >//", Indent: indent + 3, Toggle: getDoDebug());
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 60, Indent: indent + 2, Toggle: getDoDebug());
@@ -353,7 +356,7 @@ namespace XRL.World.Parts
                     if (!prioritisedAdjustments.IsNullOrEmpty())
                     {
                         Debug.Entry(4,
-                        $"> foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments)",
+                        $"> foreach (PartAdjustment adjustment in prioritisedAdjustments)",
                         Indent: 1, Toggle: doDebug);
                         Debug.LastIndent++;
 
@@ -366,7 +369,7 @@ namespace XRL.World.Parts
                         }
                         Debug.Divider(4, HONLY, 40, Indent: 1, Toggle: doDebug);
                         Debug.Entry(4,
-                            $"x foreach (HNPS_AdjustmentBase adjustment in prioritisedAdjustments) >//",
+                            $"x foreach (PartAdjustment adjustment in prioritisedAdjustments) >//",
                             Indent: 1, Toggle: doDebug);
                     }
 
@@ -385,38 +388,63 @@ namespace XRL.World.Parts
                         //  - "icy" and "flaming" were breaking it when the player also has flaming or freezing ray, so this will
                         //    check without them first, applying that, then checking with them for the edge-case it's been included
 
-                        string tileName = string.Empty;
-                        foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
-                        {
-                            if (!naturalEquipmentMod.ExludeFromDynamicTile)
-                            {
-                                tileName += naturalEquipmentMod.GetAdjective();
-                            }
-                        }
-                        tileName += ParentRender?.DisplayName;
-
                         string icyString = "{{icy|icy}}";
                         string flamingString = "{{fiery|flaming}}";
                         string displayNameOnlySansRays = ParentObject.DisplayNameOnly;
                         displayNameOnlySansRays.Replace(icyString, "");
                         displayNameOnlySansRays.Replace(flamingString, "");
 
+                        string tileName = string.Empty;
+                        if (!NaturalEquipmentMods.IsNullOrEmpty())
+                        {
+                            foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                            {
+                                if (!naturalEquipmentMod.GetAdjective().IsNullOrEmpty())
+                                {
+                                    if (!naturalEquipmentMod.ExludeFromDynamicTile)
+                                    {
+                                        if (!tileName.IsNullOrEmpty())
+                                        {
+                                            tileName += " ";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        displayNameOnlySansRays.Replace(naturalEquipmentMod.GetAdjective(), "");
+                                    }
+                                    tileName += naturalEquipmentMod.GetAdjective();
+                                }
+                            }
+                        }
+                        string tileNoun = ParentRender?.DisplayName;
+                        if (!tileNoun.IsNullOrEmpty())
+                        {
+                            if (!tileName.IsNullOrEmpty())
+                            {
+                                tileName += " ";
+                            }
+                            tileName += Grammar.MakeTitleCase(tileNoun);
+                        }
+                        tileName = BuildCustomTilePath(tileName);
+
+                        displayNameOnlySansRays = BuildCustomTilePath(displayNameOnlySansRays);
+
                         bool tilePathDebugToggle = Utils.getDoDebug(nameof(TryGetTilePath));
                         bool gotTileFromSansRays = false;
                         bool gotTileFromTileName = false;
                         Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
-                        if (gotTileFromSansRays = TryGetTilePath(BuildCustomTilePath(displayNameOnlySansRays.Strip()), out string tilePath))
+                        if (gotTileFromSansRays = TryGetTilePath(displayNameOnlySansRays, out string tilePath))
                         {
                             ParentRender.Tile = tilePath;
                             Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                         }
-                        Debug.LoopItem(4, $"Checked {nameof(displayNameOnlySansRays)}", $"{displayNameOnlySansRays}]", Good: gotTileFromSansRays, Indent: 2, Toggle: doDebug);
-                        if (gotTileFromTileName = TryGetTilePath(BuildCustomTilePath(tileName), out tilePath))
+                        Debug.LoopItem(4, $"Checked {nameof(displayNameOnlySansRays)}", $"{displayNameOnlySansRays}", Good: gotTileFromSansRays, Indent: 2, Toggle: doDebug);
+                        if (gotTileFromTileName = TryGetTilePath(tileName, out tilePath))
                         {
                             ParentRender.Tile = tilePath;
                             Debug.Divider(4, HONLY, 25, Indent: 2, Toggle: tilePathDebugToggle);
                         }
-                        Debug.LoopItem(4, $"Checked {nameof(tileName)}", $"{tileName}]", Good: gotTileFromTileName, Indent: 2, Toggle: doDebug);
+                        Debug.LoopItem(4, $"Checked {nameof(tileName)}", $"{tileName}", Good: gotTileFromTileName, Indent: 2, Toggle: doDebug);
 
                         Debug.Entry(4, $"Dynamic Tile update attempted...", Indent: 1, Toggle: doDebug);
                         bool gotTile = gotTileFromSansRays || gotTileFromTileName;
@@ -553,28 +581,40 @@ namespace XRL.World.Parts
         public bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
-            $"@ {nameof(NaturalEquipmentManager)}."
-            + $"{nameof(HandleEvent)}({nameof(BeforeBodyPartsUpdatedEvent)} E)",
-            Indent: 0, Toggle: doDebug);
+                $"@ {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(BeforeBodyPartsUpdatedEvent)} E)",
+                Indent: 0, Toggle: getDoDebug(nameof(BeforeBodyPartsUpdatedEvent)));
 
-            Debug.Entry(4,
-                $"Creature: {E?.Creature?.DebugName ?? NULL} | Limb: [{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description ?? NULL}",
-                Indent: 1, Toggle: doDebug);
 
-            if (E.Creature == Wielder)
+            if (E.Creature == Wielder && !ParentObject.HasNaturalEquipmentMods())
             {
+                Debug.Entry(4,
+                    $"Creature: {E?.Creature?.DebugName ?? NULL} | " +
+                    $"Limb: [{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description ?? NULL}",
+                    Indent: 1, Toggle: getDoDebug(nameof(BeforeBodyPartsUpdatedEvent)));
+
                 ClearShortDescriptionCache();
                 HasManaged = false;
             }
+
+            Debug.Entry(4,
+                $"x {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(BeforeBodyPartsUpdatedEvent)}"
+                + $" E.Creature: {E.Creature?.DebugName ?? NULL}) @//",
+                Indent: 0, Toggle: getDoDebug(nameof(BeforeBodyPartsUpdatedEvent)));
 
             return base.HandleEvent(E);
         }
         public bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
-            $"@ {nameof(NaturalEquipmentManager)}."
-            + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E.Creature: {E.Creature?.DebugName})",
-            Indent: 0, Toggle: doDebug);
+                $"@ {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(AfterBodyPartsUpdatedEvent)}"
+                + $" E.Creature: {E.Creature?.DebugName ?? NULL})",
+                Indent: 0, Toggle: getDoDebug(nameof(AfterBodyPartsUpdatedEvent)));
 
             if (E.Creature != null)
             {
@@ -590,7 +630,7 @@ namespace XRL.World.Parts
 
                     Debug.LoopItem(4,
                         $"{ParentObject?.DebugName} Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(ParentObject)}",
-                        Good: !TinkeringHelpers.CanBeDisassembled(ParentObject), Indent: 1, Toggle: getDoDebug());
+                        Good: !TinkeringHelpers.CanBeDisassembled(ParentObject), Indent: 1, Toggle: getDoDebug(nameof(AfterBodyPartsUpdatedEvent)));
 
                     BeforeManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this);
                     if (ManageDefaultNaturalEquipmentEvent.CheckFor(ParentObject, Wielder, ParentLimb, this))
@@ -603,8 +643,10 @@ namespace XRL.World.Parts
 
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}({nameof(AfterBodyPartsUpdatedEvent)} E.Creature: {E.Creature?.DebugName}) @//",
-                Indent: 0, Toggle: doDebug);
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(AfterBodyPartsUpdatedEvent)}"
+                + $" E.Creature: {E.Creature?.DebugName ?? NULL}) @//",
+                Indent: 0, Toggle: getDoDebug(nameof(AfterBodyPartsUpdatedEvent)));
 
             return base.HandleEvent(E);
         }

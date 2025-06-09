@@ -101,8 +101,6 @@ namespace HNPS_GigantismPlus
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(FactionEncounters));
             zoneManager.ClearZoneBuilders(SecretZoneId);
 
-            // zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(CreateGiantCrater));
-
             string MapFileName = SCRT_GNT_ZONE_MAP2_CENTRE;
 
             zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{MapFileName}");
@@ -179,11 +177,7 @@ namespace HNPS_GigantismPlus
             }
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,
-                    BonusModChance: 0,
-                    SetModNumber: 0,
-                    AutoMod: null,
                     BeforeObjectCreated: ApplyBuilder,
-                    AfterObjectCreated: null,
                     Context: Unique ? "Unique" : "Hero",
                     ProvideInventory: null);
 

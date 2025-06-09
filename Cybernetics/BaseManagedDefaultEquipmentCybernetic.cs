@@ -32,6 +32,8 @@ namespace XRL.World.Parts
             };
             List<object> dontList = new()
             {
+                "getMods",
+                'M',    // Manage
             };
 
             if (what != null && doList.Contains(what))
@@ -228,9 +230,9 @@ namespace XRL.World.Parts
             Debug.Header(4, 
                 $"{typeof(T).Name}", 
                 $"{nameof(OnManageDefaultNaturalEquipment)}" +
-                $"(body)", Toggle: getDoDebug());
+                $"(body)", Toggle: getDoDebug('M'));
             Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", 
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug('M'));
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
@@ -239,7 +241,7 @@ namespace XRL.World.Parts
             Debug.Footer(4,
                 $"{typeof(T).Name}",
                 $"{nameof(OnManageDefaultNaturalEquipment)}" +
-                $"(body of: {Implantee.Blueprint})", Toggle: getDoDebug());
+                $"(body of: {Implantee.Blueprint})", Toggle: getDoDebug('M'));
         }
 
         public virtual List<int> GetImplanteeRegisteredEventIDs()
@@ -358,7 +360,7 @@ namespace XRL.World.Parts
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug("getMods"));
 
             List<ModNaturalEquipment<T>> naturalEquipmentMods = 
                 UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
@@ -381,7 +383,7 @@ namespace XRL.World.Parts
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug('M'));
 
             if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentManager>())
             {

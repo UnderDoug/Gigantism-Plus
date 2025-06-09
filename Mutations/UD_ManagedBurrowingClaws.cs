@@ -27,6 +27,8 @@ namespace XRL.World.Parts.Mutation
             };
             List<object> dontList = new()
             {
+                "getMods",
+                'M',    // Manage
             };
 
             if (what != null && doList.Contains(what))
@@ -297,9 +299,9 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, 
                 $"{nameof(UD_ManagedBurrowingClaws)}", 
                 $"{nameof(OnManageDefaultNaturalEquipment)}(body)", 
-                Toggle: getDoDebug());
+                Toggle: getDoDebug('M'));
             Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", 
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug('M'));
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
@@ -309,7 +311,7 @@ namespace XRL.World.Parts.Mutation
                 $"{nameof(UD_ManagedBurrowingClaws)}",
                 $"{nameof(OnManageDefaultNaturalEquipment)}" +
                 $"(body of: {ParentObject?.Blueprint})", 
-                Toggle: getDoDebug());
+                Toggle: getDoDebug('M'));
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
@@ -339,7 +341,7 @@ namespace XRL.World.Parts.Mutation
                 $"@ {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug("getMods"));
 
             List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentMods = 
                 UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
@@ -362,7 +364,7 @@ namespace XRL.World.Parts.Mutation
                 $"@ {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug('M'));
 
             if (E.Creature == ParentObject)
             {

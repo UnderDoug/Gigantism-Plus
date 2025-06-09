@@ -391,10 +391,10 @@ namespace XRL.World.Parts
                     $"{nameof(HandleEvent)}({typeof(ObjectEnteredCellEvent).Name} E)",
                     Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,
-                    $"E.Object: {Actor.ShortDisplayName} in Cell:{E.Cell.Location}",
+                    $"E.Object: {Actor?.DebugName ?? NULL}",
                     Indent: 1, Toggle: getDoDebug());
                 Debug.Entry(4,
-                    $"Cell:{E.Cell}",
+                    $"Cell: [{E.Cell?.Location}]",
                     Indent: 1, Toggle: getDoDebug());
                 Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
 

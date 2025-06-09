@@ -23,7 +23,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(bool) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool RegrowHorns_AlwaysForce_Prefix(ref Horns __instance, ref bool Force, ref GameObject ___HornsObject, ref string ___Variant)
+        public static bool RegrowHorns_AlwaysForce_Prefix(ref Horns __instance, ref bool Force, ref GameObject ___HornsObject, ref string ___Variant)
         {
             Force = true;
             ___HornsObject = GameObject.Create(___Variant);
@@ -36,7 +36,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(bool) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void RegrowHorns_MaxStrengthBonus_Postfix(ref GameObject ___HornsObject)
+        public static void RegrowHorns_MaxStrengthBonus_Postfix(ref GameObject ___HornsObject)
         {
             MeleeWeapon HornsWeapon = ___HornsObject.GetPart<MeleeWeapon>();
             if (HornsWeapon != null)

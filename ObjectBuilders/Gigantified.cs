@@ -314,6 +314,7 @@ namespace XRL.World.ObjectBuilders
                         }
                         Debug.LoopItem(4, nameof(hasImplants.Implants), hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
                         success = hasImplants.Implants.Contains(addImplant);
+                        exoframeObject?.Obliterate();
                     }
                     else
                     {
@@ -352,7 +353,6 @@ namespace XRL.World.ObjectBuilders
                         $"{nameof(exoframeObject)} is null or lacks {nameof(CyberneticsGiganticExoframe)} part", 
                         Indent: indent + 1);
                 }
-                exoframeObject?.Obliterate();
             }
             else
             {

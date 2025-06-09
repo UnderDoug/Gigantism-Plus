@@ -199,7 +199,7 @@ namespace HNPS_GigantismPlus
 
                     Debug.LoopItem(4,
                         $"{attachedNaturalEquipmentMod.Name}" +
-                        $"[{attachedNaturalEquipmentMod.GetAdjective()}])",
+                        $"[{attachedNaturalEquipmentMod.GetAdjective()}]",
                         Good: naturalEquipmentMods[priority] != null, Indent: indent + 2, Toggle: doDebug);
                 }
             }
@@ -263,8 +263,7 @@ namespace HNPS_GigantismPlus
 
         public static string MaybeColor(this string Text, string Color, bool Pretty = true)
         {
-            if (Pretty && Color != "") return Text.Color(Color);
-            return Text;
+            return (Pretty && Color != "") ? Text.Color(Color) : Text;
         }
 
         public static string OptionalColor(this string Text, string Color, string FallbackColor = "", int Option = 0)
@@ -273,7 +272,12 @@ namespace HNPS_GigantismPlus
             // 2: Vanilla Only
             // 1: Plain Text
             Option = Option == 0 ? Colorfulness : Option;
-            return Text.MaybeColor(Color, Option > 2).MaybeColor(FallbackColor, Option > 1);
+            return Option switch
+            {
+                3 => Text.MaybeColor(Color),
+                2 => Text.MaybeColor(FallbackColor),
+                _ => Text,
+            };
         }
         public static string OptionalColorGigantic(this string Text, int Option = 0)
         {
@@ -1036,6 +1040,21 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<Tombstone>())
                 return "tombstone";
 
+            if (Object.HasPart<NaturalEquipmentManager>())
+            {
+                if (Object.IsPlural && Object.HasPropertyOrTag("DisplayNameSingular"))
+                {
+                    return Object.GetPropertyOrTag("DisplayNameSingular");
+                }
+                return Object.Render.DisplayName switch
+                {
+                    "horns" => "horn",
+                    "quills" => "quill",
+                    "claws" => "claw",
+                    _ => Object.Render.DisplayName
+                };
+            }
+
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {
                 if (missileWeapon.Skill.Contains("Shotgun") 
@@ -1077,21 +1096,6 @@ namespace HNPS_GigantismPlus
 
             if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised() && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
-                if (Object.HasPart<NaturalEquipmentManager>())
-                {
-                    if (Object.IsPlural && Object.HasPropertyOrTag("DisplayNameSingular"))
-                    {
-                        return Object.GetPropertyOrTag("DisplayNameSingular");
-                    }
-                    return Object.Render.DisplayName switch
-                    {
-                        "horns" => "horn",
-                        "quills" => "quill",
-                        "claws" => "claw",
-                        _ => Object.Render.DisplayName
-                    };
-                }
-
                 if (Object.InheritsFrom("BaseCudgel"))
                     return "cudgel";
 

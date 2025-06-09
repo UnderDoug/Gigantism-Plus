@@ -30,10 +30,11 @@ namespace XRL.World.Parts.Mutation
             {
                 'V',    // Vomit
                 'R',    // Register
-                'M',    // Manage
             };
             List<object> dontList = new()
             {
+                "getMods",
+                'M',    // Manage
             };
 
             if (what != null && doList.Contains(what))
@@ -270,7 +271,7 @@ namespace XRL.World.Parts.Mutation
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug("getMods"));
 
             List<ModNaturalEquipment<T>> naturalEquipmentMods = 
                 UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
@@ -293,7 +294,7 @@ namespace XRL.World.Parts.Mutation
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: 0, Toggle: getDoDebug('M'));
 
             if (E.Creature == ParentObject)
             {

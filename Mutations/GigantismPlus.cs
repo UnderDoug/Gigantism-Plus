@@ -188,15 +188,8 @@ namespace XRL.World.Parts.Mutation
 
             static bool cosmeticCondition(GameObject Equipment)
             {
-                int indent = Debug.LastIndent;
-                bool blueprintNotNull = Equipment?.Blueprint != null;
-                bool blueprintIsDefaultFist = blueprintNotNull && Equipment.Blueprint == "DefaultFist";
-
-                Debug.LoopItem(4, $"{nameof(blueprintNotNull)}", $"{blueprintNotNull}", Good: blueprintNotNull, Indent: indent + 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"{nameof(blueprintIsDefaultFist)}", $"{blueprintIsDefaultFist}", Good: blueprintIsDefaultFist, Indent: indent + 1, Toggle: doDebug);
-
-                Debug.LastIndent = indent;
-                return blueprintIsDefaultFist;
+                return Equipment?.Blueprint != null
+                    && Equipment.Blueprint == "DefaultFist";
             };
             giganticFistMod.AddNounAdjustment(true, Condition: cosmeticCondition);
 

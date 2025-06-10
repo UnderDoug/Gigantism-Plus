@@ -53,7 +53,7 @@ namespace XRL.World.Parts
         }
         public bool HandleEvent(BeforeDescribeModificationEvent<ModGigantic> E)
         {
-            if (E.Object == ParentObject && E.Context == "Natural Equipment")
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 int dieCount = GetDamageDieCount();
                 int damageBonus = GetDamageBonus();
@@ -81,8 +81,7 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(DescribeModificationEvent<ModGigantic> E)
         {
-            if (E.Object == ParentObject 
-                && E.Context == "Natural Equipment")
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 E.RemoveWeaponElement("have", "+3 damage");
                 E.RemoveWeaponElement("cleave", "for -3 AV");
@@ -97,7 +96,7 @@ namespace XRL.World.Parts
                 return base.GetInstanceDescription(Object);
             }
             return DescribeModificationEvent<ModGigantic>
-                .Send(Object, GetColoredAdjective(), Context: "Natural Equipment")
+                .Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
                 .Process(PluralizeObject: true);
         }
 

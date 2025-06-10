@@ -42,7 +42,7 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsManagedHandBones>> E)
         {
-            if (Wielder.HasPart<GigantismPlus>())
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT && Wielder.HasPart<GigantismPlus>())
             {
                 E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die count");
             }

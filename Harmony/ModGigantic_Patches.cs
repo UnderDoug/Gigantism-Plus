@@ -110,7 +110,7 @@ namespace HNPS_GigantismPlus.Harmony
             string gigantic = "gigantic";
 
             __result = DescribeModificationEvent<ModGigantic>
-                .Send(Object, gigantic.OptionalColorGiant(Colorfulness))
+                .Send(Object, gigantic.OptionalColorGigantic(Colorfulness))
                 .Process();
 
             return false;

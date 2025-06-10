@@ -64,7 +64,10 @@ public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
 
         // Consider adding a data bucket reader here
 
-        The.Game.HandleEvent(E);
+        if (The.Game != null && The.Game.WantEvent(ID, CascadeLevel))
+        {
+            The.Game.HandleEvent(E);
+        }
 
         List<string> BrightColorStrings = E.BrightColors.IsNullOrEmpty() ? new() : E.BrightColors.Select((string x) => "&" + x).ToList();
         List<string> DarkColorStrings = E.DarkColors.IsNullOrEmpty() ? new() : E.DarkColors.Select((string x) => "&" + x).ToList();

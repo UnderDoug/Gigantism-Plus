@@ -12,12 +12,12 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
 
-[GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
+[GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class BeforeBodyPartsUpdatedEvent : ModPooledEvent<BeforeBodyPartsUpdatedEvent>
 {
     private static bool doDebug => getClassDoDebug(nameof(BeforeBodyPartsUpdatedEvent));
 
-    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
+    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
 
     public static readonly string RegisteredEventID = nameof(BeforeBodyPartsUpdatedEvent);
 

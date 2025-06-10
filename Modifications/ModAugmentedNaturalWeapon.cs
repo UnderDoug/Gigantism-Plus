@@ -46,11 +46,13 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsGiganticExoframe>> E)
         {
-            string cyberneticsObject = AssigningPart?.ImplantObject?.ShortDisplayName;
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                string cyberneticsObject = AssigningPart?.ImplantObject?.ShortDisplayName;
 
-            E.BeforeEvent.ClearDescriptionElements();
-            E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
-
+                E.BeforeEvent.ClearDescriptionElements();
+                E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
+            }
             return base.HandleEvent(E);
         }
 

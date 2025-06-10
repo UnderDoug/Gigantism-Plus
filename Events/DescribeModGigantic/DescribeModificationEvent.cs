@@ -162,7 +162,6 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            BeforeEvent.Reset();
             Reset();
             return Event.FinalizeString(SB);
         }

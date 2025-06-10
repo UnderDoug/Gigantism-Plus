@@ -194,8 +194,8 @@ namespace XRL.World.Parts.Mutation
             giganticFistMod.AddNounAdjustment(true, Condition: cosmeticCondition);
 
             giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: cosmeticCondition);
-            giganticFistMod.AddColorStringAdjustment("&x", true);
-            giganticFistMod.AddTileColorAdjustment("&x", true);
+            giganticFistMod.AddColorStringAdjustment("&Z", true);
+            giganticFistMod.AddTileColorAdjustment("&Z", true);
             giganticFistMod.AddDetailColorAdjustment("z", true);
             return giganticFistMod;
         }
@@ -223,8 +223,8 @@ namespace XRL.World.Parts.Mutation
             };
             giganticNogginMod.AddStatAdjustment("Strength", -100);
 
-            giganticNogginMod.AddColorStringAdjustment("&x", true);
-            giganticNogginMod.AddTileColorAdjustment("&x", true);
+            giganticNogginMod.AddColorStringAdjustment("&Z", true);
+            giganticNogginMod.AddTileColorAdjustment("&Zx", true);
             giganticNogginMod.AddDetailColorAdjustment("z", true);
             return giganticNogginMod;
         }
@@ -252,8 +252,8 @@ namespace XRL.World.Parts.Mutation
             };
             giganticMugMod.AddStatAdjustment("Strength", -100);
 
-            giganticMugMod.AddColorStringAdjustment("&x", true);
-            giganticMugMod.AddTileColorAdjustment("&x", true);
+            giganticMugMod.AddColorStringAdjustment("&Z", true);
+            giganticMugMod.AddTileColorAdjustment("&Z", true);
             giganticMugMod.AddDetailColorAdjustment("z", true);
             return giganticMugMod;
         }
@@ -281,8 +281,8 @@ namespace XRL.World.Parts.Mutation
             };
             giganticBodMod.AddStatAdjustment("Strength", -100);
 
-            giganticBodMod.AddColorStringAdjustment("&x", true);
-            giganticBodMod.AddTileColorAdjustment("&x", true);
+            giganticBodMod.AddColorStringAdjustment("&Z", true);
+            giganticBodMod.AddTileColorAdjustment("&Z", true);
             giganticBodMod.AddDetailColorAdjustment("z", true);
             return giganticBodMod;
         }

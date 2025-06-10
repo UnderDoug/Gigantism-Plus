@@ -632,12 +632,12 @@ namespace XRL.World.Parts
                         $"{ParentObject?.DebugName} Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(ParentObject)}",
                         Good: !TinkeringHelpers.CanBeDisassembled(ParentObject), Indent: 1, Toggle: getDoDebug(nameof(AfterBodyPartsUpdatedEvent)));
 
-                    BeforeManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this);
+                    BeforeManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this).Reset();
                     if (ManageDefaultNaturalEquipmentEvent.CheckFor(ParentObject, Wielder, ParentLimb, this))
                     {
                         ManageNaturalEquipment(GetNaturalEquipmentMods());
                     }
-                    AfterManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this);
+                    AfterManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this).Reset();
                 }
             }
 

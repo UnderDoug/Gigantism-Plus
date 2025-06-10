@@ -20,6 +20,8 @@ namespace HNPS_GigantismPlus
     {
         private static bool doDebug => getClassDoDebug("IDescribeModificationEvent");
 
+        public new static readonly int CascadeLevel = CASCADE_ALL;
+
         public static string RegisteredEventID => typeof(T).Name;
 
         public GameObject Object;
@@ -55,8 +57,6 @@ namespace HNPS_GigantismPlus
         }
         public T Send()
         {
-            int indent = Debug.LastIndent;
-
             bool haveGame = The.Game != null;
             bool haveObject = Object != null;
 
@@ -95,8 +95,6 @@ namespace HNPS_GigantismPlus
                     GeneralDescriptions = @event.GetParameter(nameof(GeneralDescriptions)) as List<DescriptionElement>;
                 }
             }
-
-            Debug.LastIndent = indent;
             return (T)this;
         }
 

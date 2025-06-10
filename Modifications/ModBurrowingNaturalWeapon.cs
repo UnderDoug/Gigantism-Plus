@@ -43,22 +43,24 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<UD_ManagedBurrowingClaws>> E)
         {
-            int wallBonusPenetration = UD_ManagedBurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
-            int wallHitsRequired = UD_ManagedBurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                int wallBonusPenetration = UD_ManagedBurrowingClaws.GetWallBonusPenetration(AssigningPart.Level);
+                int wallHitsRequired = UD_ManagedBurrowingClaws.GetWallHitsRequired(AssigningPart.Level, Wielder);
 
-            if (wallBonusPenetration != 0)
-            {
-                E.BeforeEvent.AddWeaponElement("get", $"{wallBonusPenetration.Signed()} penetration vs. walls");
+                if (wallBonusPenetration != 0)
+                {
+                    E.BeforeEvent.AddWeaponElement("get", $"{wallBonusPenetration.Signed()} penetration vs. walls");
+                }
+                if (wallHitsRequired != 0)
+                {
+                    E.AddGeneralElement("destroy", $"walls after {wallHitsRequired} penetrating hits");
+                }
+                if (AssigningPart.HasGigantism && !(AssigningPart.HasElongated || AssigningPart.HasCrystallinity))
+                {
+                    E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
+                }
             }
-            if (wallHitsRequired != 0)
-            {
-                E.AddGeneralElement("destroy", $"walls after {wallHitsRequired} penetrating hits");
-            }
-            if (AssigningPart.HasGigantism && !(AssigningPart.HasElongated || AssigningPart.HasCrystallinity))
-            {
-                E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
-            }
-
             return base.HandleEvent(E);
         }
     } //!-- public class ModBurrowingNaturalWeapon : ModNaturalWeaponBase<UD_ManagedBurrowingClaws>

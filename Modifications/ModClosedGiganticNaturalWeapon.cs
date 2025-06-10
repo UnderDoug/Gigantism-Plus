@@ -36,7 +36,7 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>> E)
         {
-            if (E.Adjective == GetColoredAdjective())
+            if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 E.BeforeEvent.ClearDescriptionElements();
 

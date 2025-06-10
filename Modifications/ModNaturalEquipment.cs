@@ -209,7 +209,7 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<T>> E)
         {
-            if (E.Adjective == GetColoredAdjective())
+            if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 int dieCount = GetDamageDieCount();
                 int dieSize = GetDamageDieSize();
@@ -256,7 +256,7 @@ namespace XRL.World.Parts
         public override string GetInstanceDescription(GameObject Object = null)
         {
             return DescribeModificationEvent<ModNaturalEquipment<T>>
-                .Send(Object, GetColoredAdjective(), Context: "Natural Equipment")
+                .Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
                 .Process();
         }
         

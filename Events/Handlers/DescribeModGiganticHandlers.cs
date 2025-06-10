@@ -120,7 +120,7 @@ namespace HNPS_GigantismPlus
             }
             if (Object.HasPart<Bed>())
             {
-                E.AddWeaponElement("support", "gigantic sleepers");
+                E.AddGeneralElement("support", "gigantic sleepers");
             }
 
             if (Object.LiquidVolume != null)
@@ -177,7 +177,7 @@ namespace HNPS_GigantismPlus
                 E.AddGeneralElement("inspire", "awe with its immensity");
             }
 
-            if (Object.HasTagOrProperty("Wall"))
+            if (Object.HasTagOrProperty("Wall") || Object.HasTagOrProperty("Door"))
             {
                 E.AddGeneralElement("stand", "much taller than usual");
             }

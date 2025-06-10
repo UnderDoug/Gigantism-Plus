@@ -37,8 +37,12 @@ namespace XRL.World.Parts.Mutation
 
         private static string[] AffectedSlotTypes => new string[3] { "Hand", "Hands", "Missile Weapon" };
 
+        public static string SCALE_STAT => "Agility";
+        public int ScaleStatModifier => ParentObject.StatMod(SCALE_STAT);
         public int StrengthModifier => ParentObject.StatMod("Strength");
         public int AgilityModifier => ParentObject.StatMod("Agility");
+
+        private int StatChangeEventAttempts = 0; // This is in case UpdateBodyParts results in a stat change that causes a loop.
 
         public ElongatedPaws()
         {
@@ -79,8 +83,8 @@ namespace XRL.World.Parts.Mutation
             elongatedNaturalWeaponMod.AddNounAdjustment(true, Condition: cosmeticCondition);
 
             elongatedNaturalWeaponMod.AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: cosmeticCondition);
-            elongatedNaturalWeaponMod.AddColorStringAdjustment("&x", true);
-            elongatedNaturalWeaponMod.AddTileColorAdjustment("&x", true);
+            elongatedNaturalWeaponMod.AddColorStringAdjustment("&Z", true);
+            elongatedNaturalWeaponMod.AddTileColorAdjustment("&Z", true);
             elongatedNaturalWeaponMod.AddDetailColorAdjustment("z", true);
             return elongatedNaturalWeaponMod;
         }
@@ -104,9 +108,9 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponPenBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
-            return (int)Math.Floor(AgilityModifier / 2.0);
+            return (int)Math.Floor(ScaleStatModifier / 2.0);
         }
 
         public override bool CanLevel() { return false; }
@@ -131,12 +135,22 @@ namespace XRL.World.Parts.Mutation
         {
             return "";
         }
-        
+
+        public override void TurnTick(long TimeTick, int Amount)
+        {
+            StatChangeEventAttempts = 0;
+
+            base.TurnTick(TimeTick, Amount);
+        }
+        public override bool WantTurnTick()
+        {
+            return true;
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == StatChangeEvent.ID;
+                || (StatChangeEventAttempts < 3 && ID == StatChangeEvent.ID);
         }
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
@@ -148,14 +162,13 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(StatChangeEvent E)
         {
-            if (E.Name == "Strength") // || E.Name == "Agility")
+            if (E.Name == SCALE_STAT && StatChangeEventAttempts < 3)
             {
                 Body body = E.Object?.Body;
 
                 if (body != null && NaturalEquipmentMod != null)
                 {
-                    NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-
+                    StatChangeEventAttempts++;
                     body.UpdateBodyParts();
 
                     foreach (GameObject equipped in body.GetEquippedObjects())
@@ -224,5 +237,4 @@ namespace XRL.World.Parts.Mutation
         }
 
     } //!-- public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
-
 }

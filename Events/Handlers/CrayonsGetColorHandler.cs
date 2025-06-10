@@ -28,9 +28,9 @@ namespace HNPS_GigantismPlus
         public bool HandleEvent(CrayonsGetColorsEvent E)
         {
             if (!E.BrightColors.Contains("z")) E.BrightColors.Add("z");
-            if (!E.BrightColors.Contains("x")) E.BrightColors.Add("x");
+            // if (!E.BrightColors.Contains("x")) E.BrightColors.Add("x");
             if (!E.DarkColors.Contains("Z")) E.DarkColors.Add("Z");
-            if (!E.DarkColors.Contains("X")) E.DarkColors.Add("X");
+            // if (!E.DarkColors.Contains("X")) E.DarkColors.Add("X");
             return true;
         }
     } //!-- public class CrayonsGetColorHandler : IEventHandler, IModEventHandler<CrayonsGetColorsEvent>

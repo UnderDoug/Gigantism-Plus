@@ -47,6 +47,8 @@ namespace HNPS_GigantismPlus
         public const string NATEQUIPMANAGER_STRINGPROP_PRIORITY = "NaturalEquipmentManager::StringProp:Priority";
         public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentManager::IntProp:Priority";
 
+        public const string NATURAL_EQUIPMENT = "Natural Equipment";
+
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
 
         public const string GIGANTISMPLUS_COLORCHANGE_PROP = "GigantismPlusColorChange";

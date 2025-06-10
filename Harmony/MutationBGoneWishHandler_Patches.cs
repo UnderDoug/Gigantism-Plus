@@ -9,6 +9,7 @@ using XRL.World;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -17,24 +18,27 @@ namespace HNPS_GigantismPlus.Harmony
     [HarmonyPatch]
     public static class MutationBGoneWishHandler_Patches
     {
-        [HarmonyPrefix]
+        private static bool doDebug => getClassDoDebug(nameof(MutationBGoneWishHandler_Patches));
+
         [HarmonyPatch(
             declaringType: typeof(MutationBGoneWishHandler),
             methodName: nameof(MutationBGoneWishHandler.MutationBGone),
             argumentTypes: new Type[] { typeof(string) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
-        static bool MutationBGone_WorkOnEntryName_Prefix(string argument)
+        [HarmonyPrefix]
+        public static bool MutationBGone_WorkOnEntryName_Prefix(ref bool __result, string argument)
         {
             Debug.Entry(4,
                 $"# {nameof(MutationBGoneWishHandler_Patches)}." +
                 $"{nameof(MutationBGone_WorkOnEntryName_Prefix)}(string argument: {argument})",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
-            Mutations mutations = The.Player.GetPart<Mutations>();
-            BaseMutation mutation = mutations.GetMutationByName(argument);
-            if (mutation != null)
+            Mutations mutations = MutationBGoneWishHandler.GetMutations();
+            BaseMutation baseMutation = mutations.GetMutationByName(argument);
+            if (baseMutation != null)
             {
-                argument = mutation.Name;
+                MutationBGoneWishHandler.RemoveMutation(mutations, baseMutation);
+                __result = true;
                 return false;
             }
             return true;

@@ -5,14 +5,18 @@ using XRL.Language;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using UnityEngine.UIElements;
 
 namespace XRL.World.Parts
 {
     [Serializable]
     public class ModAugmentedNaturalWeapon : ModNaturalEquipment<CyberneticsGiganticExoframe>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModAugmentedNaturalWeapon));
+
         public ModAugmentedNaturalWeapon()
         {
         }
@@ -30,26 +34,48 @@ namespace XRL.World.Parts
             }
             base.ApplyModification(Object);
         }
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
 
         public override string GetColoredAdjective()
         {
-            return AssigningPart?.GetNaturalEquipmentColoredAdjective() ?? base.GetColoredAdjective();
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness) ?? base.GetColoredAdjective();
+        }
+        public override string GetAdjective()
+        {
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1).Strip() ?? base.GetAdjective();
         }
 
-        public override string GetInstanceDescription()
+        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsGiganticExoframe>> E)
         {
-            string cyberneticsObject = AssigningPart.ImplantObject.ShortDisplayName;
-            string text = ParentObject.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(AssigningPart.GetNaturalEquipmentColoredAdjective());
-            string description = $"{descriptionName}: ";
-            description += $"{(ParentObject.IsPlural ? ("These " + Grammar.Pluralize(text) + " have ") : ("This " + text + " has "))} ";
-            description += $"some of its bonuses applied by an implanted {cyberneticsObject}.";
-            return description;
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                string cyberneticsObject = AssigningPart?.ImplantObject?.ShortDisplayName;
+
+                E.BeforeEvent.ClearDescriptionElements();
+                E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
+            }
+            return base.HandleEvent(E);
+        }
+
+        public override bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
+        {
+            if (E.NaturalEquipmentMod == nameof(ModClosedGiganticNaturalWeapon) && E.Target == RENDER && E.Field == "Tile")
+            {
+                Debug.Entry(4, $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {E.Field} Adjustment", 
+                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
+                Debug.LastIndent--;
+
+                foreach (PartAdjustment adjustment in Adjustments)
+                {
+                    if (adjustment.Field == E.Field && adjustment.Target == E.Target)
+                    {
+                        if (adjustment.CheckCondition(E.Equipment))
+                        {
+                            E.Value = adjustment.Value;
+                        }
+                    }
+                }
+            }
+            return base.HandleEvent(E);
         }
     } //!-- public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>
 }

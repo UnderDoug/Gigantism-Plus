@@ -1,17 +1,17 @@
-﻿using System;
-using SerializeField = UnityEngine.SerializeField;
-
+﻿using HNPS_GigantismPlus;
+using System;
+using System.Collections.Generic;
+using XRL.Language;
+using XRL.Rules;
 using XRL.UI;
+using XRL.Wish;
 using XRL.World.Parts.Mutation;
 using XRL.World.Skills.Cooking;
-using XRL.Wish;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Options;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
-using XRL.Language;
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
@@ -19,6 +19,26 @@ namespace XRL.World.Parts
     [Serializable]
     public class StewBelly : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(StewBelly));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         [SerializeField]
         private int _Stews;
         public int Stews // total number of times SeriouslyThickStew has been consumed.
@@ -36,6 +56,7 @@ namespace XRL.World.Parts
                 this.Hankering = Hankering;
             }
         }
+        public bool StartingStewsPocessed { get; private set; }
 
         [SerializeField]
         private int _Gains;
@@ -44,6 +65,7 @@ namespace XRL.World.Parts
             get => _Gains;
             private set => _Gains = Math.Max(0, value);
         }
+        public Guid mutationMod = Guid.Empty;
 
         [SerializeField]
         private int _StartingHankering;
@@ -65,11 +87,8 @@ namespace XRL.World.Parts
             private set => _Hankering = Math.Max(0, value);
         }
 
-        public Guid mutationMod = Guid.Empty;
-
         public bool Grumble;
         public int TurnsTillGrumble;
-        public bool StartingStewsPocessed { get; private set; }
 
         public StewBelly()
         {
@@ -217,19 +236,29 @@ namespace XRL.World.Parts
         public bool ProcessStartingStews()
         {
             bool did = false;
-            if (int.TryParse(ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0"), out int startingSews))
+            string StartingStewsProperty = ParentObject.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "0");
+            int StartingStews = 0;
+
+            DieRoll startingStewsDie = new(StartingStewsProperty);
+            if (startingStewsDie != null)
             {
-                if (Stews < startingSews)
-                    Stews += startingSews;
+                StartingStews = Math.Max(0,startingStewsDie.Resolve());
+            }
+            if (StartingStews > 0)
+            {
+                if (Stews < StartingStews)
+                {
+                    Stews += StartingStews;
+                }
                 did = true;
             }
-            StartingStewsPocessed = Stews >= startingSews;
+            StartingStewsPocessed = Stews >= StartingStews;
             return StartingStewsPocessed && did;
         }
 
         public int GetTurnsTillGrumble()
         {
-            return RndGP.Next(1200, 8000);
+            return Stat.Roll(1200, 8000);
         }
 
         public override bool WantEvent(int ID, int cascade)
@@ -237,7 +266,7 @@ namespace XRL.World.Parts
             return base.WantEvent(ID, cascade)
                 || ID == EndTurnEvent.ID
                 || ID == GetShortDescriptionEvent.ID
-                || ((!StartingStewsPocessed || Stews <= 0) && ID == ObjectEnteredCellEvent.ID);
+                || ((!StartingStewsPocessed || Stews <= 0) && ID == EnteredCellEvent.ID);
         }
         public override bool HandleEvent(EndTurnEvent E)
         {
@@ -265,16 +294,16 @@ namespace XRL.World.Parts
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
             Debug.Entry(4,
-                $"{nameof(StewBelly)}" + 
+                $"{nameof(StewBelly)}." + 
                 $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
                 Indent: 0);
 
-            Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1);
-            Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1);
-            Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1);
-            Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1);
-            Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1);
-            Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1);
+            Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1, Toggle: getDoDebug());
 
             if (Stews > 0)
             {
@@ -290,7 +319,7 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-        public override bool HandleEvent(ObjectEnteredCellEvent E)
+        public override bool HandleEvent(EnteredCellEvent E)
         {
             ProcessStartingStews();
             return base.HandleEvent(E);

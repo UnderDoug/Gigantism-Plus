@@ -6,6 +6,7 @@ using XRL.UI;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -16,6 +17,26 @@ namespace XRL.World.Parts
     [Serializable]
     public class WrassleGear : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(WrassleGear));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         [SerializeField]
         private Guid _WrassleID;
 
@@ -130,6 +151,10 @@ namespace XRL.World.Parts
         }
         private bool DetailColorIsBright => _DetailColor != null && DetailColor.Any(char.IsUpper);
 
+        // TopLeft, Left, Right, BottomRight
+        public string EquipmentFrameColor => $"{TileColor}{DetailColor}{TileColor}{DetailColor}";
+        public bool ColorEquipmentFrame;
+
         public WrassleGear()
         {
             WrassleID = Guid.NewGuid();
@@ -138,15 +163,16 @@ namespace XRL.World.Parts
             RandomizeTile = false;
             FillTileBag();
             ColorBag = NewColorBag();
+            ColorEquipmentFrame = true;
         }
 
         public override void Attach()
         {
-            base.Attach();
             if (ParentObject.TryGetPart(out MeleeWeapon meleeWeapon))
             {
                 MeleeWeaponCopy = meleeWeapon.DeepCopy(ParentObject) as MeleeWeapon;
             }
+            base.Attach();
         }
 
         public static Dictionary<string, List<string>> NewColorBag()
@@ -200,10 +226,25 @@ namespace XRL.World.Parts
             if (ParentObject != null && ParentObject.TryGetPart(out Render render))
             {
                 if (doTile && RandomizeTile && !Tile.IsNullOrEmpty())
+                {
                     render.Tile = Tile;
-                if (doTileColor) render.TileColor = $"&{TileColor}";
-                if (doDetailColor) render.DetailColor = DetailColor;
-                if (doColorString) render.ColorString = $"&{TileColor}";
+                }
+                if (doTileColor)
+                {
+                    render.TileColor = $"&{TileColor}";
+                }
+                if (doDetailColor)
+                {
+                    render.DetailColor = DetailColor;
+                }
+                if (doColorString)
+                {
+                    render.ColorString = $"&{TileColor}";
+                }
+                if (ColorEquipmentFrame)
+                {
+                    ParentObject.SetEquipmentFrameColors(EquipmentFrameColor);
+                }
             }
         }
 
@@ -243,10 +284,10 @@ namespace XRL.World.Parts
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " + 
                     $"TileColor: &&{TileColor.Quote().Color("Y")}, DetailColor: {DetailColor.Quote().Color("Y")}",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"Tile: {Tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
 
                 ApplyFlair();
             }
@@ -266,7 +307,7 @@ namespace XRL.World.Parts
                         $"E.Item: [{Item.ID}:{Item.ShortDisplayNameStripped}] " +
                         $"E.Actor: [{Actor.ID}:{Actor.ShortDisplayNameStripped}]" +
                         $") WrassleID: {WrassleID}",
-                        Indent: 0);
+                        Indent: 0, Toggle: getDoDebug());
 
                     if (Actor.IsPlayer() && Item.TryGetPart(out Examiner examiner) && !(wrassler.KnowsChairs = Actor.Understood(examiner)))
                     {
@@ -344,7 +385,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"x {typeof(WrassleGear).Name}." 
                     + $"{nameof(HandleEvent)}({typeof(GetKineticResistanceEvent).Name} " 
-                    + $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
+                    + $"E.Object: [{Object.ManagerID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
                     Indent: 0);
                 */
                 return false;
@@ -357,18 +398,51 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(4, 
                     $"{typeof(WrassleGear).Name}." + 
-                    $"{nameof(FireEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
-                    Indent: 0);
+                    $"{nameof(HandleEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
+                    Indent: 0, Toggle: getDoDebug());
                 Damage damage = E.Damage;
                 GameObject attacker = E.Source;
 
-                Debug.Entry(4, $"Source: {attacker?.DebugName ?? "null"}", Indent: 1);
-                Debug.Entry(4, $"Damage Before: {damage.GetDebugInfo()}", Indent: 1);
-                if (damage != null && (damage.Attributes.Contains("Concussion") || E.Indirect) || E.Source.HasPart<Wrassler>())
+                bool haveDamage = damage != null;
+
+                bool sourceIsWrassler =
+                    E.Source != null
+                 && E.Source.HasPart<Wrassler>();
+
+                bool isRopes = E.Object.InheritsFrom("WrassleRingRopes");
+
+                bool isChair = E.Object.InheritsFrom("FoldingChair");
+
+                bool ropesSpecialCase =
+                    isRopes
+                 && damage.Attributes.Contains("Concussion")
+                 || (E.Indirect && sourceIsWrassler);
+
+                bool chairSpecialCase =
+                    isChair
+                 && (damage.Attributes.Contains("Concussion") || E.Indirect) 
+                 && sourceIsWrassler;
+
+                bool notJostled =
+                    haveDamage
+                 && !damage.Attributes.Contains("Jostle");
+
+                bool isAccidental =
+                    haveDamage
+                 && !(isChair || isRopes)
+                 && (E.Indirect || (damage.Attributes.Contains("Concussion") && sourceIsWrassler));
+
+                bool blockDamage =
+                    notJostled
+                 && (ropesSpecialCase || chairSpecialCase || isAccidental);
+
+                Debug.Entry(4, $"Source: {attacker?.DebugName ?? "null"}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"Damage Before: {damage.GetDebugInfo()}", Indent: 1, Toggle: getDoDebug());
+                if (blockDamage)
                 {
                     damage = new(0);
                 }
-                Debug.Entry(4, $"Damage  After: {damage.GetDebugInfo()}", Indent: 1);
+                Debug.Entry(4, $"Damage  After: {damage.GetDebugInfo()}", Indent: 1, Toggle: getDoDebug());
                 return false;
             }
             return base.HandleEvent(E);
@@ -382,7 +456,9 @@ namespace XRL.World.Parts
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
+            bool forWeapon = E.ID == "AdjustWeaponScore";
+            bool forArmor = E.ID == "AdjustArmorScore";
+            if (forWeapon || forArmor)
             {
                 GameObject User = E.GetGameObjectParameter("User");
                 int Score = E.GetIntParameter("Score");
@@ -391,7 +467,14 @@ namespace XRL.World.Parts
                     Score = Math.Max(100, Score);
                     if (wrassler.WrassleID == WrassleID)
                     {
+                        ParentObject.SetIntProperty("AlwaysEquipAsWeapon", 1);
+                        ParentObject.SetIntProperty("AlwaysEquipAsArmor", 1);
                         Score = Math.Max(150, Score + 50);
+                    }
+                    else
+                    {
+                        ParentObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
+                        ParentObject.SetIntProperty("AlwaysEquipAsArmor", 0, true);
                     }
                 }
                 E.SetParameter("Score", Score);
@@ -414,14 +497,12 @@ namespace XRL.World.Parts
             base.Read(Basis, Reader);
             _WrassleID = Reader.ReadGuid();
         }
-        /*
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             WrassleGear wrassleGear = base.DeepCopy(Parent, MapInv) as WrassleGear;
-            wrassleGear._WrassleID = Guid.NewGuid();
+            // wrassleGear._WrassleID = Guid.NewGuid();
             return wrassleGear;
         }
-        */
 
     } //!-- public class Source : IScribedPart
 }

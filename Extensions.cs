@@ -1,5 +1,4 @@
-﻿using Genkit;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -7,42 +6,77 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+using Genkit;
+
 using XRL;
+using XRL.UI;
 using XRL.Rules;
+using XRL.Language;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Capabilities;
 using XRL.World.Parts;
+using XRL.World.Parts.Skill;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
-using XRL.World.Parts.Skill;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using XRL.UI;
-using Microsoft.CodeAnalysis;
 
 namespace HNPS_GigantismPlus
 {
     public static class Extensions
     {
-        // checks if part is managed externally
-        public static bool IsExternallyManagedLimb(this BodyPart part)  // Renamed method
+        private static bool doDebug => true;
+        public static bool getDoDebug(string MethodName)
         {
-            if (part?.Manager == null) return false;
+            if (MethodName == nameof(GigantifyInventory))
+                return true;
+
+            if (MethodName == nameof(CheckEquipmentSlots))
+                return false;
+
+            if (MethodName == nameof(TagIsIncludedOrNotExcluded))
+                return false;
+
+            if (MethodName == nameof(MakeIncludeExclude))
+                return false;
+
+            if (MethodName == nameof(PullInsideFromEdges))
+                return false;
+
+            if (MethodName == nameof(PullInsideFromEdge))
+                return false;
+
+            if (MethodName == nameof(GetNumberedTileVariants))
+                return false;
+
+            return doDebug;
+        }
+
+        // checks if BodyPart is managed externally
+        public static bool IsExternallyManagedLimb(this BodyPart BodyPart)  // Renamed method
+        {
+            if (BodyPart?.Manager == null) return false;
+
+            GameObject Creature = BodyPart.ParentBody.ParentObject;
+
+            if (Creature == null) return false;
 
             // Check for HelpingHands or AgolgotChord managed parts
-            if (part.Manager.EndsWith("::HelpingHands") || part.Manager.EndsWith("::AgolgotChord"))
+            if (BodyPart.Manager.EndsWith("::HelpingHands") || BodyPart.Manager.EndsWith("::AgolgotsChord"))
                 return true;
 
             // Check for Nephal claws (Agolgot parts that don't use the manager)
-            if (!string.IsNullOrEmpty(part.DefaultBehaviorBlueprint) &&
-                part.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
+            if (!Creature.InheritsFrom("BaseNephal") 
+             && !BodyPart.DefaultBehaviorBlueprint.IsNullOrEmpty() 
+             && BodyPart.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
                 return true;
 
             return false;
-        } //!-- public static bool IsExternallyManagedLimb(BodyPart part)
+        } //!-- public static bool IsExternallyManagedLimb(BodyPart BodyPart)
 
         public static int GetDieCount(this DieRoll DieRoll)
         {
@@ -50,14 +84,15 @@ namespace HNPS_GigantismPlus
             {
                 return 0;
             }
+            if (DieRoll.Left != null)
+            {
+                return DieRoll.Left.GetDieCount();
+            }
             if (DieRoll.LeftValue > 0)
             {
                 return DieRoll.LeftValue;
             }
-            else
-            {
-                return DieRoll.Left.GetDieCount();
-            }
+            return 0;
         }
         public static int GetDieCount(this string DieRoll)
         {
@@ -105,14 +140,81 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static int GetNaturalWeaponModsCount(this GameObject GO)
+        public static int GetNaturalEquipmentModsCount(this GameObject GO)
         {
             List<ModNaturalEquipmentBase> naturalEquipmentMods = GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
             return naturalEquipmentMods.Count;
         }
-        public static bool HasNaturalWeaponMods(this GameObject GO)
+        public static bool HasNaturalEquipmentMods(this GameObject GO)
         {
             return GO.HasPartDescendedFrom<ModNaturalEquipmentBase>();
+        }
+        public static List<ModNaturalEquipmentBase> GetNaturalEquipmentMods(this GameObject GO)
+        {
+            return GO.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
+        }
+        public static SortedDictionary<int, ModNaturalEquipmentBase> GetPrioritisedNaturalEquipmentMods(this GameObject Equipment, bool ForDescriptions = false)
+        {
+            int indent = Debug.LastIndent;
+
+            Debug.Entry(4,
+                $"* {nameof(GetPrioritisedNaturalEquipmentMods)}"
+                + $"(ForDescriptions: {ForDescriptions})",
+                Indent: indent + 1, Toggle: doDebug);
+
+            string label = ForDescriptions
+                ? "Descriptions"
+                : "EquipmentMods"
+                ;
+
+            Debug.Entry(4, $"{label}:", Indent: indent + 1, Toggle: doDebug);
+
+            List<ModNaturalEquipmentBase> naturalEquipmentModList = Equipment?.GetPartsDescendedFrom<ModNaturalEquipmentBase>();
+            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = new();
+            if(Equipment != null && !naturalEquipmentModList.IsNullOrEmpty())
+            {
+                foreach (ModNaturalEquipmentBase attachedNaturalEquipmentMod in naturalEquipmentModList)
+                {
+                    int priority = ForDescriptions
+                        ? attachedNaturalEquipmentMod.DescriptionPriority
+                        : attachedNaturalEquipmentMod.ModPriority
+                        ;
+                    string priorityString = ForDescriptions
+                        ? nameof(attachedNaturalEquipmentMod.DescriptionPriority)
+                        : nameof(attachedNaturalEquipmentMod.ModPriority)
+                        ;
+
+                    if (naturalEquipmentMods.ContainsKey(priority))
+                    {
+                        Debug.Warn(2,
+                            $"{nameof(Extensions)}",
+                            $"{nameof(GetPrioritisedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                            $"[{priority}]" +
+                            $"{naturalEquipmentMods[priority]} " +
+                            $"in {nameof(naturalEquipmentMods)} overwritten: Same {priorityString}",
+                            Indent: indent + 2);
+                    }
+
+                    naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
+
+                    Debug.LoopItem(4,
+                        $"{attachedNaturalEquipmentMod.Name}" +
+                        $"[{attachedNaturalEquipmentMod.GetAdjective()}]",
+                        Good: naturalEquipmentMods[priority] != null, Indent: indent + 2, Toggle: doDebug);
+                }
+            }
+            else
+            {
+                Debug.Warn(2,
+                    $"{nameof(Extensions)}",
+                    $"{nameof(GetPrioritisedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                    $"{nameof(Equipment)} {Equipment?.DebugName ?? NULL} has no {nameof(naturalEquipmentMods)} when it was expected {Equipment?.it ?? "it"} would",
+                    Indent: indent + 2);
+            }
+
+            Debug.LastIndent = indent;
+
+            return naturalEquipmentMods;
         }
 
         public static string BonusOrPenalty(this int Int) 
@@ -129,45 +231,68 @@ namespace HNPS_GigantismPlus
                 $"SignedInt must be capable of conversion to int.");
         }
 
-        public static StringBuilder AppendGigantic(this StringBuilder sb, string value)
+        public static StringBuilder AppendGigantic(this StringBuilder SB, string String)
         {
-            sb.AppendColored("gigantic", value);
-            return sb;
+            SB.AppendColored("gigantic", String);
+            return SB;
         }
-        public static StringBuilder AppendRule(this StringBuilder sb, string value)
+        public static StringBuilder AppendRule(this StringBuilder SB, string String)
         {
             // different from AppendRules (plural) since this doesn't force a new-line.
-            sb.AppendColored("rules", value);
-            return sb;
+            SB.AppendColored("rules", String);
+            return SB;
+        }
+        public static StringBuilder AppendPens(this StringBuilder SB, string String = "")
+        {
+            SB.AppendColored("c", "\u001a");
+            if (!String.IsNullOrEmpty())
+            {
+                SB.Append(String);
+            }
+            return SB;
+        }
+        public static StringBuilder AppendDamage(this StringBuilder SB, string String = "")
+        {
+            SB.AppendColored("r", "\u0003");
+            if (!String.IsNullOrEmpty())
+            {
+                SB.Append(String);
+            }
+            return SB;
         }
 
         public static string MaybeColor(this string Text, string Color, bool Pretty = true)
         {
-            if (Pretty && Color != "") return Text.Color(Color);
-            return Text;
+            return (Pretty && Color != "") ? Text.Color(Color) : Text;
         }
 
-        public static string OptionalColor(this string Text, string Color, string FallbackColor = "", int Option = 3)
+        public static string OptionalColor(this string Text, string Color, string FallbackColor = "", int Option = 0)
         {
             // 3: Most Colorful
             // 2: Vanilla Only
             // 1: Plain Text
-            return Text.MaybeColor(Color, Option > 2).MaybeColor(FallbackColor, Option > 1);
+            Option = Option == 0 ? Colorfulness : Option;
+            return Option switch
+            {
+                3 => Text.MaybeColor(Color),
+                2 => Text.MaybeColor(FallbackColor),
+                _ => Text,
+            };
         }
-        public static string OptionalColorGigantic(this string Text, int Option = 3)
+        public static string OptionalColorGigantic(this string Text, int Option = 0)
         {
             return Text.OptionalColor(Color: "gigantic", FallbackColor: "w", Option);
         }
-        public static string OptionalColorYuge(this string Text, int Option = 3)
+        public static string OptionalColorYuge(this string Text, int Option = 0)
         {
             return Text.OptionalColor(Color: "yuge", FallbackColor: "w", Option);
         }
-        public static string OptionalColorGiant(this string Text, int Option = 3)
+        public static string OptionalColorGiant(this string Text, int Option = 0)
         {
             return Text.OptionalColor(Color: "giant", FallbackColor: "w", Option);
         }
 
-        // ripped from the CyberneticPropertyModifier part, converted into extension.
+        // ripped from the CyberneticPropertyModifier BodyPart, converted into extension.
         // Props must equal "string:int;string:int;string:int" where
         // string   is an IntProperty
         // int      is the value
@@ -324,7 +449,9 @@ namespace HNPS_GigantismPlus
 
         public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false, bool Wish = false, bool Force = false)
         {
-            string creatureBlueprint = Creature.Blueprint;
+            if (Creature == null) return; // need to have a creature.
+
+            string creatureBlueprint = Creature?.Blueprint;
 
             bool creatureIsMerchant = Creature.HasPart<GenericInventoryRestocker>();
             (DieRoll die, int high) merchantBaseChance = (new("1d5"), 4);
@@ -338,8 +465,8 @@ namespace HNPS_GigantismPlus
             if (!Creature.IsCreature && !Force) return; // skip non-creatures
             if (Creature.Inventory == null) return; // skip creatures without inventory
 
-            Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}, Force: {Force})", Indent: 1);
-            Debug.Divider(3, Indent: 1);
+            Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}, Force: {Force})", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+            Debug.Divider(3, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
 
             if (Force)
             {
@@ -347,193 +474,211 @@ namespace HNPS_GigantismPlus
                 GrenadeOption = Force;
             }
 
-            Debug.Entry(3, "Making inventory items gigantic for creature", creatureBlueprint, Indent: 1);
-            Debug.Entry(3, $"Creature is merchant", creatureIsMerchant ? "Yeh" : "Nah", Indent: 1);
+            Debug.Entry(3, "Making inventory items gigantic for creature", creatureBlueprint, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+            Debug.Entry(3, $"Creature is merchant", creatureIsMerchant ? "Yeh" : "Nah", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
 
             // Create a copy of the items list to avoid modifying during enumeration
             List<GameObject> itemsToProcess = new(Creature.GetInventoryAndEquipment());
 
-            Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)", Indent: 1);
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
-            foreach (GameObject item in itemsToProcess)
+            if (!itemsToProcess.IsNullOrEmpty())
             {
-                string ItemDebug = item.DebugName;
-                string ItemName = item.Blueprint;
-                Debug.DiveIn(3, $"{ItemDebug}", Indent: 1);
-                int NoThanks = 0;
-                // Can the item have the gigantic modifier applied?
-                if (ItemModding.ModificationApplicable("ModGigantic", item))
+                Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                foreach (GameObject item in itemsToProcess)
                 {
-                    Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 2);
-                    // Is the item already gigantic? Don't attempt to apply it again.
-                    if (item.HasPart<ModGigantic>())
+                    string ItemDebug = item.DebugName;
+                    string ItemName = item.Blueprint;
+                    Debug.DiveIn(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                    int NoThanks = 0;
+                    // Can the item have the gigantic modifier applied?
+                    if (ItemModding.ModificationApplicable("ModGigantic", item))
                     {
-                        Debug.CheckNah(4, "already gigantic", "NoThanks++; x/", Indent: 2);
-                        NoThanks++;
-                    }
-                    else
-                    {
-                        Debug.CheckYeh(4, "not already gigantic", Indent: 2);
-                    }
-
-                    // Is the item a grenade, and is the option not set to include them?
-                    if (item.HasTag("Grenade"))
-                    {
-                        if (!GrenadeOption || creatureIsMerchant)
+                        Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        // Is the item already gigantic? Don't attempt to apply it again.
+                        if (item.HasPart<ModGigantic>())
                         {
-                            if (!GrenadeOption)
-                            { 
-                                Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 2); 
-                                NoThanks++; 
-                            }
-                            if (creatureIsMerchant) 
-                            { 
-                                Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 2); 
-                                NoThanks++; 
-                            }
+                            Debug.CheckNah(4, "already gigantic", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            NoThanks++;
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, "not already gigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
 
-                            if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high)
+                        // Is the item a grenade, and is the option not set to include them?
+                        if (item.HasTag("Grenade"))
+                        {
+                            if (!GrenadeOption || creatureIsMerchant)
+                            {
+                                if (!GrenadeOption)
+                                {
+                                    Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                    NoThanks++;
+                                }
+                                if (creatureIsMerchant)
+                                {
+                                    Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                    NoThanks++;
+                                }
+
+                                if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high)
+                                {
+                                    Debug.LoopItem(4,
+                                        $"but!] merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
+                                        $"NoThanks--;",
+                                        Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                    NoThanks--;
+                                }
+                            }
+                            else if (GrenadeOption)
+                            {
+                                Debug.CheckYeh(4, "grenade (included)", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            }
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, "not grenade", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+
+                        // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
+                        if (item.HasTag("DynamicObjectsTable:TradeGoods"))
+                        {
+                            Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            NoThanks++;
+
+                            if (creatureIsMerchant && merchantTradeGoods.die.Resolve() >= merchantTradeGoods.high)
                             {
                                 Debug.LoopItem(4,
-                                    $"but!] merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
+                                    $"but!] merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
                                     $"NoThanks--;",
-                                    Indent: 2);
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                                 NoThanks--;
                             }
                         }
-                        else if (GrenadeOption)
+                        else
                         {
-                            Debug.CheckYeh(4, "grenade (included)", Indent: 2);
+                            Debug.CheckYeh(4, "not TradeGoods", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                         }
+
+                        // Is the item a non-rare tonic? Double doses are basically useless in the early game
+                        if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                        {
+                            Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            NoThanks++;
+
+                            if (creatureIsMerchant && merchantTonics.die.Resolve() >= merchantTonics.high)
+                            {
+                                Debug.LoopItem(4,
+                                    $"but!] merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
+                                    $"NoThanks--;",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                NoThanks--;
+                            }
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, "not Tonics_NonRare", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+
+                        // Is the item a rare tonic? Double doses are basically useless in the early game
+                        if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                        {
+                            Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            NoThanks++;
+
+                            if (creatureIsMerchant && merchantRareTonics.die.Resolve() >= merchantRareTonics.high)
+                            {
+                                Debug.LoopItem(4,
+                                    $"but!] merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
+                                    $"NoThanks--;",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                NoThanks--;
+                            }
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, "not Rare Tonics", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+
+                        // Is the item held by a merchant, and did their roll fail?
+                        if (creatureIsMerchant)
+                        {
+                            Debug.CheckNah(4, "creatureIsMerchant is True", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            NoThanks++;
+
+                            if (merchantBaseChance.die.Resolve() >= merchantBaseChance.high)
+                            {
+                                Debug.LoopItem(4,
+                                    $"but!] merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}",
+                                    $"NoThanks--;",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                NoThanks--;
+                            }
+                            else
+                            {
+                                Debug.LoopItem(4,
+                                    $"and!] merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}",
+                                    "Bummer!",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            }
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4,
+                                $"creatureIsMerchant is False",
+                                Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+
+                        Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        if (NoThanks > 0 && !Wish)
+                        {
+                            Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            continue;
+                        }
+
+                        string byWish = Wish ? ", by Wish!" : "";
+                        Debug.Entry(3, 
+                            $"Gigantifying {ItemName}{byWish}", 
+                            Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+
+                        item.ApplyModification("ModGigantic");
+                        if (!item.HasPart<ModGigantic>())
+                        {
+                            Debug.Entry(3, ItemName, "/!\\ Gigantification Failed",
+                                Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+                        else
+                        {
+                            Debug.Entry(3, 
+                                ItemName, "has been Gigantified", 
+                                Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+
+                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
                     }
                     else
                     {
-                        Debug.CheckYeh(4, "not grenade", Indent: 2);
+                        Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
                     }
-
-                    // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
-                    if (item.HasTag("DynamicObjectsTable:TradeGoods"))
-                    {
-                        Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 2);
-                        NoThanks++;
-
-                        if (creatureIsMerchant && merchantTradeGoods.die.Resolve() >= merchantTradeGoods.high)
-                        {
-                            Debug.LoopItem(4,
-                                $"but!] merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
-                                $"NoThanks--;",
-                                Indent: 2);
-                            NoThanks--;
-                        }
-                    }
-                    else
-                    {
-                        Debug.CheckYeh(4, "not TradeGoods", Indent: 2);
-                    }
-
-                    // Is the item a non-rare tonic? Double doses are basically useless in the early game
-                    if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
-                    {
-                        Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 2);
-                        NoThanks++;
-
-                        if (creatureIsMerchant && merchantTonics.die.Resolve() >= merchantTonics.high)
-                        {
-                            Debug.LoopItem(4,
-                                $"but!] merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
-                                $"NoThanks--;",
-                                Indent: 2);
-                            NoThanks--;
-                        }
-                    }
-                    else
-                    {
-                        Debug.CheckYeh(4, "not Tonics_NonRare", Indent: 2);
-                    }
-
-                    // Is the item a rare tonic? Double doses are basically useless in the early game
-                    if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
-                    {
-                        Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 2);
-                        NoThanks++;
-
-                        if (creatureIsMerchant && merchantRareTonics.die.Resolve() >= merchantRareTonics.high)
-                        {
-                            Debug.LoopItem(4,
-                                $"but!] merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
-                                $"NoThanks--;",
-                                Indent: 2);
-                            NoThanks--;
-                        }
-                    }
-                    else
-                    {
-                        Debug.CheckYeh(4, "not Rare Tonics", Indent: 2);
-                    }
-
-                    // Is the item held by a merchant, and did their roll fail?
-                    if (creatureIsMerchant)
-                    {
-                        Debug.CheckNah(4, "creatureIsMerchant is True", "NoThanks++; x/", Indent: 2);
-                        NoThanks++;
-
-                        if (merchantBaseChance.die.Resolve() >= merchantBaseChance.high)
-                        {
-                            Debug.LoopItem(4,
-                                $"but!] merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}",
-                                $"NoThanks--;",
-                                Indent: 2);
-                            NoThanks--;
-                        }
-                        else 
-                        {
-                            Debug.LoopItem(4, 
-                                $"and!] merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}",
-                                "Bummer!",
-                                Indent: 2);
-                        }
-                    }
-                    else
-                    {
-                        Debug.CheckYeh(4,
-                            $"creatureIsMerchant is False",
-                            Indent: 2);
-                    }
-
-                    Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2);
-                    if (NoThanks > 0 && !Wish)
-                    {
-                        Debug.Entry(3, "/x Skipping", Indent: 2);
-                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
-                        continue;
-                    }
-                    string byWish = Wish ? ", by Wish!" : "";
-                    Debug.Entry(3, $"Gigantifying {ItemName}{byWish}", Indent: 2);
-                    item.ApplyModification("ModGigantic");
-                    if (!item.HasPart<ModGigantic>()) Debug.Entry(3, ItemName, "<!!> Gigantification Failed", Indent: 2);
-                    else Debug.Entry(3, ItemName, "has been Gigantified", Indent: 2);
-
-                    Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
                 }
-                else
-                {
-                    Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 2);
-                    Debug.Entry(3, "/x Skipping", Indent: 2);
-                    Debug.DiveOut(3, $"{ItemDebug}", Indent: 1);
-                }
+                Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                Debug.Entry(4, "x foreach (GameObject item in itemsToProcess) >//", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
             }
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
-            Debug.Entry(4, "x foreach (GameObject item in itemsToProcess) >//", Indent: 1);
-
+            
             // Now equip all items that should be equipped
             if (!Wish)
             {
-                Debug.Entry(3, "Creature.WantToReequip()", Indent: 1);
+                Debug.Entry(3, "Creature.WantToReequip()", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
                 Creature.WantToReequip();
             }
 
-            Debug.Divider(3, Indent: 1);
-            Debug.Entry(3, $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", Indent: 1);
+            Debug.Divider(3, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
+            Debug.Entry(3, 
+                $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", 
+                Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
         } //!-- public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
         
         public static void SetSwingSound(this GameObject Object, string Path)
@@ -553,19 +698,19 @@ namespace HNPS_GigantismPlus
 
         public static void CheckEquipmentSlots(this GameObject Actor)
         {
-            Debug.Entry(3, $"* {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName})");
+            Debug.Entry(3, $"* {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName})", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
             Body Body = Actor?.Body;
             if (Body != null)
             {
                 List<GameObject> list = Event.NewGameObjectList();
-                Debug.Entry(3, "> foreach (BodyPart bodyPart in Actor.LoopParts())");
+                Debug.Entry(3, "> foreach (BodyPart bodyPart in Actor.LoopParts())", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
                 foreach (BodyPart bodyPart in Body.LoopParts())
                 {
-                    Debug.Entry(3, "bodyPart", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Name}]", Indent: 1);
+                    Debug.Entry(3, "bodyPart", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Name}]", Indent: 1, Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
                     GameObject equipped = bodyPart.Equipped;
                     if (equipped != null && !list.Contains(equipped))
                     {
-                        Debug.LoopItem(3, "equipped", $"[{equipped.ID}:{equipped.ShortDisplayName}]", Indent: 2);
+                        Debug.LoopItem(3, "equipped", $"[{equipped.ID}:{equipped.ShortDisplayName}]", Indent: 2, Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
                         list.Add(equipped);
                         int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
                         int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
@@ -578,13 +723,13 @@ namespace HNPS_GigantismPlus
                         }
                     }
                 }
-                Debug.Entry(3, "x foreach (BodyPart bodyPart in Actor.LoopParts()) >//");
+                Debug.Entry(3, "x foreach (BodyPart bodyPart in Actor.LoopParts()) >//", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
             }
             else
             {
-                Debug.Entry(4, $"no body on which to perform check, aborting ");
+                Debug.Entry(4, $"no body on which to perform check, aborting ", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
             }
-            Debug.Entry(3, $"x {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//");
+            Debug.Entry(3, $"x {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
         }
 
         public static IPart RequirePart(this GameObject Object, IPart Part, bool DoRegistration = true, bool Creation = false)
@@ -612,9 +757,8 @@ namespace HNPS_GigantismPlus
 
         public static IPart ConvertToPart(this string Part)
         {
-            GamePartBlueprint gamePartBlueprint = new(Part);
-            IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
-            return part;
+            GamePartBlueprint gamePartBlueprint = new (Part);
+            return gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
         }
 
         public static IModification ConvertToModification(this string ModPartName)
@@ -623,7 +767,7 @@ namespace HNPS_GigantismPlus
             Type type = ModManager.ResolveType("XRL.World.Parts." + ModPartName);
             if (type == null)
             {
-                MetricsManager.LogError("ConvertToModification", "Couldn'type resolve unknown mod part: " + ModPartName);
+                MetricsManager.LogError(nameof(ConvertToModification), "Couldn't resolve unknown mod BodyPart: " + ModPartName);
                 return null;
             }
             ModPart = Activator.CreateInstance(type) as IModification;
@@ -635,7 +779,7 @@ namespace HNPS_GigantismPlus
                 }
                 else
                 {
-                    MetricsManager.LogError(type?.ToString() + " is not an IModification");
+                    MetricsManager.LogError(type?.ToString() + " is not an ModPart");
                 }
                 return null;
             }
@@ -643,7 +787,11 @@ namespace HNPS_GigantismPlus
         }
 
         public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
-            where T : IPart, IModEventHandler<ManageDefaultEquipmentEvent>, IManagedDefaultNaturalEquipment<T>, new()
+            where T 
+            : IPart
+            , IModEventHandler<ManageDefaultNaturalEquipmentEvent>
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
         {
             IModification ModPart = ModPartName.ConvertToModification();
             return (ModNaturalEquipment<T>)ModPart;
@@ -680,16 +828,14 @@ namespace HNPS_GigantismPlus
         public static BodyPart EquippingPart(this GameObject Object)
         {
             Body body = Object?.Equipped?.Body;
-            if (body != null)
+            if (body != null && Object != null)
             {
                 foreach (BodyPart part in body.LoopParts())
                 {
-                    if (part.DefaultBehavior == Object)
+                    if (part.DefaultBehavior == Object || part.Equipped == Object || part.Cybernetics == Object)
+                    {
                         return part;
-                    if (part.Equipped == Object)
-                        return part;
-                    if (part.Cybernetics == Object)
-                        return part;
+                    }
                 }
             }
             return null;
@@ -799,6 +945,50 @@ namespace HNPS_GigantismPlus
             return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
         }
 
+        public static string GetProcessedItem(this DescriptionElement DescriptionElement, bool second, List<DescriptionElement> DescriptionElements, GameObject obj)
+        {
+            string verb = DescriptionElement.Verb;
+            string effect = DescriptionElement.Effect;
+
+            if (verb == "")
+            {
+                if (second && DescriptionElement.Equals(DescriptionElements[0]))
+                {
+                    return obj.It + " " + effect;
+                }
+                return effect;
+            }
+            if (verb == null)
+            {
+                if (second && DescriptionElement.Equals(DescriptionElements[0]))
+                {
+                    return obj.Itis + " " + effect;
+                }
+                if (!DescriptionElement.Equals(DescriptionElements[0]))
+                {
+                    bool flag = true;
+                    foreach (DescriptionElement descriptionElement in DescriptionElements)
+                    {
+                        if (descriptionElement.Verb != null)
+                        {
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag)
+                    {
+                        return effect;
+                    }
+                }
+                return obj.GetVerb("are", PrependSpace: false) + " " + effect;
+            }
+            if (second && DescriptionElement.Equals(DescriptionElements[0]))
+            {
+                return obj.It + obj.GetVerb(verb) + " " + effect;
+            }
+            return obj.GetVerb(verb, PrependSpace: false) + " " + effect;
+        }
+
         public static string GetObjectNoun(this GameObject Object)
         {
             if (Object == null)
@@ -850,6 +1040,21 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<Tombstone>())
                 return "tombstone";
 
+            if (Object.HasPart<NaturalEquipmentManager>())
+            {
+                if (Object.IsPlural && Object.HasPropertyOrTag("DisplayNameSingular"))
+                {
+                    return Object.GetPropertyOrTag("DisplayNameSingular");
+                }
+                return Object.Render.DisplayName switch
+                {
+                    "horns" => "horn",
+                    "quills" => "quill",
+                    "claws" => "claw",
+                    _ => Object.Render.DisplayName
+                };
+            }
+
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {
                 if (missileWeapon.Skill.Contains("Shotgun") 
@@ -872,7 +1077,7 @@ namespace HNPS_GigantismPlus
                 return "missile weapon";
             }
 
-            if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised())
+            if (Object.TryGetPart(out ThrownWeapon thrownWeapon) && !thrownWeapon.IsImprovised() && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
                 if (Object.InheritsFrom("BaseBoulder"))
                     return "boulder";
@@ -889,11 +1094,8 @@ namespace HNPS_GigantismPlus
                 return "thrown weapon";
             }
 
-            if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised())
+            if (Object.TryGetPart(out MeleeWeapon meleeWeapon) && !meleeWeapon.IsImprovised() && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
-                if (Object.HasPart<NaturalEquipmentManager>())
-                    return Object.Render.DisplayName;
-
                 if (Object.InheritsFrom("BaseCudgel"))
                     return "cudgel";
 
@@ -1144,8 +1346,20 @@ namespace HNPS_GigantismPlus
 
         public static List<GameObject> GetNaturalEquipment(this Body Body)
         {
-            static bool filter(GameObject GO) { return GO.HasPart<NaturalEquipment>() || GO.HasTag("NaturalGear"); }
+            if (Body == null) return null;
+            static bool filter(GameObject GO) { return GO.IsNaturalEquipment(); }
             return Body.GetEquippedObjects(filter);
+        }
+
+        public static bool IsNaturalEquipment(this GameObject @object)
+        {
+            if (@object == null) return false;
+            return @object.HasPart<NaturalEquipment>()
+                || @object.HasTagOrProperty("NaturalGear")
+                || @object.HasTagOrProperty("MutationEquipment")
+                || @object.HasTagOrProperty("NoDefaultBehavior")
+                || @object.Physics?.Category == "Natural Armor"
+                || @object.InheritsFrom("NaturalWeapon");
         }
 
         public static T DrawRandomElement<T>(this List<T> Bag, T ExceptForElement = null, List<T> ExceptForElements = null)
@@ -1309,12 +1523,12 @@ namespace HNPS_GigantismPlus
         public static bool TryGetGameObjectBlueprint(this GameObject GameObject, out GameObjectBlueprint GameObjectBlueprint)
         {
             GameObjectBlueprint = GameObject.GetGameObjectBlueprint();
-            return !GameObjectBlueprint.Is(null);
+            return GameObjectBlueprint != null;
         }
 
         public static string DebugName(this BodyPart BodyPart)
         {
-            return $"[{BodyPart.ID}:{BodyPart.Name}]::{BodyPart.Description}";
+            return $"[{BodyPart.ID}:{BodyPart.Name}]:{BodyPart.Description}::{BodyPart.Type}";
         }
 
         public static int Between(this int @int, int Min, int Max)
@@ -1374,7 +1588,7 @@ namespace HNPS_GigantismPlus
             {
                 weightMax += entryWeight;
             }
-            int ticket = RndGP.Next(1, weightMax);
+            int ticket = Stat.Roll(1, weightMax);
             int weightCurrent = 0;
             foreach ((T entryT, int entryWeight) in WeightedList)
             {
@@ -1414,23 +1628,23 @@ namespace HNPS_GigantismPlus
                 $"* ({Blueprint.Name})."
                 + $"{nameof(TagIsIncludedOrNotExcluded)}" 
                 + $"(string TagName: {TagName}, Dictionary<string, bool> IncludeExclude)",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
 
             if (!IncludeExclude.IsNullOrEmpty())
             {
 
-                Debug.CheckYeh(4, $"IncludeExclude Not Empty", Indent: 1);
+                Debug.CheckYeh(4, $"IncludeExclude Not Empty", Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
 
                 List<string> includeTags = new();
                 List<string> excludeTags = new();
 
-                Debug.Entry(4, $"IncludeExclude values:", Indent: 2);
+                Debug.Entry(4, $"IncludeExclude values:", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 foreach ((string entryValue, bool entryInclude) in IncludeExclude)
                 {
                     if (entryInclude) includeTags.Add(entryValue);
                     else excludeTags.Add(entryValue);
-                    Debug.LoopItem(4, $"{(entryInclude ? "include" : "exclude")}: {entryValue}", Indent: 2,
-                        Good: entryInclude);
+                    Debug.LoopItem(4, $"{(entryInclude ? "include" : "exclude")}: {entryValue}", 
+                        Indent: 2, Good: entryInclude, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 }
 
                 bool noBlueprintTagValue = !Blueprint.TryGetTag(TagName, out string blueprintTagValue);
@@ -1446,7 +1660,8 @@ namespace HNPS_GigantismPlus
                 bool noBlueprintTagOrPart = noBlueprintTagValue && noBlueprintPart;
                 if (!includeTags.IsNullOrEmpty() && noBlueprintTagOrPart)
                 {
-                    Debug.CheckNah(4, $"includeTags not empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part", Indent: 1);
+                    Debug.CheckNah(4, $"includeTags not empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part", 
+                        Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                     return false; 
                 }
                 else if (noBlueprintTagOrPart)
@@ -1454,28 +1669,28 @@ namespace HNPS_GigantismPlus
                     Debug.CheckYeh(4, 
                         $"includeTags is empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part, " + 
                         $"exclusions are irrelevant",
-                        Indent: 1);
+                        Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                     return true;
                 }
 
-                Debug.CheckYeh(4, $"{TagName}: \"{blueprintTagValue}\"", Indent: 1);
+                Debug.CheckYeh(4, $"{TagName}: \"{blueprintTagValue}\"", Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 List<string> blueprintTagValues = new();
                 if (blueprintTagValue != null)
                 {
                     if (blueprintTagValue.Contains(","))
                     {
-                        Debug.Entry(4, $"blueprintTagValue contains \",\"", Indent: 2);
+                        Debug.Entry(4, $"blueprintTagValue contains \",\"", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                         string[] tagsArray = blueprintTagValue.Split(',');
                         foreach (string value in tagsArray)
                         {
-                            Debug.LoopItem(4, $" \"{value}\" added to values list", Indent: 3);
+                            Debug.LoopItem(4, $" \"{value}\" added to values list", Indent: 3, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                             blueprintTagValues.Add(value);
                         }
                     }
                     else
                     {
-                        Debug.Entry(4, $"blueprintTagValue doesn't contain \",\"", Indent: 2);
-                        Debug.LoopItem(4, $" \"{blueprintTagValue}\" added to values list", Indent: 3);
+                        Debug.Entry(4, $"blueprintTagValue doesn't contain \",\"", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
+                        Debug.LoopItem(4, $" \"{blueprintTagValue}\" added to values list", Indent: 3, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                         blueprintTagValues.Add(blueprintTagValue);
                     }
                 }
@@ -1487,46 +1702,46 @@ namespace HNPS_GigantismPlus
                 List<string> inclusionMatches = new();
                 List<string> exclusionMatches = new();
 
-                Debug.Entry(4, $"blueprintTagValues Matches:", Indent: 2);
+                Debug.Entry(4, $"blueprintTagValues Matches:", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 foreach (string tagValue in blueprintTagValues)
                 {
                     if (includeTags.Contains(tagValue))
                     {
-                        Debug.CheckYeh(4, $"includeTags contains {tagValue}", Indent: 2);
+                        Debug.CheckYeh(4, $"includeTags contains {tagValue}", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                         inclusionMatches.Add(tagValue);
                     }
                     if (excludeTags.Contains(tagValue))
                     {
-                        Debug.CheckNah(4, $"excludeTags contains {tagValue}", Indent: 2);
+                        Debug.CheckNah(4, $"excludeTags contains {tagValue}", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                         exclusionMatches.Add(tagValue);
                     }
                 }
 
-                Debug.Entry(4, $"inclusionMatches:", Indent: 2);
+                Debug.Entry(4, $"inclusionMatches:", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 foreach (string entry in inclusionMatches)
                 {
-                    Debug.CheckYeh(4, $"{entry}", Indent: 2);
+                    Debug.CheckYeh(4, $"{entry}", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 }
                 if (inclusionMatches.IsNullOrEmpty())
-                    Debug.CheckNah(4, $"Empty", Indent: 2);
+                    Debug.CheckNah(4, $"Empty", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
 
-                Debug.Entry(4, $"exclusionMatches:", Indent: 2);
+                Debug.Entry(4, $"exclusionMatches:", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 foreach (string entry in exclusionMatches)
                 {
-                    Debug.CheckNah(4, $"{entry}", Indent: 2);
+                    Debug.CheckNah(4, $"{entry}", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 }
                 if (exclusionMatches.IsNullOrEmpty())
-                    Debug.CheckYeh(4, $"Empty", Indent: 2);
+                    Debug.CheckYeh(4, $"Empty", Indent: 2, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
 
                 if (!includeTags.IsNullOrEmpty() && inclusionMatches.IsNullOrEmpty())
                     return false;
-                Debug.CheckYeh(4, $"includeTags was Empty, or there was at least one inclusionMatch", Indent: 1);
+                Debug.CheckYeh(4, $"includeTags was Empty, or there was at least one inclusionMatch", Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
 
                 if (!excludeTags.IsNullOrEmpty() && !exclusionMatches.IsNullOrEmpty())
                     return false;
-                Debug.CheckYeh(4, $"excludeTags was Empty, or there were no exclusionMatchs", Indent: 1);
+                Debug.CheckYeh(4, $"excludeTags was Empty, or there were no exclusionMatchs", Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
             }
-            Debug.CheckYeh(4, $"IncludeExclude was empty or filter allowed blueprint through", Indent: 1);
+            Debug.CheckYeh(4, $"IncludeExclude was empty or filter allowed blueprint through", Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
             return true;
         }
 
@@ -1536,30 +1751,30 @@ namespace HNPS_GigantismPlus
                 $"* {valueString}."
                 + $"{nameof(MakeIncludeExclude)}"
                 + $"(Dictionary<string, bool> @return)",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug(nameof(MakeIncludeExclude)));
 
             if (!valueString.IsNullOrEmpty())
             {
-                Debug.Entry(4, $"value not empty or null", Indent: 1);
+                Debug.Entry(4, $"value not empty or null", Indent: 1, Toggle: getDoDebug(nameof(MakeIncludeExclude)));
                 if (valueString.Contains(","))
                 {
-                    Debug.Entry(4, $"valueString contains \",\"", Indent: 1);
+                    Debug.Entry(4, $"valueString contains \",\"", Indent: 1, Toggle: getDoDebug(nameof(MakeIncludeExclude)));
                     string[] classesArray = valueString.Split(',');
                     foreach (string entry in classesArray)
                     {
                         bool isNot = entry.StartsWith("!");
                         string value = isNot ? entry.Substring(1) : entry;
-                        Debug.LoopItem(4, $"{value}: {(!isNot ? "include" : "exclude")}", Indent: 2, Good: !isNot);
+                        Debug.LoopItem(4, $"{value}: {(!isNot ? "include" : "exclude")}", Indent: 2, Good: !isNot, Toggle: getDoDebug(nameof(MakeIncludeExclude)));
                         @return.Add(value.ToLower(), !isNot);
                     }
                 }
                 else
                 {
-                    Debug.Entry(4, $"valueString doesn't contain \",\"", Indent: 1);
+                    Debug.Entry(4, $"valueString doesn't contain \",\"", Indent: 1, Toggle: getDoDebug(nameof(MakeIncludeExclude)));
 
                     bool isNot = valueString.StartsWith("!");
                     string value = isNot ? valueString.Substring(1) : valueString;
-                    Debug.LoopItem(4, $"{value}: {(!isNot ? "include" : "exclude")}", Indent: 2, Good: !isNot);
+                    Debug.LoopItem(4, $"{value}: {(!isNot ? "include" : "exclude")}", Indent: 2, Good: !isNot, Toggle: getDoDebug(nameof(MakeIncludeExclude)));
                     @return.Add(value.ToLower(), !isNot);
                 }
             }
@@ -1727,12 +1942,12 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(PullInsideFromEdges)}"
                 + $"(Cell: {Cell}, List<Cell> Edge, " 
                 + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())})",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug(nameof(PullInsideFromEdges)));
 
             Point2D output = new(Cell.X, Cell.Y);
             foreach ((string Side, List<Cell> Edge) in Edges)
             {
-                Debug.Entry(4, $"Side: {Side}", Indent: 1);
+                Debug.Entry(4, $"Side: {Side}", Indent: 1, Toggle: getDoDebug(nameof(PullInsideFromEdges)));
                 if (DoorSide == "" || Side == DoorSide)
                     output = Cell.PullInsideFromEdge(Edge);
             }
@@ -1741,7 +1956,7 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(PullInsideFromEdges)}"
                 + $"(Cell: [{Cell}], List<Cell> Edge, "
                 + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())}) @//",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug(nameof(PullInsideFromEdges)));
             return output;
         }
 
@@ -1751,7 +1966,7 @@ namespace HNPS_GigantismPlus
                 $"* {typeof(Extensions).Name}."
                 + $"{nameof(PullInsideFromEdge)}"
                 + $"(Cell: {Cell}, List<Cell> Edge)",
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
 
             Point2D output = new(Cell.X, Cell.Y);
             if (Edge != null && Edge.Contains(Cell))
@@ -1773,8 +1988,8 @@ namespace HNPS_GigantismPlus
                 {
                     YsString += YsString == "" ? $"{Y}" : $",{Y}";
                 }
-                Debug.Entry(4, $"Xs: {XsString}", Indent: 2);
-                Debug.Entry(4, $"Ys: {YsString}", Indent: 2);
+                Debug.Entry(4, $"Xs: {XsString}", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
+                Debug.Entry(4, $"Ys: {YsString}", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                 if (Xs.Count > 1 &&  Ys.Count > 1)
                 {
                     Debug.Entry(2, 
@@ -1782,11 +1997,11 @@ namespace HNPS_GigantismPlus
                         $"{typeof(Extensions).Name}." + 
                         $"{nameof(PullInsideFromEdge)}() " + 
                         $"List<Cell> Edge must be a straight line.", 
-                        Indent: 0);
+                        Indent: 0, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                     return output;
                 }
                 bool edgeIsLat = Xs.Count > 1;
-                Debug.Entry(4, $"edgeIsLat: {edgeIsLat}", Indent: 2);
+                Debug.Entry(4, $"edgeIsLat: {edgeIsLat}", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                 int max = int.MinValue;
                 int min = int.MaxValue;
                 if (edgeIsLat)
@@ -1798,12 +2013,12 @@ namespace HNPS_GigantismPlus
                     }
                     if (output.x <= min)
                     {
-                        Debug.Entry(4, $"output.x ({output.x}) >= min ({min}): output.x = min + 1", Indent: 2);
+                        Debug.Entry(4, $"output.x ({output.x}) >= min ({min}): output.x = min + 1", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                         output.x = min + 1;
                     }
                     if (output.x >= max)
                     {
-                        Debug.Entry(4, $"output.x ({output.x}) <= max ({max}): output.x = max - 1", Indent: 2);
+                        Debug.Entry(4, $"output.x ({output.x}) <= max ({max}): output.x = max - 1", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                         output.x = max - 1;
                     }
                 }
@@ -1816,12 +2031,12 @@ namespace HNPS_GigantismPlus
                     }
                     if (output.y <= min)
                     {
-                        Debug.Entry(4, $"output.y ({output.y}) >= min ({min}): output.y = min + 1", Indent: 2);
+                        Debug.Entry(4, $"output.y ({output.y}) >= min ({min}): output.y = min + 1", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                         output.y = min + 1;
                     }
                     if (output.y >= max)
                     {
-                        Debug.Entry(4, $"output.y ({output.y}) <= max ({max}): output.y = max - 1", Indent: 2);
+                        Debug.Entry(4, $"output.y ({output.y}) <= max ({max}): output.y = max - 1", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                         output.y = max - 1;
                     }
                 }
@@ -1830,7 +2045,7 @@ namespace HNPS_GigantismPlus
                 $"x {typeof(Extensions).Name}."
                 + $"{nameof(PullInsideFromEdge)}"
                 + $"(Cell: {Cell}, List<Cell> Edge) *//",
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
 
             return output;
         }
@@ -1841,31 +2056,31 @@ namespace HNPS_GigantismPlus
                 $"* {typeof(Extensions).Name}."
                 + $"{nameof(GetNumberedTileVariants)}"
                 + $"(string Source: {Source})",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
             List<string> output = new();
             
             string[] sourcePieces = Source.Split("~");
             string pathBefore = sourcePieces[0];
             string pathAfter = sourcePieces[2];
 
-            Debug.Entry(4, $"pathBefore: {pathBefore}, pathAfter: {pathAfter}", Indent: 1);
-            Debug.Entry(4, $"sourcePieces[1] {sourcePieces[1]}", Indent: 1);
+            Debug.Entry(4, $"pathBefore: {pathBefore}, pathAfter: {pathAfter}", Indent: 1, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
+            Debug.Entry(4, $"sourcePieces[1] {sourcePieces[1]}", Indent: 1, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
             
             string[] pathRange = sourcePieces[1].Split('-');
             int first = int.Parse(pathRange[0]);
             int last = int.Parse(pathRange[1]);
 
-            Debug.Entry(4, $"first {first} - last: {last}", Indent: 1);
+            Debug.Entry(4, $"first {first} - last: {last}", Indent: 1, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
 
             for (int i = first; i <= last; i++)
             {
-                Debug.Entry(4, $"i: {i}", Indent: 2);
+                Debug.Entry(4, $"i: {i}", Indent: 2, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
 
                 int padding = Math.Max(2, last.ToString().Length);
                 string number = $"{i}".PadLeft(padding, '0');
                 string path = $"{pathBefore}{number}{pathAfter}";
-                Debug.Entry(4, $"path: {path}", Indent: 2);
-                if (/*TryGetTilePath(path, out path, IsWholePath: true) &&*/ !output.Contains(path)) output.Add(path);
+                Debug.Entry(4, $"path: {path}", Indent: 2, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
+                if (!output.Contains(path)) output.Add(path);
             }
 
             return output;
@@ -2104,6 +2319,147 @@ namespace HNPS_GigantismPlus
                 }
             }
             return stringList;
+        }
+
+        public static bool OverlapsWith<T>(this List<T> List, List<T> TestList)
+        {
+            bool overlaps = false;
+            if (!List.IsNullOrEmpty() && !TestList.IsNullOrEmpty())
+            {
+                foreach (T entry in List)
+                {
+                    if (TestList.Contains(entry))
+                    {
+                        overlaps = true;
+                        break;
+                    }
+                }
+            }
+            return overlaps;
+        }
+
+        public static Cell GetCellOppositePivotCell(this Cell Origin, Cell Pivot)
+        {
+            if (Origin == null || Origin == Pivot || !Origin.GetAdjacentCells().Contains(Pivot)) return null;
+            return Pivot.GetCellFromDirection(Origin.GetDirectionFromCell(Pivot));
+        }
+
+        public static string YehNah(this bool Condition, bool Flip = false)
+        {
+            // Input |  Flip
+            // true  != false   == true
+            // true  != true    == false
+            // false != false   == false
+            // false != true    == true
+            return Condition != Flip ? TICK.Color("G") : CROSS.Color("R");
+        }
+        public static string ThisManyTimes(this string @string, int Times = 1)
+        {
+            string output = @string;
+
+            for (int i = 0; i < Times; i++)
+            {
+                output += @string;
+            }
+
+            return output;
+        }
+
+        public static string ThingsNoNum(this int Number, string What, string WhatPlural = null)
+        {
+            if (Number == 1)
+                return What;
+            return WhatPlural ?? Grammar.Pluralize(What);
+        }
+
+        public static string ThingsNoNum(this float Number, string What, string WhatPlural = null)
+        {
+            if (Number == 1f)
+                return What;
+            return WhatPlural ?? Grammar.Pluralize(What);
+        }
+
+        public static string ThingsNoNum(this double Number, string What, string WhatPlural = null)
+        {
+            if (Number == 1.0)
+                return What;
+            return WhatPlural ?? Grammar.Pluralize(What);
+        }
+
+        public static bool HasDiggableVaultableObject(this Cell cell)
+        {
+            foreach (GameObject vaultable in cell.GetObjectsWithPart(nameof(Vaultable)))
+            {
+                if (vaultable.HasTagOrProperty("Diggable") || vaultable.HasTagOrProperty("WasDiggable"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool IsStock(this GameObject Item)
+        {
+            return Item.HasPropertyOrTag("_stock");
+        }
+
+        public static string Append(this string @string, string Text)
+        {
+            return @string + Text;
+        }
+        public static string AppendDefect(this string @string)
+        {
+            return @string.Append(" ({{r|D}})");
+        }
+
+        public static List<List<string>> AddElement(this List<List<string>> Descriptions, string Relationship, string Effect)
+        {
+            Descriptions.Add(new() { Relationship, Effect });
+            return Descriptions;
+        }
+        public static List<DescriptionElement> AddElement(this List<DescriptionElement> Descriptions, string Relationship, string Effect)
+        {
+            Descriptions.Add(new(Relationship, Effect));
+            return Descriptions;
+        }
+        public static List<List<string>> RemoveElement(this List<List<string>> Descriptions, string Relationship, string Effect)
+        {
+            List<List<string>> elementsToRemove = new()
+            {
+                new List<string>() { Relationship, Effect },
+            };
+            List<List<string>> InumerateDescriptions = new(Descriptions);
+            if (!InumerateDescriptions.IsNullOrEmpty())
+            {
+                foreach (List<string> entry in InumerateDescriptions)
+                {
+                    if (elementsToRemove.Contains(entry))
+                    {
+                        Descriptions.Remove(entry);
+                    }
+                }
+            }
+            return Descriptions;
+        }
+        public static List<DescriptionElement> RemoveElement(this List<DescriptionElement> Descriptions, string Verb, string Effect)
+        {
+            Descriptions.RemoveAll(x => x.Verb == Verb && x.Effect == Effect);
+            return Descriptions;
+        }
+
+        public static bool IsAssignableFrom(this IPart @this, IPart Part)
+        {
+            return @this.GetType().IsAssignableFrom(Part.GetType());
+        }
+
+        public static bool InheritsFrom(this IPart @this, Type Type)
+        {
+            return Type.IsAssignableFrom(@this.GetType());
+        }
+        public static bool InheritsFrom<T>(this IPart @this)
+            where T : IModification
+        {
+            return typeof(T).IsAssignableFrom(@this.GetType());
         }
 
     } //!-- Extensions

@@ -8,27 +8,27 @@ using HistoryKit;
 using Qud.API;
 
 using XRL;
+using XRL.UI;
+using XRL.Rules;
 using XRL.World;
-using XRL.World.WorldBuilders;
-using XRL.World.ZoneBuilders;
-using static XRL.World.ZoneBuilderPriority;
+using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
-using XRL.World.Conversations;
+using XRL.World.ZoneBuilders;
+using XRL.World.WorldBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Anatomy;
 using XRL.World.Skills.Cooking;
+using XRL.World.Conversations;
 using XRL.Language;
 using XRL.Names;
-using XRL.World.Capabilities;
-using XRL.Rules;
-using XRL.UI;
 using XRL.Wish;
+
+using static XRL.World.ZoneBuilderPriority;
 
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using Sheeter;
 
 namespace HNPS_GigantismPlus
 {
@@ -36,6 +36,27 @@ namespace HNPS_GigantismPlus
     [JoppaWorldBuilderExtension]
     public class SecretGiantWhoCooksBuilderExtension : IJoppaWorldBuilderExtension
     {
+        private static bool doDebug => getClassDoDebug(nameof(SecretGiantWhoCooksBuilderExtension));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+                '!',    // Alert
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         public static string SecretZoneId = string.Empty;
         public static JournalMapNote SecretMapNote = null;
         public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneId);
@@ -54,9 +75,9 @@ namespace HNPS_GigantismPlus
         public override void OnAfterBuild(JoppaWorldBuilder builder)
         {
             Debug.Entry(4,
-                $"\u2666 {typeof(SecretGiantWhoCooksBuilderExtension).Name}." +
+                $"\u2666 {nameof(SecretGiantWhoCooksBuilderExtension)}." +
                 $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
             SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
@@ -80,11 +101,9 @@ namespace HNPS_GigantismPlus
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(FactionEncounters));
             zoneManager.ClearZoneBuilders(SecretZoneId);
 
-            // zoneManager.AddZoneBuilder(SecretZoneId, LATE, nameof(CreateGiantCrater));
-
             string MapFileName = SCRT_GNT_ZONE_MAP2_CENTRE;
 
-            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{ThisMod.Path}/Secrets/Maps/{MapFileName}");
+            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{MapFileName}");
             zoneManager.AddZonePostBuilder(SecretZoneId, "Music", "Track", "Music/Barathrums Study");
 
             zoneManager.AddZonePostBuilder(SecretZoneId, nameof(IsCheckpoint), "Key", SecretZoneId);
@@ -106,10 +125,10 @@ namespace HNPS_GigantismPlus
 
             if (UniqueGiant == null)
             {
-                Debug.Entry(2,
-                    $"WARN: {typeof(SecretGiantWhoCooksBuilderExtension).Name}." +
-                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
-                    $"failed instantiate UniqueGiant. Placement aborted.",
+                Debug.Warn(2,
+                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
+                    $"failed to instantiate UniqueGiant. Placement aborted.",
                     Indent: 0);
                 return;
             }
@@ -138,7 +157,6 @@ namespace HNPS_GigantismPlus
                 Key1: "Object", 
                 Value1: zoneManager.CacheObject(UniqueGiant)); */
 
-
         } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
 
         public static GameObject GetTheGiant()
@@ -149,17 +167,17 @@ namespace HNPS_GigantismPlus
         {
             GameObject creature;
             GameObjectBlueprint creatureBlueprint = Unique 
-                ? WrassleGiantHero.GetAUniqueGiantHeroBluePrintModel()
-                : WrassleGiantHero.GetAGiantHeroBluePrintModel()
+                ? WrassleGiantHero.GetAUniqueGiantHeroBlueprintModel()
+                : WrassleGiantHero.GetAGiantHeroBlueprintModel()
                 ;
 
+            void ApplyBuilder(GameObject Creature) 
+            { 
+                WrassleGiantHeroBuilder.Apply(Creature, Context: Unique ? "Unique" : "Hero"); 
+            }
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,
-                    BonusModChance: 0,
-                    SetModNumber: 0,
-                    AutoMod: null,
-                    BeforeObjectCreated: null,
-                    AfterObjectCreated: null,
+                    BeforeObjectCreated: ApplyBuilder,
                     Context: Unique ? "Unique" : "Hero",
                     ProvideInventory: null);
 
@@ -183,7 +201,7 @@ namespace HNPS_GigantismPlus
             Cell cell = The.Player.CurrentCell.getClosestEmptyCell();
             if (cell == null)
             {
-                Popup.Show($"No empty cells nearby to spawn giant {giant.DisplayNameStripped}");
+                Popup.Show($"No empty cells nearby to spawn giant {giant?.DebugName ?? NULL}");
                 return;
             }
             cell.AddObject(giant);

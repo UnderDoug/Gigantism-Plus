@@ -1,17 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+
+using Qud.API;
+
+using XRL.Rules;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using NUnit.Framework;
-using System.Collections.Generic;
-using Qud.API;
 
 namespace XRL.World.Parts
 {
     [Serializable]
     public class RandomTree : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(RandomTree));
+
         public bool Nearby;
         public int Count;
         public bool Persist;
@@ -55,7 +60,7 @@ namespace XRL.World.Parts
                 int count = Count;
                 while(count > 0 && !cells.IsNullOrEmpty())
                 {
-                    bool ByChance = RndGP.Next(1, 100) <= ChancePer;
+                    bool ByChance = Stat.Roll(1, 100) <= ChancePer;
                     cell = cells.DrawRandomElement();
                     if (cell.IsEmpty() && ByChance)
                     {

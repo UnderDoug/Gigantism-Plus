@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using XRL;
 using XRL.Core;
@@ -10,7 +11,6 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
-using System.Collections.Generic;
 
 namespace XRL.World.Conversations.Parts
 {

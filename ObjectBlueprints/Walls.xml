@@ -13,6 +13,64 @@
   <object Name="Wall" Load="Merge">
     <tag Name="IsImprovisedThrown" />
     <tag Name="IsImprovisedMelee" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
+  </object>
+
+  <object Name="BaseMuralWall" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
+  </object>
+
+  <object Name="GolemInteriorWall" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <removetag Name="Diggable" />
+  </object>
+
+  <object Name="GolemInteriorGlassWall" Load="Merge">
+    <removetag Name="Diggable" />
+  </object>
+
+  <object Name="MechInteriorWall" Load="Merge">
+    <removetag Name="Diggable" />
+  </object>
+
+  <object Name="MechInteriorContainer" Load="Merge">
+    <removetag Name="Diggable" />
+  </object>
+
+  <object Name="MechInteriorGlassWall" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <removetag Name="Diggable" />
+  </object>
+
+  <object Name="CrystalWall" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
+  </object>
+
+  <object Name="BrinestalkStakes" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="WoodFence" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="BrinestalkFence" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="HalfWall" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+  </object>
+  <object Name="Rubble" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   
   <object Name="WrassleRingRopes" Inherits="Wall">

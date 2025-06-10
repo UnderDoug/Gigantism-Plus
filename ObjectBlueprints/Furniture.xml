@@ -6,735 +6,64 @@
     <tag Name="IsImprovisedMelee" />
   </object>
 
-  <!-- Widget Categories -->
-
-  <object Name="Archway" Load="Merge">
-    <tag Name="WidgetCategory" Value="door" />
-  </object>
-
-  <object Name="Door" Load="Merge">
-    <tag Name="WidgetCategory" Value="door" />
-  </object>
-
-  <object Name="BaseBookshelf" Load="Merge">
-    <tag Name="WidgetCategory" Value="bookshelf" />
-  </object>
-
-  <object Name="BaseBed" Load="Merge">
-    <tag Name="WidgetCategory" Value="bed" />
-  </object>
-
-  <object Name="Bedroll" Load="Merge">
-    <tag Name="WidgetCategory" Value="bed" />
-  </object>
-
-  <object Name="Hammock" Load="Merge">
-    <tag Name="WidgetCategory" Value="bed" />
-  </object>
-
-  <object Name="BaseChair" Load="Merge">
-    <tag Name="WidgetCategory" Value="chair" />
-  </object>
-
-  <object Name="Kline" Load="Merge">
-    <tag Name="WidgetCategory" Value="chair,bed" />
-  </object>
-
-  <object Name="Chest" Load="Merge">
-    <tag Name="WidgetCategory" Value="chest,container" />
-  </object>
-
-  <object Name="Woven Basket" Load="Merge">
-    <tag Name="WidgetCategory" Value="chest,container" />
-  </object>
-
-  <object Name="Multicabinet" Load="Merge">
-    <tag Name="WidgetCategory" Value="surface,chest,container" />
-  </object>
-
-  <object Name="Brazier" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-  <object Name="Tall Brazier" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-
-  <object Name="Sconce" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-
-  <object Name="Torchpost" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-  <object Name="Unlit Torchpost" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-
-  <object Name="Techlight1" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-  <object Name="Techlight2" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-  <object Name="Techlight3" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-
-  <object Name="Full-Spectrum Techlight" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-  <object Name="Half Candelabra" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-  <object Name="Candelabra" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-
-  <object Name="Tomb Techlight1" Load="Merge">
-    <tag Name="WidgetCategory" Value="light" />
-  </object>
-
-  <object Name="Vessel" Load="Merge">
-    <tag Name="WidgetCategory" Value="liquid container,container" />
-  </object>
-
   <object Name="Table" Load="Merge">
-    <tag Name="WidgetCategory" Value="table,surface" />
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
   </object>
-
-  <object Name="Low Table" Load="Merge">
-    <tag Name="WidgetCategory" Value="table,surface" />
+  
+  <object Name="Brinestalk Gate" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
   </object>
-
-  <object Name="Octagonal Table" Load="Merge">
-    <tag Name="WidgetCategory" Value="table,surface" />
-  </object>
-
-  <object Name="Dresser" Load="Merge">
-    <tag Name="WidgetCategory" Value="table,surface" />
-  </object>
-
-  <object Name="Book Table" Load="Merge">
-    <tag Name="WidgetCategory" Value="table,surface" />
-  </object>
-
-  <object Name="Globe" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Orrery" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Clockthing" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Bubblething" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,installation" />
-  </object>
-
-  <object Name="Fluxthing" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,installation" />
-  </object>
-
-  <object Name="Electrothing" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,installation" />
-  </object>
-
-  <object Name="Unicomputer" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,installation" />
-  </object>
-
-  <object Name="Loudspeaker" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,installation" />
-  </object>
-
-  <object Name="Telescope" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,installation" />
-  </object>
-
-  <object Name="Bust of K4K5" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,sculpture" />
-  </object>
-
-  <object Name="Bust of Mehmet I" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,sculpture" />
-  </object>
-
-  <object Name="Ornate Potted Plant 1" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,greenery" />
-  </object>
-
-  <object Name="Ornate Potted Plant 2" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,greenery" />
-  </object>
-
-  <object Name="Ornate Potted Plant 3" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,greenery" />
-  </object>
-
-  <object Name="Ornate Potted Plant 4" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,greenery" />
-  </object>
-
-  <object Name="Chalkboard" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Display Breadboard" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Sewing Machine" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Light Sculpture" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,sculpture" />
-  </object>
-
-  <object Name="Brain Sculpture" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,sculpture" />
-  </object>
-
-  <object Name="Unfinished Sculpture" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,sculpture" />
-  </object>
-
-  <object Name="Painted Column L" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,column" />
-  </object>
-
-  <object Name="Painting" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Mushroom Case" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration" />
-  </object>
-
-  <object Name="Harp" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,instrument" />
-  </object>
-
-  <object Name="Rectangular Bells" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,instrument" />
-  </object>
-
-  <object Name="Hammered Dulcimer" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,instrument" />
-  </object>
-
-  <object Name="Iron Maiden" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,death" />
-  </object>
-
-  <object Name="Hookah" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,liquid container,container" />
-  </object>
-
-  <object Name="Cage" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,death" />
-  </object>
-
-  <object Name="Forge" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Anvil" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue" />
-  </object>
-
-  <object Name="Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue" />
-  </object>
-
-  <object Name="Random Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue" />
-  </object>
-
-  <object Name="Oboroqoru Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue,shrine" />
-  </object>
-
-  <object Name="Keresh Statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue,shrine" />
-  </object>
-
-  <object Name="Six Day Stilt statue" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,statue,shrine" />
-  </object>
-
-  <object Name="Eater Hologram" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,hologram" />
+  <object Name="Iron Gate" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
   </object>
 
   <object Name="Village Monument" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,monument" />
-  </object>
-
-  <object Name="Village Hologram 1" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,monument,hologram" />
-  </object>
-
-  <object Name="Village Hologram 2" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,monument,hologram" />
-  </object>
-
-  <object Name="Sign" Load="Merge">
-    <tag Name="WidgetCategory" Value="sign" />
-  </object>
-
-  <object Name="Tombstone" Load="Merge">
-    <tag Name="WidgetCategory" Value="tombstone,death" />
-  </object>
-
-  <object Name="Empty Urn" Load="Merge">
-    <tag Name="WidgetCategory" Value="liquid container,container,death" />
-  </object>
-
-  <object Name="Urn" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tombstone,death" />
-  </object>
-
-  <object Name="Urn" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tombstone,death" />
-  </object>
-
-  <object Name="TombUrn" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tombstone,death" />
-  </object>
-
-  <object Name="Sarcophagus" Load="Merge">
-    <tag Name="WidgetCategory" Value="tombstone,death" />
-  </object>
-
-  <object Name="Wooden Wind Turbine" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator" />
-  </object>
-
-  <object Name="Millstone" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Wooden Water Wheel" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator" />
-  </object>
-
-  <object Name="Kiln" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Electric Generator" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator" />
-  </object>
-
-  <object Name="Induction Charging Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Hydraulic Irrigator" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Rock Tumbler" Load="Merge">
-    <tag Name="WidgetCategory" Value="container,tool,installation" />
-  </object>
-
-  <object Name="Lathe" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
-  </object>
-
-  <object Name="Solar Power Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator,installation" />
-  </object>
-
-  <object Name="Solar Pumping Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator,installation" />
-  </object>
-
-  <object Name="Food Processor" Load="Merge">
-    <tag Name="WidgetCategory" Value="container,tool,installation" />
-  </object>
-
-  <object Name="Universal Charging Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Hydraulic Turbine" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Hydraulic Press" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Force Projector" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Glass Furnace" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Wire Extruder" Load="Merge">
-    <tag Name="WidgetCategory" Value="container,tool,installation" />
-  </object>
-
-  <object Name="Broadcast Power Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator,installation" />
-  </object>
-
-  <object Name="Fusion Power Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator,installation" />
-  </object>
-
-  <object Name="Fusion Pumping Station" Load="Merge">
-    <tag Name="WidgetCategory" Value="generator,installation" />
-  </object>
-
-  <object Name="Industrial Fan" Load="Merge">
-    <tag Name="WidgetCategory" Value="installation" />
-  </object>
-
-  <object Name="Glass Printer" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
-  </object>
-
-  <object Name="Regen Tank" Load="Merge">
-    <tag Name="WidgetCategory" Value="tool,installation" />
-  </object>
-
-  <object Name="Catchbasin" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,liquid container,tool" />
-  </object>
-
-  <object Name="Air Well" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool" />
-  </object>
-
-  <object Name="Solar Still" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,liquid container,tool" />
-  </object>
-
-  <object Name="Solar Condenser" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,liquid container,tool" />
-  </object>
-
-  <object Name="Quantum Rippler" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
-  </object>
-
-  <object Name="NormCore" Load="Merge">
-    <tag Name="WidgetCategory" Value="decoration,tool,installation" />
-  </object>
-
-  <!-- Quality Beds -->
-
-  <object Name="Bedroll" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-
-  <object Name="Crib" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Folding Cot" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Hammock" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-
-  <object Name="Four-Poster Bed" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Waterbed" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-  <object Name="Bedger" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <object Name="Medical Bed" Load="Merge">
-    <tag Name="Utility" Value="medical" />
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Hyperbiotic Bed" Load="Merge">
-    <tag Name="Utility" Value="medical" />
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <!-- Quality Chairs -->
-
-  <object Name="Chair" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Floor Cushion" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-  <object Name="Kline" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Bench" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Stool" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-  <object Name="Canvas Folding Chair" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-  <object Name="Throne" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-  <object Name="Armchair" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Massage Chair" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-  <object Name="Work Chair" Load="Merge">
-    <tag Name="Utility" Value="work" />
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Ergomax Chair" Load="Merge">
-    <tag Name="Utility" Value="work" />
-    <tag Name="Quality" Value="luxury" />
-  </object>
-  <object Name="Chairbear" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <object Name="Torture Chair" Load="Merge">
-    <tag Name="Utility" Value="work" />
-    <tag Name="Quality" Value="basic" />
-  </object>
-
-  <object Name="Medical Chair" Load="Merge">
-    <tag Name="Utility" Value="medical" />
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Hyperbiotic Chair" Load="Merge">
-    <tag Name="Utility" Value="medical" />
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <object Name="Gravchair" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-  <object Name="Ornate Chair" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-  <object Name="Scrapasan" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Starmchair" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <object Name="Sofa L" Load="Merge">
-    <tag Name="Utility" Value="wide" />
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Sofa C" Load="Merge">
-    <tag Name="Utility" Value="wide" />
-    <tag Name="Quality" Value="nice" />
-  </object>
-  <object Name="Sofa R" Load="Merge">
-    <tag Name="Utility" Value="wide" />
-    <tag Name="Quality" Value="nice" />
-  </object>
-
-  <!-- Quality Doors -->
-
-  <object Name="Archway" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-
-  <object Name="Door" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-  </object>
-
-  <object Name="Windowed Door" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-
-  <object Name="Striped Door" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <object Name="Wavy Door" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-  </object>
-
-  <object Name="Metal Door" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-  </object>
-
-  <object Name="Double Door N" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-  <object Name="Double Door S" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-
-  <object Name="Double Door E" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-  <object Name="Double Door W" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-
-  <object Name="Double Windowed Door N" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-  <object Name="Double Windowed Door S" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-
-  <object Name="Double Windowed Door E" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-  <object Name="Double Windowed Door W" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-
-  <object Name="Double Striped Door N" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-  <object Name="Double Striped Door S" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-
-  <object Name="Double Striped Door E" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-  <object Name="Double Striped Door W" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-
-  <object Name="Double Wavy Door N" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-  <object Name="Double Wavy Door S" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-
-  <object Name="Double Wavy Door E" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-  <object Name="Double Wavy Door W" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-
-  <object Name="Double Metal Door N" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-  <object Name="Double Metal Door S" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="tall" />
-  </object>
-
-  <object Name="Double Metal Door E" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-  <object Name="Double Metal Door W" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide" />
-  </object>
-
-  <object Name="Glass Door E" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide,vision" />
-  </object>
-  <object Name="Glass Door W" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide,vision" />
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   
-  <object Name="Tinted Glass Door E" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide,vision" />
+  <object Name="Statue" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
-  <object Name="Tinted Glass Door W" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="wide,vision" />
-  </object>
-
-  <object Name="Security Door" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="secure" />
+  <object Name="Random Statue" Load="Merge">
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
   
-  <object Name="Red Security Door" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="secure" />
+  <object Name="Oboroqoru Statue" Load="Merge">
+    <part Name="ModGigantic" />
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
-  <object Name="Yellow Security Door" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="secure" />
+  <object Name="NephilimShrine" Load="Merge">
+    <part Name="ModGigantic" />
+    <part Name="Vaultable" SizeMatters="true" EnablingLimbs="Hand,Hands,Foot,Feet" />
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
+    <removetag Name="Diggable" />
+    <intproperty Name="Diggable" Value="1" />
   </object>
-  <object Name="Green Security Door" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="secure" />
-  </object>
-  <object Name="Blue Security Door" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="secure" />
-  </object>
-  <object Name="Purple Security Door" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="secure" />
-  </object>
-
-  <object Name="Fused Security Door" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="secure,nopass" />
-  </object>
-
-  <object Name="Crypt Door" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="death" />
-  </object>
-  <object Name="Crypt Double Door N" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="tall,death" />
-  </object>
-  <object Name="Crypt Double Door S" Load="Merge">
-    <tag Name="Quality" Value="luxury" />
-    <tag Name="Utility" Value="tall,death" />
-  </object>
-
-  <object Name="Brinestalk Gate" Load="Merge">
-    <tag Name="Quality" Value="basic" />
-    <tag Name="Utility" Value="gate" />
-  </object>
-  <object Name="Iron Gate" Load="Merge">
-    <tag Name="Quality" Value="nice" />
-    <tag Name="Utility" Value="gate" />
+  
+  <object Name="Eater Hologram" Load="Merge">
+    <tag Name="IsImprovisedThrown" />
+    <tag Name="IsImprovisedMelee" />
+    <tag Name="Ornate" />
   </object>
   
   <!-- Gigantic Infrastructure -->
@@ -1813,12 +1142,6 @@
 
   <!-- Gigantic Statues -->
 
-  <object Name="Statue" Load="Merge">
-    <tag Name="IsImprovisedThrown" />
-    <tag Name="IsImprovisedMelee" />
-    <tag Name="Ornate" />
-  </object>
-
   <object Name="Gigantic Statue" Inherits="Statue">
     <part Name="ModGigantic" />
     <tag Name="IsImprovisedThrown" />
@@ -1876,25 +1199,8 @@
     <tag Name="Ornate" />
   </object>
 
-  <object Name="Oboroqoru Statue" Load="Merge">
-    <part Name="ModGigantic" />
-    <tag Name="IsImprovisedThrown" />
-    <tag Name="IsImprovisedMelee" />
-    <tag Name="Ornate" />
-  </object>
-
-  <object Name="NephilimShrine" Load="Merge">
-    <part Name="ModGigantic" />
-    <tag Name="IsImprovisedThrown" />
-    <tag Name="IsImprovisedMelee" />
-    <tag Name="Ornate" />
-  </object>
-
   <!-- Gigantic Holograms -->
 
-  <object Name="Eater Hologram" Load="Merge">
-    <tag Name="Ornate" />
-  </object>
   <object Name="Gigantic Eater Hologram" Inherits="Eater Hologram">
     <part Name="ModGigantic" />
   </object>
@@ -1906,10 +1212,6 @@
   </object>
 
   <!-- Gigantic Village Monuments -->
-
-  <object Name="Village Monument" Load="Merge">
-    <tag Name="Ornate" />
-  </object>
 
   <object Name="Gigantic Village Monument Obelisk" Inherits="Village Monument Obelisk">
     <part Name="ModGigantic" />

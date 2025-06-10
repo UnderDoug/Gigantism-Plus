@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using ConsoleLib.Console;
 
 using Kobold;
@@ -9,6 +8,7 @@ using Kobold;
 using XRL;
 using XRL.UI;
 using XRL.Rules;
+using XRL.Language;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Parts;
@@ -16,8 +16,6 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
 using XRL.World.AI.GoalHandlers;
-using XRL.Language;
-
 using XRL.World.Text.Delegates;
 using XRL.World.Text.Attributes;
 
@@ -29,11 +27,138 @@ namespace HNPS_GigantismPlus
     [HasVariableReplacer]
     public static class Utils
     {
+        private static bool doDebug => true;
+        public static bool getDoDebug (string MethodName)
+        {
+            if (MethodName == nameof(TryGetTilePath))
+                return false;
+
+            if (MethodName == nameof(AddAccumulatedNaturalEquipmentTo))
+                return false;
+
+            if (MethodName == nameof(ExplodingDie))
+                return false;
+
+            if (MethodName == nameof(SwapMutationEnrtyClass))
+                return false;
+
+            if (MethodName == nameof(ManagedVanillaMutationOptionHandler))
+                return false;
+
+            if (MethodName == nameof(SwapMutationCategory))
+                return false;
+
+            if (MethodName == nameof(Rumble))
+                return true;
+
+            return doDebug;
+        }
+
         public static ModInfo ThisMod => ModManager.GetMod(MOD_ID);
+        public static ModInfo UD_Blink_Mutation => ModManager.GetMod(UD_BLINK_MUTATION_MOD_ID);
 
         public static Gigantified Gigantifier = new();
         public static GiantHero GiantHeroBuilder = new();
         public static WrassleGiantHero WrassleGiantHeroBuilder = new();
+
+        public struct DescriptionElement
+        {
+            private static bool doDebug => getClassDoDebug(nameof(DescriptionElement));
+
+            public string Verb;
+            public string Effect;
+
+            public DescriptionElement(string Verb, string Effect)
+            {
+                this.Verb = Verb;
+                this.Effect = Effect;
+            }
+
+            public DescriptionElement(List<string> Source)
+            {
+                Verb = null;
+                Effect = null;
+                if (!Source.IsNullOrEmpty())
+                {
+                    Verb = Source[0];
+                    if (Source.Count > 1)
+                    {
+                        Effect = Source[1];
+                    }
+                }
+            }
+
+            public readonly List<string> ToList()
+            {
+                return new List<string>()
+                {
+                    Verb,
+                    Effect,
+                };
+            }
+
+            public override readonly string ToString()
+            {
+                if (Verb == "")
+                {
+                    return "It " + Effect;
+                }
+                if (Verb == null)
+                {
+                    return "It is " + Effect;
+                }
+                return Grammar.ThirdPerson(Verb, PrependSpace: false) + " " + Effect;
+            }
+
+            public readonly string ToString(GameObject Object)
+            {
+                if (Verb == "")
+                {
+                    return Object.It + " " + Effect;
+                }
+                if (Verb == null)
+                {
+                    return Object.Itis + " " + Effect;
+                }
+                return Object.GetVerb(Verb, PrependSpace: false) + " " + Effect;
+            }
+        }
+
+        public static List<DescriptionElement> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
+        {
+            List<DescriptionElement> Output = new();
+            foreach ((string location, string value) in GigantismPlusModGiganticDescriptions.Tags)
+            {
+                string[] locationArray = location.Split("::", StringSplitOptions.RemoveEmptyEntries);
+                if (locationArray.Length != 4) continue;
+
+                (string targetEvent, string targetList, string conditionPart, string who) = (locationArray[0], locationArray[1], locationArray[2], locationArray[2]);
+                if (targetEvent != When) continue;
+                if (targetList != "General" && targetList != "Weapon")
+                {
+                    Debug.Warn(1,
+                        nameof(Utils),
+                        nameof(IterateDataBucketTags),
+                        $"[{who}]: {targetList} in {location} is not a valid list. \"Weapon\" or \"General\" required.", Indent: 0);
+                    continue;
+                }
+                if (!Object.HasPart(conditionPart)) continue;
+
+                string[] descriptionArray = value.Split(";", StringSplitOptions.RemoveEmptyEntries);
+                if (descriptionArray.Length != 2) continue;
+
+                if (descriptionArray[0] == "'null'") descriptionArray[0] = null;
+                DescriptionElement description = new(descriptionArray[0], descriptionArray[1]);
+                if (targetEvent == When)
+                {
+                    if (targetList == Where)
+                    {
+                        Output.Add(description);
+                    }
+                }
+            }
+            return Output;
+        }
 
         [VariableReplacer]
         public static string nbsp(DelegateContext Context)
@@ -51,7 +176,7 @@ namespace HNPS_GigantismPlus
         }
 
         [VariableReplacer]
-        public static string OptionalColor(DelegateContext Context)
+        public static string optionalColor(DelegateContext Context)
         {
             string Text = string.Empty;
             string Color = string.Empty;
@@ -69,7 +194,7 @@ namespace HNPS_GigantismPlus
         }
 
         [VariableReplacer]
-        public static string OptionalColorYuge(DelegateContext Context)
+        public static string optionalColorYuge(DelegateContext Context)
         {
             string Text = string.Empty;
             if (!Context.Parameters.IsNullOrEmpty())
@@ -78,6 +203,18 @@ namespace HNPS_GigantismPlus
                     Text = Context.Parameters[0];
             }
             return Text.OptionalColorYuge(Colorfulness);
+        }
+
+        [VariableReplacer]
+        public static string optionalColorGigantic(DelegateContext Context)
+        {
+            string Text = string.Empty;
+            if (!Context.Parameters.IsNullOrEmpty())
+            {
+                if (Context.Parameters[0] != null)
+                    Text = Context.Parameters[0];
+            }
+            return Text.OptionalColorGigantic(Colorfulness);
         }
 
         public static bool RegisterGameLevelEventHandlers()
@@ -91,7 +228,6 @@ namespace HNPS_GigantismPlus
                 AfterModGiganticAppliedHandler.Register();
                 BeforeDescribeModGiganticHandler.Register();
                 DescribeModGiganticHandler.Register();
-                MeleeWeapon_AfterObjectCreatedHandler.Register();
                 // ExampleHandler.Register();
             }
             else
@@ -128,19 +264,19 @@ namespace HNPS_GigantismPlus
         }
         public static bool TryGetTilePath(string TileName, out string TilePath, bool IsWholePath = false)
         {
-            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2);
+            Debug.Entry(3, $"@ Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath)", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
 
             bool wasFound = false;
             bool inCache;
-            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2);
+            Debug.Entry(4, $"? if (_TilePathCache.TryGetValue(TileName, out TilePath))", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
             if (inCache = !_TilePathCache.TryGetValue(TileName, out TilePath))
             {
-                Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3);
-                Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2);
+                Debug.Entry(4, $"_TilePathCache does not contain {TileName}", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
+                Debug.Entry(4, $"x if (_TilePathCache.TryGetValue(TileName, out TilePath)) ?//", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
 
-                Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 3);
+                Debug.Entry(4, $"Attempting to add \"{TileName}\" to _TilePathCache", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                 if (!wasFound && !_TilePathCache.TryAdd(TileName, TilePath))
-                    Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 3);
+                    Debug.Entry(3, $"!! Adding \"{TileName}\" to _TilePathCache failed", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
 
                 if (IsWholePath)
                 {
@@ -148,25 +284,25 @@ namespace HNPS_GigantismPlus
                     {
                         TilePath = TileName;
                         _TilePathCache[TileName] = TileName;
-                        Debug.CheckYeh(4, $"Tile: \"{TileName}\", Added entry to _TilePathCache", Indent: 3);
+                        Debug.CheckYeh(4, $"Tile: \"{TileName}\", Added entry to _TilePathCache", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     }
                     else
                     {
-                        Debug.CheckNah(4, $"Tile: \"{TileName}\"", Indent: 3);
+                        Debug.CheckNah(4, $"Tile: \"{TileName}\"", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     }
                 }
                 else
                 {
-                    Debug.Entry(4, $"Listing subfolders", Indent: 2);
-                    Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2);
+                    Debug.Entry(4, $"Listing subfolders", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
+                    Debug.Entry(4, $"> foreach (string subfolder  in TileSubfolders)", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     foreach (string subfolder in TileSubfolders)
                     {
-                        Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3);
+                        Debug.LoopItem(4, $" \"{subfolder}\"", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     }
-                    Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2);
+                    Debug.Entry(4, $"x foreach (string subfolder  in TileSubfolders) >//", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
 
-                    Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 2);
-                    Debug.Divider(3, "-", Count: 25, Indent: 2);
+                    Debug.Entry(4, $"> foreach (string subfolder in TileSubfolders)", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
+                    Debug.Divider(3, "-", Count: 25, Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
                     foreach (string subfolder in TileSubfolders)
                     {
                         string path = subfolder;
@@ -176,20 +312,20 @@ namespace HNPS_GigantismPlus
                         {
                             TilePath = path;
                             _TilePathCache[TileName] = TilePath;
-                            Debug.CheckYeh(4, $"Tile: \"{path}\", Added entry to _TilePathCache", Indent: 3);
+                            Debug.CheckYeh(4, $"Tile: \"{path}\", Added entry to _TilePathCache", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                         }
                         else
                         {
-                            Debug.CheckNah(4, $"Tile: \"{path}\"", Indent: 3);
+                            Debug.CheckNah(4, $"Tile: \"{path}\"", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
                         }
                     }
-                    Debug.Divider(3, "-", Count: 25, Indent: 2);
-                    Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 2);
+                    Debug.Divider(3, "-", Count: 25, Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
+                    Debug.Entry(4, $"x foreach (string subfolder in TileSubfolders) >//", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
                 }
             }
             else
             {
-                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3);
+                Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
             }
             string foundLocation = 
                 inCache 
@@ -198,10 +334,10 @@ namespace HNPS_GigantismPlus
                     ? "files" 
                     : "supplied subfolders";
 
-            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in {foundLocation}", Indent: 2);
+            Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in {foundLocation}", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
 
             wasFound = TilePath != null;
-            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2);
+            Debug.Entry(3, $"x Utils.TryGetTilePath(string TileName: {TileName}, out string TilePath) @//", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
             return wasFound;
         }
 
@@ -221,15 +357,13 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static Random RndGP = Stat.GetSeededRandomGenerator("HNPS_GigantismPlus");
-
         // !! This is currently not firing from any of the NaturalEquipmentMod Mutations but it has code that will make implementing the cybernetics adjustments easier.
         // The supplied part has the supplied blueprint created and assigned to it, saving the supplied previous behavior.
         // The supplied stats are assigned to the new part.
         public static void AddAccumulatedNaturalEquipmentTo(GameObject Creature, BodyPart Part, string BlueprintName, GameObject OldDefaultBehavior, string BaseDamage, int MaxStrBonus, int HitBonus, string AssigningMutation)
         {
-            Debug.Divider(3, "-", 40, Indent: 4);
-            Debug.Entry(3, "* Utils.AddAccumulatedNaturalEquipmentTo()", Indent: 4);
+            Debug.Divider(3, "-", 40, Indent: 4, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
+            Debug.Entry(3, "* Utils.AddAccumulatedNaturalEquipmentTo()", Indent: 4, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
 
             if (Part != null && Part.Type == "Hand" && !Part.IsExternallyManagedLimb())
             {
@@ -251,7 +385,7 @@ namespace HNPS_GigantismPlus
 
                 if (Part.DefaultBehavior != null)
                 {
-                    Debug.Entry(3, "Part.DefaultBehavior not null, assigning stats", Indent: 5);
+                    Debug.Entry(3, "Part.DefaultBehavior not null, assigning stats", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
 
                     Part.DefaultBehavior.SetStringProperty("TemporaryDefaultBehavior", AssigningMutation, false);
 
@@ -260,39 +394,39 @@ namespace HNPS_GigantismPlus
                     // if (HitBonus != 0) weapon.HitBonus = HitBonus;
                     // weapon.MaxStrengthBonus = MaxStrBonus;
 
-                    Debug.Entry(3, "Checking for HandBones", Indent: 5);
-                    Debug.Entry(3, "* if (TryGetNaturalWeaponCyberneticsList(Part.ParentBody, out string FistReplacement))", Indent: 5);
+                    Debug.Entry(3, "Checking for HandBones", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
+                    Debug.Entry(3, "* if (TryGetNaturalWeaponCyberneticsList(Part.ParentBody, out string FistReplacement))", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                     if (Part.ParentBody.TryGetNaturalWeaponCyberneticsList(out string FistReplacement))
                     {
                         Debug.Entry(3, $"HandBones Found: {FistReplacement}", Indent: 6);
                         switch (FistReplacement)
                         {
                             case "RealHomosapien_ZetachromeFist":
-                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(4)", Indent: 6);
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(4)", Indent: 6, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                                 weapon.AdjustDamageDieSize(4);
                                 break;
                             case "CrysteelFist":
-                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(3)", Indent: 6);
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(3)", Indent: 6, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                                 weapon.AdjustDamageDieSize(3);
                                 break;
                             case "FulleriteFist":
-                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(2)", Indent: 6);
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(2)", Indent: 6, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                                 weapon.AdjustDamageDieSize(2);
                                 break;
                             case "CarbideFist":
-                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(1)", Indent: 6);
+                                Debug.Entry(3, "- weapon.AdjustDamageDieSize(1)", Indent: 6, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                                 weapon.AdjustDamageDieSize(1);
                                 break;
                             default:
-                                Debug.Entry(3, "-FistReplacement has no assiciated bonus", Indent: 6);
+                                Debug.Entry(3, "-FistReplacement has no assiciated bonus", Indent: 6, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                                 break;
                         }
                     }
                     else
                     {
-                        Debug.Entry(3, $"No HandBones Found", Indent: 6);
+                        Debug.Entry(3, $"No HandBones Found", Indent: 6, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                     }
-                    Debug.Entry(3, "x if (TryGetNaturalWeaponCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5);
+                    Debug.Entry(3, "x if (TryGetNaturalWeaponCyberneticsList(Part.ParentBody, out string FistReplacement)) >//", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
 
                     var cybernetics = Part.ParentBody.GetBody().Cybernetics;
                     if (cybernetics != null && cybernetics.TryGetPart(out CyberneticsGiganticExoframe exoframe))
@@ -316,7 +450,7 @@ namespace HNPS_GigantismPlus
                         Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
 
                         Description desc = Part.DefaultBehavior.GetPart<Description>();
-                        desc._Short += $" This appendage is being {exoframe.GetShortAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
+                        desc._Short += $" This appendage is being {exoframe.GetAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
 
                         Render render = Part.DefaultBehavior.GetPart<Render>();
                         render.ColorString = exoframe.AugmentTileColorString;
@@ -327,16 +461,16 @@ namespace HNPS_GigantismPlus
                         Part.DefaultBehavior.SetStringProperty("BlockedSound", exoframe.AugmentBlockedSound);
                     }
 
-                    Debug.Entry(4, $"]|> hand.DefaultBehavior = {BlueprintName}", Indent: 5);
-                    Debug.Entry(4, $"]|> MaxStrBonus: {weapon.MaxStrengthBonus}", Indent: 5);
-                    Debug.Entry(4, $"]|> Base: {weapon.BaseDamage}", Indent: 5);
-                    Debug.Entry(4, $"]|> Hit: {weapon.HitBonus}", Indent: 5);
+                    Debug.Entry(4, $"]|> hand.DefaultBehavior = {BlueprintName}", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
+                    Debug.Entry(4, $"]|> MaxStrBonus: {weapon.MaxStrengthBonus}", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
+                    Debug.Entry(4, $"]|> Base: {weapon.BaseDamage}", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
+                    Debug.Entry(4, $"]|> Hit: {weapon.HitBonus}", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                 }
                 else
                 {
-                    Debug.Entry(3, $"part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"", Indent: 5);
+                    Debug.Entry(3, $"part.DefaultBehavior was null, invalid blueprint name \"{BlueprintName}\"", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                     Part.DefaultBehavior = OldDefaultBehavior;
-                    Debug.Entry(3, $"OldDefaultBehavior reassigned", Indent: 5);
+                    Debug.Entry(3, $"OldDefaultBehavior reassigned", Indent: 5, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
                 }
 
                 // make Creature not gigantic if they're prentending not to be.
@@ -344,11 +478,11 @@ namespace HNPS_GigantismPlus
             }
             else
             {
-                Debug.Entry(2, "part null or not Type \"Hand\"", Indent: 4);
+                Debug.Entry(2, "part null or not Type \"Hand\"", Indent: 4, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
             }
 
-            Debug.Entry(2, "x public void AddAccumulatedNaturalEquipmentTo() ]//", Indent: 4);
-            Debug.Divider(3, "-", 40, Indent: 4);
+            Debug.Entry(2, "x public void AddAccumulatedNaturalEquipmentTo() ]//", Indent: 4, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
+            Debug.Divider(3, "-", 40, Indent: 4, Toggle: getDoDebug(nameof(AddAccumulatedNaturalEquipmentTo)));
         } //!-- public void AddGiganticFistTo(BodyPart part)
 
         // Ripped wholesale from ModGigantic.
@@ -397,28 +531,28 @@ namespace HNPS_GigantismPlus
         {
             Debug.Entry(4,
                 $"ExplodingDie(Number: {Number}, DieRoll: {DieRoll}, Step: {Step}, Limit: {Limit})",
-                Indent: Indent);
+                Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
 
             int High = DieRoll.Max();
             int oldIndent = Indent;
 
-            Debug.Entry(4, $"Explodes on High Roll: {High}", Indent: Indent);
+            Debug.Entry(4, $"Explodes on High Roll: {High}", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
             Begin:
             if (Limit != 0 && High >= Limit)
             {
-                Debug.Entry(4, "Limit 0 or DieRoll.Max() >= Limit", Indent: ++Indent);
-                Debug.Entry(4, "Exiting", Indent: Indent--);
+                Debug.Entry(4, "Limit 0 or DieRoll.Max() >= Limit", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
+                Debug.Entry(4, "Exiting", Indent: Indent--, Toggle: getDoDebug(nameof(ExplodingDie)));
                 Number = Limit;
                 goto Exit;
             }
 
-            Debug.Entry(4, $"Rollin' the Die!", Indent: Indent);
+            Debug.Entry(4, $"Rollin' the Die!", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
             int Result = DieRoll.Resolve();
             if (Result == High)
             {
-                Debug.Entry(4, $"Result: {Result}, Success!", Indent: ++Indent);
-                Debug.Entry(4, $"Increasing Number by {Step}", Indent: Indent);
-                Debug.Entry(4, $"Sending Number for another roll!", Indent: Indent);
+                Debug.Entry(4, $"continue: {Result}, Success!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
+                Debug.Entry(4, $"Increasing Number by {Step}", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
+                Debug.Entry(4, $"Sending Number for another roll!", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
                 Number += Step;
                 Indent++;
                 // Number = ExplodingDie(Number += Step, DieRoll, Step, Limit, ++Indent);
@@ -426,11 +560,11 @@ namespace HNPS_GigantismPlus
             }
             else
             {
-                Debug.Entry(4, $"Result: {Result}, Failure!", Indent: ++Indent);
+                Debug.Entry(4, $"continue: {Result}, Failure!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
             }
 
             Exit:
-            Debug.Entry(4, $"Final Number: {Number}", Indent: oldIndent);
+            Debug.Entry(4, $"Final Number: {Number}", Indent: oldIndent, Toggle: getDoDebug(nameof(ExplodingDie)));
             return Number;
         }
 
@@ -444,38 +578,38 @@ namespace HNPS_GigantismPlus
         {
             Debug.Entry(4, 
                 $"@ {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0)",
-                Indent: Indent);
+                Indent: Indent, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
             Debug.Entry(4,
-                $"Entry.DisplayName: {Entry.DisplayName ?? "[Nameless]"} | Entry.Class: {Entry.Class} | Destination Class: {Class}",
-                Indent: Indent);
+                $"Entry.DisplayName: {Entry.Name ?? "[Nameless]"} | Entry.Class: {Entry.Class} | Destination Class: {Class}",
+                Indent: Indent, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
 
             if (Entry.Class != Class)
             {
-                Debug.Entry(4, $"Classes don't match, swapping", Indent: Indent+1);
+                Debug.Entry(4, $"Classes don't match, swapping", Indent: Indent + 1, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
                 Entry.Class = Class;
             }
             else
             {
-                Debug.Entry(4, $"Classes already match, no action necessary", Indent: Indent + 1);
+                Debug.Entry(4, $"Classes already match, no action necessary", Indent: Indent + 1, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
             }
                 
             Debug.Entry(4,
                 $"x {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0) @//",
-                Indent: Indent);
+                Indent: Indent, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
         }
 
         public static void ManagedVanillaMutationOptionHandler()
         {
-            Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}()", Indent: 1);
+            Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}()", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
             List<(string, string, string)> MutationEntries = new()
             {
                 ("Burrowing Claws", "BurrowingClaws", "UD_ManagedBurrowingClaws"),
                 ("Crystallinity", "Crystallinity", "UD_ManagedCrystallinity")
             };
-            Debug.Entry(4, $"> foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries)", Indent: 1);
+            Debug.Entry(4, $"> foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries)", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
             foreach ((string Name, string Vanilla, string Managed) in MutationEntries)
             {
-                Debug.LoopItem(4, $"Name: {Name} | Vanilla: {Vanilla} | Managed: {Managed}", Indent: 1);
+                Debug.LoopItem(4, $"Name: {Name} | Vanilla: {Vanilla} | Managed: {Managed}", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
                 MutationEntry vanillaMutation = MutationFactory.GetMutationEntryByName(Name);
                 if ((bool)EnableManagedVanillaMutations)
                 {
@@ -486,111 +620,71 @@ namespace HNPS_GigantismPlus
                     SwapMutationEnrtyClass(vanillaMutation, Vanilla, Indent: 2);
                 }
             }
-            Debug.Entry(4, $"x foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries) >//", Indent: 1);
-            Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}() *//", Indent: 1);
+            Debug.Entry(4, $"x foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries) >//", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
+            Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}() *//", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
         }
-
-        /*
-        // method to swap Gigantism mutation category between Physical and PhysicalDefects
-        public static void SwapMutationCategory(MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
-        {
-            SwapMutationCategory(MutationEntry.Name, OutOfCategory, IntoCategory);
-        } //!--- public static void SwapMutationCategory(this MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
-
-        public static void SwapMutationCategory(BaseMutation Mutation, string OutOfCategory, string IntoCategory)
-        {
-            SwapMutationCategory(Mutation?.GetMutationEntry()?.Name, OutOfCategory, IntoCategory);
-        } //!--- public static void SwapMutationCategory(this MutationEntry MutationEntry, string OutOfCategory, string IntoCategory)
-
-        public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
-        {
-            if (MutationFactory.TryGetMutationEntry(MutationName, out MutationEntry MutationEntry))
-            {
-                Debug.Header(3, MutationEntry.DisplayName, $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
-
-                List<MutationCategory> mutationCategories = MutationFactory.GetCategories().Vomit(4, "mutationCategories", DivAfter: Debug.HONLY, Indent: 1);
-
-                MutationCategory outOfCategory = mutationCategories.Find((x) => x.Name == OutOfCategory);
-                MutationCategory intoCategory = mutationCategories.Find((x) => x.Name == IntoCategory);
-
-                outOfCategory.Entries.Vomit(4, "outOfCategoryEntries | Before:", DivAfter: Debug.HONLY, Indent: 1);
-                intoCategory.Entries.Vomit(4, "intoCategoryEntries | Before:", Indent: 1);
-                Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
-
-                foreach (MutationCategory category in MutationFactory.GetCategories())
-                {
-                    if (category.Name == IntoCategory)
-                    {
-                        if (!category.Entries.Contains(MutationEntry))
-                        {
-                            Debug.Entry(4, $"Mutation \"{MutationEntry.DisplayName}\" not found in IntoCategory \"{intoCategory.Name}\"", Indent: 2);
-                            Debug.Entry(4, $"Adding it", Indent: 3);
-                            category.Entries.Add(MutationEntry);
-                            Debug.Entry(4, $"Attempting to Sort", Indent: 3);
-                            category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
-                            MutationEntry.Type = IntoCategory;
-                        }
-                    }
-                    if (category.Name == OutOfCategory)
-                    {
-                        if (outOfCategory.Entries.Contains(MutationEntry))
-                        {
-                            Debug.Entry(4, $"Mutation \"{MutationEntry.DisplayName}\" found in OutOfCategory \"{outOfCategory.Name}\"", Indent: 2);
-                            Debug.Entry(4, $"Removing it", Indent: 3);
-                            outOfCategory.Entries.Remove(MutationEntry);
-                        }
-                    }
-                }
-
-                Debug.Divider(4, Debug.HONLY, 40, Indent: 1);
-                outOfCategory.Entries.Vomit(4, "outOfCategoryEntries |  After:", DivAfter: Debug.HONLY, Indent: 1);
-                intoCategory.Entries.Vomit(4, "intoCategoryEntries |  After:", Indent: 1);
-
-                Debug.Footer(3, MutationEntry.Mutation.GetMutationClass(), $"{nameof(SwapMutationCategory)}(OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
-            }
-        }
-        */
-
         public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
         {
             Debug.Header(3, 
                 $"{MutationName}", 
-                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+                $"SwapMutationCategory(MutationName, " +
+                $"OutOfCategory: \"{OutOfCategory}\", " +
+                $"IntoCategory: \"{IntoCategory}\")", 
+                Toggle: getDoDebug(nameof(SwapMutationCategory)));
 
             MutationEntry MutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
 
-            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 1);
+            Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", 
+                Indent: 1, Toggle: getDoDebug(nameof(SwapMutationCategory)));
             foreach (MutationCategory category in MutationFactory.GetCategories())
             {
-                Debug.LoopItem(4, category.Name, Indent: 2);
+                Debug.LoopItem(4, category.Name, Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                 if (category.Name == IntoCategory)
                 {
-                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", Indent: 2);
+                    Debug.DiveIn(4, $"Found Category: \"{IntoCategory}\"", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
 
-                    Debug.Entry(3, $"Adding \"{MutationEntry.DisplayName}\" Mutation to \"{IntoCategory}\" Category", Indent: 3);
+                    Debug.Entry(3, $"Adding \"{MutationEntry.Name}\" Mutation to \"{IntoCategory}\" Category", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
                     category.Add(MutationEntry);
-                    category.Entries.Sort((x, y) => x.DisplayName.CompareTo(y.DisplayName));
+                    category.Entries.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", Indent: 3);
-                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", Indent: 3);
+                    Debug.Entry(4, $"Displaying all entries in \"{IntoCategory}\" Category", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
+                    Debug.Entry(4, "> foreach (MutationCategory category in MutationFactory.GetCategories())", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                     foreach (MutationEntry entry in category.Entries)
                     {
-                        Debug.LoopItem(4, entry.DisplayName, Indent: 4);
+                        Debug.LoopItem(4, entry.Name, Indent: 4, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                     }
-                    Debug.DiveOut(3, $"x {IntoCategory} //", Indent: 2);
+
+                    Debug.DiveOut(3, $"x {IntoCategory} //", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                 }
                 if (category.Name == OutOfCategory)
                 {
-                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", Indent: 2);
-                    Debug.Entry(3, $"Removing \"{MutationEntry.DisplayName}\" from \"{OutOfCategory}\" Category", Indent: 3);
+                    Debug.DiveIn(3, $"Found Category: \"{OutOfCategory}\"", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+                    Debug.Entry(3, $"Removing \"{MutationEntry.Name}\" from \"{OutOfCategory}\" Category", 
+                        Indent: 3, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
                     category.Entries.RemoveAll(r => r == MutationEntry);
-                    Debug.DiveOut(3, $"x {OutOfCategory} //", Indent: 2);
+
+                    Debug.DiveOut(3, $"x {OutOfCategory} //", 
+                        Indent: 2, Toggle: getDoDebug(nameof(SwapMutationCategory)));
                 }
             }
-            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) >//", Indent: 1);
+            Debug.Entry(4, "x foreach (MutationCategory category in MutationFactory.GetCategories()) >//", 
+                Indent: 1, Toggle: getDoDebug(nameof(SwapMutationCategory)));
+
             Debug.Footer(3, 
                 $"{MutationName}", 
-                $"SwapMutationCategory(MutationName, OutOfCategory: \"{OutOfCategory}\", IntoCategory: \"{IntoCategory}\")");
+                $"SwapMutationCategory(MutationName, " +
+                $"OutOfCategory: \"{OutOfCategory}\", " +
+                $"IntoCategory: \"{IntoCategory}\")", 
+                Toggle: getDoDebug(nameof(SwapMutationCategory)));
         } //!-- private void SwapMutationCategory(bool Before = true)
 
         public static GameObjectBlueprint GetGameObjectBlueprint(string Blueprint)
@@ -628,7 +722,13 @@ namespace HNPS_GigantismPlus
         {
             float duration = Math.Min(DurationMax, Cause * DurationFactor);
             CombatJuice.cameraShake(duration, Async: Async);
-            Debug.Entry(4, $"* {nameof(Rumble)}: Duration ({duration}), Cause ({Cause}), DurationFactor ({DurationFactor}), DurationMax({DurationMax})");
+            Debug.Entry(4, 
+                $"* {nameof(Rumble)}:"
+                + $" Duration ({duration}),"
+                + $" Cause ({Cause}),"
+                + $" DurationFactor ({DurationFactor}), "
+                + $"DurationMax({DurationMax})", 
+                Toggle: getDoDebug(nameof(Rumble)));
             return duration;
         }
         public static float Rumble(double Cause, float DurationFactor = 1.0f, float DurationMax = 1.0f, bool Async = true)

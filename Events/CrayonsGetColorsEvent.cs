@@ -6,12 +6,15 @@ using XRL.World;
 using XRL.World.Parts;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
 public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
 {
+    private static bool doDebug => getClassDoDebug(nameof(CrayonsGetColorsEvent));
+
     public new static readonly int CascadeLevel = CASCADE_ALL;
 
     public List<string> BrightColors;
@@ -48,7 +51,7 @@ public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
         Debug.Entry(4, 
             $"! {typeof(CrayonsGetColorsEvent).Name}." +
             $"{nameof(GetColors)}(List<string> BrightColors({BrightColorsCount}), List<string> DarkColors({DarkColorsCount}))",
-            Indent: 0);
+            Indent: 0, Toggle: doDebug);
 
         CrayonsGetColorsEvent E = FromPool();
         E.BrightColors = BrightColors ?? new();
@@ -61,7 +64,10 @@ public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
 
         // Consider adding a data bucket reader here
 
-        The.Game.HandleEvent(E);
+        if (The.Game != null && The.Game.WantEvent(ID, CascadeLevel))
+        {
+            The.Game.HandleEvent(E);
+        }
 
         List<string> BrightColorStrings = E.BrightColors.IsNullOrEmpty() ? new() : E.BrightColors.Select((string x) => "&" + x).ToList();
         List<string> DarkColorStrings = E.DarkColors.IsNullOrEmpty() ? new() : E.DarkColors.Select((string x) => "&" + x).ToList();
@@ -95,8 +101,8 @@ public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
             { nameof(AllColorStrings), AllColorStrings },
         };
 
-        if (!E.BrightColors.IsNullOrEmpty()) Debug.Entry(4, $"BrightColors: [{E.BrightColors.Join(", ")}]", Indent: 1);
-        if (!E.DarkColors.IsNullOrEmpty()) Debug.Entry(4, $"DarkColors: [{E.DarkColors.Join(", ")}]", Indent: 1);
+        if (!E.BrightColors.IsNullOrEmpty()) Debug.Entry(4, $"BrightColors: [{E.BrightColors.Join(", ")}]", Indent: 1, Toggle: doDebug);
+        if (!E.DarkColors.IsNullOrEmpty()) Debug.Entry(4, $"DarkColors: [{E.DarkColors.Join(", ")}]", Indent: 1, Toggle: doDebug);
 
         BrightColorsCount = E.BrightColors.IsNullOrEmpty() ? 0 : E.BrightColors.Count;
         DarkColorsCount = E.DarkColors.IsNullOrEmpty() ? 0 : E.DarkColors.Count;
@@ -104,7 +110,7 @@ public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
         Debug.Entry(4,
             $"x {typeof(CrayonsGetColorsEvent).Name}." +
             $"{nameof(GetColors)}(List<string> BrightColors({BrightColorsCount}), List<string> DarkColors({DarkColorsCount})) !//",
-            Indent: 0);
+            Indent: 0, Toggle: doDebug);
 
         E.Reset();
         return Colors;

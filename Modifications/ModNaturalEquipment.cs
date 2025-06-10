@@ -1,14 +1,13 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using Sheeter;
+using System;
 using System.Collections.Generic;
-
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -16,12 +15,35 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModNaturalEquipment<T> 
         : ModNaturalEquipmentBase
+        , IModEventHandler<BeforeDescribeModificationEvent<ModNaturalEquipment<T>>>
+        , IModEventHandler<DescribeModificationEvent<ModNaturalEquipment<T>>>
         where T 
         : IPart
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        [SerializeField]
+        private static bool doDebug => getClassDoDebug("ModNaturalEquipment");
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+                "AM",    // Apply Mod
+                "APP",   // Apply Part & Prop
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         private T _assigningPart = null;
 
         public T AssigningPart
@@ -49,67 +71,20 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
-        public override Guid AddAdjustment(string Target, string Field, string Value, int Priority)
-        {
-            Guid guid = Guid.NewGuid();
-            Adjustment adjustment = default;
-
-            adjustment.ID = guid;
-            adjustment.Target = Target;
-            adjustment.Field = Field;
-            adjustment.Value = Value;
-            adjustment.Priority = Priority;
-
-            Adjustment item = adjustment;
-
-            Adjustments ??= new List<Adjustment>(1);
-
-            Adjustments.Add(item);
-            return guid;
-        }
-        public override Guid AddAdjustment(string Target, string Field, string Value, bool FlipPriority = false)
-        {
-            int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddAdjustment(Target, Field, Value, modPriority);
-        }
-
-        public override int GetDamageDieCount()
-        {
-            return DamageDieCount;
-        }
-        public override int GetDamageDieSize()
-        {
-            return DamageDieSize;
-        }
-
-        public override int GetDamageBonus()
-        {
-            return DamageBonus;
-        }
-
-        public override int GetHitBonus()
-        {
-            return HitBonus;
-        }
-        public override int GetPenBonus()
-        {
-            return PenBonus;
-        }
-
         public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4);
-            Debug.Entry(4, $"{AssigningPart.Name}; Level: {AssigningPart.Level}", Indent: 5);
+            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4, Toggle: getDoDebug("APP"));
+            Debug.Entry(4, $"{AssigningPart?.Name}; Level: {(int)AssigningPart?.Level}", Indent: 5, Toggle: getDoDebug("APP"));
 
             if (AddedParts != null)
             {
-                Debug.Entry(4, "> foreach (string part in NaturalEquipmentMod.GetAddedParts())", Indent: 5);
+                Debug.Entry(4, "> foreach (string part in NaturalEquipmentMod.GetAddedParts())", Indent: 5, Toggle: getDoDebug("APP"));
                 foreach (string part in AddedParts)
                 {
-                    Debug.LoopItem(4, "part", part, Indent: 6);
+                    Debug.LoopItem(4, "part", part, Indent: 6, Toggle: getDoDebug("APP"));
                     Object.RequirePart(part);
                 }
-                Debug.Entry(4, $"x foreach (string part in NaturalEquipmentMod.GetAddedParts()) >//", Indent: 5);
+                Debug.Entry(4, $"x foreach (string part in NaturalEquipmentMod.GetAddedParts()) >//", Indent: 5, Toggle: getDoDebug("APP"));
             }
 
             if (AddedStringProps != null)
@@ -121,24 +96,24 @@ namespace XRL.World.Parts
                 {
                     Object.SetIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY, -ModPriority);
 
-                    Debug.Entry(4, "> foreach ((string Name, string Value) in AddedStringProps)", Indent: 5);
+                    Debug.Entry(4, "> foreach ((string Name, string Value) in AddedStringProps)", Indent: 5, Toggle: getDoDebug("APP"));
                     foreach ((string Name, string Value) in AddedStringProps)
                     {
-                        Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6);
+                        Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6, Toggle: getDoDebug("APP"));
                         Object.SetStringProperty(Name: Name, Value: Value, RemoveIfNull: true);
                     }
-                    Debug.Entry(4, $"x foreach ((string Name, string Value) in AddedStringProps) >//", Indent: 5);
+                    Debug.Entry(4, $"x foreach ((string Name, string Value) in AddedStringProps) >//", Indent: 5, Toggle: getDoDebug("APP"));
                 }
                 else
                 {
                     Debug.CheckNah(4,
                         $"{NATEQUIPMANAGER_STRINGPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}",
-                        Indent: 5);
+                        Indent: 5, Toggle: getDoDebug("APP"));
                 }
             }
             else
             {
-                Debug.CheckNah(4, $"No StringProps", Indent: 5);
+                Debug.CheckNah(4, $"No StringProps", Indent: 5, Toggle: getDoDebug("APP"));
             }
 
             if (AddedIntProps != null)
@@ -150,29 +125,28 @@ namespace XRL.World.Parts
                 {
                     Object.SetIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY, -ModPriority);
 
-                    Debug.Entry(4, $"> foreach ((string Name, int Value) in AddedIntProps", Indent: 5);
+                    Debug.Entry(4, $"> foreach ((string Name, int Value) in AddedIntProps", Indent: 5, Toggle: getDoDebug("APP"));
                     foreach ((string Name, int Value) in AddedIntProps)
                     {
-                        Debug.CheckYeh(4, $"{Name}", $"{Value}", Indent: 6);
+                        Debug.CheckYeh(4, $"{Name}", $"{Value}", Indent: 6, Toggle: getDoDebug("APP"));
                         Object.SetIntProperty(Name: Name, Value: Value, RemoveIfZero: true);
                     }
-                    Debug.Entry(4, $"x foreach ((string Name, int Value) in AddedIntProps) >//", Indent: 5);
+                    Debug.Entry(4, $"x foreach ((string Name, int Value) in AddedIntProps) >//", Indent: 5, Toggle: getDoDebug("APP"));
                 }
                 else
                 {
                     Debug.CheckNah(4, 
                         $"{NATEQUIPMANAGER_INTPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}", 
-                        Indent: 5);
+                        Indent: 5, Toggle: getDoDebug("APP"));
                 }
             }
             else
             {
-                Debug.CheckNah(4, $"No IntProps", Indent: 5);
+                Debug.CheckNah(4, $"No IntProps", Indent: 5, Toggle: getDoDebug("APP"));
             }
 
-            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4);
+            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4, Toggle: getDoDebug("APP"));
         }
-
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
@@ -182,11 +156,11 @@ namespace XRL.World.Parts
             }
             if(AssigningPart.Is(null))
             {
-                Debug.Entry(2,
-                    $"WARN",
-                    $"{typeof(ModNaturalEquipment<T>).Name}<{typeof(T).Name}>.{nameof(BeingAppliedBy)} (" +
-                    $"GameObject obj: {obj.ID}:{obj.ShortDisplayNameStripped}, " +
-                    $"GameObject who: {who.ID}:{who.ShortDisplayNameStripped}) - " +
+                Debug.Warn(2,
+                    $"{typeof(ModNaturalEquipment<T>).Name}<{GetSource()}>",
+                    $"{nameof(BeingAppliedBy)}(" +
+                    $"obj: {obj?.DebugName ?? NULL}, " +
+                    $"who: {who?.DebugName ?? NULL})",
                     $"Failed to assign {GetSource()} as AssigningPart",
                     Indent: 0);
             }
@@ -195,19 +169,19 @@ namespace XRL.World.Parts
         public override void ApplyModification(GameObject Object)
         {
             Debug.Entry(4, 
-                $"@ {Name}[{GetSource()}]." + 
-                $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\")", 
-                Indent: 3);
-
-            Object.GetPart<NaturalEquipmentManager>()
-                .AddShortDescriptionEntry(this);
+                $"@ {Name}[{GetSource()}]."
+                + $"{nameof(ApplyModification)}"
+                + $"(Object: \"{Object.BaseDisplayName}\")", 
+                Indent: 3, Toggle: getDoDebug("AM"));
             
             ApplyPartAndPropChanges(Object);
 
             Debug.Entry(4, 
-                $"x {Name}[{GetSource()}]." + 
-                $"{nameof(ApplyModification)}(Object: \"{Object.ShortDisplayNameStripped}\") @//", 
-                Indent: 3);
+                $"x {Name}[{GetSource()}]."
+                + $"{nameof(ApplyModification)}"
+                + $"(Object: \"{Object.BaseDisplayName}\")"
+                + $" @//", 
+                Indent: 3, Toggle: getDoDebug("AM"));
             base.ApplyModification(Object);
         }
         public override string GetSource()
@@ -215,12 +189,16 @@ namespace XRL.World.Parts
             return typeof(T).Name;
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register(DescribeModificationEvent<ModNaturalEquipment<T>>.ID, EventOrder.EXTREMELY_EARLY);
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
+                || ID == BeforeDescribeModificationEvent<ModNaturalEquipment<T>>.ID;
         }
-
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
             if (!E.Object.HasProperName)
@@ -229,63 +207,68 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
+        public virtual bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<T>> E)
+        {
+            if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                int dieCount = GetDamageDieCount();
+                int dieSize = GetDamageDieSize();
+                int damageBonus = GetDamageBonus();
+                int hitBonus = GetHitBonus();
+                int penBonus = GetPenBonus();
+
+                if (dieCount != 0)
+                {
+                    E.AddWeaponElement("gain", $"{dieCount} additional damage die");
+                }
+                if (dieSize != 0)
+                {
+                    E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
+                }
+                if (damageBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                }
+                if (hitBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
+                }
+                if (penBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
+                }
+                if (E.WeaponDescriptions.IsNullOrEmpty() && E.GeneralDescriptions.IsNullOrEmpty())
+                {
+                    E.AddWeaponElement("gain", "some manner of adjustments");
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<T>> E)
+        {
+            return base.HandleEvent(E);
+        }
 
         public override string GetAdjective()
         {
             return Adjective ?? typeof(T).Name;
         }
-        public override string GetInstanceDescription()
+        public override string GetInstanceDescription(GameObject Object = null)
         {
-            string text = ParentObject.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            int dieCount = GetDamageDieCount();
-            int dieSize = GetDamageDieSize();
-            int damageBonus = GetDamageBonus();
-            int hitBonus = GetHitBonus();
-            int penBonus = GetPenBonus();
-            string description = $"{descriptionName}: ";
-            description += ParentObject.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " ")
-                        : ("This " + text + " ");
-            
-            List<List<string>> descriptions = new();
-            if (dieCount != 0) descriptions
-                    .Add(new() { "gain", $"{dieCount} additional damage die" });
-            if (dieSize != 0) descriptions
-                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
-            if (damageBonus != 0) descriptions
-                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
-            if (hitBonus != 0) descriptions
-                    .Add(new() { "have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}" });
-            if (penBonus != 0) descriptions
-                    .Add(new() { "have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}" });
-            if (descriptions.IsNullOrEmpty()) descriptions
-                    .Add(new() { "gain", "some manner of adjustments" });
-
-
-            List<string> processedDescriptions = new();
-            foreach (List<string> entry in descriptions)
-            {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
-            }
-
-            return description += Grammar.MakeAndList(processedDescriptions) + ".";
+            return DescribeModificationEvent<ModNaturalEquipment<T>>
+                .Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
+                .Process();
         }
-
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-        }
-
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-        }
+        
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
-            ModNaturalEquipment<T> modNaturalWeaponBase = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;
-            return ClearForCopy(modNaturalWeaponBase);
+            ModNaturalEquipment<T> modNaturalEquipment = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;
+            return ClearForCopy(modNaturalEquipment);
+        }
+        public override IPart DeepCopy(GameObject Parent)
+        {
+            ModNaturalEquipment<T> naturalEquipmentMod = base.DeepCopy(Parent) as ModNaturalEquipment<T>;
+            return ClearForCopy(naturalEquipmentMod);
         }
         public static ModNaturalEquipment<T> ClearForCopy(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
@@ -293,5 +276,10 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod;
         }
 
-    } //!-- public class ModNaturalEquipment<E> : ModNaturalEquipmentBase where E : IPart, IManagedDefaultNaturalEquipment<E>, new()
+    } //!-- public class ModNaturalEquipment<T>
+      //        : ModNaturalEquipmentBase
+      //        where T
+      //        : IPart
+      //        , IManagedDefaultNaturalEquipment<T>
+      //        , new()
 }

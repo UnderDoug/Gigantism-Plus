@@ -5,6 +5,7 @@ using XRL.Language;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModElongatedNaturalWeapon : ModNaturalEquipment<ElongatedPaws>
     {
+        private static bool doDebug => getClassDoDebug(nameof(ModElongatedNaturalWeapon));
+
         public ModElongatedNaturalWeapon()
         {
         }
@@ -22,50 +25,42 @@ namespace XRL.World.Parts
         {
         }
 
-        public override void ApplyModification(GameObject Object)
+        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
         {
-            base.ApplyModification(Object);
-        }
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                E.BeforeEvent.ClearDescriptionElements();
+                string scalingStat = ElongatedPaws.SCALE_STAT;
+                int dieSize = GetDamageDieSize();
+                int damageBonus = GetDamageBonus();
 
-        public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetDisplayNameEvent>.ID;
-        }
-
-        public override bool HandleEvent(GetDisplayNameEvent E)
-        {
+                if (E.Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.Stat == scalingStat)
+                {
+                    E.AddWeaponElement("get", $"bonus penetration from {scalingStat}");
+                }
+                if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
+                {
+                    E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
+                }
+                if (damageBonus != 0)
+                {
+                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                }
+                if (E.WeaponDescriptions.IsNullOrEmpty())
+                {
+                    E.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's {scalingStat} Modifier");
+                }
+                else
+                {
+                    E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's {scalingStat} Modifier");
+                }
+                if (AssigningPart.HasGigantism || AssigningPart.HasBurrowing)
+                {
+                    E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
+                }
+            }
             return base.HandleEvent(E);
         }
 
-        public override string GetInstanceDescription()
-        {
-            string text = ParentObject.GetObjectNoun();
-            string descriptionName = Grammar.MakeTitleCase(GetColoredAdjective());
-            string pluralPossessive = ParentObject.IsPlural ? "their" : "its";
-            int dieSize = GetDamageDieSize();
-            int damageBonus = GetDamageBonus();
-            string description = $"{descriptionName}: ";
-            description += ParentObject.IsPlural
-                        ? ("These " + Grammar.Pluralize(text) + " ")
-                        : ("This " + text + " ");
-
-            List<List<string>> descriptions = new();
-            if (dieSize > 0 && (!Wielder.HasPart<GigantismPlus>() || !Wielder.HasPart<BurrowingClaws>())) descriptions
-                    .Add(new() { "gain", $"{dieSize.Signed()} damage die size" });
-
-            if (damageBonus != 0) descriptions
-                    .Add(new() { "have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage" });
-            descriptions
-                    .Add(new() { "", $"{pluralPossessive} bonus damage scales by half {pluralPossessive} wielder's Strength Modifier" });
-
-            List<string> processedDescriptions = new();
-            foreach(List<string> entry in descriptions)
-            {
-                processedDescriptions.Add(entry.GetProcessedItem(second: false, descriptions, ParentObject));
-            }
-
-            return description += Grammar.MakeAndList(processedDescriptions) + ".";
-        }
     } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
 }

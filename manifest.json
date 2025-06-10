@@ -1,6 +1,6 @@
 {
     "id": "gigantism_Plus",
-    "title": "{{giant|Gigantism Plus}}",
+    "title": "{{giant|Gigantism Plus}} (development)",
     "description": "Adds a modified version of the {{gigantism|Gigantism}} defect and a new physical mutation, {{giant|Elongated Paws}}, like the Giant Hands cybernetic with it's own flair.\n\nUnlike other defects, {{gigantism|Gigantism}} has a mutation rank which can increase with {{rules|MP}} and {{rules|Rapid Advancement}}!\n\nAlso included is the active ability {{rules|\"Hunch Over\"}} which will allow gigantic creatures to enter spaces they otherwise wouldn't fit.\n\nNo more end-game softlock!",
     "version": "0.3.0",
     "author": "{{metamorphic|hydnplynsyt}} and {{K-g-G-Y-G-g-K alternation|UnderDoug}}",

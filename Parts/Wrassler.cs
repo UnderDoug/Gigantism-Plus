@@ -14,6 +14,7 @@ using XRL.World.Tinkering;
 using XRL.Wish;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -25,6 +26,26 @@ namespace XRL.World.Parts
     [Serializable]
     public class Wrassler : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(Wrassler));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         public const int ICON_COLOR_PRIORITY = 110;
 
         [SerializeField]
@@ -143,6 +164,26 @@ namespace XRL.World.Parts
             return ColorBag;
         }
 
+        public override void Attach()
+        {
+            if (ParentObject != null)
+            {
+                if (!ParentObject.TryGetPart(out Vaultable vaultable))
+                {
+                    vaultable = ParentObject.RequirePart<Vaultable>();
+                }
+                vaultable.SizeMatters = true;
+                vaultable.EnablingLimbs = "Hand,Hands,Foot,Feet,Tail";
+                vaultable.EnablingLimbsList = vaultable.EnablingLimbs.CommaExpansion();
+                vaultable.OverridingParts = "Wrassler";
+                vaultable.OverridingPartsList = new()
+                {
+                    "Wrassler",
+                };
+            }
+            base.Attach();
+        }
+
         public Wrassler BestowWrassleGear(out bool Bestowed)
         {
             Bestowed = false;
@@ -169,7 +210,7 @@ namespace XRL.World.Parts
                 $"{typeof(Wrassler).Name}." +
                 $"{nameof(BestowWrassleGear)}() " + 
                 $"Actor: {Actor.DebugName}", 
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             string FootOrFeet = "Feet";
             if (feetCount * 2 < footCount) FootOrFeet = "Foot";
@@ -179,12 +220,12 @@ namespace XRL.World.Parts
                 $"handCount: {handCount}, " + 
                 $"feetCount: {feetCount}, " + 
                 $"footCount: {footCount}", 
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4, 
                 $"SeededBool: {WrassleID.SeededRandomBool()}, " + 
                 $"FootOrFeet: {FootOrFeet}", 
-                Indent: 1);
+                Indent: 1, Toggle: getDoDebug());
 
             List<GameObject> wrassleGearObjects = new();
             foreach (BodyPart bodyPart in Actor.Body.GetParts())
@@ -214,16 +255,26 @@ namespace XRL.World.Parts
 
                 if (wrassleGearObject != null && wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
                 {
+                    if (wrassleGearObject.HasPart<MeleeWeapon>())
+                    {
+                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 1);
+                    }
+                    if (wrassleGearObject.HasPart<Armor>())
+                    {
+                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
+                        wrassleGearObject.SetIntProperty("AlwaysEquipAsArmor", 1);
+                    }
+
                     if (Actor.HasPart<GigantismPlus>())
                         wrassleGearObject.ApplyModification("ModGigantic", true, null, true);
 
                     wrassleGear.WrassleID = WrassleID;
                     wrassleGear.RandomizeTile = true;
                     wrassleGear.ApplyFlair();
-                }
 
-                wrassleGearObjects.TryAdd(wrassleGearObject);
-                if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
+                    wrassleGearObjects.TryAdd(wrassleGearObject);
+                    if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
+                }
             }
 
             if (ParentObject.IsPlayer())
@@ -296,7 +347,28 @@ namespace XRL.World.Parts
             if (E.Object != null && E.Object == ParentObject)
             {
                 GameObject Actor = E.Object;
-                if (Bestow && !Actor.InheritsFrom("BaseTemplar"))
+
+                bool noWrassleGear = ParentObject.HasTagOrProperty("NoWrassleGear");
+                bool isTemplar = Actor.InheritsFrom("BaseTemplar");
+                
+                int bestowChance = ParentObject.GetIntProperty("WrassleGearBestowChance", -1);
+
+                if (bestowChance < 0 
+                 && (int.TryParse(ParentObject.GetStringProperty("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0)
+                 && (int.TryParse(ParentObject.GetTag("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0))
+                {
+                    bestowChance = 100;
+                }
+
+                bool bestowByChance = bestowChance.in100();
+
+                bool shouldBestow = 
+                    Bestow
+                 && bestowByChance
+                 && !noWrassleGear
+                 && !isTemplar;
+
+                if (shouldBestow)
                 {
                     BestowWrassleGear(out BeenBestowed);
                 }
@@ -317,13 +389,13 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"{typeof(Wrassler).Name}." +
                     $"{nameof(HandleEvent)}({typeof(ObjectEnteredCellEvent).Name} E)",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,
-                    $"E.Object: {Actor.ShortDisplayName} in Cell:{E.Cell.Location}",
-                    Indent: 1);
+                    $"E.Object: {Actor?.DebugName ?? NULL}",
+                    Indent: 1, Toggle: getDoDebug());
                 Debug.Entry(4,
-                    $"Cell:{E.Cell}",
-                    Indent: 1);
+                    $"Cell: [{E.Cell?.Location}]",
+                    Indent: 1, Toggle: getDoDebug());
                 Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
 
                 List<GameObject> EquippedList = Actor.GetEquippedObjects();
@@ -349,7 +421,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"{typeof(Wrassler).Name}." +
                     $"{nameof(HandleEvent)}({typeof(ExamineSuccessEvent).Name} E)",
-                    Indent: 0);
+                    Indent: 0, Toggle: getDoDebug());
 
                 if (E.Object.TryGetPart(out Examiner examiner))
                 {
@@ -398,6 +470,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             Wrassler wrassler = base.DeepCopy(Parent, MapInv) as Wrassler;
+            // wrassler._WrassleID = Guid.NewGuid();
             return wrassler;
         }
 

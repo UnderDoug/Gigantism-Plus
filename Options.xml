@@ -41,6 +41,27 @@
       The default is {{w|Disabled}}.
     </helptext>
   </option>
+	
+  <option
+        ID="Option_GigantismPlus_DebugIncludeVaultDebugDescriptions"
+        DisplayText="{{giant|Gigantism Plus}}: Show Tactics_Vault internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
+        Category="Debug"
+        Type="Checkbox"
+        Default="No"
+    >
+    <helptext>
+      When enabled, internal debug information relating to the Tactics_Vault skill will be displayed when [{{W|l}}]ooking at anything with the relevant parts.
+
+      {{M|Vaulter}}:
+      {{W|Cells and Vault State}}: Information relating to the cells involved in a current vault and which stage of vaulting the vaulter is up to.
+      {{W|AutoAct State}}: Information relating to the Vault toggle ability and the info it uses to restart AutoAct.
+      {{M|Vaultable}}:
+      {{W|Nav Weight}}: Explicit navigation weight numbers.
+      {{W|Vaultable Cells}}: Visualisation of which cells are eligble for being vaulted from/into.
+
+      The default is {{w|Disabled}}.
+    </helptext>
+  </option>
   
   <!-- 
   End of Debug Options
@@ -52,7 +73,7 @@
   <option
 		  ID="Option_GigantismPlus_Colorfulness"
 	    DisplayText="Use colorful text strings throughout the mod"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
       Type="Slider"
       Default="3"
       Min="1"
@@ -73,7 +94,7 @@
 	<option 
 		  ID="Option_GigantismPlus_EnableGiganticStartingGear"
 	    DisplayText="{{gigantic|Gigantify}} starting equipment for {{gigantic|Gigantic}} ({{r|D}}) players ({{R|new save}})"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -89,7 +110,7 @@
 		  ID="Option_GigantismPlus_EnableGiganticStartingGear_Grenades"
 	    Requires="Option_GigantismPlus_EnableGiganticStartingGear==Yes"
 	    DisplayText="Include starting grenades ({{R|new save}})"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox" 
 			Default="No"
 	    >
@@ -103,7 +124,7 @@
 	<option
 		  ID="Option_GigantismPlus_EnableGigantismRapidAdvance"
 	    DisplayText="Make {{gigantic|Gigantism}} ({{r|D}}) eligible for rapid advancement"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -116,9 +137,9 @@
 	</option>
 	
 	<option 
-		  ID="Option_GigantismPlus_SelectGiganticTinkering"
+		  ID="Option_GigantismPlus_EnableGiganticTinkering"
 	    DisplayText="Make the {{gigantic|gigantic}} modifier tinkerable"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -132,9 +153,9 @@
 	</option>
 	
 	<option 
-		  ID="Option_GigantismPlus_SelectGiganticDerarification"
+		  ID="Option_GigantismPlus_EnableGiganticDerarification"
 	    DisplayText="Make {{gigantic|gigantic}} items slightly more common"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
 	    Type="Checkbox"
 			Default="Yes"
 	    >
@@ -150,7 +171,7 @@
   <option 
       ID="Option_GigantismPlus_EnableGiganticNPCGear"
       DisplayText="Make NPC Equipment {{gigantic|Gigantic}}"
-      Category="Mods: Gigantism Plus"
+      Category="Mod: Gigantism Plus"
       Type="Checkbox"
       Default="Yes"
       >
@@ -166,7 +187,7 @@
       ID="Option_GigantismPlus_EnableGiganticNPCGear_Grenades"
       Requires="Option_GigantismPlus_EnableGiganticNPCGear==Yes"
       DisplayText="Include NPC grenades"
-      Category="Mods: Gigantism Plus"
+      Category="Mod: Gigantism Plus"
       Type="Checkbox"
       Default="No"
       >
@@ -181,11 +202,11 @@
 
   <!-- Advanced Options -->
 
-  <option
+  <!--option
 		  ID="Option_GigantismPlus_ManagedVanilla"
 	    DisplayText="Use &quot;up-classed&quot; versions of vanilla mutations that have natural weapons ({{R|new save}})"
       Requires="OptionShowAdvancedOptions==Yes"
-	    Category="Mods: Gigantism Plus"
+	    Category="Mod: Gigantism Plus"
       Type="Button"
       Default="Yes"
       OnClick="HNPS_GigantismPlus.Options.OnOptionManagedVanilla"
@@ -207,7 +228,7 @@
 
       The default is {{w|Enabled}}.
     </helptext>
-  </option>
+  </option-->
 	
   <!-- End of Mod Options -->
   

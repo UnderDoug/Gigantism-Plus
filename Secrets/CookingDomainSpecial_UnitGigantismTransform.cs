@@ -4,23 +4,25 @@ using System.Text;
 using System.Linq;
 using ConsoleLib.Console;
 
+using Qud.API;
+
 using XRL;
 using XRL.UI;
 using XRL.World;
-using XRL.World.WorldBuilders;
-using XRL.World.ZoneBuilders;
-using static XRL.World.ZoneBuilderPriority;
-using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.ObjectBuilders;
+using XRL.World.ZoneBuilders;
+using XRL.World.WorldBuilders;
 using XRL.Language;
 using XRL.Names;
-using Qud.API;
 
+using static XRL.World.ZoneBuilderPriority;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
-using HNPS_GigantismPlus;
 
 namespace XRL.World.Effects
 {
@@ -98,7 +100,7 @@ namespace XRL.World.Effects
                 Popup.Show("Your limbs suddenly feel constrained, like there's too much of them to fit in the space they occupy.");
                 Popup.Show("You buckle under the weight of your rapidly increasing mass. The ground under your feet gives way.");
                 Popup.Show("The world rushes away from you as your anatomy realizes its new stature.");
-                Popup.Show($"You gained the mutation {gigantism.DisplayName}!");
+                Popup.Show($"You gained the mutation {gigantism.GetDisplayName()}!");
                 JournalAPI.AddAccomplishment(
                     text: JournalTexts.GetRandomElement(), 
                     muralText: $"{JournalMuralPrefixs.GetRandomElement()}{JournalMuralInfix}{JournalMuralSuffixs.GetRandomElement()}",

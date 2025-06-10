@@ -1,53 +1,43 @@
 ﻿using HarmonyLib;
 
+using System;
+
 using XRL.World;
 using XRL.World.Parts;
-using XRL.World.Parts.Mutation;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
 {
-    [HarmonyPatch(typeof(Leveler))]
+    [HarmonyPatch]
     public static class Leveler_Patches
     {
-        [HarmonyPrefix]
+        private static bool doDebug => getClassDoDebug(nameof(Leveler_Patches));
+
+        [HarmonyPatch(
+            declaringType: typeof(Leveler),
+            methodName: nameof(Leveler.RapidAdvancement),
+            argumentTypes: new Type[] { typeof(int), typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPriority(800)]
-        [HarmonyPatch(nameof(Leveler.RapidAdvancement))]
-        static bool RapidAdvancement_SendBeforeEvent_Prefix(int Amount, GameObject ParentObject)
+        [HarmonyPrefix]
+        public static bool RapidAdvancement_SendBeforeEvent_Prefix(int Amount, GameObject ParentObject)
         {
-            /*Debug.Entry(4, 
-                $"{typeof(Leveler_Patches).Name}." + 
-                $"{nameof(RapidAdvancement_SendBeforeEvent_Prefix)}(int Amount, GameObject ParentObject)", 
-                Indent: 0);
-
-            string objectDesc = ParentObject != null 
-                ? $"{ParentObject?.ID}:{ParentObject?.ShortDisplayNameStripped}" 
-                : "[null]";
-
-            Debug.Entry(4, $"ParentObject is {objectDesc}", Indent: 1);*/
-
             BeforeRapidAdvancementEvent.Send(Amount, ParentObject);
             return true;
         }
 
-        [HarmonyPostfix]
+        [HarmonyPatch(
+            declaringType: typeof(Leveler),
+            methodName: nameof(Leveler.RapidAdvancement),
+            argumentTypes: new Type[] { typeof(int), typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPriority(1)]
-        [HarmonyPatch(nameof(Leveler.RapidAdvancement))]
-        static void RapidAdvancement_SendAfterEvent_Postfix(int Amount, GameObject ParentObject)
+        [HarmonyPostfix]
+        public static void RapidAdvancement_SendAfterEvent_Postfix(int Amount, GameObject ParentObject)
         {
-            /*Debug.Entry(4,
-                $"{typeof(Leveler_Patches).Name}." +
-                $"{nameof(RapidAdvancement_SendAfterEvent_Postfix)}(int Amount, GameObject ParentObject)", 
-            Indent: 0);
-
-            string objectDesc = ParentObject != null 
-                ? $"{ParentObject?.ID}:{ParentObject?.ShortDisplayNameStripped}" 
-                : "[null]";
-
-            Debug.Entry(4, $"ParentObject is {objectDesc}", Indent: 1);*/
-
             AfterRapidAdvancementEvent.Send(Amount, ParentObject);
         }
     }

@@ -4,14 +4,20 @@ using XRL;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
+    [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class AfterModGiganticAppliedEvent : ModPooledEvent<AfterModGiganticAppliedEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(AfterModGiganticAppliedEvent));
+
         public new static readonly int CascadeLevel = CASCADE_ALL;
+
+        public static readonly string RegisteredEventID = nameof(AfterModGiganticAppliedEvent);
 
         public GameObject Object;
 
@@ -20,6 +26,10 @@ namespace HNPS_GigantismPlus
         public override int GetCascadeLevel()
         {
             return CascadeLevel;
+        }
+        public virtual string GetRegisteredEventID()
+        {
+            return RegisteredEventID;
         }
 
         public override void Reset()
@@ -31,24 +41,45 @@ namespace HNPS_GigantismPlus
 
         public static AfterModGiganticAppliedEvent FromPool(GameObject Object, ModGigantic Modification)
         {
-            AfterModGiganticAppliedEvent afterModGiganticAppliedEvent = FromPool();
-            afterModGiganticAppliedEvent.Object = Object;
-            afterModGiganticAppliedEvent.Modification = Modification;
-            return afterModGiganticAppliedEvent;
+            AfterModGiganticAppliedEvent E = FromPool();
+            E.Object = Object;
+            E.Modification = Modification;
+            return E;
         }
         public static void Send(GameObject Object, ModGigantic Modification)
         {
-            AfterModGiganticAppliedEvent afterModGiganticAppliedEvent = FromPool(Object, Modification);
+            AfterModGiganticAppliedEvent E = FromPool(Object, Modification);
 
-            bool flag = The.Game.HandleEvent(afterModGiganticAppliedEvent) && Object.HandleEvent(afterModGiganticAppliedEvent);
+            bool haveGame = The.Game != null;
+            bool haveObject = Object != null;
 
-            if (flag && Object.HasRegisteredEvent(typeof(AfterModGiganticAppliedEvent).Name))
+            bool gameWants = haveGame && haveObject && The.Game.WantEvent(ID, CascadeLevel);
+
+            bool objectWantsMin = haveObject && Object.WantEvent(ID, CascadeLevel);
+            bool objectWantsStr = haveObject && Object.HasRegisteredEvent(RegisteredEventID);
+
+            bool anyWants = gameWants || objectWantsMin || objectWantsStr;
+
+            bool proceed = anyWants;
+
+            if (proceed)
             {
-                Event @event = Event.New(typeof(AfterModGiganticAppliedEvent).Name);
-                @event.SetParameter("Object", Object);
-                @event.SetParameter("Modification", Modification);
-                Object.FireEvent(@event);
-                @event.Clear();
+                if (proceed && gameWants)
+                {
+                    proceed = The.Game.HandleEvent(E);
+                }
+                if (proceed && objectWantsMin)
+                {
+                    proceed = Object.HandleEvent(E);
+                }
+                if (proceed && objectWantsStr)
+                {
+                    Event @event = Event.New(nameof(AfterModGiganticAppliedEvent));
+                    @event.SetParameter("Object", Object);
+                    @event.SetParameter("ModPart", Modification);
+                    proceed = Object.FireEvent(@event);
+                    @event.Clear();
+                }
             }
         }
     }

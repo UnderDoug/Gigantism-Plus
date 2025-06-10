@@ -1,237 +1,373 @@
 <?xml version="1.0" encoding="utf-8"?>
 <objects>
-    <!-- 
-       Add NaturalEquipmentManager to Item
-     -->
-    <object Name="NaturalWeapon" Load="Merge">
-      <part Name="NaturalEquipmentManager" />
-    </object>
   
-    <!-- 
-        Make select creatures Gigantic: 
-        - give mutation "GigantismPlus"
-        - remove tag "Gigantic" 
-        Give creatures InventoryGigantifier.
-        Give creatures ObjectCreationAnalyzer.
-     -->
-    <object Name="Creature" Load="Merge">
-      <part Name="InventoryGigantifier" />
-      <!-- part Name="ObjectCreationAnalyzer" /-->
-      <builder Name="Gigantified" ChanceOneIn="5000" />
-    </object>
-    <object Name="Templar" Load="Merge">
-      <builder Name="Gigantified" ChanceOneIn="500" />
-    </object>
-    <object Name="Great Saltback" Load="Merge">
-        <mutation Name="GigantismPlus" Level="3" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="Chrome Pyramid" Load="Merge">
-        <mutation Name="GigantismPlus" Level="7" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-	  </object>
-	  <object Name="Great Magma Crab" Load="Merge">
-		    <mutation Name="GigantismPlus" Level="2" />
-		    <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="Saltwurm" Load="Merge">
-        <mutation Name="GigantismPlus" Level="10" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="Star Kraken" Load="Merge">
-        <mutation Name="GigantismPlus" Level="10" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="VehicleTemplarMech" Load="Merge">
-        <mutation Name="GigantismPlus" Level="5" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="BaseNephal" Load="Merge">
-        <mutation Name="GigantismPlus" Level="10" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="BaseVehicleGolem" Load="Merge">
-        <mutation Name="GigantismPlus" Level="5" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="Rodanis Y" Load="Merge">
-        <mutation Name="GigantismPlus" Level="2" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="Oboroqoru" Load="Merge">
-        <mutation Name="GigantismPlus" Level="16" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-    <object Name="Troll" Load="Merge">
-        <mutation Name="GigantismPlus" Level="4" />
-        <removetag Name="Gigantic" />
-        <tag Name="GigantismPlusColorChange" Value="false" />
-    </object>
-
-    <!--object Name="Knight Templar" Load="Merge">
-        <part Name="CyberneticsHasImplants" Implants="GiganticExoframeDelta@body" />
-    </object-->
-    <!-- End make creatures Gigantic -->
+  <!-- 
+      Make select creatures Gigantic: 
+      - give mutation "GigantismPlus"
+      - remove tag "Gigantic" 
+      Give creatures InventoryGigantifier.
+      Give creatures ObjectCreationAnalyzer.
+    -->
+  <object Name="Creature" Load="Merge">
+    <part Name="InventoryGigantifier" />
+    <!-- part Name="ObjectCreationAnalyzer" /-->
+    <builder Name="Gigantified" ChanceOneIn="5000" />
+    <intproperty Name="WrassleGearBestowChance" Value="15" />
+    <skill Name="Tactics_Vault" />
+  </object>
   
-    <!-- 
-        Make creatures Elongated: 
-        - give mutation "ElongatedPaws" 
-     -->
-    <object Name="Urshiib" Load="Merge">
-      <mutation Name="ElongatedPaws" />
-    </object>
-    <!-- End make creatures Elongated -->
+  <object Name="Templar" Load="Merge">
+    <builder Name="Gigantified" ChanceOneIn="500" />
+    <property Name="NoWrassleGear" Value="NonePlease!" />
+  </object>
+  
+  <object Name="Great Saltback" Load="Merge">
+    <mutation Name="GigantismPlus" Level="5" />
+    <property Name="GenerateWithStews" Value="2d3" />
+    <property Name="NoWrassleGear" Value="NonePlease!" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="Chrome Pyramid" Load="Merge">
+    <mutation Name="GigantismPlus" Level="7" />
+    <removetag Name="Gigantic" />
+    <property Name="NoWrassleGear" Value="NonePlease!" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+	</object>
+	<object Name="Great Magma Crab" Load="Merge">
+		<mutation Name="GigantismPlus" Level="5" />
+    <property Name="GenerateWithStews" Value="2d3" />
+    <property Name="NoWrassleGear" Value="NonePlease!" />
+		<removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="Saltwurm" Load="Merge">
+    <mutation Name="GigantismPlus" Level="8" />
+    <property Name="GenerateWithStews" Value="2d3" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="Star Kraken" Load="Merge">
+    <mutation Name="GigantismPlus" Level="8" />
+    <property Name="GenerateWithStews" Value="3d4" />
+    <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="VehicleTemplarMech" Load="Merge">
+    <mutation Name="GigantismPlus" Level="8" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="BaseNephal" Load="Merge">
+    <mutation Name="GigantismPlus" Level="10" />
+    <property Name="GenerateWithStews" Value="3d3" />
+    <intproperty Name="RapidLevel_GigantismPlus" Value="6" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="BaseVehicleGolem" Load="Merge">
+    <mutation Name="GigantismPlus" Level="5" />
+    <property Name="GenerateWithStews" Value="2d3" />
+    <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="Rodanis Y" Load="Merge">
+    <mutation Name="GigantismPlus" Level="8" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="Oboroqoru" Load="Merge">
+    <mutation Name="GigantismPlus" Level="10" />
+    <property Name="GenerateWithStews" Value="3d3" />
+    <intproperty Name="RapidLevel_GigantismPlus" Value="6" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="Troll" Load="Merge">
+    <mutation Name="GigantismPlus" Level="6" />
+    <property Name="GenerateWithStews" Value="3d3" />
+    <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
+    <removetag Name="Gigantic" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  
+  <object Name="Mak" Load="Merge">
+    <mutation Name="GigantismPlus" Level="4" />
+    <property Name="GenerateWithStews" Value="6d3-3" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+    <tag Name="WrasslerColorChange" Value="false" />
+  </object>
+  
+  <object Name="Goek" Load="Merge">
+    <mutation Name="GigantismPlus" Level="4" />
+    <property Name="GenerateWithStews" Value="6d3-3" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+    <tag Name="WrasslerColorChange" Value="false" />
+  </object>
+  
+  <object Name="Geeub" Load="Merge">
+    <mutation Name="GigantismPlus" Level="4" />
+    <property Name="GenerateWithStews" Value="6d3-3" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+    <tag Name="WrasslerColorChange" Value="false" />
+  </object>
 
-    <!-- 
-        Putus Templar: Giant-Slayers
-     -->
-    <object Name="TemplarGiantSlayerBase" Inherits="Templar">
-      <part Name="Render" DisplayName="Templar Giant-Slayer"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png" 
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"  
-            />
-      <part Name="Description" Short="An over-square jaw competes with =pronouns.possessive= broad, furrowed brow for posession of =pronouns.possessive= face. =pronouns.Possessive= posture hints at a once bent spine, and =pronouns.possessive= gait all but betrays it. =pronouns.Subjective= =verb:flex:afterpronoun= =pronouns.possessive= immense fists in subconcious anticipation of imminent glory, while =pronouns.possessive= deep-set, monochrome eyes flicker hopefully across the horizon." />
-      <removeskill Name="LongBlades" />
-      <removeskill Name="LongBladesProficiency" />
-      <skill Name="Acrobatics" />
-      <skill Name="Acrobatics_Jump" />
-      <skill Name="Cudgel" />
-      <skill Name="Cudgel_Expertise" />
-      <tag Name="BaseObject" Value="*noinherit" />
-      <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Equipment Pool" />
-      <builder Name="Gigantified" ChanceOneIn="1" />
-    </object>
+  <!-- End make creatures Gigantic -->
+  
+  <!-- 
+      Swap Burrowing Claws mutation class for creatures that come with it.
+    -->
+  <object Name="MopangoCharioteer" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" />
+  </object>
+  <object Name="MopangoPilgrim" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
+  </object>
+  <object Name="MopangoPilgrim Still" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
+  </object>
+  <object Name="MopangoTombdweller" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
+  </object>
+  <object Name="MopangoWatcher" Load="Merge">
+    <removemutation Name="BurrowingClaws" />
+    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="6" />
+  </object>
+  
+  <!-- 
+      Swap Horns mutation class for creatures that come with it.
+    -->
+  <object Name="Horned Chameleon" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="1" Variant="Horns Single" />
+  </object>
+  <object Name="BaseHindren" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="3" Variant="Horns Antlers" />
+  </object>
+  <object Name="Fork-Horned Gnu" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="5" Variant="Horns" />
+  </object>
+  <object Name="Unimax" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="10" Variant="Horns Spiral" />
+    <intproperty Name="RapidLevel_UD_HornsPlus" Value="6" />
+  </object>
+  <object Name="Goat Golem" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="Horns" />
+  </object>
+  <object Name="Warden Yrame" Load="Merge">
+    <removemutation Name="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="Horns" />
+  </object>
+  
+  <!-- 
+      Swap Quills mutation class for creatures that come with it.
+    -->
+  <object Name="Prickler" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="1" />
+  </object>
+  <object Name="Quillipede" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="3" />
+  </object>
+  <object Name="Urshiib" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="6" />
+  </object>
+  <object Name="Urchin Golem" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="10" />
+  </object>
+  <object Name="Urshiib Golem" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="9" />
+    <intproperty Name="RapidLevel_UD_QuillsPlus" Value="3" />
+  </object>
+  <object Name="Dagasha" Load="Merge">
+    <removemutation Name="Quills" />
+    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="10" />
+  </object>
+  
+  <!-- 
+      Make creatures Elongated: 
+      - give mutation "ElongatedPaws" 
+    -->
+  <object Name="Urshiib" Load="Merge">
+    <mutation Name="ElongatedPaws" DisplayName="Elongated Paws" />
+  </object>
+  <!-- End make creatures Elongated -->
 
-    <object Name="Templar Squire Giant-Slayer" Inherits="TemplarGiantSlayerBase">
-      <part Name="Render" DisplayName="Templar Squire Giant-Slayer"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"
-            />
-      <stat Name="Level" Value="11" />
-      <stat Name="Hitpoints" Value="32" />
-      <stat Name="Strength" Boost="2" />
-      <inventoryobject Blueprint="Carbide Shield" />
-      <tag Name="InventoryPopulationTable" Value="Templar Squire Giant-Slayer Extra Armor" />
-    </object>
+  <!-- 
+      Putus Templar: Giant-Slayers
+    -->
+  <object Name="TemplarGiantSlayerBase" Inherits="Templar">
+    <part Name="Render" DisplayName="Templar Giant-Slayer"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png" 
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"  
+          />
+    <part Name="Description" Short="An over-square jaw competes with =pronouns.possessive= broad, furrowed brow for posession of =pronouns.possessive= face. =pronouns.Possessive= posture hints at a once bent spine, and =pronouns.possessive= gait all but betrays it. =pronouns.Subjective= =verb:flex:afterpronoun= =pronouns.possessive= immense fists in subconcious anticipation of imminent glory, while =pronouns.possessive= deep-set, monochrome eyes flicker hopefully across the horizon." />
+    <removeskill Name="LongBlades" />
+    <removeskill Name="LongBladesProficiency" />
+    <skill Name="Acrobatics" />
+    <skill Name="Acrobatics_Jump" />
+    <skill Name="Cudgel" />
+    <skill Name="Cudgel_Expertise" />
+    <tag Name="BaseObject" Value="*noinherit" />
+    <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Equipment Pool" />
+    <builder Name="Gigantified" ChanceOneIn="1" />
+  </object>
 
-    <object Name="Templar Giant-Slayer" Inherits="TemplarGiantSlayerBase">
-      <part Name="Render" DisplayName="Templar Giant-Slayer"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
-      <stat Name="Level" Value="21" />
-      <stat Name="Hitpoints" Value="65" />
-      <stat Name="Strength" Boost="3" />
-      <stat Name="Willpower" Boost="1" />
-      <skill Name="Endurance" />
-      <skill Name="Endurance_ShakeItOff" />
-      <skill Name="Cudgel_Bludgeon" />
-      <skill Name="Cudgel_Slam" />
-      <skill Name="SingleWeaponFighting" />
-      <skill Name="SingleWeaponFighting_OpportuneAttacks" />
-      <inventoryobject Blueprint="Fullerite Shield" />
-      <inventoryobject Blueprint="Fullerite Gauntlets" AutoMod="ModSpiked" />
-      <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Extra Armor" />
-      <part Name="CyberneticsHasRandomImplants"
-            ImplantChance="25" ChangeColor="false" 
-            ImplantTable="Cybernetics4" LicensesAtLeast="6" />
-    </object>
+  <object Name="Templar Squire Giant-Slayer" Inherits="TemplarGiantSlayerBase">
+    <part Name="Render" DisplayName="Templar Squire Giant-Slayer"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"
+          />
+    <stat Name="Level" Value="11" />
+    <stat Name="Hitpoints" Value="32" />
+    <stat Name="Strength" Boost="2" />
+    <inventoryobject Blueprint="Carbide Shield" />
+    <tag Name="InventoryPopulationTable" Value="Templar Squire Giant-Slayer Extra Armor" />
+  </object>
 
-    <object Name="Giant-Slayer Commander" Inherits="TemplarGiantSlayerBase">
-      <part Name="Render" DisplayName="Giant-Slayer Commander"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
-      <stat Name="Level" Value="31" />
-      <stat Name="Hitpoints" Value="250" />
-      <stat Name="Strength" Boost="4" />
-      <stat Name="Willpower" Boost="2" />
-      <stat Name="Toughness" Boost="1" />
-      <skill Name="Endurance" />
-      <skill Name="Endurance_ShakeItOff" />
-      <skill Name="Endurance_Weathered" />
-      <skill Name="Tactics" />
-      <skill Name="Tactics_Charge" />
-      <skill Name="Cudgel_Bludgeon" />
-      <skill Name="Cudgel_Slam" />
-      <skill Name="Cudgel_ChargingStrike" />
-      <skill Name="Cudgel_Backswing" />
-      <skill Name="SingleWeaponFighting" />
-      <skill Name="SingleWeaponFighting_OpportuneAttacks" />
-      <skill Name="SingleWeaponFighting_WeaponExpertise" />
-      <inventoryobject Blueprint="Crysteel Shield" AutoMod="ModSpiked" />
-      <inventoryobject Blueprint="Crysteel Gauntlets" AutoMod="ModSpiked" />
-      <tag Name="InventoryPopulationTable" Value="Giant-Slayer Commander Extra Armor" />
-      <part Name="CyberneticsHasRandomImplants"
-            ImplantChance="45" ChangeColor="false"
-            ImplantTable="Cybernetics5" LicensesAtLeast="8" />
-    </object>
+  <object Name="Templar Giant-Slayer" Inherits="TemplarGiantSlayerBase">
+    <part Name="Render" DisplayName="Templar Giant-Slayer"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+    <stat Name="Level" Value="21" />
+    <stat Name="Hitpoints" Value="65" />
+    <stat Name="Strength" Boost="3" />
+    <stat Name="Willpower" Boost="1" />
+    <skill Name="Endurance" />
+    <skill Name="Endurance_ShakeItOff" />
+    <skill Name="Cudgel_Bludgeon" />
+    <skill Name="Cudgel_Slam" />
+    <skill Name="SingleWeaponFighting" />
+    <skill Name="SingleWeaponFighting_OpportuneAttacks" />
+    <inventoryobject Blueprint="Fullerite Shield" />
+    <inventoryobject Blueprint="Fullerite Gauntlets" AutoMod="ModSpiked" />
+    <tag Name="InventoryPopulationTable" Value="Templar Giant-Slayer Extra Armor" />
+    <part Name="CyberneticsHasRandomImplants"
+          ImplantChance="25" ChangeColor="false" 
+          ImplantTable="Cybernetics4" LicensesAtLeast="6" />
+  </object>
 
-    <object Name="Uplifted Giant-Slayer Commander" Inherits="Giant-Slayer Commander">
-      <part Name="Render" DisplayName="Giant-Slayer Commander"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
-      <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
-      <tag Name="NamingTag" Value="KnightCommander" />
-      <tag Name="NoLibrarian" />
-      <tag Name="ExcludeFromVillagePopulations" />
-    </object>
+  <object Name="Giant-Slayer Commander" Inherits="TemplarGiantSlayerBase">
+    <part Name="Render" DisplayName="Giant-Slayer Commander"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+    <stat Name="Level" Value="31" />
+    <stat Name="Hitpoints" Value="250" />
+    <stat Name="Strength" Boost="4" />
+    <stat Name="Willpower" Boost="2" />
+    <stat Name="Toughness" Boost="1" />
+    <skill Name="Endurance" />
+    <skill Name="Endurance_ShakeItOff" />
+    <skill Name="Endurance_Weathered" />
+    <skill Name="Tactics" />
+    <skill Name="Tactics_Charge" />
+    <skill Name="Cudgel_Bludgeon" />
+    <skill Name="Cudgel_Slam" />
+    <skill Name="Cudgel_ChargingStrike" />
+    <skill Name="Cudgel_Backswing" />
+    <skill Name="SingleWeaponFighting" />
+    <skill Name="SingleWeaponFighting_OpportuneAttacks" />
+    <skill Name="SingleWeaponFighting_WeaponExpertise" />
+    <inventoryobject Blueprint="Crysteel Shield" AutoMod="ModSpiked" />
+    <inventoryobject Blueprint="Crysteel Gauntlets" AutoMod="ModSpiked" />
+    <tag Name="InventoryPopulationTable" Value="Giant-Slayer Commander Extra Armor" />
+    <part Name="CyberneticsHasRandomImplants"
+          ImplantChance="45" ChangeColor="false"
+          ImplantTable="Cybernetics5" LicensesAtLeast="8" />
+  </object>
 
-    <object Name="Grand Giant-Slayer" Inherits="TemplarGiantSlayerBase">
-      <part Name="Render" DisplayName="Grand Giant-Slayer"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
-      <stat Name="Level" Value="41" />
-      <stat Name="Hitpoints" Value="415" />
-      <stat Name="Strength" Boost="5" />
-      <stat Name="Willpower" Boost="2" />
-      <stat Name="Toughness" Boost="2" />
-      <skill Name="Endurance" />
-      <skill Name="Endurance_ShakeItOff" />
-      <skill Name="Endurance_Weathered" />
-      <skill Name="Endurance_Calloused" />
-      <skill Name="Tactics" />
-      <skill Name="Tactics_Charge" />
-      <skill Name="Cudgel_Bludgeon" />
-      <skill Name="Cudgel_Slam" />
-      <skill Name="Cudgel_ChargingStrike" />
-      <skill Name="Cudgel_Backswing" />
-      <skill Name="Cudgel_Conk" />
-      <skill Name="Cudgel_SmashUp" />
-      <skill Name="SingleWeaponFighting" />
-      <skill Name="SingleWeaponFighting_OpportuneAttacks" />
-      <skill Name="SingleWeaponFighting_WeaponExpertise" />
-      <skill Name="SingleWeaponFighting_PenetratingStrikes" />
-      <inventoryobject Blueprint="Flawless Crysteel Shield" AutoMod="ModSpiked" />
-      <inventoryobject Blueprint="Flawless Crysteel Gauntlets" AutoMod="ModSpiked" />
-      <tag Name="InventoryPopulationTable" Value="Grand Giant-Slayer Extra Armor" />
-      <part Name="CyberneticsHasRandomImplants"
-            ImplantChance="65" ChangeColor="false"
-            ImplantTable="Cybernetics5" LicensesAtLeast="10" />
-    </object>
+  <object Name="Uplifted Giant-Slayer Commander" Inherits="Giant-Slayer Commander">
+    <part Name="Render" DisplayName="Giant-Slayer Commander"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+    <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
+    <tag Name="NamingTag" Value="KnightCommander" />
+    <tag Name="NoLibrarian" />
+    <tag Name="ExcludeFromVillagePopulations" />
+  </object>
 
-    <object Name="Uplifted Grand Giant-Slayer" Inherits="Grand Giant-Slayer">
-      <part Name="Render" DisplayName="Grand Giant-Slayer"
-            RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-            ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
-      <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
-      <tag Name="NamingTag" Value="KnightCommander" />
-      <tag Name="NoLibrarian" />
-      <tag Name="ExcludeFromVillagePopulations" />
-    </object>
+  <object Name="Grand Giant-Slayer" Inherits="TemplarGiantSlayerBase">
+    <part Name="Render" DisplayName="Grand Giant-Slayer"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+    <stat Name="Level" Value="41" />
+    <stat Name="Hitpoints" Value="415" />
+    <stat Name="Strength" Boost="5" />
+    <stat Name="Willpower" Boost="2" />
+    <stat Name="Toughness" Boost="2" />
+    <skill Name="Endurance" />
+    <skill Name="Endurance_ShakeItOff" />
+    <skill Name="Endurance_Weathered" />
+    <skill Name="Endurance_Calloused" />
+    <skill Name="Tactics" />
+    <skill Name="Tactics_Charge" />
+    <skill Name="Cudgel_Bludgeon" />
+    <skill Name="Cudgel_Slam" />
+    <skill Name="Cudgel_ChargingStrike" />
+    <skill Name="Cudgel_Backswing" />
+    <skill Name="Cudgel_Conk" />
+    <skill Name="Cudgel_SmashUp" />
+    <skill Name="SingleWeaponFighting" />
+    <skill Name="SingleWeaponFighting_OpportuneAttacks" />
+    <skill Name="SingleWeaponFighting_WeaponExpertise" />
+    <skill Name="SingleWeaponFighting_PenetratingStrikes" />
+    <inventoryobject Blueprint="Flawless Crysteel Shield" AutoMod="ModSpiked" />
+    <inventoryobject Blueprint="Flawless Crysteel Gauntlets" AutoMod="ModSpiked" />
+    <tag Name="InventoryPopulationTable" Value="Grand Giant-Slayer Extra Armor" />
+    <part Name="CyberneticsHasRandomImplants"
+          ImplantChance="65" ChangeColor="false"
+          ImplantTable="Cybernetics5" LicensesAtLeast="10" />
+  </object>
 
-    <!-- 
-        Vanilla Fixes
-     -->
-    <object Name="Scorpiock_Claws" Load="Merge">
-      <part Name="Render" DisplayName="claw" Load="Merge" />
-    </object>
+  <object Name="Uplifted Grand Giant-Slayer" Inherits="Grand Giant-Slayer">
+    <part Name="Render" DisplayName="Grand Giant-Slayer"
+          RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
+    <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
+    <tag Name="NamingTag" Value="KnightCommander" />
+    <tag Name="NoLibrarian" />
+    <tag Name="ExcludeFromVillagePopulations" />
+  </object>
+
+  <!-- 
+      Vanilla "Fixes"
+    -->
+  <object Name="Scorpiock_Claws" Load="Merge">
+    <!-- this object is both a plural and has DisplayName="claws" resulting in "clawss" -->
+    <part Name="Render" DisplayName="claws" />
+    <tag Name="DisplayNameSingular" Value="claw" />
+  </object>
+  <object Name="Horns" Load="Merge">
+    <!-- this object is both a plural and has DisplayName="claws" resulting in "hornses" -->
+    <tag Name="DisplayNameSingular" Value="horn" />
+  </object>
+  <object Name="Horns Antlers" Load="Merge">
+    <!-- this object is both a plural and has DisplayName="antlers" resulting in "antlerses" -->
+    <tag Name="DisplayNameSingular" Value="antler" />
+  </object>
+
+  <object Name="Horns Single" Load="Merge">
+    <removetag Name="DisplayNameSingular" />
+  </object>
+  <object Name="Horns Casque" Load="Merge">
+    <removetag Name="DisplayNameSingular" />
+  </object>
+  <object Name="Horns Spiral" Load="Merge">
+    <removetag Name="DisplayNameSingular" />
+  </object>
+  
 </objects>

@@ -52,7 +52,7 @@ namespace HNPS_GigantismPlus
                     Popup.Show("...You've {{W|really}} done it...");
                     Popup.Show("At last, you have {{c|become}}...");
                     string finalMessage = "{{SECRETGOLDEN|";
-                    finalMessage += BecomingStrings.GetRandomElement(RndGP);
+                    finalMessage += BecomingStrings.GetRandomElement();
                     finalMessage += "}}";
                     Popup.Show(finalMessage);
                 }
@@ -62,7 +62,7 @@ namespace HNPS_GigantismPlus
                     hadFrameCount = User.GetIntProperty(SecretExoframePart.HadFrameCountProperty);
                     secretExoframePart.HadFrameCount = hadFrameCount;
                     secretExoframePart.ExoframeObject = ImplantObject;
-                    secretExoframePart.ExoframeObject.DisplayName = "{{SECRETGOLDEN|" + GoldExoframeNames.GetRandomElement(RndGP) + "}}";
+                    secretExoframePart.ExoframeObject.DisplayName = "{{SECRETGOLDEN|" + GoldExoframeNames.GetRandomElement() + "}}";
 
                     secretExoframePart.OldBleedLiquid = User.GetStringProperty("BleedLiquid");
                     secretExoframePart.OldBleedPrefix = User.GetStringProperty("BleedPrefix");

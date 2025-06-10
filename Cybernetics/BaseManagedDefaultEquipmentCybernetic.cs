@@ -1,14 +1,16 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
 
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
+
+using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
@@ -21,101 +23,74 @@ namespace XRL.World.Parts
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        // Dictionary holds a BodyPart.Type string as Key, and naturalEquipmentMod for that BodyPart.
-        // Property is for easier access if the mutation has only a single type (via naturalEquipmentMod.Type).
-        public Dictionary<string, ModNaturalEquipment<T>> NaturalEquipmentMods { get; set; }
-        public ModNaturalEquipment<T> NaturalEquipmentMod { get; set; }
+        private static bool doDebug => getClassDoDebug("BaseManagedDefaultEquipmentCybernetic");
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+                "getMods",
+                'M',    // Manage
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+        public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
+        public virtual ModNaturalEquipment<T> NaturalEquipmentMod => GetNaturalEquipmentMod();
+
         public int Level { get; set; }
 
         private GameObject _implantee = null;
         public GameObject Implantee
         {
-            get
-            {
-                return _implantee ??= ImplantObject?.Equipped;
-            }
+            get => _implantee ??= ImplantObject?.Implantee;
             set => _implantee = value == null ? null : _implantee;
         }
 
         private GameObject _implantObject = null;
         public GameObject ImplantObject
         {
-            get
-            {
-                return _implantObject ??= ParentObject;
-            }
+            get =>_implantObject ??= ParentObject;
             set => _implantObject = value == null ? null : _implantObject;
         }
 
         public BaseManagedDefaultEquipmentCybernetic()
         {
             Level = 1;
-            NaturalEquipmentMods = new();
-            NaturalEquipmentMod = new();
-        }
-
-        public BaseManagedDefaultEquipmentCybernetic(T NewAssigner)
-            : this()
-        {
-            foreach ((_, ModNaturalEquipment<T> naturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                naturalEquipmentMod.AssigningPart = NewAssigner;
-            }
-            NaturalEquipmentMod.AssigningPart = NewAssigner;
-        }
-
-        // Takes an existing NaturalEquipmentMods Dictionary
-        public BaseManagedDefaultEquipmentCybernetic(
-            Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, 
-            T NewAssigner)
-            : this(NewAssigner)
-        {
-            Dictionary<string, ModNaturalEquipment<T>> newNaturalEquipmentMods = new();
-            foreach ((string bodyPartType, ModNaturalEquipment<T> naturalEquipmentMod) in naturalEquipmentMods)
-            {
-                ModNaturalEquipment<T> newNaturalEquipmentMod = new(naturalEquipmentMod, NewAssigner);
-                newNaturalEquipmentMods.Add(bodyPartType, newNaturalEquipmentMod);
-            }
-            NaturalEquipmentMods = newNaturalEquipmentMods;
-        }
-
-        public BaseManagedDefaultEquipmentCybernetic(
-            ModNaturalEquipment<T> naturalEquipmentMod, 
-            T NewAssigner)
-            : this(NewAssigner)
-        {
-            NaturalEquipmentMod = new(naturalEquipmentMod, NewAssigner);
-        }
-
-        public BaseManagedDefaultEquipmentCybernetic(
-            Dictionary<string, ModNaturalEquipment<T>> naturalEquipmentMods, 
-            ModNaturalEquipment<T> naturalEquipmentMod, 
-            T NewAssigner)
-            : this(naturalEquipmentMods, NewAssigner)
-        {
-            NaturalEquipmentMod = new(naturalEquipmentMod, NewAssigner);
         }
 
         public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
         {
             if (Parts == null) return false;
             NaturalEquipmentMod.AddedParts ??= new();
-            string[] parts = Parts.Split(',');
-            foreach (string part in parts)
+            if (Parts.Contains(","))
             {
-                NaturalEquipmentMod.AddedParts.Add(part);
+                string[] parts = Parts.Split(',');
+                foreach (string part in parts)
+                {
+                    NaturalEquipmentMod.AddedParts.TryAdd(part);
+                }
             }
-            return true;
+            else
+            {
+                NaturalEquipmentMod.AddedParts.TryAdd(Parts);
+            }
+            return !NaturalEquipmentMod.AddedParts.IsNullOrEmpty();
         }
         public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props)
         {
             if (Props == null) return false;
-            if (Props.ParseProps(out Dictionary<string, string> StringProps, out Dictionary<string, int> IntProps))
-            {
-                NaturalEquipmentMod.AddedStringProps = StringProps;
-                NaturalEquipmentMod.AddedIntProps = IntProps;
-            }
-            return true;
+            Props.ParseProps(out NaturalEquipmentMod.AddedStringProps, out NaturalEquipmentMod.AddedIntProps);
+            return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1)
@@ -152,162 +127,271 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod.AddedIntProps;
         }
 
-        public virtual bool UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
+        public virtual ModNaturalEquipment<T> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
         {
+            return null;
+        }
+        public virtual List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
+        {
+            int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(UpdateNaturalEquipmentMod)}(ModNaturalEquipment<{typeof(T).Name}> NaturalEquipmentMod[{NaturalEquipmentMod.BodyPartType}], int Level: {Level})",
-                Indent: 2);
+                + $"{nameof(GetNaturalEquipmentMods)}("
+                + $"{nameof(Filter)}, "
+                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            NewAssigner ??= (T)this;
+            List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
+            ModNaturalEquipment<T> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
+            if (naturalEquipmentMod != null)
+            {
+                naturalEquipmentModsList.Add(naturalEquipmentMod);
+            }
+
+            Debug.LastIndent = indent;
+            return naturalEquipmentModsList;
+        }
+
+        public virtual ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
 
             NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
-            return true;
-        }
 
-        public virtual bool ProcessNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
-        {
-            Debug.Entry(4,
-                $"@ {typeof(T).Name}."
-                + $"{nameof(ProcessNaturalEquipment)}",
-                Indent: 1);
+            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
-            string targetType = TargetBodyPart.Type;
-            Debug.LoopItem(4, $" part", $"{TargetBodyPart.Description} [{TargetBodyPart.ID}:{TargetBodyPart.Type}]", Indent: 2);
-            ModNaturalEquipment<T> naturalEquipmentMod = null;
-            if (NaturalEquipmentMod != null && NaturalEquipmentMod.BodyPartType == targetType)
-            {
-                naturalEquipmentMod = NaturalEquipmentMod;
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property contains entry for this BodyPart", Indent: 2);
-                Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2);
-            }
-            else
-            {
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Property does not contain entry for this BodyPart", Indent: 2);
-            }
-
-            if (!NaturalEquipmentMods.IsNullOrEmpty() && NaturalEquipmentMods.ContainsKey(targetType))
-            {
-                naturalEquipmentMod = NaturalEquipmentMods[targetType];
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary contains entry for this BodyPart", Indent: 2);
-                Manager.AddNaturalEquipmentMod(naturalEquipmentMod);
-                Debug.Entry(4, $"Added NaturalWeaponMod: {naturalEquipmentMod?.Name}", Indent: 2);
-            }
-            else
-            {
-                Debug.CheckYeh(4, $"NaturalEquipmentMod Dictionary does not contain entry for this BodyPart", Indent: 2);
-            }
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
-                + $"{nameof(ProcessNaturalEquipment)} @//",
-                Indent: 1);
-            return true;
+                + $"{nameof(UpdateNaturalEquipmentMod)}("
+                + $"{NaturalEquipmentMod.GetType().Name}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
+            return NaturalEquipmentMod;
+        }
+        public virtual List<ModNaturalEquipment<T>> UpdateNaturalEquipmentMods(List<ModNaturalEquipment<T>> NaturalEquipmentMods, int Level)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach (ModNaturalEquipment<T> naturalEquipmentMod in NaturalEquipmentMods)
+                {
+                    UpdateNaturalEquipmentMod(naturalEquipmentMod, Level);
+                }
+            }
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(UpdateNaturalEquipmentMods)}("
+                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(Level)}: {Level})"
+                + $" *//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
+            return NaturalEquipmentMods;
         }
 
         public virtual void OnImplanted(GameObject Implantee, GameObject Implant)
         {
-            Implantee.Body.UpdateBodyParts();
+            Implantee?.Body?.UpdateBodyParts();
         } //!-- public override void OnImplanted(GameObject Object)
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
-            Implantee.Body.UpdateBodyParts();
+            Implantee?.Body?.UpdateBodyParts();
         } //!-- public override void OnUnimplanted(GameObject Object)
 
-        public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
+        public virtual void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = Implantee.GetCurrentZone();
-            string InstanceObjectZoneID = "[Pre-build]";
-            if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, $"{typeof(T).Name}", $"{nameof(OnManageNaturalEquipment)}(body)");
-            Debug.Entry(4, $"TARGET {Implantee.DebugName} in zone {InstanceObjectZoneID}", Indent: 0);
+            string InstanceObjectZoneID = InstanceObjectZone?.ZoneID ?? "[Pre-build]";
 
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
-            ProcessNaturalEquipment(Manager, TargetBodyPart);
-            Debug.Divider(4, "-", Count: 25, Indent: 1);
+            Debug.Header(4, 
+                $"{typeof(T).Name}", 
+                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"(body)", Toggle: getDoDebug('M'));
+            Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", 
+                Indent: 0, Toggle: getDoDebug('M'));
+
+            // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
+
+            // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageNaturalEquipment)}(body of: {Implantee.Blueprint})");
-        } //!-- public virtual void OnManageNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
-        public virtual void OnUpdateNaturalEquipmentMods()
-        {
-            Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
-            foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            }
-            if (NaturalEquipmentMod != null) UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-            Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
-        } //!-- public virtual void OnUpdateNaturalEquipmentMods()
+                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"(body of: {Implantee.Blueprint})", Toggle: getDoDebug('M'));
+        }
 
+        public virtual List<int> GetImplanteeRegisteredEventIDs()
+        {
+            return new()
+            {
+                GetPrioritisedNaturalEquipmentModsEvent.ID,
+                ManageDefaultNaturalEquipmentEvent.ID,
+            };
+        }
+        public virtual void RegisterImplanteeEvents(GameObject Implantee)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"{nameof(RegisterImplanteeEvents)}", Indent: indent + 1, Toggle: getDoDebug('R'));
+
+            List<int> eventIDs = GetImplanteeRegisteredEventIDs();
+            if (!eventIDs.IsNullOrEmpty())
+            {
+                foreach (int eventID in eventIDs)
+                {
+                    Implantee?.RegisterEvent(this, eventID);
+                    Debug.LoopItem(4, $"Registered {nameof(eventID)}: {eventID}]", Indent: indent + 2, Toggle: getDoDebug('R'));
+                }
+            }
+
+            Debug.LastIndent = indent;
+        }
+        public virtual void UnregisterImplanteeEvents(GameObject Implantee)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"{nameof(UnregisterImplanteeEvents)}", Indent: indent + 1, Toggle: getDoDebug('R'));
+
+            List<int> eventIDs = GetImplanteeRegisteredEventIDs();
+            if (!eventIDs.IsNullOrEmpty())
+            {
+                foreach (int eventID in eventIDs)
+                {
+                    Implantee.UnregisterEvent(this, eventID);
+                    Debug.LoopItem(4, $"Unregistered {nameof(eventID)}: {eventID}]", Indent: indent + 2, Toggle: getDoDebug('R'));
+                }
+            }
+
+            Debug.LastIndent = indent;
+        }
         public override bool WantEvent(int ID, int cascade)
         {
-            return ID == ImplantedEvent.ID
-                || ID == UnimplantedEvent.ID
-                || ID == BeforeBodyPartsUpdatedEvent.ID
-                || ID == UpdateNaturalEquipmentModsEvent.ID
-                || ID == AfterBodyPartsUpdatedEvent.ID
-                || ID == BeforeManageDefaultEquipmentEvent.ID
-                || ID == ManageDefaultEquipmentEvent.ID
-                || ID == AfterManageDefaultEquipmentEvent.ID
-                || ID == BeforeRapidAdvancementEvent.ID
-                || ID == AfterRapidAdvancementEvent.ID;
+            return base.WantEvent(ID, cascade)
+                || ID == ImplantedEvent.ID
+                || ID == UnimplantedEvent.ID;
         }
         public override bool HandleEvent(ImplantedEvent E)
         {
-            Implantee = E.Implantee;
-            ImplantObject = E.Item;
-            OnImplanted(Implantee, ImplantObject);
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ImplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            RegisterImplanteeEvents(E.Implantee);
+
+            OnImplanted(E.Implantee, E.Item);
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ImplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}"
+                + $" @//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(UnimplantedEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(UnimplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            UnregisterImplanteeEvents(E.Implantee);
+
             OnUnimplanted(E.Implantee, E.Item);
+
+            Debug.Entry(4,
+                $"x {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(UnimplantedEvent)} E)"
+                + $" {nameof(E.Implantee)}: {E.Implantee?.DebugName ?? NULL}"
+                + $" {nameof(E.Item)}: {E.Item?.DebugName ?? NULL}"
+                + $" @//",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(UpdateNaturalEquipmentModsEvent E)
-        {
-            Debug.Entry(4,
-                $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({typeof(UpdateNaturalEquipmentModsEvent).Name} E)",
-                Indent: 0);
-
-            if (E.Actor == Implantee)
-            {
-                OnUpdateNaturalEquipmentMods();
-            }
-            return base.HandleEvent(E);
-        }
         public virtual bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(BeforeManageDefaultEquipmentEvent E)
-        {
-            return base.HandleEvent(E);
-        }
-        public bool HandleEvent(ManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}({typeof(ManageDefaultEquipmentEvent).Name} E)",
-                Indent: 0);
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
+                Indent: 0, Toggle: getDoDebug("getMods"));
 
-            if (E.Wielder.Is(Implantee) && E.Object.HasPart<NaturalEquipmentManager>())
+            List<ModNaturalEquipment<T>> naturalEquipmentMods = 
+                UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
+                    mod => mod.BodyPartType == E.TargetBodyPart.Type), 
+                    Level);
+
+            foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
             {
-                OnManageNaturalEquipment(E.Manager, E.BodyPart);
+                E.AddNaturalEquipmentMod(naturalEquipmentMod);
             }
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(AfterManageDefaultEquipmentEvent E)
+        public virtual bool HandleEvent(BeforeManageDefaultNaturalEquipmentEvent E)
+        {
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(ManageDefaultNaturalEquipmentEvent E)
+        {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
+                Indent: 0, Toggle: getDoDebug('M'));
+
+            if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentManager>())
+            {
+                OnManageDefaultNaturalEquipment(E.Manager, E.BodyPart);
+            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)
         {
             return base.HandleEvent(E);
         }
@@ -322,25 +406,33 @@ namespace XRL.World.Parts
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
+            Registrar.Register("CanBeDisassembled"); // This prevents the cybernetic from being disassembled.
             Registrar.Register("BeforeMutationAdded");
             Registrar.Register("MutationAdded");
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {
+            if (E.ID == "CanBeDisassembled")
+            {
+                return false; // This prevents the cybernetic from being disassembled.
+            }
+
             if (E.ID == "BeforeMutationAdded")
             {
                 GameObject Actor = E.GetParameter("Object") as GameObject;
                 string Mutation = E.GetParameter("Mutation") as string;
                 if (Actor == Implantee)
                 {
-                    Debug.Entry(4, $"> foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods)", Indent: 1);
-                    foreach ((_, ModNaturalEquipment<T> NaturalEquipmentMod) in NaturalEquipmentMods)
+                    /*
+                    Debug.Entry(4, $"> foreach (ModNaturalEquipment<E> naturalEquipmentMod in NaturalEquipmentMods)", Indent: 1, Toggle: getDoDebug());
+                    foreach (ModNaturalEquipment<T> NaturalEquipmentMod in NaturalEquipmentMods)
                     {
                         // UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
                     }
                     if (NaturalEquipmentMod != null) // UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-                    Debug.Entry(4, $"x foreach ((_, ModNaturalEquipment<E> naturalEquipmentMod) in NaturalEquipmentMods) >//", Indent: 1);
+                    Debug.Entry(4, $"x foreach (ModNaturalEquipment<E> naturalEquipmentMod in NaturalEquipmentMods) >//", Indent: 1, Toggle: getDoDebug());
+                    */
                 }
             }
             else if (E.ID == "MutationAdded")
@@ -354,27 +446,20 @@ namespace XRL.World.Parts
             }
             return base.FireEvent(E);
         }
+        // This prevents the cybernetic from being disassembled.
+        public virtual void CanBeDisassembled()
+        {
+            Event CanBeDisassembled = Event.New("CanBeDisassembled");
+            ParentObject.FireEvent(CanBeDisassembled);
+        }
 
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentCybernetic<T> cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic<T>;
-            cybernetic.NaturalEquipmentMods = new();
-            foreach ((string type, ModNaturalEquipment<T> subpart) in NaturalEquipmentMods)
-            {
-                cybernetic.NaturalEquipmentMods.Add(type, new(subpart, (T)cybernetic));
-            }
-            NaturalEquipmentMod ??= new();
-            cybernetic.NaturalEquipmentMod = new(NaturalEquipmentMod, (T)cybernetic);
+
             cybernetic.Implantee = null;
             cybernetic.ImplantObject = null;
+
             return cybernetic;
         }
     }

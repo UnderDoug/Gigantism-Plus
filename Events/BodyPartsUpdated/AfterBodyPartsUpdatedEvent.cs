@@ -6,15 +6,18 @@ using XRL.World.Parts;
 using XRL.World.Anatomy;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
-[GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
+[GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
 public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEvent>
 {
-    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_SLOTS | CASCADE_EXCEPT_THROWN_WEAPON;
+    private static bool doDebug => getClassDoDebug(nameof(AfterBodyPartsUpdatedEvent));
 
-    public GameObject Actor;
+    public new static readonly int CascadeLevel = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON;
+
+    public GameObject Creature;
 
     public override int GetCascadeLevel()
     {
@@ -23,35 +26,45 @@ public class AfterBodyPartsUpdatedEvent : ModPooledEvent<AfterBodyPartsUpdatedEv
 
     public virtual string GetRegisteredEventID()
     {
-        return $"{typeof(AfterBodyPartsUpdatedEvent).Name}";
+        return $"{nameof(AfterBodyPartsUpdatedEvent)}";
     }
 
     public override void Reset()
     {
         base.Reset();
-        Actor = null;
+        Creature = null;
     }
 
-    public static void Send(GameObject Actor)
+    public static void Send(GameObject Creature)
     {
         Debug.Entry(4, 
-            $"{typeof(AfterBodyPartsUpdatedEvent).Name}." + 
-            $"{nameof(Send)}(GameObject Actor: {Actor?.DebugName})", 
-            Indent: 0);
-        
+            $"! {nameof(AfterBodyPartsUpdatedEvent)}."
+            + $"{nameof(Send)}(GameObject Creature: {Creature?.DebugName ?? NULL})", 
+            Indent: 0, Toggle: doDebug);
+
         AfterBodyPartsUpdatedEvent E = FromPool();
 
-        bool flag = true;
-        if (Actor.WantEvent(ID, CascadeLevel))
+        bool validCreature = Creature != null;
+
+        bool wantsMin = validCreature && Creature.WantEvent(ID, E.GetCascadeLevel());
+        bool wantsStr = validCreature && Creature.HasRegisteredEvent(E.GetRegisteredEventID());
+
+        bool anyWants = wantsMin || wantsStr;
+
+        bool proceed = validCreature;
+        if (anyWants)
         {
-            E.Actor = Actor;
-            flag = Actor.HandleEvent(E);
-        }
-        if (flag && Actor.HasRegisteredEvent(E.GetRegisteredEventID()))
-        {
-            Event @event = Event.New(E.GetRegisteredEventID());
-            @event.SetParameter(nameof(Actor), Actor);
-            Actor.FireEvent(@event);
+            if (proceed && wantsMin)
+            {
+                E.Creature = Creature;
+                proceed = Creature.HandleEvent(E);
+            }
+            if (proceed && wantsStr)
+            {
+                Event @event = Event.New(E.GetRegisteredEventID());
+                @event.SetParameter(nameof(Creature), Creature);
+                proceed = Creature.FireEvent(@event);
+            }
         }
     }
 }

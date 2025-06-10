@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 
 using XRL.Names;
-using XRL.World.ObjectBuilders;
-using XRL.World.Parts.Mutation;
-using XRL.World.Parts;
 using XRL.Rules;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+using XRL.World.ObjectBuilders;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
@@ -25,6 +25,14 @@ namespace XRL.World.ObjectBuilders
         public override void Apply(GameObject Creature, string Context)
         {
             Context ??= "Hero";
+
+            Creature.SetStringProperty("Culture", "Giant");
+
+            Creature.SetStringProperty("Role", "Hero");
+
+            Creature.SetStringProperty("staticFaction1", null);
+            Creature.SetStringProperty("staticFaction2", null);
+            Creature.SetStringProperty("staticFaction3", null);
 
             int MentalMutations = 0;
             int PhysicalMutations = 0;
@@ -229,6 +237,8 @@ namespace XRL.World.ObjectBuilders
                 staticFaction2Admiration = GNT_THICCBOI_ADMIREREASON;
             }
             Creature.SetStringProperty("staticFaction2", $"{staticFaction2Faction},friend,{staticFaction2Admiration}");
+
+            Creature.RandomlySpendPoints();
         }
     }
 }

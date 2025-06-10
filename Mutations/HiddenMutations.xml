@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mutations Hidden="true" ExcludeFromPool="true">
+  
+    <category Name="Physical">
+
+      <mutation Name="Crystallinity" Class="UD_ManagedCrystallinity" DisplayName="Crystallinity" />
+      
+    <!-- NaturalWeapon Managed vanilla mutations -->
+
+      <mutation Name="Base Burrowing Claws" Class="BurrowingClaws" DisplayName="Burrowing Claws (B)" />
+      <mutation Name="Base Crystallinity" Class="Crystallinity" DisplayName="Crystallinity (B)" />
+      
+    <!-- "Fixed" vanilla mutations -->
+      
+      <mutation Name="Base Horns" Class="Horns" DisplayName="Horns (B)" />
+      <mutation Name="Base Quills" Class="Quills" DisplayName="Quills (B)" />
+    </category>
+  
+</mutations>

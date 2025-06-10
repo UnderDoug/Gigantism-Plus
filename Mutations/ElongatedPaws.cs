@@ -15,23 +15,50 @@ namespace XRL.World.Parts.Mutation
     public class ElongatedPaws 
         : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
-        private static readonly string[] AffectedSlotTypes = new string[3] { "Hand", "Hands", "Missile Weapon" };
+        private static bool doDebug => getClassDoDebug(nameof(ElongatedPaws));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
 
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
+        private static string[] AffectedSlotTypes => new string[3] { "Hand", "Hands", "Missile Weapon" };
+
+        public static string SCALE_STAT => "Agility";
+        public int ScaleStatModifier => ParentObject.StatMod(SCALE_STAT);
         public int StrengthModifier => ParentObject.StatMod("Strength");
         public int AgilityModifier => ParentObject.StatMod("Agility");
 
+        private int StatChangeEventAttempts = 0; // This is in case UpdateBodyParts results in a stat change that causes a loop.
+
         public ElongatedPaws()
         {
-            DisplayName = "{{giant|Elongated Paws}}"; //.OptionalColorGiant(Colorfulness);
-            Type = "Physical";
+        }
 
-            NaturalEquipmentMod = new ModElongatedNaturalWeapon()
+        public static ModElongatedNaturalWeapon NewElongatedWeaponMod(ElongatedPaws assigningPart)
+        {
+            ModElongatedNaturalWeapon elongatedNaturalWeaponMod = new()
             {
-                AssigningPart = this,
+                AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
-                ModPriority = 20,
-                DescriptionPriority = 20,
+                ModPriority = 60,
+                DescriptionPriority = 60,
+
+                Noun = "paw",
 
                 Adjective = "elongated",
                 AdjectiveColor = "giant",
@@ -45,61 +72,31 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
                 },
             };
-            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Skill", "ShortBlades", true);
-            NaturalEquipmentMod.AddAdjustment(MELEEWEAPON, "Stat", "Strength", true);
+            elongatedNaturalWeaponMod.AddSkillAdjustment("ShortBlades", true);
+            elongatedNaturalWeaponMod.AddStatAdjustment("Agility", -120);
 
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DisplayName", "paw", true);
+            static bool cosmeticCondition(GameObject Equipment)
+            {
+                return Equipment?.Blueprint != null
+                    && Equipment.Blueprint == "DefaultFist";
+            };
+            elongatedNaturalWeaponMod.AddNounAdjustment(true, Condition: cosmeticCondition);
 
-            NaturalEquipmentMod.AddAdjustment(RENDER, "Tile", "NaturalWeapons/ElongatedPaw.png", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "ColorString", "&x", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "TileColor", "&x", true);
-            NaturalEquipmentMod.AddAdjustment(RENDER, "DetailColor", "z", true);
+            elongatedNaturalWeaponMod.AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: cosmeticCondition);
+            elongatedNaturalWeaponMod.AddColorStringAdjustment("&Z", true);
+            elongatedNaturalWeaponMod.AddTileColorAdjustment("&Z", true);
+            elongatedNaturalWeaponMod.AddDetailColorAdjustment("z", true);
+            return elongatedNaturalWeaponMod;
         }
-
-        private bool _HasGigantism = false;
-        public bool HasGigantism
+        public override ModNaturalEquipment<ElongatedPaws> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<ElongatedPaws>> Filter = null, ElongatedPaws NewAssigner = null)
         {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPart<GigantismPlus>();
-                return _HasGigantism;
-            }
-            set
-            {
-                _HasGigantism = value;
-            }
+            ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod = NewElongatedWeaponMod(NewAssigner ?? this);
+            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
-        private bool _HasBurrowing = false;
-        public bool HasBurrowing
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPartDescendedFrom<BurrowingClaws>();
-                return _HasBurrowing;
-            }
-            set
-            {
-                _HasBurrowing = value;
-            }
-        }
-
-        private bool _HasCrystallinity = false;
-        public bool HasCrystallinity
-        {
-            get
-            {
-                if (ParentObject != null)
-                    return ParentObject.HasPartDescendedFrom<Crystallinity>();
-                return _HasCrystallinity;
-            }
-            set
-            {
-                _HasCrystallinity = value;
-            }
-        }
+        public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
+        public bool HasBurrowing => ParentObject != null && ParentObject.HasPartDescendedFrom<BurrowingClaws>();
+        public bool HasCrystallinity => ParentObject != null && ParentObject.HasPartDescendedFrom<Crystallinity>();
 
         public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
@@ -111,14 +108,19 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponPenBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
         {
-            return (int)Math.Floor(AgilityModifier / 2.0);
+            return (int)Math.Floor(ScaleStatModifier / 2.0);
         }
 
         public override bool CanLevel() { return false; }
 
         public override bool AllowStaticRegistration() { return true; }
+
+        protected override string GetBaseDisplayName()
+        {
+            return base.GetBaseDisplayName().OptionalColorGiant(Colorfulness);
+        }
 
         public override string GetDescription()
         {
@@ -129,13 +131,27 @@ namespace XRL.World.Parts.Mutation
                  + "\n\n+{{rules|100}} reputation with {{w|Barathrumites}}";
         }
 
+        public override string GetLevelText(int Level)
+        {
+            return "";
+        }
+
+        public override void TurnTick(long TimeTick, int Amount)
+        {
+            StatChangeEventAttempts = 0;
+
+            base.TurnTick(TimeTick, Amount);
+        }
+        public override bool WantTurnTick()
+        {
+            return true;
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == StatChangeEvent.ID;
+                || (StatChangeEventAttempts < 3 && ID == StatChangeEvent.ID);
         }
-
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
             if (Array.IndexOf(AffectedSlotTypes, E.SlotType) >= 0 && E.Actor == ParentObject)
@@ -144,26 +160,25 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(StatChangeEvent E)
         {
-            if (E.Name == "Strength") // || E.Name == "Agility")
+            if (E.Name == SCALE_STAT && StatChangeEventAttempts < 3)
             {
-                Body body = E.Object.Body;
+                Body body = E.Object?.Body;
 
-                NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-
-                body?.UpdateBodyParts();
-
-
-                foreach (GameObject equipped in body.GetEquippedObjects())
+                if (body != null && NaturalEquipmentMod != null)
                 {
-                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                    StatChangeEventAttempts++;
+                    body.UpdateBodyParts();
+
+                    foreach (GameObject equipped in body.GetEquippedObjects())
                     {
-                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                        if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                        {
+                            weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                        }
                     }
                 }
-
             }
             return base.HandleEvent(E);
         }
@@ -178,11 +193,14 @@ namespace XRL.World.Parts.Mutation
         public override void AfterMutate()
         {
             GameObject GO = ParentObject;
-            foreach (GameObject equipped in GO.Body.GetEquippedObjects())
+            if (GO != null && GO.Body != null && !GO.Body.GetEquippedObjects().IsNullOrEmpty())
             {
-                if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                foreach (GameObject equipped in GO.Body.GetEquippedObjects())
                 {
-                    weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                    {
+                        weaponElongator.ApplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    }
                 }
             }
             base.AfterMutate();
@@ -190,15 +208,18 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Unmutate(GameObject GO)
         {
-            foreach (GameObject equipped in GO.Body.GetEquippedObjects())
+            if (GO != null && GO.Body != null && !GO.Body.GetEquippedObjects().IsNullOrEmpty())
             {
-                if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                foreach (GameObject equipped in GO.Body.GetEquippedObjects())
                 {
-                    weaponElongator.UnapplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    if (equipped.TryGetPart(out WeaponElongator weaponElongator))
+                    {
+                        weaponElongator.UnapplyElongatedBonusCap(equipped.GetPart<MeleeWeapon>());
+                    }
                 }
-            }
 
-            GO.CheckEquipmentSlots();
+                GO.CheckEquipmentSlots();
+            }
 
             return base.Unmutate(GO);
         }
@@ -211,15 +232,9 @@ namespace XRL.World.Parts.Mutation
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ElongatedPaws elongatedPaws = base.DeepCopy(Parent, MapInv) as ElongatedPaws;
-            elongatedPaws.NaturalEquipmentMods = new();
-            foreach ((_, ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod) in NaturalEquipmentMods)
-            {
-                elongatedPaws.NaturalEquipmentMods.Add(naturalEquipmentMod.BodyPartType, new(naturalEquipmentMod, elongatedPaws));
-            }
-            elongatedPaws.NaturalEquipmentMod = new(NaturalEquipmentMod, elongatedPaws);
+
             return elongatedPaws;
         }
 
-    } //!-- public class ElongatedPaws : BaseDefaultEquipmentMutation
-
-} //!-- namespace XRL.World.Parts.Mutation
+    } //!-- public class ElongatedPaws : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
+}

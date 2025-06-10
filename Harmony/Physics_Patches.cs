@@ -2,24 +2,44 @@
 
 using System;
 
+using XRL.UI;
 using XRL.World;
 using XRL.World.Parts;
 
-using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
 {
     [HarmonyPatch]
     public static class Physics_Patches
     {
-        [HarmonyPatch(typeof(Physics), nameof(Physics.HandleEvent), new Type[] { typeof(EquippedEvent) })]
+        private static bool doDebug => getClassDoDebug(nameof(Physics_Patches));
+
+        [HarmonyPatch(
+            declaringType: typeof(Physics), 
+            methodName: nameof(Physics.HandleEvent),
+            argumentTypes: new Type[] { typeof(EquippedEvent) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, ref Physics __instance)
+        static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, Physics __instance)
         {
             // goal: reduce the amount of thrown warnings when the FinalizeCopy patch sends an EquippedEvent
-            __instance._Equipped = null;
+
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"# [Prefix] {nameof(Physics)}."
+                + $"{nameof(Physics.HandleEvent)}("
+                + $"{nameof(EquippedEvent)} E, ref Physics __instance)",
+                Indent: indent, Toggle: doDebug);
+
+            if (__instance?._Equipped != null)
+            {
+                __instance._Equipped = null; 
+                Debug.Entry(4, $"__instance._Equipped", __instance._Equipped?.DebugName ?? NULL, Indent: indent + 1, Toggle: doDebug);
+            }
             return true;
-        } //!-- static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E)
+        } //!-- static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, Physics __instance)
     }
 }

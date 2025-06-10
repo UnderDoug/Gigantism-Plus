@@ -6,6 +6,7 @@ using XRL;
 using XRL.World;
 using XRL.World.Parts;
 
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
@@ -13,6 +14,8 @@ namespace HNPS_GigantismPlus
 {
     public class BeforeModGiganticAppliedHandler : IEventHandler, IModEventHandler<BeforeModGiganticAppliedEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(BeforeModGiganticAppliedEvent));
+
         private static readonly BeforeModGiganticAppliedHandler Handler = new();
 
         public static bool Register()
@@ -31,16 +34,28 @@ namespace HNPS_GigantismPlus
                 Object.SetIntProperty("IsImprovisedMelee", 0, true);
                 Object.SetStringProperty("ShowMeleeWeaponStats", "true");
                 MeleeWeapon meleeWeapon = Object.RequirePart<MeleeWeapon>();
-                meleeWeapon.BaseDamage = "3d3";
-                meleeWeapon.MaxStrengthBonus = 8;
-                meleeWeapon.Skill = "Cudgel";
-                meleeWeapon.Stat = "Strength";
+                if (meleeWeapon != null)
+                {
+                    meleeWeapon.BaseDamage = "3d3";
+                    meleeWeapon.MaxStrengthBonus = 8;
+                    meleeWeapon.Skill = "Cudgel";
+                    meleeWeapon.Stat = "Strength";
+                }
 
                 Object.SetIntProperty("IsImprovisedThrown", 0, true);
                 ThrownWeapon thrownWeapon = Object.RequirePart<ThrownWeapon>();
-                thrownWeapon.Damage = "3d3";
-                thrownWeapon.Penetration = 8;
-                thrownWeapon.Attributes = "Cudgel";
+                if (thrownWeapon != null)
+                {
+                    thrownWeapon.Damage = "3d3";
+                    thrownWeapon.Penetration = 8;
+                    thrownWeapon.Attributes = "Cudgel";
+                }
+
+                Physics physics = Object.RequirePart<Physics>();
+                if (physics != null)
+                {
+                    physics.Category = "Melee Weapons";
+                }
             }
 
             if (Object.TryGetPart(out LightSource lightSource))
@@ -167,6 +182,8 @@ namespace HNPS_GigantismPlus
 
     public class AfterModGiganticAppliedHandler : IEventHandler, IModEventHandler<AfterModGiganticAppliedEvent>
     {
+        private static bool doDebug => getClassDoDebug(nameof(AfterModGiganticAppliedHandler));
+
         private static readonly AfterModGiganticAppliedHandler Handler = new();
 
         public static bool Register()

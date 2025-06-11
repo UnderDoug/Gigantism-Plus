@@ -114,6 +114,13 @@ namespace HNPS_GigantismPlus
             zoneManager.SetZoneName(SecretZoneId, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneId, false);
 
+            TerrainTravel pTravel = builder.terrainComponents[Location2D.Get(location.X, location.Y)];
+            if (XRL.UI.Options.ShowOverlandEncounters && pTravel != null)
+            {
+                pTravel.ParentObject.Render.RenderString = "G";
+                pTravel.ParentObject.Render.SetForegroundColor('Z');
+            }
+
             GameObject UniqueGiant = GetTheGiant();
 
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE)

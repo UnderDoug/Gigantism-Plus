@@ -35,7 +35,7 @@ namespace XRL.World.Skills.Cooking
             Components.Add(new PreparedCookingRecipeUnusualComponentBlueprint("Plump Mushroom"));
             Components.Add(new PreparedCookingRecipeUnusualComponentBlueprint("HulkHoneyTonic"));
             Components.Add(new PreparedCookingRecipeUnusualComponentBlueprint("GravityGrenade3"));
-            Effects.Add(new CookingRecipeResultProceduralEffect(ProceduralCookingEffect.CreateSpecific(new List<string> { "CookingDomainSpecial_UnitGigantismTransform" })));
+            Effects.Add(new CookingRecipeResultProceduralEffect(ProceduralCookingEffect.CreateSpecific(new List<string> { nameof(CookingDomainSpecial_UnitGigantismTransform) })));
         }
         public override string GetDescription()
         {
@@ -49,7 +49,7 @@ namespace XRL.World.Skills.Cooking
 
         public override string GetDisplayName()
         {
-            return $"Seriously Thick Stew".OptionalColor("yuge", "w", Colorfulness);
+            return CookingDomainSpecial_UnitGigantismTransform.DisplayNameColored;
         }
 
         public override bool ApplyEffectsTo(GameObject target, bool showMessage = true)

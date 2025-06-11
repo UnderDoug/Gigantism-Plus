@@ -5,6 +5,7 @@ using XRL.Language;
 using XRL.Rules;
 using XRL.UI;
 using XRL.Wish;
+using XRL.World.Effects;
 using XRL.World.Parts.Mutation;
 using XRL.World.Skills.Cooking;
 using static HNPS_GigantismPlus.Const;
@@ -39,6 +40,8 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
+        public static string Stew => CookingDomainSpecial_UnitGigantismTransform.DisplayNameColored;
+
         [SerializeField]
         private int _Stews;
         public int Stews // total number of times SeriouslyThickStew has been consumed.
@@ -65,6 +68,8 @@ namespace XRL.World.Parts
             get => _Gains;
             private set => _Gains = Math.Max(0, value);
         }
+
+        [NonSerialized]
         public Guid mutationMod = Guid.Empty;
 
         [SerializeField]
@@ -232,6 +237,7 @@ namespace XRL.World.Parts
         public void EatStew()
         {
             Stews++;
+            DidX("ate", $"some {Stew}");
         }
         public bool ProcessStartingStews()
         {
@@ -314,7 +320,7 @@ namespace XRL.World.Parts
                 E.Postfix.AppendRules(
                     $"{"Stew Belly".OptionalColorYuge(Colorfulness)}: " + 
                     $"This creature has achieved {Gains.Things("Gain")} " 
-                    + $"from the {Stews.Things("hepling")} of {new SeriouslyThickStew().GetDisplayName()} they've eaten! " + 
+                    + $"from the {Stews.Things("hepling")} of {Stew} they've eaten! " + 
                     $"Talk about a hankering!");
             }
             return base.HandleEvent(E);
@@ -342,6 +348,16 @@ namespace XRL.World.Parts
             }
         }
 
+        public override void Write(GameObject Basis, SerializationWriter Writer)
+        {
+            base.Write(Basis, Writer);
+            Writer.Write(mutationMod);
+        }
+        public override void Read(GameObject Basis, SerializationReader Reader)
+        {
+            base.Read(Basis, Reader);
+            mutationMod = Reader.ReadGuid();
+        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             StewBelly stewBelly = base.DeepCopy(Parent, MapInv) as StewBelly;

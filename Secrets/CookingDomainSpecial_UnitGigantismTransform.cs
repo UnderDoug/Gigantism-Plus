@@ -1,34 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using ConsoleLib.Console;
-
+﻿using ConsoleLib.Console;
+using HNPS_GigantismPlus;
 using Qud.API;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using XRL;
-using XRL.UI;
-using XRL.World;
-using XRL.World.Parts;
-using XRL.World.Parts.Mutation;
-using XRL.World.ObjectBuilders;
-using XRL.World.ZoneBuilders;
-using XRL.World.WorldBuilders;
 using XRL.Language;
 using XRL.Names;
-
-using static XRL.World.ZoneBuilderPriority;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
+using XRL.UI;
+using XRL.World;
+using XRL.World.ObjectBuilders;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+using XRL.World.Skills.Cooking;
+using XRL.World.WorldBuilders;
+using XRL.World.ZoneBuilders;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
+using static XRL.World.ZoneBuilderPriority;
 
 namespace XRL.World.Effects
 {
     public class CookingDomainSpecial_UnitGigantismTransform : ProceduralCookingEffectUnit
     {
-        public static string JournalTextPrefix = $"You ate some {"Seriously Thick Stew".OptionalColor("yuge", "w", Colorfulness)}";
+        public static string DisplayName => "Seriously Thick Stew";
+        public static string DisplayNameColored => DisplayName.OptionalColorYuge(Colorfulness);
+
+        public static string JournalTextPrefix = $"You ate some {DisplayNameColored}";
         public static List<string> JournalTexts = new()
         {
             $"{JournalTextPrefix} and achieved massive gains.",
@@ -112,28 +112,16 @@ namespace XRL.World.Effects
                     secretId: null, 
                     time: -1L);
             }
-            if (!Object.IsTrueKin())
+
+            Object.Gigantify("Meal");
+
+            if (stewBelly.Stews > 0)
             {
-                Object.Gigantify("Meal");
-            }
-            else
-            {
-                int Level = ExplodingDie(1, "1d2", Step: 1, Limit: 16, Indent: 2);
-                Object.RequirePart<Mutations>().AddMutation(new GigantismPlus(), Level, true);
-                string NamePrefix = "gigantic".MaybeColor("gigantic");
-                
-                if (!NamePrefix.IsNullOrEmpty())
-                {
-                    Object.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
-                }
-            }
-            if (Object.IsPlayer())
-            {
-                if (stewBelly.Stews > 0)
+                if (Object.IsPlayer())
                 {
                     int breakpoint = (int)Math.Floor(stewBelly.GetLastHankering() / 2.0);
                     int hankering = stewBelly.Hankering;
-                    Popup.Show("{{emote|*chew* *chew*}} That is one " + "Seriously Thick Stew".OptionalColorYuge(Colorfulness) + "!");
+                    Popup.Show("{{emote|*chew* *chew*}} That is one " + DisplayNameColored + "!");
                     if (hankering == 1)
                     {
                         Popup.Show("That one hit the spot!");

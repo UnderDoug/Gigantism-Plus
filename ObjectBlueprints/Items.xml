@@ -40,7 +40,7 @@
           ColorString="&amp;c" DetailColor="r" />
     <part Name="CyberneticsBaseItem"
           Slots="Body" Cost="2"
-          BehaviorDescription="You are considered a gigantic creature while the exoframe is installed.
+          BehaviorDescription="You are considered a gigantic creature while this exoframe is installed.
 You cannot wear equipment on your body." />
     <removepart Name="TinkerItem" />
     <part Name="Metal" />

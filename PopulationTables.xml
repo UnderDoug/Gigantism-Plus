@@ -85,7 +85,6 @@
   Encounter changes
   
   -->
-  
   <population Name="Grit Gate Templar Scouts">
     <group Name="Contents" Style="pickeach" Load="Merge">
       <object Number="1" Blueprint="Templar Squire Giant-Slayer" />
@@ -168,12 +167,25 @@
     </group>
   </population>
 
+
+
+  <population Name="RuinsPerSector">
+    <group Name="Creatures" Load="Merge">
+      <table Weight="250" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+
+  <population Name="BaroqueRuinsPerSector">
+    <group Name="Creatures" Load="Merge">
+      <table Weight="250" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+
   <!-- 
   
   Encounter additions
   
   -->
-  
   <population Name="Templar Weighted Toward Giant-Slayer">
     <group Name="Creatures" Style="pickone">
       <object Weight="85" Blueprint="Templar Giant-Slayer" />
@@ -243,6 +255,43 @@
         <table Weight="80" Name="Templar Weighted Toward Giant-Slayer" />
         <object Weight="20" Number="4" Blueprint="Templar Squire Giant-Slayer" />
       </group>
+    </group>
+  </population>
+  
+  <population Name="Templar Giant-Hunter Party">
+    <group Name="Contents" Style="pickone">
+      <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Major" />
+      <table Weight="9" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+  
+  
+
+  <!-- 
+  
+  Loot changes
+  
+  -->
+  <population Name="Implants_1and2Pointers">
+    <group Name="Items" Load="Merge">
+      <object Weight="10" Number="1" Blueprint="GiganticExoframeAlpha" />
+    </group>
+  </population>
+
+  <population Name="Implants_4PlusPointers">
+    <group Name="Items" Load="Merge">
+      <object Weight="12" Number="1" Blueprint="GiganticExoframeDelta" />
+      <object Weight="5" Number="1" Blueprint="GiganticExoframeSigma" />
+      <object Weight="1" Number="1" Blueprint="GiganticExoframeOmega" />
+    </group>
+  </population>
+
+  <population Name="Implants_4PlusPointersWithCathedras">
+    <group Name="Items" Load="Merge">
+      <object Weight="30" Number="1" Blueprint="GiganticExoframeOmega" />
+      <!-- Weight is set so high because there are 4 Cathedras and only 1 Gigantic Exoframe Omega
+           40/70 to get a Cathedra (any), 30/70 to get a Gigantic Exoframe Omega 
+           Exoframe is slightly less likely than any Cathedra but 3 times as likely as a specific one -->
     </group>
   </population>
   

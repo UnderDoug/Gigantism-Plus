@@ -65,11 +65,16 @@ namespace XRL.World.ObjectBuilders
 
         public override void Apply(GameObject Object, string Context = "")
         {
-            int Level = GetLevel();
-            int Stews = GetStews();
+            bool isMeal = Context == "Meal";
+
+            int Level = !isMeal ? GetLevel() : 1;
+            int Stews = !isMeal ? GetStews() : 0;
             int ObjectTier = GetObjectTier(Object);
             int Tier = GetTier(ObjectTier);
-            Gigantify(Object, Level, Stews, Tier, NamePrefix, Context);
+
+            bool asThoughMutant = isMeal;
+
+            Gigantify(Object, Level, Stews, Tier, NamePrefix, Context, asThoughMutant);
         }
 
         public static int GetLevel(int StartsAt = 1, string DieString = "1d3", int Step = 2, int Limit = 16, int Indent = 2)
@@ -93,7 +98,7 @@ namespace XRL.World.ObjectBuilders
             return ExplodingDie(StartsAt, DieString, Step, 8, Indent);
         }
 
-        public static bool GigantifyMutant(GameObject Creature, int Level = 1, int? Stews = null, string NamePrefix = "", string Context = "")
+        public static bool GigantifyMutant(GameObject Creature, int Level = 1, int? Stews = null, string NamePrefix = "", string Context = "", bool DoForTrueKin = false)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
@@ -102,11 +107,11 @@ namespace XRL.World.ObjectBuilders
                 + $" Level: {Level},"
                 + $" Stews: {Stews},"
                 + $" NamePrefix: {NamePrefix},"
-                + $" Context: {Context.Quote()})",
+                + $" Context: {Context?.Quote() ?? NULL})",
                 Indent: indent, Toggle: getDoDebug());
 
             bool success = false;
-            if (Creature != null && Creature.IsCreature && !Creature.IsTrueKin())
+            if (Creature != null && Creature.IsCreature && (DoForTrueKin || !Creature.IsTrueKin()))
             {
                 Debug.CheckYeh(4, $"Have Creature that isn't TrueKin", Indent: indent + 1, Toggle: getDoDebug());
 
@@ -168,7 +173,7 @@ namespace XRL.World.ObjectBuilders
                 + $" Level: {Level},"
                 + $" Stews: {Stews},"
                 + $" NamePrefix: {NamePrefix},"
-                + $" Context: {Context.Quote()}) *//",
+                + $" Context: {Context?.Quote() ?? NULL}) *//",
                 Indent: indent, Toggle: getDoDebug());
 
             Debug.LastIndent = indent;
@@ -183,7 +188,7 @@ namespace XRL.World.ObjectBuilders
                 + $"(Creature: {Creature?.DebugName ?? NULL},"
                 + $" Tier: {Tier},"
                 + $" NamePrefix: {NamePrefix},"
-                + $" Context: {Context.Quote()})",
+                + $" Context: {Context?.Quote() ?? NULL})",
                 Indent: indent, Toggle: getDoDebug());
 
             bool success = false;
@@ -379,33 +384,37 @@ namespace XRL.World.ObjectBuilders
                 + $"(Creature: {Creature?.DebugName ?? NULL},"
                 + $" Tier: {Tier},"
                 + $" NamePrefix: {NamePrefix},"
-                + $" Context: {Context.Quote()}) *//",
+                + $" Context: {Context?.Quote() ?? NULL}) *//",
                 Indent: indent, Toggle: getDoDebug());
 
             Debug.LastIndent = indent;
             return success;
         }
 
-        public static bool Gigantify(GameObject Creature, int Level = 1, int Stews = 0, int Tier = 1, string NamePrefix = "", string Context = "")
+        public static bool Gigantify(GameObject Creature, int Level = 1, int Stews = 0, int Tier = 1, string NamePrefix = "", string Context = "", bool AsThoughMutant = false)
         {
             Debug.Header(4, 
                 $"{nameof(Gigantified)}", 
-                $"{nameof(Gigantify)}" +
-                $"(Object: {Creature?.DebugName ?? NULL}," +
-                $" Level: {Level}," +
-                $" Tier: {Tier})",
+                $"{nameof(Gigantify)}(" +
+                $"{nameof(Creature)}: {Creature?.DebugName ?? NULL}, " +
+                $"{nameof(Level)}: {Level}, " +
+                $"{nameof(Stews)}: {Stews}, " +
+                $"{nameof(Tier)}: {Tier}, " +
+                $"{nameof(Context)}: {Context?.Quote() ?? NULL})",
                 Toggle: doDebug);
 
             bool gigantified = 
-                GigantifyMutant(Creature, Level, Stews, NamePrefix, Context) 
+                GigantifyMutant(Creature, Level, Stews, NamePrefix, Context, AsThoughMutant)
              || GigantifyTrueKin(Creature, Tier, NamePrefix, Context);
             
-            Debug.Footer(4, 
-                $"{nameof(Gigantified)}", 
-                $"{nameof(Gigantify)}" +
-                $"(Object: {Creature?.DebugName ?? NULL}," +
-                $" Level: {Level}," +
-                $" Tier: {Tier})",
+            Debug.Footer(4,
+                $"{nameof(Gigantified)}",
+                $"{nameof(Gigantify)}(" +
+                $"{nameof(Creature)}: {Creature?.DebugName ?? NULL}, " +
+                $"{nameof(Level)}: {Level}, " +
+                $"{nameof(Stews)}: {Stews}, " +
+                $"{nameof(Tier)}: {Tier}, " +
+                $"{nameof(Context)}: {Context?.Quote() ?? NULL})",
                 Toggle: doDebug);
 
             return gigantified;

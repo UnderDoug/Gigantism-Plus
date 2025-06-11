@@ -161,22 +161,8 @@ namespace XRL.World.Parts.Mutation
                 AssigningPart = assigningPart,
                 BodyPartType = "Hand",
 
-                ModPriority = 40,
-                DescriptionPriority = 40,
-
                 Noun = "fist",
 
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
-
-                Adjustments = new(),
-
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                },
                 AddedStringProps = new()
                 {
                     { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
@@ -184,7 +170,6 @@ namespace XRL.World.Parts.Mutation
                 },
             };
             giganticFistMod.AddSkillAdjustment("Cudgel", true);
-            giganticFistMod.AddStatAdjustment("Strength", -100);
 
             static bool cosmeticCondition(GameObject Equipment)
             {
@@ -192,70 +177,25 @@ namespace XRL.World.Parts.Mutation
                     && Equipment.Blueprint == "DefaultFist";
             };
             giganticFistMod.AddNounAdjustment(true, Condition: cosmeticCondition);
-
             giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: cosmeticCondition);
-            giganticFistMod.AddColorStringAdjustment("&Z", true);
-            giganticFistMod.AddTileColorAdjustment("&Z", true);
-            giganticFistMod.AddDetailColorAdjustment("z", true);
+
             return giganticFistMod;
         }
         public static ModGiganticNaturalWeapon NewGiganticNogginMod(GigantismPlus assigningPart)
         {
-            ModGiganticNaturalWeapon giganticNogginMod = new()
+            return new()
             {
                 AssigningPart = assigningPart,
                 BodyPartType = "Head",
-
-                ModPriority = 40,
-                DescriptionPriority = 40,
-
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
-
-                Adjustments = new(),
-
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                },
             };
-            giganticNogginMod.AddStatAdjustment("Strength", -100);
-
-            giganticNogginMod.AddColorStringAdjustment("&Z", true);
-            giganticNogginMod.AddTileColorAdjustment("&Zx", true);
-            giganticNogginMod.AddDetailColorAdjustment("z", true);
-            return giganticNogginMod;
         }
         public static ModGiganticNaturalWeapon NewGiganticMugMod(GigantismPlus assigningPart)
         {
-            ModGiganticNaturalWeapon giganticMugMod = new()
+            return new()
             {
                 AssigningPart = assigningPart,
                 BodyPartType = "Face",
-
-                ModPriority = 40,
-                DescriptionPriority = 40,
-
-                Adjective = "gigantic",
-                AdjectiveColor = "gigantic",
-                AdjectiveColorFallback = "w",
-
-                Adjustments = new(),
-
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                },
             };
-            giganticMugMod.AddStatAdjustment("Strength", -100);
-
-            giganticMugMod.AddColorStringAdjustment("&Z", true);
-            giganticMugMod.AddTileColorAdjustment("&Z", true);
-            giganticMugMod.AddDetailColorAdjustment("z", true);
-            return giganticMugMod;
         }
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
         {
@@ -303,21 +243,13 @@ namespace XRL.World.Parts.Mutation
                 AdjectiveColor = "Y",
                 AdjectiveColorFallback = "y",
 
-                Adjustments = new(),
-
-                AddedIntProps = new()
-                    {
-                        { "ModGiganticNoShortDescription", 1 },
-                        { "ModGiganticNoDisplayName", 1 }
-                    },
                 AddedStringProps = new()
-                    {
-                        { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
-                        { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
-                    },
+                {
+                    { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
+                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
+                },
             };
             closedGiganticFist.AddSkillAdjustment("Cudgel", false);
-            closedGiganticFist.AddStatAdjustment("Strength", false);
 
             closedGiganticFist.AddNounAdjustment();
 
@@ -347,7 +279,7 @@ namespace XRL.World.Parts.Mutation
             return 8 * level;
         }
 
-        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
         {
             if (NaturalEquipmentMod.Adjective == "closed") 
                 return 0;
@@ -360,7 +292,7 @@ namespace XRL.World.Parts.Mutation
 
             return 0;
         }
-        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
         {
             if (NaturalEquipmentMod.Adjective == "closed") 
                 return 0;
@@ -376,7 +308,7 @@ namespace XRL.World.Parts.Mutation
             }
             return 0;
         }
-        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
+        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
         {
             if (NaturalEquipmentMod.Adjective == "closed") 
                 return 0;

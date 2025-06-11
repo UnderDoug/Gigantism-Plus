@@ -36,27 +36,38 @@ namespace XRL.World.Parts
 
         public MeleeWeapon MeleeWeapon => ParentObject?.GetPart<MeleeWeapon>();
 
-        ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod =>
-            ElongatedPaws?.UpdateNaturalEquipmentMod(
+        private ModNaturalEquipment<ElongatedPaws> _naturalEquipmentMod = null;
+
+        public ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod
+        {
+            get => _naturalEquipmentMod ??= ElongatedPaws?.UpdateNaturalEquipmentMod(
                 ElongatedPaws?.GetNaturalEquipmentMod(),
-                    (int)ElongatedPaws?.Level);
+                    (int) ElongatedPaws?.Level);
+            set => _naturalEquipmentMod = value;
+        }
 
         public int AppliedElongatedBonusCap = 0;
 
+        public bool Applied = false;
+
+        public int ElongatedBonusCap => ElongatedPaws != null ? ElongatedPaws.GetNaturalWeaponDamageBonus() : 0;
+
         public void ApplyElongatedBonusCap(MeleeWeapon Weapon)
         {
+            Weapon ??= MeleeWeapon;
             Debug.Entry(4,
                 $"* {nameof(ApplyElongatedBonusCap)}("
                 + $"{nameof(Weapon)}: {Weapon?.ParentObject?.DebugName ?? NULL})",
                 Indent: 3, Toggle: doDebug);
 
-            if (ElongatedPaws != null && NaturalEquipmentMod != null)
+            if (ElongatedPaws != null && Weapon != null)
             {
                 UnapplyElongatedBonusCap(Weapon);
 
-                AppliedElongatedBonusCap = NaturalEquipmentMod.GetDamageBonus();
-                Weapon.AdjustBonusCap(AppliedElongatedBonusCap);
-
+                if (!Applied && (Applied = Weapon.AdjustBonusCap(ElongatedBonusCap)))
+                {
+                    AppliedElongatedBonusCap = ElongatedBonusCap;
+                }
                 Debug.LoopItem(4, $"New {nameof(AppliedElongatedBonusCap)}", $"{AppliedElongatedBonusCap}",
                     Indent: 4, Toggle: doDebug);
             }
@@ -73,6 +84,7 @@ namespace XRL.World.Parts
         }
         public void UnapplyElongatedBonusCap(MeleeWeapon Weapon)
         {
+            Weapon ??= MeleeWeapon;
             Debug.Entry(4,
                 $"* {nameof(UnapplyElongatedBonusCap)}("
                 + $"{nameof(Weapon)}: {Weapon?.ParentObject?.DebugName ?? NULL})",
@@ -80,8 +92,10 @@ namespace XRL.World.Parts
 
             Debug.LoopItem(4, $"Old {nameof(AppliedElongatedBonusCap)}", $"{AppliedElongatedBonusCap}", Indent: 5, Toggle: doDebug);
 
-            Weapon.AdjustBonusCap(-AppliedElongatedBonusCap);
-            AppliedElongatedBonusCap = 0;
+            if (Weapon != null && Applied && !(Applied = !Weapon.AdjustBonusCap(-AppliedElongatedBonusCap)))
+            {
+                AppliedElongatedBonusCap = 0;
+            }
 
             Debug.Entry(4,
                 $"x {nameof(UnapplyElongatedBonusCap)}("
@@ -95,51 +109,50 @@ namespace XRL.World.Parts
         }
         public override bool WantEvent(int ID, int cascade)
         {
-            bool haveNaturalEquipmentMod = NaturalEquipmentMod != null;
             return base.WantEvent(ID, cascade)
-                || (AppliedElongatedBonusCap > 0 && haveNaturalEquipmentMod && ID == PooledEvent<GetDisplayNameEvent>.ID)
-                || (AppliedElongatedBonusCap > 0 && haveNaturalEquipmentMod && ID == GetShortDescriptionEvent.ID)
-                || (AppliedElongatedBonusCap > 0 && haveNaturalEquipmentMod && ID == BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>>.ID)
+                || (Applied && ID == PooledEvent<GetDisplayNameEvent>.ID)
+                || (Applied && ID == GetShortDescriptionEvent.ID)
+                || (Applied && ID == BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>>.ID)
                 || ID == StatChangeEvent.ID
                 || ID == UnequippedEvent.ID
                 || ID == EquippedEvent.ID;
         }
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            if (!E.Object.HasProperName && NaturalEquipmentMod != null && AppliedElongatedBonusCap > 0)
+            if (!E.Object.HasProperName && AppliedElongatedBonusCap > 0)
             {
-                E.AddAdjective(NaturalEquipmentMod.GetColoredAdjective(), DescriptionBuilder.ORDER_ADJUST_EXTREMELY_EARLY);
+                E.AddAdjective(new ModElongatedNaturalWeapon().GetColoredAdjective(), DescriptionBuilder.ORDER_ADJUST_EXTREMELY_EARLY);
             }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            if (E.Object == ParentObject && NaturalEquipmentMod != null && AppliedElongatedBonusCap > 0)
+            if (E.Object == ParentObject && AppliedElongatedBonusCap > 0)
             {
                 E.Postfix.AppendRules(
                     DescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>>
-                        .Send(ParentObject, NaturalEquipmentMod.GetColoredAdjective(), Context: $"{nameof(WeaponElongator)}")
+                        .Send(ParentObject, new ModElongatedNaturalWeapon().GetColoredAdjective(), Context: $"{nameof(WeaponElongator)}")
                         .Process());
             }
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
         {
-            if (E.Object == ParentObject && NaturalEquipmentMod != null && E.Context == $"{nameof(WeaponElongator)}")
+            if (E.Object == ParentObject && E.Context == $"{nameof(WeaponElongator)}")
             {
                 string scalingStat = ElongatedPaws.SCALE_STAT;
-                int damageBonus = NaturalEquipmentMod.GetDamageBonus();
-                if (damageBonus != 0)
+                int penCapBonus = AppliedElongatedBonusCap;
+                if (penCapBonus != 0)
                 {
-                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                    E.AddGeneralElement("", $"getting a {penCapBonus.Signed()} {penCapBonus.Signed().BonusOrPenalty()} to penetration cap");
                 }
                 if (E.WeaponDescriptions.IsNullOrEmpty())
                 {
-                    E.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    E.AddWeaponElement("have", $"{E.Object.its} penetration cap increased by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
                 else
                 {
-                    E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    E.AddWeaponElement("", $"{E.Object.its} penetration cap increased by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
             }
             return base.HandleEvent(E);
@@ -162,7 +175,7 @@ namespace XRL.World.Parts
                         Debug.LoopItem(4, $"Item: {item?.DebugName ?? NULL}",
                             Indent: 3, Toggle: doDebug);
 
-                        ApplyElongatedBonusCap(item.GetPart<MeleeWeapon>());
+                        ApplyElongatedBonusCap(MeleeWeapon);
 
                         Debug.Entry(4,
                             $"x {nameof(WeaponElongator)}"
@@ -182,7 +195,7 @@ namespace XRL.World.Parts
         public override bool HandleEvent(UnequippedEvent E)
         {
             GameObject item = E.Item;
-            if (item.Is(ParentObject) && !Wielder.Is(null) && !ElongatedPaws.Is(null))
+            if (item == ParentObject && Wielder != null && ElongatedPaws != null)
             {
                 Debug.Entry(4,
                     $"@ {nameof(WeaponElongator)}."

@@ -20,11 +20,25 @@ namespace XRL.World.Parts
 
         public ModGiganticNaturalWeapon()
         {
-        }
+            ModPriority = 40;
+            DescriptionPriority = 40;
 
-        public ModGiganticNaturalWeapon(int Tier)
-            : base(Tier)
-        {
+            Adjective = "gigantic";
+            AdjectiveColor = "gigantic";
+            AdjectiveColorFallback = "w";
+
+            Adjustments = new();
+
+            AddedIntProps = new()
+            {
+                { "ModGiganticNoShortDescription", 1 },
+                { "ModGiganticNoDisplayName", 1 }
+            };
+            AddStatAdjustment("Strength", -100);
+
+            AddColorStringAdjustment("&Z", true);
+            AddTileColorAdjustment("&Z", true);
+            AddDetailColorAdjustment("z", true);
         }
 
         public override void ApplyModification(GameObject Object)

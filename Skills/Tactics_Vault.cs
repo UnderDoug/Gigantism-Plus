@@ -925,6 +925,7 @@ namespace XRL.World.Parts.Skill
                 if (AttemptVault(E.Target, E.TargetCell, E, E.Silent))
                 {
                     ParentObject.UseEnergy(1000, "Movement Vault", null, ParentObject.GetStat("MoveSpeed").BaseValue);
+                    Clear();
                 }
             }
             return base.HandleEvent(E);
@@ -939,7 +940,7 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(ObjectLeavingCellEvent E)
         {
-            if (WantToVault && ParentObject != null && E.Actor == ParentObject && E.Cell != null && E.Cell == ParentObject.CurrentCell)
+            if (WantToVault && ParentObject != null && !ParentObject.IsFlying && E.Actor == ParentObject && E.Cell != null && E.Cell == ParentObject.CurrentCell)
             {
                 GameObject Vaulter = ParentObject;
                 GameObject Vaultee = null;
@@ -1061,7 +1062,7 @@ namespace XRL.World.Parts.Skill
                         foreach (GameObject vaultable in cell.GetObjectsWithPart(nameof(Vaultable)))
                         {
                             bool vaultableWasDiggable = vaultable.HasIntProperty(WAS_DIGGABLE);
-                            bool vaulterCanVaultVaultable = CanVault(vaultable);
+                            bool vaulterCanVaultVaultable = CanVault(vaultable, Silent: true);
                             bool vaultableCellPairsContainsVaulter = vaultable.GetPart<Vaultable>().GetVaultableCellPairs(Vaulter).ContainsKey(E.Cell);
                             bool swapDiggable =
                                 vaultableWasDiggable && vaulterCanVaultVaultable && vaultableCellPairsContainsVaulter;
@@ -1140,7 +1141,7 @@ namespace XRL.World.Parts.Skill
                         foreach (GameObject vaultable in cell.GetObjectsWithPart(nameof(Vaultable)))
                         {
                             bool vaultableIsDiggable = vaultable.HasIntProperty(DIGGABLE);
-                            bool vaulterCanVaultVaultable = CanVault(vaultable);
+                            bool vaulterCanVaultVaultable = CanVault(vaultable, Silent: true);
                             bool vaultableCellPairsContainsVaulter = vaultable.GetPart<Vaultable>().GetVaultableCellPairs(Vaulter).ContainsKey(E.Cell);
                             bool swapDiggable =
                                 vaultableIsDiggable && vaulterCanVaultVaultable && vaultableCellPairsContainsVaulter;

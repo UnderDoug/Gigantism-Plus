@@ -129,11 +129,11 @@ namespace XRL.World.Parts.Mutation
             return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
         }
 
-        public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)
         {
             return 0;
         }
-        public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)
         {
             if (HasGigantism)
             {
@@ -146,7 +146,7 @@ namespace XRL.World.Parts.Mutation
             DieRoll baseDamage = new(GetClawsDamage(Level));
             return baseDamage.RightValue-2;
         }
-        public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalWeaponSubpart, int Level = 1)
+        public virtual int GetNaturalWeaponDamageBonus(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)
         {
             if (HasGigantism && (HasElongated || HasCrystallinity))
             {
@@ -154,11 +154,11 @@ namespace XRL.World.Parts.Mutation
             }
             return 0;
         }
-        public virtual int GetNaturalWeaponHitBonus(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level = 1)
+        public virtual int GetNaturalWeaponHitBonus(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)
         {
             return 0;
         }
-        public virtual int GetNaturalWeaponPenBonus(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, int Level = 1)
+        public virtual int GetNaturalWeaponPenBonus(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)
         {
             return 0;
         }

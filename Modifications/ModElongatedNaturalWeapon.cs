@@ -18,11 +18,38 @@ namespace XRL.World.Parts
 
         public ModElongatedNaturalWeapon()
         {
-        }
+            BodyPartType = "Hand";
 
-        public ModElongatedNaturalWeapon(int Tier)
-            : base(Tier)
-        {
+            ModPriority = 60;
+            DescriptionPriority = 60;
+
+            Noun = "paw";
+
+            Adjective = "elongated";
+            AdjectiveColor = "giant";
+            AdjectiveColorFallback = "w";
+
+            Adjustments = new();
+
+            AddedStringProps = new()
+            {
+                { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
+                { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
+            };
+            AddSkillAdjustment("ShortBlades", true);
+            AddStatAdjustment("Agility", -120);
+
+            static bool cosmeticCondition(GameObject Equipment)
+            {
+                return Equipment?.Blueprint != null
+                    && Equipment.Blueprint == "DefaultFist";
+            };
+            AddNounAdjustment(true, Condition: cosmeticCondition);
+
+            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: cosmeticCondition);
+            AddColorStringAdjustment("&Z", true);
+            AddTileColorAdjustment("&Z", true);
+            AddDetailColorAdjustment("z", true);
         }
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)

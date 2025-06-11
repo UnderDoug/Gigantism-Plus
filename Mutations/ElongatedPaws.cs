@@ -50,43 +50,10 @@ namespace XRL.World.Parts.Mutation
 
         public static ModElongatedNaturalWeapon NewElongatedWeaponMod(ElongatedPaws assigningPart)
         {
-            ModElongatedNaturalWeapon elongatedNaturalWeaponMod = new()
+            return new()
             {
                 AssigningPart = assigningPart,
-                BodyPartType = "Hand",
-
-                ModPriority = 60,
-                DescriptionPriority = 60,
-
-                Noun = "paw",
-
-                Adjective = "elongated",
-                AdjectiveColor = "giant",
-                AdjectiveColorFallback = "w",
-
-                Adjustments = new(),
-
-                AddedStringProps = new()
-                {
-                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
-                },
             };
-            elongatedNaturalWeaponMod.AddSkillAdjustment("ShortBlades", true);
-            elongatedNaturalWeaponMod.AddStatAdjustment("Agility", -120);
-
-            static bool cosmeticCondition(GameObject Equipment)
-            {
-                return Equipment?.Blueprint != null
-                    && Equipment.Blueprint == "DefaultFist";
-            };
-            elongatedNaturalWeaponMod.AddNounAdjustment(true, Condition: cosmeticCondition);
-
-            elongatedNaturalWeaponMod.AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: cosmeticCondition);
-            elongatedNaturalWeaponMod.AddColorStringAdjustment("&Z", true);
-            elongatedNaturalWeaponMod.AddTileColorAdjustment("&Z", true);
-            elongatedNaturalWeaponMod.AddDetailColorAdjustment("z", true);
-            return elongatedNaturalWeaponMod;
         }
         public override ModNaturalEquipment<ElongatedPaws> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<ElongatedPaws>> Filter = null, ElongatedPaws NewAssigner = null)
         {
@@ -98,7 +65,7 @@ namespace XRL.World.Parts.Mutation
         public bool HasBurrowing => ParentObject != null && ParentObject.HasPartDescendedFrom<BurrowingClaws>();
         public bool HasCrystallinity => ParentObject != null && ParentObject.HasPartDescendedFrom<Crystallinity>();
 
-        public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod = null, int Level = 1)
         {
             int dieSize = 0;
             
@@ -108,7 +75,7 @@ namespace XRL.World.Parts.Mutation
             return dieSize;
         }
 
-        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod = null, int Level = 1)
         {
             return (int)Math.Floor(ScaleStatModifier / 2.0);
         }

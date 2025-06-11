@@ -383,7 +383,7 @@ namespace XRL.World.Parts
             Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
             bool hasAnyValidVaultCells = !originDestinationPairs.IsNullOrEmpty();
 
-            if (hasAnyValidVaultCells && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null)
+            if (hasAnyValidVaultCells && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null && !E.Actor.IsFlying)
             {
                 if (Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
                 {
@@ -424,6 +424,7 @@ namespace XRL.World.Parts
 
             Tactics_Vault vaultSkill = null;
             bool vaulterNotNull = Vaulter != null;
+            bool flyoverFlyingMismatch = vaulterNotNull && Vaultee.HasPropertyOrTag("Flyover") != Vaulter.IsFlying;
             bool cellExists = E.Cell != null;
             bool cellIsSolidForVaulter = cellExists && E.Cell.IsSolidFor(Vaulter);
             bool haveSkill = vaulterNotNull && Vaulter.TryGetPart(out vaultSkill);
@@ -435,6 +436,7 @@ namespace XRL.World.Parts
 
             bool shouldBlock =
                 vaulterNotNull
+             && flyoverFlyingMismatch
              && cellIsSolidForVaulter
              && haveSkill
              && wantToVault
@@ -454,6 +456,9 @@ namespace XRL.World.Parts
                 Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
                 Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}",
                     Good: vaulterNotNull, Indent: 1, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(flyoverFlyingMismatch)}", $"{flyoverFlyingMismatch}",
+                    Good: flyoverFlyingMismatch, Indent: 1, Toggle: doDebug);
 
                 Debug.LoopItem(4, $"{nameof(cellIsSolidForVaulter)}", $"{cellIsSolidForVaulter}",
                     Good: cellIsSolidForVaulter, Indent: 1, Toggle: doDebug);
@@ -587,14 +592,15 @@ namespace XRL.World.Parts
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "BeforePhysicsRejectObjectEntringCell" && E.HasFlag("Actual"))
+            if (E.ID == "BeforePhysicsRejectObjectEntringCell" && E.HasFlag("Actual") 
+                && E.GetGameObjectParameter("Object") is GameObject Vaulter && Vaulter != null && !Vaulter.IsFlying)
             {
                 Debug.Entry(4,
                     $"@ {nameof(Vaultable)}."
-                    + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()})",
+                    + $"{nameof(FireEvent)}("
+                    + $"{nameof(Event)} E.Command: {E.ID.Quote()})",
                     Indent: 0, Toggle: doDebug);
 
-                GameObject Vaulter = E.GetGameObjectParameter("Object");
                 GameObject Vaultee = ParentObject;
 
                 bool vaulterNotNull = Vaulter != null;
@@ -650,7 +656,9 @@ namespace XRL.World.Parts
 
                         Debug.Entry(4,
                         $"x {nameof(Vaultable)}."
-                        + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()}) @//",
+                        + $"{nameof(FireEvent)}("
+                        + $"{nameof(Event)} E.Command: {E.ID.Quote()})"
+                        + $" @//",
                         Indent: 0, Toggle: doDebug);
 
                         return false; // don't Reject entering cell
@@ -661,7 +669,9 @@ namespace XRL.World.Parts
                 }
                 Debug.Entry(4,
                     $"x {nameof(Vaultable)}."
-                    + $"{nameof(FireEvent)}({nameof(Event)} E.Command: {E.ID.Quote()}) @//",
+                    + $"{nameof(FireEvent)}("
+                    + $"{nameof(Event)} E.Command: {E.ID.Quote()})"
+                    + $" @//",
                     Indent: 0, Toggle: doDebug);
             }
             return base.FireEvent(E);

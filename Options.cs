@@ -1,12 +1,14 @@
-﻿using HNPS_GigantismPlus.Harmony;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
 using XRL;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using XRL.World.ZoneBuilders;
+
+using HNPS_GigantismPlus.Harmony;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
@@ -108,6 +110,7 @@ namespace HNPS_GigantismPlus
             { nameof(SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
             { nameof(WrassleGiantHero), true },
+            { nameof(WeaponElongator), true },
 
             // Events
             { nameof(BeforeBodyPartsUpdatedEvent), false },

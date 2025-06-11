@@ -25,20 +25,28 @@ namespace XRL.World.Parts
         {
             private static bool doDebug => getClassDoDebug(nameof(PartAdjustment));
 
+            [NonSerialized]
             public Guid ID;
 
+            [NonSerialized]
             public bool Applied; // Whether the adjustment has been applied.
 
+            [NonSerialized]
             public string ParentNaturalEquipmentMod; // String name of the NaturalEquipmentMod this part adjust belongs to.
 
+            [NonSerialized]
             public Type Target; // Render, MeleeWeapon, Armor, etc.
 
+            [NonSerialized]
             public string Field; // Field/Property to adjust
 
+            [NonSerialized]
             public int AdjustmentPriority; // Priority of adjustment, lower number = higher priority
 
+            [NonSerialized]
             public object Value; // Value to adjust the Field to.
 
+            [NonSerialized]
             public Func<GameObject, bool> Condition;
 
             public PartAdjustment()

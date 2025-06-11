@@ -126,7 +126,7 @@ namespace HNPS_GigantismPlus
         public static void Warn(int Verbosity, string ClassName, string MethodName, string Issue = null, int Indent = 0)
         {
             string noIssue = "Something didn't go as planned";
-            string output = $"/!\\ WARN | {ClassName}.{MethodName}: {Issue ?? noIssue}";
+            string output = $">!< WARN | {ClassName}.{MethodName}: {Issue ?? noIssue}";
             Entry(Verbosity, output, Indent, Toggle: true);
         }
 

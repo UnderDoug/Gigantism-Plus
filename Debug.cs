@@ -312,6 +312,15 @@ namespace HNPS_GigantismPlus
             return NaturalEquipmentMod;
         }
 
+        public static Dictionary<string, List<T>> VomitBag<T>(this Dictionary<string, List<T>> Bag, string Label = "", string FromSubBag = "")
+            where T : class
+        {
+            Label = Label.IsNullOrEmpty() ? "" : $"{Label}: ";
+            string output = "";
+
+            return Bag;
+        }
+
         public static GameObject VaultVomit(this GameObject Vaulter, int Verbosity, string Method = null, string Context = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)
         {
             if (Vaulter.TryGetPart(out Tactics_Vault vaultSkill))

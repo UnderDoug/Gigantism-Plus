@@ -1374,12 +1374,21 @@ namespace HNPS_GigantismPlus
             List<T> drawBag = new();
             drawBag.AddRange(Bag);
             ExceptForElements ??= new();
-            if (drawBag.Contains(ExceptForElement)) drawBag.Remove(ExceptForElement);
+            if (drawBag.Contains(ExceptForElement))
+            {
+                drawBag.Remove(ExceptForElement);
+            }
             foreach (T exceptForElement in ExceptForElements)
             {
-                if (drawBag.Contains(exceptForElement)) drawBag.Remove(exceptForElement);
+                if (drawBag.Contains(exceptForElement))
+                {
+                    drawBag.Remove(exceptForElement);
+                }
             }
-            if (drawBag.IsNullOrEmpty()) return null;
+            if (drawBag.IsNullOrEmpty())
+            {
+                return null;
+            }
             T output = null;
             if (Seed != Guid.Empty)
             {
@@ -1400,113 +1409,125 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromSubBag = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromPocket = "", T ExceptForElement = null, List<T> ExceptForElements = null)
             where T : class
         {
-            return Bag.DrawSeededElement(Guid.Empty, FromSubBag, ExceptForElement, ExceptForElements);
+            return Bag.DrawSeededElement(Guid.Empty, FromPocket, ExceptForElement, ExceptForElements);
         }
-        public static T DrawSeededElement<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromSubBag = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+        public static T DrawSeededElement<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromPocket = "", T ExceptForElement = null, List<T> ExceptForElements = null)
             where T : class
         {
             List<T> drawBag = new();
             ExceptForElements ??= new();
-            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
-            if (haveTargetedSubBag)
+            bool haveTargetPocket = FromPocket != "" && Bag.ContainsKey(FromPocket);
+            if (haveTargetPocket)
             {
-                drawBag = Bag[FromSubBag];
+                drawBag = Bag[FromPocket];
             }
             else
             {
-                foreach ((_, List<T> subBag) in Bag)
+                foreach ((_, List<T> pocket) in Bag)
                 {
-                    foreach (T element in subBag)
+                    foreach (T element in pocket)
                     {
-                        if (!drawBag.Contains(element)) drawBag.Add(element);
+                        drawBag.TryAdd(element);
                     }
                 }
             }
 
             T output = drawBag.DrawSeededElement(Seed, ExceptForElement, ExceptForElements);
 
-            if (haveTargetedSubBag)
+            if (haveTargetPocket)
             {
-                if (Bag[FromSubBag].Contains(output)) Bag[FromSubBag].Remove(output);
+                if (Bag[FromPocket].Contains(output))
+                {
+                    Bag[FromPocket].Remove(output);
+                }
             }
             else
             {
-                foreach ((_, List<T> subBag) in Bag)
+                foreach ((_, List<T> pocket) in Bag)
                 {
-                    if (subBag.Contains(output)) subBag.Remove(output);
+                    if (pocket.Contains(output))
+                    {
+                        pocket.Remove(output);
+                    }
                 }
             }
             return output;
         }
-        public static T DrawElement<T>(this Dictionary<string, List<T>> Bag, T Element, string FromSubBag = "")
+        public static T DrawElement<T>(this Dictionary<string, List<T>> Bag, T Element, string FromPocket = "")
             where T : class
         {
             List<T> drawBag = new();
-            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
-            if (haveTargetedSubBag)
+            bool haveTargetPocket = FromPocket != "" && Bag.ContainsKey(FromPocket);
+            if (haveTargetPocket)
             {
-                drawBag = Bag[FromSubBag];
+                drawBag = Bag[FromPocket];
             }
             else
             {
-                foreach ((_, List<T> subBag) in Bag)
+                foreach ((_, List<T> pocket) in Bag)
                 {
-                    foreach (T element in subBag)
+                    foreach (T element in pocket)
                     {
-                        if (!drawBag.Contains(element)) drawBag.Add(element);
+                        drawBag.TryAdd(element);
                     }
                 }
             }
 
             T output = (!drawBag.IsNullOrEmpty() && drawBag.Contains(Element)) ? Element : null;
 
-            if (haveTargetedSubBag)
+            if (haveTargetPocket)
             {
-                if (Bag[FromSubBag].Contains(output)) Bag[FromSubBag].Remove(output);
+                if (Bag[FromPocket].Contains(output))
+                {
+                    Bag[FromPocket].Remove(output);
+                }
             }
             else
             {
-                foreach ((_, List<T> subBag) in Bag)
+                foreach ((_, List<T> pocket) in Bag)
                 {
-                    if (subBag.Contains(output)) subBag.Remove(output);
+                    if (pocket.Contains(output))
+                    {
+                        pocket.Remove(output);
+                    }
                 }
             }
             return output;
         }
-        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, out string Key, string FromSubBag = "")
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, out string Key, string FromPocket = "")
             where T : class
         {
-            List<T> peekBag = new();
-            bool haveTargetedSubBag = FromSubBag != "" && Bag.ContainsKey(FromSubBag);
+            bool haveTargetPocket = FromPocket != "" && Bag.ContainsKey(FromPocket);
             bool haveElement = false;
             Key = null;
-            if (haveTargetedSubBag)
+            if (!Bag.IsNullOrEmpty())
             {
-                peekBag = Bag[FromSubBag];
-            }
-            else
-            {
-                foreach ((string key, List<T> subBag) in Bag)
+                foreach ((string key, List<T> pocket) in Bag)
                 {
-                    foreach (T element in subBag)
+                    if (haveTargetPocket && FromPocket != key)
                     {
-                        if (peekBag.Contains(element))
+                        continue;
+                    }
+                    foreach (T element in pocket)
+                    {
+                        if (element == Element)
                         {
                             Key = key;
                             haveElement = true;
+                            break;
                         }
                     }
                 }
             }
             return haveElement;
         }
-        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, string FromSubBag = "")
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, string FromPocket = "")
             where T : class
         {
-            return Bag.Contains(Element, out _, FromSubBag);
+            return Bag.Contains(Element, out _, FromPocket);
         }
 
         public static void Gigantify(this GameObject Object, string Context = "")

@@ -98,7 +98,7 @@ namespace XRL.World.Parts
                         _DetailColor?.ToUpper() 
                     }) 
                 : ColorBag.DrawSeededElement(WrassleID,
-                    FromSubBag: "Bright",
+                    FromPocket: "Bright",
                     ExceptForElements: new() 
                     { 
                         _DetailColor?.ToLower(), 
@@ -131,7 +131,7 @@ namespace XRL.World.Parts
                         _TileColor?.ToUpper(),
                     })
                 : ColorBag.DrawSeededElement(WrassleID,
-                    FromSubBag: "Bright",
+                    FromPocket: "Bright",
                     ExceptForElements: new() 
                     { 
                         _TileColor?.ToLower(),
@@ -184,10 +184,14 @@ namespace XRL.World.Parts
             ColorBag = NewColorBag();
 
             if (ColorBag.Contains(TileColor))
+            {
                 ColorBag.Remove(TileColor);
+            }
 
             if (ColorBag.Contains(DetailColor))
+            {
                 ColorBag.Remove(DetailColor);
+            }
 
             return ColorBag;
         }
@@ -217,7 +221,9 @@ namespace XRL.World.Parts
         public string GetTileFromBag()
         {
             if (TileBag.IsNullOrEmpty())
+            {
                 return FillTileBag().DrawSeededElement(WrassleID);
+            }
             return TileBag.DrawSeededElement(WrassleID);
         }
 

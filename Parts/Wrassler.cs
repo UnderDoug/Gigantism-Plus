@@ -88,7 +88,7 @@ namespace XRL.World.Parts
                         _DetailColor?.ToUpper()
                     })
                 : ColorBag.DrawSeededElement(WrassleID,
-                    FromSubBag: "Bright",
+                    FromPocket: "Bright",
                     ExceptForElements: new()
                     {
                         _DetailColor?.ToLower(),
@@ -121,7 +121,7 @@ namespace XRL.World.Parts
                         _TileColor?.ToUpper(),
                     })
                 : ColorBag.DrawSeededElement(WrassleID,
-                    FromSubBag: "Bright",
+                    FromPocket: "Bright",
                     ExceptForElements: new()
                     {
                         _TileColor?.ToLower(),
@@ -308,7 +308,9 @@ namespace XRL.World.Parts
         public Wrassler BestowWrassleGear(bool Force = false)
         {
             if (!BeenBestowed || Force)
+            {
                 return BestowWrassleGear(out BeenBestowed);
+            }
             return this;
         }
 

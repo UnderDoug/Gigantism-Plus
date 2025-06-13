@@ -61,17 +61,6 @@ namespace HNPS_GigantismPlus
         public static JournalMapNote SecretMapNote = null;
         public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneId);
 
-        public static List<string> WrassleRingColors = new()
-        {
-            $"W",
-            $"M",
-            $"G",
-            $"B",
-            $"C",
-            $"R",
-            $"w",
-        };
-
         public override void OnAfterBuild(JoppaWorldBuilder builder)
         {
             Debug.Entry(4,
@@ -123,13 +112,6 @@ namespace HNPS_GigantismPlus
 
             GameObject UniqueGiant = GetTheGiant();
 
-            if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE)
-                zoneManager.AddZonePostBuilder(
-                    ZoneID: SecretZoneId, 
-                    Class: nameof(GiantAbodePopulator), 
-                    Key1: "GiantID", 
-                    Value1: zoneManager.CacheObject(UniqueGiant));
-
             if (UniqueGiant == null)
             {
                 Debug.Warn(2,
@@ -141,29 +123,47 @@ namespace HNPS_GigantismPlus
             }
 
             string wrasslerColor = null;
-            if (UniqueGiant.TryGetPart(out Wrassler wrassler)) wrasslerColor = wrassler.DetailColor;
-
-            string wrassleRingColor = wrasslerColor ?? WrassleRingColors.GetRandomElement();
-            foreach (GameObject rope in zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes"))
+            if (UniqueGiant.TryGetPart(out Wrassler wrassler))
             {
-                if(rope.TryGetPart(out WrassleGear wrassleGear) && wrassler != null)
+                wrasslerColor = wrassler.DetailColor;
+            }
+            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
+
+            List<GameObject> ropesList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes");
+            if (!ropesList.IsNullOrEmpty())
+            {
+                foreach (GameObject rope in ropesList)
                 {
-                    wrassleGear.WrassleID = wrassler.WrassleID;
-                    wrassleGear.ApplyFlair(doTile: false, doTileColor: false, doDetailColor: true, doColorString: false);
-                }
-                else
-                {
-                    rope.Render.DetailColor = wrassleRingColor;
+                    if (rope.TryGetPart(out WrassleGear wrassleGear) && wrassler != null)
+                    {
+                        if (UD_QWE.TrySyncWrassleID(wrassler, wrassleGear))
+                        {
+                            wrassleGear.ApplyFlair(IgnoreTile: true, IgnoreTileColor: true, IgnoreColorString: true);
+                        }
+                    }
+                    else
+                    {
+                        rope.Render.DetailColor = wrassleRingColor;
+                    }
                 }
             }
 
-            /*
-            zoneManager.AddZonePostBuilder(
-                ZoneID: SecretZoneId, 
-                Class: nameof(AddObjectBuilder), 
-                Key1: "Object", 
-                Value1: zoneManager.CacheObject(UniqueGiant)); */
-
+            if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE) // This specific map has the widgets necessary for the specified builder to work
+            {
+                zoneManager.AddZonePostBuilder(
+                    ZoneID: SecretZoneId,
+                    Class: nameof(GiantAbodePopulator),
+                    Key1: "GiantID",
+                    Value1: zoneManager.CacheObject(UniqueGiant));
+            }
+            else
+            {
+                zoneManager.AddZonePostBuilder(
+                    ZoneID: SecretZoneId,
+                    Class: nameof(AddObjectBuilder),
+                    Key1: "Object",
+                    Value1: zoneManager.CacheObject(UniqueGiant));
+            }
         } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
 
         public static GameObject GetTheGiant()
@@ -179,8 +179,8 @@ namespace HNPS_GigantismPlus
                 ;
 
             void ApplyBuilder(GameObject Creature) 
-            { 
-                WrassleGiantHeroBuilder.Apply(Creature, Context: Unique ? "Unique" : "Hero"); 
+            {
+                UD_QWE.WrassleGiantHeroBuilder.Apply(Creature, Context: Unique ? "Unique" : "Hero"); 
             }
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,

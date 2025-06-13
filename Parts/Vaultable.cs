@@ -120,6 +120,7 @@ namespace XRL.World.Parts
         {
             Registrar.Register("BeforePhysicsRejectObjectEntringCell");
             Registrar.Register(ParentObject, GetNavigationWeightEvent.ID, EventOrder.EXTREMELY_EARLY);
+            Registrar.Register(ParentObject, GetAdjacentNavigationWeightEvent.ID, EventOrder.EXTREMELY_EARLY);
             Registrar.Register(ParentObject, OkayToDamageEvent.ID, EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
         }
@@ -404,6 +405,24 @@ namespace XRL.World.Parts
                         E.Uncacheable = true;
                         E.MinWeight(weight, maxWeight);
                         return false;
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetAdjacentNavigationWeightEvent E)
+        {
+            if (E.AdjacentCell != null)
+            {
+                Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
+                bool isValidVaultCell = !originDestinationPairs.IsNullOrEmpty() && (originDestinationPairs.ContainsKey(E.AdjacentCell) || originDestinationPairs.ContainsValue(E.AdjacentCell));
+
+                if (!isValidVaultCell && E.AdjacentCell != ParentObject.CurrentCell)
+                {
+                    if (Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
+                    {
+                        E.Uncacheable = true;
+                        E.Weight += 15;
                     }
                 }
             }

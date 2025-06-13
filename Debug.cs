@@ -308,16 +308,30 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            Debug.LastIndent = Indent;
+            LastIndent = Indent;
             return NaturalEquipmentMod;
         }
 
-        public static Dictionary<string, List<T>> VomitBag<T>(this Dictionary<string, List<T>> Bag, string Label = "", string FromSubBag = "")
+        public static Dictionary<string, List<T>> VomitBag<T>(this Dictionary<string, List<T>> Bag, int Verbosity, string Label = "", string FromPocket = "", bool WithKey = false, int Indent = 0, bool Toggle = true)
             where T : class
         {
-            Label = Label.IsNullOrEmpty() ? "" : $"{Label}: ";
+            Label = "% Vomit: " + (Label.IsNullOrEmpty() ? "" : $"{Label}: ");
             string output = "";
-
+            foreach (string token in Bag.GetContentsAsString(FromPocket, WithKey))
+            {
+                bool isKey = false;
+                if (token.StartsWith("@"))
+                {
+                    isKey = true;
+                }
+                if (!output.IsNullOrEmpty())
+                {  
+                    output += !isKey ? ", " : "; "; 
+                }
+                output += !isKey ? token : token[1..];
+            }
+            output = Label + output;
+            Entry(Verbosity, output, Indent, Toggle);
             return Bag;
         }
 

@@ -1,16 +1,16 @@
+using HNPS_GigantismPlus;
 using System;
 using System.Collections.Generic;
-
 using XRL.World.Parts.Mutation;
-
-using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+using static XRL.UD_QudWrasslingEntertainment;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModWrassleVibrant : IModification
+    public class ModWrassleVibrant : IWrassleModification
     {
         private static bool doDebug => getClassDoDebug(nameof(ModWrassleVibrant));
         private static bool getDoDebug(object what = null)
@@ -31,8 +31,6 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
-
-
 
         public ModWrassleVibrant()
         {

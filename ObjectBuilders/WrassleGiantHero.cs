@@ -209,9 +209,9 @@ namespace XRL.World.ObjectBuilders
             List<string> factionAdmirationBag = new(FactionAdmirationBag);
             Dictionary<int, string> factionAdmirationList = new()
             {
-                { 1, factionAdmirationBag.DrawRandomElement() },
-                { 2, factionAdmirationBag.DrawRandomElement() },
-                { 3, factionAdmirationBag.DrawRandomElement() },
+                { 1, factionAdmirationBag.DrawRandomToken() },
+                { 2, factionAdmirationBag.DrawRandomToken() },
+                { 3, factionAdmirationBag.DrawRandomToken() },
             };
 
             Debug.LoopItem(4, $"Setting StaticFactions", Indent: 1, Toggle: getDoDebug());
@@ -699,7 +699,7 @@ namespace XRL.World.ObjectBuilders
             }
             Debug.LoopItem(4, $"<HasMakersMark>?", Good: Creature.HasPart<HasMakersMark>(), Indent: 2, Toggle: getDoDebug());
             List<string> usableMarks = new(MakersMark.GetUsable());
-            string heroMark = usableMarks.DrawSeededElement(wrassler.WrassleID);
+            string heroMark = usableMarks.DrawSeededToken(wrassler.WrassleID);
             hasMakersMark.Mark = Unique ? ((char)156).ToString() : heroMark;
             hasMakersMark.Color = wrassler.DetailColor;
             if (Unique) MakersMark.RecordUsage(hasMakersMark.Mark);

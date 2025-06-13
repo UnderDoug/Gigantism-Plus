@@ -61,7 +61,7 @@ namespace XRL.World.Parts
                 while(count > 0 && !cells.IsNullOrEmpty())
                 {
                     bool ByChance = Stat.Roll(1, 100) <= ChancePer;
-                    cell = cells.DrawRandomElement();
+                    cell = cells.DrawRandomToken();
                     if (cell.IsEmpty() && ByChance)
                     {
                         cell.AddObject(GameObjectFactory.Factory.CreateObject("Dogthorn Tree"));

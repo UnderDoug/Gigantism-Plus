@@ -1,29 +1,27 @@
-﻿using System;
+﻿using Genkit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-
-using Genkit;
-
+using System.Text.RegularExpressions;
+using UnityEngine.UIElements;
 using XRL;
-using XRL.UI;
-using XRL.Rules;
 using XRL.Language;
+using XRL.Rules;
+using XRL.UI;
 using XRL.World;
 using XRL.World.Anatomy;
 using XRL.World.Capabilities;
-using XRL.World.Parts;
-using XRL.World.Parts.Skill;
-using XRL.World.Parts.Mutation;
-using XRL.World.Tinkering;
 using XRL.World.ObjectBuilders;
-
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+using XRL.World.Parts.Skill;
+using XRL.World.Tinkering;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -1362,64 +1360,64 @@ namespace HNPS_GigantismPlus
                 || @object.InheritsFrom("NaturalWeapon");
         }
 
-        public static T DrawRandomElement<T>(this List<T> Bag, T ExceptForElement = null, List<T> ExceptForElements = null)
+        public static T DrawRandomToken<T>(this List<T> Bag, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
-            return Bag.DrawSeededElement(Guid.Empty, ExceptForElement, ExceptForElements);
+            return Bag.DrawSeededToken(Guid.Empty, ExceptForToken, ExceptForTokens);
         }
-        public static T DrawSeededElement<T>(this List<T> Bag, Guid Seed, T ExceptForElement = null, List<T> ExceptForElements = null)
+        public static T DrawSeededToken<T>(this List<T> Bag, Guid Seed, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
             if (Bag.IsNullOrEmpty()) return null;
             List<T> drawBag = new();
             drawBag.AddRange(Bag);
-            ExceptForElements ??= new();
-            if (drawBag.Contains(ExceptForElement))
+            ExceptForTokens ??= new();
+            if (drawBag.Contains(ExceptForToken))
             {
-                drawBag.Remove(ExceptForElement);
+                drawBag.Remove(ExceptForToken);
             }
-            foreach (T exceptForElement in ExceptForElements)
+            foreach (T exceptForToken in ExceptForTokens)
             {
-                if (drawBag.Contains(exceptForElement))
+                if (drawBag.Contains(exceptForToken))
                 {
-                    drawBag.Remove(exceptForElement);
+                    drawBag.Remove(exceptForToken);
                 }
             }
             if (drawBag.IsNullOrEmpty())
             {
                 return null;
             }
-            T output = null;
+            T token = null;
             if (Seed != Guid.Empty)
             {
                 string seed = Seed.ToString();
                 int low = 0;
                 int high = (drawBag.Count - 1) * 7;
                 int roll = Stat.SeededRandom(seed, low, high) % (drawBag.Count - 1);
-                output = drawBag.ElementAt(roll);
+                token = drawBag.ElementAt(roll);
             }
-            output ??= drawBag.GetRandomElement();
-            Bag.Remove(output);
-            return output;
+            token ??= drawBag.GetRandomElement();
+            Bag.Remove(token);
+            return token;
         }
-        public static T DrawElement<T>(this List<T> Bag, T Element)
+        public static T DrawToken<T>(this List<T> Bag, T Token)
             where T : class
         {
-            T output = (!Bag.IsNullOrEmpty() || Bag.Remove(Element)) ? Element : null;
-            return output;
+            T token = (!Bag.IsNullOrEmpty() || Bag.Remove(Token)) ? Token : null;
+            return token;
         }
 
-        public static T DrawRandomElement<T>(this Dictionary<string, List<T>> Bag, string FromPocket = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+        public static T DrawRandomToken<T>(this Dictionary<string, List<T>> Bag, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
-            return Bag.DrawSeededElement(Guid.Empty, FromPocket, ExceptForElement, ExceptForElements);
+            return Bag.DrawSeededToken(Guid.Empty, FromPocket, ExceptForToken, ExceptForTokens);
         }
-        public static T DrawSeededElement<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromPocket = "", T ExceptForElement = null, List<T> ExceptForElements = null)
+        public static T DrawSeededToken<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
             List<T> drawBag = new();
-            ExceptForElements ??= new();
-            bool haveTargetPocket = FromPocket != "" && Bag.ContainsKey(FromPocket);
+            ExceptForTokens ??= new();
+            bool haveTargetPocket = !FromPocket.IsNullOrEmpty() && Bag.ContainsKey(FromPocket);
             if (haveTargetPocket)
             {
                 drawBag = Bag[FromPocket];
@@ -1435,32 +1433,32 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            T output = drawBag.DrawSeededElement(Seed, ExceptForElement, ExceptForElements);
+            T token = drawBag.DrawSeededToken(Seed, ExceptForToken, ExceptForTokens);
 
             if (haveTargetPocket)
             {
-                if (Bag[FromPocket].Contains(output))
+                if (Bag[FromPocket].Contains(token))
                 {
-                    Bag[FromPocket].Remove(output);
+                    Bag[FromPocket].Remove(token);
                 }
             }
             else
             {
                 foreach ((_, List<T> pocket) in Bag)
                 {
-                    if (pocket.Contains(output))
+                    if (pocket.Contains(token))
                     {
-                        pocket.Remove(output);
+                        pocket.Remove(token);
                     }
                 }
             }
-            return output;
+            return token;
         }
-        public static T DrawElement<T>(this Dictionary<string, List<T>> Bag, T Element, string FromPocket = "")
+        public static T DrawToken<T>(this Dictionary<string, List<T>> Bag, T Token, string FromPocket = null)
             where T : class
         {
             List<T> drawBag = new();
-            bool haveTargetPocket = FromPocket != "" && Bag.ContainsKey(FromPocket);
+            bool haveTargetPocket = !FromPocket.IsNullOrEmpty() && Bag.ContainsKey(FromPocket);
             if (haveTargetPocket)
             {
                 drawBag = Bag[FromPocket];
@@ -1476,58 +1474,128 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            T output = (!drawBag.IsNullOrEmpty() && drawBag.Contains(Element)) ? Element : null;
+            T token = (!drawBag.IsNullOrEmpty() && drawBag.Contains(Token)) ? Token : null;
 
             if (haveTargetPocket)
             {
-                if (Bag[FromPocket].Contains(output))
+                if (Bag[FromPocket].Contains(token))
                 {
-                    Bag[FromPocket].Remove(output);
+                    Bag[FromPocket].Remove(token);
                 }
             }
             else
             {
                 foreach ((_, List<T> pocket) in Bag)
                 {
-                    if (pocket.Contains(output))
+                    if (pocket.Contains(token))
                     {
-                        pocket.Remove(output);
+                        pocket.Remove(token);
                     }
                 }
             }
-            return output;
+            return token;
         }
-        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, out string Key, string FromPocket = "")
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Token, out string Key, string InPocket = null)
             where T : class
         {
-            bool haveTargetPocket = FromPocket != "" && Bag.ContainsKey(FromPocket);
-            bool haveElement = false;
+            bool haveToken = false;
             Key = null;
             if (!Bag.IsNullOrEmpty())
             {
+                bool haveTargetPocket = !InPocket.IsNullOrEmpty() && Bag.ContainsKey(InPocket);
+                foreach ((string key, List<T> pocket) in Bag)
+                {
+                    if (haveTargetPocket && InPocket != key)
+                    {
+                        continue;
+                    }
+                    foreach (T token in pocket)
+                    {
+                        if (token == Token)
+                        {
+                            Key = key;
+                            haveToken = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return haveToken;
+        }
+        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Token, string FromPocket = null)
+            where T : class
+        {
+            return Bag.Contains(Token, out _, FromPocket);
+        }
+        public static IEnumerable<T> GetContents<T>(this Dictionary<string, List<T>> Bag, string FromPocket = null)
+            where T : class
+        {
+            if (!Bag.IsNullOrEmpty())
+            {
+                bool haveTargetPocket = !FromPocket.IsNullOrEmpty() && Bag.ContainsKey(FromPocket);
                 foreach ((string key, List<T> pocket) in Bag)
                 {
                     if (haveTargetPocket && FromPocket != key)
                     {
                         continue;
                     }
-                    foreach (T element in pocket)
+                    foreach (T token in pocket)
                     {
-                        if (element == Element)
-                        {
-                            Key = key;
-                            haveElement = true;
-                            break;
-                        }
+                        yield return token;
                     }
                 }
             }
-            return haveElement;
+            yield break;
         }
-        public static bool Contains<T>(this Dictionary<string, List<T>> Bag, T Element, string FromPocket = "")
+        public static IEnumerable<string> GetContentsAsString<T>(this Dictionary<string, List<T>> Bag, string FromPocket = null, bool WithKey = false)
             where T : class
         {
-            return Bag.Contains(Element, out _, FromPocket);
+            if (!Bag.IsNullOrEmpty())
+            {
+                bool haveTargetPocket = !FromPocket.IsNullOrEmpty() && Bag.ContainsKey(FromPocket);
+                foreach ((string key, List<T> pocket) in Bag)
+                {
+                    if (haveTargetPocket && FromPocket != key)
+                    {
+                        continue;
+                    }
+                    foreach (T token in pocket)
+                    {
+                        if (token is string elementString)
+                        {
+                            if (WithKey)
+                            {
+                                yield return "@" + key;
+                            }
+                            yield return elementString;
+                        }
+                        else yield break;
+                    }
+                }
+            }
+            yield break;
+        }
+
+        public static bool? IsBrightColor(this string Color)
+        {
+            if (Color.IsNullOrEmpty())
+            {
+                return null;
+            }
+            string color = Color.Replace("&", "").Replace("^", "");
+            if (color.IsNullOrEmpty() || color.Length > 1)
+            {
+                return null;
+            }
+            return color[0].ToString().Any(char.IsUpper);
+        }
+        public static bool? IsDarkColor(this string Color)
+        {
+            if (Color.IsBrightColor() == null)
+            {
+                return null;
+            }
+            return !(bool)Color.IsBrightColor();
         }
 
         public static void Gigantify(this GameObject Object, string Context = "")

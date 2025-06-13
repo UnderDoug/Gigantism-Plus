@@ -4,6 +4,9 @@ using System.Linq;
 
 using XRL.UI;
 using XRL.World.Parts.Mutation;
+using XRL.World.Capabilities;
+
+using static XRL.UD_QudWrasslingEntertainment;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
@@ -15,7 +18,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class WrassleGear : IScribedPart
+    public class WrassleGear : IWrasslePart
     {
         private static bool doDebug => getClassDoDebug(nameof(WrassleGear));
         private static bool getDoDebug(object what = null)
@@ -37,122 +40,18 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        [SerializeField]
-        private Guid _WrassleID;
+        public string Tile => UD_QWE.GetTileFromBag(WrassleID, RandomTiles);
 
-        public Guid WrassleID
-        {
-            get => _WrassleID = _WrassleID == Guid.Empty ? Guid.NewGuid() : _WrassleID;
-            set
-            {
-                _WrassleID = value;
-                _Tile = null;
-                TileBag = FillTileBag();
-                _TileColor = null;
-                _DetailColor = null;
-                ColorBag = NewColorBag();
-            }
-        }
+        // TopLeft, Left, Right, BottomRight
+        public string EquipmentFrameColor => UD_QWE.GetEquipmentFrameColor(WrassleID);
 
         public MeleeWeapon MeleeWeaponCopy;
 
         public bool RandomGeneration;
 
-        public List<string> TileBag = new();
-
-        private static Dictionary<string, List<string>> _ColorBag => new()
-        {
-            { "Bright", new() { "W", "Y", "R", "G", "B", "C", "M", } },
-            { "Dull", new() {"K", "y", "r", "g", "b", "c", "m", } },
-        };
-
-        public Dictionary<string, List<string>> ColorBag = new();
-
         public string RandomTiles;
-
-        [SerializeField]
-        private string _Tile;
-        public string Tile
-        {
-            get => _Tile ??= GetTileFromBag();
-            set
-            {
-                if (_Tile != value)
-                    if (!TileBag.Contains(_Tile)) TileBag.Add(_Tile);
-                _Tile = value;
-                RandomizeTile = false;
-            }
-        }
         public bool RandomizeTile;
 
-        [SerializeField]
-        private string _TileColor;
-        public string TileColor
-        {
-            get => _TileColor ??=
-                (DetailColorIsBright 
-                ? ColorBag.DrawSeededElement(WrassleID,
-                    ExceptForElements: new() 
-                    { 
-                        _DetailColor?.ToLower(), 
-                        _DetailColor?.ToUpper() 
-                    }) 
-                : ColorBag.DrawSeededElement(WrassleID,
-                    FromPocket: "Bright",
-                    ExceptForElements: new() 
-                    { 
-                        _DetailColor?.ToLower(), 
-                        _DetailColor?.ToUpper() 
-                    })
-                );
-            set
-            {
-                if (value == null) _TileColor = null;
-                if (ColorBag.Contains(value))
-                    _TileColor = ColorBag.DrawElement(value);
-                else
-                {
-                    _TileColor ??= TileColor;
-                }
-            }
-        }
-        private bool TileColorIsBright => _TileColor != null && TileColor.Any(char.IsUpper);
-
-        [SerializeField]
-        private string _DetailColor;
-        public string DetailColor
-        {
-            get => _DetailColor ??=
-                (TileColorIsBright
-                ? ColorBag.DrawSeededElement(WrassleID,
-                    ExceptForElements: new() 
-                    { 
-                        _TileColor?.ToLower(),
-                        _TileColor?.ToUpper(),
-                    })
-                : ColorBag.DrawSeededElement(WrassleID,
-                    FromPocket: "Bright",
-                    ExceptForElements: new() 
-                    { 
-                        _TileColor?.ToLower(),
-                        _TileColor?.ToUpper(),
-                    })
-                );
-            set
-            {
-                if (value == null) _DetailColor = null;
-                if (ColorBag.Contains(value))
-                    _DetailColor = ColorBag.DrawElement(value);
-                else
-                {
-                    _DetailColor ??= DetailColor;
-                }
-            }
-        }
-        private bool DetailColorIsBright => _DetailColor != null && DetailColor.Any(char.IsUpper);
-
-        // TopLeft, Left, Right, BottomRight
-        public string EquipmentFrameColor => $"{TileColor}{DetailColor}{TileColor}{DetailColor}";
         public bool ColorEquipmentFrame;
 
         public WrassleGear()
@@ -161,8 +60,6 @@ namespace XRL.World.Parts
             RandomGeneration = true;
             MeleeWeaponCopy = null;
             RandomizeTile = false;
-            FillTileBag();
-            ColorBag = NewColorBag();
             ColorEquipmentFrame = true;
         }
 
@@ -174,80 +71,27 @@ namespace XRL.World.Parts
             }
             base.Attach();
         }
-
-        public static Dictionary<string, List<string>> NewColorBag()
-        {
-            return _ColorBag;
-        }
-        public Dictionary<string, List<string>> SyncColorBag()
-        {
-            ColorBag = NewColorBag();
-
-            if (ColorBag.Contains(TileColor))
-            {
-                ColorBag.Remove(TileColor);
-            }
-
-            if (ColorBag.Contains(DetailColor))
-            {
-                ColorBag.Remove(DetailColor);
-            }
-
-            return ColorBag;
-        }
-        public List<string> FillTileBag()
-        {
-            TileBag = new();
-            List<string> randomTiles = RandomTiles?.CommaExpansion() ?? new();
-            foreach (string tile in randomTiles)
-            {
-                if (tile.Contains("~"))
-                {
-                    List<string> variants = new();
-                    variants = tile.GetNumberedTileVariants();
-                    foreach (string variant in variants)
-                    {
-                        if (!TileBag.Contains(variant)) TileBag.Add(variant);
-                    }
-                }
-                else
-                {
-                    if (!TileBag.Contains(tile)) TileBag.Add(tile);
-                }
-            }
-            return TileBag;
-        }
-
-        public string GetTileFromBag()
-        {
-            if (TileBag.IsNullOrEmpty())
-            {
-                return FillTileBag().DrawSeededElement(WrassleID);
-            }
-            return TileBag.DrawSeededElement(WrassleID);
-        }
-
-        public void ApplyFlair(bool doTile = true, bool doTileColor = true, bool doDetailColor = true, bool doColorString = true)
+        public void ApplyFlair(bool IgnoreTile = false, bool IgnoreTileColor = false, bool IgnoreDetailColor = false, bool IgnoreColorString = false, bool IgnoreEquipmentFrame = false)
         {
             if (ParentObject != null && ParentObject.TryGetPart(out Render render))
             {
-                if (doTile && RandomizeTile && !Tile.IsNullOrEmpty())
+                if (!IgnoreTile && (RandomizeTile && !Tile.IsNullOrEmpty()))
                 {
                     render.Tile = Tile;
                 }
-                if (doTileColor)
+                if (!IgnoreTileColor)
                 {
-                    render.TileColor = $"&{TileColor}";
+                    render.TileColor = $"&{PrimaryColor}";
                 }
-                if (doDetailColor)
+                if (!IgnoreDetailColor)
                 {
-                    render.DetailColor = DetailColor;
+                    render.DetailColor = SecondaryColor;
                 }
-                if (doColorString)
+                if (!IgnoreColorString)
                 {
-                    render.ColorString = $"&{TileColor}";
+                    render.ColorString = $"&{PrimaryColor}";
                 }
-                if (ColorEquipmentFrame)
+                if (!IgnoreEquipmentFrame && ColorEquipmentFrame)
                 {
                     ParentObject.SetEquipmentFrameColors(EquipmentFrameColor);
                 }
@@ -283,13 +127,13 @@ namespace XRL.World.Parts
         {
             if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear") && E.Context != "Bestowal")
             {
-                string tileColor = $"&{TileColor}";
+                string tileColor = $"&{PrimaryColor}";
                 GameObject Object = E.Object;
                 Debug.Entry(4,
                     $"{typeof(WrassleGear).Name}." +
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " + 
-                    $"TileColor: &&{TileColor.Quote().Color("Y")}, DetailColor: {DetailColor.Quote().Color("Y")}",
+                    $"TileColor: &&{PrimaryColor.Quote().Color("Y")}, DetailColor: {SecondaryColor.Quote().Color("Y")}",
                     Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"Tile: {Tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
@@ -496,12 +340,12 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-            Writer.Write(_WrassleID);
+
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            _WrassleID = Reader.ReadGuid();
+
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

@@ -113,8 +113,10 @@ namespace HNPS_GigantismPlus
             { nameof(WeaponElongator), true },
 
             // Events
+            { "IBodyPartsUpdatedEvent", false },
             { nameof(BeforeBodyPartsUpdatedEvent), false },
             { nameof(AfterBodyPartsUpdatedEvent), false },
+
             { nameof(GetPrioritisedNaturalEquipmentModsEvent), true },
             { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
             { nameof(ManageDefaultNaturalEquipmentEvent), false },
@@ -129,7 +131,6 @@ namespace HNPS_GigantismPlus
             { nameof(CrayonsGetColorsEvent), false },
 
             { "IDescribeModificationEvent", false },
-
             { nameof(BeforeDescribeModificationEvent<ModGigantic>), true },
             { nameof(DescribeModificationEvent<ModGigantic>), true },
 

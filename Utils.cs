@@ -59,7 +59,7 @@ namespace HNPS_GigantismPlus
 
         public static Gigantified Gigantifier = new();
         public static GiantHero GiantHeroBuilder = new();
-        public static WrassleGiantHero WrassleGiantHeroBuilder = new();
+        public static WrassleGiantHero WrassleGiantHeroBuilder => UD_QudWrasslingEntertainment.WrassleGiantHeroBuilder;
 
         public struct DescriptionElement
         {

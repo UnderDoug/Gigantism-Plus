@@ -224,13 +224,13 @@ namespace XRL.World.ObjectBuilders
             Creature.SetStringProperty("NoHateFactions", noHateFactionsList.Join(","));
 
             List<string> factionAdmiration = new(FactionAdmirationBag);
-            string factionAdmiration1 = factionAdmiration.DrawRandomElement();
+            string factionAdmiration1 = factionAdmiration.DrawRandomToken();
             // Get a bag of different height/size/weight related reasons, draw a random one each
             Creature.SetStringProperty("staticFaction1",
                 $",friend,{factionAdmiration1}");
 
             string staticFaction2Faction = string.Empty;
-            string staticFaction2Admiration = factionAdmiration.DrawRandomElement();
+            string staticFaction2Admiration = factionAdmiration.DrawRandomToken();
             if ("1d4".Roll().Is(4))
             {
                 staticFaction2Faction = ThiccBoisBag.GetRandomElement();

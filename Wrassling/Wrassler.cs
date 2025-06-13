@@ -13,6 +13,8 @@ using XRL.World.ObjectBuilders;
 using XRL.World.Tinkering;
 using XRL.Wish;
 
+using static XRL.UD_QudWrasslingEntertainment;
+
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -24,7 +26,7 @@ namespace XRL.World.Parts
 {
     [HasWishCommand]
     [Serializable]
-    public class Wrassler : IScribedPart
+    public class Wrassler : IWrasslePart
     {
         private static bool doDebug => getClassDoDebug(nameof(Wrassler));
         private static bool getDoDebug(object what = null)
@@ -48,21 +50,6 @@ namespace XRL.World.Parts
 
         public const int ICON_COLOR_PRIORITY = 110;
 
-        [SerializeField]
-        private Guid _WrassleID;
-
-        public Guid WrassleID
-        {
-            get => _WrassleID = _WrassleID == Guid.Empty ? Guid.NewGuid() : _WrassleID;
-            set
-            {
-                _WrassleID = value;
-                _TileColor = null;
-                _DetailColor = null;
-                ColorBag = NewColorBag();
-            }
-        }
-
         public bool Bestow = true;
         public bool BeenBestowed = false;
         public bool KnowsChairs = false;
@@ -81,15 +68,15 @@ namespace XRL.World.Parts
         {
             get => _TileColor ??=
             (DetailColorIsBright
-                ? ColorBag.DrawSeededElement(WrassleID,
-                    ExceptForElements: new()
+                ? ColorBag.DrawSeededToken(WrassleID,
+                    ExceptForTokens: new()
                     {
                         _DetailColor?.ToLower(),
                         _DetailColor?.ToUpper()
                     })
-                : ColorBag.DrawSeededElement(WrassleID,
+                : ColorBag.DrawSeededToken(WrassleID,
                     FromPocket: "Bright",
-                    ExceptForElements: new()
+                    ExceptForTokens: new()
                     {
                         _DetailColor?.ToLower(),
                         _DetailColor?.ToUpper()
@@ -99,7 +86,7 @@ namespace XRL.World.Parts
             {
                 if (value == null) _TileColor = null;
                 if (ColorBag.Contains(value))
-                    _TileColor = ColorBag.DrawElement(value);
+                    _TileColor = ColorBag.DrawToken(value);
                 else
                 {
                     _TileColor ??= TileColor;
@@ -114,15 +101,15 @@ namespace XRL.World.Parts
         {
             get => _DetailColor ??=
             (TileColorIsBright
-                ? ColorBag.DrawSeededElement(WrassleID,
-                    ExceptForElements: new()
+                ? ColorBag.DrawSeededToken(WrassleID,
+                    ExceptForTokens: new()
                     {
                         _TileColor?.ToLower(),
                         _TileColor?.ToUpper(),
                     })
-                : ColorBag.DrawSeededElement(WrassleID,
+                : ColorBag.DrawSeededToken(WrassleID,
                     FromPocket: "Bright",
-                    ExceptForElements: new()
+                    ExceptForTokens: new()
                     {
                         _TileColor?.ToLower(),
                         _TileColor?.ToUpper(),
@@ -132,7 +119,7 @@ namespace XRL.World.Parts
             {
                 if (value == null) _DetailColor = null;
                 if (ColorBag.Contains(value))
-                    _DetailColor = ColorBag.DrawElement(value);
+                    _DetailColor = ColorBag.DrawToken(value);
                 else
                 {
                     _DetailColor ??= DetailColor;
@@ -462,12 +449,12 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-            Writer.Write(_WrassleID);
+
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            _WrassleID = Reader.ReadGuid();
+
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

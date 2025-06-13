@@ -50,11 +50,8 @@ namespace HNPS_GigantismPlus.Harmony
 
             if (E.Is(___eBodypartsUpdated) && @this.ParentObject != null)
             {
-                // This one tells each NaturalEquipmentManager to reset its collected Modifications
+                // Tells each NaturalEquipmentManager to reset itself in prep for managing its attached equipment
                 BeforeBodyPartsUpdatedEvent.Send(@this.ParentObject);
-
-                // This one tells each ManagedNaturalEquipment source to update its stored NaturalEquipmentMods
-                // UpdateNaturalEquipmentModsEvent.Send(@this.ParentObject);
             }
 
             Debug.Entry(4,
@@ -69,9 +66,8 @@ namespace HNPS_GigantismPlus.Harmony
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, 
-                $"* {nameof(Body_Patches)}."
-                + $"{nameof(RegenerateNonDefaultNaturalEquipment)}("
-                + $"{nameof(Creature)}: {Creature?.ShortDisplayNameStripped ?? NULL})", 
+                $"* {nameof(RegenerateNonDefaultNaturalEquipment)}("
+                + $"{nameof(Creature)}: {Creature?.DebugName ?? NULL})", 
                 Indent: indent, Toggle: doDebug);
 
             Debug.Entry(4, $"? if (!Creature.Is(null) and Creature.HasPart<Inventory>())", Indent: indent + 1, Toggle: doDebug);
@@ -201,10 +197,10 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, $"x if (!Creature.Is(null) and Creature.HasPart<Inventory>()) ?//", Indent: indent + 1, Toggle: doDebug);
 
             Debug.Entry(4,
-                $"x {nameof(Body_Patches)}."
-                + $"{nameof(RegenerateNonDefaultNaturalEquipment)}("
-                + $"{nameof(Creature)}: {Creature?.ShortDisplayNameStripped ?? NULL}) *//",
+                $"x {nameof(RegenerateNonDefaultNaturalEquipment)}("
+                + $"{nameof(Creature)}: {Creature?.DebugName ?? NULL}) *//",
                 Indent: indent, Toggle: doDebug);
+            Debug.LastIndent = indent;
         }
 
         [HarmonyPatch(

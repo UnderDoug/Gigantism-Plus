@@ -1,18 +1,36 @@
-﻿using System;
-
+﻿using HNPS_GigantismPlus;
+using System;
+using System.Collections.Generic;
 using XRL.Wish;
 using XRL.World.Parts.Mutation;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts
 {
     [Serializable]
     public class InventoryGigantifier : IScribedPart
     {
+        private static bool doDebug => getClassDoDebug(nameof(InventoryGigantifier));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
         public bool IsMerchant => ParentObject != null && ParentObject.HasPart<GenericInventoryRestocker>();
         public bool IsGigantic => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
@@ -28,12 +46,18 @@ namespace XRL.World.Parts
             GameObject GO = E.Object;
             if (GO != null && GO == ParentObject && IsGigantic)
             {
-                Debug.Header(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)");
-                Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
+                Debug.Header(3, 
+                    nameof(InventoryGigantifier), 
+                    $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)",
+                    Toggle: doDebug);
+                Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0, Toggle: doDebug);
             
                 GO.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
-                Debug.Footer(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)");
+                Debug.Footer(3, 
+                    nameof(InventoryGigantifier), 
+                    $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)", 
+                    Toggle: doDebug);
             }
             return base.HandleEvent(E);
         }
@@ -41,14 +65,20 @@ namespace XRL.World.Parts
         public override bool HandleEvent(StockedEvent E)
         {
             GameObject GO = E.Object;
-            Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0);
+            Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0, Toggle: doDebug);
             if (GO != null && GO == ParentObject && IsMerchant)
             {
-                Debug.Header(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)");
+                Debug.Header(3, 
+                    nameof(InventoryGigantifier), 
+                    $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)", 
+                    Toggle: doDebug);
 
                 GO.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
-                Debug.Footer(3, nameof(InventoryGigantifier), $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)");
+                Debug.Footer(3, 
+                    nameof(InventoryGigantifier), 
+                    $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)", 
+                    Toggle: doDebug);
             }
             return base.HandleEvent(E);
         }

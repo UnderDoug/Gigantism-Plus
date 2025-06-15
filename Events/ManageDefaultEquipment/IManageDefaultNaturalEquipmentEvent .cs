@@ -16,7 +16,7 @@ namespace HNPS_GigantismPlus
     public abstract class IManageDefaultNaturalEquipmentEvent<T> : ModPooledEvent<T>
         where T : IManageDefaultNaturalEquipmentEvent<T>, new()
     {
-        private static bool doDebug => getClassDoDebug("IManageDefaultNaturalEquipmentEvent");
+        private static bool doDebug => getClassDoDebug(typeof(T).Name);
 
         public new static readonly int CascadeLevel = CASCADE_EQUIPMENT;
 
@@ -51,7 +51,7 @@ namespace HNPS_GigantismPlus
         public static T FromPool(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager)
         {
             T E = FromPool();
-            if (Equipment != null & Creature != null && Manager != null && BodyPart != null)
+            if (Equipment != null && Creature != null && Manager != null && BodyPart != null)
             {
                 E.Equipment = Equipment;
                 E.Creature = Creature;

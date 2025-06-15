@@ -14,5 +14,10 @@ namespace HNPS_GigantismPlus
         public AfterBodyPartsUpdatedEvent()
         {
         }
+
+        public override int GetCascadeLevel()
+        {
+            return CascadeLevel;
+        }
     }
 }

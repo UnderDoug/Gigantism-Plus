@@ -68,11 +68,19 @@ namespace HNPS_GigantismPlus
                 $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
                 Indent: 0, Toggle: getDoDebug());
 
+            Debug.Entry(4, $"Getting coordinates...", Indent: 1, Toggle: getDoDebug());
             Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
-            SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
+            Debug.LoopItem(4, $"{nameof(location)}: [{location}]", Indent: 2, Toggle: getDoDebug());
 
-            if (JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID).Is(null))
+            Debug.Entry(4, $"Getting ZoneID from {nameof(location)}...", Indent: 1, Toggle: getDoDebug());
+            SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
+            Debug.Entry(4, $"{nameof(SecretZoneId)} Set", $"{SecretZoneId}", Indent: 1, Toggle: getDoDebug());
+
+            Debug.Entry(4, $"Checking MapNote isn't already set...", Indent: 1, Toggle: getDoDebug());
+            if (JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID) == null)
             {
+                Debug.CheckYeh(4, $"MapNote not set", Indent: 2, Toggle: getDoDebug());
+                Debug.Entry(4, $"Setting MapNote...", Indent: 1, Toggle: getDoDebug());
                 JournalAPI.AddMapNote(
                     ZoneID: SecretZoneId,
                     text: SCRT_GNT_LCTN_TEXT,
@@ -81,36 +89,58 @@ namespace HNPS_GigantismPlus
                     secretId: SCRT_GNT_SCRT_ID
                 );
             }
+            Debug.Entry(4, $"Setting MapNote Weight...", Indent: 1, Toggle: getDoDebug());
             SecretMapNote = JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID);
             SecretMapNote.Weight = 25000;
 
             ZoneManager zoneManager = The.ZoneManager;
 
+            Debug.Entry(4, $"Removing undesired ZoneBuilders...", Indent: 1, Toggle: getDoDebug());
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(Hills));
             zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(FactionEncounters));
             zoneManager.ClearZoneBuilders(SecretZoneId);
 
             string MapFileName = SCRT_GNT_ZONE_MAP2_CENTRE;
+            Debug.Entry(4, $"Setting {nameof(MapFileName)}...", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"{nameof(MapFileName)} Set", $"{MapFileName}", Indent: 1, Toggle: getDoDebug());
 
+            Debug.Entry(4, $"Assigning MapFile to MapBuilder...", Indent: 1, Toggle: getDoDebug());
             zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{MapFileName}");
+
+            Debug.Entry(4, $"Setting Music...", Indent: 1, Toggle: getDoDebug());
             zoneManager.AddZonePostBuilder(SecretZoneId, "Music", "Track", "Music/Barathrums Study");
 
+            Debug.Entry(4, $"Setting Zone to Checkpoint...", Indent: 1, Toggle: getDoDebug());
             zoneManager.AddZonePostBuilder(SecretZoneId, nameof(IsCheckpoint), "Key", SecretZoneId);
 
+            Debug.Entry(4, $"Skipping TerainBuilders and flaggign NoBiomes...", Indent: 1, Toggle: getDoDebug());
             zoneManager.SetZoneProperty(SecretZoneId, "SkipTerrainBuilders", true);
             zoneManager.SetZoneProperty(SecretZoneId, "NoBiomes", "Yes");
 
+            Debug.Entry(4, $"Setting ZoneName...", Indent: 1, Toggle: getDoDebug());
             zoneManager.SetZoneName(SecretZoneId, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneId, false);
 
             TerrainTravel pTravel = builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
             if (XRL.UI.Options.ShowOverlandEncounters && pTravel != null)
             {
+                Debug.Entry(4, $"Setting up OverLandEncounters option...", Indent: 1, Toggle: getDoDebug());
                 pTravel.ParentObject.Render.RenderString = "G";
                 pTravel.ParentObject.Render.SetForegroundColor('Z');
             }
 
+            Debug.Entry(4, $"Waking up Unique Giant...", Indent: 1, Toggle: getDoDebug());
             GameObject UniqueGiant = GetTheGiant();
+
+            string wrasslerColor = null;
+            Debug.Entry(4, $"Storing {nameof(wrasslerColor)}...", Indent: 1, Toggle: getDoDebug());
+            if (UniqueGiant.TryGetPart(out Wrassler wrassler))
+            {
+                Debug.CheckYeh(4, $"{nameof(UniqueGiant)} has {nameof(Wrassler)} part", Indent: 1, Toggle: getDoDebug());
+                wrasslerColor = wrassler.DetailColor;
+            }
+            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
+            Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
 
             if (UniqueGiant == null)
             {
@@ -122,34 +152,10 @@ namespace HNPS_GigantismPlus
                 return;
             }
 
-            string wrasslerColor = null;
-            if (UniqueGiant.TryGetPart(out Wrassler wrassler))
-            {
-                wrasslerColor = wrassler.DetailColor;
-            }
-            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
-
-            List<GameObject> ropesList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes");
-            if (!ropesList.IsNullOrEmpty())
-            {
-                foreach (GameObject rope in ropesList)
-                {
-                    if (rope.TryGetPart(out WrassleGear wrassleGear) && wrassler != null)
-                    {
-                        if (UD_QWE.TrySyncWrassleID(wrassler, wrassleGear))
-                        {
-                            wrassleGear.ApplyFlair(IgnoreTile: true, IgnoreTileColor: true, IgnoreColorString: true);
-                        }
-                    }
-                    else
-                    {
-                        rope.Render.DetailColor = wrassleRingColor;
-                    }
-                }
-            }
-
+            Debug.Entry(4, $"Assigning GiantAbodePopulator if it's necessary...", Indent: 1, Toggle: getDoDebug());
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE) // This specific map has the widgets necessary for the specified builder to work
             {
+                Debug.CheckYeh(4, $"Map is correct, adding {nameof(GiantAbodePopulator)}...", Indent: 2, Toggle: getDoDebug());
                 zoneManager.AddZonePostBuilder(
                     ZoneID: SecretZoneId,
                     Class: nameof(GiantAbodePopulator),
@@ -158,11 +164,50 @@ namespace HNPS_GigantismPlus
             }
             else
             {
+                Debug.CheckNah(4, $"Map is incorrect, adding {nameof(AddObjectBuilder)}...", Indent: 2, Toggle: getDoDebug());
                 zoneManager.AddZonePostBuilder(
                     ZoneID: SecretZoneId,
                     Class: nameof(AddObjectBuilder),
                     Key1: "Object",
                     Value1: zoneManager.CacheObject(UniqueGiant));
+            }
+
+            Debug.Entry(4, $"Getting Ropes and Attempting to assign Color...", Indent: 1, Toggle: getDoDebug());
+            List<GameObject> ropesList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes");
+            if (!ropesList.IsNullOrEmpty())
+            {
+                Debug.CheckYeh(4, $"Got Ropes", Indent: 2, Toggle: getDoDebug());
+                foreach (GameObject rope in ropesList)
+                {
+                    Debug.LoopItem(4, $"{nameof(rope)}: {rope?.DebugName}", Indent: 2, Toggle: getDoDebug());
+                    if (rope.TryGetPart(out WrassleGear wrassleGear))
+                    {
+                        Debug.CheckYeh(4, $"{nameof(rope)} has {nameof(WrassleGear)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.Entry(4, $"Attempting to sync WrassleIDs...", Indent: 3, Toggle: getDoDebug());
+                        if (UD_QWE.TrySyncWrassleID(UniqueGiant, rope))
+                        {
+                            Debug.CheckYeh(4, $"Wrassle ID's synched", Indent: 3, Toggle: getDoDebug());
+                            wrassleGear.SetDetailColor(Force: true);
+                        }
+                        else
+                        {
+                            Debug.CheckNah(4, $"Wrassle ID's failed to sync", Indent: 3, Toggle: getDoDebug());
+                        }
+
+                    }
+                    else
+                    {
+                        Debug.CheckNah(4, $"{nameof(rope)} lacks {nameof(WrassleGear)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.Entry(4, $"Setting color to preselected {wrassleRingColor.Quote()} via {nameof(Render)}...", 
+                            Indent: 3, Toggle: getDoDebug());
+
+                        rope.Render.DetailColor = wrassleRingColor;
+                    }
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No Ropes", Indent: 2, Toggle: getDoDebug());
             }
         } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
 

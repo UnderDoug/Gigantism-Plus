@@ -18,7 +18,7 @@ namespace HNPS_GigantismPlus
         where T : IDescribeModificationEvent<T, M>, new()
         where M : IModification
     {
-        private static bool doDebug => getClassDoDebug("IDescribeModificationEvent");
+        private static bool doDebug => getClassDoDebug(typeof(T).Name);
 
         public new static readonly int CascadeLevel = CASCADE_ALL;
 

@@ -1,18 +1,16 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using XRL.UI;
-using XRL.World.Parts.Mutation;
 using XRL.World.Capabilities;
-
-using static XRL.UD_QudWrasslingEntertainment;
-
-using HNPS_GigantismPlus;
+using XRL.World.ObjectBuilders;
+using XRL.World.Parts.Mutation;
+using XRL.World.Tinkering;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
-
+using static XRL.UD_QudWrasslingEntertainment;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -40,60 +38,123 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public string Tile => UD_QWE.GetTileFromBag(WrassleID, RandomTiles);
-
-        // TopLeft, Left, Right, BottomRight
-        public string EquipmentFrameColor => UD_QWE.GetEquipmentFrameColor(WrassleID);
+        public string Tile => UD_QWE.GetTileFromBag(WrassleID.ID, RandomTiles);
 
         public MeleeWeapon MeleeWeaponCopy;
 
-        public bool RandomGeneration;
+        public bool AutoFlair;
 
+        public bool UseColors;
+        public bool ChangeTileColor;
+        public bool ChangeDetailColor;
+        public string TileColor => PrimaryColor;
+        public string DetailColor => SecondaryColor;
+        
         public string RandomTiles;
         public bool RandomizeTile;
 
         public bool ColorEquipmentFrame;
 
+        public bool IsVibrant;
+
         public WrassleGear()
         {
-            WrassleID = Guid.NewGuid();
-            RandomGeneration = true;
+            AutoFlair = true;
+
+            UseColors = true;
+            ChangeTileColor = true;
+            ChangeDetailColor = true;
+
             MeleeWeaponCopy = null;
+
             RandomizeTile = false;
+            RandomTiles = null;
+
             ColorEquipmentFrame = true;
+
+            IsVibrant = true;
         }
 
+        public override void OnUpdatedWrassleID()
+        {
+            base.OnUpdatedWrassleID();
+            if (ParentObject != null)
+            {
+                List<IWrassleModification> wrassleMods = ParentObject.GetPartsDescendedFrom<IWrassleModification>();
+                if (!wrassleMods.IsNullOrEmpty())
+                {
+                    foreach (IWrassleModification wrassleMod in wrassleMods)
+                    {
+                        wrassleMod.SetWrassleID(WrassleID);
+                    }
+                }
+                ApplyFlair();
+            }
+        }
         public override void Attach()
         {
             if (ParentObject.TryGetPart(out MeleeWeapon meleeWeapon))
             {
                 MeleeWeaponCopy = meleeWeapon.DeepCopy(ParentObject) as MeleeWeapon;
             }
+
             base.Attach();
         }
-        public void ApplyFlair(bool IgnoreTile = false, bool IgnoreTileColor = false, bool IgnoreDetailColor = false, bool IgnoreColorString = false, bool IgnoreEquipmentFrame = false)
+        public void ApplyFlair(bool Force = false)
+        {
+            if (AutoFlair || Force)
+            {
+                SetTile();
+                SetTileColor();
+                SetDetailColor();
+                ApplyVibrantModification();
+            }
+        }
+
+        public void SetTile(bool Force = false)
         {
             if (ParentObject != null && ParentObject.TryGetPart(out Render render))
             {
-                if (!IgnoreTile && (RandomizeTile && !Tile.IsNullOrEmpty()))
+                if ((RandomizeTile || Force) && !Tile.IsNullOrEmpty())
                 {
                     render.Tile = Tile;
                 }
-                if (!IgnoreTileColor)
+            }
+        }
+        public void SetTileColor(bool Force = false)
+        {
+            if (ParentObject != null && ParentObject.TryGetPart(out Render render))
+            {
+                if ((UseColors && ChangeTileColor) || Force)
                 {
-                    render.TileColor = $"&{PrimaryColor}";
+                    render.TileColor = $"&{TileColor}";
+                    render.ColorString = $"&{TileColor}";
                 }
-                if (!IgnoreDetailColor)
+            }
+        }
+        public void SetDetailColor(bool Force = false)
+        {
+            if (ParentObject != null && ParentObject.TryGetPart(out Render render))
+            {
+                if ((UseColors && ChangeDetailColor) || Force)
                 {
-                    render.DetailColor = SecondaryColor;
+                    render.DetailColor = DetailColor;
                 }
-                if (!IgnoreColorString)
+            }
+        }
+        public void ApplyVibrantModification(GameObject AppliedBy = null, bool Creation = false, bool Force = false)
+        {
+            if (ParentObject != null && (IsVibrant || Force))
+            {
+                
+                if (!ParentObject.TryGetPart(out ModWrassleVibrant wrassleVibrantMod))
                 {
-                    render.ColorString = $"&{PrimaryColor}";
+                    wrassleVibrantMod = new(WrassleID);
+                    ParentObject.ApplyModification(wrassleVibrantMod, Actor: AppliedBy, Creation: Creation);
                 }
-                if (!IgnoreEquipmentFrame && ColorEquipmentFrame)
+                else
                 {
-                    ParentObject.SetEquipmentFrameColors(EquipmentFrameColor);
+                    wrassleVibrantMod.OnUpdatedWrassleID();
                 }
             }
         }
@@ -125,14 +186,19 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear") && E.Context != "Bestowal")
+            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear"))
             {
+                GameObject WrassleObject = E.Object;
+                string wrassleContext = nameof(WrassleID) + "::";
+                if (E.Context.StartsWith(wrassleContext) && Guid.TryParse(E.Context.Substring(wrassleContext.Length), out Guid fromWrassleID))
+                {
+                    WrassleID.SetID(fromWrassleID);
+                }
                 string tileColor = $"&{PrimaryColor}";
-                GameObject Object = E.Object;
                 Debug.Entry(4,
                     $"{typeof(WrassleGear).Name}." +
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
-                    $"E.Object: [{Object.ID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " + 
+                    $"E.Object: [{WrassleObject.ID}:{WrassleObject.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " +
                     $"TileColor: &&{PrimaryColor.Quote().Color("Y")}, DetailColor: {SecondaryColor.Quote().Color("Y")}",
                     Indent: 0, Toggle: getDoDebug());
                 Debug.Entry(4,

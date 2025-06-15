@@ -31,7 +31,10 @@ namespace HNPS_GigantismPlus
         public static bool getDoDebug(string MethodName)
         {
             if (MethodName == nameof(GigantifyInventory))
-                return true;
+                return false;
+
+            if (MethodName == nameof(GetPrioritisedNaturalEquipmentMods))
+                return false;
 
             if (MethodName == nameof(CheckEquipmentSlots))
                 return false;
@@ -50,6 +53,9 @@ namespace HNPS_GigantismPlus
 
             if (MethodName == nameof(GetNumberedTileVariants))
                 return false;
+
+            if (MethodName == nameof(GetShaderFromSequence))
+                return true;
 
             return doDebug;
         }
@@ -154,7 +160,7 @@ namespace HNPS_GigantismPlus
         public static SortedDictionary<int, ModNaturalEquipmentBase> GetPrioritisedNaturalEquipmentMods(this GameObject Equipment, bool ForDescriptions = false)
         {
             int indent = Debug.LastIndent;
-
+            bool doDebug = getDoDebug(nameof(GetPrioritisedNaturalEquipmentMods));
             Debug.Entry(4,
                 $"* {nameof(GetPrioritisedNaturalEquipmentMods)}"
                 + $"(ForDescriptions: {ForDescriptions})",
@@ -765,7 +771,7 @@ namespace HNPS_GigantismPlus
             Type type = ModManager.ResolveType("XRL.World.Parts." + ModPartName);
             if (type == null)
             {
-                MetricsManager.LogError(nameof(ConvertToModification), "Couldn't resolve unknown mod BodyPart: " + ModPartName);
+                MetricsManager.LogError(nameof(ConvertToModification), "Couldn't resolve unknown mod ModPart: " + ModPartName);
                 return null;
             }
             ModPart = Activator.CreateInstance(type) as IModification;
@@ -1559,14 +1565,14 @@ namespace HNPS_GigantismPlus
                     {
                         continue;
                     }
+                    if (WithKey)
+                    {
+                        yield return "@" + key;
+                    }
                     foreach (T token in pocket)
                     {
                         if (token is string elementString)
                         {
-                            if (WithKey)
-                            {
-                                yield return "@" + key;
-                            }
                             yield return elementString;
                         }
                         else yield break;
@@ -1587,7 +1593,7 @@ namespace HNPS_GigantismPlus
             {
                 return null;
             }
-            return color[0].ToString().Any(char.IsUpper);
+            return color[0].ToString().Any(char.IsUpper) && color[0].ToString() != "K";
         }
         public static bool? IsDarkColor(this string Color)
         {
@@ -1879,7 +1885,7 @@ namespace HNPS_GigantismPlus
 
         public static string Quote(this string @string)
         {
-            return Utils.Quote($"{@string}");
+            return @string.IsNullOrEmpty() ? NULL : Utils.Quote($"{@string}");
         }
 
         public static Dictionary<string,List<Cell>> GetHutRegion(this Zone Z, Rect2D R, bool Round = false)
@@ -2186,10 +2192,32 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static bool SeededRandomBool(this Guid Seed, int ChanceIn = 2)
+        public static bool SeededRandomBool(this Guid Seed, int? Stepper = null, int ChanceIn = 2)
         {
-            int High = ChanceIn * 7;
-            return Stat.SeededRandom(Seed.ToString(), 0, High) % ChanceIn == 0;
+            int indent = Debug.LastIndent;
+            bool doDebug = getDoDebug(nameof(SeededRandomBool));
+            Debug.Entry(4,
+                $"* {nameof(Extensions)}."
+                + $"{nameof(SeededRandomBool)}(Guid Seed, "
+                + $"{nameof(Stepper)}: {Stepper}, "
+                + $"{nameof(ChanceIn)}: {ChanceIn})",
+                Indent: indent + 1, Toggle: doDebug);
+
+            int High = ChanceIn * 7000;
+            string stepper = null;
+            if (Stepper != null)
+            {
+                stepper = $"-{Stepper}";
+            }
+            string seed = $"{Seed}{stepper}";
+            int roll = Stat.SeededRandom(seed, 0, High);
+            int rollModChanceIn = roll % ChanceIn;
+            Debug.Entry(4, $"{nameof(High)}: {High})", Indent: indent + 2, Toggle: doDebug);
+            Debug.Entry(4, $"{nameof(seed)}: {seed})", Indent: indent + 2, Toggle: doDebug);
+            Debug.Entry(4, $"{nameof(roll)}: {roll})", Indent: indent + 2, Toggle: doDebug);
+            Debug.Entry(4, $"{nameof(rollModChanceIn)}: {rollModChanceIn})", Indent: indent + 2, Toggle: doDebug);
+            Debug.LastIndent = indent;
+            return rollModChanceIn == 0;
         }
 
         public static string Join<T>(this List<T> List, string Delimiter = ",")
@@ -2549,6 +2577,39 @@ namespace HNPS_GigantismPlus
             where T : IModification
         {
             return typeof(T).IsAssignableFrom(@this.GetType());
+        }
+
+        public static string GetShaderFromSequence(this IEnumerable<string> Sequence)
+        {
+            int indent = Debug.LastIndent;
+            bool doDebug = getDoDebug(nameof(GetShaderFromSequence));
+            Debug.Entry(4,
+                $"* {typeof(Extensions).Name}."
+                + $"{nameof(GetShaderFromSequence)}"
+                + $"(IEnumerable<string> {nameof(Sequence)})",
+                Indent: indent + 1, Toggle: doDebug);
+            if (Sequence.IsNullOrEmpty())
+            {
+                Debug.CheckNah(4, $"{nameof(Sequence)} null or empty", Indent: indent + 1, Toggle: doDebug);
+                Debug.LastIndent = indent;
+                return null;
+            }
+            string shader = "";
+            foreach (string color in Sequence)
+            {
+                if (!shader.IsNullOrEmpty())
+                {
+                    shader += "-";
+                }
+                shader += color;
+                Debug.Entry(4, $"{nameof(color)}", $"{color}",
+                    Indent: indent + 2, Toggle: doDebug);
+            }
+            Debug.Entry(4, $"{nameof(shader)}", $"{shader}",
+                Indent: indent + 1, Toggle: doDebug);
+
+            Debug.LastIndent = indent;
+            return shader;
         }
 
     } //!-- Extensions

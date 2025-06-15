@@ -1,14 +1,14 @@
-﻿using System;
+﻿using HNPS_GigantismPlus.Harmony;
+using System;
 using System.Collections.Generic;
-
 using XRL;
+using XRL.World;
+using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
 using XRL.World.ZoneBuilders;
-
-using HNPS_GigantismPlus.Harmony;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
@@ -81,46 +81,46 @@ namespace HNPS_GigantismPlus
         public static Dictionary<string, bool> classDoDebug = new()
         {
             // General
-            { nameof(NaturalEquipmentManager), true },
-            { nameof(ModNaturalEquipmentBase), true },
-            { nameof(PartAdjustment), true },
-            { nameof(DescriptionElement), true },
-            { nameof(ModGiganticNaturalWeapon), true },
-            { nameof(ModClosedGiganticNaturalWeapon), true },
-            { nameof(ModElongatedNaturalWeapon), true },
-            { nameof(ModBurrowingNaturalWeapon), true },
-            { nameof(ModCrystallineNaturalWeapon), true },
-            { nameof(ModAugmentedNaturalWeapon), true },
-            { "ModNaturalEquipment", true },
-            { "BaseManagedDefaultEquipmentMutation", true },
-            { "BaseManagedDefaultEquipmentCybernetic", true },
-            { nameof(GigantismPlus), true },
-            { nameof(ElongatedPaws), true },
-            { nameof(UD_ManagedBurrowingClaws), true },
-            { nameof(UD_ManagedCrystallinity), true },
+            { nameof(NaturalEquipmentManager), false },
+            { nameof(ModNaturalEquipmentBase), false },
+            { nameof(PartAdjustment), false },
+            { "ModNaturalEquipment", false },
+            { nameof(ModGiganticNaturalWeapon), false },
+            { nameof(ModClosedGiganticNaturalWeapon), false },
+            { nameof(ModElongatedNaturalWeapon), false },
+            { nameof(ModBurrowingNaturalWeapon), false },
+            { nameof(ModCrystallineNaturalWeapon), false },
+            { nameof(ModAugmentedNaturalWeapon), false },
+            { "BaseManagedDefaultEquipmentMutation", false },
+            { "BaseManagedDefaultEquipmentCybernetic", false },
+            { nameof(GigantismPlus), false },
+            { nameof(ElongatedPaws), false },
+            { nameof(UD_ManagedBurrowingClaws), false },
+            { nameof(UD_ManagedCrystallinity), false },
             { nameof(UD_HornsPlus), false },
             { nameof(UD_QuillsPlus), false },
-            { nameof(CyberneticsGiganticExoframe), true },
+            { nameof(CyberneticsGiganticExoframe), false },
             { nameof(StewBelly), false },
-            { nameof(Wrassler), true },
-            { nameof(WrassleGear), true },
             { nameof(Tactics_Vault), false },
             { nameof(Vaultable), false },
             { nameof(Gigantified), true },
+            { nameof(InventoryGigantifier), false },
             { nameof(SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
-            { nameof(WrassleGiantHero), true },
-            { nameof(WeaponElongator), true },
+            { nameof(WeaponElongator), false },
 
             // Events
             { "IBodyPartsUpdatedEvent", false },
             { nameof(BeforeBodyPartsUpdatedEvent), false },
             { nameof(AfterBodyPartsUpdatedEvent), false },
 
-            { nameof(GetPrioritisedNaturalEquipmentModsEvent), true },
+            { nameof(GetPrioritisedNaturalEquipmentModsEvent), false },
+
+            { "IManageDefaultNaturalEquipmentEvent", false },
             { nameof(BeforeManageDefaultNaturalEquipmentEvent), false },
             { nameof(ManageDefaultNaturalEquipmentEvent), false },
             { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
+
             { nameof(BeforeApplyPartAdjustmentEvent), false },
             { nameof(BeforeModGiganticAppliedEvent), false },
             { nameof(AfterModGiganticAppliedEvent), false },
@@ -131,8 +131,16 @@ namespace HNPS_GigantismPlus
             { nameof(CrayonsGetColorsEvent), false },
 
             { "IDescribeModificationEvent", false },
-            { nameof(BeforeDescribeModificationEvent<ModGigantic>), true },
-            { nameof(DescribeModificationEvent<ModGigantic>), true },
+            { nameof(DescriptionElement), false },
+            { nameof(BeforeDescribeModificationEvent<ModGigantic>), false },
+            { nameof(DescribeModificationEvent<ModGigantic>), false },
+
+            { "IWrassleIDEvent", true },
+            { nameof(AddWrassleIDEvent), true },
+            { nameof(GetWrassleIDEvent), true },
+            { nameof(UpdateWrassleIDEvent), true },
+            { nameof(WrassleIDUpdatedEvent), true },
+            { nameof(SyncWrassleIDEvent), true },
 
             // Handlers
             { nameof(CrayonsGetColorHandler), false },
@@ -159,7 +167,7 @@ namespace HNPS_GigantismPlus
             { nameof(Leveler_Patches), false },
             { nameof(MeleeWeapon_Patches), false },
             { nameof(ModGigantic_Patches), false },
-            { nameof(MutationBGoneWishHandler_Patches), false },
+            { nameof(MutationBGoneWishHandler_Patches), true },
             { nameof(Physics_Patches), false },
             { nameof(Skulk_Tonic_Patches), true },
             { nameof(Tinkering_Disassemble_Patches), false },
@@ -169,6 +177,16 @@ namespace HNPS_GigantismPlus
             { nameof(RandomTree), false },
             { nameof(WallOrDebris), false },
             { nameof(WallOrNot), false },
+
+            // Wrassle
+            { nameof(UD_QWE), true },
+            { nameof(UD_QudWrasslingEntertainment), true },
+            { nameof(WrassleGiantHero), true },
+            { nameof(IWrassle), true },
+            { nameof(IWrasslePart), true },
+            { nameof(IWrassleModification), true },
+            { nameof(Wrassler), true },
+            { nameof(WrassleGear), true },
         };
 
         public static bool getClassDoDebug(string Class)

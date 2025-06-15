@@ -18,6 +18,7 @@ using XRL.World.ObjectBuilders;
 using XRL.World.AI.GoalHandlers;
 using XRL.World.Text.Delegates;
 using XRL.World.Text.Attributes;
+using XRL.World.Capabilities;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
@@ -59,7 +60,7 @@ namespace HNPS_GigantismPlus
 
         public static Gigantified Gigantifier = new();
         public static GiantHero GiantHeroBuilder = new();
-        public static WrassleGiantHero WrassleGiantHeroBuilder => UD_QudWrasslingEntertainment.WrassleGiantHeroBuilder;
+        public static WrassleGiantHero WrassleGiantHeroBuilder => UD_QWE.WrassleGiantHeroBuilder;
 
         public struct DescriptionElement
         {
@@ -709,7 +710,7 @@ namespace HNPS_GigantismPlus
         }
         public static string Quote(string @string)
         {
-            return $"\"{@string}\"";
+            return @string.IsNullOrEmpty() ? NULL : $"\"{@string}\"";
         }
 
         public static BookInfo GetBook(string BookName)

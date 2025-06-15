@@ -78,7 +78,7 @@
     <part Name="Physics" Weight="30" Takeable="false" Solid="true" />
     <part Name="Description" Short="A triplicate set of ropes held taught provide the perfect platform for launching oneself." />
     <removepart Name="Graffitied" />
-    <part Name="WrassleGear" RandomGeneration="false" />
+    <part Name="WrassleGear" AutoFlair="false" UseColors="false" ColorEquipmentFrame="false" IsVibrant="false" />
     <part Name="Vaultable" />
     <stat Name="AV" Value="10" />
     <stat Name="DV" Value="15" />

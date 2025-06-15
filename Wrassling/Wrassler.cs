@@ -48,107 +48,15 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
+        public string DetailColor => SecondaryColor;
         public const int ICON_COLOR_PRIORITY = 110;
 
         public bool Bestow = true;
         public bool BeenBestowed = false;
         public bool KnowsChairs = false;
 
-        private static Dictionary<string, List<string>> _ColorBag => new()
-        {
-            { "Bright", new() { "W", "Y", "R", "G", "B", "C", "M", } },
-            { "Dull", new() {"K", "y", "r", "g", "b", "c", "m", } },
-        };
-
-        public Dictionary<string, List<string>> ColorBag = new();
-
-        [SerializeField]
-        private string _TileColor;
-        public string TileColor
-        {
-            get => _TileColor ??=
-            (DetailColorIsBright
-                ? ColorBag.DrawSeededToken(WrassleID,
-                    ExceptForTokens: new()
-                    {
-                        _DetailColor?.ToLower(),
-                        _DetailColor?.ToUpper()
-                    })
-                : ColorBag.DrawSeededToken(WrassleID,
-                    FromPocket: "Bright",
-                    ExceptForTokens: new()
-                    {
-                        _DetailColor?.ToLower(),
-                        _DetailColor?.ToUpper()
-                    })
-                );
-            set
-            {
-                if (value == null) _TileColor = null;
-                if (ColorBag.Contains(value))
-                    _TileColor = ColorBag.DrawToken(value);
-                else
-                {
-                    _TileColor ??= TileColor;
-                }
-            }
-        }
-        private bool TileColorIsBright => _TileColor != null && TileColor.Any(char.IsUpper);
-
-        [SerializeField]
-        private string _DetailColor;
-        public string DetailColor
-        {
-            get => _DetailColor ??=
-            (TileColorIsBright
-                ? ColorBag.DrawSeededToken(WrassleID,
-                    ExceptForTokens: new()
-                    {
-                        _TileColor?.ToLower(),
-                        _TileColor?.ToUpper(),
-                    })
-                : ColorBag.DrawSeededToken(WrassleID,
-                    FromPocket: "Bright",
-                    ExceptForTokens: new()
-                    {
-                        _TileColor?.ToLower(),
-                        _TileColor?.ToUpper(),
-                    })
-                );
-            set
-            {
-                if (value == null) _DetailColor = null;
-                if (ColorBag.Contains(value))
-                    _DetailColor = ColorBag.DrawToken(value);
-                else
-                {
-                    _DetailColor ??= DetailColor;
-                }
-            }
-        }
-        private bool DetailColorIsBright => _DetailColor != null && DetailColor.Any(char.IsUpper);
-
         public Wrassler()
         {
-            WrassleID = Guid.NewGuid();
-            ColorBag = NewColorBag();
-        }
-
-        public static Dictionary<string, List<string>> NewColorBag()
-        {
-            return _ColorBag;
-        }
-        public Dictionary<string, List<string>> SyncColorBag()
-        {
-            ColorBag = NewColorBag();
-
-            if (ColorBag.Contains(TileColor))
-                ColorBag.Remove(TileColor);
-
-            if (ColorBag.Contains(DetailColor))
-                ColorBag.Remove(DetailColor);
-
-            return ColorBag;
         }
 
         public override void Attach()
@@ -171,132 +79,11 @@ namespace XRL.World.Parts
             base.Attach();
         }
 
-        public Wrassler BestowWrassleGear(out bool Bestowed)
-        {
-            Bestowed = false;
-
-            GameObject Actor = ParentObject;
-
-            Dictionary<string, string> wrassleGearBlueprints = new()
-            {
-                { "Face", "WrassleFace" },
-                { "Body", "WrassleSuit" },
-                { "Back", "WrassleCape" },
-                { "Hands", "WrassleGloves" },
-                { "Feet", "WrassleBoots" },
-                { "Foot", "WrassleBoot" },
-                { "Tail", "WrassleBootTail" },
-                { "Hand", "FoldingChair" },
-            };
-
-            int handCount = (int)Math.Floor(Actor.Body.GetPartCount("Hand") / 2.0);
-            int feetCount = Actor.Body.GetPartCount("Feet");
-            int footCount = Actor.Body.GetPartCount("Foot");
-
-            Debug.Entry(4,
-                $"{typeof(Wrassler).Name}." +
-                $"{nameof(BestowWrassleGear)}() " + 
-                $"Actor: {Actor.DebugName}", 
-                Indent: 0, Toggle: getDoDebug());
-
-            string FootOrFeet = "Feet";
-            if (feetCount * 2 < footCount) FootOrFeet = "Foot";
-            if (feetCount * 2 == footCount && WrassleID.SeededRandomBool()) FootOrFeet = "Foot";
-            
-            Debug.Entry(4, 
-                $"handCount: {handCount}, " + 
-                $"feetCount: {feetCount}, " + 
-                $"footCount: {footCount}", 
-                Indent: 1, Toggle: getDoDebug());
-
-            Debug.Entry(4, 
-                $"SeededBool: {WrassleID.SeededRandomBool()}, " + 
-                $"FootOrFeet: {FootOrFeet}", 
-                Indent: 1, Toggle: getDoDebug());
-
-            List<GameObject> wrassleGearObjects = new();
-            foreach (BodyPart bodyPart in Actor.Body.GetParts())
-            {
-                // no blueprint for part? Skip.
-                if (!wrassleGearBlueprints.ContainsKey(bodyPart.Type)) continue;
-
-                // Only do foot or feet, not both. We only do foot slots if there are more of them than 2x the feet.
-                if ((bodyPart.Type == "Foot" || bodyPart.Type == "Feet") && bodyPart.Type != FootOrFeet) continue;
-
-                // Already done half as many chairs as hands? Skip.
-                if (bodyPart.Type == "Hand" && handCount-- <= 0) continue;
-
-                string blueprint = wrassleGearBlueprints[bodyPart.Type];
-
-                if (bodyPart.Type == "Foot")
-                {
-                    if (bodyPart.Laterality.HasBit(Laterality.LEFT))
-                        blueprint += "Left";
-                    if (bodyPart.Laterality.HasBit(Laterality.RIGHT))
-                        blueprint += "Right";
-                }
-
-                GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint, Context: "Bestowal");
-
-                TinkeringHelpers.CheckMakersMark(wrassleGearObject, Actor, null, null);
-
-                if (wrassleGearObject != null && wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
-                {
-                    if (wrassleGearObject.HasPart<MeleeWeapon>())
-                    {
-                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 1);
-                    }
-                    if (wrassleGearObject.HasPart<Armor>())
-                    {
-                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
-                        wrassleGearObject.SetIntProperty("AlwaysEquipAsArmor", 1);
-                    }
-
-                    if (Actor.HasPart<GigantismPlus>())
-                        wrassleGearObject.ApplyModification("ModGigantic", true, null, true);
-
-                    wrassleGear.WrassleID = WrassleID;
-                    wrassleGear.RandomizeTile = true;
-                    wrassleGear.ApplyFlair();
-
-                    wrassleGearObjects.TryAdd(wrassleGearObject);
-                    if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
-                }
-            }
-
-            if (ParentObject.IsPlayer())
-            {
-                GameObject metalFoldingChair = GameObjectFactory.Factory.CreateSampleObject("Gigantic FoldingChair");
-                if (metalFoldingChair.TryGetPart(out Examiner metalFoldingChairExaminer))
-                {
-                    metalFoldingChairExaminer.MakeUnderstood(ShowMessage: false);
-                    if (The.Game.Turns > 1 && !KnowsChairs)
-                    {
-                        Popup.Show($"You're struck with a sudden, intimate understanding of {metalFoldingChair.GetPluralName()}.");
-                    }
-                    KnowsChairs = true;
-                }
-                metalFoldingChair.Obliterate();
-            }
-
-            List<GameObject> EquippedList = Actor.GetEquippedObjects();
-            foreach (GameObject reject in wrassleGearObjects)
-            {
-                if (reject != null && !EquippedList.Contains(reject))
-                {
-                    Actor.Inventory.RemoveObjectFromInventory(reject);
-                    reject.Obliterate();
-                }
-            }
-
-            Bestowed = true;
-            return this;
-        }
         public Wrassler BestowWrassleGear(bool Force = false)
         {
             if (!BeenBestowed || Force)
             {
-                return BestowWrassleGear(out BeenBestowed);
+                return UD_QWE.BestowWrassleGear(ParentObject, out BeenBestowed);
             }
             return this;
         }
@@ -319,7 +106,7 @@ namespace XRL.World.Parts
             {
                 hasMakersMark = ParentObject.RequirePart<HasMakersMark>();
             }
-            hasMakersMark.Color = DetailColor;
+            hasMakersMark.Color = SecondaryColor;
 
             base.AddedAfterCreation();
         }
@@ -333,6 +120,16 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {nameof(Wrassler)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(AfterObjectCreatedEvent)} E) "
+                + $"{nameof(E.Object)}: {E.Object?.DebugName ?? NULL}, "
+                + $"{nameof(ParentObject)}: {ParentObject?.DebugName ?? NULL}, "
+                + $"{nameof(E.Context)}: {E.Context?.Quote()}",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
             if (E.Object != null && E.Object == ParentObject)
             {
                 GameObject Actor = E.Object;
@@ -359,14 +156,14 @@ namespace XRL.World.Parts
 
                 if (shouldBestow)
                 {
-                    BestowWrassleGear(out BeenBestowed);
+                    UD_QWE.BestowWrassleGear(ParentObject, out BeenBestowed);
                 }
 
                 if (!Actor.TryGetPart(out HasMakersMark hasMakersMark))
                 {
                     hasMakersMark = Actor.RequirePart<HasMakersMark>();
                 }
-                hasMakersMark.Color = DetailColor;
+                hasMakersMark.Color = SecondaryColor;
             }
             return base.HandleEvent(E);
         }
@@ -424,16 +221,19 @@ namespace XRL.World.Parts
         {
             if (ParentObject.GetPropertyOrTag(WRASSLER_COLORCHANGE_PROP, "true").Is("true"))
             {
-                bool flag = false;
+                bool foundGear = false;
                 foreach (GameObject item in ParentObject.GetEquippedObjects())
                 {
                     if (item.HasPart<Armor>() && item.TryGetPart(out WrassleGear wrassleGear))
                     {
-                        flag = wrassleGear.WrassleID == WrassleID;
-                        if (flag) break;
+                        foundGear = wrassleGear.WrassleID == WrassleID;
+                        if (foundGear)
+                        {
+                            break;
+                        }
                     }
                 }
-                if (flag)
+                if (foundGear)
                 {
                     E.ApplyDetailColor(DetailColor, ICON_COLOR_PRIORITY);
                 }
@@ -484,7 +284,7 @@ namespace XRL.World.Parts
             Popup.Show($"Stealing identity...");
             string oldWrassleID = wrassler.WrassleID.ToString();
             Popup.Show($"...");
-            wrassler.WrassleID = Guid.NewGuid();
+            wrassler.NewWrassleID();
             Popup.Show($"... Done.");
             wrassler.BeenBestowed = false;
             Popup.Show($"Old: [{oldWrassleID.Color("W")}]; \nNew: [{wrassler.WrassleID.ToString().Color("G")}]");

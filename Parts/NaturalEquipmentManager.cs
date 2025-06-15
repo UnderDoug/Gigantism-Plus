@@ -578,14 +578,13 @@ namespace XRL.World.Parts
 
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}("
                 + $"{nameof(BeforeBodyPartsUpdatedEvent)} E)",
                 Indent: 0, Toggle: getDoDebug(nameof(BeforeBodyPartsUpdatedEvent)));
-
 
             if (E.Creature == Wielder && !ParentObject.HasNaturalEquipmentMods())
             {
@@ -607,7 +606,7 @@ namespace XRL.World.Parts
 
             return base.HandleEvent(E);
         }
-        public bool HandleEvent(AfterBodyPartsUpdatedEvent E)
+        public virtual bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."

@@ -167,8 +167,6 @@
     </group>
   </population>
 
-
-
   <population Name="RuinsPerSector">
     <group Name="Creatures" Load="Merge">
       <table Weight="250" Number="1" Name="Templar Giant-Hunter Party" />

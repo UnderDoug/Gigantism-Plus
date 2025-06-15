@@ -21,5 +21,10 @@ namespace HNPS_GigantismPlus
         public BeforeManageDefaultNaturalEquipmentEvent()
         {
         }
+
+        public override int GetCascadeLevel()
+        {
+            return CascadeLevel;
+        }
     }
 }

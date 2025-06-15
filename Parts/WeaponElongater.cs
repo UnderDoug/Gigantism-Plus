@@ -110,9 +110,9 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || (Applied && ID == PooledEvent<GetDisplayNameEvent>.ID)
-                || (Applied && ID == GetShortDescriptionEvent.ID)
-                || (Applied && ID == BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>>.ID)
+                || ID == PooledEvent<GetDisplayNameEvent>.ID
+                || ID == GetShortDescriptionEvent.ID
+                || ID == BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>>.ID
                 || ID == StatChangeEvent.ID
                 || ID == UnequippedEvent.ID
                 || ID == EquippedEvent.ID;
@@ -144,15 +144,15 @@ namespace XRL.World.Parts
                 int penCapBonus = AppliedElongatedBonusCap;
                 if (penCapBonus != 0)
                 {
-                    E.AddGeneralElement("", $"getting a {penCapBonus.Signed()} {penCapBonus.Signed().BonusOrPenalty()} to penetration cap");
+                    E.AddWeaponElement("get", $"a {penCapBonus.Signed()} {penCapBonus.Signed().BonusOrPenalty()} to penetration cap");
                 }
                 if (E.WeaponDescriptions.IsNullOrEmpty())
                 {
-                    E.AddWeaponElement("have", $"{E.Object.its} penetration cap increased by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    E.AddWeaponElement("have", $"{E.Object.its} penetration cap is increased by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
                 else
                 {
-                    E.AddWeaponElement("", $"{E.Object.its} penetration cap increased by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    E.AddWeaponElement("", $"{E.Object.its} penetration cap increases by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
             }
             return base.HandleEvent(E);

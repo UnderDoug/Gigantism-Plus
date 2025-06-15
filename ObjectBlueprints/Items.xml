@@ -426,6 +426,8 @@ You cannot wear equipment on your body." />
           Tile="Items/Nanoweave_Mask_Grips.png" />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Grips_~01-07~.png" />
     <part Name="Armor" WornOn="Hands" />
+    <tag Name="Gender" Value="plural" />
+    <tag Name="DisplayNameSingular" Value="nanoweave grip" />
 	</object>
 	<object Name="WrassleBoots" Inherits="BaseWrassleGear">
     <part Name="Render" DisplayName="nanoweave botas" RenderString="M"
@@ -433,6 +435,8 @@ You cannot wear equipment on your body." />
     <part Name="WrassleGear" RandomTiles="Items/Nanoweave_Botas_~01-04~.png" />
     <part Name="Armor" WornOn="Feet" />
     <part Name="Physics" Weight="2" />
+    <tag Name="Gender" Value="plural" />
+    <tag Name="DisplayNameSingular" Value="nanoweave bota" />
 	</object>
 	<object Name="BaseWrassleBoot" Inherits="WrassleBoots">
     <part Name="Render" DisplayName="[BaseWrassleBoot]" RenderString="L"

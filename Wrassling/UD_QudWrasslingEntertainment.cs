@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine.UIElements;
 using XRL.World;
+using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 
@@ -48,6 +49,40 @@ namespace XRL
         public static UD_QudWrasslingEntertainment InitializeSystem()
         {
             return new();
+        }
+
+        [NonSerialized]
+        public Dictionary<Guid, Dictionary<int, IEnumerable<string>>> WrassleColorSequenceCache;
+
+        public UD_QudWrasslingEntertainment()
+        {
+            WrassleColorSequenceCache = new();
+        }
+
+        public IEnumerable<string> CacheWrassleColorSequence(Guid WrassleID, int Length, IEnumerable<string> Sequence)
+        {
+            WrassleColorSequenceCache ??= new();
+            if (WrassleID == Guid.Empty || Length < 1 || Sequence.IsNullOrEmpty())
+            {
+                return null;
+            }
+            WrassleColorSequenceCache.TryAdd(WrassleID, new() { { Length, Sequence } });
+            return WrassleColorSequenceCache[WrassleID][Length];
+        }
+        public IEnumerable<string> GetCachedWrassleColorSequence(Guid WrassleID, int Length)
+        {
+            WrassleColorSequenceCache ??= new();
+            if (WrassleID == Guid.Empty || Length < 1)
+            {
+                return null;
+            }
+            if (WrassleColorSequenceCache.IsNullOrEmpty() 
+                || WrassleColorSequenceCache[WrassleID].IsNullOrEmpty() 
+                || WrassleColorSequenceCache[WrassleID][Length].IsNullOrEmpty())
+            {
+                CacheWrassleColorSequence(WrassleID, Length, UD_QWE.GetWrassleColorSequence(WrassleID, Length));
+            }
+            return WrassleColorSequenceCache[WrassleID][Length];
         }
 
         public override void Register(XRLGame Game, IEventRegistrar Registrar)

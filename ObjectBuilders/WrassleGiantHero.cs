@@ -699,7 +699,7 @@ namespace XRL.World.ObjectBuilders
             }
             Debug.LoopItem(4, $"<HasMakersMark>?", Good: Creature.HasPart<HasMakersMark>(), Indent: 2, Toggle: getDoDebug());
             List<string> usableMarks = new(MakersMark.GetUsable());
-            string heroMark = usableMarks.DrawSeededToken(wrassler.WrassleID);
+            string heroMark = usableMarks.DrawSeededToken(wrassler.WrassleID.ID);
             hasMakersMark.Mark = Unique ? ((char)156).ToString() : heroMark;
             hasMakersMark.Color = wrassler.DetailColor;
             if (Unique) MakersMark.RecordUsage(hasMakersMark.Mark);
@@ -792,6 +792,7 @@ namespace XRL.World.ObjectBuilders
             }
             for (int i = 0; i < MentalMutations; i++)
             {
+                Debug.LoopItem(4, $"{nameof(MentalMutations)} Iteration {i + 1}", Indent: 4, Toggle: getDoDebug());
                 BaseMutation randomMentalMutation;
                 do
                 {
@@ -825,6 +826,7 @@ namespace XRL.World.ObjectBuilders
             }
             for (int i = 0; i < PhysicalMutations; i++)
             {
+                Debug.LoopItem(4, $"{nameof(PhysicalMutations)} Iteration {i + 1}", Indent: 4, Toggle: getDoDebug());
                 BaseMutation randomPhysicalMutation;
                 do
                 {
@@ -1024,7 +1026,9 @@ namespace XRL.World.ObjectBuilders
 
             // aCreature = Unique ? Creature.An(Stripped: true, BaseOnly: true) : Creature.an(Stripped: true, BaseOnly: true);
 
-            description.Short = preDesc.Replace("*creature.an*", aCreature) + description._Short;
+            preDesc = preDesc.Replace("*creature.an*", aCreature);
+
+            description.Short = preDesc + description._Short;
 
             Creature.SetStringProperty("GigantismPlusColorChange", "true");
 

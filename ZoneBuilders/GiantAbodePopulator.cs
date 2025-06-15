@@ -1,17 +1,21 @@
-﻿using Genkit;
-using HNPS_GigantismPlus;
-using Qud.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using Genkit;
+using Qud.API;
+
 using XRL.Rules;
 using XRL.World.AI.Pathfinding;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
+
+using static XRL.Core.XRLCore;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static XRL.Core.XRLCore;
 
 namespace XRL.World.ZoneBuilders
 {
@@ -40,18 +44,20 @@ namespace XRL.World.ZoneBuilders
             return doDebug;
         }
 
+
         public const string INNER = "Inner";
         public const string OUTER = "Outer";
         public const string DOOR = "Door";
         public const string POPULATION = "Population";
 
-        Dictionary<string, Dictionary<string, List<Cell>>> Regions;
+        public Dictionary<string, Dictionary<string, List<Cell>>> Regions;
 
         public string GiantID;
 
         public GiantAbodePopulator()
         {
             Regions = new();
+            GiantID = "";
         }
 
         public bool BuildZone(Zone Z)

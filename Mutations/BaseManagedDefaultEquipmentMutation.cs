@@ -259,10 +259,22 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(BeforeBodyPartsUpdatedEvent)} E)",
+                Indent: 0, Toggle: getDoDebug());
+
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(AfterBodyPartsUpdatedEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(AfterBodyPartsUpdatedEvent)} E)",
+                Indent: 0, Toggle: getDoDebug());
+
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)

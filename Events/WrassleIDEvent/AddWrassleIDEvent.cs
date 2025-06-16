@@ -22,10 +22,10 @@ namespace HNPS_GigantismPlus
             List<object> doList = new()
             {
                 'V',    // Vomit
-                'X',    // Trace
             };
             List<object> dontList = new()
             {
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))

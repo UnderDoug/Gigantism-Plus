@@ -31,11 +31,11 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
-                'X',    // Trace
             };
             List<object> dontList = new()
             {
-                "WID"   // WrassleID
+                "WID",  // WrassleID
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))

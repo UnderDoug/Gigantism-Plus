@@ -39,6 +39,7 @@ namespace HNPS_GigantismPlus
             List<object> doList = new()
             {
                 'V',    // Vomit
+                'X',    // Trace
                 '!',    // Alert
             };
             List<object> dontList = new()
@@ -129,16 +130,6 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"Waking up Unique Giant...", Indent: 1, Toggle: getDoDebug());
             GameObject UniqueGiant = GetTheGiant();
 
-            string wrasslerColor = null;
-            Debug.Entry(4, $"Storing {nameof(wrasslerColor)}...", Indent: 1, Toggle: getDoDebug());
-            if (UniqueGiant.TryGetPart(out Wrassler wrassler))
-            {
-                Debug.CheckYeh(4, $"{nameof(UniqueGiant)} has {nameof(Wrassler)} part", Indent: 1, Toggle: getDoDebug());
-                wrasslerColor = wrassler.DetailColor;
-            }
-            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
-            Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
-
             if (UniqueGiant == null)
             {
                 Debug.Warn(2,
@@ -169,6 +160,17 @@ namespace HNPS_GigantismPlus
                     Value1: zoneManager.CacheObject(UniqueGiant));
             }
 
+            string wrasslerColor = null;
+            Debug.Entry(4, $"Storing {nameof(wrasslerColor)}...", Indent: 1, Toggle: getDoDebug());
+            if (UniqueGiant.TryGetPart(out WrassleID wrassleID))
+            {
+                Debug.CheckYeh(4, $"{nameof(UniqueGiant)} has {nameof(Wrassler)} part, ID", wrassleID.ToString(),
+                    Indent: 1, Toggle: getDoDebug());
+                wrasslerColor = wrassleID.SecondaryColor;
+            }
+            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
+            Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
+
             Debug.Entry(4, $"Getting Ropes and Attempting to assign Color...", Indent: 1, Toggle: getDoDebug());
             List<GameObject> ropesList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes");
             if (!ropesList.IsNullOrEmpty())
@@ -183,12 +185,14 @@ namespace HNPS_GigantismPlus
                         Debug.Entry(4, $"Attempting to sync WrassleIDs...", Indent: 3, Toggle: getDoDebug());
                         if (UD_QWE.TrySyncWrassleID(UniqueGiant, rope))
                         {
-                            Debug.CheckYeh(4, $"Wrassle ID's synched", Indent: 3, Toggle: getDoDebug());
+                            Debug.CheckYeh(4, $"Wrassle ID's synched", $"{UniqueGiant.WrassleIDString()}", 
+                                Indent: 3, Toggle: getDoDebug());
                             // wrassleGear.SetDetailColor(Force: true); // Might not need this now.
                         }
                         else
                         {
-                            Debug.CheckNah(4, $"Wrassle ID's failed to sync", Indent: 3, Toggle: getDoDebug());
+                            Debug.CheckNah(4, $"Wrassle ID's failed to sync",
+                                Indent: 3, Toggle: getDoDebug());
                         }
                     }
                     else
@@ -225,7 +229,8 @@ namespace HNPS_GigantismPlus
                         Debug.Entry(4, $"Attempting to sync WrassleIDs...", Indent: 3, Toggle: getDoDebug());
                         if (UD_QWE.TrySyncWrassleID(UniqueGiant, chair))
                         {
-                            Debug.CheckYeh(4, $"Wrassle ID's synched", Indent: 3, Toggle: getDoDebug());
+                            Debug.CheckYeh(4, $"Wrassle ID's synched", $"{UniqueGiant.WrassleIDString()}", 
+                                Indent: 3, Toggle: getDoDebug());
                         }
                         else
                         {

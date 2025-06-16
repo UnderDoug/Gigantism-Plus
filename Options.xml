@@ -43,6 +43,23 @@
   </option>
 	
   <option
+        ID="Option_GigantismPlus_DebugIncludeWrassleIDDebugDescriptions"
+        DisplayText="{{giant|Gigantism Plus}}: Show WrassleID internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
+        Category="Debug"
+        Type="Checkbox"
+        Default="No"
+    >
+    <helptext>
+      When enabled, internal debug information relating to the WrassleID part will be displayed when [{{W|l}}]ooking at anything with the relevant parts.
+
+      {{M|WrassleID}}:
+      {{W|Colors}}: Information relating to the WrassleID's associated colors.
+
+      The default is {{w|Disabled}}.
+    </helptext>
+  </option>
+	
+  <option
         ID="Option_GigantismPlus_DebugIncludeVaultDebugDescriptions"
         DisplayText="{{giant|Gigantism Plus}}: Show Tactics_Vault internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
         Category="Debug"
@@ -197,6 +214,44 @@
       This option can be changed mid-game, however, due to targeting the creation of the creature, it will only apply to creatures generated after this option is enabled.
 
       The default is {{w|Disabled}}.
+    </helptext>
+  </option>
+
+  <!-- Wrassle Options -->
+  <option
+      ID="Option_GigantismPlus_EnableWrasslePlayerStart"
+      DisplayText="Override chance that player characters who start with {{gigantic|Gigantism}} ({{r|D}}) will start with Wrassle Equipment"
+      Category="Mod: Gigantism Plus"
+      Type="Checkbox"
+      Default="No"
+      >
+    <helptext>
+      Creatures have a 15% chance, under most circumstances, to spawn with Wrassle Equipment if they spawn with {{gigantic|Gigantism}} ({{r|D}}).
+      The player has a much smaller chance due to it being a full set of gear and a weapon. When enabled, this option presents a slider to manually select the chance that player characters will spawn with their own unique set.
+
+      The default is {{w|Disabled}}.
+    </helptext>
+  </option>
+  
+  <option
+      ID="Option_GigantismPlus_SlideWrasslePlayerStart"
+      Requires="Option_GigantismPlus_EnableWrasslePlayerStart==Yes"
+      DisplayText="Chane in 1,000 that player characters with {{gigantic|Gigantism}} ({{r|D}}) will start with Wrassle Equipment"
+      Category="Mod: Gigantism Plus"
+      Type="Slider"
+      Default="1"
+      Min="0"
+      Max="1000"
+      Increment="1"
+      >
+    <helptext>
+      This slider represents the chance in 1,000 that when a player character spawns with {{gigantic|Gigantism}} ({{r|D}}), they will start with a full set of their own personal unique Wrassle Equipment with randomly (seeded) selected tiles, colors, and shader.
+      
+      Select 0 to disable this feature.
+      Select 100 to have this occur 10% of the time.
+      Select 1,000 to force this feature.
+
+      The default is {{w|1}}.
     </helptext>
   </option>
 

@@ -40,7 +40,11 @@ namespace XRL.World.Parts
 
         public string Tile => UD_QWE.GetTileFromBag(WrassleID.ID, RandomTiles);
 
-        public MeleeWeapon MeleeWeaponCopy;
+        private MeleeWeapon MeleeWeaponCopy;
+
+        private bool IsMeleeWeaponNormally => ParentObject != null && ParentObject.GetBlueprint().HasPart(nameof(MeleeWeapon));
+        private int IsImprovisedMelee = -1;
+        private string ShowMeleeWeaponStats = null;
 
         public bool AutoFlair;
 
@@ -60,7 +64,7 @@ namespace XRL.World.Parts
         public bool ColorEquipmentFrame;
 
         public bool IsVibrant;
-
+        
         public WrassleGear()
         {
             AutoFlair = true;
@@ -91,12 +95,32 @@ namespace XRL.World.Parts
         }
         public override void Attach()
         {
-            if (ParentObject.TryGetPart(out MeleeWeapon meleeWeapon))
+            int indent = Debug.LastIndent;
+
+            Debug.Entry(4,
+                $"* {nameof(WrassleGear)}."
+                + $"{nameof(Attach)}()"
+                + $" {nameof(ParentObject)}: {ParentObject?.DebugName ?? NULL}"
+                + $" {nameof(WrassleID)}: {WrassleID.GetID(Silent: true)}",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            Debug.Entry(4, $"calling base.{nameof(Attach)}()",
+                Indent: indent + 2, Toggle: getDoDebug('X'));
+            base.Attach();
+
+            if (ParentObject.TryGetPart(out MeleeWeapon wrassleWeapon))
             {
-                MeleeWeaponCopy = meleeWeapon.DeepCopy(ParentObject) as MeleeWeapon;
+                MeleeWeaponCopy = wrassleWeapon.DeepCopy(ParentObject) as MeleeWeapon;
+                Debug.LoopItem(4, $"{nameof(MeleeWeaponCopy)} coppied", $"{MeleeWeaponCopy != null}",
+                    Good: MeleeWeaponCopy != null, Indent: indent + 2, Toggle: getDoDebug('X'));
+
+                MeleeWeaponCopy.TransferMeleeWeaponStatsFrom(wrassleWeapon);
+
+                IsImprovisedMelee = ParentObject.GetIntProperty("IsImprovisedMelee", 0);
+                ShowMeleeWeaponStats = ParentObject.HasTagOrProperty("ShowMeleeWeaponStats") ? "true" : null;
             }
 
-            base.Attach();
+            Debug.LastIndent = indent;
         }
         public void ApplyFlair(bool Force = false)
         {
@@ -152,22 +176,28 @@ namespace XRL.World.Parts
             }
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register("AdjustWeaponScore");
+            Registrar.Register("AdjustArmorScore");
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
-            bool wantObjectCreated = ParentObject.InheritsFrom("BaseWrassleGear");
-            bool wantKineticResist = ParentObject.InheritsFrom("WrassleRingRopes");
+            bool wantObjectCreated = ParentObject.InheritsFrom(BASE_WRASSLE_GEAR);
+            bool wantKineticResist = ParentObject.InheritsFrom(WRASSLE_RING_ROPES);
             bool wantEquipped =
-                ParentObject.InheritsFrom("BaseWrassleGear")
-             || ParentObject.InheritsFrom("FoldingChair")
+                ParentObject.InheritsFrom(BASE_WRASSLE_GEAR)
+             || ParentObject.InheritsFrom(FOLDING_CHAIR)
              || ParentObject.HasPart<Armor>();
             bool wantUnequipped =
-                ParentObject.InheritsFrom("BaseWrassleGear")
+                ParentObject.InheritsFrom(BASE_WRASSLE_GEAR)
              || (ParentObject.HasPart<Armor>() && ParentObject.HasPart<MeleeWeapon>());
             bool wantLateBeforeApplyDamage =
-                ParentObject.InheritsFrom("WrassleRingRopes")
-             || ParentObject.InheritsFrom("FoldingChair");
+                ParentObject.InheritsFrom(WRASSLE_RING_ROPES)
+             || ParentObject.InheritsFrom(FOLDING_CHAIR);
             bool wantInventoryActions =
-                ParentObject.InheritsFrom("WrassleRingRopes");
+                ParentObject.InheritsFrom(WRASSLE_RING_ROPES);
 
             return base.WantEvent(ID, cascade)
                 || (wantObjectCreated && ID == AfterObjectCreatedEvent.ID)
@@ -176,10 +206,9 @@ namespace XRL.World.Parts
                 || (wantKineticResist && ID == GetKineticResistanceEvent.ID)
                 || (wantLateBeforeApplyDamage && ID == LateBeforeApplyDamageEvent.ID);
         }
-
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear"))
+            if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom(BASE_WRASSLE_GEAR))
             {
                 int indent = Debug.LastIndent;
                 GameObject WrassleObject = E.Object;
@@ -212,15 +241,20 @@ namespace XRL.World.Parts
 
                 GameObject Item = E.Item;
                 GameObject Actor = E.Actor;
-                if (E.Item.InheritsFrom("FoldingChair"))
+
+                Debug.Entry(4,
+                    $"@ {nameof(WrassleGear)}."
+                    + $"{nameof(HandleEvent)}({nameof(EquippedEvent)} "
+                    + $" E.Item: {Item?.DebugName ?? NULL},"
+                    + $" E.Actor: {Actor?.DebugName ?? NULL})"
+                    + $"{nameof(WrassleID)}: {WrassleID.GetID(Silent: true)}",
+                    Indent: indent + 1, Toggle: getDoDebug());
+
+                if (E.Item.InheritsFrom(FOLDING_CHAIR))
                 {
                     Debug.Entry(4,
-                        $"{typeof(WrassleGear).Name}." +
-                        $"{nameof(HandleEvent)}({nameof(EquippedEvent)} " +
-                        $"E.Item: [{Item.ID}:{Item?.DebugName ?? NULL}] " +
-                        $"E.Actor: [{Actor.ID}:{Actor?.DebugName ?? NULL}]" +
-                        $") WrassleID: {WrassleID.GetID(Silent: true)}",
-                        Indent: 0, Toggle: getDoDebug());
+                        $"{ParentObject?.DebugName ?? NULL} is a {FOLDING_CHAIR}",
+                        Indent: indent + 2, Toggle: getDoDebug('X'));
 
                     if (Actor.IsPlayer() && Item.TryGetPart(out Examiner examiner) && !(wrassler.KnowsChairs = Actor.Understood(examiner)))
                     {
@@ -232,20 +266,37 @@ namespace XRL.World.Parts
                         wrassler.KnowsChairs = Actor.Understood(examiner);
                     }
                 }
-                if (Item.InheritsFrom("WrassleGear") && Item.TryGetPart(out Armor armor))
+
+                if (Item.InheritsFrom(BASE_WRASSLE_GEAR) && Item.TryGetPart(out Armor armor))
                 {
                     Debug.Entry(4,
-                        $"{ParentObject?.DebugName ?? NULL} has {nameof(Armor)} part",
-                        Indent: indent + 1, Toggle: getDoDebug('X'));
+                        $"{nameof(Item)} has {nameof(Armor)} part",
+                        Indent: indent + 2, Toggle: getDoDebug('X'));
 
                     GameObject defaultBehavior = Item.EquippedOn().DefaultBehavior;
+
+                    Debug.Entry(4,
+                        $"{nameof(defaultBehavior)} is {defaultBehavior?.DebugName ?? NULL}",
+                        Indent: indent + 2, Toggle: getDoDebug('X'));
+
                     if (defaultBehavior != null && defaultBehavior.TryGetPart(out MeleeWeapon defaultMeleeWeapon))
                     {
-                        ParentObject.RequirePart(defaultMeleeWeapon.DeepCopy(ParentObject) as MeleeWeapon);
-                        if (ParentObject.TryGetPart(out MeleeWeapon parentMeleeWeapon))
+                        if (!Item.TryGetPart(out MeleeWeapon wrassleWeapon))
                         {
-                            ParentObject.SetIntProperty("IsImprovisedMelee", 0, true);
-                            ParentObject.SetStringProperty("ShowMeleeWeaponStats", "true");
+                            wrassleWeapon = ParentObject.RequirePart<MeleeWeapon>();
+                        }
+                        if (wrassleWeapon != null)
+                        {
+                            MeleeWeaponCopy ??= new();
+                            MeleeWeaponCopy.TransferMeleeWeaponStatsFrom(wrassleWeapon);
+
+                            Debug.Entry(4,
+                                $"{nameof(MeleeWeaponCopy)} stats transferred back to {nameof(wrassleWeapon)}",
+                                Indent: indent + 2, Toggle: getDoDebug('X'));
+
+                            wrassleWeapon.TransferMeleeWeaponStatsFrom(defaultMeleeWeapon);
+                            Item.SetIntProperty("IsImprovisedMelee", 0, true);
+                            Item.SetStringProperty("ShowMeleeWeaponStats", "true");
                         }
                     }
                 }
@@ -258,27 +309,54 @@ namespace XRL.World.Parts
         {
             if (E.Actor.TryGetPart(out Wrassler wrassler) && E.Item != null)
             {
+                int indent = Debug.LastIndent;
+
                 GameObject Item = E.Item;
                 GameObject Actor = E.Actor;
 
-                if (Item.InheritsFrom("WrassleGear") 
-                    && Item.TryGetPart(out Armor armor) 
-                    && Item.TryGetPart(out MeleeWeapon meleeWeapon))
+                Debug.Entry(4,
+                    $"@ {nameof(WrassleGear)}."
+                    + $"{nameof(HandleEvent)}({nameof(UnequippedEvent)} "
+                    + $" E.Item: {Item?.DebugName ?? NULL},"
+                    + $" E.Actor: {Actor?.DebugName ?? NULL})"
+                    + $"{nameof(WrassleID)}: {WrassleID.GetID(Silent: true)}",
+                    Indent: indent + 1, Toggle: getDoDebug());
+
+                if (Item.InheritsFrom(BASE_WRASSLE_GEAR) && Item.HasPart<Armor>() && Item.TryGetPart(out MeleeWeapon wrassleWeapon))
                 {
-                    ParentObject.RemovePart(meleeWeapon);
-                    if (MeleeWeaponCopy != null)
+                    Debug.Entry(4,
+                        $"{nameof(Item)} has {nameof(Armor)} part and {nameof(MeleeWeapon)} part",
+                        Indent: indent + 2, Toggle: getDoDebug('X'));
+
+                    Debug.LoopItem(4, $"{nameof(IsMeleeWeaponNormally)}", $"{ IsMeleeWeaponNormally}",
+                        Good: IsMeleeWeaponNormally, Indent: indent + 2, Toggle: getDoDebug('X'));
+                    if (!IsMeleeWeaponNormally)
                     {
-                        ParentObject.RequirePart(MeleeWeaponCopy.DeepCopy(ParentObject) as MeleeWeapon);
+                        Item.RemovePart(wrassleWeapon);
+                        Debug.LoopItem(4, $"{nameof(MeleeWeapon)} removed", $"{!Item.HasPart<MeleeWeapon>()}",
+                            Good: !Item.HasPart<MeleeWeapon>(), Indent: indent + 2, Toggle: getDoDebug('X'));
                     }
-                    ParentObject.SetIntProperty("IsImprovisedMelee", 1);
-                    ParentObject.SetStringProperty("ShowMeleeWeaponStats", "false");
+                    else
+                    {
+                        MeleeWeaponCopy ??= new();
+                        wrassleWeapon.TransferMeleeWeaponStatsFrom(MeleeWeaponCopy);
+                        Debug.Entry(4,
+                            $"{nameof(MeleeWeaponCopy)} stats transferred back to {nameof(wrassleWeapon)}",
+                            Indent: indent + 2, Toggle: getDoDebug('X'));
+                    }
+
+                    if (IsImprovisedMelee > -1)
+                    {
+                        Item.SetIntProperty("IsImprovisedMelee", IsImprovisedMelee, true);
+                    }
+                    Item.SetStringProperty("ShowMeleeWeaponStats", ShowMeleeWeaponStats, true);
                 }
             }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetKineticResistanceEvent E)
         {
-            if (E.Object == ParentObject && E.Object.InheritsFrom("WrassleRingRopes"))
+            if (E.Object == ParentObject && E.Object.InheritsFrom(WRASSLE_RING_ROPES))
             {
                 GameObject Object = E.Object;
                 /*
@@ -312,7 +390,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(LateBeforeApplyDamageEvent E)
         {
-            if (E.Object == ParentObject && (E.Object.InheritsFrom("WrassleRingRopes") || E.Object.InheritsFrom("FoldingChair")))
+            if (E.Object == ParentObject && (E.Object.InheritsFrom(WRASSLE_RING_ROPES) || E.Object.InheritsFrom(FOLDING_CHAIR)))
             {
                 Debug.Entry(4, 
                     $"{typeof(WrassleGear).Name}." + 
@@ -327,9 +405,9 @@ namespace XRL.World.Parts
                     E.Source != null
                  && E.Source.HasPart<Wrassler>();
 
-                bool isRopes = E.Object.InheritsFrom("WrassleRingRopes");
+                bool isRopes = E.Object.InheritsFrom(WRASSLE_RING_ROPES);
 
-                bool isChair = E.Object.InheritsFrom("FoldingChair");
+                bool isChair = E.Object.InheritsFrom(FOLDING_CHAIR);
 
                 bool ropesSpecialCase =
                     isRopes
@@ -364,13 +442,6 @@ namespace XRL.World.Parts
                 return false;
             }
             return base.HandleEvent(E);
-        }
-
-        public override void Register(GameObject Object, IEventRegistrar Registrar)
-        {
-            Registrar.Register("AdjustWeaponScore");
-            Registrar.Register("AdjustArmorScore");
-            base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
         {
@@ -408,16 +479,17 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-
+            MeleeWeaponCopy.Write(Basis, Writer);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-
+            MeleeWeaponCopy = Reader.ReadObject() as MeleeWeapon;
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             WrassleGear wrassleGear = base.DeepCopy(Parent, MapInv) as WrassleGear;
+            wrassleGear.MeleeWeaponCopy = MeleeWeaponCopy.DeepCopy(wrassleGear.ParentObject) as MeleeWeapon;
             wrassleGear._TileColor = null;
             wrassleGear._DetailColor = null;
             return wrassleGear;

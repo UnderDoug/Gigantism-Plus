@@ -8,9 +8,9 @@ using XRL.World.Capabilities;
 using static XRL.UD_QudWrasslingEntertainment;
 
 using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
 
 using SerializeField = UnityEngine.SerializeField;
 
@@ -31,11 +31,12 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
-                'X',    // Trace
+                'S',    // Serialize
             };
             List<object> dontList = new()
             {
-                "WID"   // WrassleID
+                "WID",  // WrassleID
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))
@@ -217,7 +218,7 @@ namespace XRL.World.Parts
                 $"* {nameof(WrassleID)}."
                 + $"{nameof(OnUpdatedID)}()",
                 $"{GetID(Silent: true)}",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             _PrimaryColor = null;
             _SecondaryColor = null;
@@ -263,7 +264,30 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int Cascade)
         {
             return base.WantEvent(ID, Cascade)
+                || ID == GetShortDescriptionEvent.ID
                 || ID == GetWrassleIDEvent.ID;
+        }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            if (WrassleIDDebugDescriptions)
+            {
+                // bool haveOrigin = Origin != null;
+
+                StringBuilder SB = Event.NewStringBuilder();
+                SB.AppendColored("M", $"{nameof(WrassleID)}");
+                SB.AppendLine();
+                SB.AppendColored("W", "ID: ").AppendColored("g", $"{GetID(Silent: true)}");
+                SB.AppendLine();
+                SB.AppendColored("W", "Colors");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored(PrimaryColor, $"{PrimaryColor}").Append($"){HONLY}{nameof(PrimaryColor)}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append("(").AppendColored(SecondaryColor, $"{SecondaryColor}").Append($"){HONLY}{nameof(SecondaryColor)}");
+                SB.AppendLine();
+
+                E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
+            }
+            return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(GetWrassleIDEvent E)
         {
@@ -382,7 +406,7 @@ namespace XRL.World.Parts
 
         public override string ToString()
         {
-            return ID.ToString();
+            return GetID(Silent: true).ToString();
         }
 
         public virtual bool IsSyncedWith(WrassleID WrassleID, bool Silent = false)
@@ -404,12 +428,19 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
+            ToString().Vomit(4, nameof(Write), Indent: Debug.LastIndent, Toggle: getDoDebug('S'));
             Writer.Write(_ID);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
+            ToString().Vomit(4, nameof(Read), Indent: Debug.LastIndent, Toggle: getDoDebug('S'));
             _ID = Reader.ReadGuid();
+        }
+        public override void FinalizeRead(SerializationReader Reader)
+        {
+            base.FinalizeRead(Reader);
+            OnUpdatedID();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

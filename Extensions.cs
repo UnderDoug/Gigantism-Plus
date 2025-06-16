@@ -55,10 +55,10 @@ namespace HNPS_GigantismPlus
                 return false;
 
             if (MethodName == nameof(SeededRandomBool))
-                return true;
+                return false;
 
             if (MethodName == nameof(GetShaderFromSequence))
-                return true;
+                return false;
 
             return doDebug;
         }
@@ -850,7 +850,7 @@ namespace HNPS_GigantismPlus
 
         public static bool InheritsFrom(this GameObject Object, string Blueprint)
         {
-            return Object.Blueprint.Is(Blueprint) || Object.GetBlueprint().InheritsFrom(Blueprint);
+            return Object.Blueprint == Blueprint || Object.GetBlueprint().InheritsFrom(Blueprint);
         }
 
         // partially repurposed from https://stackoverflow.com/a/32184652
@@ -2614,6 +2614,36 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return shader;
         }
+
+        public static MeleeWeapon TransferMeleeWeaponStatsFrom(this MeleeWeapon Destination, MeleeWeapon Origin)
+        {
+            if (Destination == null || Origin == null)
+            {
+                return null;
+            }
+
+            Destination.MaxStrengthBonus = Origin.MaxStrengthBonus;
+            Destination.PenBonus = Origin.PenBonus;
+            Destination.HitBonus = Origin.HitBonus;
+            Destination.BaseDamage = Origin.BaseDamage;
+            Destination.Ego = Origin.Ego;
+            Destination.Skill = Origin.Skill;
+            Destination.Stat = Origin.Stat;
+            Destination.Slot = Origin.Slot;
+            Destination.Attributes = Origin.Attributes;
+
+            return Destination;
+        }
+
+        public static WrassleID WrassleID(this GameObject WrassleObject)
+        {
+            return WrassleObject.GetPart<WrassleID>();
+        }
+        public static string WrassleIDString(this GameObject WrassleObject)
+        {
+            return WrassleObject.WrassleID().GetID(Silent: true).ToString();
+        }
+
 
     } //!-- Extensions
 }

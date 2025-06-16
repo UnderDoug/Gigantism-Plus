@@ -30,11 +30,11 @@ namespace XRL.World.Capabilities
             List<object> doList = new()
             {
                 'B',    // Bestowal
-                'X',    // Trace
             };
             List<object> dontList = new()
             {
                 'V',    // Vomit
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))
@@ -385,7 +385,7 @@ namespace XRL.World.Capabilities
             Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
                 + $"{nameof(GetColorBag)}(Primary: {Primary ?? NULL}, Secondary: {Secondary ?? NULL})",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             Dictionary<string, List<string>> colorBag = new(ColorBag);
 
@@ -446,15 +446,15 @@ namespace XRL.World.Capabilities
             Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
                 + $"{nameof(GetWrassleColorPair)}({nameof(WrassleID)}, out {nameof(PrimaryColor)}, out {nameof(SecondaryColor)})",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
-            Debug.Entry(4, $"{WrassleID}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.Entry(4, $"{WrassleID}", Indent: indent + 2, Toggle: getDoDebug('X'));
 
             PrimaryColor = null;
             SecondaryColor = null;
             if (WrassleID == Guid.Empty)
             {
-                Debug.CheckNah(4, $"No WrassleID", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"No WrassleID", Indent: indent + 2, Toggle: getDoDebug('X'));
 
                 Debug.LastIndent = indent;
                 return false;
@@ -633,12 +633,12 @@ namespace XRL.World.Capabilities
             Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
                 + $"{nameof(GetWrassleShaderForWord)}(Guid WrassleID, {nameof(Word)}: {Word})",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             if (WrassleID == Guid.Empty || Word.IsNullOrEmpty() || Type.IsNullOrEmpty())
             {
                 Debug.CheckNah(4, $"{nameof(WrassleID)} empty, {nameof(Word)} null, or {nameof(Type)} null or empty",
-                    Indent: indent + 2, Toggle: getDoDebug());
+                    Indent: indent + 2, Toggle: getDoDebug('X'));
                 Debug.LastIndent = indent;
                 return null;
             }
@@ -647,7 +647,7 @@ namespace XRL.World.Capabilities
                 Debug.CheckYeh(4,
                     $"{nameof(UD_QudWrasslingEntertainment)}.{nameof(UD_QudWrasslingEntertainment.WrassleColorSequenceCache)} " +
                     $"contains entry",
-                    Indent: indent + 2, Toggle: getDoDebug());
+                    Indent: indent + 2, Toggle: getDoDebug('X'));
             }
             else
             {
@@ -656,7 +656,7 @@ namespace XRL.World.Capabilities
                     Debug.CheckYeh(4,
                         $"Generated {nameof(colorSequence)} and Cached in " +
                         $"{nameof(UD_QudWrasslingEntertainment)}.{nameof(UD_QudWrasslingEntertainment.WrassleColorSequenceCache)}",
-                        Indent: indent + 2, Toggle: getDoDebug());
+                        Indent: indent + 2, Toggle: getDoDebug('X'));
                 }
                 else
                 {
@@ -754,10 +754,10 @@ namespace XRL.World.Capabilities
             Debug.Entry(4, $"Getting {nameof(WrassleID)} and {nameof(WrassleGearBlueprints)}...",
                 Indent: indent + 2, Toggle: getDoDebug('B'));
 
-            WrassleID wrassleID = wrassler.WrassleID;
+            WrassleID wrassleID = WrassleCreature.WrassleID();
             Debug.Entry(4,
                 $"{nameof(wrassleID)}.{nameof(wrassleID.ID)}",
-                $"{wrassleID?.ID}",
+                $"{wrassleID?.ToString()}",
                 Indent: indent + 3, Toggle: getDoDebug('B'));
 
             if (wrassleID == null)

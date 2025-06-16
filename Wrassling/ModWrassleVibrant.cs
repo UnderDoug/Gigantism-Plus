@@ -29,6 +29,7 @@ namespace XRL.World.Parts
             };
             List<object> dontList = new()
             {
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))
@@ -105,7 +106,7 @@ namespace XRL.World.Parts
             if (ParentObject.InheritsFrom("FoldingChair"))
             {
                 int indent = Debug.LastIndent;
-                string adjective = Grammar.InitialCap(GetColoredAdjective());
+                string adjective = Grammar.InitialCap(GetAdjective()).Color(GetWrassleShaderFor(GetAdjective()));
 
                 Debug.Entry(4,
                     $"@ {nameof(GetShortDescriptionEvent)}, "

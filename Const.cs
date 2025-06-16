@@ -49,6 +49,9 @@ namespace HNPS_GigantismPlus
 
         public const string NATURAL_EQUIPMENT = "Natural Equipment";
         public const string WRASSLE_GEAR_MODS = "Wrassle Gear Mods";
+        public const string BASE_WRASSLE_GEAR = "BaseWrassleGear";
+        public const string WRASSLE_RING_ROPES = "WrassleRingRopes";
+        public const string FOLDING_CHAIR = "FoldingChair";
 
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
 

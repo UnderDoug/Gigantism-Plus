@@ -34,6 +34,7 @@ namespace HNPS_GigantismPlus
         {
             { nameof(DebugVerbosity), Label("DebugVerbosity") },
             { nameof(DebugIncludeInMessage), Label("DebugIncludeInMessage") },
+            { nameof(WrassleIDDebugDescriptions), Label("DebugIncludeWrassleIDDebugDescriptions") },
             { nameof(DebugVaultDescriptions), Label("DebugIncludeVaultDebugDescriptions") },
             { nameof(Colorfulness), Label("Colorfulness") },
             { nameof(EnableGiganticStartingGear), Label("EnableGiganticStartingGear") },
@@ -43,6 +44,8 @@ namespace HNPS_GigantismPlus
             { nameof(EnableGiganticDerarification), Label("EnableGiganticDerarification") },
             { nameof(EnableGiganticNPCGear), Label("EnableGiganticNPCGear") },
             { nameof(EnableGiganticNPCGear_Grenades), Label("EnableGiganticNPCGear_Grenades") },
+            { nameof(EnableWrasslePlayerStart), Label("EnableWrasslePlayerStart") },
+            { nameof(SlideWrasslePlayerStart), Label("SlideWrasslePlayerStart") },
         };
 
         private static string GetStringOption(string ID, string Default = "")
@@ -221,6 +224,11 @@ namespace HNPS_GigantismPlus
             get => GetBoolOption(nameof(DebugIncludeInMessage), false);
             set => SetBoolOption(nameof(DebugIncludeInMessage), value);
         }
+        public static bool WrassleIDDebugDescriptions
+        {
+            get => GetBoolOption(nameof(WrassleIDDebugDescriptions), false);
+            set => SetBoolOption(nameof(WrassleIDDebugDescriptions), value);
+        }
         public static bool DebugVaultDescriptions
         {
             get => GetBoolOption(nameof(DebugVaultDescriptions), false);
@@ -268,6 +276,16 @@ namespace HNPS_GigantismPlus
         {
             get => GetBoolOption(nameof(EnableGiganticNPCGear_Grenades), false);
             set => SetBoolOption(nameof(EnableGiganticNPCGear_Grenades), value);
+        }
+        public static bool EnableWrasslePlayerStart
+        {
+            get => GetBoolOption(nameof(EnableWrasslePlayerStart), false);
+            set => SetBoolOption(nameof(EnableWrasslePlayerStart), value);
+        }
+        public static int SlideWrasslePlayerStart
+        {
+            get => EnableWrasslePlayerStart ? GetIntOption(nameof(SlideWrasslePlayerStart), 1) : 1;
+            set => SetIntOption(nameof(EnableWrasslePlayerStart), value);
         }
 
         // Advanced Settings

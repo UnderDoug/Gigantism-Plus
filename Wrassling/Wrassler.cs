@@ -140,7 +140,6 @@ namespace XRL.World.Parts
             if (E.Object != null && E.Object == ParentObject)
             {
                 GameObject Actor = E.Object;
-
             }
             return base.HandleEvent(E);
         }
@@ -149,18 +148,16 @@ namespace XRL.World.Parts
             if (E.Object != null && E.Object == ParentObject && !E.Object.HasStringProperty("HNPS_CellShouted"))
             {
                 GameObject Actor = E.Object;
+
                 Debug.Entry(4,
                     $"{typeof(Wrassler).Name}." +
-                    $"{nameof(HandleEvent)}({typeof(ObjectEnteredCellEvent).Name} E)",
+                    $"{nameof(HandleEvent)}({nameof(ObjectEnteredCellEvent)} E)",
                     Indent: 0, Toggle: getDoDebug());
-                Debug.Entry(4,
-                    $"E.Object: {Actor?.DebugName ?? NULL}",
+                Debug.Entry(4, $"E.Object: {Actor?.DebugName ?? NULL}",
                     Indent: 1, Toggle: getDoDebug());
-                Debug.Entry(4,
-                    $"Cell: [{E.Cell?.Location}]",
+                Debug.Entry(4, $"E.Cell: [{E.Cell?.Location}]",
                     Indent: 1, Toggle: getDoDebug());
                 Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
-
 
                 bool noWrassleGear = Actor.HasTagOrProperty("NoWrassleGear");
                 bool isTemplar = Actor.InheritsFrom("BaseTemplar");
@@ -174,7 +171,18 @@ namespace XRL.World.Parts
                     bestowChance = 100;
                 }
 
-                bool bestowByChance = bestowChance.in100();
+                if (Actor.IsPlayer())
+                {
+                    bestowChance = SlideWrasslePlayerStart;
+                }
+                else
+                {
+                    bestowChance *= 10;
+                }
+                Debug.Entry(4, $"{nameof(bestowChance)}: {bestowChance}/1,000",
+                    Indent: 1, Toggle: getDoDebug());
+
+                bool bestowByChance = bestowChance.in1000();
 
                 bool shouldBestow =
                     Bestow

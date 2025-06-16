@@ -25,6 +25,7 @@ namespace XRL
             List<object> doList = new()
             {
                 'V',    // Vomit
+                'X',    // Vomit
             };
             List<object> dontList = new()
             {

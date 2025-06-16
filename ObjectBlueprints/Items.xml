@@ -396,7 +396,7 @@ You cannot wear equipment on your body." />
           RenderString="]" ColorString="&amp;Y"
           TileColor="&amp;Y" DetailColor="r" />
     <part Name="Description" 
-          Short="*Vibrant* nanoweave material of variant colors has been sutured together into a gestalt display of unique flair." />
+          Short="=subject.WrassleShader:Vibrant= nanoweave material of =subject.wrassleShader:various colors= has been sutured together into a gestalt display of =subject.wrassleShader:unique flair=." />
     <part Name="Physics" Weight="1" />
     <part Name="WrassleGear" RandomizeTile="true" />
     <tag Name="BaseObject" Value="*noinherit" />

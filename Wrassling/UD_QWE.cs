@@ -1,21 +1,27 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using XRL.Rules;
+
 using XRL.UI;
+using XRL.Rules;
 using XRL.World.Anatomy;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
+using XRL.World.Text.Attributes;
 using XRL.World.Tinkering;
 using XRL.World.ZoneBuilders;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+using XRL.World.Text.Delegates;
+using XRL.Language;
 
 namespace XRL.World.Capabilities
 {
+    [HasVariableReplacer]
     public static class UD_QWE
     {
         private static bool doDebug => getClassDoDebug(nameof(UD_QWE));
@@ -23,11 +29,12 @@ namespace XRL.World.Capabilities
         {
             List<object> doList = new()
             {
-                'V',    // Vomit
+                'B',    // Bestowal
                 'X',    // Trace
             };
             List<object> dontList = new()
             {
+                'V',    // Vomit
             };
 
             if (what != null && doList.Contains(what))
@@ -42,6 +49,8 @@ namespace XRL.World.Capabilities
         public static UD_QudWrasslingEntertainment System => The.Game?.GetSystem<UD_QudWrasslingEntertainment>();
 
         public static WrassleGiantHero WrassleGiantHeroBuilder = new();
+
+        public static readonly string WRASSLE_ID_CONTEXT = $"{nameof(WrassleID)}::";
 
         public static List<string> WrassleRingColors => new()
         {
@@ -113,6 +122,15 @@ namespace XRL.World.Capabilities
         public static bool TryGetWrassleID(GameObject WrassleObject, out WrassleID WrassleID)
         {
             return (WrassleID = GetWrassleID(WrassleObject)) != null;
+        }
+        public static bool TryDecodeWrassleIDContext(string WrassleIDContext, out Guid WrassleID_ID)
+        {
+            WrassleID_ID = default;
+            if (WrassleIDContext.StartsWith(WRASSLE_ID_CONTEXT) && Guid.TryParse(WrassleIDContext.Substring(WRASSLE_ID_CONTEXT.Length), out WrassleID_ID))
+            {
+                return true;
+            }
+            return false;
         }
         public static IEnumerable<IWrassle> GetWrassleParts(GameObject WrassleObject)
         {
@@ -204,6 +222,14 @@ namespace XRL.World.Capabilities
 
             Debug.LastIndent = indent;
             return isWrassler;
+        }
+        public static Wrassler MakeWrassler(GameObject WrassleCreature)
+        {
+            if (WrassleCreature == null)
+            {
+                return null;
+            }
+            return WrassleCreature.RequirePart<Wrassler>();
         }
 
         public static WrassleID UpdateWrassleID(WrassleID WrassleID)
@@ -357,7 +383,7 @@ namespace XRL.World.Capabilities
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"* {nameof(IWrassleModification)}."
+                $"* {nameof(UD_QWE)}."
                 + $"{nameof(GetColorBag)}(Primary: {Primary ?? NULL}, Secondary: {Secondary ?? NULL})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
@@ -374,7 +400,7 @@ namespace XRL.World.Capabilities
             if (!Primary.IsNullOrEmpty() && Secondary == Primary)
             {
                 Debug.Warn(4,
-                    nameof(UD_QudWrasslingEntertainment),
+                    nameof(UD_QWE),
                     nameof(GetColorBag),
                     $"Supplied Primary ({Primary}) is the same as supplied Secondary ({Secondary})");
 
@@ -384,7 +410,7 @@ namespace XRL.World.Capabilities
             if ((!Primary.IsNullOrEmpty() && Primary.Length > 1) || (!Secondary.IsNullOrEmpty() && Secondary.Length > 1))
             {
                 Debug.Warn(4,
-                    nameof(UD_QudWrasslingEntertainment),
+                    nameof(UD_QWE),
                     nameof(GetColorBag),
                     $"Supplied Primary ({Primary}) or supplied Secondary ({Secondary}) is longer than expected");
 
@@ -394,7 +420,7 @@ namespace XRL.World.Capabilities
             if ((!Primary.IsNullOrEmpty() && !colorBag.Contains(Primary)) || (!Secondary.IsNullOrEmpty() && !colorBag.Contains(Secondary)))
             {
                 Debug.Warn(4,
-                    nameof(UD_QudWrasslingEntertainment),
+                    nameof(UD_QWE),
                     nameof(GetColorBag),
                     $"Supplied Primary ({Primary}) or supplied Secondary ({Secondary}) does not exist in {nameof(colorBag)}");
 
@@ -418,7 +444,7 @@ namespace XRL.World.Capabilities
             int indent = Debug.LastIndent;
 
             Debug.Entry(4,
-                $"* {nameof(IWrassleModification)}."
+                $"* {nameof(UD_QWE)}."
                 + $"{nameof(GetWrassleColorPair)}({nameof(WrassleID)}, out {nameof(PrimaryColor)}, out {nameof(SecondaryColor)})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
@@ -434,7 +460,7 @@ namespace XRL.World.Capabilities
                 return false;
             }
 
-            Dictionary<string, List<string>> colorBag = GetColorBag().VomitBag(4, "Init", null, true, Debug.LastIndent, doDebug);
+            Dictionary<string, List<string>> colorBag = GetColorBag().VomitBag(4, "Init", null, true, Debug.LastIndent + 1, getDoDebug('V'));
 
             PrimaryColor = colorBag.DrawSeededToken(WrassleID);
             bool? primaryIsDark = PrimaryColor.IsDarkColor();
@@ -616,136 +642,311 @@ namespace XRL.World.Capabilities
                 Debug.LastIndent = indent;
                 return null;
             }
-
-            if ((System != null && System.GetCachedWrassleColorSequence(WrassleID, Word.Length).IsNullOrEmpty()) 
-                || GetWrassleColorSequence(WrassleID, Word.Length).IsNullOrEmpty())
+            if (System != null && System.TryGetCachedWrassleColorSequence(WrassleID, Word.Length, out IEnumerable<string> colorSequence))
             {
-                Debug.CheckNah(4, $"{nameof(GetWrassleColorSequence)} empty", Indent: indent + 2, Toggle: getDoDebug());
-                Debug.LastIndent = indent;
-                return null;
-            }
-            string shader = "";
-            if (System != null)
-            {
-                shader = System.GetCachedWrassleColorSequence(WrassleID, Word.Length).GetShaderFromSequence();
+                Debug.CheckYeh(4,
+                    $"{nameof(UD_QudWrasslingEntertainment)}.{nameof(UD_QudWrasslingEntertainment.WrassleColorSequenceCache)} " +
+                    $"contains entry",
+                    Indent: indent + 2, Toggle: getDoDebug());
             }
             else
             {
-                shader = GetWrassleColorSequence(WrassleID, Word.Length).GetShaderFromSequence();
+                if (System != null && System.TryCacheWrassleColorSequence(WrassleID, Word.Length, GetWrassleColorSequence(WrassleID, Word.Length), out colorSequence))
+                {
+                    Debug.CheckYeh(4,
+                        $"Generated {nameof(colorSequence)} and Cached in " +
+                        $"{nameof(UD_QudWrasslingEntertainment)}.{nameof(UD_QudWrasslingEntertainment.WrassleColorSequenceCache)}",
+                        Indent: indent + 2, Toggle: getDoDebug());
+                }
+                else
+                {
+                    colorSequence = GetWrassleColorSequence(WrassleID, Word.Length);
+                }
             }
-
+            string shader = colorSequence.GetShaderFromSequence();
             Debug.LastIndent = indent;
             return shader + " " + Type;
         }
         public static string GetWrassleShaderForWord(WrassleID WrassleID, string Word, string Type = "sequence")
         {
-            return GetWrassleShaderForWord(WrassleID.ID, Word, Type);
+            if (WrassleID == null)
+            {
+                return null;
+            }
+            return GetWrassleShaderForWord(WrassleID.GetID(Silent: true), Word, Type);
         }
 
-        public static Wrassler BestowWrassleGear(GameObject WrassleCreature, out bool Bestowed)
+        [VariableObjectReplacer]
+        public static string WrassleShader(DelegateContext Context)
         {
+            string Text = null;
+            if (!Context.Parameters.IsNullOrEmpty())
+            {
+                Text ??= Context.Parameters[0] ?? null;
+            }
+            if (Text == null)
+            {
+                return null;
+            }
+            if (Context.Capitalize)
+            {
+                Text = Grammar.InitialCap(Text);
+            }
+            else
+            {
+                Text = Grammar.MakeLowerCase(Text);
+            }
+            string shader = null;
+            if (!TryGetWrassleID(Context.Target, out WrassleID wrassleID) || (shader = GetWrassleShaderForWord(wrassleID, Text)) == null)
+            {
+                return Text;
+            }
+            return Text.Color(shader);
+        }
+
+        public static Wrassler BestowWrassleGear(GameObject WrassleCreature, out bool Bestowed, bool Register = false)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(UD_QWE)}."
+                + $"{nameof(BestowWrassleGear)}("
+                + $"{nameof(WrassleCreature)}: {WrassleCreature?.DebugName ?? NULL})",
+                Indent: indent + 1, Toggle: getDoDebug('B'));
+
             Bestowed = false;
 
             if (WrassleCreature == null)
             {
+                Debug.CheckNah(4, $"{nameof(WrassleCreature)} is null",
+                    Indent: indent + 2, Toggle: getDoDebug('B'));
+                Debug.LoopItem(4, $"{nameof(Bestowed)}", $"{Bestowed}",
+                    Good: Bestowed, Indent: indent + 2, Toggle: getDoDebug('B'));
+                Debug.LastIndent = indent;
                 return null;
             }
             if (!WrassleCreature.TryGetPart(out Wrassler wrassler))
             {
+                if (!Register)
+                {
+                    Debug.CheckNah(4, $"{nameof(WrassleCreature)} is not a {nameof(Wrassler)}",
+                        Indent: indent + 2, Toggle: getDoDebug('B'));
+                    Debug.LoopItem(4, $"{nameof(Bestowed)}", $"{Bestowed}",
+                        Good: Bestowed, Indent: indent + 2, Toggle: getDoDebug('B'));
+                    Debug.LastIndent = indent;
+                    return null;
+                }
+                if ((wrassler = MakeWrassler(WrassleCreature)) == null)
+                {
+                    Debug.Warn(2,
+                    $"{nameof(UD_QWE)}",
+                    $"{nameof(BestowWrassleGear)}",
+                    $"Failed get {nameof(Wrassler)} "
+                    + $"from {nameof(WrassleCreature)} {WrassleCreature?.DebugName ?? NULL}"
+                    + $"after performing {nameof(MakeWrassler)}",
+                    Indent: 0);
+                    Debug.LoopItem(4, $"{nameof(Bestowed)}", $"{Bestowed}",
+                        Good: Bestowed, Indent: indent + 2, Toggle: getDoDebug('B'));
+                    Debug.LastIndent = indent;
+                    return null;
+                }
+            }
+
+            Debug.Entry(4, $"Getting {nameof(WrassleID)} and {nameof(WrassleGearBlueprints)}...",
+                Indent: indent + 2, Toggle: getDoDebug('B'));
+
+            WrassleID wrassleID = wrassler.WrassleID;
+            Debug.Entry(4,
+                $"{nameof(wrassleID)}.{nameof(wrassleID.ID)}",
+                $"{wrassleID?.ID}",
+                Indent: indent + 3, Toggle: getDoDebug('B'));
+
+            if (wrassleID == null)
+            {
+                Debug.CheckNah(4, $"{nameof(wrassleID)} is null",
+                    Indent: indent + 3, Toggle: getDoDebug('B'));
+                Debug.LoopItem(4, $"{nameof(Bestowed)}", $"{Bestowed}",
+                    Good: Bestowed, Indent: indent + 2, Toggle: getDoDebug('B'));
+                Debug.LastIndent = indent;
                 return null;
             }
 
             Dictionary<string, string> wrassleGearBlueprints = new(WrassleGearBlueprints);
-            WrassleID wrassleID = wrassler.WrassleID;
 
+            if (wrassleGearBlueprints.IsNullOrEmpty())
+            {
+                Debug.Warn(2,
+                    $"{nameof(UD_QWE)}",
+                    $"{nameof(BestowWrassleGear)}",
+                    $"Failed get {nameof(WrassleGearBlueprints)}, "
+                    + $"list was empty",
+                    Indent: 0);
+                Debug.LoopItem(4, $"{nameof(Bestowed)}", $"{Bestowed}",
+                    Good: Bestowed, Indent: indent + 2, Toggle: getDoDebug('B'));
+                Debug.LastIndent = indent;
+                return null;
+            }
+            Debug.Entry(4, $"{nameof(wrassleGearBlueprints)}:",
+                Indent: indent + 2, Toggle: getDoDebug('B'));
+            foreach ((string slot, string blueprint) in wrassleGearBlueprints)
+            {
+                Debug.LoopItem(4, $"{nameof(slot)}: {slot}; {nameof(blueprint)}: {blueprint}",
+                    Indent: indent + 3, Toggle: getDoDebug('B'));
+            }
+
+            Debug.Entry(4, $"Getting hand, feet, and foot counts...",
+                Indent: indent + 2, Toggle: getDoDebug('B'));
             int handCount = (int)Math.Floor(WrassleCreature.Body.GetPartCount("Hand") / 2.0);
             int feetCount = WrassleCreature.Body.GetPartCount("Feet");
             int footCount = WrassleCreature.Body.GetPartCount("Foot");
 
-            Debug.Entry(4,
-                $"{nameof(Wrassler)}." +
-                $"{nameof(BestowWrassleGear)}() " +
-                $"Actor: {WrassleCreature.DebugName}",
-                Indent: 0, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"{nameof(handCount)}", $"{handCount}",
+                Indent: indent + 3, Toggle: getDoDebug('B'));
 
-            Debug.Entry(4,
-                $"{nameof(wrassleID)}",
-                $"{wrassleID}",
-                Indent: 0, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"{nameof(feetCount)}", $"{feetCount}",
+                Indent: indent + 3, Toggle: getDoDebug('B'));
 
+            Debug.LoopItem(4, $"{nameof(footCount)}", $"{footCount}",
+                Indent: indent + 3, Toggle: getDoDebug('B'));
+
+            Debug.Entry(4, $"Getting whether foot or feet...",
+                Indent: indent + 2, Toggle: getDoDebug('B'));
             string FootOrFeet = "Feet";
             if (feetCount * 2 < footCount) FootOrFeet = "Foot";
             if (feetCount * 2 == footCount && wrassleID.SeededRandomBool()) FootOrFeet = "Foot";
 
-            Debug.Entry(4,
-                $"handCount: {handCount}, " +
-                $"feetCount: {feetCount}, " +
-                $"footCount: {footCount}",
-                Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"{nameof(wrassleID.SeededRandomBool)}", $"{wrassleID.SeededRandomBool()}",
+                Indent: indent + 3, Toggle: getDoDebug('B'));
 
-            Debug.Entry(4,
-                $"SeededBool: {wrassleID.SeededRandomBool()}, " +
-                $"FootOrFeet: {FootOrFeet}",
-                Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"{nameof(FootOrFeet)}", $"{FootOrFeet}",
+                Indent: indent + 3, Toggle: getDoDebug('B'));
 
             List<GameObject> wrassleGearObjects = new();
+            Debug.Entry(4, $"Filling list of {wrassleGearObjects}...",
+                Indent: indent + 2, Toggle: getDoDebug('B'));
             foreach (BodyPart bodyPart in WrassleCreature.Body.GetParts())
             {
+                Debug.Divider(4, HONLY, Count: 40, Indent: indent + 3, Toggle: getDoDebug('B'));
+                Debug.LoopItem(4, $"{nameof(bodyPart)}", $"{bodyPart.DebugName()}",
+                    Indent: indent + 3, Toggle: getDoDebug('B'));
                 // no blueprint for part? Skip.
-                if (!wrassleGearBlueprints.ContainsKey(bodyPart.Type)) continue;
+                if (!wrassleGearBlueprints.ContainsKey(bodyPart.Type))
+                {
+                    Debug.CheckNah(4, $"no blueprint for {bodyPart.Type} slot",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
+                    continue;
+                }
 
-                // Only do foot or feet, not both. We only do foot slots if there are more of them than 2x the feet.
-                if ((bodyPart.Type == "Foot" || bodyPart.Type == "Feet") && bodyPart.Type != FootOrFeet) continue;
+                // Only do foot or feet, not both. We only do foot slots if there are more of them than 2x the feet
+                // (or, one or the other randomly if they're even).
+                if ((bodyPart.Type == "Foot" || bodyPart.Type == "Feet") && bodyPart.Type != FootOrFeet)
+                {
+                    Debug.CheckNah(4, $"{bodyPart.Type} slot, we're doing {FootOrFeet}",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
+                    continue;
+                }
 
                 // Already done half as many chairs as hands? Skip.
-                if (bodyPart.Type == "Hand" && handCount-- <= 0) continue;
+                if (bodyPart.Type == "Hand" && handCount-- <= 0)
+                {
+                    Debug.CheckNah(4, $"{bodyPart.Type} slots exceeded",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
+                    continue;
+                }
 
                 string blueprint = wrassleGearBlueprints[bodyPart.Type];
 
+                Debug.Entry(4, $"{nameof(blueprint)}", $"{blueprint}",
+                    Indent: indent + 4, Toggle: getDoDebug('B'));
+
                 if (bodyPart.Type == "Foot")
                 {
+                    Debug.Entry(4, $"{nameof(bodyPart)} is {bodyPart.Type}, getting {nameof(Laterality)}",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
                     if (bodyPart.Laterality.HasBit(Laterality.LEFT))
                     {
+                        Debug.LoopItem(4, $"{nameof(Laterality)}", $"Left",
+                            Indent: indent + 5, Toggle: getDoDebug('B'));
                         blueprint += "Left";
                     }
                     if (bodyPart.Laterality.HasBit(Laterality.RIGHT))
                     {
+                        Debug.LoopItem(4, $"{nameof(Laterality)}", $"Right",
+                            Indent: indent + 5, Toggle: getDoDebug('B'));
                         blueprint += "Right";
                     }
+                    Debug.Entry(4, $"{nameof(blueprint)}", $"{blueprint}",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
                 }
 
                 string context = $"{nameof(WrassleID)}::{wrassleID}";
+                Debug.Entry(4, $"{nameof(context)} set for preloading {nameof(WrassleID)}", $"{context}",
+                    Indent: indent + 4, Toggle: getDoDebug('B'));
+                Debug.Entry(4, $"Creating {nameof(WrassleGear)} object...",
+                    Indent: indent + 4, Toggle: getDoDebug('B'));
                 GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint, Context: context);
-                
-                TinkeringHelpers.CheckMakersMark(wrassleGearObject, WrassleCreature, null, null);
 
+                Debug.Entry(4, $"Attempting to configure {nameof(WrassleGear)}...",
+                    Indent: indent + 4, Toggle: getDoDebug('B'));
                 if (wrassleGearObject != null && wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
                 {
+                    Debug.Entry(4, $"{nameof(TinkeringHelpers.CheckMakersMark)}...",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
+                    TinkeringHelpers.CheckMakersMark(wrassleGearObject, WrassleCreature, null, null);
+
                     if (wrassleGearObject.HasPart<MeleeWeapon>())
                     {
                         wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 1);
+                        Debug.LoopItem(4, $"AlwaysEquipAsWeapon", $"{wrassleGearObject.GetIntProperty("AlwaysEquipAsWeapon")}",
+                            Good: wrassleGearObject.GetIntProperty("AlwaysEquipAsWeapon") > 0, Indent: indent + 4, Toggle: getDoDebug('B'));
                     }
                     if (wrassleGearObject.HasPart<Armor>())
                     {
-                        wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
+                        if (!wrassleGearObject.HasPart<MeleeWeapon>())
+                        {
+                            wrassleGearObject.SetIntProperty("AlwaysEquipAsWeapon", 0, true);
+                            Debug.LoopItem(4, $"AlwaysEquipAsWeapon", $"{wrassleGearObject.GetIntProperty("AlwaysEquipAsWeapon")}",
+                                Good: wrassleGearObject.GetIntProperty("AlwaysEquipAsWeapon") == 0, Indent: indent + 4, Toggle: getDoDebug('B'));
+                        }
                         wrassleGearObject.SetIntProperty("AlwaysEquipAsArmor", 1);
+                        Debug.LoopItem(4, $"AlwaysEquipAsArmor", $"{wrassleGearObject.GetIntProperty("AlwaysEquipAsArmor")}",
+                            Good: wrassleGearObject.GetIntProperty("AlwaysEquipAsArmor") > 0, Indent: indent + 4, Toggle: getDoDebug('B'));
                     }
 
                     if (WrassleCreature.HasPart<GigantismPlus>())
                     {
-                        wrassleGearObject.ApplyModification("ModGigantic", true, null, true);
+                        wrassleGearObject.ApplyModification(nameof(ModGigantic), true, null, true);
+                        Debug.LoopItem(4, $"{nameof(ModGigantic)}", $"{wrassleGearObject.HasPart<ModGigantic>()}",
+                            Good: wrassleGearObject.HasPart<ModGigantic>(), Indent: indent + 4, Toggle: getDoDebug('B'));
                     }
 
                     if (!wrassleID.IsSyncedWith(wrassleGear.WrassleID) && TrySyncWrassleID(wrassleID, wrassleGear.WrassleID))
                     {
+                        Debug.CheckYeh(4, $"Successfully synched {nameof(wrassleGear)}.{nameof(WrassleID)} with {nameof(Wrassler)}",
+                            Good: wrassleGearObject.HasPart<ModGigantic>(), Indent: indent + 4, Toggle: getDoDebug('B'));
                         wrassleGear.RandomizeTile = true;
                         wrassleGear.ApplyFlair();
                     }
 
-                    wrassleGearObjects.TryAdd(wrassleGearObject);
-                    if (!bodyPart.Equip(wrassleGearObject, Silent: true)) wrassleGearObject.Obliterate();
+                    if (!bodyPart.Equip(wrassleGearObject, Silent: true))
+                    {
+                        Debug.CheckNah(4, $"Couldn't equip {wrassleGearObject?.DebugName ?? NULL} in {bodyPart.Type} slot",
+                            Indent: indent + 4, Toggle: getDoDebug('B'));
+                        wrassleGearObject.Obliterate();
+                    }
+                    else
+                    {
+                        Debug.CheckYeh(4, $"Equipped {wrassleGearObject?.DebugName ?? NULL} in {bodyPart.Type} slot",
+                            Indent: indent + 4, Toggle: getDoDebug('B'));
+                        wrassleGearObjects.TryAdd(wrassleGearObject);
+                    }
+                }
+                else
+                {
+                    Debug.CheckNah(4, $"{wrassleGearObject?.DebugName ?? NULL} was null or lacked {nameof(WrassleGear)} part",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
                 }
             }
+            Debug.Divider(4, HONLY, Count: 40, Indent: indent + 3, Toggle: getDoDebug('B'));
 
             if (WrassleCreature.IsPlayer())
             {
@@ -762,17 +963,31 @@ namespace XRL.World.Capabilities
                 metalFoldingChair.Obliterate();
             }
 
+            Debug.Entry(4, $"Filling list of rejected {wrassleGearObjects}...",
+                Indent: indent + 2, Toggle: getDoDebug('B'));
             List<GameObject> EquippedList = WrassleCreature.GetEquippedObjects();
             foreach (GameObject reject in wrassleGearObjects)
             {
+                Debug.Divider(4, HONLY, Count: 40, Indent: indent + 3, Toggle: getDoDebug('B'));
+                Debug.LoopItem(4, $"{nameof(WrassleGear)}", $"{reject?.DebugName ?? NULL}",
+                    Indent: indent + 3, Toggle: getDoDebug('B'));
                 if (reject != null && !EquippedList.Contains(reject))
                 {
+                    Debug.CheckYeh(4, $"{nameof(reject)} is not equipped, {nameof(GameObject.Obliterate)}",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
                     WrassleCreature.Inventory.RemoveObjectFromInventory(reject);
                     reject.Obliterate();
+                    continue;
                 }
+                Debug.CheckNah(4, $"{nameof(WrassleGear)} is equipped, keeping",
+                    Indent: indent + 4, Toggle: getDoDebug('B'));
             }
+            Debug.Divider(4, HONLY, Count: 40, Indent: indent + 3, Toggle: getDoDebug('B'));
 
             Bestowed = true;
+            Debug.LoopItem(4, $"{nameof(Bestowed)}", $"{Bestowed}",
+                Good: Bestowed, Indent: indent + 2, Toggle: getDoDebug('B'));
+            Debug.LastIndent = indent;
             return wrassler;
         }
     }

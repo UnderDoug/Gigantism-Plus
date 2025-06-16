@@ -187,6 +187,7 @@ namespace HNPS_GigantismPlus
             { nameof(IWrassleModification), true },
             { nameof(Wrassler), true },
             { nameof(WrassleGear), true },
+            { nameof(ModWrassleVibrant), true },
         };
 
         public static bool getClassDoDebug(string Class)

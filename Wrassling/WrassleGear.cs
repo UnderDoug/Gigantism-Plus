@@ -47,8 +47,12 @@ namespace XRL.World.Parts
         public bool UseColors;
         public bool ChangeTileColor;
         public bool ChangeDetailColor;
-        public string TileColor => PrimaryColor;
-        public string DetailColor => SecondaryColor;
+
+        private string _TileColor;
+        public string TileColor => _TileColor ??= PrimaryColor;
+
+        private string _DetailColor;
+        public string DetailColor => _DetailColor ??= SecondaryColor;
         
         public string RandomTiles;
         public bool RandomizeTile;
@@ -80,14 +84,8 @@ namespace XRL.World.Parts
             base.OnUpdatedWrassleID();
             if (ParentObject != null)
             {
-                List<IWrassleModification> wrassleMods = ParentObject.GetPartsDescendedFrom<IWrassleModification>();
-                if (!wrassleMods.IsNullOrEmpty())
-                {
-                    foreach (IWrassleModification wrassleMod in wrassleMods)
-                    {
-                        wrassleMod.SetWrassleID(WrassleID);
-                    }
-                }
+                _TileColor = null;
+                _DetailColor = null;
                 ApplyFlair();
             }
         }
@@ -146,15 +144,10 @@ namespace XRL.World.Parts
         {
             if (ParentObject != null && (IsVibrant || Force))
             {
-                
                 if (!ParentObject.TryGetPart(out ModWrassleVibrant wrassleVibrantMod))
                 {
                     wrassleVibrantMod = new(WrassleID);
                     ParentObject.ApplyModification(wrassleVibrantMod, Actor: AppliedBy, Creation: Creation);
-                }
-                else
-                {
-                    wrassleVibrantMod.OnUpdatedWrassleID();
                 }
             }
         }
@@ -188,9 +181,9 @@ namespace XRL.World.Parts
         {
             if (E.Object != null && E.Object == ParentObject && E.Object.InheritsFrom("BaseWrassleGear"))
             {
+                int indent = Debug.LastIndent;
                 GameObject WrassleObject = E.Object;
-                string wrassleContext = nameof(WrassleID) + "::";
-                if (E.Context.StartsWith(wrassleContext) && Guid.TryParse(E.Context.Substring(wrassleContext.Length), out Guid fromWrassleID))
+                if (UD_QWE.TryDecodeWrassleIDContext(E.Context, out Guid fromWrassleID))
                 {
                     WrassleID.SetID(fromWrassleID);
                 }
@@ -199,13 +192,15 @@ namespace XRL.World.Parts
                     $"{typeof(WrassleGear).Name}." +
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{WrassleObject.ID}:{WrassleObject.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " +
-                    $"TileColor: &&{PrimaryColor.Quote().Color("Y")}, DetailColor: {SecondaryColor.Quote().Color("Y")}",
-                    Indent: 0, Toggle: getDoDebug());
+                    $"TileColor: {tileColor.Quote()}, DetailColor: {SecondaryColor.Quote()}",
+                    Indent: indent + 1, Toggle: getDoDebug());
                 Debug.Entry(4,
                     $"Tile: {Tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
-                    Indent: 0, Toggle: getDoDebug());
+                    Indent: indent + 2, Toggle: getDoDebug());
 
                 ApplyFlair();
+
+                Debug.LastIndent = indent;
             }
             return base.HandleEvent(E);
         }
@@ -213,16 +208,18 @@ namespace XRL.World.Parts
         {
             if (E.Actor.TryGetPart(out Wrassler wrassler) && E.Item != null)
             {
+                int indent = Debug.LastIndent;
+
                 GameObject Item = E.Item;
                 GameObject Actor = E.Actor;
                 if (E.Item.InheritsFrom("FoldingChair"))
                 {
                     Debug.Entry(4,
                         $"{typeof(WrassleGear).Name}." +
-                        $"{nameof(HandleEvent)}({typeof(EquippedEvent).Name} " +
-                        $"E.Item: [{Item.ID}:{Item.ShortDisplayNameStripped}] " +
-                        $"E.Actor: [{Actor.ID}:{Actor.ShortDisplayNameStripped}]" +
-                        $") WrassleID: {WrassleID}",
+                        $"{nameof(HandleEvent)}({nameof(EquippedEvent)} " +
+                        $"E.Item: [{Item.ID}:{Item?.DebugName ?? NULL}] " +
+                        $"E.Actor: [{Actor.ID}:{Actor?.DebugName ?? NULL}]" +
+                        $") WrassleID: {WrassleID.GetID(Silent: true)}",
                         Indent: 0, Toggle: getDoDebug());
 
                     if (Actor.IsPlayer() && Item.TryGetPart(out Examiner examiner) && !(wrassler.KnowsChairs = Actor.Understood(examiner)))
@@ -235,9 +232,12 @@ namespace XRL.World.Parts
                         wrassler.KnowsChairs = Actor.Understood(examiner);
                     }
                 }
-                if (Item.InheritsFrom("WrassleGear") 
-                    && Item.TryGetPart(out Armor armor))
+                if (Item.InheritsFrom("WrassleGear") && Item.TryGetPart(out Armor armor))
                 {
+                    Debug.Entry(4,
+                        $"{ParentObject?.DebugName ?? NULL} has {nameof(Armor)} part",
+                        Indent: indent + 1, Toggle: getDoDebug('X'));
+
                     GameObject defaultBehavior = Item.EquippedOn().DefaultBehavior;
                     if (defaultBehavior != null && defaultBehavior.TryGetPart(out MeleeWeapon defaultMeleeWeapon))
                     {
@@ -249,6 +249,8 @@ namespace XRL.World.Parts
                         }
                     }
                 }
+
+                Debug.LastIndent = indent;
             }
             return base.HandleEvent(E);
         }
@@ -416,7 +418,8 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             WrassleGear wrassleGear = base.DeepCopy(Parent, MapInv) as WrassleGear;
-            // wrassleGear._WrassleID = Guid.NewGuid();
+            wrassleGear._TileColor = null;
+            wrassleGear._DetailColor = null;
             return wrassleGear;
         }
 

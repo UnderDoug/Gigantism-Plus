@@ -1030,7 +1030,7 @@ namespace XRL.World.ObjectBuilders
 
             description.Short = preDesc + description._Short;
 
-            Creature.SetStringProperty("GigantismPlusColorChange", "true");
+            Creature.SetStringProperty(WRASSLER_COLORCHANGE_PROP, "true");
 
             Debug.LoopItem(4, 
                 $"<Description>?", 

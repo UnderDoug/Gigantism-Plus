@@ -1,34 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-
-using Genkit;
+﻿using Genkit;
 using HistoryKit;
+using NAudio.CoreAudioApi;
 using Qud.API;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using XRL;
-using XRL.UI;
-using XRL.Rules;
-using XRL.World;
-using XRL.World.Capabilities;
-using XRL.World.ObjectBuilders;
-using XRL.World.ZoneBuilders;
-using XRL.World.WorldBuilders;
-using XRL.World.Parts;
-using XRL.World.Parts.Mutation;
-using XRL.World.Anatomy;
-using XRL.World.Skills.Cooking;
-using XRL.World.Conversations;
 using XRL.Language;
 using XRL.Names;
+using XRL.Rules;
+using XRL.UI;
 using XRL.Wish;
-
-using static XRL.World.ZoneBuilderPriority;
-
-using static HNPS_GigantismPlus.Utils;
+using XRL.World;
+using XRL.World.Anatomy;
+using XRL.World.Capabilities;
+using XRL.World.Conversations;
+using XRL.World.ObjectBuilders;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+using XRL.World.Skills.Cooking;
+using XRL.World.WorldBuilders;
+using XRL.World.ZoneBuilders;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
+using static XRL.World.ZoneBuilderPriority;
 
 namespace HNPS_GigantismPlus
 {
@@ -187,13 +184,12 @@ namespace HNPS_GigantismPlus
                         if (UD_QWE.TrySyncWrassleID(UniqueGiant, rope))
                         {
                             Debug.CheckYeh(4, $"Wrassle ID's synched", Indent: 3, Toggle: getDoDebug());
-                            wrassleGear.SetDetailColor(Force: true);
+                            // wrassleGear.SetDetailColor(Force: true); // Might not need this now.
                         }
                         else
                         {
                             Debug.CheckNah(4, $"Wrassle ID's failed to sync", Indent: 3, Toggle: getDoDebug());
                         }
-
                     }
                     else
                     {
@@ -208,6 +204,43 @@ namespace HNPS_GigantismPlus
             else
             {
                 Debug.CheckNah(4, $"No Ropes", Indent: 2, Toggle: getDoDebug());
+            }
+
+            Debug.Entry(4, $"Getting Folding Chairs and Attempting to assign Color...", Indent: 1, Toggle: getDoDebug());
+            List<GameObject> chairsList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("FoldingChair");
+            if (!chairsList.IsNullOrEmpty())
+            {
+                Debug.CheckYeh(4, $"Got Chairs", Indent: 2, Toggle: getDoDebug());
+                foreach (GameObject chair in chairsList)
+                {
+                    Debug.LoopItem(4, $"{nameof(chair)}: {chair?.DebugName}", Indent: 2, Toggle: getDoDebug());
+                    if (!chair.IsGiganticEquipment)
+                    {
+                        Debug.CheckNah(4, $"{nameof(chair)} not {nameof(chair.IsGiganticEquipment)}, skipping", Indent: 3, Toggle: getDoDebug());
+                        continue;
+                    }
+                    if (chair.TryGetPart(out WrassleGear wrassleGear))
+                    {
+                        Debug.CheckYeh(4, $"{nameof(chair)} has {nameof(WrassleGear)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.Entry(4, $"Attempting to sync WrassleIDs...", Indent: 3, Toggle: getDoDebug());
+                        if (UD_QWE.TrySyncWrassleID(UniqueGiant, chair))
+                        {
+                            Debug.CheckYeh(4, $"Wrassle ID's synched", Indent: 3, Toggle: getDoDebug());
+                        }
+                        else
+                        {
+                            Debug.CheckNah(4, $"Wrassle ID's failed to sync", Indent: 3, Toggle: getDoDebug());
+                        }
+                    }
+                    else
+                    {
+                        Debug.CheckNah(4, $"{nameof(chair)} lacks {nameof(WrassleGear)}", Indent: 3, Toggle: getDoDebug());
+                    }
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"No Chairs", Indent: 2, Toggle: getDoDebug());
             }
         } //!-- public override void OnAfterBuild(JoppaWorldBuilder builder)
 

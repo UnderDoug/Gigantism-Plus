@@ -26,7 +26,6 @@ namespace HNPS_GigantismPlus
             };
             List<object> dontList = new()
             {
-                "WID"   // WrassleID
             };
 
             if (what != null && doList.Contains(what))
@@ -49,6 +48,8 @@ namespace HNPS_GigantismPlus
 
         public override WrassleID GetFor()
         {
+            // don't try and output the ID in here, it creates an infinite loop.
+
             int indent = Debug.LastIndent;
 
             Debug.Entry(4, $"override {nameof(GetFor)}()",

@@ -48,7 +48,8 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public string DetailColor => SecondaryColor;
+        private string _DetailColor;
+        public string DetailColor => _DetailColor ??= SecondaryColor;
         public const int ICON_COLOR_PRIORITY = 110;
 
         public bool Bestow = true;
@@ -111,6 +112,12 @@ namespace XRL.World.Parts
             base.AddedAfterCreation();
         }
 
+        public override void OnUpdatedWrassleID()
+        {
+            base.OnUpdatedWrassleID();
+            _DetailColor = null;
+        }
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -134,36 +141,6 @@ namespace XRL.World.Parts
             {
                 GameObject Actor = E.Object;
 
-                bool noWrassleGear = ParentObject.HasTagOrProperty("NoWrassleGear");
-                bool isTemplar = Actor.InheritsFrom("BaseTemplar");
-                
-                int bestowChance = ParentObject.GetIntProperty("WrassleGearBestowChance", -1);
-
-                if (bestowChance < 0 
-                 && (int.TryParse(ParentObject.GetStringProperty("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0)
-                 && (int.TryParse(ParentObject.GetTag("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0))
-                {
-                    bestowChance = 100;
-                }
-
-                bool bestowByChance = bestowChance.in100();
-
-                bool shouldBestow = 
-                    Bestow
-                 && bestowByChance
-                 && !noWrassleGear
-                 && !isTemplar;
-
-                if (shouldBestow)
-                {
-                    UD_QWE.BestowWrassleGear(ParentObject, out BeenBestowed);
-                }
-
-                if (!Actor.TryGetPart(out HasMakersMark hasMakersMark))
-                {
-                    hasMakersMark = Actor.RequirePart<HasMakersMark>();
-                }
-                hasMakersMark.Color = SecondaryColor;
             }
             return base.HandleEvent(E);
         }
@@ -183,6 +160,39 @@ namespace XRL.World.Parts
                     $"Cell: [{E.Cell?.Location}]",
                     Indent: 1, Toggle: getDoDebug());
                 Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
+
+
+                bool noWrassleGear = Actor.HasTagOrProperty("NoWrassleGear");
+                bool isTemplar = Actor.InheritsFrom("BaseTemplar");
+
+                int bestowChance = Actor.GetIntProperty("WrassleGearBestowChance", -1);
+
+                if (bestowChance < 0
+                 && (int.TryParse(Actor.GetStringProperty("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0)
+                 && (int.TryParse(Actor.GetTag("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0))
+                {
+                    bestowChance = 100;
+                }
+
+                bool bestowByChance = bestowChance.in100();
+
+                bool shouldBestow =
+                    Bestow
+                 && bestowByChance
+                 && !noWrassleGear
+                 && !isTemplar;
+
+                if (shouldBestow)
+                {
+                    BestowWrassleGear();
+                }
+
+                if (!Actor.TryGetPart(out HasMakersMark hasMakersMark))
+                {
+                    hasMakersMark = Actor.RequirePart<HasMakersMark>();
+                }
+                hasMakersMark.Color = SecondaryColor;
+
 
                 List<GameObject> EquippedList = Actor.GetEquippedObjects();
                 List<GameObject> wrassleGearObjects = Actor.GetInventory();
@@ -226,7 +236,7 @@ namespace XRL.World.Parts
                 {
                     if (item.HasPart<Armor>() && item.TryGetPart(out WrassleGear wrassleGear))
                     {
-                        foundGear = wrassleGear.WrassleID == WrassleID;
+                        foundGear = WrassleID.IsSyncedWith(wrassleGear.WrassleID);
                         if (foundGear)
                         {
                             break;
@@ -259,7 +269,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             Wrassler wrassler = base.DeepCopy(Parent, MapInv) as Wrassler;
-            // wrassler._WrassleID = Guid.NewGuid();
+            wrassler._DetailColor = null;
             return wrassler;
         }
 

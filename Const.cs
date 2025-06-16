@@ -48,6 +48,7 @@ namespace HNPS_GigantismPlus
         public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentManager::IntProp:Priority";
 
         public const string NATURAL_EQUIPMENT = "Natural Equipment";
+        public const string WRASSLE_GEAR_MODS = "Wrassle Gear Mods";
 
         public const string MODGIGANTIC_DESCRIPTIONBUCKET = "GigantismPlusModGiganticDescriptions";
 

@@ -1,22 +1,29 @@
-﻿using AiUnity.NLog.Core.Time;
-using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
 using XRL.World.ZoneBuilders;
+
+using static XRL.UD_QudWrasslingEntertainment;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static XRL.UD_QudWrasslingEntertainment;
+
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class IWrassleModification : IModification, IWrassle
+    public abstract class IWrassleModification 
+        : IModification
+        , IWrassle
+        , IModEventHandler<BeforeDescribeModificationEvent<IWrassleModification>>
+        , IModEventHandler<DescribeModificationEvent<IWrassleModification>>
     {
         private static bool doDebug => getClassDoDebug(nameof(IWrassleModification));
         private static bool getDoDebug(object what = null)
@@ -24,6 +31,7 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
+                'X',    // Trace
             };
             List<object> dontList = new()
             {
@@ -43,8 +51,13 @@ namespace XRL.World.Parts
         private WrassleID _WrassleID;
         public virtual WrassleID WrassleID => _WrassleID ??= GetWrassleID();
 
-        public string PrimaryColor => WrassleID?.PrimaryColor;
-        public string SecondaryColor => WrassleID?.SecondaryColor;
+        private string _PrimaryColor;
+        public string PrimaryColor => _PrimaryColor ??= WrassleID?.PrimaryColor;
+
+        private string _SecondaryColor;
+        public string SecondaryColor => _SecondaryColor ??= WrassleID?.SecondaryColor;
+
+        private Dictionary<int, string> WrassleShaderCache;
 
         public string EquipmentFrameColor => UD_QWE.GetEquipmentFrameColor(WrassleID.ID);
 
@@ -52,9 +65,11 @@ namespace XRL.World.Parts
 
         public IWrassleModification()
         {
+            WrassleShaderCache = new();
             PreloadedWrassleID = Guid.Empty;
         }
         public IWrassleModification(Guid ID)
+            : this()
         {
             PreloadedWrassleID = ID;
         }
@@ -69,6 +84,7 @@ namespace XRL.World.Parts
         public IWrassleModification(int Tier)
             : base(Tier)
         {
+            WrassleShaderCache = new();
             PreloadedWrassleID = Guid.Empty;
         }
         public IWrassleModification(int Tier, Guid ID)
@@ -87,7 +103,6 @@ namespace XRL.World.Parts
 
         public override void Attach()
         {
-
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(IWrassleModification)}."
@@ -155,7 +170,7 @@ namespace XRL.World.Parts
                 $"* {nameof(IWrassle)}."
                 + $"{nameof(OnUpdatedWrassleID)}()",
                 $"{WrassleID.ID}",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             Debug.LastIndent = indent;
         }
@@ -193,14 +208,83 @@ namespace XRL.World.Parts
 
         public virtual string GetWrassleShaderFor(string Word)
         {
-            return UD_QWE.GetWrassleShaderForWord(WrassleID, Word);
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(IWrassleModification)}."
+                + $"{nameof(GetWrassleShaderFor)}("
+                + $"{nameof(Word)}: {Word ?? NULL})",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
+            if (Word.IsNullOrEmpty() || Word.Length < 1)
+            {
+                Debug.CheckNah(4, $"{nameof(Word)} empty or null", Indent: indent + 2, Toggle: getDoDebug('X'));
+                Debug.LastIndent = indent;
+                return null;
+            }
+            if ((WrassleShaderCache ??= new()).IsNullOrEmpty() || !WrassleShaderCache.ContainsKey(Word.Length))
+            {
+                Debug.CheckYeh(4, $"{nameof(WrassleShaderCache)} is either empty or doesn't contain key {Word.Length}", 
+                    Indent: indent + 2, Toggle: getDoDebug('X'));
+                string shader = UD_QWE.GetWrassleShaderForWord(WrassleID, Word);
+                if (shader.StartsWith(" sequence"))
+                {
+                    Debug.CheckNah(4, $"{nameof(shader)} functionally empty", Indent: indent + 2, Toggle: getDoDebug('X'));
+                    Debug.LastIndent = indent;
+                    return null;
+                }
+                WrassleShaderCache.TryAdd(Word.Length, shader);
+            }
+
+            Debug.Entry(4, $"{nameof(GetWrassleShaderFor)}({Word})", $"{WrassleShaderCache[Word.Length].Quote()}",
+                Indent: indent + 2, Toggle: getDoDebug('X'));
+            Debug.LastIndent = indent;
+            return WrassleShaderCache[Word.Length];
+        }
+
+        public virtual bool WantModDisplayName()
+        {
+            return false;
+        }
+        public virtual bool WantModShortDescription()
+        {
+            return false;
+        }
+        public virtual string GetAdjective()
+        {
+            return "adjective?";
+        }
+        public virtual string GetColoredAdjective()
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(IWrassleModification)}."
+                + $"{nameof(GetColoredAdjective)}()",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
+            string shader = null;
+            string coloredAdjective = GetAdjective();
+            if ((shader = GetWrassleShaderFor(GetAdjective())) != null)
+            {
+                coloredAdjective = coloredAdjective.Color(shader);
+            }
+
+            Debug.LastIndent = indent;
+            return coloredAdjective;
+        }
+        public virtual string GetInstanceDescription(GameObject Object = null)
+        {
+            return DescribeModificationEvent<IWrassleModification>
+                .Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
+                .Process();
         }
 
         public override bool WantEvent(int ID, int Cascade)
         {
             return base.WantEvent(ID, Cascade)
                 || ID == UpdateWrassleIDEvent.ID
-                || ID == WrassleIDUpdatedEvent.ID;
+                || ID == WrassleIDUpdatedEvent.ID
+                || (WantModDisplayName() && ID == PooledEvent<GetDisplayNameEvent>.ID)
+                || (WantModShortDescription() && ID == GetShortDescriptionEvent.ID);
         }
         public virtual bool HandleEvent(UpdateWrassleIDEvent E)
         {
@@ -208,7 +292,29 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(WrassleIDUpdatedEvent E)
         {
-            OnUpdatedWrassleID();
+            if (WrassleID != null && WrassleID.ID != E.FromWrassleID)
+            {
+                _PrimaryColor = null;
+                _SecondaryColor = null;
+                WrassleShaderCache = new();
+                OnUpdatedWrassleID();
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetDisplayNameEvent E)
+        {
+            if (WantModDisplayName() && E.Understood() && !E.Object.HasProperName)
+            {
+                E.AddAdjective(GetColoredAdjective());
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            if (WantModShortDescription())
+            {
+                E.Postfix.AppendRules(GetInstanceDescription(ParentObject));
+            }
             return base.HandleEvent(E);
         }
 
@@ -237,9 +343,17 @@ namespace XRL.World.Parts
                 PreloadedWrassleID = Reader.ReadGuid();
             }
         }
+        public override void FinalizeRead(SerializationReader Reader)
+        {
+            base.FinalizeRead(Reader);
+            OnUpdatedWrassleID();
+        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             IWrassleModification wrassleMod = base.DeepCopy(Parent, MapInv) as IWrassleModification;
+            wrassleMod._PrimaryColor = null;
+            wrassleMod._SecondaryColor = null;
+            wrassleMod.WrassleShaderCache = new();
             return wrassleMod;
         }
     }

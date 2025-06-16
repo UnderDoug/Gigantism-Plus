@@ -26,7 +26,7 @@ namespace HNPS_GigantismPlus
             };
             List<object> dontList = new()
             {
-                "WID"   // WrassleID
+                'R'     // Reset
             };
 
             if (what != null && doList.Contains(what))
@@ -65,7 +65,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(Reset)}()",
-                Indent: indent + 1, Toggle: getDoDebug('X'));
+                Indent: indent + 1, Toggle: getDoDebug('R'));
 
             base.Reset();
             WrassleID = null;
@@ -76,13 +76,14 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
         }
 
-        public static T FromPool(WrassleID WrassleID, GameObject WrassleObject, string Context = null)
+        public static T FromPool(WrassleID WrassleID, GameObject WrassleObject, Guid FromWrassleID = default, string Context = null)
         {
             T E = FromPool();
             if (WrassleID != null && WrassleObject != null)
             {
                 E.WrassleID = WrassleID;
                 E.WrassleObject = WrassleObject;
+                E.FromWrassleID = FromWrassleID;
                 E.Context = Context;
                 return E;
             }
@@ -97,8 +98,8 @@ namespace HNPS_GigantismPlus
             {
                 E.WrassleObject = WrassleObject;
                 E.WrassleID = null;
-                E.Context = Context;
                 E.FromWrassleID = FromWrassleID;
+                E.Context = Context;
                 return E;
             }
             E.Reset();
@@ -112,7 +113,7 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(GetFor)}("
                 + $"{nameof(WrassleObject)}: {WrassleObject?.DebugName}, "
                 + $"{nameof(Context)}: {Context?.Quote()})",
-                Indent: 0, Toggle: getDoDebug('X'));
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             T E = FromPool(WrassleObject, FromWrassleID, Context);
 
@@ -150,7 +151,7 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return wrassleID;
         }
-        public static T Send(WrassleID WrassleID, GameObject WrassleObject, string Context = null)
+        public static T Send(WrassleID WrassleID, GameObject WrassleObject, Guid FromWrassleID = default, string Context = null)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
@@ -159,9 +160,9 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(WrassleID)}, "
                 + $"{nameof(WrassleObject)}: {WrassleObject?.DebugName}, "
                 + $"{nameof(Context)}: {Context?.Quote()})",
-                Indent: 0, Toggle: getDoDebug('X'));
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
-            T E = FromPool(WrassleID, WrassleObject, Context);
+            T E = FromPool(WrassleID, WrassleObject, FromWrassleID, Context);
 
             E.CheckFor();
 
@@ -185,9 +186,9 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(WrassleID)}, "
                 + $"{nameof(WrassleObject)}: {WrassleObject?.DebugName}, "
                 + $"{nameof(Context)}: {Context?.Quote()})",
-                Indent: indent, Toggle: getDoDebug('X'));
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
-            T E = FromPool(WrassleID, WrassleObject, Context);
+            T E = FromPool(WrassleID, WrassleObject, default, Context);
 
             bool checkResult = E.CheckFor();
             E.Reset();

@@ -47,6 +47,8 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
+        public override int Priority => PRIORITY_HIGH;
+
         [SerializeField]
         private Guid _ID;
         public virtual Guid ID 
@@ -55,8 +57,11 @@ namespace XRL.World.Parts
             set => SetID(value);
         }
 
-        public string PrimaryColor => UD_QWE.GetPrimaryWrassleColor(this);
-        public string SecondaryColor => UD_QWE.GetSecondaryWrassleColor(this);
+        private string _PrimaryColor;
+        public string PrimaryColor => _PrimaryColor ??= UD_QWE.GetPrimaryWrassleColor(this);
+
+        private string _SecondaryColor;
+        public string SecondaryColor => _SecondaryColor ??= UD_QWE.GetSecondaryWrassleColor(this);
 
         public WrassleID()
         {
@@ -74,14 +79,15 @@ namespace XRL.World.Parts
         {
         }
 
-        public Guid GetID(bool SuppressEvent = false)
+        public Guid GetID(bool SuppressEvent = false, bool Silent = false)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(WrassleID)}."
                 + $"{nameof(GetID)}("
-                + $"{nameof(SuppressEvent)}: {SuppressEvent})",
-                Indent: indent + 1, Toggle: getDoDebug('X'));
+                + $"{nameof(SuppressEvent)}: {SuppressEvent}, "
+                + $"{nameof(Silent)}: {Silent})",
+                Indent: indent + 1, Toggle: _ID == Guid.Empty || (!Silent && getDoDebug('X')));
 
             if (_ID == Guid.Empty)
             {
@@ -104,10 +110,11 @@ namespace XRL.World.Parts
 
             if (SuppressEvent || UpdateWrassleIDEvent.CheckFor(this, ParentObject))
             {
+                Guid oldID = _ID;
                 _ID = Value;
                 if (!SuppressEvent)
                 {
-                    WrassleIDUpdatedEvent.Send(this, ParentObject);
+                    WrassleIDUpdatedEvent.Send(this, ParentObject, oldID);
                 }
             }
 
@@ -118,13 +125,13 @@ namespace XRL.World.Parts
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"@ {nameof(WrassleID)}."
+                $"* {nameof(WrassleID)}."
                 + $"{nameof(SetID)}("
                 + $"{nameof(WrassleID)} {nameof(Source)}, "
                 + $"{nameof(SuppressEvent)}: {SuppressEvent})",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
-            Guid setID = SetID(Source.ID, SuppressEvent);
+            Guid setID = SetID(Source.GetID(Silent: true), SuppressEvent);
 
             Debug.LastIndent = indent;
             return setID;
@@ -133,7 +140,7 @@ namespace XRL.World.Parts
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"@ {nameof(WrassleID)}."
+                $"* {nameof(WrassleID)}."
                 + $"{nameof(SetID)}("
                 + $"{nameof(IWrassle)} {nameof(WrasslePart)}, "
                 + $"{nameof(SuppressEvent)}: {SuppressEvent})",
@@ -148,7 +155,7 @@ namespace XRL.World.Parts
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"@ {nameof(WrassleID)}."
+                $"* {nameof(WrassleID)}."
                 + $"{nameof(ClearID)}("
                 + $"{nameof(SuppressEvent)}: {SuppressEvent})",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
@@ -162,7 +169,7 @@ namespace XRL.World.Parts
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"@ {nameof(WrassleID)}."
+                $"* {nameof(WrassleID)}."
                 + $"{nameof(NewID)}("
                 + $"{nameof(SuppressEvent)}: {SuppressEvent})",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
@@ -185,9 +192,9 @@ namespace XRL.World.Parts
         }
         public virtual bool PullWrassleID(WrassleID FromWrassleID)
         {
-            Guid oldWrassleID = ID;
+            Guid oldWrassleID = GetID(Silent: true);
             
-            if (SetID(FromWrassleID) != oldWrassleID)
+            if (SetID(FromWrassleID.GetID(Silent: true)) != oldWrassleID)
             {
                 return true;
             }
@@ -200,7 +207,7 @@ namespace XRL.World.Parts
             {
                 return null;
             }
-            return UD_QWE.GetWrassleShaderForWord(ID, Word);
+            return UD_QWE.GetWrassleShaderForWord(GetID(Silent: true), Word);
         }
         
         public virtual void OnUpdatedID()
@@ -209,15 +216,18 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"* {nameof(WrassleID)}."
                 + $"{nameof(OnUpdatedID)}()",
-                $"{ID}",
+                $"{GetID(Silent: true)}",
                 Indent: indent + 1, Toggle: getDoDebug());
+
+            _PrimaryColor = null;
+            _SecondaryColor = null;
 
             Debug.LastIndent = indent;
         }
 
         public bool SeededRandomBool(int? Stepper = null, int ChanceIn = 2)
         {
-            return ID.SeededRandomBool(Stepper, ChanceIn);
+            return GetID(Silent: true).SeededRandomBool(Stepper, ChanceIn);
         }
 
         public override void Attach()
@@ -231,7 +241,7 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"{nameof(ParentObject)}", $"{ParentObject?.DebugName ?? NULL}",
                 Indent: indent + 2, Toggle: getDoDebug('X'));
 
-            Debug.Entry(4, $"{nameof(WrassleID)}.{nameof(ID)}", $"{ID}",
+            Debug.Entry(4, $"{nameof(WrassleID)}.{nameof(ID)}", $"{GetID(Silent: true)}",
                 Indent: indent + 2, Toggle: getDoDebug('X'));
 
             Debug.Entry(4, $"calling base.{nameof(Attach)}()",
@@ -272,7 +282,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"{nameof(E.WrassleObject)} is {nameof(ParentObject)}",
                     Indent: indent + 2, Toggle: getDoDebug('X'));
 
-                Debug.Entry(4, $"{nameof(WrassleID)}.{nameof(ID)}: {ID}",
+                Debug.Entry(4, $"{nameof(WrassleID)}.{nameof(ID)}: {GetID(Silent: true)}",
                     Indent: indent + 2, Toggle: getDoDebug('X'));
 
                 WrassleID wrassleID = this;
@@ -306,7 +316,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4, $"{nameof(ParentObject)}: {ParentObject?.DebugName ?? NULL} pushing WrassleID",
                     Indent: indent + 2, Toggle: getDoDebug('X'));
 
-                E.FromWrassleID = ID;
+                E.FromWrassleID = GetID(Silent: true);
 
                 Debug.LastIndent = indent;
                 return true;
@@ -375,19 +385,19 @@ namespace XRL.World.Parts
             return ID.ToString();
         }
 
-        public virtual bool IsSyncedWith(WrassleID WrassleID)
+        public virtual bool IsSyncedWith(WrassleID WrassleID, bool Silent = false)
         {
-            return WrassleID.ID == ID;
+            return WrassleID.GetID(Silent: true) == GetID(Silent: true);
         }
-        public virtual bool IsSyncedWith(Guid WrassleID)
+        public virtual bool IsSyncedWith(Guid WrassleID, bool Silent = false)
         {
-            return WrassleID == ID;
+            return WrassleID == GetID(Silent: true);
         }
 
         public override bool SameAs(IPart p)
         {
-            return p is WrassleID w 
-                && w.ID == ID 
+            return p is WrassleID w
+                && w.GetID(Silent: true) == GetID(Silent: true)
                 && base.SameAs(p);
         }
 
@@ -404,6 +414,8 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             WrassleID wrassleID = base.DeepCopy(Parent, MapInv) as WrassleID;
+            wrassleID._PrimaryColor = null;
+            wrassleID._SecondaryColor = null;
             return wrassleID;
         }
     }

@@ -76,9 +76,9 @@
   <object Name="WrassleRingRopes" Inherits="Wall">
     <part Name="Render" DisplayName="rope barrier" RenderString="=" ColorString="&amp;y" TileColor="&amp;y" DetailColor="w" Occluding="false" RenderLayer="6" Tile="Tiles/WrassleRing_Ropes_.png" />
     <part Name="Physics" Weight="30" Takeable="false" Solid="true" />
-    <part Name="Description" Short="A triplicate set of ropes held taught provide the perfect platform for launching oneself." />
+    <part Name="Description" Short="A triplicate set of =subject.wrassleShader:vibrant= ropes held taught provide the perfect platform for launching oneself." />
     <removepart Name="Graffitied" />
-    <part Name="WrassleGear" AutoFlair="false" UseColors="false" ColorEquipmentFrame="false" IsVibrant="false" />
+    <part Name="WrassleGear" AutoFlair="true" ChangeTileColor="false" ColorEquipmentFrame="false" IsVibrant="true" />
     <part Name="Vaultable" />
     <stat Name="AV" Value="10" />
     <stat Name="DV" Value="15" />

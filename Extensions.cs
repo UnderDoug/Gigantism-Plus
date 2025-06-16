@@ -54,6 +54,9 @@ namespace HNPS_GigantismPlus
             if (MethodName == nameof(GetNumberedTileVariants))
                 return false;
 
+            if (MethodName == nameof(SeededRandomBool))
+                return true;
+
             if (MethodName == nameof(GetShaderFromSequence))
                 return true;
 

@@ -61,28 +61,52 @@ namespace XRL
 
         public IEnumerable<string> CacheWrassleColorSequence(Guid WrassleID, int Length, IEnumerable<string> Sequence)
         {
-            WrassleColorSequenceCache ??= new();
-            if (WrassleID == Guid.Empty || Length < 1 || Sequence.IsNullOrEmpty())
+            if (WrassleID == Guid.Empty 
+                || Length < 1 
+                || Sequence.IsNullOrEmpty())
             {
                 return null;
             }
-            WrassleColorSequenceCache.TryAdd(WrassleID, new() { { Length, Sequence } });
-            return WrassleColorSequenceCache[WrassleID][Length];
+            if (!(WrassleColorSequenceCache ??= new()).IsNullOrEmpty() && WrassleColorSequenceCache.ContainsKey(WrassleID))
+            {
+                if (WrassleColorSequenceCache[WrassleID].ContainsKey(Length) && WrassleColorSequenceCache[WrassleID][Length] != Sequence)
+                {
+                    WrassleColorSequenceCache[WrassleID][Length] = Sequence;
+                }
+                else
+                {
+                    WrassleColorSequenceCache.TryAdd(WrassleID, new() { { Length, Sequence } });
+                }
+
+                if (WrassleColorSequenceCache[WrassleID].ContainsKey(Length) && WrassleColorSequenceCache[WrassleID][Length] == Sequence)
+                {
+                    return WrassleColorSequenceCache[WrassleID][Length];
+                }
+            }
+            return null;
+        }
+        public bool TryCacheWrassleColorSequence(Guid WrassleID, int Length, IEnumerable<string> Sequence, out IEnumerable<string> CachedSequence)
+        {
+            return !(CachedSequence = CacheWrassleColorSequence(WrassleID, Length, Sequence)).IsNullOrEmpty();
         }
         public IEnumerable<string> GetCachedWrassleColorSequence(Guid WrassleID, int Length)
         {
-            WrassleColorSequenceCache ??= new();
             if (WrassleID == Guid.Empty || Length < 1)
             {
                 return null;
             }
-            if (WrassleColorSequenceCache.IsNullOrEmpty() 
-                || WrassleColorSequenceCache[WrassleID].IsNullOrEmpty() 
-                || WrassleColorSequenceCache[WrassleID][Length].IsNullOrEmpty())
+            if (!(WrassleColorSequenceCache ??= new()).IsNullOrEmpty()
+                && WrassleColorSequenceCache.ContainsKey(WrassleID)
+                && WrassleColorSequenceCache[WrassleID].ContainsKey(Length)
+                && !WrassleColorSequenceCache[WrassleID][Length].IsNullOrEmpty())
             {
-                CacheWrassleColorSequence(WrassleID, Length, UD_QWE.GetWrassleColorSequence(WrassleID, Length));
+                return WrassleColorSequenceCache[WrassleID][Length];
             }
-            return WrassleColorSequenceCache[WrassleID][Length];
+            return null;
+        }
+        public bool TryGetCachedWrassleColorSequence(Guid WrassleID, int Length, out IEnumerable<string> CachedSequence)
+        {
+            return !(CachedSequence = GetCachedWrassleColorSequence(WrassleID, Length)).IsNullOrEmpty();
         }
 
         public override void Register(XRLGame Game, IEventRegistrar Registrar)

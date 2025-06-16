@@ -12,6 +12,8 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 using SerializeField = UnityEngine.SerializeField;
+using XRL.Language;
+using System.Text;
 
 namespace XRL.World.Parts
 {
@@ -38,9 +40,7 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public static string Vibrant = nameof(Vibrant);
-
-        public string Shader => GetVibrantShader();
+        public static string vibrant = nameof(vibrant);
 
         public WrassleGear WrassleGear => ParentObject?.GetPart<WrassleGear>();
 
@@ -85,26 +85,58 @@ namespace XRL.World.Parts
                 || ID == PooledEvent<GetDisplayNameEvent>.ID
                 || ID == GetShortDescriptionEvent.ID;
         }
-
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
-            E.AddBase(GetAdjective(), -11); // This *should* result in it being added to the start of the base display name.
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(ModWrassleVibrant)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(GetDisplayNameEvent)} E) "
+                + $"{nameof(GetColoredAdjective)}: {GetColoredAdjective() ?? NULL}",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
+            E.AddBase(GetColoredAdjective(), -11); // This *should* result in it being added to the start of the base display name.
+
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
-
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            E.Base = E.Base.Replace("*Vibrant*", GetAdjective());
+            if (ParentObject.InheritsFrom("FoldingChair"))
+            {
+                int indent = Debug.LastIndent;
+                string adjective = Grammar.InitialCap(GetColoredAdjective());
+
+                Debug.Entry(4,
+                    $"@ {nameof(GetShortDescriptionEvent)}, "
+                    + $"{nameof(adjective)}",
+                    $"{adjective}",
+                    Indent: indent + 1, Toggle: getDoDebug('X'));
+
+                StringBuilder eBase = Event.NewStringBuilder();
+                eBase.Append(adjective).Append(" ").Append(Grammar.MakeLowerCase(E.Base.ToString()));
+                E.Base.Clear().Append(eBase);
+
+                Debug.LastIndent = indent;
+            }
             return base.HandleEvent(E);
         }
 
-        public virtual string GetAdjective()
+        public override bool WantModDisplayName()
         {
-            return Vibrant.Color(Shader);
+            return true;
         }
-        public virtual string GetVibrantShader()
+        public override string GetAdjective()
         {
-            return GetWrassleShaderFor(Vibrant);
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(ModWrassleVibrant)}."
+                + $"{nameof(GetAdjective)}()",
+                $"{vibrant}",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
+            Debug.LastIndent = indent;
+            return vibrant;
         }
 
     } //!-- public class ModWrassleVibrant : IModification

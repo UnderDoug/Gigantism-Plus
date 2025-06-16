@@ -30,7 +30,6 @@ namespace XRL.World.Parts
             };
             List<object> dontList = new()
             {
-                "WID"   // WrassleID
             };
 
             if (what != null && doList.Contains(what))
@@ -46,8 +45,11 @@ namespace XRL.World.Parts
         private WrassleID _WrassleID;
         public virtual WrassleID WrassleID => _WrassleID ??= GetWrassleID();
 
-        public virtual string PrimaryColor => WrassleID?.PrimaryColor;
-        public virtual string SecondaryColor => WrassleID?.SecondaryColor;
+        private string _PrimaryColor;
+        public string PrimaryColor => _PrimaryColor ??= WrassleID?.PrimaryColor;
+
+        private string _SecondaryColor;
+        public string SecondaryColor => _SecondaryColor ??= WrassleID?.SecondaryColor;
 
         public Guid PreloadedWrassleID;
 
@@ -181,7 +183,12 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(WrassleIDUpdatedEvent E)
         {
-            OnUpdatedWrassleID();
+            if (WrassleID != null && WrassleID.ID != E.FromWrassleID)
+            {
+                _PrimaryColor = null;
+                _SecondaryColor = null;
+                OnUpdatedWrassleID();
+            }
             return base.HandleEvent(E);
         }
 
@@ -210,9 +217,16 @@ namespace XRL.World.Parts
                 PreloadedWrassleID = Reader.ReadGuid();
             }
         }
+        public override void FinalizeRead(SerializationReader Reader)
+        {
+            base.FinalizeRead(Reader);
+            OnUpdatedWrassleID();
+        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             IWrasslePart wrasslePart = base.DeepCopy(Parent, MapInv) as IWrasslePart;
+            wrasslePart._PrimaryColor = null;
+            wrasslePart._SecondaryColor = null;
             return wrasslePart;
         }
     }

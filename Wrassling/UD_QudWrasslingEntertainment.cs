@@ -25,10 +25,10 @@ namespace XRL
             List<object> doList = new()
             {
                 'V',    // Vomit
-                'X',    // Vomit
             };
             List<object> dontList = new()
             {
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))

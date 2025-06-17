@@ -25,8 +25,8 @@ namespace HNPS_GigantismPlus
             };
             List<object> dontList = new()
             {
-                'X',    // Trace
                 'R',    // Reset
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))

@@ -332,7 +332,7 @@ namespace XRL.World.ZoneBuilders
                 }
             }
 
-            GameObject UniqueGiant = The.ZoneManager.GetCachedObjects(GiantID);
+            GameObject UniqueGiant = The.ZoneManager.PullCachedObject(GiantID, false);
             if (UniqueGiant == null)
             {
                 Debug.Warn(2,

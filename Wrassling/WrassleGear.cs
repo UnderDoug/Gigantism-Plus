@@ -27,6 +27,7 @@ namespace XRL.World.Parts
             };
             List<object> dontList = new()
             {
+                'X',    // Trace
             };
 
             if (what != null && doList.Contains(what))
@@ -38,7 +39,7 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public string Tile => UD_QWE.GetTileFromBag(WrassleID.ID, RandomTiles);
+        public int BondedLimbID;
 
         private MeleeWeapon MeleeWeaponCopy;
 
@@ -51,6 +52,8 @@ namespace XRL.World.Parts
         public bool UseColors;
         public bool ChangeTileColor;
         public bool ChangeDetailColor;
+
+        public string Tile => UD_QWE.GetTileFromBag(WrassleID.ID, RandomTiles);
 
         private string _TileColor;
         public string TileColor => _TileColor ??= PrimaryColor;
@@ -67,6 +70,8 @@ namespace XRL.World.Parts
         
         public WrassleGear()
         {
+            BondedLimbID = 0;
+
             AutoFlair = true;
 
             UseColors = true;
@@ -102,7 +107,7 @@ namespace XRL.World.Parts
                 + $"{nameof(Attach)}()"
                 + $" {nameof(ParentObject)}: {ParentObject?.DebugName ?? NULL}"
                 + $" {nameof(WrassleID)}: {WrassleID.GetID(Silent: true)}",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             Debug.Entry(4, $"calling base.{nameof(Attach)}()",
                 Indent: indent + 2, Toggle: getDoDebug('X'));
@@ -173,6 +178,10 @@ namespace XRL.World.Parts
                     wrassleVibrantMod = new(WrassleID);
                     ParentObject.ApplyModification(wrassleVibrantMod, Actor: AppliedBy, Creation: Creation);
                 }
+                else
+                {
+                    wrassleVibrantMod.OnUpdatedWrassleID();
+                }
             }
         }
 
@@ -222,10 +231,10 @@ namespace XRL.World.Parts
                     $"{nameof(HandleEvent)}({typeof(AfterObjectCreatedEvent).Name} " +
                     $"E.Object: [{WrassleObject.ID}:{WrassleObject.ShortDisplayNameStripped}]) WrassleID: {WrassleID} " +
                     $"TileColor: {tileColor.Quote()}, DetailColor: {SecondaryColor.Quote()}",
-                    Indent: indent + 1, Toggle: getDoDebug());
+                    Indent: indent + 1, Toggle: getDoDebug('X'));
                 Debug.Entry(4,
                     $"Tile: {Tile.Quote()}, RandomizeTile: {RandomizeTile.ToString().Quote()}, RandomTiles: {RandomTiles.Quote()}",
-                    Indent: indent + 2, Toggle: getDoDebug());
+                    Indent: indent + 2, Toggle: getDoDebug('X'));
 
                 ApplyFlair();
 
@@ -248,7 +257,7 @@ namespace XRL.World.Parts
                     + $" E.Item: {Item?.DebugName ?? NULL},"
                     + $" E.Actor: {Actor?.DebugName ?? NULL})"
                     + $"{nameof(WrassleID)}: {WrassleID.GetID(Silent: true)}",
-                    Indent: indent + 1, Toggle: getDoDebug());
+                    Indent: indent + 1, Toggle: getDoDebug('X'));
 
                 if (E.Item.InheritsFrom(FOLDING_CHAIR))
                 {
@@ -320,7 +329,7 @@ namespace XRL.World.Parts
                     + $" E.Item: {Item?.DebugName ?? NULL},"
                     + $" E.Actor: {Actor?.DebugName ?? NULL})"
                     + $"{nameof(WrassleID)}: {WrassleID.GetID(Silent: true)}",
-                    Indent: indent + 1, Toggle: getDoDebug());
+                    Indent: indent + 1, Toggle: getDoDebug('X'));
 
                 if (Item.InheritsFrom(BASE_WRASSLE_GEAR) && Item.HasPart<Armor>() && Item.TryGetPart(out MeleeWeapon wrassleWeapon))
                 {

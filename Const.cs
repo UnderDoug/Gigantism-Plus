@@ -57,6 +57,8 @@ namespace HNPS_GigantismPlus
 
         public const string GIGANTISMPLUS_COLORCHANGE_PROP = "GigantismPlusColorChange";
         public const string WRASSLER_COLORCHANGE_PROP = "WrasslerColorChange";
+        public const string WRASSLER_BESTOW_CHANCE_PROP = "WrassleGearBestowChance";
+        public const string WRASSLER_NO_WRASSLE_GEAR_PROP = "NoWrassleGear";
 
         public const string SCRT_GNT_ZONE_MAP1_CENTRE = "HNPS_GiantCrater_01_Center.rpm";
         public const string SCRT_GNT_ZONE_MAP2_CENTRE = "HNPS_GiantCrater_02_Center.rpm";

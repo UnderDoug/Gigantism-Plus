@@ -182,7 +182,7 @@
           <value Name="Stew" />
           <value Name="Stews" />
           <value Name="Gains" />
-          <value Name="=optionalColor:Folding Chairs:c=" />
+          <value Name="Folding Chairs" />
           <value Name="Bellies" />
           <value Name="Stone" />
           <value Name="Stones" />
@@ -315,7 +315,7 @@
         </templatevar>
         <templatevar Name="Subject">
           <value Name="Gains" />
-          <value Name="=optionalColor:Folding Chairs:c=" />
+          <value Name="Folding Chairs" />
           <value Name="Bellies" />
           <value Name="Stone" />
           <value Name="Pillars" />
@@ -376,9 +376,11 @@
       <templatevars>
         <templatevar Name="Adjective">
           <value Name="=optionalColorYuge:Giant=" />
+          <!-- =subject.WrassleShader:Giant= -->
         </templatevar>
         <templatevar Name="Role">
           <value Name="=optionalColorYuge:Hankerer=" />
+          <!-- =subject.WrassleShader:Hankerer= -->
         </templatevar>
         <templatevar Name="Noun">
           <value Name="=optionalColorYuge:Stew=" />

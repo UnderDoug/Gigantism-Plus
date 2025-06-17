@@ -1,25 +1,22 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
-using XRL.UI;
+using System.Text;
 using XRL.Core;
 using XRL.Rules;
+using XRL.UI;
+using XRL.Wish;
 using XRL.World.Anatomy;
 using XRL.World.Capabilities;
-using XRL.World.Parts.Mutation;
 using XRL.World.ObjectBuilders;
+using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
-using XRL.Wish;
-
-using static XRL.UD_QudWrasslingEntertainment;
-
-using HNPS_GigantismPlus;
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
-
+using static XRL.UD_QudWrasslingEntertainment;
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -118,12 +115,39 @@ namespace XRL.World.Parts
             _DetailColor = null;
         }
 
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
+        {
+            Registrar.Register(GetShortDescriptionEvent.ID, EventOrder.VERY_EARLY);
+            base.Register(Object, Registrar);
+        }
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
                 || ID == AfterObjectCreatedEvent.ID
                 || ID == ObjectEnteredCellEvent.ID
                 || (!KnowsChairs && ID == ExamineSuccessEvent.ID);
+        }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            if (WrassleIDDebugDescriptions)
+            {
+                StringBuilder SB = Event.NewStringBuilder();
+                SB.AppendColored("M", $"{nameof(Wrassler)}");
+                SB.AppendLine();
+                SB.AppendColored("W", "State");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{Bestow.YehNah()}]{HONLY}{nameof(Bestow)}: ").AppendColored("B", $"{Bestow}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("G", $"{UD_QWE.GetBestowalChance(ParentObject)}").Append($"){HONLY}Bestowal Chance");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{BeenBestowed.YehNah()}]{HONLY}{nameof(BeenBestowed)}: ").AppendColored("B", $"{BeenBestowed}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append($"[{KnowsChairs.YehNah()}]{HONLY}{nameof(KnowsChairs)}: ").AppendColored("B", $"{KnowsChairs}");
+                SB.AppendLine();
+
+                E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
+            }
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
@@ -159,36 +183,18 @@ namespace XRL.World.Parts
                     Indent: 1, Toggle: getDoDebug());
                 Actor.SetStringProperty("HNPS_CellShouted", "Yeh");
 
-                bool noWrassleGear = Actor.HasTagOrProperty("NoWrassleGear");
-                bool isTemplar = Actor.InheritsFrom("BaseTemplar");
+                bool noWrassleGear = Actor.HasTagOrProperty(WRASSLER_NO_WRASSLE_GEAR_PROP) && Actor.GetTagOrStringProperty(WRASSLER_NO_WRASSLE_GEAR_PROP) != "Overridden";
 
-                int bestowChance = Actor.GetIntProperty("WrassleGearBestowChance", -1);
+                int bestowChance = UD_QWE.GetBestowalChance(Actor);
 
-                if (bestowChance < 0
-                 && (int.TryParse(Actor.GetStringProperty("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0)
-                 && (int.TryParse(Actor.GetTag("WrassleGearBestowChance", "-1"), out bestowChance) && bestowChance < 0))
-                {
-                    bestowChance = 100;
-                }
-
-                if (Actor.IsPlayer())
-                {
-                    bestowChance = SlideWrasslePlayerStart;
-                }
-                else
-                {
-                    bestowChance *= 10;
-                }
-                Debug.Entry(4, $"{nameof(bestowChance)}: {bestowChance}/1,000",
-                    Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"{nameof(bestowChance)}", $"{bestowChance}/1000", Indent: 1, Toggle: getDoDebug());
 
                 bool bestowByChance = bestowChance.in1000();
 
                 bool shouldBestow =
                     Bestow
                  && bestowByChance
-                 && !noWrassleGear
-                 && !isTemplar;
+                 && !noWrassleGear;
 
                 if (shouldBestow)
                 {

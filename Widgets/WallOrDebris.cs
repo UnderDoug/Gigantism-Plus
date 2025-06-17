@@ -92,9 +92,13 @@ namespace XRL.World.Parts
                         GamePartBlueprint renderBlueprint = wallBlueprint.Parts["Render"];
 
                         if (renderBlueprint.TryGetParameter(InvertColor ? "TileColor" : "DetailColor", out string tileColor))
+                        {
                             TileColor = $"&{tileColor}";
+                        }
                         if (renderBlueprint.TryGetParameter(InvertColor ? "DetailColor" : "TileColor", out string detailColor))
+                        {
                             DetailColor = detailColor.Replace("&", "");
+                        }
                     }
                     Render render = newObject?.Render;
                     if (render != null)

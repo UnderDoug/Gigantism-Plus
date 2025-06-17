@@ -165,10 +165,14 @@ namespace XRL.World.Parts.Skill
             VaultSkill = null;
 
             if (Vaulter == null)
+            {
                 return false;
+            }
 
             if (!Vaulter.TryGetPart(out VaultSkill))
+            {
                 return false;
+            }
 
             if (VaultSkill.Vaulted)
             {
@@ -179,10 +183,30 @@ namespace XRL.World.Parts.Skill
                 return false;
             }
 
+            if (Vaulter == Vaultee)
+            {
+                if (!Silent)
+                {
+                    Vaulter.Fail("You cannot vault over yourself.");
+                }
+                return false;
+            }
+
             if (Vaulter.IsFlying)
             {
                 if (!Silent)
+                {
                     Vaulter.Fail("You cannot vault while flying.");
+                }
+                return false;
+            }
+
+            if (Vaultee.IsFlying)
+            {
+                if (!Silent)
+                {
+                    Vaulter.Fail("You cannot vault something while it's flying.");
+                }
                 return false;
             }
 
@@ -286,7 +310,7 @@ namespace XRL.World.Parts.Skill
             {
                 Debug.CheckNah(4, $"No DestinationCell", Indent: 2, Toggle: getDoDebug("AV"));
                 FromEvent?.RequestInterfaceExit();
-                if (Vaulter.IsPlayer() && !Silent)
+                if (Vaulter.IsPlayerControlled() && !Silent)
                 {
                     Popup.Show($"There's no room on the other side of the {Vaultee.DisplayName} you're trying to vault over!");
                 }
@@ -529,7 +553,7 @@ namespace XRL.World.Parts.Skill
             if (!BeforeVaultEvent.CheckFor(Vaulter, Origin, Over, Destination, out string Message))
             {
                 Debug.CheckNah(3, $"Cancelled by BeforeVaultEvent.CheckFor", Message, Indent: 2);
-                if (Vaulter.IsPlayer() && !Message.IsNullOrEmpty() && !Silent)
+                if (Vaulter.IsPlayerControlled() && !Message.IsNullOrEmpty() && !Silent)
                 {
                     Popup.Show(Message);
                 }
@@ -543,7 +567,7 @@ namespace XRL.World.Parts.Skill
             }
             Debug.CheckYeh(4, $"Vault not blocked by event", Indent: 2, Toggle: getDoDebug());
 
-            bool isAutoActingPlayer = Vaulter.IsPlayer() && AutoAct.IsActive();
+            bool isAutoActingPlayer = Vaulter.IsPlayerControlled() && AutoAct.IsActive();
 
             Debug.LoopItem(4, $"isAutoActingPlayer", $"{isAutoActingPlayer}", Good: isAutoActingPlayer,
                 Indent: 2, Toggle: getDoDebug());
@@ -553,6 +577,8 @@ namespace XRL.World.Parts.Skill
             Debug.LoopItem(4, $"vaulted", $"{vaulted}", Good: !vaulted,
                 Indent: 2, Toggle: getDoDebug());
 
+            int existingRenderLayer = Vaulter.Render.RenderLayer;
+            Debug.LoopItem(4, $"Storing {nameof(Vaulter)} RenderLayer ({existingRenderLayer})...", Indent: 2, Toggle: getDoDebug());
             if (isAutoActingPlayer)
             {
                 Debug.LoopItem(4, $"Checking AutoAct for Movement or Explore...", Indent: 2, Toggle: getDoDebug());
@@ -582,6 +608,10 @@ namespace XRL.World.Parts.Skill
                 vaultSkill.MidVault = true;
                 Debug.LoopItem(4, $"MidVault", $"{vaultSkill.MidVault}", Good: vaultSkill.MidVault,
                     Indent: 2, Toggle: getDoDebug());
+
+                int underVaulteeRenderLayer = Vaultee.Render.RenderLayer - 1;
+                Debug.LoopItem(4, $"Setting {nameof(Vaulter)} RenderLayer to 1 less than {nameof(Vaultee)}'s ({underVaulteeRenderLayer})...", Indent: 2, Toggle: getDoDebug());
+                Vaulter.Render.RenderLayer = underVaulteeRenderLayer;
 
                 Debug.LoopItem(4, $"DirectMove Vaulter to Vaultee Cell...", Indent: 2, Toggle: getDoDebug());
                 bool directMove = Vaulter.DirectMoveTo(Over, 0, Forced: false, IgnoreCombat: true, IgnoreGravity: true, Ignore: Vaultee);
@@ -641,6 +671,10 @@ namespace XRL.World.Parts.Skill
                     Indent: 2, Toggle: getDoDebug());
                 Land(Origin, Destination);
             }
+
+            Debug.LoopItem(4, $"Restoring {nameof(Vaulter)} RenderLayer to {existingRenderLayer}...", Indent: 2, Toggle: getDoDebug());
+            Vaulter.Render.RenderLayer = existingRenderLayer;
+
             if (!vaulted && isAutoActingPlayer)
             {
                 Debug.LoopItem(4, $"vaulted", $"{vaulted}", Good: !vaulted,
@@ -760,7 +794,7 @@ namespace XRL.World.Parts.Skill
 
             Tactics_Vault vaultSkill = null;
             bool vaulterNotNull = Vaulter != null;
-            bool isPlayer = vaulterNotNull && Vaulter.IsPlayer();
+            bool isPlayer = vaulterNotNull && Vaulter.IsPlayerControlled();
             bool haveSkill = vaulterNotNull && Vaulter.TryGetPart(out vaultSkill);
             bool wasAutoActing = haveSkill && vaultSkill.WasAutoActing;
             bool haveAutoActSetting = haveSkill && !vaultSkill.AutoActSetting.IsNullOrEmpty();
@@ -963,7 +997,7 @@ namespace XRL.World.Parts.Skill
                     Indent: 0, Toggle: getDoDebug());
 
                     bool cellIsSolidForVaulter = Over.IsSolidFor(Vaulter);
-                    bool notPlayer = !Vaulter.IsPlayer();
+                    bool notPlayer = !Vaulter.IsPlayerControlled();
                     bool autoActActive = AutoAct.IsActive();
                     bool actingAutomatically = notPlayer || autoActActive;
 
@@ -1201,7 +1235,7 @@ namespace XRL.World.Parts.Skill
 
                 bool vaulterNotPlayer =
                     vaulterNotNull
-                    && !Vaulter.IsPlayer();
+                    && !Vaulter.IsPlayerControlled();
 
                 bool autoActActive = AutoAct.IsActive();
 
@@ -1317,7 +1351,7 @@ namespace XRL.World.Parts.Skill
 
             bool vaulteeNotNull = Vaultee != null;
 
-            bool vaulterMovingAutomatically = (!Vaulter.IsPlayer() || AutoAct.IsAnyMovement());
+            bool vaulterMovingAutomatically = (!Vaulter.IsPlayerControlled() || AutoAct.IsAnyMovement());
 
             bool targetNotVaultee = vaulteeNotNull && E.Target != Vaultee;
 

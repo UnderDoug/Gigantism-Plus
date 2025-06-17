@@ -51,6 +51,14 @@ namespace XRL.World.Parts
         private WrassleID _WrassleID;
         public virtual WrassleID WrassleID => _WrassleID ??= GetWrassleID();
 
+        [SerializeField]
+        private Guid _PreloadedWrassleID;
+        public Guid PreloadedWrassleID
+        {
+            get => _PreloadedWrassleID;
+            set => _PreloadedWrassleID = value;
+        }
+
         private string _PrimaryColor;
         public string PrimaryColor => _PrimaryColor ??= WrassleID?.PrimaryColor;
 
@@ -60,8 +68,6 @@ namespace XRL.World.Parts
         private Dictionary<int, string> WrassleShaderCache;
 
         public string EquipmentFrameColor => UD_QWE.GetEquipmentFrameColor(WrassleID.ID);
-
-        public Guid PreloadedWrassleID;
 
         public IWrassleModification()
         {
@@ -113,23 +119,8 @@ namespace XRL.World.Parts
                 Indent: indent + 2, Toggle: getDoDebug('X'));
             base.Attach();
 
-            if (WrassleID != null && PreloadedWrassleID != Guid.Empty && PreloadedWrassleID != default)
-            {
-                Debug.CheckYeh(4, $"{nameof(PreloadedWrassleID)} has Value",
-                    Indent: indent + 2, Toggle: getDoDebug('X'));
+            WrassleID.ProcessPreloadedWrassleID(WrassleID, PreloadedWrassleID);
 
-                if (PreloadedWrassleID == WrassleID.ID || PreloadedWrassleID == WrassleID.SetID(PreloadedWrassleID))
-                {
-                    Debug.CheckYeh(4, $"{nameof(WrassleID)} set to {nameof(PreloadedWrassleID)}",
-                        Indent: indent + 2, Toggle: getDoDebug('X'));
-                    PreloadedWrassleID = Guid.Empty;
-                }
-            }
-            else
-            {
-                Debug.CheckNah(4, $"{nameof(WrassleID)} is null, or {nameof(PreloadedWrassleID)} is empty or default",
-                    Indent: indent + 2, Toggle: getDoDebug('X'));
-            }
             Debug.LastIndent = indent;
         }
 
@@ -278,6 +269,11 @@ namespace XRL.World.Parts
                 .Process();
         }
 
+        public override bool AllowStaticRegistration()
+        {
+            return base.AllowStaticRegistration()
+                || true;
+        }
         public override bool WantEvent(int ID, int Cascade)
         {
             return base.WantEvent(ID, Cascade)
@@ -324,11 +320,11 @@ namespace XRL.World.Parts
 
             _WrassleID.Write(Basis, Writer);
 
-            bool writePreloadedWrassleID = PreloadedWrassleID != Guid.Empty && PreloadedWrassleID != default;
+            bool writePreloadedWrassleID = _PreloadedWrassleID != Guid.Empty && _PreloadedWrassleID != default;
             Writer.Write(writePreloadedWrassleID);
             if (writePreloadedWrassleID)
             {
-                Writer.Write(PreloadedWrassleID);
+                Writer.Write(_PreloadedWrassleID);
             }
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
@@ -340,7 +336,7 @@ namespace XRL.World.Parts
             bool readPreloadedWrassleID = Reader.ReadBoolean();
             if (readPreloadedWrassleID)
             {
-                PreloadedWrassleID = Reader.ReadGuid();
+                _PreloadedWrassleID = Reader.ReadGuid();
             }
         }
         public override void FinalizeRead(SerializationReader Reader)

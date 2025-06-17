@@ -188,6 +188,7 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusGameBasedInitialiser)}", 
                 $"{nameof(AdditionalSetup)}()");
 
+            /*
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             EnableManagedVanillaMutations = 
@@ -195,7 +196,8 @@ namespace HNPS_GigantismPlus
                 ? EnableManagedVanillaMutations 
                 : EnableManagedVanillaMutationsCurrent;
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
-            
+            */
+
             if (!GameLevelEventsRegistered)
             {
                 GameLevelEventsRegistered = RegisterGameLevelEventHandlers();
@@ -244,6 +246,7 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnPlayerLoad)}", 
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
 
+            /*
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             if (The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla"))
@@ -277,6 +280,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
 
             // ManagedVanillaMutationOptionHandler();
+            */
 
             if (player.TryGetPart(out Wrassler wrassler) && !wrassler.KnowsChairs)
             {
@@ -289,6 +293,9 @@ namespace HNPS_GigantismPlus
                 wrassler.KnowsChairs = foldingChair.Understood();
                 foldingChair.Obliterate();
             }
+
+            player.SetIntProperty("IsPlayer", 1);
+            player.SetIntProperty(WRASSLER_BESTOW_CHANCE_PROP, SlideWrasslePlayerStart);
             
             Debug.Footer(3, 
                 $"{nameof(GigantismPlusOnPlayerLoad)}",
@@ -312,6 +319,7 @@ namespace HNPS_GigantismPlus
                 RegisterGameLevelEventHandlers();
             }
 
+            /*
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);
             Debug.Entry(4, $"Before EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             if (The.Game.HasStringGameState("Option_GigantismPlus_ManagedVanilla"))
@@ -344,6 +352,7 @@ namespace HNPS_GigantismPlus
                 Indent: 1);
 
             // ManagedVanillaMutationOptionHandler();
+            */
 
             Gigantic_ModEntry_Adjustments.AdjustGiganticModifier();
 

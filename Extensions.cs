@@ -2195,7 +2195,7 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static bool SeededRandomBool(this Guid Seed, int? Stepper = null, int ChanceIn = 2)
+        public static bool SeededRandomBool(this Guid Seed, int? Stepper = null, int ChanceIn = 2, string Context = null)
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(SeededRandomBool));
@@ -2203,16 +2203,22 @@ namespace HNPS_GigantismPlus
                 $"* {nameof(Extensions)}."
                 + $"{nameof(SeededRandomBool)}(Guid Seed, "
                 + $"{nameof(Stepper)}: {Stepper}, "
-                + $"{nameof(ChanceIn)}: {ChanceIn})",
+                + $"{nameof(ChanceIn)}: {ChanceIn}, "
+                + $"{nameof(Context)}: {Context})",
                 Indent: indent + 1, Toggle: doDebug);
 
             int High = ChanceIn * 7000;
             string stepper = null;
+            string context = null;
+            if (!Context.IsNullOrEmpty())
+            {
+                context = $"-{context}";
+            }
             if (Stepper != null)
             {
                 stepper = $"-{Stepper}";
             }
-            string seed = $"{Seed}{stepper}";
+            string seed = $"{Seed}{context}{stepper}";
             int roll = Stat.SeededRandom(seed, 0, High);
             int rollModChanceIn = roll % ChanceIn;
             Debug.Entry(4, $"{nameof(High)}: {High})", Indent: indent + 2, Toggle: doDebug);
@@ -2635,15 +2641,67 @@ namespace HNPS_GigantismPlus
             return Destination;
         }
 
+        public static bool IsWrassleIDSyncedWith(this GameObject ThisWrassleObject, GameObject ThatWrassleObject)
+        {
+            if (!ThisWrassleObject.TryWrassleID(out WrassleID thisWrassleID))
+            {
+                return false;
+            }
+            if (!ThatWrassleObject.TryWrassleID(out WrassleID thatWrassleID))
+            {
+                return false;
+            }
+            return thisWrassleID.IsSyncedWith(thatWrassleID);
+        }
+        public static bool IsWrassleIDSyncedWith(this IWrassle ThisWrasslePart, IWrassle ThatWrasslePart)
+        {
+            if (ThisWrasslePart == null || ThisWrasslePart.WrassleID == null)
+            {
+                return false;
+            }
+            if (ThatWrasslePart == null || ThatWrasslePart.WrassleID == null)
+            {
+                return false;
+            }
+            return ThisWrasslePart.WrassleID.IsSyncedWith(ThatWrasslePart.WrassleID);
+        }
+
         public static WrassleID WrassleID(this GameObject WrassleObject)
         {
             return WrassleObject.GetPart<WrassleID>();
+        }
+        public static bool TryWrassleID(this GameObject WrassleObject, out WrassleID WrassleID)
+        {
+            return (WrassleID = WrassleObject.WrassleID()) != null;
         }
         public static string WrassleIDString(this GameObject WrassleObject)
         {
             return WrassleObject.WrassleID().GetID(Silent: true).ToString();
         }
 
+        public static bool IsWrassler(this GameObject Creature)
+        {
+            return Creature.HasPart<Wrassler>();
+        }
+
+        public static bool HasWrassleGearForThisSlot(this GameObject Creature, BodyPart BodyPart)
+        {
+            if (Creature == null || !Creature.TryGetPart(out Wrassler wrassler) || BodyPart == null)
+            {
+                return false;
+            }
+            foreach (GameObject wrassleGearObject in Creature.GetInventoryAndEquipment(o => o.HasPart<WrassleGear>()))
+            {
+                if (wrassleGearObject.TryGetPart(out WrassleGear wrassleGear))
+                {
+                    if (wrassleGear.BondedLimbID == BodyPart.ID && wrassleGear.IsWrassleIDSyncedWith(wrassler))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
     } //!-- Extensions
 }

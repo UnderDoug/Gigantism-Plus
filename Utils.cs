@@ -50,7 +50,7 @@ namespace HNPS_GigantismPlus
                 return false;
 
             if (MethodName == nameof(Rumble))
-                return true;
+                return false;
 
             return doDebug;
         }

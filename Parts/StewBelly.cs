@@ -302,7 +302,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"{nameof(StewBelly)}." + 
                 $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
-                Indent: 0);
+                Indent: 0, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());
             Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1, Toggle: getDoDebug());

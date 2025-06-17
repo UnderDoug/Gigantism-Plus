@@ -14,7 +14,7 @@
     NegativeSound="Sounds/Reputation/sfx_reputation_cragmensch_negative"
     EmblemTile="Factions/Giants.png"
     EmblemTileColor="z"
-    EmblemDetailColor="X"
+    EmblemDetailColor="x"
   >
     <partreputation About="GigantismPlus" Value="200" />
     <feeling About="*" Value="0" />

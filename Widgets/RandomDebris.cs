@@ -55,9 +55,13 @@ namespace XRL.World.Parts
 
                         // These are swapped, but that's a typical difference between walls and other objects
                         if (renderBlueprint.TryGetParameter(Invert ? "TileColor" : "DetailColor", out string tileColor))
+                        {
                             TileColor = $"&{tileColor}";
+                        }
                         if (renderBlueprint.TryGetParameter(Invert ? "DetailColor" : "TileColor", out string detailColor))
-                            DetailColor = detailColor.Replace("&","");
+                        {
+                            DetailColor = detailColor.Replace("&", "");
+                        }
                     }
                 }
                 GameObject newObject = GameObjectFactory.Factory.CreateObject(debrisBlueprints.Sample());

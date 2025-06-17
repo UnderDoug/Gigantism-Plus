@@ -114,12 +114,14 @@ namespace XRL.World.ObjectBuilders
 
         public override void Apply(GameObject Creature, string Context = null)
         {
+            int indent = Debug.LastIndent;
+
             Debug.Entry(4, 
                 $"{nameof(WrassleGiantHero)}." +
                 $"{nameof(Apply)}(" +
                 $"GameObject Creature: {Creature?.DebugName ?? NULL}, " + 
                 $"string Context: {Context.Quote()})",
-                Indent: 0, Toggle: getDoDebug());
+                Indent: indent + 0, Toggle: getDoDebug());
 
             Context ??= this.Context;
 
@@ -130,23 +132,31 @@ namespace XRL.World.ObjectBuilders
                     $"{nameof(WrassleGiantHero)}", 
                     $"{nameof(Apply)}", 
                     $"Attempted to create Unique {nameof(WrassleGiantHero)} while one already exists", 
-                    Indent: Debug.LastIndent + 1);
+                    Indent: 0);
 
                 Context = "Hero";
                 Unique = false;
             }
 
-            Debug.LoopItem(4, $"Unique?", Good: Unique, Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Unique?", Good: Unique, Indent: indent + 1, Toggle: getDoDebug());
 
             string nameSpecial = Unique ? "Unique" : "Hero";
 
-            Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: 1, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: indent + 1, Toggle: getDoDebug());
 
             Creature.SetStringProperty("Culture", "WrassleGiant");
 
             Creature.SetStringProperty("Role", Unique ? "Leader" : "Hero");
 
-            Creature.SetIntProperty("WrassleGearBestowChance", 100);
+            if (Unique)
+            {
+                Creature.SetIntProperty(WRASSLER_BESTOW_CHANCE_PROP, 100);
+            }
+            else
+            {
+                Creature.SetIntProperty(WRASSLER_BESTOW_CHANCE_PROP, 0, true);
+            }
+            Creature.SetStringProperty(WRASSLER_NO_WRASSLE_GEAR_PROP, "Overridden");
 
             Creature.SetStringProperty("staticFaction1", null);
             Creature.SetStringProperty("staticFaction2", null);
@@ -167,10 +177,10 @@ namespace XRL.World.ObjectBuilders
 
             if (!Creature.TryGetPart(out Wrassler wrassler))
             {
-                Debug.CheckNah(4, $"<Wrassler> missing, Adding", Indent: 1, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"<Wrassler> missing, Adding", Indent: indent + 1, Toggle: getDoDebug());
                 wrassler = Creature.RequirePart<Wrassler>();
             }
-            Debug.LoopItem(4, $"Have <Wrassler>?", Good: wrassler != null, Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Have <Wrassler>?", Good: wrassler != null, Indent: indent + 1, Toggle: getDoDebug());
 
             List<string> noHateFactionsList = new(NoHateFactionsList);
             if (Creature.TryGetStringProperty("NoHateFactions", out string existingNoHateFactions))
@@ -193,7 +203,7 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, 
                 $"NoHateFactions", $"{Creature.GetStringProperty("NoHateFactions")}", 
                 Good: !Creature.GetStringProperty("NoHateFactions").IsNullOrEmpty(), 
-                Indent: 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug());
 
             int StaticFactionAdmirations = Unique || wrassler.WrassleID.SeededRandomBool() ? 3 : 2;
             bool ThiccBoisAdmire = Unique || wrassler.WrassleID.SeededRandomBool(3);
@@ -214,12 +224,12 @@ namespace XRL.World.ObjectBuilders
                 { 3, factionAdmirationBag.DrawRandomToken() },
             };
 
-            Debug.LoopItem(4, $"Setting StaticFactions", Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Setting StaticFactions", Indent: indent + 1, Toggle: getDoDebug());
             for (int i = 1; i < 4; i++)
             {
                 string faction = "";
                 string feeling = "friend";
-                string reason = factionAdmirationBag[i];
+                string reason = GameText.VariableReplace(factionAdmirationBag[i], Creature);
 
                 if (i == ThiccBoisIndex)
                 {
@@ -240,7 +250,7 @@ namespace XRL.World.ObjectBuilders
                 Creature.SetStringProperty($"staticFaction{i}", factionAdmiration, RemoveIfNull: true);
 
                 Debug.LoopItem(4, $"staticFaction{i}", Creature.GetStringProperty($"staticFaction{i}") ?? NULL, 
-                    Good: Creature.HasStringProperty($"staticFaction{i}"), Indent: 2, Toggle: getDoDebug());
+                    Good: Creature.HasStringProperty($"staticFaction{i}"), Indent: indent + 2, Toggle: getDoDebug());
             }
 
             if (Unique)
@@ -251,12 +261,12 @@ namespace XRL.World.ObjectBuilders
                     $"SharesRecipe",
                     Creature.GetStringProperty("SharesRecipe"),
                     Good: Creature.HasStringProperty("SharesRecipe"), 
-                    Indent: 1, Toggle: getDoDebug());
+                    Indent: indent + 1, Toggle: getDoDebug());
                 Debug.LoopItem(4, 
                     $"SharesRecipeWithTrueKin",
                     Creature.GetStringProperty("SharesRecipeWithTrueKin"),
                     Good: Creature.HasStringProperty("SharesRecipeWithTrueKin"), 
-                    Indent: 1, Toggle: getDoDebug());
+                    Indent: indent + 1, Toggle: getDoDebug());
 
                 SecretRevealer secretRevealer = Creature.RequirePart<SecretRevealer>();
                 secretRevealer.id = SCRT_GNT_SCRT_ID;
@@ -268,63 +278,63 @@ namespace XRL.World.ObjectBuilders
                 Debug.LoopItem(4,
                     $"<SecretRevealer>?",
                     Good: secretRevealer != null,
-                    Indent: 1, Toggle: getDoDebug());
+                    Indent: indent + 1, Toggle: getDoDebug());
                 if (secretRevealer != null)
                 {
                     Debug.LoopItem(4,
                         $"secretRevealer.id",
                         secretRevealer.id,
                         Good: secretRevealer.id == SCRT_GNT_SCRT_ID,
-                        Indent: 2, Toggle: getDoDebug());
+                        Indent: indent + 2, Toggle: getDoDebug());
                     Debug.LoopItem(4,
                         $"secretRevealer.text",
                         secretRevealer.text,
                         Good: secretRevealer.text == SCRT_GNT_LCTN_TEXT,
-                        Indent: 2, Toggle: getDoDebug());
+                        Indent: indent + 2, Toggle: getDoDebug());
                     Debug.LoopItem(4,
                         $"secretRevealer.message",
                         secretRevealer.message,
                         Good: secretRevealer.message == $"You have discovered {secretRevealer.text}!",
-                        Indent: 2, Toggle: getDoDebug());
+                        Indent: indent + 2, Toggle: getDoDebug());
                     Debug.LoopItem(4,
                         $"secretRevealer.category",
                         secretRevealer.category,
                         Good: secretRevealer.category == SCRT_GNT_LCTN_CATEGORY,
-                        Indent: 2, Toggle: getDoDebug());
+                        Indent: indent + 2, Toggle: getDoDebug());
                     Debug.LoopItem(4,
                         $"secretRevealer.adjectives",
                         secretRevealer.adjectives,
                         Good: secretRevealer.adjectives == SecretAttributes.ToList().Join(","),
-                        Indent: 2, Toggle: getDoDebug());
+                        Indent: indent + 2, Toggle: getDoDebug());
                 }
             }
 
-            Debug.LoopItem(4, $"Configuring Brain", Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Configuring Brain", Indent: indent + 1, Toggle: getDoDebug());
 
             Creature.Brain.Mobile = true;
             Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}", 
-                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+                Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Wanders = true;
             Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
-                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+                Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.WandersRandomly = true;
             Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
-                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+                Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Factions = "";
             Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
-                Good: Creature.Brain.Mobile, Indent: 2, Toggle: getDoDebug());
+                Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Allegiance.Clear();
             Creature.Brain.Allegiance.Add("WrassleGiants", 800);
             Creature.Brain.Allegiance.Add("Giants", 600);
 
-            Debug.LoopItem(4, $"Brain.{nameof(Brain.Allegiance)}", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Allegiance)}", Indent: indent + 2, Toggle: getDoDebug());
             foreach ((string creatureFaction, int creatureRep) in Creature.Brain.Allegiance)
             {
-                Debug.LoopItem(4, $"{creatureFaction}", $"{creatureRep}", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{creatureFaction}", $"{creatureRep}", Indent: indent + 3, Toggle: getDoDebug());
             }
 
             int MentalMutations = 0;
@@ -347,7 +357,7 @@ namespace XRL.World.ObjectBuilders
                 HasHonorific: null,
                 HasEpithet: null);
 
-            Debug.LoopItem(4, $"Epithet", Epithet ?? "null", Good: Epithet != null, Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Epithet", Epithet ?? "null", Good: Epithet != null, Indent: indent + 1, Toggle: getDoDebug());
 
             string CreatureName = NameMaker.MakeName(
                 For: null,
@@ -366,7 +376,7 @@ namespace XRL.World.ObjectBuilders
                 HasHonorific: null,
                 HasEpithet: null);
 
-            Debug.LoopItem(4, $"CreatureName", CreatureName ?? "null", Good: CreatureName != null, Indent: 1, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"CreatureName", CreatureName ?? "null", Good: CreatureName != null, Indent: indent + 1, Toggle: getDoDebug());
 
             if (CreatureName.Contains("NameGenFail"))
             {
@@ -387,7 +397,7 @@ namespace XRL.World.ObjectBuilders
                 NamingContext: null);
 
             int Stews = Stat.Roll("4d4");
-            Debug.CheckYeh(4, $"{"4d4".Quote()} Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"{"4d4".Quote()} Stews", $"{Stews}", Indent: indent + 1, Toggle: getDoDebug());
 
             if (!Epithet.IsNullOrEmpty())
             {
@@ -400,196 +410,196 @@ namespace XRL.World.ObjectBuilders
             }
             if (!Epithet.IsNullOrEmpty() && !Unique)
             {
-                Debug.Entry(4, $"Beginning WrassleGiant Runway", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"Beginning WrassleGiant Runway", Indent: indent + 1, Toggle: getDoDebug());
 
                 if (Epithet.IsGivingStewful())
                 {
                     int extraStews = Stat.Roll("2d4");
                     Stews += extraStews;
-                    Debug.CheckYeh(4, $"Epithet.IsGivingStewful() {"2d4".Quote()} extraStews", $"{extraStews}", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingStewful() {"2d4".Quote()} extraStews", $"{extraStews}", Indent: indent + 2, Toggle: getDoDebug());
                 }
 
                 if (Epithet.IsGivingStewless())
                 {
                     int fewerStews = Stat.Roll("1d4");
                     Stews -= fewerStews;
-                    Debug.CheckYeh(4, $"Epithet.IsGivingStewless() {"1d4".Quote()} fewerStews", $"{fewerStews}", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingStewless() {"1d4".Quote()} fewerStews", $"{fewerStews}", Indent: indent + 2, Toggle: getDoDebug());
                 }
                     
                 if (Epithet.IsGivingThoughtful())
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingThoughtful()", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingThoughtful()", Indent: indent + 2, Toggle: getDoDebug());
 
                     int extraInt = Stat.Roll("1d4");
                     Creature.AddBaseStat("Intelligence", extraInt);
-                    Debug.LoopItem(4, $"{"1d4".Quote()} extraInt", $"{extraInt}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d4".Quote()} extraInt", $"{extraInt}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int extraMentalMutations = Stat.Roll("1d2");
                     MentalMutations += extraMentalMutations;
-                    Debug.LoopItem(4, $"{"1d2".Quote()} extraMentalMutations", $"{extraMentalMutations}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d2".Quote()} extraMentalMutations", $"{extraMentalMutations}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int fewerPhysicalMutations = Stat.Roll("1d2");
                     PhysicalMutations -= fewerPhysicalMutations;
-                    Debug.LoopItem(4, $"{"1d2".Quote()} fewerPhysicalMutations", $"{fewerPhysicalMutations}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d2".Quote()} fewerPhysicalMutations", $"{fewerPhysicalMutations}", Indent: indent + 3, Toggle: getDoDebug());
                 }
 
                 if (Epithet.IsGivingTough())
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingTough()", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingTough()", Indent: indent + 2, Toggle: getDoDebug());
 
                     int extraTou = Stat.Roll("1d4");
                     Creature.AddBaseStat("Toughness", extraTou);
-                    Debug.LoopItem(4, $"{"1d4".Quote()} extraTou", $"{extraTou}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d4".Quote()} extraTou", $"{extraTou}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int extraPhysicalMutations = Stat.Roll("1d2");
                     PhysicalMutations += extraPhysicalMutations;
-                    Debug.LoopItem(4, $"{"1d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: indent + 3, Toggle: getDoDebug());
                 }
 
                 if (Epithet.IsGivingStrong())
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingStrong()", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingStrong()", Indent: indent + 2, Toggle: getDoDebug());
 
                     int extraStr = Stat.Roll("1d4");
                     Creature.AddBaseStat("Strength", extraStr);
-                    Debug.LoopItem(4, $"{"1d4".Quote()} extraStr", $"{extraStr}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d4".Quote()} extraStr", $"{extraStr}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int extraPhysicalMutations = Stat.Roll("1d2");
                     PhysicalMutations += extraPhysicalMutations;
-                    Debug.LoopItem(4, $"{"1d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: indent + 3, Toggle: getDoDebug());
                 }
 
                 if (Epithet.IsGivingResilient())
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingResilient()", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingResilient()", Indent: indent + 2, Toggle: getDoDebug());
 
                     int extraWil = Stat.Roll("1d4");
                     Creature.AddBaseStat("Willpower", extraWil);
-                    Debug.LoopItem(4, $"{"1d4".Quote()} extraWil", $"{extraWil}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d4".Quote()} extraWil", $"{extraWil}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int extraMentalMutations = Stat.Roll("1d2");
                     MentalMutations += extraMentalMutations;
-                    Debug.LoopItem(4, $"{"1d2".Quote()} extraMentalMutations", $"{extraMentalMutations}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d2".Quote()} extraMentalMutations", $"{extraMentalMutations}", Indent: indent + 3, Toggle: getDoDebug());
                 }
 
                 if (Epithet.IsGivingTrulyImmense())
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingTrulyImmense() Hitpoints", $"x2", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingTrulyImmense() Hitpoints", $"x2", Indent: indent + 2, Toggle: getDoDebug());
                     
                     Creature.MultiplyStat("Hitpoints", 2);
-                    Debug.LoopItem(4, $"Hitpoints", $"x2", Indent: 3, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $"Hitpoints new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"Hitpoints", $"x2", Indent: indent + 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"Hitpoints new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int extraPhysicalMutations = Stat.Roll("1d2");
                     PhysicalMutations += extraPhysicalMutations;
-                    Debug.LoopItem(4, $"{"1d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: indent + 3, Toggle: getDoDebug());
 
                     int cimeraRoll = Stat.Roll("1d3");
                     bool makeChimera = cimeraRoll == 3;
-                    Debug.LoopItem(4, $"{"1d3".Quote()} cimeraRoll", $"{cimeraRoll}", Good: makeChimera, Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{"1d3".Quote()} cimeraRoll", $"{cimeraRoll}", Good: makeChimera, Indent: indent + 3, Toggle: getDoDebug());
                     if (makeChimera)
                     {
                         MakeChimera = true;
                         PhysicalMutations += 1;
-                        Debug.LoopItem(4, $"Chimera extraPhysicalMutations", $"{1}", Indent: 4, Toggle: getDoDebug());
+                        Debug.LoopItem(4, $"Chimera extraPhysicalMutations", $"{1}", Indent: indent + 4, Toggle: getDoDebug());
                     }
                 }
 
                 if (Epithet.IsGivingWrassler())
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingWrassler() Gigantic FoldingChair", $"Give", Indent: 2, Toggle: getDoDebug());
-                    Creature.ReceiveObject("Gigantic FoldingChair");
+                    Debug.CheckYeh(4, $"Epithet.IsGivingWrassler() Gigantic FoldingChair", $"Give", Indent: indent + 2, Toggle: getDoDebug());
+                    Creature.ReceiveObject("Gigantic FoldingChair", Context: $"{UD_QWE.WRASSLE_ID_CONTEXT}{Creature.WrassleID()}");
                 }
 
                 if (!Epithet.IsGivingPopular())
                 {
-                    Debug.CheckNah(4, $"Epithet.IsGivingPopular() Followers", $"Dismiss", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckNah(4, $"Epithet.IsGivingPopular() Followers", $"Dismiss", Indent: indent + 2, Toggle: getDoDebug());
 
                     if (Creature.TryGetPart(out Leader leader))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(Leader)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(Leader)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(leader);
                     }
                     if (Creature.TryGetPart(out Followers followers))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(Followers)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(Followers)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(followers);
                     }
                     if (Creature.TryGetPart(out DromadCaravan dromadCaravan))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(DromadCaravan)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(DromadCaravan)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(dromadCaravan);
                     }
                     if (Creature.TryGetPart(out HasGuards hasGuards))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(HasGuards)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(HasGuards)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(hasGuards);
                     }
                     if (Creature.TryGetPart(out SnapjawPack1 snapjawPack1))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(SnapjawPack1)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(SnapjawPack1)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(snapjawPack1);
                     }
                     if (Creature.TryGetPart(out BaboonHero1Pack baboonHero1Pack))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(BaboonHero1Pack)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(BaboonHero1Pack)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(baboonHero1Pack);
                     }
                     if (Creature.TryGetPart(out GoatfolkClan1 goatfolkClan1))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(GoatfolkClan1)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(GoatfolkClan1)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(goatfolkClan1);
                     }
                     if (Creature.TryGetPart(out EyelessKingCrabSkuttle1 eyelessKingCrabSkuttle1))
                     {
-                        Debug.CheckYeh(4, $"Removed {nameof(EyelessKingCrabSkuttle1)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Removed {nameof(EyelessKingCrabSkuttle1)}", Indent: indent + 3, Toggle: getDoDebug());
                         Creature.RemovePart(eyelessKingCrabSkuttle1);
                     }
                 }
                 else
                 {
-                    Debug.CheckYeh(4, $"Epithet.IsGivingPopular() Followers", $"Keep", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Epithet.IsGivingPopular() Followers", $"Keep", Indent: indent + 2, Toggle: getDoDebug());
                     if (Creature.TryGetPart(out Leader leader))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(Leader)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(Leader)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out Followers followers))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(Followers)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(Followers)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out DromadCaravan dromadCaravan))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(DromadCaravan)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(DromadCaravan)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out HasGuards hasGuards))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(HasGuards)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(HasGuards)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out SnapjawPack1 snapjawPack1))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(SnapjawPack1)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(SnapjawPack1)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out BaboonHero1Pack baboonHero1Pack))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(BaboonHero1Pack)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(BaboonHero1Pack)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out GoatfolkClan1 goatfolkClan1))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(GoatfolkClan1)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(GoatfolkClan1)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                     if (Creature.TryGetPart(out EyelessKingCrabSkuttle1 eyelessKingCrabSkuttle1))
                     {
-                        Debug.CheckYeh(4, $"Have {nameof(EyelessKingCrabSkuttle1)}", Indent: 3, Toggle: getDoDebug());
+                        Debug.CheckYeh(4, $"Have {nameof(EyelessKingCrabSkuttle1)}", Indent: indent + 3, Toggle: getDoDebug());
                     }
                 }
             }
             else if (Unique || Epithet.IsNullOrEmpty())
             {
-                Debug.Entry(4, $"Beginning Unique WrassleGiant Runway", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"Beginning Unique WrassleGiant Runway", Indent: indent + 1, Toggle: getDoDebug());
 
                 int extraStews = Stat.Roll("2d4");
                 Stews += extraStews;
-                Debug.CheckYeh(4, $"{"2d4".Quote()} extraStews", $"{extraStews}", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"{"2d4".Quote()} extraStews", $"{extraStews}", Indent: indent + 2, Toggle: getDoDebug());
 
                 Dictionary<string, (string die, int roll)> statRolls = new()
                 {
@@ -601,7 +611,7 @@ namespace XRL.World.ObjectBuilders
                     { "extraEgo", ("2d3", Stat.Roll("2d3")) },
                 };
 
-                Debug.CheckYeh(4, $"Extra Stats", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Extra Stats", Indent: indent + 2, Toggle: getDoDebug());
                 Creature.AddBaseStat("Strength",     statRolls["extraStr"].roll);
                 Creature.AddBaseStat("Agility",      statRolls["extraAgi"].roll);
                 Creature.AddBaseStat("Toughness",    statRolls["extraTou"].roll);
@@ -609,78 +619,78 @@ namespace XRL.World.ObjectBuilders
                 Creature.AddBaseStat("Willpower",    statRolls["extraWil"].roll);
                 Creature.AddBaseStat("Ego",          statRolls["extraEgo"].roll);
 
-                Debug.LoopItem(4, $"{statRolls["extraStr"].die.Quote()} extraStr", $"{statRolls["extraStr"].roll}", Indent: 3, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"{statRolls["extraAgi"].die.Quote()} extraAgi", $"{statRolls["extraAgi"].roll}", Indent: 3, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"{statRolls["extraTou"].die.Quote()} extraTou", $"{statRolls["extraTou"].roll}", Indent: 3, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"{statRolls["extraInt"].die.Quote()} extraInt", $"{statRolls["extraInt"].roll}", Indent: 3, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"{statRolls["extraWil"].die.Quote()} extraWil", $"{statRolls["extraWil"].roll}", Indent: 3, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"{statRolls["extraEgo"].die.Quote()} extraEgo", $"{statRolls["extraEgo"].roll}", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{statRolls["extraStr"].die.Quote()} extraStr", $"{statRolls["extraStr"].roll}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{statRolls["extraAgi"].die.Quote()} extraAgi", $"{statRolls["extraAgi"].roll}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{statRolls["extraTou"].die.Quote()} extraTou", $"{statRolls["extraTou"].roll}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{statRolls["extraInt"].die.Quote()} extraInt", $"{statRolls["extraInt"].roll}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{statRolls["extraWil"].die.Quote()} extraWil", $"{statRolls["extraWil"].roll}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{statRolls["extraEgo"].die.Quote()} extraEgo", $"{statRolls["extraEgo"].roll}", Indent: indent + 3, Toggle: getDoDebug());
 
                 int cimeraRoll = Stat.Roll("1d3");
                 bool makeChimera = cimeraRoll == 3;
-                Debug.LoopItem(4, $"{"1d3".Quote()} cimeraRoll", $"{cimeraRoll}", Good: makeChimera, Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{"1d3".Quote()} cimeraRoll", $"{cimeraRoll}", Good: makeChimera, Indent: indent + 2, Toggle: getDoDebug());
                 if (makeChimera)
                 {
                     MakeChimera = true;
                     PhysicalMutations += 1;
-                    Debug.LoopItem(4, $"Chimera extraPhysicalMutations", $"{1}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"Chimera extraPhysicalMutations", $"{1}", Indent: indent + 3, Toggle: getDoDebug());
                 }
 
                 int extraPhysicalMutations = Stat.Roll("2d2");
                 PhysicalMutations += extraPhysicalMutations;
-                Debug.CheckYeh(4, $"{"2d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"{"2d2".Quote()} extraPhysicalMutations", $"{extraPhysicalMutations}", Indent: indent + 2, Toggle: getDoDebug());
 
                 int extraMentalMutations = Stat.Roll("1d3");
                 MentalMutations += extraMentalMutations;
-                Debug.CheckYeh(4, $"{"1d3".Quote()} extraMentalMutations", $"{extraMentalMutations}", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"{"1d3".Quote()} extraMentalMutations", $"{extraMentalMutations}", Indent: indent + 2, Toggle: getDoDebug());
 
-                Debug.CheckYeh(4, $"Unique Followers", $"Dismiss", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Unique Followers", $"Dismiss", Indent: indent + 2, Toggle: getDoDebug());
                 if (Creature.TryGetPart(out Leader leader))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(Leader)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(Leader)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(leader);
                 }
                 if (Creature.TryGetPart(out Followers followers))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(Followers)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(Followers)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(followers);
                 }
                 if (Creature.TryGetPart(out DromadCaravan dromadCaravan))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(DromadCaravan)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(DromadCaravan)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(dromadCaravan);
                 }
                 if (Creature.TryGetPart(out HasGuards hasGuards))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(HasGuards)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(HasGuards)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(hasGuards);
                 }
                 if (Creature.TryGetPart(out SnapjawPack1 snapjawPack1))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(SnapjawPack1)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(SnapjawPack1)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(snapjawPack1);
                 }
                 if (Creature.TryGetPart(out BaboonHero1Pack baboonHero1Pack))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(BaboonHero1Pack)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(BaboonHero1Pack)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(baboonHero1Pack);
                 }
                 if (Creature.TryGetPart(out GoatfolkClan1 goatfolkClan1))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(GoatfolkClan1)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(GoatfolkClan1)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(goatfolkClan1);
                 }
                 if (Creature.TryGetPart(out EyelessKingCrabSkuttle1 eyelessKingCrabSkuttle1))
                 {
-                    Debug.CheckYeh(4, $"Removed {nameof(EyelessKingCrabSkuttle1)}", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {nameof(EyelessKingCrabSkuttle1)}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RemovePart(eyelessKingCrabSkuttle1);
                 }
 
                 Creature.MultiplyStat("Hitpoints", 3);
-                Debug.LoopItem(4, $"Hitpoints x3, new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Hitpoints x3, new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: indent + 2, Toggle: getDoDebug());
             }
 
-            Debug.CheckYeh(4, $"Pump Hitpoints from {Stews.Things("stew")}", Indent: 2, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Pump Hitpoints from {Stews.Things("stew")}", Indent: indent + 2, Toggle: getDoDebug());
             int totalStewsHP = 0;
             for (int i = 0; i < Stews; i++)
             {
@@ -688,60 +698,60 @@ namespace XRL.World.ObjectBuilders
                 int stewsHP = Stat.Roll(stewsHPDie);
                 Creature.AddBaseStat("Hitpoints", stewsHP);
                 totalStewsHP += stewsHP;
-                Debug.LoopItem(4, $"{stewsHPDie.Quote()} stewsHP{(Unique ? " (Unique)" : "")}", $"{stewsHP}", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{stewsHPDie.Quote()} stewsHP{(Unique ? " (Unique)" : "")}", $"{stewsHP}", Indent: indent + 3, Toggle: getDoDebug());
             }
-            Debug.CheckYeh(4, $"Hitpoints from {Stews.Things("stew")}", $"{totalStewsHP}", Indent: 3, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"Hitpoints new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: 3, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Hitpoints from {Stews.Things("stew")}", $"{totalStewsHP}", Indent: indent + 3, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Hitpoints new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: indent + 3, Toggle: getDoDebug());
 
             if (!Creature.TryGetPart(out HasMakersMark hasMakersMark))
             {
                 hasMakersMark = Creature.RequirePart<HasMakersMark>();
             }
-            Debug.LoopItem(4, $"<HasMakersMark>?", Good: Creature.HasPart<HasMakersMark>(), Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"<HasMakersMark>?", Good: Creature.HasPart<HasMakersMark>(), Indent: indent + 2, Toggle: getDoDebug());
             List<string> usableMarks = new(MakersMark.GetUsable());
             string heroMark = usableMarks.DrawSeededToken(wrassler.WrassleID.ID);
             hasMakersMark.Mark = Unique ? ((char)156).ToString() : heroMark;
             hasMakersMark.Color = wrassler.DetailColor;
             if (Unique) MakersMark.RecordUsage(hasMakersMark.Mark);
-            Debug.LoopItem(4, $"Mark: {hasMakersMark.Mark}, Color: {hasMakersMark.Color}", Indent: 3, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Mark: {hasMakersMark.Mark}, Color: {hasMakersMark.Color}", Indent: indent + 3, Toggle: getDoDebug());
 
             int level = Unique ? 35 : 20;
             int extraLevels = Stat.Roll("3d3");
             Creature.GetStat("Level").BaseValue = level + extraLevels;
-            Debug.CheckYeh(4, $"Set Level", $"{level + extraLevels}", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"starting level", $"{level}", Indent: 3, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"{"3d3".Quote()} extraLevels", $"{extraLevels}", Indent: 3, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Set Level", $"{level + extraLevels}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"starting level", $"{level}", Indent: indent + 3, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"{"3d3".Quote()} extraLevels", $"{extraLevels}", Indent: indent + 3, Toggle: getDoDebug());
 
             int extraMP = (Creature.GetStat("Level").BaseValue - 1);
             Creature.AddBaseStat("MP", extraMP);
-            Debug.CheckYeh(4, $"Add extraMP", $"{extraMP}", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"(starting Level - 1)", Indent: 3, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Add extraMP", $"{extraMP}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"(starting Level - 1)", Indent: indent + 3, Toggle: getDoDebug());
 
             int extraXP = Stat.Roll("1d18") * Stat.Roll("18d18");
             Creature.GetStat("XP").BaseValue = Leveler.GetXPForLevel(Creature.GetStat("Level").Value) + extraXP;
-            Debug.CheckYeh(4, $"Set XP", $"{Creature.GetStat("XP").BaseValue}", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"starting XP", $"{Leveler.GetXPForLevel(Creature.GetStat("Level").Value)}", Indent: 3, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"{"18d18d18".Quote()} extraXP", $"{extraXP}", Indent: 3, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Set XP", $"{Creature.GetStat("XP").BaseValue}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"starting XP", $"{Leveler.GetXPForLevel(Creature.GetStat("Level").Value)}", Indent: indent + 3, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"{"18d18d18".Quote()} extraXP", $"{extraXP}", Indent: indent + 3, Toggle: getDoDebug());
 
             int extraXPValue = Stews * 75;
             Creature.AddBaseStat("XPValue", extraXPValue);
 
             if (Unique) Creature.MultiplyStat("XPValue", 2);
 
-            Debug.CheckYeh(4, $"Configure XPValue", $"{Creature.GetStat("XPValue").BaseValue}", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"Add XPValue (Stews * 75)", $"{extraXPValue}", Indent: 3, Toggle: getDoDebug());
-            if (Unique) Debug.LoopItem(4, $"Multiply XPValue x2 (Unique)", Indent: 3, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Configure XPValue", $"{Creature.GetStat("XPValue").BaseValue}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"Add XPValue (Stews * 75)", $"{extraXPValue}", Indent: indent + 3, Toggle: getDoDebug());
+            if (Unique) Debug.LoopItem(4, $"Multiply XPValue x2 (Unique)", Indent: indent + 3, Toggle: getDoDebug());
 
-            Debug.CheckYeh(4, $"Gigantify Creature", Indent: 2, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Gigantify Creature", Indent: indent + 2, Toggle: getDoDebug());
             int GigantismLevel = (int)Math.Floor(Creature.Level / 3.0);
-            Debug.LoopItem(4, $"GigantismLevel (Creature.Level({Creature.Level}) / 3.0)", $"{GigantismLevel}", Indent: 3, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"GigantismLevel (Creature.Level({Creature.Level}) / 3.0)", $"{GigantismLevel}", Indent: indent + 3, Toggle: getDoDebug());
             Gigantified.GigantifyMutant(Creature, GigantismLevel, Stews, null, Context);
 
             Mutations mutations = Creature.RequirePart<Mutations>();
 
             if (MakeChimera)
             {
-                Debug.CheckYeh(4, $"MakeChimera", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"MakeChimera", Indent: indent + 2, Toggle: getDoDebug());
                 BaseMutation Chimera = MutationFactory.GetMutationEntryByName("Chimera")?.CreateInstance();
                 if (Chimera != null)
                 {
@@ -749,121 +759,121 @@ namespace XRL.World.ObjectBuilders
                     Debug.LoopItem(4, 
                         $"Chimera Mutation added", 
                         Good: mutations.ActiveMutationList.Contains(Chimera),
-                        Indent: 3, Toggle: getDoDebug());
+                        Indent: indent + 3, Toggle: getDoDebug());
                     // mutations.MutationList = mutations.MutationList.OrderByDescending(x => x.Name == Chimera.Name).ToList();
                     Debug.LoopItem(4, 
                         $"Mutations list sorted to have Chimera at the top", 
                         Good: mutations.MutationList.ElementAt(0) == Chimera,
-                        Indent: 3, Toggle: getDoDebug());
+                        Indent: indent + 3, Toggle: getDoDebug());
 
-                    Debug.CheckYeh(4, $"Convert MentalMutations count to some number of PhysicalMutations", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Convert MentalMutations count to some number of PhysicalMutations", Indent: indent + 3, Toggle: getDoDebug());
                     int MentalToPhysicalMutations = Math.Max(0, (int)Math.Floor(MentalMutations / 2.0));
                     PhysicalMutations += MentalToPhysicalMutations;
                     MentalMutations = 0;
                     Debug.LoopItem(4, 
                         $"Max(0, (int)Math.Floor(MentalMutations / 2.0)) extraPhysicalMutations", 
                         $"{MentalToPhysicalMutations}", 
-                        Indent: 4, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $"MentalMutations", $"{MentalMutations}", Indent: 4, Toggle: getDoDebug());
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"MentalMutations", $"{MentalMutations}", Indent: indent + 4, Toggle: getDoDebug());
                 }
                 else
                 {
-                    Debug.CheckNah(4, $"Failed to Instantiate MakeChimera", Indent: 3, Toggle: getDoDebug());
+                    Debug.CheckNah(4, $"Failed to Instantiate MakeChimera", Indent: indent + 3, Toggle: getDoDebug());
                 }
             }
             else
             {
-                Debug.CheckNah(4, $"MakeChimera", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"MakeChimera", Indent: indent + 2, Toggle: getDoDebug());
             }
 
-            Debug.CheckYeh(4, $"Final Mutation Counts", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"PhysicalMutations", $"{PhysicalMutations}", Indent: 3, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"MentalMutations", $"{MentalMutations}", Indent: 3, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Final Mutation Counts", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"PhysicalMutations", $"{PhysicalMutations}", Indent: indent + 3, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"MentalMutations", $"{MentalMutations}", Indent: indent + 3, Toggle: getDoDebug());
 
             int MentalMutationLevelHigh = 2 + Math.Max(1, (int)Math.Floor(MentalMutations / 2.0));
             string MentalMutationLevelDie = $"1d{MentalMutationLevelHigh}";
             if (MentalMutations > 0)
             {
-                Debug.CheckYeh(4, $"Process MentalMutations", Indent: 2, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"MentalMutationLevelDie", $"{MentalMutationLevelDie}", Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Process MentalMutations", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"MentalMutationLevelDie", $"{MentalMutationLevelDie}", Indent: indent + 3, Toggle: getDoDebug());
 
-                Debug.LoopItem(4, $"Getting {MentalMutations.Things("Random Mental Mutation")}", Indent: 3, Toggle: getDoDebug());
-                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Getting {MentalMutations.Things("Random Mental Mutation")}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
             }
             for (int i = 0; i < MentalMutations; i++)
             {
-                Debug.LoopItem(4, $"{nameof(MentalMutations)} Iteration {i + 1}", Indent: 4, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{nameof(MentalMutations)} Iteration {i + 1}", Indent: indent + 4, Toggle: getDoDebug());
                 BaseMutation randomMentalMutation;
                 do
                 {
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
                     randomMentalMutation = MutationFactory.GetRandomMutation("Mental");
                     Debug.LoopItem(4, 
                         $"{randomMentalMutation.Name}", 
                         Good: !mutations.HasMutation(randomMentalMutation), 
-                        Indent: 5, Toggle: getDoDebug());
+                        Indent: indent + 5, Toggle: getDoDebug());
                 }
                 while (randomMentalMutation != null && mutations.HasMutation(randomMentalMutation));
                 if (randomMentalMutation != null)
                 {
                     int randomMutationLevel = Stat.Roll(MentalMutationLevelDie);
                     mutations.AddMutation(randomMentalMutation, randomMutationLevel);
-                    Debug.LoopItem(4, $"mutation added at level {randomMutationLevel}", Indent: 6, Toggle: getDoDebug());
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"mutation added at level {randomMutationLevel}", Indent: indent + 6, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
                 }
-                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
             }
 
             int PhysicalMutationLevelHigh = 2 + Math.Max(1, (int)Math.Floor(PhysicalMutations / 2.0));
             string PhysicalMutationLevelDie = $"1d{PhysicalMutationLevelHigh}";
             if (PhysicalMutations > 0)
             {
-                Debug.CheckYeh(4, $"Process PhysicalMutations", Indent: 2, Toggle: getDoDebug());
-                Debug.LoopItem(4, $"PhysicalMutationLevelDie", $"{PhysicalMutationLevelDie}", Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Process PhysicalMutations", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"PhysicalMutationLevelDie", $"{PhysicalMutationLevelDie}", Indent: indent + 3, Toggle: getDoDebug());
 
-                Debug.LoopItem(4, $"Getting {PhysicalMutations.Things("Random Physical Mutation")}", Indent: 3, Toggle: getDoDebug());
-                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"Getting {PhysicalMutations.Things("Random Physical Mutation")}", Indent: indent + 3, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
             }
             for (int i = 0; i < PhysicalMutations; i++)
             {
-                Debug.LoopItem(4, $"{nameof(PhysicalMutations)} Iteration {i + 1}", Indent: 4, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{nameof(PhysicalMutations)} Iteration {i + 1}", Indent: indent + 4, Toggle: getDoDebug());
                 BaseMutation randomPhysicalMutation;
                 do
                 {
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
                     randomPhysicalMutation = MutationFactory.GetRandomMutation("Physical");
                     Debug.LoopItem(4, 
                         $"{randomPhysicalMutation.Name}", 
                         Good: !mutations.HasMutation(randomPhysicalMutation), 
-                        Indent: 5, Toggle: getDoDebug());
+                        Indent: indent + 5, Toggle: getDoDebug());
                 }
                 while (randomPhysicalMutation != null && mutations.HasMutation(randomPhysicalMutation));
                 if (randomPhysicalMutation != null)
                 {
                     int randomMutationLevel = Stat.Roll(PhysicalMutationLevelDie);
                     mutations.AddMutation(randomPhysicalMutation, randomMutationLevel);
-                    Debug.LoopItem(4, $"mutation added at level {randomMutationLevel}", Indent: 6, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"mutation added at level {randomMutationLevel}", Indent: indent + 6, Toggle: getDoDebug());
                     if (mutations.HasMutation("Chimera"))
                     {
-                        Debug.LoopItem(4, $"Chimera Limb?", Indent: 6, Toggle: getDoDebug());
+                        Debug.LoopItem(4, $"Chimera Limb?", Indent: indent + 6, Toggle: getDoDebug());
                         int chimeraLimbRoll = "1d7".RollCached();
                         bool giveChimeraLimb = chimeraLimbRoll > 4;
                         Debug.LoopItem(4,
                             $"{"1d7".Quote()} chimeraLimbRoll {chimeraLimbRoll} > 4", 
                             Good: giveChimeraLimb, 
-                            Indent: 7, Toggle: getDoDebug());
+                            Indent: indent + 7, Toggle: getDoDebug());
                         if (giveChimeraLimb)
                         {
                             mutations.AddChimericBodyPart();
                         }
                     }
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 5, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
                 }
-                Debug.Divider(4, HONLY, Count: 40, Indent: 4, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 40, Indent: indent + 4, Toggle: getDoDebug());
             }
 
             Creature.RequirePart<Calming>();
-            Debug.LoopItem(4, $"<Calming>?", Good: Creature.HasPart<Calming>(), Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"<Calming>?", Good: Creature.HasPart<Calming>(), Indent: indent + 2, Toggle: getDoDebug());
 
             if (!Creature.TryGetPart(out GivesRep givesRep))
             {
@@ -878,27 +888,27 @@ namespace XRL.World.ObjectBuilders
                 $"<GivesRep>?", 
                 $"{(givesRep?.repValue != null ? givesRep.repValue : "")}",
                 Good: Creature.HasPart<GivesRep>(), 
-                Indent: 2, Toggle: getDoDebug());
+                Indent: indent + 2, Toggle: getDoDebug());
 
-            Debug.CheckYeh(4, $"Remove Problem Parts", Indent: 2, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Remove Problem Parts", Indent: indent + 2, Toggle: getDoDebug());
             if (Creature.TryGetPart(out GreaterVoider greaterVoider))
             {
-                Debug.CheckYeh(4, $"Removed {nameof(GreaterVoider)}", Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Removed {nameof(GreaterVoider)}", Indent: indent + 3, Toggle: getDoDebug());
                 Creature.RemovePart(greaterVoider);
             }
             if (Creature.TryGetPart(out Rummager rummager))
             {
-                Debug.CheckYeh(4, $"Removed {nameof(Rummager)}", Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Removed {nameof(Rummager)}", Indent: indent + 3, Toggle: getDoDebug());
                 Creature.RemovePart(rummager);
             }
             if (Creature.TryGetPart(out Breeder breeder))
             {
-                Debug.CheckYeh(4, $"Removed {nameof(Breeder)}", Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Removed {nameof(Breeder)}", Indent: indent + 3, Toggle: getDoDebug());
                 Creature.RemovePart(breeder);
             }
             if (Creature.TryGetPart(out ReplaceObject replaceObject))
             {
-                Debug.CheckYeh(4, $"Removed {nameof(ReplaceObject)}", Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Removed {nameof(ReplaceObject)}", Indent: indent + 3, Toggle: getDoDebug());
                 Creature.RemovePart(replaceObject);
             }
 
@@ -908,7 +918,7 @@ namespace XRL.World.ObjectBuilders
             {
                 if (displayNameAdjectives.AdjectiveList.Contains(Gigantified.GetNamePrefix()))
                 {
-                    Debug.CheckYeh(4, $"Removed {Gigantified.GetNamePrefix()} from {nameof(DisplayNameAdjectives)}", Indent: 2, Toggle: getDoDebug());
+                    Debug.CheckYeh(4, $"Removed {Gigantified.GetNamePrefix()} from {nameof(DisplayNameAdjectives)}", Indent: indent + 2, Toggle: getDoDebug());
                     displayNameAdjectives.RemoveAdjective(Gigantified.GetNamePrefix());
                 }
             }
@@ -925,24 +935,24 @@ namespace XRL.World.ObjectBuilders
                     $"<ConversationScript>?", 
                     $"{conversationScript?.ConversationID ?? "" }",
                     Good: Creature.HasPart<ConversationScript>(),
-                    Indent: 2, Toggle: getDoDebug());
+                    Indent: indent + 2, Toggle: getDoDebug());
             }
             else
             {
                 Debug.CheckNah(4,
                     $"<ConversationScript>?",
                     $"Not yet written for non-unique WrassleGiants",
-                    Indent: 2, Toggle: getDoDebug());
+                    Indent: indent + 2, Toggle: getDoDebug());
             }
 
             Creature.AddSkills(HeroSkills);
             if (Unique) 
                 Creature.AddSkills(UniqueHeroSkills);
 
-            Debug.CheckYeh(4, $"Skills Added", Indent: 2, Toggle: getDoDebug());
+            Debug.CheckYeh(4, $"Skills Added", Indent: indent + 2, Toggle: getDoDebug());
             foreach (BaseSkill skill in Creature.GetPartsDescendedFrom<BaseSkill>())
             {
-                Debug.LoopItem(4, $" {skill.Name}", Indent: 3, Toggle: getDoDebug());
+                Debug.LoopItem(4, $" {skill.Name}", Indent: indent + 3, Toggle: getDoDebug());
             }
 
             int startingMP = Creature.Stat("MP");
@@ -952,8 +962,8 @@ namespace XRL.World.ObjectBuilders
                 int lastPoints = 0;
                 bool stuck = false;
                 int maxAttempts = 200;
-                Debug.CheckYeh(4, $"Total MP to Spend", $"{startingMP}", Indent: 2, Toggle: getDoDebug());
-                Debug.Divider(4, HONLY, Count: 25, Indent: 3, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Total MP to Spend", $"{startingMP}", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 3, Toggle: getDoDebug());
                 while (Creature.Stat("MP") > 0 && Creature.Stat("MP") != lastRemaining && !stuck && --maxAttempts > 0)
                 {
                     int pointsToSpend = Stat.Roll($"1d{Math.Max(1, Math.Min(Creature.Stat("MP"), 4))}");
@@ -968,44 +978,41 @@ namespace XRL.World.ObjectBuilders
                     }
                     lastPoints = pointsToSpend;
                     lastRemaining = Creature.Stat("MP");
-                    Debug.LoopItem(4, $"Spending: {pointsToSpend}", Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"Spending: {pointsToSpend}", Indent: indent + 3, Toggle: getDoDebug());
                     Creature.RandomlySpendPoints(maxAPtospend: 0, maxSPtospend: 0, maxMPtospend: pointsToSpend);
-                    Debug.LoopItem(4, $"Remaining: {Creature.Stat("MP")}", Indent: 4, Toggle: getDoDebug());
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 3, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"Remaining: {Creature.Stat("MP")}", Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.Divider(4, HONLY, Count: 25, Indent: indent + 3, Toggle: getDoDebug());
                 }
             }
             else
             {
-                Debug.CheckNah(4, $"No MP to Spend", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"No MP to Spend", Indent: indent + 2, Toggle: getDoDebug());
             }
             Creature.RandomlySpendPoints();
-            Debug.LoopItem(4, $"AP", $"{Creature.Stat("AP")}", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"SP", $"{Creature.Stat("SP")}", Indent: 2, Toggle: getDoDebug());
-            Debug.LoopItem(4, $"MP", $"{Creature.Stat("MP")}", Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"AP", $"{Creature.Stat("AP")}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"SP", $"{Creature.Stat("SP")}", Indent: indent + 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"MP", $"{Creature.Stat("MP")}", Indent: indent + 2, Toggle: getDoDebug());
 
             if (Creature.IsMutant() && !Creature.IsEsper())
             {
-                Debug.CheckYeh(4, $"Attempting Rapid Advancements", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckYeh(4, $"Attempting Rapid Advancements", Indent: indent + 2, Toggle: getDoDebug());
                 for (int i = 0; i < Creature.Level; i++)
                 {
                     int iLevel = i + 1;
-                    Debug.LoopItem(4, $"iLevel: {iLevel}", Indent: 3, Toggle: getDoDebug());
-
                     int rapidAdvancement = ((iLevel + 5) % 10 == 0) ? 3 : 0;
+                    Debug.LoopItem(4, 
+                        $"iLevel: {iLevel}" +
+                        $"{(rapidAdvancement != 0 ? $" | Rapid Advance: {rapidAdvancement != 0}" : "")}", 
+                        Indent: indent + 3, Toggle: getDoDebug());
                     Leveler.RapidAdvancement(rapidAdvancement, Creature);
-                    if (rapidAdvancement != 0)
-                    {
-                        Debug.CheckYeh(4, $"Rapid Advance", $"{rapidAdvancement != 0}",
-                            Indent: 4, Toggle: getDoDebug());
-                    }
                 }
             }
             else
             {
-                Debug.CheckNah(4, $"Inelligeble for Rapid Advancements", Indent: 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"Inelligeble for Rapid Advancements", Indent: indent + 2, Toggle: getDoDebug());
             }
             Creature.RequirePart<Interesting>();
-            Debug.LoopItem(4, $"<Interesting>?", Good: Creature.HasPart<Interesting>(), Indent: 2, Toggle: getDoDebug());
+            Debug.LoopItem(4, $"<Interesting>?", Good: Creature.HasPart<Interesting>(), Indent: indent + 2, Toggle: getDoDebug());
 
             if (!Creature.TryGetPart(out Description description))
             {
@@ -1035,7 +1042,9 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, 
                 $"<Description>?", 
                 Good: description.Short.Contains($"{preDesc}"), 
-                Indent: 2, Toggle: getDoDebug());
+                Indent: indent + 2, Toggle: getDoDebug());
+
+            Debug.LastIndent = indent;
         }
 
         public static GameObjectBlueprint GetGiantEligibleBlueprintModel(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)

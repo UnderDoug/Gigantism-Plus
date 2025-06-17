@@ -656,10 +656,13 @@ namespace XRL.World.Parts
                 if (E.ID == "AdjustWeaponScore" || E.ID == "AdjustArmorScore")
                 {
                     GameObject User = E.GetGameObjectParameter("User");
-                    int Score = E.GetIntParameter("Score");
-                    Score = Math.Max(100, Score);
+                    if (!User.HasWrassleGearForThisSlot(ParentLimb))
+                    {
+                        int Score = E.GetIntParameter("Score");
+                        Score = Math.Max(100, Score);
 
-                    E.SetParameter("Score", Score);
+                        E.SetParameter("Score", Score);
+                    }
                 }
                 if (E.ID == "CanBeDisassembled")
                 {

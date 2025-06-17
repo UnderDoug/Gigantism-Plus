@@ -258,6 +258,7 @@ namespace XRL.World.Parts
                 E.Object == ParentObject
              && E.Actor.TryGetPart(out Tactics_Vault vaultSkill)
              && vaultSkill.CanNormallyVault(E.Object);
+
             if (wantInventoryAction)
             {
                 int priority = 0;
@@ -449,7 +450,7 @@ namespace XRL.World.Parts
             bool haveSkill = vaulterNotNull && Vaulter.TryGetPart(out vaultSkill);
             bool wantToVault = haveSkill && vaultSkill.WantToVault;
             bool midVault = haveSkill && vaultSkill.MidVault;
-            bool notPlayer = vaulterNotNull && !Vaulter.IsPlayer();
+            bool notPlayer = vaulterNotNull && !Vaulter.IsPlayerControlled();
             bool autoActActive = AutoAct.IsActive();
             bool actingAutomatically = notPlayer || autoActActive;
 
@@ -555,7 +556,7 @@ namespace XRL.World.Parts
 
                 bool vaulterNotPlayer =
                     vaulterNotNull
-                    && !Vaulter.IsPlayer();
+                    && !Vaulter.IsPlayerControlled();
 
                 bool autoActActive = AutoAct.IsActive();
 
@@ -627,7 +628,7 @@ namespace XRL.World.Parts
                 bool notMidVault = haveSkill && !vaultSkill.MidVault;
                 bool vaulted = haveSkill && vaultSkill.Vaulted;
                 bool wantToVault = haveSkill && vaultSkill.WantToVault;
-                bool isPlayer = vaulterNotNull && Vaulter.IsPlayer();
+                bool isPlayer = vaulterNotNull && Vaulter.IsPlayerControlled();
                 bool autoActActive = AutoAct.IsActive();
                 bool actingAutomatically = isPlayer || autoActActive;
 

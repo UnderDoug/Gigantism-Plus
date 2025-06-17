@@ -608,11 +608,11 @@ namespace XRL.World.Capabilities
                 + $"{nameof(GetWrassleColorSequence)}(Guid WrassleID, {nameof(Number)}: {Number}) "
                 + $"{nameof(Primary)}: {Primary}, "
                 + $"{nameof(Secondary)}: {Secondary}",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: getDoDebug('X'));
 
             if (WrassleID == Guid.Empty)
             {
-                Debug.CheckNah(4, $"WrassleID empty", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.CheckNah(4, $"WrassleID empty", Indent: indent + 2, Toggle: getDoDebug('X'));
                 Debug.LastIndent = indent;
                 yield break;
             }
@@ -704,6 +704,45 @@ namespace XRL.World.Capabilities
             return Text.Color(shader);
         }
 
+        public static int GetBestowalChance(GameObject WrassleCreature, int Indent = 0)
+        {
+            if (WrassleCreature == null || !WrassleCreature.HasPart<Wrassler>())
+            {
+                return 0;
+            }
+
+            int bestowChance = WrassleCreature.GetIntProperty(WRASSLER_BESTOW_CHANCE_PROP, -1);
+
+            if (bestowChance < 0
+             && (int.TryParse(WrassleCreature.GetStringProperty(WRASSLER_BESTOW_CHANCE_PROP, "-1"), out bestowChance) && bestowChance < 0)
+             && (int.TryParse(WrassleCreature.GetTag(WRASSLER_BESTOW_CHANCE_PROP, "-1"), out bestowChance) && bestowChance < 0))
+            {
+                bestowChance = 100;
+            }
+
+            if (WrassleCreature.HasIntProperty("IsPlayer"))
+            {
+                bestowChance = SlideWrasslePlayerStart;
+            }
+            else
+            {
+                bestowChance *= 10;
+            }
+
+            int indent = Debug.LastIndent;
+            Indent += indent;
+
+            Debug.Entry(4, 
+                $"* {nameof(UD_QWE)}."
+                + $"{nameof(GetBestowalChance)}("
+                + $"{WrassleCreature?.DebugName ?? NULL})",
+                $"{bestowChance}/1,000",
+                Indent: indent + Indent, Toggle: getDoDebug('X'));
+
+            Debug.LastIndent = indent;
+
+            return bestowChance;
+        }
         public static Wrassler BestowWrassleGear(GameObject WrassleCreature, out bool Bestowed, bool Register = false)
         {
             int indent = Debug.LastIndent;
@@ -878,7 +917,7 @@ namespace XRL.World.Capabilities
                         Indent: indent + 4, Toggle: getDoDebug('B'));
                 }
 
-                string context = $"{nameof(WrassleID)}::{wrassleID}";
+                string context = $"{WRASSLE_ID_CONTEXT}{wrassleID}";
                 Debug.Entry(4, $"{nameof(context)} set for preloading {nameof(WrassleID)}", $"{context}",
                     Indent: indent + 4, Toggle: getDoDebug('B'));
                 Debug.Entry(4, $"Creating {nameof(WrassleGear)} object...",
@@ -938,6 +977,10 @@ namespace XRL.World.Capabilities
                         Debug.CheckYeh(4, $"Equipped {wrassleGearObject?.DebugName ?? NULL} in {bodyPart.Type} slot",
                             Indent: indent + 4, Toggle: getDoDebug('B'));
                         wrassleGearObjects.TryAdd(wrassleGearObject);
+
+                        Debug.Entry(4, $"Bonding limb with {nameof(wrassleGearObject)}...",
+                            Indent: indent + 4, Toggle: getDoDebug('B'));
+                        wrassleGear.BondedLimbID = bodyPart.ID;
                     }
                 }
                 else

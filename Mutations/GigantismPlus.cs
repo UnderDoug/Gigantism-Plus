@@ -8,6 +8,7 @@ using XRL.Core;
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Skill;
+using XRL.World.Capabilities;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
@@ -840,7 +841,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})", Toggle: doDebug);
             Body body = GO.Body;
 
-            GO.RequirePart<Wrassler>();
+            UD_QWE.MakeWrassler(GO);
 
             Debug.Entry(4, "? if (body != null)", Indent: 1, Toggle: doDebug);
             if (body != null)

@@ -18,7 +18,7 @@
   
   <object Name="Templar" Load="Merge">
     <builder Name="Gigantified" ChanceOneIn="500" />
-    <property Name="NoWrassleGear" Value="NonePlease!" />
+    <intproperty Name="WrassleGearBestowChance" Value="0" />
   </object>
   
   <object Name="Great Saltback" Load="Merge">

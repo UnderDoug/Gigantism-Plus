@@ -135,10 +135,42 @@ namespace HNPS_GigantismPlus
                 Debug.Warn(2,
                     $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
                     $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
-                    $"failed to instantiate UniqueGiant. Placement aborted.",
+                    $"failed to instantiate {nameof(UniqueGiant)}. Placement aborted.",
                     Indent: 0);
                 return;
             }
+
+            string wrasslerColor = null;
+            WrassleID wrassleID = null;
+            Debug.Entry(4, $"Storing {nameof(wrasslerColor)}...", Indent: 1, Toggle: getDoDebug());
+            if (!UniqueGiant.TryGetPart(out Wrassler wrassler))
+            {
+                Debug.CheckYeh(4, $"{nameof(UniqueGiant)} lacks {nameof(Wrassler)} part, registering with {nameof(UD_QWE)}",
+                    Indent: 1, Toggle: getDoDebug());
+                wrassler = UD_QWE.MakeWrassler(UniqueGiant);
+            }
+            else
+            {
+                Debug.CheckYeh(4, $"{nameof(UniqueGiant)} has {nameof(Wrassler)} part",
+                    Indent: 1, Toggle: getDoDebug());
+            }
+            wrassleID = wrassler.GetWrassleID();
+
+            if (wrassleID == null)
+            {
+                Debug.Warn(2,
+                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
+                    $"failed to instantiate {nameof(wrassleID)}. Ring sync aborted.",
+                    Indent: 0);
+                return;
+            }
+
+            Debug.Entry(4, $"{nameof(wrassleID)}.{nameof(wrassleID.ID)}", $"{wrassleID.GetID(Silent: true)}", Indent: 1, Toggle: getDoDebug());
+
+            wrasslerColor = wrassleID?.SecondaryColor;
+            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
+            Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Assigning GiantAbodePopulator if it's necessary...", Indent: 1, Toggle: getDoDebug());
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE) // This specific map has the widgets necessary for the specified builder to work
@@ -160,17 +192,6 @@ namespace HNPS_GigantismPlus
                     Value1: zoneManager.CacheObject(UniqueGiant));
             }
 
-            string wrasslerColor = null;
-            Debug.Entry(4, $"Storing {nameof(wrasslerColor)}...", Indent: 1, Toggle: getDoDebug());
-            if (UniqueGiant.TryGetPart(out WrassleID wrassleID))
-            {
-                Debug.CheckYeh(4, $"{nameof(UniqueGiant)} has {nameof(Wrassler)} part, ID", wrassleID.ToString(),
-                    Indent: 1, Toggle: getDoDebug());
-                wrasslerColor = wrassleID.SecondaryColor;
-            }
-            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
-            Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
-
             Debug.Entry(4, $"Getting Ropes and Attempting to assign Color...", Indent: 1, Toggle: getDoDebug());
             List<GameObject> ropesList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes");
             if (!ropesList.IsNullOrEmpty())
@@ -178,6 +199,7 @@ namespace HNPS_GigantismPlus
                 Debug.CheckYeh(4, $"Got Ropes", Indent: 2, Toggle: getDoDebug());
                 foreach (GameObject rope in ropesList)
                 {
+                    Debug.Divider(4, HONLY, Count: 40, Indent: 2, Toggle: getDoDebug());
                     Debug.LoopItem(4, $"{nameof(rope)}: {rope?.DebugName}", Indent: 2, Toggle: getDoDebug());
                     if (rope.TryGetPart(out WrassleGear wrassleGear))
                     {
@@ -204,6 +226,7 @@ namespace HNPS_GigantismPlus
                         rope.Render.DetailColor = wrassleRingColor;
                     }
                 }
+                Debug.Divider(4, HONLY, Count: 40, Indent: 2, Toggle: getDoDebug());
             }
             else
             {
@@ -217,6 +240,7 @@ namespace HNPS_GigantismPlus
                 Debug.CheckYeh(4, $"Got Chairs", Indent: 2, Toggle: getDoDebug());
                 foreach (GameObject chair in chairsList)
                 {
+                    Debug.Divider(4, HONLY, Count: 40, Indent: 2, Toggle: getDoDebug());
                     Debug.LoopItem(4, $"{nameof(chair)}: {chair?.DebugName}", Indent: 2, Toggle: getDoDebug());
                     if (!chair.IsGiganticEquipment)
                     {
@@ -242,6 +266,7 @@ namespace HNPS_GigantismPlus
                         Debug.CheckNah(4, $"{nameof(chair)} lacks {nameof(WrassleGear)}", Indent: 3, Toggle: getDoDebug());
                     }
                 }
+                Debug.Divider(4, HONLY, Count: 40, Indent: 2, Toggle: getDoDebug());
             }
             else
             {

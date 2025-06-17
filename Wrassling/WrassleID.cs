@@ -4,6 +4,7 @@ using System.Text;
 
 using XRL.World;
 using XRL.World.Capabilities;
+using XRL.Wish;
 
 using static XRL.UD_QudWrasslingEntertainment;
 
@@ -16,6 +17,7 @@ using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
+    [HasWishCommand]
     [Serializable]
     public class WrassleID 
         : IScribedPart
@@ -32,6 +34,7 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 'S',    // Serialize
+                'W',    // Wish
             };
             List<object> dontList = new()
             {
@@ -58,6 +61,14 @@ namespace XRL.World.Parts
             set => SetID(value);
         }
 
+        [SerializeField]
+        private Guid _PreloadedWrassleID;
+        public Guid PreloadedWrassleID
+        {
+            get => _PreloadedWrassleID;
+            set => _PreloadedWrassleID = value;
+        }
+
         private string _PrimaryColor;
         public string PrimaryColor => _PrimaryColor ??= UD_QWE.GetPrimaryWrassleColor(this);
 
@@ -66,10 +77,11 @@ namespace XRL.World.Parts
 
         public WrassleID()
         {
+            PreloadedWrassleID = Guid.Empty;
         }
         public WrassleID(Guid ID)
         {
-            SetID(ID, SuppressEvent: true);
+            PreloadedWrassleID = ID;
         }
         public WrassleID(WrassleID Source)
             : this (Source.ID)
@@ -83,12 +95,14 @@ namespace XRL.World.Parts
         public Guid GetID(bool SuppressEvent = false, bool Silent = false)
         {
             int indent = Debug.LastIndent;
+            bool toggle = _ID == Guid.Empty || (!Silent && getDoDebug('X'));
             Debug.Entry(4,
                 $"* {nameof(WrassleID)}."
                 + $"{nameof(GetID)}("
                 + $"{nameof(SuppressEvent)}: {SuppressEvent}, "
-                + $"{nameof(Silent)}: {Silent})",
-                Indent: indent + 1, Toggle: _ID == Guid.Empty || (!Silent && getDoDebug('X')));
+                + $"{nameof(Silent)}: {Silent})"
+                + $" for: {ParentObject?.DebugName ?? NULL})",
+                Indent: indent + 1, Toggle: toggle);
 
             if (_ID == Guid.Empty)
             {
@@ -250,11 +264,47 @@ namespace XRL.World.Parts
 
             base.Attach();
 
+            ProcessPreloadedWrassleID(this, PreloadedWrassleID);
+
             Debug.LastIndent = indent;
+        }
+
+        public static bool ProcessPreloadedWrassleID(WrassleID WrassleID, Guid PreloadedWrassleID)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"= {nameof(WrassleID)}."
+                + $"{nameof(ProcessPreloadedWrassleID)}("
+                + $"{nameof(WrassleID)}, "
+                + $"{nameof(PreloadedWrassleID)})",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
+            if (WrassleID != null && PreloadedWrassleID != Guid.Empty && PreloadedWrassleID != default)
+            {
+                Debug.CheckYeh(4, $"{nameof(PreloadedWrassleID)} has Value",
+                    Indent: indent + 2, Toggle: getDoDebug('X'));
+                
+                if (PreloadedWrassleID == WrassleID.GetID(Silent: true) || PreloadedWrassleID == WrassleID.SetID(PreloadedWrassleID))
+                {
+                    Debug.CheckYeh(4, $"{nameof(WrassleID)} set to {nameof(PreloadedWrassleID)}",
+                        Indent: indent + 2, Toggle: getDoDebug('X'));
+                    PreloadedWrassleID = Guid.Empty;
+                }
+                Debug.LastIndent = indent;
+                return PreloadedWrassleID == Guid.Empty;
+            }
+            else
+            {
+                Debug.CheckNah(4, $"{nameof(WrassleID)} is null, or {nameof(PreloadedWrassleID)} is empty or default",
+                    Indent: indent + 2, Toggle: getDoDebug('X'));
+                Debug.LastIndent = indent;
+                return false;
+            }
         }
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
+            Registrar.Register(GetShortDescriptionEvent.ID, EventOrder.EXTREMELY_EARLY);
             Registrar.Register(AddWrassleIDEvent.ID, EventOrder.EXTREMELY_EARLY);
             Registrar.Register(SyncWrassleIDEvent.ID, EventOrder.EXTREMELY_EARLY);
             Registrar.Register(UpdateWrassleIDEvent.ID, EventOrder.EXTREMELY_EARLY);
@@ -264,7 +314,6 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int Cascade)
         {
             return base.WantEvent(ID, Cascade)
-                || ID == GetShortDescriptionEvent.ID
                 || ID == GetWrassleIDEvent.ID;
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
@@ -430,12 +479,25 @@ namespace XRL.World.Parts
             base.Write(Basis, Writer);
             ToString().Vomit(4, nameof(Write), Indent: Debug.LastIndent, Toggle: getDoDebug('S'));
             Writer.Write(_ID);
+
+            bool writePreloadedWrassleID = _PreloadedWrassleID != Guid.Empty && _PreloadedWrassleID != default;
+            Writer.Write(writePreloadedWrassleID);
+            if (writePreloadedWrassleID)
+            {
+                Writer.Write(_PreloadedWrassleID);
+            }
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
             ToString().Vomit(4, nameof(Read), Indent: Debug.LastIndent, Toggle: getDoDebug('S'));
             _ID = Reader.ReadGuid();
+
+            bool readPreloadedWrassleID = Reader.ReadBoolean();
+            if (readPreloadedWrassleID)
+            {
+                _PreloadedWrassleID = Reader.ReadGuid();
+            }
         }
         public override void FinalizeRead(SerializationReader Reader)
         {
@@ -444,10 +506,45 @@ namespace XRL.World.Parts
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"@ {nameof(WrassleID)}."
+                + $"{nameof(DeepCopy)}("
+                + $"{nameof(Parent)}: {Parent?.DebugName ?? NULL}, "
+                + $"{nameof(MapInv)})",
+                Indent: indent + 1, Toggle: getDoDebug('X'));
+
             WrassleID wrassleID = base.DeepCopy(Parent, MapInv) as WrassleID;
             wrassleID._PrimaryColor = null;
             wrassleID._SecondaryColor = null;
+            wrassleID.SetID(GetID(Silent: true), true);
+
+            Debug.LastIndent = indent;
             return wrassleID;
+        }
+        public override void FinalizeCopyLate(GameObject Source, bool CopyEffects, bool CopyID, Func<GameObject, GameObject> MapInv)
+        {
+            base.FinalizeCopyLate(Source, CopyEffects, CopyID, MapInv);
+            WrassleIDUpdatedEvent.Send(this, ParentObject, Guid.Empty);
+        }
+
+        [WishCommand(Command = "poke WrassleIDs")]
+        public static void CascadeWrassleIDToParts()
+        {
+            foreach (GameObject wrassleObject in The.Player.CurrentZone.GetObjects())
+            {
+                if (wrassleObject.TryWrassleID(out WrassleID wrassleID))
+                {
+                    Debug.Entry(4,
+                        $"/ {wrassleObject?.DebugName ?? NULL} poked",
+                        Indent: 0, Toggle: true || getDoDebug('W'));
+                    WrassleIDUpdatedEvent.Send(wrassleID, wrassleObject, Guid.Empty);
+                    foreach (IWrassle wrasslePart in wrassleObject.GetPartsDescendedFrom<IWrassle>())
+                    {
+                        wrasslePart.OnUpdatedWrassleID();
+                    }
+                }
+            }
         }
     }
 }

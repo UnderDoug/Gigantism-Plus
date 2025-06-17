@@ -24,11 +24,13 @@ namespace XRL.World
     {
         public virtual WrassleID WrassleID => GetWrassleID();
 
+        public abstract Guid PreloadedWrassleID { set; }
+
         public virtual string PrimaryColor => WrassleID?.PrimaryColor;
         public virtual string SecondaryColor => WrassleID?.SecondaryColor;
 
         public abstract WrassleID GetWrassleID();
-        public abstract WrassleID SetWrassleID(Guid WrassleID);
+        public abstract WrassleID SetWrassleID(Guid WrassleID_ID);
         public abstract WrassleID SetWrassleID(WrassleID WrassleID);
         public abstract WrassleID SetWrassleID(IWrassle WrasslePart);
         public abstract void ClearWrassleID();

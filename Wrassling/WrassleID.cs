@@ -33,13 +33,13 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
-                'S',    // Serialize
                 'W',    // Wish
             };
             List<object> dontList = new()
             {
                 "WID",  // WrassleID
                 'X',    // Trace
+                'S',    // Serialize
             };
 
             if (what != null && doList.Contains(what))
@@ -53,7 +53,7 @@ namespace XRL.World.Parts
 
         public override int Priority => PRIORITY_HIGH;
 
-        [SerializeField]
+        [NonSerialized]
         private Guid _ID;
         public virtual Guid ID 
         { 
@@ -61,8 +61,8 @@ namespace XRL.World.Parts
             set => SetID(value);
         }
 
-        [SerializeField]
-        private Guid _PreloadedWrassleID;
+        [NonSerialized]
+        private Guid _PreloadedWrassleID = Guid.Empty;
         public Guid PreloadedWrassleID
         {
             get => _PreloadedWrassleID;
@@ -77,7 +77,6 @@ namespace XRL.World.Parts
 
         public WrassleID()
         {
-            PreloadedWrassleID = Guid.Empty;
         }
         public WrassleID(Guid ID)
         {
@@ -240,9 +239,9 @@ namespace XRL.World.Parts
             Debug.LastIndent = indent;
         }
 
-        public bool SeededRandomBool(int? Stepper = null, int ChanceIn = 2)
+        public bool SeededRandomBool(int? Stepper = null, string Context = null, int ChanceIn = 2)
         {
-            return GetID(Silent: true).SeededRandomBool(Stepper, ChanceIn);
+            return GetID(Silent: true).SeededRandomBool(Stepper, Context, ChanceIn);
         }
 
         public override void Attach()
@@ -477,27 +476,16 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-            ToString().Vomit(4, nameof(Write), Indent: Debug.LastIndent, Toggle: getDoDebug('S'));
-            Writer.Write(_ID);
 
-            bool writePreloadedWrassleID = _PreloadedWrassleID != Guid.Empty && _PreloadedWrassleID != default;
-            Writer.Write(writePreloadedWrassleID);
-            if (writePreloadedWrassleID)
-            {
-                Writer.Write(_PreloadedWrassleID);
-            }
+            Writer.Write(_ID);
+            Writer.Write(_PreloadedWrassleID);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            ToString().Vomit(4, nameof(Read), Indent: Debug.LastIndent, Toggle: getDoDebug('S'));
-            _ID = Reader.ReadGuid();
 
-            bool readPreloadedWrassleID = Reader.ReadBoolean();
-            if (readPreloadedWrassleID)
-            {
-                _PreloadedWrassleID = Reader.ReadGuid();
-            }
+            _ID = Reader.ReadGuid();
+            _PreloadedWrassleID = Reader.ReadGuid();
         }
         public override void FinalizeRead(SerializationReader Reader)
         {

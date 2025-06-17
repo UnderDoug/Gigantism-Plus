@@ -60,6 +60,9 @@ namespace HNPS_GigantismPlus
             if (MethodName == nameof(GetShaderFromSequence))
                 return false;
 
+            if (MethodName == nameof(DrawSeededToken))
+                return false;
+
             return doDebug;
         }
 
@@ -1372,9 +1375,9 @@ namespace HNPS_GigantismPlus
         public static T DrawRandomToken<T>(this List<T> Bag, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
-            return Bag.DrawSeededToken(Guid.Empty, ExceptForToken, ExceptForTokens);
+            return Bag.DrawSeededToken((string)null, null, null, ExceptForToken, ExceptForTokens);
         }
-        public static T DrawSeededToken<T>(this List<T> Bag, Guid Seed, T ExceptForToken = null, List<T> ExceptForTokens = null)
+        public static T DrawSeededToken<T>(this List<T> Bag, string Seed, int? Stepper = null, string Context = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
             if (Bag.IsNullOrEmpty()) return null;
@@ -1397,17 +1400,51 @@ namespace HNPS_GigantismPlus
                 return null;
             }
             T token = null;
-            if (Seed != Guid.Empty)
+            if (!Seed.IsNullOrEmpty())
             {
-                string seed = Seed.ToString();
+                string stepper = null;
+                string context = null;
+                if (!Context.IsNullOrEmpty())
+                {
+                    context = $"-{Context}";
+                }
+                if (Stepper != null)
+                {
+                    stepper = $"-{Stepper}";
+                }
+                string seed = $"{Seed}{context}{stepper}";
                 int low = 0;
                 int high = (drawBag.Count - 1) * 7;
                 int roll = Stat.SeededRandom(seed, low, high) % (drawBag.Count - 1);
+
+                int indent = Debug.LastIndent;
+                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(Seed)}: {Seed}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(Stepper)}: {Stepper}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(Context)}: {Context}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(seed)}: {seed}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(low)}: {low}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(drawBag.Count)} - 1: {drawBag.Count - 1}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(high)}: {high}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Entry(4, $"{nameof(roll)}: {roll}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+
+                Debug.LastIndent = indent;
                 token = drawBag.ElementAt(roll);
             }
             token ??= drawBag.GetRandomElement();
             Bag.Remove(token);
             return token;
+        }
+        public static T DrawSeededToken<T>(this List<T> Bag, Guid Seed, int? Stepper = null, string Context = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
+            where T : class
+        {
+            return Bag.DrawSeededToken(Seed.ToString(), Stepper, Context, ExceptForToken, ExceptForTokens);
+        }
+        public static T DrawSeededToken<T>(this List<T> Bag, WrassleID Seed, int? Stepper = null, string Context = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
+            where T : class
+        {
+            return Bag.DrawSeededToken(Seed.GetID(Silent: true), Stepper, Context, ExceptForToken, ExceptForTokens);
         }
         public static T DrawToken<T>(this List<T> Bag, T Token)
             where T : class
@@ -1419,9 +1456,9 @@ namespace HNPS_GigantismPlus
         public static T DrawRandomToken<T>(this Dictionary<string, List<T>> Bag, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
-            return Bag.DrawSeededToken(Guid.Empty, FromPocket, ExceptForToken, ExceptForTokens);
+            return Bag.DrawSeededToken((string)null, null, null, FromPocket, ExceptForToken, ExceptForTokens);
         }
-        public static T DrawSeededToken<T>(this Dictionary<string, List<T>> Bag, Guid Seed, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
+        public static T DrawSeededToken<T>(this Dictionary<string, List<T>> Bag, string Seed, int? Stepper = null, string Context = null, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {
             List<T> drawBag = new();
@@ -1442,7 +1479,7 @@ namespace HNPS_GigantismPlus
                 }
             }
 
-            T token = drawBag.DrawSeededToken(Seed, ExceptForToken, ExceptForTokens);
+            T token = drawBag.DrawSeededToken(Seed, Stepper, Context, ExceptForToken, ExceptForTokens);
 
             if (haveTargetPocket)
             {
@@ -1462,6 +1499,16 @@ namespace HNPS_GigantismPlus
                 }
             }
             return token;
+        }
+        public static T DrawSeededToken<T>(this Dictionary<string, List<T>> Bag, Guid Seed, int? Stepper = null, string Context = null, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
+            where T : class
+        {
+            return Bag.DrawSeededToken(Seed.ToString(), Stepper, Context, FromPocket, ExceptForToken, ExceptForTokens);
+        }
+        public static T DrawSeededToken<T>(this Dictionary<string, List<T>> Bag, WrassleID Seed, int? Stepper = null, string Context = null, string FromPocket = null, T ExceptForToken = null, List<T> ExceptForTokens = null)
+            where T : class
+        {
+            return Bag.DrawSeededToken(Seed.GetID(Silent: true), Stepper, Context, FromPocket, ExceptForToken, ExceptForTokens);
         }
         public static T DrawToken<T>(this Dictionary<string, List<T>> Bag, T Token, string FromPocket = null)
             where T : class
@@ -2195,7 +2242,7 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public static bool SeededRandomBool(this Guid Seed, int? Stepper = null, int ChanceIn = 2, string Context = null)
+        public static bool SeededRandomBool(this string Seed, int? Stepper = null, string Context = null, int ChanceIn = 2)
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(SeededRandomBool));
@@ -2227,6 +2274,14 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"{nameof(rollModChanceIn)}: {rollModChanceIn})", Indent: indent + 2, Toggle: doDebug);
             Debug.LastIndent = indent;
             return rollModChanceIn == 0;
+        }
+        public static bool SeededRandomBool(this Guid Seed, int? Stepper = null, string Context = null, int ChanceIn = 2)
+        {
+            return SeededRandomBool(Seed.ToString(), Stepper, Context, ChanceIn);
+        }
+        public static bool SeededRandomBool(this WrassleID Seed, int? Stepper = null, string Context = null, int ChanceIn = 2)
+        {
+            return SeededRandomBool(Seed.GetID(Silent: true), Stepper, Context, ChanceIn);
         }
 
         public static string Join<T>(this List<T> List, string Delimiter = ",")
@@ -2701,6 +2756,76 @@ namespace HNPS_GigantismPlus
                 }
             }
             return false;
+        }
+
+        public static bool IsLeft(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.LEFT);
+        }
+        public static bool IsRight(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.RIGHT);
+        }
+        public static bool IsUpper(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.UPPER);
+        }
+        public static bool IsLower(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.LOWER);
+        }
+        public static bool IsFore(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.FORE);
+        }
+        public static bool IsMid(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.MID);
+        }
+        public static bool IsHind(this BodyPart BodyPart)
+        {
+            return BodyPart.Laterality.HasBit(Laterality.HIND);
+        }
+
+        public static int LongitudinalLaterality(this BodyPart BodyPart)
+        {
+            if (BodyPart.IsFore())
+            {
+                return Laterality.FORE;
+            }
+            if (BodyPart.IsMid())
+            {
+                return Laterality.MID;
+            }
+            if (BodyPart.IsHind())
+            {
+                return Laterality.HIND;
+            }
+            return Laterality.NONE;
+        }
+        public static int VerticalLaterality(this BodyPart BodyPart)
+        {
+            if (BodyPart.IsUpper())
+            {
+                return Laterality.UPPER;
+            }
+            if (BodyPart.IsLower())
+            {
+                return Laterality.LOWER;
+            }
+            return Laterality.NONE;
+        }
+        public static int LateralLaterality(this BodyPart BodyPart)
+        {
+            if (BodyPart.IsLeft())
+            {
+                return Laterality.LEFT;
+            }
+            if (BodyPart.IsRight())
+            {
+                return Laterality.RIGHT;
+            }
+            return Laterality.NONE;
         }
 
     } //!-- Extensions

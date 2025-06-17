@@ -43,11 +43,11 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        [SerializeField]
+        [NonSerialized]
         private WrassleID _WrassleID;
         public virtual WrassleID WrassleID => _WrassleID ??= GetWrassleID();
 
-        [SerializeField]
+        [NonSerialized]
         private Guid _PreloadedWrassleID;
         public Guid PreloadedWrassleID
         {
@@ -182,7 +182,7 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(WrassleIDUpdatedEvent E)
         {
-            if (WrassleID != null && WrassleID.ID != E.FromWrassleID)
+            if (WrassleID != null && WrassleID.GetID(Silent: true) != E.FromWrassleID)
             {
                 _PrimaryColor = null;
                 _SecondaryColor = null;
@@ -196,25 +196,14 @@ namespace XRL.World.Parts
             base.Write(Basis, Writer);
 
             _WrassleID.Write(Basis, Writer);
-
-            bool writePreloadedWrassleID = _PreloadedWrassleID != Guid.Empty && _PreloadedWrassleID != default;
-            Writer.Write(writePreloadedWrassleID);
-            if (writePreloadedWrassleID)
-            {
-                Writer.Write(_PreloadedWrassleID);
-            }
+            Writer.Write(_PreloadedWrassleID);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
 
             _WrassleID = Reader.ReadObject() as WrassleID;
-
-            bool readPreloadedWrassleID = Reader.ReadBoolean();
-            if (readPreloadedWrassleID)
-            {
-                _PreloadedWrassleID = Reader.ReadGuid();
-            }
+            _PreloadedWrassleID = Reader.ReadGuid();
         }
         public override void FinalizeRead(SerializationReader Reader)
         {

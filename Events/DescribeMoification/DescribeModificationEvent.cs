@@ -22,7 +22,13 @@ namespace HNPS_GigantismPlus
         public BeforeDescribeModificationEvent<T> BeforeEvent;
 
         public DescribeModificationEvent()
+            : base()
         {
+        }
+
+        public override int GetCascadeLevel()
+        {
+            return CascadeLevel;
         }
 
         public override void Reset()

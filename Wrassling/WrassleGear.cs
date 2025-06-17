@@ -41,7 +41,7 @@ namespace XRL.World.Parts
 
         public int BondedLimbID;
 
-        private MeleeWeapon MeleeWeaponCopy;
+        public MeleeWeapon MeleeWeaponCopy;
 
         private bool IsMeleeWeaponNormally => ParentObject != null && ParentObject.GetBlueprint().HasPart(nameof(MeleeWeapon));
         private int IsImprovisedMelee = -1;
@@ -488,12 +488,10 @@ namespace XRL.World.Parts
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-            MeleeWeaponCopy.Write(Basis, Writer);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            MeleeWeaponCopy = Reader.ReadObject() as MeleeWeapon;
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {

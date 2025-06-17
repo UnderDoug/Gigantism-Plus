@@ -169,6 +169,15 @@ namespace XRL.World.Parts.Skill
                 return false;
             }
 
+            if (Vaultee == null)
+            {
+                if (!Silent)
+                {
+                    Vaulter.Fail("There's nothing to Vault!");
+                }
+                return false;
+            }
+
             if (!Vaulter.TryGetPart(out VaultSkill))
             {
                 return false;
@@ -215,7 +224,7 @@ namespace XRL.World.Parts.Skill
                 return false;
             }
 
-            if (Vaultee != null && !Vaulter.PhaseMatches(Vaultee))
+            if (!Vaulter.PhaseMatches(Vaultee))
             {
                 if (!Silent)
                     Vaulter.Fail("You cannot vault something you're out of phase with.");

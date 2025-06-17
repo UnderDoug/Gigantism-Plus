@@ -221,23 +221,30 @@ namespace HNPS_GigantismPlus
         public static bool RegisterGameLevelEventHandlers()
         {
             Debug.Entry(1, $"Registering XRLGame Event Handlers...", Indent: 1);
-            bool flag = The.Game != null;
-            if (flag)
+            if (The.Game != null)
             {
-                CrayonsGetColorHandler.Register();
-                BeforeModGiganticAppliedHandler.Register();
-                AfterModGiganticAppliedHandler.Register();
-                BeforeDescribeModGiganticHandler.Register();
-                DescribeModGiganticHandler.Register();
-                // ExampleHandler.Register();
+                bool crayonsGetColor = CrayonsGetColorHandler.Register();
+                bool beforeModGiganticApplied = BeforeModGiganticAppliedHandler.Register();
+                bool afterModGiganticApplied = AfterModGiganticAppliedHandler.Register();
+                bool beforeDescribeModGigantic = BeforeDescribeModGiganticHandler.Register();
+                bool describeModGigantic = DescribeModGiganticHandler.Register();
+
+                bool allRegistered = crayonsGetColor
+                    && beforeModGiganticApplied
+                    && afterModGiganticApplied
+                    && beforeDescribeModGigantic
+                    && describeModGigantic;
+
+                Debug.LoopItem(1, $"Event Handler Registration Finished", Indent: 1, Good: allRegistered);
+
+                return allRegistered;
             }
             else
             {
                 Debug.Entry(2, $"The.Game is null, unable to register any events.", Indent: 2);
 
             }
-            Debug.LoopItem(1, $"Event Handler Registration Finished", Indent: 1, Good: flag);
-            return flag;
+            return false;
         }
 
         [ModSensitiveStaticCache(CreateEmptyInstance = true)]

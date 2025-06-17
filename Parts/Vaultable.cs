@@ -520,14 +520,14 @@ namespace XRL.World.Parts
             GameObject Vaulter = E.Actor;
             GameObject Vaultee = E.Object;
 
-            if (Vaulter.CurrentCell.GetAdjacentCells().Contains(Vaultee.CurrentCell))
+            if (false && Vaulter.CurrentCell.GetAdjacentCells().Contains(Vaultee.CurrentCell))
             {
                 Debug.Entry(4,
                 $"@ {nameof(Vaultable)}."
                 + $"{nameof(HandleEvent)}({nameof(OkayToDamageEvent)} E)"
                 + $" E.Actor: {Vaulter?.DebugName ?? NULL},"
                 + $" E.Object: {Vaultee?.DebugName ?? NULL}",
-                Indent: 0);
+                Indent: 0, Toggle: doDebug);
 
                 Tactics_Vault vaultSkill = null;
 
@@ -603,7 +603,8 @@ namespace XRL.World.Parts
 
                 if (notOkayToDamage)
                 {
-                    Debug.Entry(4, $"Dissallowing {Vaulter?.DebugName ?? NULL} from digging {Vaultee?.DebugName ?? NULL}", Indent: 1);
+                    Debug.Entry(4, $"Dissallowing {Vaulter?.DebugName ?? NULL} from digging {Vaultee?.DebugName ?? NULL}", 
+                        Indent: 1, Toggle: doDebug);
 
                     return false;
                 }

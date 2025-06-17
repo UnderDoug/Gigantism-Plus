@@ -49,15 +49,9 @@ namespace XRL.World.ObjectBuilders
             return doDebug;
         }
 
-        public static List<string> FactionAdmirationBag
-        {
-            get
-            {
-                List<string> bag = new(GNT_ADMIREREASON_BOOK.BookPagesAsList());
-                bag.AddRange(SCRT_GNT_GNT_ADMIREREASON_BOOK.BookPagesAsList());
-                return bag;
-            }
-        }
+        public static List<string> FactionAdmirationBag => GNT_ADMIREREASON_BOOK.BookPagesAsList();
+        public static List<string> AdditionalFactionAdmirationBag => SCRT_GNT_GNT_ADMIREREASON_BOOK.BookPagesAsList();
+
         public static List<string> ThiccBoisBag => GNT_THICCBOI_BOOK.BookPagesAsList();
         public static List<string> NoHateFactionsList => GNT_NOHATEFACTION_BOOK.BookPagesAsList();
         // These are the skills the highest tier GiantSlayer has
@@ -182,6 +176,8 @@ namespace XRL.World.ObjectBuilders
             }
             Debug.LoopItem(4, $"Have <Wrassler>?", Good: wrassler != null, Indent: indent + 1, Toggle: getDoDebug());
 
+            WrassleID wrassleID = Creature.WrassleID();
+
             List<string> noHateFactionsList = new(NoHateFactionsList);
             if (Creature.TryGetStringProperty("NoHateFactions", out string existingNoHateFactions))
             {
@@ -205,8 +201,8 @@ namespace XRL.World.ObjectBuilders
                 Good: !Creature.GetStringProperty("NoHateFactions").IsNullOrEmpty(), 
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            int StaticFactionAdmirations = Unique || wrassler.WrassleID.SeededRandomBool() ? 3 : 2;
-            bool ThiccBoisAdmire = Unique || wrassler.WrassleID.SeededRandomBool(3);
+            int StaticFactionAdmirations = Unique || wrassler.WrassleID.SeededRandomBool(Context: nameof(StaticFactionAdmirations)) ? 3 : 2;
+            bool ThiccBoisAdmire = Unique || wrassler.WrassleID.SeededRandomBool(Context: nameof(ThiccBoisAdmire), ChanceIn: 3);
             string ThiccBois = ThiccBoisBag.GetRandomElement();
             int ThiccBoisIndex = 
                 Unique 
@@ -216,12 +212,19 @@ namespace XRL.World.ObjectBuilders
                     : 0
                 ;
 
-            List<string> factionAdmirationBag = new(FactionAdmirationBag);
+            List<string> factionAdmirationBag = new();
+            factionAdmirationBag.AddRange(new List<string>(FactionAdmirationBag));
+            factionAdmirationBag.AddRange(new List<string>(AdditionalFactionAdmirationBag));
+            Debug.LoopItem(4, $"{nameof(factionAdmirationBag)} contents:", Indent: indent + 1, Toggle: getDoDebug());
+            foreach (string reason in factionAdmirationBag)
+            {
+                Debug.LoopItem(4, $"{reason}", Indent: indent + 2, Toggle: getDoDebug());
+            }
             Dictionary<int, string> factionAdmirationList = new()
             {
-                { 1, factionAdmirationBag.DrawRandomToken() },
-                { 2, factionAdmirationBag.DrawRandomToken() },
-                { 3, factionAdmirationBag.DrawRandomToken() },
+                { 1, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 1, Context: nameof(factionAdmirationBag)) },
+                { 2, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 2, Context: nameof(factionAdmirationBag)) },
+                { 3, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 3, Context: nameof(factionAdmirationBag)) },
             };
 
             Debug.LoopItem(4, $"Setting StaticFactions", Indent: indent + 1, Toggle: getDoDebug());
@@ -709,7 +712,7 @@ namespace XRL.World.ObjectBuilders
             }
             Debug.LoopItem(4, $"<HasMakersMark>?", Good: Creature.HasPart<HasMakersMark>(), Indent: indent + 2, Toggle: getDoDebug());
             List<string> usableMarks = new(MakersMark.GetUsable());
-            string heroMark = usableMarks.DrawSeededToken(wrassler.WrassleID.ID);
+            string heroMark = usableMarks.DrawSeededToken(wrassleID, Context: nameof(heroMark));
             hasMakersMark.Mark = Unique ? ((char)156).ToString() : heroMark;
             hasMakersMark.Color = wrassler.DetailColor;
             if (Unique) MakersMark.RecordUsage(hasMakersMark.Mark);

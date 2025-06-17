@@ -29,7 +29,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void LoadBakedXML_MutationEntryIfSupplied_Postfix(ref GameObjectFactory __instance, ref GameObjectBlueprint __result, ObjectBlueprintLoader.ObjectBlueprintXMLData node)
         {
-            if (Stat.Roll("1d2") < 3)
+            if (Stat.Roll("1d2") < 1)
             {
                 try
                 {

@@ -20,7 +20,13 @@ namespace HNPS_GigantismPlus
         private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModificationEvent<T>));
 
         public BeforeDescribeModificationEvent()
+            : base()
         {
+        }
+
+        public override int GetCascadeLevel()
+        {
+            return CascadeLevel;
         }
 
         public static BeforeDescribeModificationEvent<T> FromPool(

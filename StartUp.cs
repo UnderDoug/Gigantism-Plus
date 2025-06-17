@@ -178,8 +178,6 @@ namespace HNPS_GigantismPlus
     [HasGameBasedStaticCache]
     public static class GigantismPlusGameBasedInitialiser
     {
-        public static bool GameLevelEventsRegistered = false;
-
         [GameBasedCacheInit]
         public static void AdditionalSetup()
         {
@@ -198,10 +196,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"After  EnableManagedVanillaMutations", $"{EnableManagedVanillaMutations}", Indent: 1);
             */
 
-            if (!GameLevelEventsRegistered)
-            {
-                GameLevelEventsRegistered = RegisterGameLevelEventHandlers();
-            }
+            RegisterGameLevelEventHandlers();
 
             Gigantic_ModEntry_Adjustments.AdjustGiganticModifier();
 
@@ -314,10 +309,7 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantismPlusOnLoadGameHandler)}",
                 $"{nameof(OnLoadGameCallback)}()");
 
-            if (!GigantismPlusGameBasedInitialiser.GameLevelEventsRegistered)
-            {
-                RegisterGameLevelEventHandlers();
-            }
+            RegisterGameLevelEventHandlers();
 
             /*
             Debug.Entry(4, $"Option EnableManagedVanillaMutationsCurrent", $"{EnableManagedVanillaMutationsCurrent}", Indent: 1);

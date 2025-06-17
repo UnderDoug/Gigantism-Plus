@@ -439,22 +439,22 @@ namespace XRL.World.Capabilities
             Debug.LastIndent = indent;
             return colorBag;
         }
-        public static bool GetWrassleColorPair(Guid WrassleID, out string PrimaryColor, out string SecondaryColor)
+        public static bool GetWrassleColorPair(Guid WrassleID_ID, out string PrimaryColor, out string SecondaryColor)
         {
             int indent = Debug.LastIndent;
 
             Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
-                + $"{nameof(GetWrassleColorPair)}({nameof(WrassleID)}, out {nameof(PrimaryColor)}, out {nameof(SecondaryColor)})",
+                + $"{nameof(GetWrassleColorPair)}({nameof(WrassleID_ID)}, out {nameof(PrimaryColor)}, out {nameof(SecondaryColor)})",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
-            Debug.Entry(4, $"{WrassleID}", Indent: indent + 2, Toggle: getDoDebug('X'));
+            Debug.Entry(4, $"{WrassleID_ID}", Indent: indent + 2, Toggle: getDoDebug('X'));
 
             PrimaryColor = null;
             SecondaryColor = null;
-            if (WrassleID == Guid.Empty)
+            if (WrassleID_ID == Guid.Empty)
             {
-                Debug.CheckNah(4, $"No WrassleID", Indent: indent + 2, Toggle: getDoDebug('X'));
+                Debug.CheckNah(4, $"No WrassleID_ID", Indent: indent + 2, Toggle: getDoDebug('X'));
 
                 Debug.LastIndent = indent;
                 return false;
@@ -462,10 +462,16 @@ namespace XRL.World.Capabilities
 
             Dictionary<string, List<string>> colorBag = GetColorBag().VomitBag(4, "Init", null, true, Debug.LastIndent + 1, getDoDebug('V'));
 
-            PrimaryColor = colorBag.DrawSeededToken(WrassleID);
+            PrimaryColor = colorBag.DrawSeededToken(WrassleID_ID, Context: nameof(GetWrassleColorPair));
+
             bool? primaryIsDark = PrimaryColor.IsDarkColor();
             string fromPocket = primaryIsDark != null && (bool)primaryIsDark ? "Bright" : null;
-            SecondaryColor = colorBag.DrawSeededToken(WrassleID, fromPocket);
+            string exceptFor = primaryIsDark != null && (bool)primaryIsDark ? PrimaryColor.ToUpper() : PrimaryColor.ToLower();
+
+            SecondaryColor = colorBag.DrawSeededToken(WrassleID_ID, 
+                Context: nameof(GetWrassleColorPair), 
+                FromPocket: fromPocket, 
+                ExceptForToken: exceptFor);
 
             Debug.LastIndent = indent;
             return !colorBag.Contains(PrimaryColor) && !colorBag.Contains(SecondaryColor);
@@ -541,7 +547,7 @@ namespace XRL.World.Capabilities
                 }
             }
         }
-        public static string GetTileFromBag(Guid WrassleID, List<string> TileBag, string RandomTiles = null)
+        public static string GetTileFromBag(Guid WrassleID_ID, List<string> TileBag, string RandomTiles = null)
         {
             FillTileBag(RandomTiles, out List<string> ancillaryTileBag);
             TileBag ??= new();
@@ -553,7 +559,7 @@ namespace XRL.World.Capabilities
             {
                 return null;
             }
-            return TileBag.DrawSeededToken(WrassleID);
+            return TileBag.DrawSeededToken(WrassleID_ID, Context: nameof(GetTileFromBag));
         }
         public static string GetTileFromBag(WrassleID WrassleID, List<string> TileBag, string RandomTiles = null)
         {
@@ -568,20 +574,9 @@ namespace XRL.World.Capabilities
             return GetTileFromBag(WrassleID.ID, RandomTiles);
         }
 
-        public static bool TryGetTileFromBag(Guid WrassleID, List<string> TileBag, out string Tile, string RandomTiles = null)
+        public static bool TryGetTileFromBag(Guid WrassleID_ID, List<string> TileBag, out string Tile, string RandomTiles = null)
         {
-            FillTileBag(RandomTiles, out List<string> ancillaryTileBag);
-            TileBag ??= new();
-            Tile = null;
-            if (!ancillaryTileBag.IsNullOrEmpty())
-            {
-                TileBag.AddRange(ancillaryTileBag);
-            }
-            if (!TileBag.IsNullOrEmpty())
-            {
-                Tile = TileBag.DrawSeededToken(WrassleID);
-            }
-            return !Tile.IsNullOrEmpty();
+            return !(Tile = GetTileFromBag(WrassleID_ID, TileBag, RandomTiles)).IsNullOrEmpty();
         }
         public static bool TryGetTileFromBag(WrassleID WrassleID, List<string> TileBag, out string Tile, string RandomTiles = null)
         {
@@ -605,21 +600,21 @@ namespace XRL.World.Capabilities
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
-                + $"{nameof(GetWrassleColorSequence)}(Guid WrassleID, {nameof(Number)}: {Number}) "
+                + $"{nameof(GetWrassleColorSequence)}(Guid WrassleID_ID, {nameof(Number)}: {Number}) "
                 + $"{nameof(Primary)}: {Primary}, "
                 + $"{nameof(Secondary)}: {Secondary}",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
             if (WrassleID == Guid.Empty)
             {
-                Debug.CheckNah(4, $"WrassleID empty", Indent: indent + 2, Toggle: getDoDebug('X'));
+                Debug.CheckNah(4, $"WrassleID_ID empty", Indent: indent + 2, Toggle: getDoDebug('X'));
                 Debug.LastIndent = indent;
                 yield break;
             }
             for (int i = 0; i < Number; i++)
             {
                 Debug.LastIndent = indent;
-                yield return WrassleID.SeededRandomBool(i) ? Primary : Secondary;
+                yield return WrassleID.SeededRandomBool(Context: nameof(GetWrassleColorSequence), Stepper: i) ? Primary : Secondary;
             }
         }
         public static IEnumerable<string> GetWrassleColorSequence(WrassleID WrassleID, int Number)
@@ -632,7 +627,7 @@ namespace XRL.World.Capabilities
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
-                + $"{nameof(GetWrassleShaderForWord)}(Guid WrassleID, {nameof(Word)}: {Word})",
+                + $"{nameof(GetWrassleShaderForWord)}(Guid WrassleID_ID, {nameof(Word)}: {Word})",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
             if (WrassleID == Guid.Empty || Word.IsNullOrEmpty() || Type.IsNullOrEmpty())
@@ -847,21 +842,27 @@ namespace XRL.World.Capabilities
             Debug.LoopItem(4, $"{nameof(footCount)}", $"{footCount}",
                 Indent: indent + 3, Toggle: getDoDebug('B'));
 
+            /*
             Debug.Entry(4, $"Getting whether foot or feet...",
                 Indent: indent + 2, Toggle: getDoDebug('B'));
-            string FootOrFeet = "Feet";
             if (feetCount * 2 < footCount) FootOrFeet = "Foot";
-            if (feetCount * 2 == footCount && wrassleID.SeededRandomBool()) FootOrFeet = "Foot";
+            if (feetCount * 2 == footCount && wrassleID.SeededRandomBool(Context: FootOrFeet)) FootOrFeet = "Foot";
+            */
 
-            Debug.LoopItem(4, $"{nameof(wrassleID.SeededRandomBool)}", $"{wrassleID.SeededRandomBool()}",
+            string FootOrFeet = $"{nameof(FootOrFeet)}";
+            bool justFeet = footCount < 2;
+            /*
+            Debug.LoopItem(4, $"{nameof(wrassleID.SeededRandomBool)}", $"{wrassleID.SeededRandomBool(Context: FootOrFeet)}",
                 Indent: indent + 3, Toggle: getDoDebug('B'));
 
             Debug.LoopItem(4, $"{nameof(FootOrFeet)}", $"{FootOrFeet}",
                 Indent: indent + 3, Toggle: getDoDebug('B'));
+            */
 
             List<GameObject> wrassleGearObjects = new();
             Debug.Entry(4, $"Filling list of {wrassleGearObjects}...",
                 Indent: indent + 2, Toggle: getDoDebug('B'));
+
             foreach (BodyPart bodyPart in WrassleCreature.Body.GetParts())
             {
                 Debug.Divider(4, HONLY, Count: 40, Indent: indent + 3, Toggle: getDoDebug('B'));
@@ -877,9 +878,22 @@ namespace XRL.World.Capabilities
 
                 // Only do foot or feet, not both. We only do foot slots if there are more of them than 2x the feet
                 // (or, one or the other randomly if they're even).
+                /*
                 if ((bodyPart.Type == "Foot" || bodyPart.Type == "Feet") && bodyPart.Type != FootOrFeet)
                 {
                     Debug.CheckNah(4, $"{bodyPart.Type} slot, we're doing {FootOrFeet}",
+                        Indent: indent + 4, Toggle: getDoDebug('B'));
+                    continue;
+                }
+                */
+                int footOrFeetLaterality = bodyPart.LongitudinalLaterality();
+                bool doFootOrFeet = wrassleID.SeededRandomBool(Stepper: footOrFeetLaterality, Context: FootOrFeet);
+                if ((bodyPart.Type == "Foot" && (justFeet || !doFootOrFeet)) || (bodyPart.Type == "Feet" && (doFootOrFeet || !justFeet)))
+                {
+                    Debug.CheckNah(4, 
+                        $"{bodyPart.Type} slot " +
+                        $"with {nameof(Laterality)} of {Laterality.LateralityAdjective(footOrFeetLaterality, true) ?? NULL} " +
+                        $"skipped for this {nameof(WrassleID)} or because {nameof(justFeet)}",
                         Indent: indent + 4, Toggle: getDoDebug('B'));
                     continue;
                 }
@@ -901,13 +915,13 @@ namespace XRL.World.Capabilities
                 {
                     Debug.Entry(4, $"{nameof(bodyPart)} is {bodyPart.Type}, getting {nameof(Laterality)}",
                         Indent: indent + 4, Toggle: getDoDebug('B'));
-                    if (bodyPart.Laterality.HasBit(Laterality.LEFT))
+                    if (bodyPart.IsLeft())
                     {
                         Debug.LoopItem(4, $"{nameof(Laterality)}", $"Left",
                             Indent: indent + 5, Toggle: getDoDebug('B'));
                         blueprint += "Left";
                     }
-                    if (bodyPart.Laterality.HasBit(Laterality.RIGHT))
+                    if (bodyPart.IsRight())
                     {
                         Debug.LoopItem(4, $"{nameof(Laterality)}", $"Right",
                             Indent: indent + 5, Toggle: getDoDebug('B'));
@@ -917,12 +931,12 @@ namespace XRL.World.Capabilities
                         Indent: indent + 4, Toggle: getDoDebug('B'));
                 }
 
-                string context = $"{WRASSLE_ID_CONTEXT}{wrassleID}";
-                Debug.Entry(4, $"{nameof(context)} set for preloading {nameof(WrassleID)}", $"{context}",
+                string wrassleContext = $"{WRASSLE_ID_CONTEXT}{wrassleID}";
+                Debug.Entry(4, $"{nameof(wrassleContext)} set for preloading {nameof(WrassleID)}", $"{wrassleContext}",
                     Indent: indent + 4, Toggle: getDoDebug('B'));
                 Debug.Entry(4, $"Creating {nameof(WrassleGear)} object...",
                     Indent: indent + 4, Toggle: getDoDebug('B'));
-                GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint, Context: context);
+                GameObject wrassleGearObject = GameObjectFactory.Factory.CreateObject(blueprint, Context: wrassleContext);
 
                 Debug.Entry(4, $"Attempting to configure {nameof(WrassleGear)}...",
                     Indent: indent + 4, Toggle: getDoDebug('B'));

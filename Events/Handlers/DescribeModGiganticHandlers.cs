@@ -87,7 +87,8 @@ namespace HNPS_GigantismPlus
 
         public static bool Register()
         {
-            The.Game?.RegisterEvent(Handler, DescribeModificationEvent<ModGigantic>.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+            int eventOrder = EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY;
+            The.Game?.RegisterEvent(Handler, DescribeModificationEvent<ModGigantic>.ID, eventOrder);
 
             return (bool)The.Game?.WasModEventHandlerRegistered<DescribeModGiganticHandler, DescribeModificationEvent<ModGigantic>>();
         }

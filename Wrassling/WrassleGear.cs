@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using XRL.UI;
 using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
@@ -53,7 +54,8 @@ namespace XRL.World.Parts
         public bool ChangeTileColor;
         public bool ChangeDetailColor;
 
-        public string Tile => UD_QWE.GetTileFromBag(WrassleID.ID, RandomTiles);
+        private string _Tile;
+        public string Tile => _Tile ??= UD_QWE.GetTileFromBag(WrassleID.ID, RandomTiles);
 
         private string _TileColor;
         public string TileColor => _TileColor ??= PrimaryColor;
@@ -93,6 +95,7 @@ namespace XRL.World.Parts
             base.OnUpdatedWrassleID();
             if (ParentObject != null)
             {
+                _Tile = null;
                 _TileColor = null;
                 _DetailColor = null;
                 ApplyFlair();
@@ -189,6 +192,7 @@ namespace XRL.World.Parts
         {
             Registrar.Register("AdjustWeaponScore");
             Registrar.Register("AdjustArmorScore");
+            Registrar.Register(GetShortDescriptionEvent.ID, EventOrder.VERY_EARLY);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -214,6 +218,48 @@ namespace XRL.World.Parts
                 || (wantUnequipped && ID == UnequippedEvent.ID)
                 || (wantKineticResist && ID == GetKineticResistanceEvent.ID)
                 || (wantLateBeforeApplyDamage && ID == LateBeforeApplyDamageEvent.ID);
+        }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            if (WrassleIDDebugDescriptions)
+            {
+                StringBuilder SB = Event.NewStringBuilder();
+                SB.AppendColored("M", $"{nameof(Wrassler)}");
+                SB.AppendLine();
+                SB.AppendColored("W", "State");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("C", $"{BondedLimbID}").Append($"){HONLY}{nameof(BondedLimbID)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{IsMeleeWeaponNormally.YehNah()}]{HONLY}{nameof(IsMeleeWeaponNormally)}: ").AppendColored("B", $"{IsMeleeWeaponNormally}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("C", $"{IsImprovisedMelee}").Append($"){HONLY}{nameof(IsImprovisedMelee)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("C", $"{ShowMeleeWeaponStats ?? NULL}").Append($"){HONLY}{nameof(ShowMeleeWeaponStats)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{AutoFlair.YehNah()}]{HONLY}{nameof(AutoFlair)}: ").AppendColored("B", $"{AutoFlair}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{UseColors.YehNah()}]{HONLY}{nameof(UseColors)}: ").AppendColored("B", $"{UseColors}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{ChangeTileColor.YehNah()}]{HONLY}{nameof(ChangeTileColor)}: ").AppendColored("B", $"{ChangeTileColor}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{ChangeDetailColor.YehNah()}]{HONLY}{nameof(ChangeDetailColor)}: ").AppendColored("B", $"{ChangeDetailColor}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{RandomizeTile.YehNah()}]{HONLY}{nameof(RandomizeTile)}: ").AppendColored("B", $"{RandomizeTile}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{ColorEquipmentFrame.YehNah()}]{HONLY}{nameof(ColorEquipmentFrame)}: ").AppendColored("B", $"{ColorEquipmentFrame}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{IsVibrant.YehNah()}]{HONLY}{nameof(IsVibrant)}: ").AppendColored("B", $"{IsVibrant}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("o", $"{Tile}").Append($"){HONLY}{nameof(Tile)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored(TileColor, $"{TileColor}").Append($"){HONLY}{nameof(TileColor)}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append("(").AppendColored(DetailColor, $"{DetailColor}").Append($"){HONLY}{nameof(DetailColor)}");
+                SB.AppendLine();
+
+                E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
+            }
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {

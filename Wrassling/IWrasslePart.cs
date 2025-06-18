@@ -47,7 +47,7 @@ namespace XRL.World.Parts
         private WrassleID _WrassleID;
         public virtual WrassleID WrassleID => _WrassleID ??= GetWrassleID();
 
-        [NonSerialized]
+        [SerializeField]
         private Guid _PreloadedWrassleID;
         public Guid PreloadedWrassleID
         {
@@ -60,7 +60,6 @@ namespace XRL.World.Parts
 
         private string _SecondaryColor;
         public string SecondaryColor => _SecondaryColor ??= WrassleID?.SecondaryColor;
-
 
         public IWrasslePart()
         {
@@ -190,21 +189,16 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-
+        /*
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-
-            _WrassleID.Write(Basis, Writer);
-            Writer.Write(_PreloadedWrassleID);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-
-            _WrassleID = Reader.ReadObject() as WrassleID;
-            _PreloadedWrassleID = Reader.ReadGuid();
         }
+        */
         public override void FinalizeRead(SerializationReader Reader)
         {
             base.FinalizeRead(Reader);

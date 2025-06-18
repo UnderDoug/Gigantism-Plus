@@ -165,6 +165,7 @@ namespace XRL.World.Parts
             {
                 GameObject Actor = E.Object;
             }
+            Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(ObjectEnteredCellEvent E)
@@ -269,17 +270,16 @@ namespace XRL.World.Parts
         {
             return true;
         }
-
+        /*
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-
         }
+        */
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             Wrassler wrassler = base.DeepCopy(Parent, MapInv) as Wrassler;

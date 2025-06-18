@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Text;using System.CodeDom.Compiler;
 
 using XRL.World;
 using XRL.World.Capabilities;
@@ -50,6 +50,8 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
+
+        private string DebugColoredShaderString = null;
 
         public override int Priority => PRIORITY_HIGH;
 
@@ -235,6 +237,7 @@ namespace XRL.World.Parts
 
             _PrimaryColor = null;
             _SecondaryColor = null;
+            DebugColoredShaderString = null;
 
             Debug.LastIndent = indent;
         }
@@ -319,7 +322,17 @@ namespace XRL.World.Parts
         {
             if (WrassleIDDebugDescriptions)
             {
-                // bool haveOrigin = Origin != null;
+                if (DebugColoredShaderString.IsNullOrEmpty())
+                {
+                    foreach (string color in UD_QWE.GetWrassleColorSequence(this, 10))
+                    {
+                        if (!DebugColoredShaderString.IsNullOrEmpty())
+                        {
+                            DebugColoredShaderString += "-";
+                        }
+                        DebugColoredShaderString += color.Color(color);
+                    }
+                }
 
                 StringBuilder SB = Event.NewStringBuilder();
                 SB.AppendColored("M", $"{nameof(WrassleID)}");
@@ -330,7 +343,9 @@ namespace XRL.World.Parts
                 SB.AppendLine();
                 SB.Append(VANDR).Append("(").AppendColored(PrimaryColor, $"{PrimaryColor}").Append($"){HONLY}{nameof(PrimaryColor)}");
                 SB.AppendLine();
-                SB.Append(TANDR).Append("(").AppendColored(SecondaryColor, $"{SecondaryColor}").Append($"){HONLY}{nameof(SecondaryColor)}");
+                SB.Append(VANDR).Append("(").AppendColored(SecondaryColor, $"{SecondaryColor}").Append($"){HONLY}{nameof(SecondaryColor)}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append("(").Append(DebugColoredShaderString).Append($")");
                 SB.AppendLine();
 
                 E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));

@@ -21,7 +21,7 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
 
         [Serializable]
-        public class PartAdjustment : IScribedPart
+        public class PartAdjustment : IComposite
         {
             private static bool doDebug => getClassDoDebug(nameof(PartAdjustment));
 
@@ -165,13 +165,9 @@ namespace XRL.World.Parts
                 return false;
             }
 
-            public override bool SameAs(IPart p)
+            public virtual bool SameAs(PartAdjustment a)
             {
-                if (p is PartAdjustment a)
-                {
-                    return ID == a.ID;
-                }
-                return false;
+                return ID == a.ID;
             }
 
             public virtual string GetAddress()
@@ -269,10 +265,8 @@ namespace XRL.World.Parts
                 }
                 return false;
             }
-            public override void Write(GameObject Basis, SerializationWriter Writer)
+            public void Write(SerializationWriter Writer)
             {
-                base.Write(Basis, Writer);
-
                 Writer.Write(ID);
                 Writer.Write(Applied);
                 Writer.Write(ParentNaturalEquipmentMod);
@@ -282,10 +276,8 @@ namespace XRL.World.Parts
                 Writer.WriteObject(Value);
                 Writer.WriteObject(Condition);
             }
-            public override void Read(GameObject Basis, SerializationReader Reader)
+            public void Read(SerializationReader Reader)
             {
-                base.Read(Basis, Reader);
-
                 ID = Reader.ReadGuid();
                 Applied = Reader.ReadBoolean();
                 ParentNaturalEquipmentMod = Reader.ReadString();
@@ -295,12 +287,19 @@ namespace XRL.World.Parts
                 Value = Reader.ReadObject();
                 Condition = Reader.ReadObject() as Func<GameObject, bool>;
             }
-            public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
+            public virtual PartAdjustment DeepCopy()
             {
-                PartAdjustment partAdjustment = base.DeepCopy(Parent, MapInv) as PartAdjustment;
-
-                partAdjustment.ID = Guid.NewGuid();
-
+                PartAdjustment partAdjustment = new()
+                {
+                    ID = Guid.NewGuid(),
+                    Applied = Applied,
+                    ParentNaturalEquipmentMod = ParentNaturalEquipmentMod,
+                    Target = Target,
+                    Field = Field,
+                    AdjustmentPriority = AdjustmentPriority,
+                    Value = Value,
+                    Condition = new(Condition),
+                };
                 return partAdjustment;
             }
         }

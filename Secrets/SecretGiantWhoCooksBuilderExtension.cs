@@ -1,11 +1,12 @@
-﻿using Genkit;
-using HistoryKit;
-using NAudio.CoreAudioApi;
-using Qud.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using Genkit;
+using HistoryKit;
+using Qud.API;
+
 using XRL;
 using XRL.Language;
 using XRL.Names;
@@ -22,6 +23,7 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Skills.Cooking;
 using XRL.World.WorldBuilders;
 using XRL.World.ZoneBuilders;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -55,9 +57,9 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
-        public static string SecretZoneId = string.Empty;
+        public static string SecretZoneID = string.Empty;
         public static JournalMapNote SecretMapNote = null;
-        public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneId);
+        public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneID);
 
         public override void OnAfterBuild(JoppaWorldBuilder builder)
         {
@@ -71,8 +73,8 @@ namespace HNPS_GigantismPlus
             Debug.LoopItem(4, $"{nameof(location)}: [{location}]", Indent: 2, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Getting ZoneID from {nameof(location)}...", Indent: 1, Toggle: getDoDebug());
-            SecretZoneId = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
-            Debug.Entry(4, $"{nameof(SecretZoneId)} Set", $"{SecretZoneId}", Indent: 1, Toggle: getDoDebug());
+            SecretZoneID = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
+            Debug.Entry(4, $"{nameof(SecretZoneID)} Set", $"{SecretZoneID}", Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Checking MapNote isn't already set...", Indent: 1, Toggle: getDoDebug());
             if (JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID) == null)
@@ -80,7 +82,7 @@ namespace HNPS_GigantismPlus
                 Debug.CheckYeh(4, $"MapNote not set", Indent: 2, Toggle: getDoDebug());
                 Debug.Entry(4, $"Setting MapNote...", Indent: 1, Toggle: getDoDebug());
                 JournalAPI.AddMapNote(
-                    ZoneID: SecretZoneId,
+                    ZoneID: SecretZoneID,
                     text: SCRT_GNT_LCTN_TEXT,
                     category: SCRT_GNT_LCTN_CATEGORY,
                     attributes: WrassleGiantHero.SecretAttributes,
@@ -94,30 +96,30 @@ namespace HNPS_GigantismPlus
             ZoneManager zoneManager = The.ZoneManager;
 
             Debug.Entry(4, $"Removing undesired ZoneBuilders...", Indent: 1, Toggle: getDoDebug());
-            zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(Hills));
-            zoneManager.RemoveZoneBuilders(SecretZoneId, nameof(FactionEncounters));
-            zoneManager.ClearZoneBuilders(SecretZoneId);
+            zoneManager.RemoveZoneBuilders(SecretZoneID, nameof(Hills));
+            zoneManager.RemoveZoneBuilders(SecretZoneID, nameof(FactionEncounters));
+            zoneManager.ClearZoneBuilders(SecretZoneID);
 
             string MapFileName = SCRT_GNT_ZONE_MAP2_CENTRE;
             Debug.Entry(4, $"Setting {nameof(MapFileName)}...", Indent: 1, Toggle: getDoDebug());
             Debug.Entry(4, $"{nameof(MapFileName)} Set", $"{MapFileName}", Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Assigning MapFile to MapBuilder...", Indent: 1, Toggle: getDoDebug());
-            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(MapBuilder), "FileName", $"{MapFileName}");
+            zoneManager.AddZonePostBuilder(SecretZoneID, nameof(MapBuilder), "FileName", $"{MapFileName}");
 
             Debug.Entry(4, $"Setting Music...", Indent: 1, Toggle: getDoDebug());
-            zoneManager.AddZonePostBuilder(SecretZoneId, "Music", "Track", "Music/Barathrums Study");
+            zoneManager.AddZonePostBuilder(SecretZoneID, "Music", "Track", "Music/Barathrums Study");
 
             Debug.Entry(4, $"Setting Zone to Checkpoint...", Indent: 1, Toggle: getDoDebug());
-            zoneManager.AddZonePostBuilder(SecretZoneId, nameof(IsCheckpoint), "Key", SecretZoneId);
+            zoneManager.AddZonePostBuilder(SecretZoneID, nameof(IsCheckpoint), "Key", SecretZoneID);
 
             Debug.Entry(4, $"Skipping TerainBuilders and flaggign NoBiomes...", Indent: 1, Toggle: getDoDebug());
-            zoneManager.SetZoneProperty(SecretZoneId, "SkipTerrainBuilders", true);
-            zoneManager.SetZoneProperty(SecretZoneId, "NoBiomes", "Yes");
+            zoneManager.SetZoneProperty(SecretZoneID, "SkipTerrainBuilders", true);
+            zoneManager.SetZoneProperty(SecretZoneID, "NoBiomes", "Yes");
 
             Debug.Entry(4, $"Setting ZoneName...", Indent: 1, Toggle: getDoDebug());
-            zoneManager.SetZoneName(SecretZoneId, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
-            zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneId, false);
+            zoneManager.SetZoneName(SecretZoneID, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
+            zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneID, false);
 
             TerrainTravel pTravel = builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
             if (XRL.UI.Options.ShowOverlandEncounters && pTravel != null)
@@ -177,7 +179,7 @@ namespace HNPS_GigantismPlus
             {
                 Debug.CheckYeh(4, $"Map is correct, adding {nameof(GiantAbodePopulator)}...", Indent: 2, Toggle: getDoDebug());
                 zoneManager.AddZonePostBuilder(
-                    ZoneID: SecretZoneId,
+                    ZoneID: SecretZoneID,
                     Class: nameof(GiantAbodePopulator),
                     Key1: "GiantID",
                     Value1: zoneManager.CacheObject(UniqueGiant));
@@ -186,14 +188,14 @@ namespace HNPS_GigantismPlus
             {
                 Debug.CheckNah(4, $"Map is incorrect, adding {nameof(AddObjectBuilder)}...", Indent: 2, Toggle: getDoDebug());
                 zoneManager.AddZonePostBuilder(
-                    ZoneID: SecretZoneId,
+                    ZoneID: SecretZoneID,
                     Class: nameof(AddObjectBuilder),
                     Key1: "Object",
                     Value1: zoneManager.CacheObject(UniqueGiant));
             }
 
             Debug.Entry(4, $"Getting Ropes and Attempting to assign Color...", Indent: 1, Toggle: getDoDebug());
-            List<GameObject> ropesList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("WrassleRingRopes");
+            List<GameObject> ropesList = zoneManager.GetZone(SecretZoneID).GetObjectsThatInheritFrom("WrassleRingRopes");
             if (!ropesList.IsNullOrEmpty())
             {
                 Debug.CheckYeh(4, $"Got Ropes", Indent: 2, Toggle: getDoDebug());
@@ -234,7 +236,7 @@ namespace HNPS_GigantismPlus
             }
 
             Debug.Entry(4, $"Getting Folding Chairs and Attempting to assign Color...", Indent: 1, Toggle: getDoDebug());
-            List<GameObject> chairsList = zoneManager.GetZone(SecretZoneId).GetObjectsThatInheritFrom("FoldingChair");
+            List<GameObject> chairsList = zoneManager.GetZone(SecretZoneID).GetObjectsThatInheritFrom("FoldingChair");
             if (!chairsList.IsNullOrEmpty())
             {
                 Debug.CheckYeh(4, $"Got Chairs", Indent: 2, Toggle: getDoDebug());
@@ -302,7 +304,7 @@ namespace HNPS_GigantismPlus
         [WishCommand(Command = "go2giant")]
         public static void GoToGiantWish()
         {
-            Zone Z = The.ZoneManager.GetZone(SecretZoneId);
+            Zone Z = The.ZoneManager.GetZone(SecretZoneID);
             The.Player.Physics.CurrentCell.RemoveObject(The.Player.Physics.ParentObject);
             Z.GetEmptyCells().GetRandomElement().AddObject(The.Player);
             The.ZoneManager.SetActiveZone(Z);

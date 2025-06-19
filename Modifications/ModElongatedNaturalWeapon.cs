@@ -39,14 +39,9 @@ namespace XRL.World.Parts
             AddSkillAdjustment("ShortBlades", true);
             AddStatAdjustment("Agility", -120);
 
-            static bool cosmeticCondition(GameObject Equipment)
-            {
-                return Equipment?.Blueprint != null
-                    && Equipment.Blueprint == "DefaultFist";
-            };
-            AddNounAdjustment(true, Condition: cosmeticCondition);
+            AddNounAdjustment(true, Condition: new MatchGameObjectBlueprint("DefaultFist"));
 
-            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: cosmeticCondition);
+            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: new MatchGameObjectBlueprint("DefaultFist"));
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);

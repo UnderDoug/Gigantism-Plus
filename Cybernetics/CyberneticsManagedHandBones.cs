@@ -82,20 +82,7 @@ namespace XRL.World.Parts
                 AddedIntProps = new(),
                 AddedStringProps = new(),
             };
-
-            static bool cosmeticCondition(GameObject Equipment)
-            {
-                int indent = Debug.LastIndent;
-                bool blueprintNotNull = Equipment?.Blueprint != null;
-                bool blueprintIsDefaultFist = blueprintNotNull && Equipment.Blueprint == "DefaultFist";
-
-                Debug.LoopItem(4, $"{nameof(blueprintNotNull)}", $"{blueprintNotNull}", Good: blueprintNotNull, Indent: indent + 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"{nameof(blueprintIsDefaultFist)}", $"{blueprintIsDefaultFist}", Good: blueprintIsDefaultFist, Indent: indent + 1, Toggle: doDebug);
-
-                Debug.LastIndent = indent;
-                return blueprintIsDefaultFist;
-            };
-            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, Condition: cosmeticCondition);
+            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, Condition: new MatchGameObjectBlueprint("DefaultFist"));
             chromeBonedNaturalWeapon.AddColorStringAdjustment(assigningPart.BonesTileColorString);
             chromeBonedNaturalWeapon.AddTileColorAdjustment(assigningPart.BonesTileColorString);
             chromeBonedNaturalWeapon.AddDetailColorAdjustment(assigningPart.BonesTileDetailColor, true);

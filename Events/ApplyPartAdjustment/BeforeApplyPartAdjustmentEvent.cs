@@ -30,7 +30,9 @@ namespace HNPS_GigantismPlus
 
         public object Value;
 
-        public Func<GameObject, bool> Condition;
+        public ICondition<GameObject> Condition;
+        public AnyConditions<GameObject> AnyConditions;
+        public AllConditions<GameObject> AllConditions;
 
         public override int GetCascadeLevel()
         {
@@ -49,9 +51,11 @@ namespace HNPS_GigantismPlus
             Target = null;
             Field = null;
             Condition = null;
+            AnyConditions = null;
+            AllConditions = null;
         }
 
-        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, Func<GameObject, bool> Condition)
+        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, ICondition<GameObject> Condition, AnyConditions<GameObject> AnyConditions, AllConditions<GameObject> AllConditions)
         {
             BeforeApplyPartAdjustmentEvent E = FromPool();
             E.Equipment = Equipment;
@@ -60,11 +64,13 @@ namespace HNPS_GigantismPlus
             E.Field = Field;
             E.Value = Value;
             E.Condition = Condition;
+            E.AnyConditions = AnyConditions;
+            E.AllConditions = AllConditions;
             return E;
         }
-        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, Func<GameObject, bool> Condition)
+        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, ICondition<GameObject> Condition, AnyConditions<GameObject> AnyConditions, AllConditions<GameObject> AllConditions)
         {
-            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Target, Field, ref Value, Condition);
+            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Target, Field, ref Value, Condition, AnyConditions, AllConditions);
 
             bool haveObject = Equipment != null;
 
@@ -91,6 +97,8 @@ namespace HNPS_GigantismPlus
                     @event.SetParameter(nameof(Field), Field);
                     @event.SetParameter(nameof(Value), E.Value);
                     @event.SetParameter(nameof(Condition), Condition);
+                    @event.SetParameter(nameof(AnyConditions), AnyConditions);
+                    @event.SetParameter(nameof(AllConditions), AllConditions);
                     proceed = Equipment.FireEvent(@event);
                     Value = @event.GetParameter(nameof(Value), E.Value);
                     @event.Clear();

@@ -9,41 +9,41 @@ namespace HNPS_GigantismPlus
     /// <example>
     /// <code>
     /// [Serializable]
-    /// public class MatchBlueprint : ICondition<GameObject>
+    /// public class MatchGameObjectBlueprint : ICondition<GameObject>
     /// {
-    ///     public string Blueprint;
+    ///     public string PropertyOrTag;
     ///     
-    ///     public MatchBlueprint(string Blueprint)
+    ///     public MatchGameObjectBlueprint(string PropertyOrTag)
     ///         : base()
     ///     {
-    ///         this.Blueprint = Blueprint;
+    ///         this.PropertyOrTag = PropertyOrTag;
     ///     }
     ///
     ///     public override bool Check(GameObject GameObject)
     ///     {
-    ///         return !Blueprint.IsNullOrEmpty() &amp;&amp; GameObject.Blueprint == Blueprint;
+    ///         return !PropertyOrTag.IsNullOrEmpty() &amp;&amp; GameObject.PropertyOrTag == PropertyOrTag;
     ///     }
     /// }
     /// </code>
     /// </example>
     [Serializable]
     public abstract class ICondition<T> : IComposite 
-        where T : class
+        where T : class, new()
     {
         public ICondition()
         {
         }
 
-        public virtual bool Check(T Parameter)
+        public virtual bool Check(T Subject)
         {
-            return true;
+            return Subject == null
+                || true;
         }
 
-        public virtual void Write(SerializationWriter Writer)
+        public virtual bool NotCheck(T Subject)
         {
-        }
-        public virtual void Read(SerializationReader Reader)
-        {
+            return Subject == null
+                || !Check(Subject);
         }
     }
 }

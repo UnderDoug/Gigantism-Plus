@@ -85,27 +85,27 @@
   Encounter changes
   
   -->
-  <population Name="Grit Gate Templar Scouts">
+  <population Name="Grit Gate Templar Scouts" Load="Merge">
     <group Name="Contents" Style="pickeach" Load="Merge">
       <object Number="1" Blueprint="Templar Squire Giant-Slayer" />
     </group>
   </population>
 
-  <population Name="OmonporchBattle_Major">
+  <population Name="OmonporchBattle_Major" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <object Blueprint="Templar Giant-Slayer" />
       <object Blueprint="Templar Squire Giant-Slayer" />
     </group>
   </population>
 
-  <population Name="Templar">
+  <population Name="Templar" Load="Merge">
     <group Name="Creatures" Style="pickone" Load="Merge">
       <object Blueprint="Templar Giant-Slayer" />
       <object Blueprint="Giant-Slayer Commander" />
     </group>
   </population>
 
-  <population Name="Templar War Party Major">
+  <population Name="Templar War Party Major" Load="Merge">
     <group Name="Contents" Style="pickeach" Load="Merge">
       <group Name="Types" Style="pickone" Load="Merge" >
         <group Name="GunnerOrKnight"></group>
@@ -119,7 +119,7 @@
     </group>
   </population>
 
-  <population Name="OmonporchBattle_Major_KnightCommander">
+  <population Name="OmonporchBattle_Major_KnightCommander" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <group Name="Backup" Style="pickone" Load="Merge">
         <object Blueprint="Grand Giant-Slayer" />
@@ -127,7 +127,7 @@
     </group>
   </population>
   
-  <population Name="OmonporchBattle_Major_GrandNewfather">
+  <population Name="OmonporchBattle_Major_GrandNewfather" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <group Name="Backup" Style="pickone" Load="Merge">
         <object Blueprint="Grand Giant-Slayer" />
@@ -135,7 +135,7 @@
     </group>
   </population>
   
-  <population Name="OmonporchBattle_Major_TemplarMech">
+  <population Name="OmonporchBattle_Major_TemplarMech" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <group Name="Backup" Style="pickone" Load="Merge">
         <object Blueprint="Grand Giant-Slayer" />
@@ -143,7 +143,7 @@
     </group>
   </population>
 
-  <population Name="OmonporchBattle_Minor">
+  <population Name="OmonporchBattle_Minor" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <group Name="Boss" Style="pickone" Load="Merge">
         <object Blueprint="Giant-Slayer Commander" />
@@ -151,7 +151,7 @@
     </group>
   </population>
 
-  <population Name="OmonporchBattle_Reinforcements_Major">
+  <population Name="OmonporchBattle_Reinforcements_Major" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <group Name="Boss" Style="pickone" Load="Merge">
         <object Blueprint="Grand Giant-Slayer" />
@@ -159,7 +159,7 @@
     </group>
   </population>
   
-  <population Name="OmonporchBattle_Reinforcements_Minor">
+  <population Name="OmonporchBattle_Reinforcements_Minor" Load="Merge">
     <group Name="Options" Style="pickeach" Load="Merge">
       <group Name="Boss" Style="pickone" Load="Merge">
         <object Blueprint="Grand Giant-Slayer" />
@@ -167,18 +167,168 @@
     </group>
   </population>
 
-  <population Name="RuinsPerSector">
+  <population Name="RuinsPerSector" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <table Weight="250" Number="1" Name="Templar Giant-Hunter Party" />
+      <table Weight="150" Number="1" Name="Templar Giant-Hunter Party" />
     </group>
   </population>
 
-  <population Name="BaroqueRuinsPerSector">
+  <population Name="BaroqueRuinsPerSector" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <table Weight="250" Number="1" Name="Templar Giant-Hunter Party" />
+      <table Weight="150" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+  
+  <population Name="BananaGroveCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
     </group>
   </population>
 
+  <population Name="Tier2CaveCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="1" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier5CaveCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="2-4" Blueprint="Templar Giant-Slayer" />
+      <object Weight="1" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <table Weight="2" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+
+  <population Name="Tier3CavePopulation" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="1" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="1" Number="1" Blueprint="Templar Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier4CavePopulation" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="2" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="5" Number="1-3" Blueprint="Templar Giant-Slayer" />
+      <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+
+  <population Name="Tier6CavePopulation" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="1" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+
+  <population Name="Tier7CavePopulation" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="2" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+      <object Weight="2" Number="1" Blueprint="Grand Giant-Slayer" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+
+  <population Name="Tier8CavePopulation" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="2" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+      <object Weight="5" Number="1" Blueprint="Grand Giant-Slayer" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party" />
+      <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Major" />
+      <object Weight="1" Number="1" Blueprint="Uplifted Grand Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier1RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="1" Number="0-1" Blueprint="Templar Squire Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier2RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier3RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="1" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="1" Number="1" Blueprint="Templar Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier4RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="2" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="5" Number="1-3" Blueprint="Templar Giant-Slayer" />
+      <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+
+  <population Name="Tier5RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="2-4" Blueprint="Templar Giant-Slayer" />
+      <object Weight="1" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <table Weight="2" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+
+  <population Name="Tier6RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="1" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party Minor" />
+    </group>
+  </population>
+
+  <population Name="Tier7RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="2" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+      <object Weight="2" Number="1" Blueprint="Grand Giant-Slayer" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+
+  <population Name="Tier8RuinsCreatures" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="2" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
+      <object Weight="5" Number="1" Blueprint="Grand Giant-Slayer" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party" />
+      <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Major" />
+      <object Weight="1" Number="1" Blueprint="Uplifted Grand Giant-Slayer" />
+    </group>
+  </population>
+
+  <population Name="Tier4BossEncounter" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <table Weight="4" Number="1" Name="Templar Giant-Hunter Party Minor" />
+      <table Weight="2" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+
+  <population Name="Tier5BossEncounter" Load="Merge">
+    <group Name="Creatures" Load="Merge">
+      <table Weight="4" Number="1" Name="Templar Giant-Hunter Party" />
+    </group>
+  </population>
+
+  <population Name="Tier8BossEncounter" Load="Merge">
+    <table Chance="0" Number="0" Name="Tier5BossEncounter" Load="Merge" />
+    <group Name="Creatures" Style="pickone" Load="MergeIfExists">
+      <table Weight="10" Name="Tier5BossEncounter" />
+      <table Weight="5" Number="1" Name="Templar Giant-Hunter Party" />
+      <table Weight="2" Number="1" Name="Templar Giant-Hunter Party Major" />
+      <object Weight="2" Number="1" Blueprint="Uplifted Grand Giant-Slayer" />
+    </group>
+  </population>
   <!-- 
   
   Encounter additions
@@ -270,13 +420,13 @@
   Loot changes
   
   -->
-  <population Name="Implants_1and2Pointers">
+  <population Name="Implants_1and2Pointers" Load="Merge">
     <group Name="Items" Load="Merge">
       <object Weight="10" Number="1" Blueprint="GiganticExoframeAlpha" />
     </group>
   </population>
 
-  <population Name="Implants_4PlusPointers">
+  <population Name="Implants_4PlusPointers" Load="Merge">
     <group Name="Items" Load="Merge">
       <object Weight="12" Number="1" Blueprint="GiganticExoframeDelta" />
       <object Weight="5" Number="1" Blueprint="GiganticExoframeSigma" />
@@ -284,7 +434,7 @@
     </group>
   </population>
 
-  <population Name="Implants_4PlusPointersWithCathedras">
+  <population Name="Implants_4PlusPointersWithCathedras" Load="Merge">
     <group Name="Items" Load="Merge">
       <object Weight="30" Number="1" Blueprint="GiganticExoframeOmega" />
       <!-- Weight is set so high because there are 4 Cathedras and only 1 Gigantic Exoframe Omega

@@ -6,8 +6,12 @@ namespace HNPS_GigantismPlus
 {
     [Serializable]
     public class OnlyOneCondition<T> : IConditions<T>
-        where T : class
+        where T : class, new()
     {
+        public OnlyOneCondition()
+            : base()
+        {
+        }
         public OnlyOneCondition(IConditions<T> Source)
             : base(Source.Conditions)
         {

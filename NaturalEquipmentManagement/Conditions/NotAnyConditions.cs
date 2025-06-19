@@ -6,16 +6,33 @@ namespace HNPS_GigantismPlus
 {
     [Serializable]
     public class NotAnyConditions<T> : AnyConditions<T>
-        where T : class
+        where T : class, new()
     {
+        public NotAnyConditions()
+            : base()
+        {
+        }
         public NotAnyConditions(IConditions<T> Source)
             : base(Source.Conditions as IConditions<T>)
         {
         }
 
-        public override bool Check(T Parameter)
+        public override bool Check(T Subject)
         {
-            return !base.Check(Parameter);
+            if (!Results(Subject).IsNullOrEmpty())
+            {
+                return base.NotCheck(Subject);
+            }
+            return true;
+        }
+
+        public override bool NotCheck(T Subject)
+        {
+            if (!Results(Subject).IsNullOrEmpty())
+            {
+                return base.Check(Subject);
+            }
+            return true;
         }
     }
 }

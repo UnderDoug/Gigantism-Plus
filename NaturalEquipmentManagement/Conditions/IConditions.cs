@@ -11,12 +11,12 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public abstract class IConditions<T> : ICondition<T>
         , IList<ICondition<T>>
-        , IList
         , IReadOnlyList<ICondition<T>>
+        , IList
         , IEnumerable<ICondition<T>>
         , IEnumerable
-        , IReadOnlyCollection<ICondition<T>>
         , ICollection<ICondition<T>>
+        , IReadOnlyCollection<ICondition<T>>
         , ICollection
         , IComposite
         where T : class, new()

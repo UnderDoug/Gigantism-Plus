@@ -59,6 +59,7 @@ namespace HNPS_GigantismPlus
 
         public static string SecretZoneID = string.Empty;
         public static JournalMapNote SecretMapNote = null;
+
         public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneID);
 
         public override void OnAfterBuild(JoppaWorldBuilder builder)

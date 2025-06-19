@@ -63,6 +63,8 @@ You cannot wear equipment on your body." />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <tag Name="BaseObject" Value="*noinherit" />
     <tag Name="ExcludeFromDynamicEncounters" Value="*noinherit" />
+    <stag Name="Cybernetics" />
+    <tag Name="IncludeInDynamicSemanticTables" />
   </object>
   
   <!-- End Base -->
@@ -73,7 +75,7 @@ You cannot wear equipment on your body." />
     <part Name="Armor" 
           AV="2" 
           DV="-5" />
-    <part Name="CyberneticsBaseItem" Slots="Body" Cost="2" />
+    <part Name="CyberneticsBaseItem" Cost="2" />
     <part Name="Commerce" Value="120" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Alpha"
@@ -95,7 +97,7 @@ You cannot wear equipment on your body." />
     <part Name="Armor" 
           AV="5" 
           DV="-4" />
-    <part Name="CyberneticsBaseItem" Slots="Body" Cost="4" />
+    <part Name="CyberneticsBaseItem" Cost="4" />
     <part Name="Commerce" Value="240" />
     <part Name="CyberneticsGiganticExoframe"
           Model="Delta"
@@ -118,7 +120,7 @@ You cannot wear equipment on your body." />
     <part Name="Armor" 
           AV="6" 
           DV="-3" />
-    <part Name="CyberneticsBaseItem" Slots="Body" Cost="8" />
+    <part Name="CyberneticsBaseItem" Cost="8" />
     <part Name="Commerce" Value="600" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Sigma"
@@ -145,7 +147,7 @@ You cannot wear equipment on your body." />
     <part Name="Armor" 
           AV="8" 
           DV="-2" />
-    <part Name="CyberneticsBaseItem" Slots="Body" Cost="16" />
+    <part Name="CyberneticsBaseItem" Cost="16" />
     <part Name="Commerce" Value="2200" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Omega"

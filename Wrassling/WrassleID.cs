@@ -341,11 +341,9 @@ namespace XRL.World.Parts
                 SB.AppendLine();
                 SB.AppendColored("W", "Colors");
                 SB.AppendLine();
-                SB.Append(VANDR).Append("(").AppendColored(PrimaryColor, $"{PrimaryColor}").Append($"){HONLY}{nameof(PrimaryColor)}");
-                SB.AppendLine();
-                SB.Append(VANDR).Append("(").AppendColored(SecondaryColor, $"{SecondaryColor}").Append($"){HONLY}{nameof(SecondaryColor)}");
-                SB.AppendLine();
-                SB.Append(TANDR).Append("(").Append(DebugColoredShaderString).Append($")");
+                SB.Append(VANDR).Append("(").AppendColored(PrimaryColor, $"{PrimaryColor}");
+                SB.Append($",").AppendColored(SecondaryColor, $"{SecondaryColor}");
+                SB.Append($"){HONLY}(").Append(DebugColoredShaderString).Append($")");
                 SB.AppendLine();
 
                 E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));

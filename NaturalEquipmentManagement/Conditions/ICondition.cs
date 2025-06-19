@@ -9,11 +9,11 @@ namespace HNPS_GigantismPlus
     /// <example>
     /// <code>
     /// [Serializable]
-    /// public class MatchGameObjectBlueprint : ICondition<GameObject>
+    /// public class GameObjectBlueprintIs : ICondition<GameObject>
     /// {
     ///     public string PropertyOrTag;
     ///     
-    ///     public MatchGameObjectBlueprint(string PropertyOrTag)
+    ///     public GameObjectBlueprintIs(string PropertyOrTag)
     ///         : base()
     ///     {
     ///         this.PropertyOrTag = PropertyOrTag;

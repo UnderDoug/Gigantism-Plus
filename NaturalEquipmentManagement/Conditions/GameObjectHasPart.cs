@@ -8,33 +8,27 @@ namespace HNPS_GigantismPlus
     {
         public string Part;
 
-        public IPart IPart;
-
         public GameObjectHasPart()
             : base()
         {
             Part = null;
-            IPart = null;
         }
-        public GameObjectHasPart(string Part = null, IPart IPart = null)
-            : base()
+        public GameObjectHasPart(string Part = null)
+            : this()
         {
             this.Part = Part;
-            this.IPart = IPart;
+        }
+        public GameObjectHasPart(IPart IPart = null)
+            : this(IPart.Name)
+        {
         }
         public GameObjectHasPart(GameObjectHasPart Source)
-            : this(Source?.Part, Source?.IPart)
+            : this(Source?.Part)
         {
         }
 
         public override bool Check(GameObject GameObject)
         {
-            Part ??= IPart?.Name;
-
-            if (Part.IsNullOrEmpty() && IPart == null)
-            {
-                return true;
-            }
             return GameObject == null 
                 || Part.IsNullOrEmpty() 
                 || GameObject.HasPart(Part);

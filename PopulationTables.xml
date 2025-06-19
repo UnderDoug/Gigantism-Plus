@@ -40,7 +40,6 @@
 
   <population Name="Templar Giant-Slayer Equipment Pool">
     <group Name="Items" Style="pickone">
-      
       <group Name="Explosives" Style="pickeach" Weight="50">
         <table Name="Explosives 3" Number="1-3" />
         <table Name="Explosives 1" Number="3-5" />

@@ -172,8 +172,8 @@ namespace XRL.World.Parts.Mutation
             };
             giganticFistMod.AddSkillAdjustment("Cudgel", true);
 
-            giganticFistMod.AddNounAdjustment(true, Condition: new MatchGameObjectBlueprint("DefaultFist"));
-            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: new MatchGameObjectBlueprint("DefaultFist"));
+            giganticFistMod.AddNounAdjustment(true, Condition: new GameObjectBlueprintIs("DefaultFist"));
+            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: new GameObjectBlueprintIs("DefaultFist"));
 
             return giganticFistMod;
         }

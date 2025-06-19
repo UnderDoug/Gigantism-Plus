@@ -82,7 +82,7 @@ namespace XRL.World.Parts
                 AddedIntProps = new(),
                 AddedStringProps = new(),
             };
-            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, Condition: new MatchGameObjectBlueprint("DefaultFist"));
+            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, Condition: new GameObjectBlueprintIs("DefaultFist"));
             chromeBonedNaturalWeapon.AddColorStringAdjustment(assigningPart.BonesTileColorString);
             chromeBonedNaturalWeapon.AddTileColorAdjustment(assigningPart.BonesTileColorString);
             chromeBonedNaturalWeapon.AddDetailColorAdjustment(assigningPart.BonesTileDetailColor, true);

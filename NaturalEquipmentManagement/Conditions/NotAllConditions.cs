@@ -13,7 +13,7 @@ namespace HNPS_GigantismPlus
         {
         }
         public NotAllConditions(IConditions<T> Source)
-            : base(Source.Conditions as IConditions<T>)
+            : base(Source)
         {
         }
 
@@ -23,7 +23,7 @@ namespace HNPS_GigantismPlus
             {
                 return base.NotCheck(Subject);
             }
-            return true;
+            return !FalseIfSubjectNull;
         }
 
         public override bool NotCheck(T Subject)
@@ -32,7 +32,7 @@ namespace HNPS_GigantismPlus
             {
                 return base.Check(Subject);
             }
-            return true;
+            return !FalseIfSubjectNull;
         }
     }
 }

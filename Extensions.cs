@@ -1940,14 +1940,14 @@ namespace HNPS_GigantismPlus
 
         public static Dictionary<string,List<Cell>> GetHutRegion(this Zone Z, Rect2D R, bool Round = false)
         {
-            string Inner = "Inner";
-            string Outer = "Outer";
-            string Corners = "Corners";
-            string NorthEdge = "NorthEdge";
-            string SouthEdge = "SouthEdge";
-            string EastEdge = "EastEdge";
-            string WestEdge = "WestEdge";
-            string Door = "Door";
+            string Inner = $"{nameof(Inner)}";
+            string Outer = $"{nameof(Outer)}";
+            string Corners = $"{nameof(Corners)}";
+            string NorthEdge = $"{nameof(NorthEdge)}";
+            string SouthEdge = $"{nameof(SouthEdge)}";
+            string EastEdge = $"{nameof(EastEdge)}";
+            string WestEdge = $"{nameof(WestEdge)}";
+            string Door = $"{nameof(Door)}";
             Dictionary<string, List<Cell>> Region = new()
             {
                 { Inner, new() },
@@ -2826,6 +2826,18 @@ namespace HNPS_GigantismPlus
                 return Laterality.RIGHT;
             }
             return Laterality.NONE;
+        }
+
+        public static bool MeetsCondition<T>(this T Subject, ICondition<T> Condition)
+            where T : class, new()
+        {
+            return Condition.Check(Subject);
+        }
+
+        public static bool NotMeetsCondition<T>(this T Subject, ICondition<T> Condition)
+            where T : class, new()
+        {
+            return Condition.NotCheck(Subject);
         }
 
     } //!-- Extensions

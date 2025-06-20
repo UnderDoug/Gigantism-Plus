@@ -11,6 +11,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
 namespace XRL.World.Parts
 {
@@ -82,7 +83,7 @@ namespace XRL.World.Parts
                 AddedIntProps = new(),
                 AddedStringProps = new(),
             };
-            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, Condition: new GameObjectBlueprintIs("DefaultFist"));
+            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, AllConditions: new() { IsOrganicFist });
             chromeBonedNaturalWeapon.AddColorStringAdjustment(assigningPart.BonesTileColorString);
             chromeBonedNaturalWeapon.AddTileColorAdjustment(assigningPart.BonesTileColorString);
             chromeBonedNaturalWeapon.AddDetailColorAdjustment(assigningPart.BonesTileDetailColor, true);

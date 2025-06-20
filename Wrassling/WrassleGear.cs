@@ -267,7 +267,7 @@ namespace XRL.World.Parts
             {
                 int indent = Debug.LastIndent;
                 GameObject WrassleObject = E.Object;
-                if (UD_QWE.TryDecodeWrassleIDContext(E.Context, out Guid fromWrassleID))
+                if (!E.Context.IsNullOrEmpty() && UD_QWE.TryDecodeWrassleIDContext(E.Context, out Guid fromWrassleID))
                 {
                     WrassleID.SetID(fromWrassleID);
                 }

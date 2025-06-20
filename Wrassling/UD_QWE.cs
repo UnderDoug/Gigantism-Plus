@@ -11,13 +11,13 @@ using XRL.World.Parts.Mutation;
 using XRL.World.Text.Attributes;
 using XRL.World.Tinkering;
 using XRL.World.ZoneBuilders;
+using XRL.World.Text.Delegates;
+using XRL.Language;
 
 using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using XRL.World.Text.Delegates;
-using XRL.Language;
 
 namespace XRL.World.Capabilities
 {
@@ -126,7 +126,9 @@ namespace XRL.World.Capabilities
         public static bool TryDecodeWrassleIDContext(string WrassleIDContext, out Guid WrassleID_ID)
         {
             WrassleID_ID = default;
-            if (WrassleIDContext.StartsWith(WRASSLE_ID_CONTEXT) && Guid.TryParse(WrassleIDContext.Substring(WRASSLE_ID_CONTEXT.Length), out WrassleID_ID))
+            if (!WrassleIDContext.IsNullOrEmpty() 
+                && WrassleIDContext.StartsWith(WRASSLE_ID_CONTEXT) 
+                && Guid.TryParse(WrassleIDContext.Substring(WRASSLE_ID_CONTEXT.Length), out WrassleID_ID))
             {
                 return true;
             }

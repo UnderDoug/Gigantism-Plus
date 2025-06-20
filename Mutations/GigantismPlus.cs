@@ -15,6 +15,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
 using SerializeField = UnityEngine.SerializeField;
 
@@ -172,8 +173,8 @@ namespace XRL.World.Parts.Mutation
             };
             giganticFistMod.AddSkillAdjustment("Cudgel", true);
 
-            giganticFistMod.AddNounAdjustment(true, Condition: new GameObjectBlueprintIs("DefaultFist"));
-            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: new GameObjectBlueprintIs("DefaultFist"));
+            giganticFistMod.AddNounAdjustment(true, AllConditions: new() { IsOrganicFist });
+            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, AllConditions: new() { IsOrganicFist });
 
             return giganticFistMod;
         }

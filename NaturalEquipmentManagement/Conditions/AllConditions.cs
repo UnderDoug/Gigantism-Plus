@@ -13,7 +13,7 @@ namespace HNPS_GigantismPlus
         {
         }
         public AllConditions(IConditions<T> Source)
-            : base(Source.Conditions)
+            : base(Source)
         {
         }
 
@@ -29,7 +29,7 @@ namespace HNPS_GigantismPlus
                     }
                 }
             }
-            return true;
+            return !FalseIfSubjectNull;
         }
 
         public override bool NotCheck(T Subject)
@@ -38,7 +38,7 @@ namespace HNPS_GigantismPlus
             {
                 return !Check(Subject);
             }
-            return true;
+            return !FalseIfSubjectNull;
         }
     }
 }

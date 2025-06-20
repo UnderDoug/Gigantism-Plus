@@ -51,15 +51,15 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
         {
-            if (E.NaturalEquipmentMod == nameof(ModGiganticNaturalWeapon) && E.Target == RENDER && E.Field == "DetailColor")
+            if (E.NaturalEquipmentMod == nameof(ModGiganticNaturalWeapon) && E.Adjustment.Target == RENDER && E.Adjustment.Field == "DetailColor")
             {
-                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {E.Field} Adjustment",
+                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {E.Adjustment.Field} Adjustment",
                     Indent: Debug.LastIndent + 1, Toggle: doDebug);
                 Debug.LastIndent--;
 
                 foreach (PartAdjustment adjustment in Adjustments)
                 {
-                    if (adjustment.Field == E.Field && adjustment.Target == E.Target)
+                    if (adjustment.HasSameTargetAs(E.Adjustment))
                     {
                         // E.Value = adjustment.Value;
                     }

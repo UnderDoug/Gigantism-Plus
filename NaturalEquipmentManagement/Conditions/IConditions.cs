@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 using XRL.Collections;
@@ -100,8 +101,6 @@ namespace HNPS_GigantismPlus
 
         object ICollection.SyncRoot => this;
 
-        public List<ICondition<T>> Conditions => Items as List<ICondition<T>>;
-
         public IConditions()
             : base()
         {
@@ -118,18 +117,34 @@ namespace HNPS_GigantismPlus
         {
             Items = Conditions.ToArray();
         }
-        public IConditions(IReadOnlyList<ICondition<T>> List)
+        public IConditions(IReadOnlyList<ICondition<T>> Conditions)
             : this()
         {
-            if (List != null)
+            if (Conditions != null)
             {
-                int count = List.Count;
+                int count = Conditions.Count;
                 EnsureCapacity(count);
                 for (int i = 0; i < count; i++)
                 {
-                    Add((ICondition<T>)List[i]);
+                    Add((ICondition<T>)Conditions[i]); // cast is here so it throws errors if I change something in the inheritance and need to update it
                 }
             }
+        }
+        public IConditions(IEnumerable<ICondition<T>> Conditions)
+            : this(Conditions as IReadOnlyList<ICondition<T>>)
+        {
+        }
+        public IConditions(ICollection<ICondition<T>> Conditions)
+            : this(Conditions as IReadOnlyList<ICondition<T>>)
+        {
+        }
+        public IConditions(IReadOnlyCollection<ICondition<T>> Conditions)
+            : this(Conditions as IReadOnlyList<ICondition<T>>)
+        {
+        }
+        public IConditions(IConditions<T> Conditions)
+            : this(Conditions as IReadOnlyList<ICondition<T>>)
+        {
         }
         public virtual ICondition<T> this[int Index]
         {
@@ -257,13 +272,6 @@ namespace HNPS_GigantismPlus
             Size = size + 1;
             Items[size] = Condition;
         }
-        /// <remarks>
-        ///     See <seealso cref="List{T}.AddRange(IEnumerable{T})" /> for implementation.
-        /// </remarks>
-        public void AddRange(IEnumerable<ICondition<T>> Conditions)
-        {
-            this.Conditions.AddRange(Conditions);
-        }
         public void AddRange(IReadOnlyList<ICondition<T>> Conditions)
         {
             int count = Conditions.Count;
@@ -271,6 +279,19 @@ namespace HNPS_GigantismPlus
             for (int i = 0; i < count; i++)
             {
                 Add(Conditions[i]);
+            }
+        }
+        public void AddRange(IEnumerable<ICondition<T>> Conditions)
+        {
+            if (Conditions is IReadOnlyList<ICondition<T>> conditions)
+            {
+                AddRange(conditions);
+                return;
+            }
+            EnsureCapacity(Length + Conditions.Count());
+            foreach (ICondition<T> Item in Conditions)
+            {
+                Add(Item);
             }
         }
         public void AddRange(IReadOnlyCollection<ICondition<T>> Conditions)
@@ -458,7 +479,7 @@ namespace HNPS_GigantismPlus
             if (Size - Index < Count)
             {
                 throw new ArgumentException(
-                    "The number of elements from Index to the end of the source List`1" +
+                    "The number of elements from Index to the end of the source Conditions`1" +
                     " is greater than the available space from ArrayIndex to the end of the destination Array");
             }
             System.Array.Copy(Items, Index, Array, ArrayIndex, Count);
@@ -571,9 +592,9 @@ namespace HNPS_GigantismPlus
         /// </returns>
         public IEnumerable<bool> Results(T Subject)
         {
-            if (!Conditions.IsNullOrEmpty())
+            if (!Items.IsNullOrEmpty())
             {
-                foreach (ICondition<T> condition in Conditions)
+                foreach (ICondition<T> condition in Items)
                 {
                     yield return condition.Check(Subject);
                 }
@@ -582,19 +603,19 @@ namespace HNPS_GigantismPlus
         }
 
         /// <summary>
-        ///     Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.
+        ///     Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.
         /// </summary>
         /// 
-        /// <param name="Subject">An instance of the class on which <see cref="ICondition{T}.Check(T)" /> is performed.</param>
+        /// <param name="Subject">An instance of the class on which <see cref="ICondition{T}.NotCheck(T)" /> is performed.</param>
         /// 
         /// <returns>
-        ///     An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.
+        ///     An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.
         /// </returns>
         public IEnumerable<bool> NotResults(T Subject)
         {
-            if (!Conditions.IsNullOrEmpty())
+            if (!Items.IsNullOrEmpty())
             {
-                foreach (ICondition<T> condition in Conditions)
+                foreach (ICondition<T> condition in Items)
                 {
                     yield return condition.NotCheck(Subject);
                 }

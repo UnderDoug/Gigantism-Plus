@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using XRL;
 using XRL.World;
 using XRL.World.Parts;
 
+using static XRL.World.Parts.ModNaturalEquipmentBase;
+
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using System;
 
 namespace HNPS_GigantismPlus
 {
@@ -24,15 +26,7 @@ namespace HNPS_GigantismPlus
 
         public string NaturalEquipmentMod;
 
-        public Type Target;
-
-        public string Field;
-
-        public object Value;
-
-        public ICondition<GameObject> Condition;
-        public AnyConditions<GameObject> AnyConditions;
-        public AllConditions<GameObject> AllConditions;
+        public PartAdjustment Adjustment;
 
         public override int GetCascadeLevel()
         {
@@ -48,29 +42,20 @@ namespace HNPS_GigantismPlus
             base.Reset();
             Equipment = null;
             NaturalEquipmentMod = null;
-            Target = null;
-            Field = null;
-            Condition = null;
-            AnyConditions = null;
-            AllConditions = null;
+            Adjustment = null;
         }
 
-        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, ICondition<GameObject> Condition, AnyConditions<GameObject> AnyConditions, AllConditions<GameObject> AllConditions)
+        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, PartAdjustment Adjustment)
         {
             BeforeApplyPartAdjustmentEvent E = FromPool();
             E.Equipment = Equipment;
             E.NaturalEquipmentMod = NaturalEquipmentMod;
-            E.Target = Target;
-            E.Field = Field;
-            E.Value = Value;
-            E.Condition = Condition;
-            E.AnyConditions = AnyConditions;
-            E.AllConditions = AllConditions;
+            E.Adjustment = Adjustment;
             return E;
         }
-        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, Type Target, string Field, ref object Value, ICondition<GameObject> Condition, AnyConditions<GameObject> AnyConditions, AllConditions<GameObject> AllConditions)
+        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, PartAdjustment Adjustment)
         {
-            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Target, Field, ref Value, Condition, AnyConditions, AllConditions);
+            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Adjustment);
 
             bool haveObject = Equipment != null;
 
@@ -86,21 +71,16 @@ namespace HNPS_GigantismPlus
                 if (proceed && objectWantsMin)
                 {
                     proceed = Equipment.HandleEvent(E);
-                    Value = E.Value;
+                    Adjustment.SetValue(E.Adjustment.Value);
                 }
                 if (proceed && objectWantsStr)
                 {
                     Event @event = Event.New(nameof(BeforeApplyPartAdjustmentEvent));
                     @event.SetParameter(nameof(Equipment), Equipment);
                     @event.SetParameter(nameof(NaturalEquipmentMod), NaturalEquipmentMod);
-                    @event.SetParameter(nameof(Target), Target);
-                    @event.SetParameter(nameof(Field), Field);
-                    @event.SetParameter(nameof(Value), E.Value);
-                    @event.SetParameter(nameof(Condition), Condition);
-                    @event.SetParameter(nameof(AnyConditions), AnyConditions);
-                    @event.SetParameter(nameof(AllConditions), AllConditions);
+                    @event.SetParameter(nameof(Adjustment), Adjustment);
                     proceed = Equipment.FireEvent(@event);
-                    Value = @event.GetParameter(nameof(Value), E.Value);
+                    Adjustment.SetValue(@event.GetParameter(nameof(Adjustment), E.Adjustment).Value);
                     @event.Clear();
                 }
             }

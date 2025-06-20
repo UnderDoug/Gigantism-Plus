@@ -13,29 +13,33 @@ namespace HNPS_GigantismPlus
         {
         }
         public OnlyOneCondition(IConditions<T> Source)
-            : base(Source.Conditions)
+            : base(Source)
         {
         }
 
-        public override bool Check(T Parameter)
+        public override bool Check(T Subject)
         {
-            bool OneCondition = false;
-            foreach (bool result in Results(Parameter))
+            if (Subject == null)
             {
-                if (result)
+                bool OneCondition = false;
+                foreach (bool result in Results(Subject))
                 {
-                    if (!OneCondition)
+                    if (result)
                     {
-                        OneCondition = true;
-                    }
-                    else
-                    {
-                        OneCondition = false;
-                        break;
+                        if (OneCondition)
+                        {
+                            OneCondition = false;
+                            break;
+                        }
+                        else
+                        {
+                            OneCondition = true;
+                        }
                     }
                 }
+                return OneCondition;
             }
-            return OneCondition;
+            return !FalseIfSubjectNull;
         }
     }
 }

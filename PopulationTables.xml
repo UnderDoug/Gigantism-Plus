@@ -321,7 +321,7 @@
 
   <population Name="Tier8BossEncounter" Load="Merge">
     <table Chance="0" Number="0" Name="Tier5BossEncounter" Load="Merge" />
-    <group Name="Creatures" Style="pickone" Load="MergeIfExists">
+    <group Name="Creatures" Style="pickone" Load="Merge">
       <table Weight="10" Name="Tier5BossEncounter" />
       <table Weight="5" Number="1" Name="Templar Giant-Hunter Party" />
       <table Weight="2" Number="1" Name="Templar Giant-Hunter Party Major" />

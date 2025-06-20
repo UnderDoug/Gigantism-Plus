@@ -1,14 +1,18 @@
-﻿using HarmonyLib;
-using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+
+using HarmonyLib;
+
 using XRL.Language;
 using XRL.World.Anatomy;
+
+using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
+
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -50,10 +54,10 @@ namespace XRL.World.Parts
             public ICondition<GameObject> Condition;
 
             [NonSerialized]
-            public AllConditions<GameObject> AllConditions;
+            public AnyConditions<GameObject> AnyConditions;
 
             [NonSerialized]
-            public AnyConditions<GameObject> AnyConditions;
+            public AllConditions<GameObject> AllConditions;
 
             public PartAdjustment()
             {
@@ -65,8 +69,8 @@ namespace XRL.World.Parts
                 AdjustmentPriority = 0;
                 Value = null;
                 Condition = null;
-                AllConditions = new();
                 AnyConditions = new();
+                AllConditions = new();
             }
 
             public PartAdjustment(string ParentNaturalEquipmentMod, Type Target, string Field, int Priority, object Value, ICondition<GameObject> Condition, AnyConditions<GameObject> AnyConditions, AllConditions<GameObject> AllConditions)
@@ -140,7 +144,12 @@ namespace XRL.World.Parts
 
             public virtual bool HasSameTargetAs(PartAdjustment OtherAdjustment)
             {
-                return GetAddress() == OtherAdjustment.GetAddress();
+                return HasSameTargetAs(OtherAdjustment.Target, OtherAdjustment.Field);
+            }
+
+            public virtual bool HasSameTargetAs(Type Target, string Field)
+            {
+                return GetAddress() == GetAddress(Target, Field);
             }
 
             public virtual bool IsTruerThan(GameObject Equipment, PartAdjustment OtherAdjustment)
@@ -192,9 +201,13 @@ namespace XRL.World.Parts
                 return ID == a.ID;
             }
 
-            public virtual string GetAddress()
+            public static string GetAddress(Type Target, string Field)
             {
                 return $"{Target?.Name ?? "null"}.{Field ?? "null"}";
+            }
+            public virtual string GetAddress()
+            {
+                return GetAddress(Target, Field);
             }
 
             public virtual bool SetAddress(string Address)
@@ -208,6 +221,11 @@ namespace XRL.World.Parts
                     return true;
                 }
                 return false;
+            }
+
+            public virtual object SetValue(object Value)
+            {
+                return this.Value = Value;
             }
 
             public virtual bool Apply(GameObject Equipment)
@@ -227,7 +245,7 @@ namespace XRL.World.Parts
                     Debug.Entry(4, $"{nameof(Target)}: {targetPart?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: doDebug);
                     if (targetPart != null)
                     {
-                        if (BeforeApplyPartAdjustmentEvent.Send(Equipment, ParentNaturalEquipmentMod, Target, Field, ref Value, Condition, AnyConditions, AllConditions) && Value != null)
+                        if (BeforeApplyPartAdjustmentEvent.Send(Equipment, ParentNaturalEquipmentMod, this) && Value != null)
                         {
                             Debug.CheckYeh(4, $"Have {targetPart.GetType().Name}", Indent: indent + 2, Toggle: doDebug);
                             Traverse targetPartTraverse = new(targetPart);
@@ -239,9 +257,9 @@ namespace XRL.World.Parts
                             Debug.Entry(4, $"{nameof(targetField)}.GetValueType: {targetField?.GetValueType()?.Name ?? NULL}", Indent: indent + 3, Toggle: doDebug);
                             try
                             {
-                                bool condition = Check(Equipment);
-                                Debug.CheckYeh(4, $"{nameof(Condition)} Checked", $"{condition}", Indent: indent + 3, Toggle: doDebug);
-                                if (condition && targetProperty.PropertyExists() && targetProperty.GetValueType() == valueType)
+                                bool conditionsMet = Check(Equipment);
+                                Debug.CheckYeh(4, $"{nameof(Check)} performed", $"{conditionsMet}", Indent: indent + 3, Toggle: doDebug);
+                                if (conditionsMet && targetProperty.PropertyExists() && targetProperty.GetValueType() == valueType)
                                 {
                                     Debug.CheckYeh(4, $"{nameof(targetProperty)}", Indent: indent + 3, Toggle: doDebug);
                                     Debug.Entry(4, $"Property Type: {targetProperty.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
@@ -252,7 +270,7 @@ namespace XRL.World.Parts
                                     Debug.LastIndent = indent;
                                     return targetProperty.GetValue().Equals(Value);
                                 }
-                                if (condition && targetField.FieldExists() && targetField.GetValueType() == valueType)
+                                if (conditionsMet && targetField.FieldExists() && targetField.GetValueType() == valueType)
                                 {
                                     Debug.CheckYeh(4, $"{nameof(targetField)}", Indent: indent + 3, Toggle: doDebug);
                                     Debug.Entry(4, $"Field Type: {targetField.GetValueType().Name}", Indent: indent + 4, Toggle: doDebug);
@@ -297,8 +315,8 @@ namespace XRL.World.Parts
                 Writer.Write(AdjustmentPriority);
                 Writer.WriteObject(Value);
                 Writer.WriteObject(Condition);
-                Writer.WriteObject(AllConditions);
                 Writer.WriteObject(AnyConditions);
+                Writer.WriteObject(AllConditions);
             }
             public void Read(SerializationReader Reader)
             {
@@ -310,8 +328,8 @@ namespace XRL.World.Parts
                 AdjustmentPriority = Reader.ReadInt32();
                 Value = Reader.ReadObject();
                 Condition = Reader.ReadObject() as ICondition<GameObject>;
-                AllConditions = Reader.ReadObject() as AllConditions<GameObject>;
                 AnyConditions = Reader.ReadObject() as AnyConditions<GameObject>;
+                AllConditions = Reader.ReadObject() as AllConditions<GameObject>;
             }
             public virtual PartAdjustment DeepCopy()
             {
@@ -325,8 +343,8 @@ namespace XRL.World.Parts
                     AdjustmentPriority = AdjustmentPriority,
                     Value = Value,
                     Condition = Condition,
-                    AllConditions = AllConditions,
                     AnyConditions = AnyConditions,
+                    AllConditions = AllConditions,
                 };
                 return partAdjustment;
             }

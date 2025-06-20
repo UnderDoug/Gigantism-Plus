@@ -26,15 +26,15 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(T Subject)
         {
-            return Condition == null
-                || Subject == null
+            return (Subject == null && !FalseIfSubjectNull)
+                || Condition == null
                 || Condition.NotCheck(Subject);
         }
 
         public override bool NotCheck(T Subject)
         {
-            return Condition == null 
-                || Subject == null
+            return (Subject == null && !FalseIfSubjectNull)
+                || Condition == null
                 || Condition.Check(Subject);
         }
     }

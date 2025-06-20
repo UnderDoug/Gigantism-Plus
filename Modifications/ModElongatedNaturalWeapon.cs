@@ -8,6 +8,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
 namespace XRL.World.Parts
 {
@@ -39,9 +40,9 @@ namespace XRL.World.Parts
             AddSkillAdjustment("ShortBlades", true);
             AddStatAdjustment("Agility", -120);
 
-            AddNounAdjustment(true, Condition: new GameObjectBlueprintIs("DefaultFist"));
+            AddNounAdjustment(true, AllConditions: new() { IsOrganicFist });
 
-            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: new GameObjectBlueprintIs("DefaultFist"));
+            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, AllConditions: new() { IsOrganicFist });
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);

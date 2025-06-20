@@ -29,6 +29,7 @@
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Chrome Pyramid" Load="Merge">
+    <part Name="Physics" Weight="5000" />
     <mutation Name="GigantismPlus" Level="7" />
     <removetag Name="Gigantic" />
     <property Name="NoWrassleGear" Value="NonePlease!" />
@@ -42,12 +43,14 @@
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Saltwurm" Load="Merge">
+    <part Name="Physics" Weight="8000" />
     <mutation Name="GigantismPlus" Level="8" />
     <property Name="GenerateWithStews" Value="2d3" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Star Kraken" Load="Merge">
+    <part Name="Physics" Weight="8000" />
     <mutation Name="GigantismPlus" Level="8" />
     <property Name="GenerateWithStews" Value="3d4" />
     <intproperty Name="RapidLevel_GigantismPlus" Value="3" />

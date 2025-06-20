@@ -12,6 +12,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.SecretGiganticExoframe;
+using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
 namespace XRL.World.Parts
 {

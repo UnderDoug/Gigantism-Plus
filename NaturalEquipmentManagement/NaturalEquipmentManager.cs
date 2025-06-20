@@ -7,6 +7,9 @@ using XRL.Rules;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+using XRL.Language;
+
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 using HNPS_GigantismPlus;
 
@@ -14,9 +17,8 @@ using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
+
 using SerializeField = UnityEngine.SerializeField;
-using XRL.Language;
 
 namespace XRL.World.Parts
 {
@@ -93,19 +95,6 @@ namespace XRL.World.Parts
         private string _shortDescriptionCache = null;
 
         public List<string> AppliedAdjustments;
-
-        /// <summary>
-        /// Key: string (name of Target object) <br></br>
-        /// Value: Tuple( TargetObject, Entry ) <br></br>
-        /// - TargetObject: per ModNaturalEquipmentBase.HNPS_Adjustment class, one of: [GameObject] (the equipment itself), [Render], [MeleeWeapon], [Armor] <br></br>
-        /// - Entry: Dictionary, <br></br>
-        /// - - Key: string (field/property being targeted) <br></br>
-        /// - - Value: Tuple( Priority, Value ), <br></br>
-        /// - - - Priority: self-explanitory <br></br>
-        /// - - - Value: the value to which the field is to be set
-        /// </summary>
-        // [NonSerialized]
-        // public Dictionary<string, (object TargetObject, Dictionary<string, (int AdjustmentPriority, object Value)> Entry)> AdjustmentTargets;
 
         public NaturalEquipmentManager()
         {

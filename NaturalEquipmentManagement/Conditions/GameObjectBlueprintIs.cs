@@ -6,28 +6,28 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public class GameObjectBlueprintIs : ICondition<GameObject>
     {
-        public string Variant;
+        public string Blueprint;
 
         public GameObjectBlueprintIs()
             : base()
         {
-            Variant = null;
+            Blueprint = null;
         }
         public GameObjectBlueprintIs(string Blueprint = null)
             : this()
         {
-            this.Variant = Blueprint;
+            this.Blueprint = Blueprint;
         }
         public GameObjectBlueprintIs(GameObjectBlueprintIs Source)
-            : this(Source?.Variant)
+            : this(Source?.Blueprint)
         {
         }
 
         public override bool Check(GameObject GameObject)
         {
-            return Variant.IsNullOrEmpty()
-                || GameObject == null
-                || GameObject?.Blueprint == Variant;
+            return (GameObject == null && !FalseIfSubjectNull)
+                || Blueprint.IsNullOrEmpty()
+                || GameObject?.Blueprint == Blueprint;
         }
     }
 }

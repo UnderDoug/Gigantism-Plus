@@ -19,15 +19,15 @@ namespace HNPS_GigantismPlus
         {
             this.Variant = Variant;
         }
-        public BodyPartVariantIs(GameObjectBlueprintIs Source)
+        public BodyPartVariantIs(BodyPartVariantIs Source)
             : this(Source?.Variant)
         {
         }
 
         public override bool Check(BodyPart BodyPart)
         {
-            return Variant.IsNullOrEmpty()
-                || BodyPart == null
+            return (BodyPart == null && !FalseIfSubjectNull)
+                || Variant.IsNullOrEmpty()
                 || BodyPart?.VariantType == Variant;
         }
     }

@@ -96,10 +96,14 @@ namespace HNPS_GigantismPlus.Harmony
                     }
                     if (doImplantedEvent)
                     {
-                        // ImplantedEvent.Send(Object, cybernetics, part, Object, true, true);
-                        EffectAppliedEvent.Send(cybernetics, null, null, Object);
-                        Debug.CheckYeh(4, $"{nameof(EffectAppliedEvent)}", "Sent", Indent: 4, Toggle: doDebug);
-                        continue;
+                        if (cybernetics != null && Object != null)
+                        {
+                            // ImplantedEvent.Send(Object, cybernetics, part, Object, true, true);
+                            EffectAppliedEvent.Send(cybernetics, "", new(), Object);
+                            Debug.CheckYeh(4, $"{nameof(EffectAppliedEvent)}", "Sent", Indent: 4, Toggle: doDebug);
+                            continue;
+                        }
+                        
                     }
                     else
                     {

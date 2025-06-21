@@ -57,24 +57,38 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
+        public JoppaWorldBuilder Builder = null;
+
         public static string SecretZoneID = string.Empty;
         public static JournalMapNote SecretMapNote = null;
 
         public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneID);
 
-        public override void OnAfterBuild(JoppaWorldBuilder builder)
+        public override void OnAfterBuild(JoppaWorldBuilder Builder)
         {
+            this.Builder = Builder;
+            MetricsManager.rngCheckpoint("gigantify");
+            Builder.BuildStep("Gigantifying wrasslers", GigantifyWrasslers);
+        }
+        public void GigantifyWrasslers(string WorldID)
+        {
+            if (!(WorldID == "JoppaWorld"))
+            {
+                return;
+            }
+            WorldCreationProgress.StepProgress("Gigantifying wrasslers...");
+
             Debug.Entry(4,
                 $"\u2666 {nameof(SecretGiantWhoCooksBuilderExtension)}." +
-                $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder)",
+                $"{nameof(GigantifyWrasslers)}(WorldID: {WorldID})",
                 Indent: 0, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Getting coordinates...", Indent: 1, Toggle: getDoDebug());
-            Location2D location = builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
+            Location2D location = Builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
             Debug.LoopItem(4, $"{nameof(location)}: [{location}]", Indent: 2, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Getting ZoneID from {nameof(location)}...", Indent: 1, Toggle: getDoDebug());
-            SecretZoneID = builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
+            SecretZoneID = Builder.ZoneIDFromXY("JoppaWorld", location.X, location.Y);
             Debug.Entry(4, $"{nameof(SecretZoneID)} Set", $"{SecretZoneID}", Indent: 1, Toggle: getDoDebug());
 
             Debug.Entry(4, $"Checking MapNote isn't already set...", Indent: 1, Toggle: getDoDebug());
@@ -122,7 +136,7 @@ namespace HNPS_GigantismPlus
             zoneManager.SetZoneName(SecretZoneID, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneID, false);
 
-            TerrainTravel pTravel = builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
+            TerrainTravel pTravel = Builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
             if (XRL.UI.Options.ShowOverlandEncounters && pTravel != null)
             {
                 Debug.Entry(4, $"Setting up OverLandEncounters option...", Indent: 1, Toggle: getDoDebug());
@@ -137,7 +151,7 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Warn(2,
                     $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
-                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
+                    $"{nameof(GigantifyWrasslers)}(JoppaWorldBuilder builder) ",
                     $"failed to instantiate {nameof(UniqueGiant)}. Placement aborted.",
                     Indent: 0);
                 return;
@@ -163,7 +177,7 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Warn(2,
                     $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
-                    $"{nameof(OnAfterBuild)}(JoppaWorldBuilder builder) ",
+                    $"{nameof(GigantifyWrasslers)}(JoppaWorldBuilder builder) ",
                     $"failed to instantiate {nameof(wrassleID)}. Ring sync aborted.",
                     Indent: 0);
                 return;

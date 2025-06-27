@@ -324,8 +324,7 @@ namespace XRL.World.Parts.Mutation
         {
             return base.WantEvent(ID, cascade)
                 || ID == GetPrioritisedNaturalEquipmentModsEvent.ID
-                || ID == ManageDefaultNaturalEquipmentEvent.ID
-                || ID == PartSupportEvent.ID;
+                || ID == ManageDefaultNaturalEquipmentEvent.ID;
         }
         public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
         {
@@ -382,20 +381,6 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual bool HandleEvent(AfterRapidAdvancementEvent E)
         {
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(PartSupportEvent E)
-        {
-            Debug.Entry(4,
-                $"@ {nameof(UD_ManagedBurrowingClaws)}."
-                + $"{nameof(HandleEvent)}("
-                + $"{nameof(PartSupportEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
-
-            if (E.Skip != this && E.Type == "Digging" && IsMyActivatedAbilityToggledOn(EnableActivatedAbilityID))
-            {
-                return false;
-            }
             return base.HandleEvent(E);
         }
         public override bool FireEvent(Event E)

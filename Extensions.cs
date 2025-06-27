@@ -515,12 +515,23 @@ namespace HNPS_GigantismPlus
                             Debug.CheckYeh(4, "not already gigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                         }
 
+                        // Is the item a natural equipment the creature starts with? don't gigantify.
+                        if (item.IsNaturalEquipment())
+                        {
+                            Debug.CheckNah(4, "Natural Equipment", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                            NoThanks++;
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, "not already gigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                        }
+
                         // Is the item a grenade, and is the option not set to include them?
                         if (item.HasTag("Grenade"))
                         {
                             if (!GrenadeOption || creatureIsMerchant)
                             {
-                                if (!GrenadeOption)
+                                if (!GrenadeOption && !creatureIsMerchant)
                                 {
                                     Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                                     NoThanks++;
@@ -530,7 +541,6 @@ namespace HNPS_GigantismPlus
                                     Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                                     NoThanks++;
                                 }
-
                                 if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high)
                                 {
                                     Debug.LoopItem(4,
@@ -551,7 +561,7 @@ namespace HNPS_GigantismPlus
                         }
 
                         // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
-                        if (item.HasTag("DynamicObjectsTable:TradeGoods"))
+                        if (item.HasTag("DynamicObjectsTable:TradeGoods") || item.InheritsFrom("BaseCurrency"))
                         {
                             Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                             NoThanks++;
@@ -560,6 +570,14 @@ namespace HNPS_GigantismPlus
                             {
                                 Debug.LoopItem(4,
                                     $"but!] merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
+                                    $"NoThanks--;",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                NoThanks--;
+                            }
+                            if (item.HasTagOrProperty("InventoryGigantifierAlwaysAllow"))
+                            {
+                                Debug.LoopItem(4,
+                                    $"but!] InventoryGigantifierAlwaysAllow",
                                     $"NoThanks--;",
                                     Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                                 NoThanks--;
@@ -584,6 +602,14 @@ namespace HNPS_GigantismPlus
                                     Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                                 NoThanks--;
                             }
+                            if (item.HasTagOrProperty("InventoryGigantifierAlwaysAllow"))
+                            {
+                                Debug.LoopItem(4,
+                                    $"but!] InventoryGigantifierAlwaysAllow",
+                                    $"NoThanks--;",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                NoThanks--;
+                            }
                         }
                         else
                         {
@@ -600,6 +626,14 @@ namespace HNPS_GigantismPlus
                             {
                                 Debug.LoopItem(4,
                                     $"but!] merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
+                                    $"NoThanks--;",
+                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
+                                NoThanks--;
+                            }
+                            if (item.HasTagOrProperty("InventoryGigantifierAlwaysAllow"))
+                            {
+                                Debug.LoopItem(4,
+                                    $"but!] InventoryGigantifierAlwaysAllow",
                                     $"NoThanks--;",
                                     Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
                                 NoThanks--;

@@ -67,18 +67,22 @@ namespace XRL.World.Parts
         public static Dictionary<Cell, Cell> GetVaultableCellPairs(Cell Pivot, GameObject For = null)
         {
             Dictionary<Cell, Cell> OriginDestinationPairs = new();
-            foreach (Cell cell in Pivot.GetLocalAdjacentCells())
+            List<Cell> adjacentCells = Event.NewCellList(Pivot.GetLocalAdjacentCells());
+            if (!adjacentCells.IsNullOrEmpty())
             {
-                if (cell == Pivot || OriginDestinationPairs.ContainsKey(cell) || OriginDestinationPairs.ContainsValue(cell) || !IsValidDestination(cell, For))
-                    continue;
-
-                Cell cellOpposite = cell.GetCellOppositePivotCell(Pivot);
-                if (cellOpposite != null && IsValidDestination(cellOpposite, For))
+                foreach (Cell cell in adjacentCells)
                 {
-                    OriginDestinationPairs.TryAdd(cell, cellOpposite);
-                    OriginDestinationPairs.TryAdd(cellOpposite, cell);
-                }
+                    if (cell == Pivot || OriginDestinationPairs.ContainsKey(cell) || OriginDestinationPairs.ContainsValue(cell) || !IsValidDestination(cell, For))
+                        continue;
 
+                    Cell cellOpposite = cell.GetCellOppositePivotCell(Pivot);
+                    if (cellOpposite != null && IsValidDestination(cellOpposite, For))
+                    {
+                        OriginDestinationPairs.TryAdd(cell, cellOpposite);
+                        OriginDestinationPairs.TryAdd(cellOpposite, cell);
+                    }
+
+                }
             }
             return OriginDestinationPairs;
         }

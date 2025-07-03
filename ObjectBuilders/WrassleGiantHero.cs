@@ -21,6 +21,7 @@ using XRL.World.Parts.Skill;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+using static XRL.World.Parts.Mutation.BaseMutation;
 
 namespace XRL.World.ObjectBuilders
 {
@@ -1046,6 +1047,19 @@ namespace XRL.World.ObjectBuilders
                 $"<Description>?", 
                 Good: description.Short.Contains($"{preDesc}"), 
                 Indent: indent + 2, Toggle: getDoDebug());
+
+            if (Creature.TryGetPart(out GigantismPlus gigantism))
+            {
+                int capOverride = 0;
+                foreach (LevelCalculation levelCalculation in gigantism.GetLevelCalculations())
+                {
+                    if (!levelCalculation.reason.EndsWith(" due to your level."))
+                    {
+                        capOverride += levelCalculation.bonus;
+                    }
+                }
+                gigantism.CapOverride = capOverride > gigantism.Level ? capOverride : - 1;
+            }
 
             Debug.LastIndent = indent;
         }

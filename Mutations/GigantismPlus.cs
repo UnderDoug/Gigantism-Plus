@@ -100,13 +100,8 @@ namespace XRL.World.Parts.Mutation
             set => _giganticExoframe = value;
         }
 
-        [NonSerialized]
         public Guid HunchOverActivatedAbilityID = Guid.Empty;
-
-        [NonSerialized]
         public Guid GroundPoundActivatedAbilityID = Guid.Empty;
-
-        [NonSerialized]
         public Guid CloseFistActivatedAbilityID = Guid.Empty;
 
         public static readonly string COMMAND_NAME_HUNCH_OVER = "CommandToggleGigantismPlusHunchOver";
@@ -144,6 +139,7 @@ namespace XRL.World.Parts.Mutation
                 _hunchOverEnergyCost = value;
             }
         }
+        private int EnterInteriorAttempts = 0;
 
         [SerializeField]
         private int AppliedJumpRangeBonus = 0;
@@ -688,23 +684,17 @@ namespace XRL.World.Parts.Mutation
 
         public virtual Guid AddActivatedAbilityHunchOver(GameObject GO, bool Force = false, bool Silent = false)
         {
-            if ((!GO.HasPart<Vehicle>() && HunchOverActivatedAbilityID == Guid.Empty) || Force)
+            if (!GO.HasPart<Vehicle>() && (HunchOverActivatedAbilityID == Guid.Empty || Force))
             {
                 HunchOverActivatedAbilityID =
                     AddMyActivatedAbility(
                         Name: HunchOverAbilityHunched,
-                        // Name: "{{C|" + "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}/" + HunchedOverAbilityHunched + "}}",
                         Command: COMMAND_NAME_HUNCH_OVER,
-                        Class: "Physical Mutations",
+                        Class: "Physical Manoeuvres",
                         Description: null,
                         Icon: "&#214",
-                        DisabledMessage: null,
                         Toggleable: true,
-                        DefaultToggleState: false,
-                        ActiveToggle: true,
-                        IsAttack: false,
-                        IsRealityDistortionBased: false,
-                        IsWorldMapUsable: false
+                        ActiveToggle: true
                         );
             }
             if (HunchOverActivatedAbilityID != Guid.Empty)
@@ -712,26 +702,6 @@ namespace XRL.World.Parts.Mutation
                 AbilityToggledHunchOver(GO, ToggledOn: false);
             }
             return HunchOverActivatedAbilityID;
-            /*
-            ActivatedAbilityEntry abilityEntry = GO.GetActivatedAbility(HunchOverActivatedAbilityID);
-            abilityEntry.DisplayName = 
-                "{{C|" + 
-                "{{W|[}}" + HunchedOverAbilityUpright + "{{W|]}}\n" +
-                            HunchedOverAbilityHunched + "\n" +
-                   "}}";
-            */
-
-            // Debug.LoopItem(4, "Activated Ability DisplayName Changed", Indent: 2);
-            /* This causes a village generation crash.
-             * 
-            if (this.IsCyberGiant)
-            {
-                abilityEntry.UITileDefault.ColorString = "b";
-                abilityEntry.UITileDefault.DetailColor = char.Parse("B");
-                abilityEntry.UITileToggleOn.ColorString = "b";
-                abilityEntry.UITileToggleOn.DetailColor = char.Parse("B");
-            }
-            */
         }
         public virtual bool RemoveActivatedAbilityHunchOver(GameObject GO, bool Force = false)
         {
@@ -741,7 +711,6 @@ namespace XRL.World.Parts.Mutation
                 removed = RemoveMyActivatedAbility(ref HunchOverActivatedAbilityID, GO);
             }
             return removed;
-
         }
 
         public virtual Guid AddActivatedAbilityGroundPound(GameObject GO, bool Force = false, bool Silent = false)
@@ -876,8 +845,7 @@ namespace XRL.World.Parts.Mutation
             if (!GO.HasPart<Vehicle>())
             {
                 Debug.CheckYeh(4, "Not Vehicle", Indent: 2, Toggle: doDebug);
-
-                
+                AddActivatedAbilityHunchOver(GO);
             }
             else
             {
@@ -967,9 +935,6 @@ namespace XRL.World.Parts.Mutation
         }
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register(COMMAND_NAME_HUNCH_OVER);
-            Registrar.Register(COMMAND_NAME_GROUND_POUND);
-            Registrar.Register(COMMAND_NAME_CLOSE_FIST);
             Registrar.Register(GetIntrinsicWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
             Registrar.Register(GetMaxCarriedWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
@@ -992,7 +957,8 @@ namespace XRL.World.Parts.Mutation
                 || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID)
                 || (wantJumped && ID == JumpedEvent.ID)
                 || ID == BeforeVaultEvent.ID
-                || ID == VaultedEvent.ID;
+                || ID == VaultedEvent.ID
+                || ID == CommandEvent.ID;
         }
         public override bool HandleEvent(GetIntrinsicWeightEvent E)
         {
@@ -1043,33 +1009,43 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(CanEnterInteriorEvent E)
         {
-            Debug.Entry(1, "Checking CanEnterInteriorEvent", Toggle: doDebug);
-            if (ParentObject == E.Object)
+            int maxAttempts = 4;
+            if (EnterInteriorAttempts < maxAttempts)
             {
-                // This check is necessary because both the enterer and enteree handle this event.
-                Debug.Entry(1, "Parent Object is the Target of Entry, Skip to base CanEnterInteriorEvent", Toggle: doDebug);
-                return base.HandleEvent(E);
-            }
-            GameObject actor = E.Actor;
-            if (actor != null && actor.IsGiganticCreature && !IsVehicleCreature)
-            {
-                Debug.Entry(2, "We are big, gonna HunchOver", Toggle: doDebug);
-                IsHunchFree = true;
-                CommandEvent.Send(actor, COMMAND_NAME_HUNCH_OVER);
-                Debug.Entry(3, "HunchOver Sent for CanEnterInteriorEvent", Toggle: doDebug);
-                bool check = CanEnterInteriorEvent.Check(E.Actor, E.Object, E.Interior, ref E.Status, ref E.Action, ref E.ShowMessage);
-                E.Status = check ? 0 : E.Status;
-                string status = "";
-                status += E.Status;
-                Debug.Entry(3, "E.Status", status, Toggle: doDebug);
+                EnterInteriorAttempts++;
+                Debug.Entry(1, $"Checking CanEnterInteriorEvent", Toggle: doDebug);
+                if (ParentObject == E.Object)
+                {
+                    // This check is necessary because both the enterer and enteree handle this event.
+                    Debug.Entry(1, $"Parent Object is the Target of Entry, Skip to base CanEnterInteriorEvent", Toggle: doDebug);
+                    return base.HandleEvent(E);
+                }
+                GameObject actor = E.Actor;
+                if (actor != null && actor.IsGiganticCreature && !IsVehicleCreature)
+                {
+                    Debug.Entry(2, $"We are big, gonna HunchOver", Toggle: doDebug);
+                    IsHunchFree = true;
+                    CommandEvent.Send(actor, COMMAND_NAME_HUNCH_OVER);
+                    Debug.Entry(3, $"HunchOver Sent for CanEnterInteriorEvent", Toggle: doDebug);
+                    bool check = CanEnterInteriorEvent.Check(E.Actor, E.Object, E.Interior, ref E.Status, ref E.Action, ref E.ShowMessage);
+                    E.Status = check ? 0 : E.Status;
+                    string status = "";
+                    status += E.Status;
+                    Debug.Entry(3, $"E.Status", status, Toggle: doDebug);
 
-                Popup.Show("You try to squeeze into the space.");
+                    Popup.Show($"You try to squeeze into the space.");
+                }
+                else
+                {
+                    Debug.Entry(2, $"CanEnterInteriorEvent - We aren't big.", Toggle: doDebug);
+                }
+                Debug.Entry(1, $"Sending to base CanEnterInteriorEvent", Toggle: doDebug);
             }
             else
             {
-                Debug.Entry(2, "CanEnterInteriorEvent - We aren't big.", Toggle: doDebug);
+                Debug.Entry(2, $"{nameof(EnterInteriorAttempts)} at or exceeds {maxAttempts}", Toggle: doDebug);
+                EnterInteriorAttempts = 0;
             }
-            Debug.Entry(1, "Sending to base CanEnterInteriorEvent", Toggle: doDebug);
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
@@ -1182,9 +1158,9 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-        public override bool FireEvent(Event E)
+        public override bool HandleEvent(CommandEvent E)
         {
-            if (E.ID == COMMAND_NAME_HUNCH_OVER)
+            if (E.Command == COMMAND_NAME_HUNCH_OVER)
             {
                 GameObject actor = ParentObject;
                 
@@ -1192,16 +1168,17 @@ namespace XRL.World.Parts.Mutation
                 if (actor.CurrentZone.ZoneWorld == "Interior" && !IsGiganticCreature)
                 {
                     Popup.Show("This space is too small for you to stand upright!");
-                    return base.FireEvent(E);
+                    return base.HandleEvent(E);
                 }
 
                 if (IsVehicleCreature)
                 {
-                    return base.FireEvent(E);
+                    Debug.Warn(3, nameof(GigantismPlus), nameof(HandleEvent) + $"{nameof(CommandEvent)}", "Vehicle attempted to use Hunch ability. Vehicles shouldn't be assigned this ability.");
+                    return base.HandleEvent(E);
                 }
 
                 // Not prevented from taking action
-                ToggleMyActivatedAbility(HunchOverActivatedAbilityID, null, Silent: true, null);
+                ToggleMyActivatedAbility(HunchOverActivatedAbilityID, actor, Silent: true, null);
                 Debug.Entry(3, "Hunch Over Toggled", Toggle: doDebug);
 
                 Debug.Entry(3, "Proceeding to Hunch Ability Effects", Toggle: doDebug);
@@ -1211,22 +1188,22 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(2, "IsGiganticCreature", $"{IsGiganticCreature}", Toggle: doDebug);
             }
 
-            if (E.ID == COMMAND_NAME_GROUND_POUND)
+            if (E.Command == COMMAND_NAME_GROUND_POUND)
             {
                 GameObject actor = ParentObject;
 
-                ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, null, Silent: true, null);
+                ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, actor, Silent: true, null);
                 Debug.Entry(3, "Ground Pound Toggled", Toggle: doDebug);
 
                 Debug.Entry(3, "Proceeding to Ground Pound Ability Effects", Toggle: doDebug);
                 AbilityToggledGroundPound(actor, IsMyActivatedAbilityToggledOn(GroundPoundActivatedAbilityID));
             }
 
-            if (E.ID == COMMAND_NAME_CLOSE_FIST)
+            if (E.Command == COMMAND_NAME_CLOSE_FIST)
             {
                 GameObject actor = ParentObject;
 
-                if (ToggleMyActivatedAbility(CloseFistActivatedAbilityID, null, Silent: true, null))
+                if (ToggleMyActivatedAbility(CloseFistActivatedAbilityID, actor, Silent: true, null))
                 {
                     Debug.Entry(3, "Close Fist Toggled", Toggle: doDebug);
                 }
@@ -1243,7 +1220,7 @@ namespace XRL.World.Parts.Mutation
             }
 
             The.Core.RenderBase();
-            return base.FireEvent(E);
+            return base.HandleEvent(E);
         }
 
         // Want to move the bulk of the Active Ability here.
@@ -1424,18 +1401,10 @@ namespace XRL.World.Parts.Mutation
         public override void Write(GameObject Basis, SerializationWriter Writer)
         {
             base.Write(Basis, Writer);
-
-            Writer.Write(HunchOverActivatedAbilityID);
-            Writer.Write(GroundPoundActivatedAbilityID);
-            Writer.Write(CloseFistActivatedAbilityID);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-
-            HunchOverActivatedAbilityID = Reader.ReadGuid();
-            GroundPoundActivatedAbilityID = Reader.ReadGuid();
-            CloseFistActivatedAbilityID = Reader.ReadGuid();
         }
 
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

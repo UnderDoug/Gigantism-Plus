@@ -96,7 +96,7 @@ namespace HNPS_GigantismPlus
             { nameof(ModAugmentedNaturalWeapon), false },
             { "BaseManagedDefaultEquipmentMutation", false },
             { "BaseManagedDefaultEquipmentCybernetic", false },
-            { nameof(GigantismPlus), false },
+            { nameof(GigantismPlus), true },
             { nameof(ElongatedPaws), false },
             { nameof(UD_ManagedBurrowingClaws), false },
             { nameof(UD_ManagedCrystallinity), false },

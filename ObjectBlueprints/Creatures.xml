@@ -13,7 +13,7 @@
     <!-- part Name="ObjectCreationAnalyzer" /-->
     <builder Name="Gigantified" ChanceOneIn="5000" />
     <intproperty Name="WrassleGearBestowChance" Value="15" />
-    <skill Name="Tactics_Vault" />
+    <!-- skill Name="Tactics_Vault" /-->
   </object>
   
   <object Name="Templar" Load="Merge">

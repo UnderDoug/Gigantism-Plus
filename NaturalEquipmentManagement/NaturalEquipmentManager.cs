@@ -624,8 +624,8 @@ namespace XRL.World.Parts
                     if (ManageDefaultNaturalEquipmentEvent.CheckFor(ParentObject, Wielder, ParentLimb, this))
                     {
                         ManageNaturalEquipment(GetNaturalEquipmentMods());
+                        AfterManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this).Reset();
                     }
-                    AfterManageDefaultNaturalEquipmentEvent.Send(ParentObject, Wielder, ParentLimb, this).Reset();
                 }
             }
 

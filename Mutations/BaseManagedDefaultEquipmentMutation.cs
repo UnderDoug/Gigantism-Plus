@@ -249,6 +249,7 @@ namespace XRL.World.Parts.Mutation
         {
             Registrar.Register("BeforeMutationAdded");
             Registrar.Register("MutationAdded");
+            Registrar.Register("CookedAt");
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -344,6 +345,13 @@ namespace XRL.World.Parts.Mutation
                 if (Actor == ParentObject)
                 {
                     // ProcessNaturalEquipment(Actor?.Actor);
+                }
+            }
+            else if (E.ID == "CookedAt")
+            {
+                if (E.GetParameter("Actor") is GameObject Actor && Actor == ParentObject && Actor.Body != null)
+                {
+                    Actor.Body.UpdateBodyParts();
                 }
             }
             return base.FireEvent(E);

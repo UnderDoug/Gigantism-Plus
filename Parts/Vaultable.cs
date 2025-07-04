@@ -15,6 +15,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using Genkit;
 
 namespace XRL.World.Parts
 {
@@ -386,12 +387,10 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetNavigationWeightEvent E)
         {
-            Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
-            bool hasAnyValidVaultCells = !originDestinationPairs.IsNullOrEmpty();
-
-            if (hasAnyValidVaultCells && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null && !E.Actor.IsFlying)
+            if (E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null && !E.Actor.IsFlying)
             {
-                if (Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
+                Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
+                if (!originDestinationPairs.IsNullOrEmpty() && Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
                 {
                     int validPairs = originDestinationPairs.Count / 2;
                     int baseWeight = validPairs switch
@@ -417,12 +416,12 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetAdjacentNavigationWeightEvent E)
         {
-            if (E.AdjacentCell != null)
+            if (E.Actor != null && E.AdjacentCell != null && E.AdjacentCell != ParentObject.CurrentCell)
             {
                 Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
                 bool isValidVaultCell = !originDestinationPairs.IsNullOrEmpty() && (originDestinationPairs.ContainsKey(E.AdjacentCell) || originDestinationPairs.ContainsValue(E.AdjacentCell));
 
-                if (!isValidVaultCell && E.AdjacentCell != ParentObject.CurrentCell)
+                if (!isValidVaultCell)
                 {
                     if (Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
                     {

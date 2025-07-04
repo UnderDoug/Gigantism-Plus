@@ -989,13 +989,17 @@ namespace XRL.World.Parts.Mutation
         public override bool HandleEvent(BeforeRapidAdvancementEvent E)
         {
             if (!E.Amount.Is(0))
+            {
                 SwapMutationCategory(nameof(GigantismPlus), "PhysicalDefects", "Physical");
+            }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(AfterRapidAdvancementEvent E)
         {
             if (!E.Amount.Is(0))
+            {
                 SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
+            }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(AfterLevelGainedEvent E)
@@ -1218,8 +1222,6 @@ namespace XRL.World.Parts.Mutation
                     Debug.CheckNah(3, "Something went wrong changing fist state (Open/Close)", Toggle: doDebug);
                 }
             }
-
-            The.Core.RenderBase();
             return base.HandleEvent(E);
         }
 

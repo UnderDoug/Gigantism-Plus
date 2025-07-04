@@ -409,6 +409,7 @@ namespace XRL.World.Parts
             Registrar.Register("CanBeDisassembled"); // This prevents the cybernetic from being disassembled.
             Registrar.Register("BeforeMutationAdded");
             Registrar.Register("MutationAdded");
+            Registrar.Register("CookedAt");
             base.Register(Object, Registrar);
         }
         public override bool FireEvent(Event E)
@@ -442,6 +443,13 @@ namespace XRL.World.Parts
                 if (Actor == Implantee)
                 {
                     // do code?
+                }
+            }
+            else if (E.ID == "CookedAt")
+            {
+                if (E.GetParameter("Actor") is GameObject Actor && Actor == ParentObject && Actor.Body != null)
+                {
+                    Actor.Body.UpdateBodyParts();
                 }
             }
             return base.FireEvent(E);

@@ -12,6 +12,7 @@ using XRL.World.Anatomy;
 using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts.Mutation;
+using XRL.World.Parts.Skill;
 using XRL.World.Tinkering;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
@@ -73,6 +74,10 @@ namespace XRL.World.Parts
                 {
                     "Wrassler",
                 };
+                if (!ParentObject.TryGetPart(out Tactics_Vault tactics_Vault))
+                {
+                    ParentObject.AddSkill(nameof(Tactics_Vault));
+                }
             }
             base.Attach();
         }

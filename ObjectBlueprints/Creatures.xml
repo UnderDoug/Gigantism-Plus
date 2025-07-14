@@ -219,6 +219,7 @@
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"  
           />
     <part Name="Description" Short="An over-square jaw competes with =pronouns.possessive= broad, furrowed brow for posession of =pronouns.possessive= face. =pronouns.Possessive= posture hints at a once bent spine, and =pronouns.possessive= gait all but betrays it. =pronouns.Subjective= =verb:flex:afterpronoun= =pronouns.possessive= immense fists in subconcious anticipation of imminent glory, while =pronouns.possessive= deep-set, monochrome eyes flicker hopefully across the horizon." />
+    <part Name="Brain" Factions="GiantTemplar-100,Templar-50" />
     <removeskill Name="LongBlades" />
     <removeskill Name="LongBladesProficiency" />
     <skill Name="Acrobatics" />
@@ -337,7 +338,7 @@
   </object>
 
   <object Name="Uplifted Grand Giant-Slayer" Inherits="Grand Giant-Slayer">
-    <part Name="Render" DisplayName="Grand Giant-Slayer"
+    <part Name="Render" DisplayName="grand giant-slayer"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />

@@ -143,7 +143,7 @@ You cannot wear equipment on your body." />
     <part Name="Physics" Weight="6" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}" DetailColor="M" />
+    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}" DetailColor="m" />
     <part Name="Armor" 
           AV="8" 
           DV="-2" />
@@ -152,7 +152,7 @@ You cannot wear equipment on your body." />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Omega"
           AugmentAdjectiveColor="zetachrome"
-          AugmentTileDetailColor="M"
+          AugmentTileDetailColor="m"
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_onehanded_zetachrome_swing"
           AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           AugmentAddParts="Zetachrome"

@@ -231,7 +231,7 @@
   </object>
 
   <object Name="Templar Squire Giant-Slayer" Inherits="TemplarGiantSlayerBase">
-    <part Name="Render" DisplayName="Templar Squire Giant-Slayer"
+    <part Name="Render" DisplayName="Templar squire giant-slayer"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"
           />
@@ -243,7 +243,7 @@
   </object>
 
   <object Name="Templar Giant-Slayer" Inherits="TemplarGiantSlayerBase">
-    <part Name="Render" DisplayName="Templar Giant-Slayer"
+    <part Name="Render" DisplayName="Templar giant-slayer"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <stat Name="Level" Value="21" />
@@ -265,7 +265,7 @@
   </object>
 
   <object Name="Giant-Slayer Commander" Inherits="TemplarGiantSlayerBase">
-    <part Name="Render" DisplayName="Giant-Slayer Commander"
+    <part Name="Render" DisplayName="giant-slayer commander"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <stat Name="Level" Value="31" />
@@ -294,7 +294,7 @@
   </object>
 
   <object Name="Uplifted Giant-Slayer Commander" Inherits="Giant-Slayer Commander">
-    <part Name="Render" DisplayName="Giant-Slayer Commander"
+    <part Name="Render" DisplayName="giant-slayer commander"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <part Name="Uplift" AdditionalSpecializationTemplate="SpecialFactionHeroTemplate_TemplarKnightCommander" />
@@ -304,7 +304,7 @@
   </object>
 
   <object Name="Grand Giant-Slayer" Inherits="TemplarGiantSlayerBase">
-    <part Name="Render" DisplayName="Grand Giant-Slayer"
+    <part Name="Render" DisplayName="grand giant-slayer"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
           ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <stat Name="Level" Value="41" />

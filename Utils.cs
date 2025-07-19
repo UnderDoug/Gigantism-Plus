@@ -43,9 +43,6 @@ namespace HNPS_GigantismPlus
             if (MethodName == nameof(SwapMutationEnrtyClass))
                 return false;
 
-            if (MethodName == nameof(ManagedVanillaMutationOptionHandler))
-                return false;
-
             if (MethodName == nameof(SwapMutationCategory))
                 return false;
 
@@ -606,31 +603,6 @@ namespace HNPS_GigantismPlus
                 Indent: Indent, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
         }
 
-        public static void ManagedVanillaMutationOptionHandler()
-        {
-            Debug.Entry(4, $"* {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}()", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
-            List<(string, string, string)> MutationEntries = new()
-            {
-                ("Burrowing Claws", "BurrowingClaws", "UD_ManagedBurrowingClaws"),
-                ("Crystallinity", "Crystallinity", "UD_ManagedCrystallinity")
-            };
-            Debug.Entry(4, $"> foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries)", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
-            foreach ((string Name, string Vanilla, string Managed) in MutationEntries)
-            {
-                Debug.LoopItem(4, $"Name: {Name} | Vanilla: {Vanilla} | Managed: {Managed}", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
-                MutationEntry vanillaMutation = MutationFactory.GetMutationEntryByName(Name);
-                if ((bool)EnableManagedVanillaMutations)
-                {
-                    SwapMutationEnrtyClass(vanillaMutation, Managed, Indent: 2);
-                }
-                else
-                {
-                    SwapMutationEnrtyClass(vanillaMutation, Vanilla, Indent: 2);
-                }
-            }
-            Debug.Entry(4, $"x foreach ((string Name, string Vanilla, string Managed) entry in MutationEntries) >//", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
-            Debug.Entry(4, $"x {nameof(Utils)}.{nameof(ManagedVanillaMutationOptionHandler)}() *//", Indent: 1, Toggle: getDoDebug(nameof(ManagedVanillaMutationOptionHandler)));
-        }
         public static void SwapMutationCategory(string MutationName, string OutOfCategory, string IntoCategory)
         {
             Debug.Header(3, 

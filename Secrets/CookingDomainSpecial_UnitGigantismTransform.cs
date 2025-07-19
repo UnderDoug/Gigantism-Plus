@@ -1,21 +1,14 @@
-﻿using ConsoleLib.Console;
-using HNPS_GigantismPlus;
-using Qud.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using XRL;
-using XRL.Language;
-using XRL.Names;
+
+using Qud.API;
+
 using XRL.UI;
-using XRL.World;
-using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
-using XRL.World.Skills.Cooking;
-using XRL.World.WorldBuilders;
-using XRL.World.ZoneBuilders;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -63,6 +56,7 @@ namespace XRL.World.Effects
             $"got swole.",
             $"satisfied a serious hankering.",
         };
+
         public override string GetDescription()
         {
             return "@they achieved massive gains.";
@@ -138,5 +132,5 @@ namespace XRL.World.Effects
             }
             stewBelly.EatStew();
         }
-    } //!-- public class CookingDomainSpecial_UnitGigantismTransform : ProceduralCookingEffectUnit
+    }
 }

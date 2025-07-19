@@ -45,7 +45,10 @@ namespace XRL
         [GameBasedCacheInit]
         public static void WrassleSystemInit()
         {
-            System = The.Game?.RequireSystem(InitializeSystem);
+            if (EnablePrereleaseContent)
+            {
+                System = The.Game?.RequireSystem(InitializeSystem);
+            }
         }
         public static UD_QudWrasslingEntertainment InitializeSystem()
         {

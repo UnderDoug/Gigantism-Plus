@@ -99,6 +99,20 @@ namespace XRL.World.Parts.Skill
              && !Vaulted
              && ParentObject.HasPart<Digging>();
 
+        public Tactics_Vault ()
+        {
+
+        }
+
+        public override void Attach()
+        {
+            base.Attach();
+            if (!EnablePrereleaseContent)
+            {
+                ParentObject?.RemovePart(this);
+            }
+        }
+
         public Tactics_Vault ClearCells()
         {
             Origin = null;

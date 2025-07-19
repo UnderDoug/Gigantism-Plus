@@ -16,71 +16,11 @@ using static XRL.World.Parts.ModNaturalEquipmentBase;
 namespace HNPS_GigantismPlus
 {
     [HasModSensitiveStaticCache]
+    [HasOptionFlagUpdate(Prefix = "Option_GigantismPlus_")]
     public static class Options
     {
-        private static string GetOption(string ID, string Default = "")
-        {
-            return XRL.UI.Options.GetOption(ID, Default);
-        }
-
-        private static string Label(string Option = null)
-        {
-            string Label = "Option_GigantismPlus";
-            if (Option == null)
-                return Label;
-            return $"{Label}_{Option}";
-        }
-        private static Dictionary<string, string> Directory => new()
-        {
-            { nameof(DebugVerbosity), Label("DebugVerbosity") },
-            { nameof(DebugIncludeInMessage), Label("DebugIncludeInMessage") },
-            { nameof(WrassleIDDebugDescriptions), Label("DebugIncludeWrassleIDDebugDescriptions") },
-            { nameof(DebugVaultDescriptions), Label("DebugIncludeVaultDebugDescriptions") },
-            { nameof(Colorfulness), Label("Colorfulness") },
-            { nameof(EnableGiganticStartingGear), Label("EnableGiganticStartingGear") },
-            { nameof(EnableGiganticStartingGear_Grenades), Label("EnableGiganticStartingGear_Grenades") },
-            { nameof(EnableGigantismRapidAdvance), Label("EnableGigantismRapidAdvance") },
-            { nameof(EnableGiganticTinkering), Label("EnableGiganticTinkering") },
-            { nameof(EnableGiganticDerarification), Label("EnableGiganticDerarification") },
-            { nameof(EnableGiganticNPCGear), Label("EnableGiganticNPCGear") },
-            { nameof(EnableGiganticNPCGear_Grenades), Label("EnableGiganticNPCGear_Grenades") },
-            { nameof(EnableWrasslePlayerStart), Label("EnableWrasslePlayerStart") },
-            { nameof(SlideWrasslePlayerStart), Label("SlideWrasslePlayerStart") },
-        };
-
-        private static string GetStringOption(string ID, string Default = "")
-        {
-            if (Directory.ContainsKey(ID))
-            {
-                return XRL.UI.Options.GetOption(Directory[ID], Default: Default);
-            }
-            return Default;
-        }
-        private static bool GetBoolOption(string ID, bool Default = false)
-        {
-            return GetStringOption(ID, Default ? "Yes" : "No").EqualsNoCase("Yes");
-        }
-        private static int GetIntOption(string ID, int Default = 0)
-        {
-            return int.Parse(GetStringOption(ID, $"{Default}"));
-        }
-
-        private static void SetBoolOption(string ID, bool Value)
-        {
-            if (Directory.ContainsKey(ID))
-                XRL.UI.Options.SetOption(Directory[ID], Value);
-        }
-        private static void SetStringOption(string ID, string Value)
-        {
-            if (Directory.ContainsKey(ID))
-                XRL.UI.Options.SetOption(Directory[ID], Value);
-        }
-        private static void SetIntOption(string ID, int Value)
-        {
-            SetStringOption(Directory[ID], $"{Value}");
-        }
-
         public static bool doDebug = true;
+
         public static Dictionary<string, bool> classDoDebug = new()
         {
             // General
@@ -195,113 +135,43 @@ namespace HNPS_GigantismPlus
 
         public static bool getClassDoDebug(string Class)
         {
-            if (classDoDebug.ContainsKey(Class)) 
+            if (classDoDebug.ContainsKey(Class))
+            {
                 return classDoDebug[Class];
-
+            }
             return doDebug;
         }
 
-        public static int Colorfulness
-        {
-            get
-            {
-                return Convert.ToInt32(GetOption("Option_GigantismPlus_Colorfulness"));
-            }
-            private set 
-            {
-                Colorfulness = value;
-            }
-        }
-
         // Debug Settings
-        public static int DebugVerbosity
-        {
-            get => GetIntOption(nameof(DebugVerbosity), 0);
-            set => SetIntOption(nameof(DebugVerbosity), value);
-        }
-        public static bool DebugIncludeInMessage
-        {
-            get => GetBoolOption(nameof(DebugIncludeInMessage), false);
-            set => SetBoolOption(nameof(DebugIncludeInMessage), value);
-        }
-        public static bool WrassleIDDebugDescriptions
-        {
-            get => GetBoolOption(nameof(WrassleIDDebugDescriptions), false);
-            set => SetBoolOption(nameof(WrassleIDDebugDescriptions), value);
-        }
-        public static bool DebugVaultDescriptions
-        {
-            get => GetBoolOption(nameof(DebugVaultDescriptions), false);
-            set => SetBoolOption(nameof(DebugVaultDescriptions), value);
-        }
+        [OptionFlag] public static int DebugVerbosity;
+        [OptionFlag] public static bool DebugIncludeInMessage;
+        [OptionFlag] public static bool StewBellyDebugDescriptions;
+        [OptionFlag] public static bool WrassleIDDebugDescriptions;
+        [OptionFlag] public static bool DebugVaultDescriptions;
+
+        // General Settings
+        [OptionFlag] public static int Colorfulness;
 
         // Starting Gear Settings
-        public static bool EnableGiganticStartingGear
-        {
-            get => GetBoolOption(nameof(EnableGiganticStartingGear), false);
-            set => SetBoolOption(nameof(EnableGiganticStartingGear), value);
-        }
-        public static bool EnableGiganticStartingGear_Grenades
-        {
-            get => GetBoolOption(nameof(EnableGiganticStartingGear_Grenades), false);
-            set => SetBoolOption(nameof(EnableGiganticStartingGear_Grenades), value);
-        }
+        [OptionFlag] public static bool EnableGiganticStartingGear;
+        [OptionFlag] public static bool EnableGiganticStartingGear_Grenades;
 
         // Mutation Interactions Settings
-        public static bool EnableGigantismRapidAdvance
-        {
-            get => GetBoolOption(nameof(EnableGigantismRapidAdvance), false);
-            set => SetBoolOption(nameof(EnableGigantismRapidAdvance), value);
-        }
+        [OptionFlag] public static bool EnableGigantismRapidAdvance;
 
         // Tinkering Settings
-        public static bool EnableGiganticTinkering
-        {
-            get => GetBoolOption(nameof(EnableGiganticTinkering), false);
-            set => SetBoolOption(nameof(EnableGiganticTinkering), value);
-        }
-        public static bool EnableGiganticDerarification
-        {
-            get => GetBoolOption(nameof(EnableGiganticDerarification), false);
-            set => SetBoolOption(nameof(EnableGiganticDerarification), value);
-        }
+        [OptionFlag] public static bool EnableGiganticTinkering;
+        [OptionFlag] public static bool EnableGiganticDerarification;
 
         // NPC Equipment Settings
-        public static bool EnableGiganticNPCGear
-        {
-            get => GetBoolOption(nameof(EnableGiganticNPCGear), false);
-            set => SetBoolOption(nameof(EnableGiganticNPCGear), value);
-        }
-        public static bool EnableGiganticNPCGear_Grenades
-        {
-            get => GetBoolOption(nameof(EnableGiganticNPCGear_Grenades), false);
-            set => SetBoolOption(nameof(EnableGiganticNPCGear_Grenades), value);
-        }
-        public static bool EnableWrasslePlayerStart
-        {
-            get => GetBoolOption(nameof(EnableWrasslePlayerStart), false);
-            set => SetBoolOption(nameof(EnableWrasslePlayerStart), value);
-        }
-        public static int SlideWrasslePlayerStart
-        {
-            get => EnableWrasslePlayerStart ? GetIntOption(nameof(SlideWrasslePlayerStart), 1) : 1;
-            set => SetIntOption(nameof(EnableWrasslePlayerStart), value);
-        }
+        [OptionFlag] public static bool EnableGiganticNPCGear;
+        [OptionFlag] public static bool EnableGiganticNPCGear_Grenades;
+
+        // Wrassle Player Settings
+        [OptionFlag] public static bool EnableWrasslePlayerStart;
+        [OptionFlag] public static int SlideWrasslePlayerStart;
 
         // Advanced Settings
-        public static bool EnableManagedVanillaMutationsCurrent => true; // GetOption("Option_GigantismPlus_ManagedVanilla").EqualsNoCase("Yes");
-        public static bool? EnableManagedVanillaMutations = null;
-
-        /*
-        // OnClick Handlers
-        public static bool OnOptionManagedVanilla()
-        {
-            Debug.Entry(4, $"@ {nameof(Options)}.{nameof(OnOptionManagedVanilla)}", Indent: 0);
-            ManagedVanillaMutationOptionHandler();
-            Debug.Entry(4, $"x {nameof(Options)}.{nameof(OnOptionManagedVanilla)} @//", Indent: 0);
-            return true;
-        }
-        */
-
-    } //!-- public static class Options
+        [OptionFlag] public static bool EnablePrereleaseContent;
+    }
 }

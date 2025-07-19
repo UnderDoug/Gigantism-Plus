@@ -806,7 +806,10 @@ namespace XRL.World.Parts.Mutation
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})", Toggle: doDebug);
             Body body = GO.Body;
 
-            UD_QWE.MakeWrassler(GO);
+            if (EnablePrereleaseContent)
+            {
+                UD_QWE.MakeWrassler(GO);
+            }
 
             Debug.Entry(4, "? if (body != null)", Indent: 1, Toggle: doDebug);
             if (body != null)

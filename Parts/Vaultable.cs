@@ -59,6 +59,10 @@ namespace XRL.World.Parts
                 OverridingPartsList = new(vaultable.OverridingPartsList);
                 ParentObject.RemovePart(vaultable);
             }
+            if (!EnablePrereleaseContent)
+            {
+                ParentObject?.RemovePart(this);
+            }
         }
 
         public Dictionary<Cell, Cell> GetVaultableCellPairs(GameObject For = null)

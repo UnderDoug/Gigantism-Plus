@@ -225,8 +225,12 @@ namespace XRL.World.Capabilities
             Debug.LastIndent = indent;
             return isWrassler;
         }
-        public static Wrassler MakeWrassler(GameObject WrassleCreature)
+        public static Wrassler MakeWrassler(GameObject WrassleCreature, string Context = null)
         {
+            if (!EnablePrereleaseContent && Context != "UniqueGiant")
+            {
+                return null;
+            }
             if (WrassleCreature == null)
             {
                 return null;
@@ -750,6 +754,14 @@ namespace XRL.World.Capabilities
                 Indent: indent + 1, Toggle: getDoDebug('B'));
 
             Bestowed = false;
+
+            if (!EnablePrereleaseContent)
+            {
+                Debug.CheckNah(4, $"{nameof(EnablePrereleaseContent)} is {EnablePrereleaseContent}",
+                    Indent: indent + 2, Toggle: getDoDebug('B'));
+                Debug.LastIndent = indent;
+                return null;
+            }
 
             if (WrassleCreature == null)
             {

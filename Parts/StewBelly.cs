@@ -311,17 +311,18 @@ namespace XRL.World.Parts
             Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1, Toggle: getDoDebug());
             Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1, Toggle: getDoDebug());
 
-            if (Stews > 0)
+            if (StewBellyDebugDescriptions && Stews > 0)
             {
                 if (!E.Postfix.IsNullOrEmpty())
                 {
                     E.Postfix.AppendLine();
                 }
-                E.Postfix.AppendRules(
-                    $"{"Stew Belly".OptionalColorYuge(Colorfulness)}: " + 
-                    $"This creature has achieved {Gains.Things("Gain")} " 
-                    + $"from the {Stews.Things("hepling")} of {Stew} they've eaten! " + 
-                    $"Talk about a hankering!");
+                E.Postfix
+                    .Append($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: ")
+                    .Append($"This creature has achieved {Gains.Things("Gain")} ")
+                    .Append($"from the {Stews.Things("hepling")} of {Stew} they've eaten! ")
+                    .Append($"Talk about a hankering!")
+                    .AppendLine();
             }
             return base.HandleEvent(E);
         }

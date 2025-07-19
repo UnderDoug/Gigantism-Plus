@@ -43,7 +43,21 @@
   </option>
 	
   <option
-        ID="Option_GigantismPlus_DebugIncludeWrassleIDDebugDescriptions"
+        ID="Option_GigantismPlus_StewBellyDebugDescriptions"
+        DisplayText="{{giant|Gigantism Plus}}: Show {{yuge|Stew Belly}} internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
+        Category="Debug"
+        Type="Checkbox"
+        Default="No"
+    >
+    <helptext>
+      When enabled, internal debug information relating to the {{yuge|Stew Belly}} part will be displayed when [{{W|l}}]ooking at anything with the relevant parts.
+
+      The default is {{w|Disabled}}.
+    </helptext>
+  </option>
+	
+  <option
+        ID="Option_GigantismPlus_WrassleIDDebugDescriptions"
         DisplayText="{{giant|Gigantism Plus}}: Show WrassleID internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
         Category="Debug"
         Type="Checkbox"
@@ -60,7 +74,7 @@
   </option>
 	
   <option
-        ID="Option_GigantismPlus_DebugIncludeVaultDebugDescriptions"
+        ID="Option_GigantismPlus_DebugVaultDescriptions"
         DisplayText="{{giant|Gigantism Plus}}: Show Tactics_Vault internal debug information in relevant ShortDescriptions displayed in the [{{W|l}}]ook UI."
         Category="Debug"
         Type="Checkbox"
@@ -119,7 +133,7 @@
 			A {{gigantic|gigantic}} character would have {{gigantic|gigantic}} equipment when they arrive in Qud.
 			Disabling this option will make for a more difficult start.
 
-			The default is {{w|Enabled}}.
+			The default is {{W|Enabled}}.
 		</helptext>
 	</option>
 	
@@ -149,7 +163,7 @@
 			({{r|D}})efects aren't typically able to be leveled up and are excluded from rapid advancement by default.
 			When enabled, {{gigantism|Gigantism}} ({{r|D}}) will be included in the list of physical mutations for this purpose.
 
-			The default is {{w|Enabled}}.
+			The default is {{W|Enabled}}.
 		</helptext>
 	</option>
 	
@@ -165,7 +179,7 @@
       Its tech tier has been adjusted up to 3 so that it will cost at least a {{b|3}} bit to tinker.
       Tinker I is the required skill.
       
-      The default is {{w|Enabled}}.
+      The default is {{W|Enabled}}.
     </helptext>
 	</option>
 	
@@ -180,7 +194,7 @@
       This makes {{gigantic|gigantic}} items a little less rare to find by adjusting their rarity from R2 to R.
       Some examples of other mods with R rarity: {{spiked|Spiked}}, {{k|Nulling}}, and {{C|Radio Powered}}.
 
-      The default is {{w|Enabled}}.
+      The default is {{W|Enabled}}.
     </helptext>
 	</option>
 
@@ -196,7 +210,7 @@
       Should equipment carried by {{gigantic|gigantic}} NPCs be {{gigantic|gigantic}}?
       This option can be changed mid-game, however, due to targeting the creation of the creature, it will only apply to creatures generated after this option is enabled.
       
-      The default is {{w|Enabled}}.
+      The default is {{W|Enabled}}.
     </helptext>
   </option>
   
@@ -220,6 +234,7 @@
   <!-- Wrassle Options -->
   <option
       ID="Option_GigantismPlus_EnableWrasslePlayerStart"
+      Requires="Option_GigantismPlus_EnablePrereleaseContent==Yes"
       DisplayText="Override chance that player characters who start with {{gigantic|Gigantism}} ({{r|D}}) will start with Wrassle Equipment"
       Category="Mod: Gigantism Plus"
       Type="Checkbox"
@@ -235,8 +250,8 @@
   
   <option
       ID="Option_GigantismPlus_SlideWrasslePlayerStart"
-      Requires="Option_GigantismPlus_EnableWrasslePlayerStart==Yes"
-      DisplayText="Chane in 1,000 that player characters with {{gigantic|Gigantism}} ({{r|D}}) will start with Wrassle Equipment"
+      Requires="Option_GigantismPlus_EnablePrereleaseContent==Yes,Option_GigantismPlus_EnableWrasslePlayerStart==Yes"
+      DisplayText="Chance in 1,000 that player characters with {{gigantic|Gigantism}} ({{r|D}}) will start with Wrassle Equipment"
       Category="Mod: Gigantism Plus"
       Type="Slider"
       Default="1"
@@ -251,39 +266,39 @@
       Select 100 to have this occur 10% of the time.
       Select 1,000 to force this feature.
 
-      The default is {{w|1}}.
+      The default is {{c|1}}.
     </helptext>
   </option>
 
   <!-- Advanced Options -->
 
-  <!--option
-		  ID="Option_GigantismPlus_ManagedVanilla"
-	    DisplayText="Use &quot;up-classed&quot; versions of vanilla mutations that have natural weapons ({{R|new save}})"
+  <option
+		  ID="Option_GigantismPlus_EnablePrereleaseContent"
+	    DisplayText="Enable &quot;prerelease&quot; content for this mod ({{R|new save}})"
       Requires="OptionShowAdvancedOptions==Yes"
 	    Category="Mod: Gigantism Plus"
-      Type="Button"
-      Default="Yes"
-      OnClick="HNPS_GigantismPlus.Options.OnOptionManagedVanilla"
+      Type="Checkbox"
+      Default="No"
+      Restart="true"
 	    >
     <helptext>
-      {{K|This option is currently inactive. The "Enabled" behavior is currently forced.}}
+      This mod has a number of things in the works that are planned for future updates but which aren't quite ready yet.
 
-      This mod adjusts how a number of vanilla mutations grant their natural weapons.
+      With this option enabled, content that is unfinished, close to finished but unpolished, or in the process of being balanced will be available to test out with the understanding that it's not stable, and is liable to leave your run/save in a locked or broken state, often in &quot;fun&quot; and &quot;exciting&quot; ways we can't predict (if you find any of these interesting interactions, please let us know on the GitHub linked in the steam workshop for this mod, or on the steam workshop page itself).
 
-      With this option enabled, the mod will replace the mutation entries' class for the mutations in question with an alternate version that implements the adjustments intended by the mod, but are otherwise identical in behaviour. Wishes that target the mutation class instead of the mutation name will require the alternate class name.
+      This mod adds a number of wishes we're willing to share that might assist in fixing a save that has succumb to prerelease content jank and several of the base game wishes have helped us unbreak things as we test these out.
+      
+      Playing with this option enabled requires a mind-set wherein you don't get as attached to your run as you normally would, and flexibility enough to accept using wishes to "unbork" things. 
 
-      With this option disabled, the mod will leave the mutation entries for the mutations in question completely vanilla, and uses a patch to bypass the relevant parts of their regular behaviour and deferring those parts to the relevant alternate mutation class mentioned above. Other mods that make changes to the mutations in question will likely have their behaviour impacted by this mod due to the nature of the patch.
+      Non-exhaustive list of prerelease stuff:
+      &#xF9; Wrassling system (very early)
+      &#xF9; Vaultable game objects (low walls, etc.)
 
-      Mutations currently affected:
-      &#xF9; {{W|Burrowing Claws}}
-      &#xF9; {{crystalline|Crystallinity}}
+      {{r|Your best bet is to begin a new run after changing this setting. Several of its parts occur during world generation.}}
 
-      {{r|If the above reads like nonsense then this option is fine to leave on default.}}
-
-      The default is {{w|Enabled}}.
+      The default is {{w|Disabled}}.
     </helptext>
-  </option-->
+  </option>
 	
   <!-- End of Mod Options -->
   

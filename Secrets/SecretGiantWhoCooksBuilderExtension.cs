@@ -159,19 +159,21 @@ namespace HNPS_GigantismPlus
 
             string wrasslerColor = null;
             WrassleID wrassleID = null;
+            string wrassleRingColor = null;
+
             Debug.Entry(4, $"Storing {nameof(wrasslerColor)}...", Indent: 1, Toggle: getDoDebug());
             if (!UniqueGiant.TryGetPart(out Wrassler wrassler))
             {
                 Debug.CheckYeh(4, $"{nameof(UniqueGiant)} lacks {nameof(Wrassler)} part, registering with {nameof(UD_QWE)}",
                     Indent: 1, Toggle: getDoDebug());
-                wrassler = UD_QWE.MakeWrassler(UniqueGiant);
+                wrassler = UD_QWE.MakeWrassler(UniqueGiant, "UniqueGiant");
             }
             else
             {
                 Debug.CheckYeh(4, $"{nameof(UniqueGiant)} has {nameof(Wrassler)} part",
                     Indent: 1, Toggle: getDoDebug());
             }
-            wrassleID = wrassler.GetWrassleID();
+            wrassleID = wrassler?.GetWrassleID();
 
             if (wrassleID == null)
             {
@@ -186,8 +188,14 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"{nameof(wrassleID)}.{nameof(wrassleID.ID)}", $"{wrassleID.GetID(Silent: true)}", Indent: 1, Toggle: getDoDebug());
 
             wrasslerColor = wrassleID?.SecondaryColor;
-            string wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
+            wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
             Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
+           
+            /*
+            wrassleRingColor ??= UD_QWE.WrassleRingColors.GetRandomElement();
+            Debug.Entry(4, $"{nameof(EnablePrereleaseContent)} is {EnablePrereleaseContent}...", Indent: 1, Toggle: getDoDebug());
+            Debug.CheckNah(4, $"Skipping Wrassler Content", Indent: 2, Toggle: getDoDebug());
+            */
 
             Debug.Entry(4, $"Assigning GiantAbodePopulator if it's necessary...", Indent: 1, Toggle: getDoDebug());
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE) // This specific map has the widgets necessary for the specified builder to work

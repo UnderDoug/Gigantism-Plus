@@ -4,7 +4,7 @@
     <solidcolor Name="flesh" Color="Z" LightTone="z" DarkTone="x" ShowInPicker="true" />
     <solidcolor Name="dark flesh" Color="x" LightTone="Z" DarkTone="X" ShowInPicker="true" />
     <solidcolor Name="light flesh" Color="z" DarkTone="Z" ShowInPicker="true" />
-    <solidcolor Name="fleshy" Color="X" LightTone="x" ShowInPicker="true" />
+    <solidcolor Name="fleshy" Color="X" LightTone="x" ShowInPicker="false" />
   </solidcolors>
   <shaders>
     <shader Name="gigantic" Type="sequence" Colors="z-Z-Z-x-x-Z-Z-z" ShowInPicker="false" /> <!--z-Z-x-X-X-x-Z-z-->

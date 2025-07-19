@@ -5,5 +5,14 @@
     "version": "0.3.0",
     "author": "{{metamorphic|hydnplynsyt}} and {{K-g-G-Y-G-g-K alternation|UnderDoug}}",
     "tags": "Mutation,Defect,Balance,Cheat,Harmony",
-    "PreviewImage": "preview.png"
+    "PreviewImage": "preview.png",
+    "Directories": [
+        {
+            "Paths": [ "/Common/", "/Textures/" ]
+        },
+        {
+            "Path": "/Prerelease/",
+            "Option": "Option_GigantismPlus_EnablePrereleaseContent == Yes"
+        }
+    ]
 }

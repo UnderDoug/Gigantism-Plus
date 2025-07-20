@@ -29,11 +29,11 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
+                "getMods",
+                'M',    // Manage
             };
             List<object> dontList = new()
             {
-                "getMods",
-                'M',    // Manage
             };
 
             if (what != null && doList.Contains(what))
@@ -222,14 +222,14 @@ namespace XRL.World.Parts
             Implantee?.Body?.UpdateBodyParts();
         } //!-- public override void OnUnimplanted(GameObject Object)
 
-        public virtual void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
+        public virtual void OnBeforeManageDefaultNaturalEquipment(NaturalEquipmentOperator Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = Implantee.GetCurrentZone();
             string InstanceObjectZoneID = InstanceObjectZone?.ZoneID ?? "[Pre-build]";
 
             Debug.Header(4, 
                 $"{typeof(T).Name}", 
-                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}" +
                 $"(body)", Toggle: getDoDebug('M'));
             Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", 
                 Indent: 0, Toggle: getDoDebug('M'));
@@ -240,7 +240,7 @@ namespace XRL.World.Parts
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}" +
                 $"(body of: {Implantee.Blueprint})", Toggle: getDoDebug('M'));
         }
 
@@ -249,7 +249,7 @@ namespace XRL.World.Parts
             return new()
             {
                 GetPrioritisedNaturalEquipmentModsEvent.ID,
-                ManageDefaultNaturalEquipmentEvent.ID,
+                BeforeManageDefaultNaturalEquipmentEvent.ID,
             };
         }
         public virtual void RegisterImplanteeEvents(GameObject Implantee)
@@ -346,7 +346,7 @@ namespace XRL.World.Parts
             Debug.LastIndent = indent;
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        public virtual bool HandleEvent(BodyPartsUpdatedEvent E)
         {
             return base.HandleEvent(E);
         }
@@ -375,20 +375,20 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(BeforeManageDefaultNaturalEquipmentEvent E)
         {
+            Debug.Entry(4,
+                $"@ {typeof(T).Name}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(BeforeManageDefaultNaturalEquipmentEvent)} E)",
+                Indent: 0, Toggle: getDoDebug('M'));
+
+            if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentOperator>())
+            {
+                OnBeforeManageDefaultNaturalEquipment(E.Operator, E.BodyPart);
+            }
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(ManageDefaultNaturalEquipmentEvent E)
         {
-            Debug.Entry(4,
-                $"@ {typeof(T).Name}."
-                + $"{nameof(HandleEvent)}("
-                + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
-                Indent: 0, Toggle: getDoDebug('M'));
-
-            if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentManager>())
-            {
-                OnManageDefaultNaturalEquipment(E.Manager, E.BodyPart);
-            }
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)

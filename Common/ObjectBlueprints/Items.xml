@@ -19,12 +19,17 @@
   -->
   <!-- 
   
-       Add NaturalEquipmentManager to Item
+       Add NaturalEquipmentOperator to Item
+       Add NaturalEquipmentManager to Object
        
      -->
   <object Name="Item" Load="Merge">
-    <part Name="NaturalEquipmentManager" />
+    <part Name="NaturalEquipmentOperator" />
     <part Name="UD_MeleeWeapon_StrBonusCapper" />
+  </object>
+  
+  <object Name="PhysicalObject" Load="Merge">
+    <part Name="NaturalEquipmentManager" />
   </object>
   
   <!-- 

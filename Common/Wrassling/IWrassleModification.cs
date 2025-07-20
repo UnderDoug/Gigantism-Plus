@@ -19,7 +19,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class IWrassleModification 
+    public abstract class IWrassleModification
         : IModification
         , IWrassle
         , IModEventHandler<BeforeDescribeModificationEvent<IWrassleModification>>

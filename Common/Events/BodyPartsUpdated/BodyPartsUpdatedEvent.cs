@@ -7,11 +7,11 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_EXCEPT_THROWN_WEAPON, Cache = Cache.Pool)]
-    public class BeforeBodyPartsUpdatedEvent : IBodyPartsUpdatedEvent<BeforeBodyPartsUpdatedEvent>
+    public class BodyPartsUpdatedEvent : IBodyPartsUpdatedEvent<BodyPartsUpdatedEvent>
     {
-        private static bool doDebug => getClassDoDebug(nameof(BeforeBodyPartsUpdatedEvent));
+        private static bool doDebug => getClassDoDebug(nameof(BodyPartsUpdatedEvent));
 
-        public BeforeBodyPartsUpdatedEvent()
+        public BodyPartsUpdatedEvent()
         {
         }
 

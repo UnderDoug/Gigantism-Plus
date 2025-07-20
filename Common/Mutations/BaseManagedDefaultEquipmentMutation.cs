@@ -30,11 +30,11 @@ namespace XRL.World.Parts.Mutation
             {
                 'V',    // Vomit
                 'R',    // Register
+                "getMods",
+                'M',    // Manage
             };
             List<object> dontList = new()
             {
-                "getMods",
-                'M',    // Manage
             };
 
             if (what != null && doList.Contains(what))
@@ -222,14 +222,14 @@ namespace XRL.World.Parts.Mutation
         {
             base.OnDecorateDefaultEquipment(body);
         }
-        public virtual void OnManageDefaultNaturalEquipment(NaturalEquipmentManager Manager, BodyPart TargetBodyPart)
+        public virtual void OnBeforeManageDefaultNaturalEquipment(NaturalEquipmentOperator Manager, BodyPart TargetBodyPart)
         {
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
             Debug.Header(4, 
                 $"{typeof(T).Name}", 
-                $"{nameof(OnManageDefaultNaturalEquipment)}(body)", 
+                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}(body)", 
                 Toggle: getDoDebug('M'));
             Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", 
                 Indent: 0, Toggle: getDoDebug('M'));
@@ -240,7 +240,7 @@ namespace XRL.World.Parts.Mutation
 
             Debug.Footer(4,
                 $"{typeof(T).Name}",
-                $"{nameof(OnManageDefaultNaturalEquipment)}" +
+                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}" +
                 $"(body of: {ParentObject.Blueprint})", 
                 Toggle: getDoDebug('M'));
         }
@@ -256,14 +256,14 @@ namespace XRL.World.Parts.Mutation
         {
             return base.WantEvent(ID, cascade)
                 || ID == GetPrioritisedNaturalEquipmentModsEvent.ID
-                || ID == ManageDefaultNaturalEquipmentEvent.ID;
+                || ID == BeforeManageDefaultNaturalEquipmentEvent.ID;
         }
-        public virtual bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        public virtual bool HandleEvent(BodyPartsUpdatedEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(BeforeBodyPartsUpdatedEvent)} E)",
+                + $"{nameof(BodyPartsUpdatedEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             return base.HandleEvent(E);
@@ -299,20 +299,21 @@ namespace XRL.World.Parts.Mutation
         }
         public virtual bool HandleEvent(BeforeManageDefaultNaturalEquipmentEvent E)
         {
-            return base.HandleEvent(E);
-        }
-        public virtual bool HandleEvent(ManageDefaultNaturalEquipmentEvent E)
-        {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(ManageDefaultNaturalEquipmentEvent)} E)",
+                + $"{nameof(BeforeManageDefaultNaturalEquipmentEvent)} E)",
                 Indent: 0, Toggle: getDoDebug('M'));
 
             if (E.Creature == ParentObject)
             {
-                OnManageDefaultNaturalEquipment(E.Manager, E.BodyPart);
+                OnBeforeManageDefaultNaturalEquipment(E.Operator, E.BodyPart);
             }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(ManageDefaultNaturalEquipmentEvent E)
+        {
+
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)

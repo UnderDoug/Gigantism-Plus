@@ -313,14 +313,11 @@ namespace XRL.World.Parts
 
             if (StewBellyDebugDescriptions && Stews > 0)
             {
-                if (!E.Postfix.IsNullOrEmpty())
-                {
-                    E.Postfix.AppendLine();
-                }
                 E.Postfix
+                    .AppendLine()
                     .Append($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: ")
                     .Append($"This creature has achieved {Gains.Things("Gain")} ")
-                    .Append($"from the {Stews.Things("hepling")} of {Stew} they've eaten! ")
+                    .Append($"from the {Stews.Things("helping")} of {Stew} they've eaten! ")
                     .Append($"Talk about a hankering!")
                     .AppendLine();
             }

@@ -4,7 +4,7 @@ using System.Linq;
 
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
-using static XRL.World.Parts.NaturalEquipmentManager;
+using static XRL.World.Parts.NaturalEquipmentOperator;
 using static XRL.World.Parts.ModNaturalEquipmentBase;
 
 using HNPS_GigantismPlus;

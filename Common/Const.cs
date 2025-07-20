@@ -44,8 +44,8 @@ namespace HNPS_GigantismPlus
         public static readonly Type MELEEWEAPON = typeof(MeleeWeapon);
         public static readonly Type ARMOR = typeof(Armor);
 
-        public const string NATEQUIPMANAGER_STRINGPROP_PRIORITY = "NaturalEquipmentManager::StringProp:Priority";
-        public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentManager::IntProp:Priority";
+        public const string NATEQUIPMANAGER_STRINGPROP_PRIORITY = "NaturalEquipmentOperator::StringProp:Priority";
+        public const string NATEQUIPMANAGER_INTPROP_PRIORITY = "NaturalEquipmentOperator::IntProp:Priority";
 
         public const string NATURAL_EQUIPMENT = "Natural Equipment";
         public const string WRASSLE_GEAR_MODS = "Wrassle Gear Mods";

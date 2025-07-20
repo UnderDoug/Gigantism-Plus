@@ -20,6 +20,7 @@ namespace HNPS_GigantismPlus
 
         public IBodyPartsUpdatedEvent()
         {
+            Creature = null;
         }
 
         public virtual string GetRegisteredEventID()
@@ -79,8 +80,8 @@ namespace HNPS_GigantismPlus
             Debug.LoopItem(4, $"{nameof(anyWants)}", $"{anyWants}",
                 Good: anyWants, Indent: indent + 2, Toggle: doDebug);
 
-            bool proceed = anyWants;
-            if (proceed)
+            bool proceed = true;
+            if (anyWants)
             {
                 if (proceed && wantsMin)
                 {

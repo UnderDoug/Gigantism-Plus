@@ -50,8 +50,8 @@ namespace HNPS_GigantismPlus.Harmony
 
             if (E.Is(___eBodypartsUpdated) && @this.ParentObject != null)
             {
-                // Tells each NaturalEquipmentManager to reset itself in prep for managing its attached equipment
-                BeforeBodyPartsUpdatedEvent.Send(@this.ParentObject);
+                // Tells each NaturalEquipmentOperator to reset itself in prep for managing its attached equipment
+                BodyPartsUpdatedEvent.Send(@this.ParentObject);
             }
 
             Debug.Entry(4,
@@ -209,8 +209,42 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(int) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPriority(1)]
+        [HarmonyPrefix]
+        public static void UpdateBodyParts_SendUpdateBodyPartsEvent_Postfix(ref Body __instance)
+        {
+            Body @this = __instance;
+            if (@this.built)
+            {
+                GameObject parentObject = @this?.ParentObject;
+                if (parentObject != null)
+                {
+                    Debug.Entry(4,
+                        $"# [Prefix] {nameof(Body)}."
+                        + $"{nameof(Body.UpdateBodyParts)}"
+                        + $"(ref Body __instance)",
+                        Indent: 0, Toggle: doDebug);
+
+                    Debug.Entry(4, $"{nameof(parentObject)}", $"{parentObject?.DebugName ?? NULL}", Indent: 1, Toggle: doDebug);
+
+                    BeforeUpdateBodyPartsEvent.Send(@this.ParentObject);
+
+                    Debug.Entry(4,
+                        $"x [Prefix] {nameof(Body)}."
+                        + $"{nameof(Body.UpdateBodyParts)}"
+                        + $"(ref Body __instance) #//",
+                        Indent: 0, Toggle: doDebug);
+                }
+            }
+        }
+
+        [HarmonyPatch(
+            declaringType: typeof(Body),
+            methodName: nameof(Body.UpdateBodyParts),
+            argumentTypes: new Type[] { typeof(int) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
+        [HarmonyPriority(1)]
         [HarmonyPostfix]
-        public static void UpdateBodyParts_SendAfterUpdateBodyPartsEvent_Postfix(ref Body __instance)
+        public static void UpdateBodyParts_SendAfterUpdatedBodyPartsEvent_Postfix(ref Body __instance)
         {
             Body @this = __instance;
             if (@this.built)

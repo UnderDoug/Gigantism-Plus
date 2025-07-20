@@ -28,10 +28,17 @@ namespace HNPS_GigantismPlus
 
         public BodyPart BodyPart;
 
+        public NaturalEquipmentOperator Operator;
+
         public NaturalEquipmentManager Manager;
 
         public IManageDefaultNaturalEquipmentEvent()
         {
+            Equipment = null;
+            Creature = null;
+            BodyPart = null;
+            Operator = null;
+            Manager = null;
         }
 
         public virtual string GetRegisteredEventID()
@@ -45,24 +52,50 @@ namespace HNPS_GigantismPlus
             Equipment = null;
             Creature = null;
             BodyPart = null;
+            Operator = null;
             Manager = null;
         }
 
-        public static T FromPool(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager)
+        public static T FromPool(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentOperator Operator)
         {
             T E = FromPool();
-            if (Equipment != null && Creature != null && Manager != null && BodyPart != null)
+            E.Reset();
+            if (Equipment != null && Creature != null && Operator != null && BodyPart != null)
             {
                 E.Equipment = Equipment;
                 E.Creature = Creature;
                 E.BodyPart = BodyPart;
+                E.Operator = Operator;
+                return E;
+            }
+            return null;
+        }
+        public static T FromPoolCreature(GameObject Creature, NaturalEquipmentManager Manager)
+        {
+            T E = FromPool();
+            E.Reset();
+            if (Creature != null && Manager != null)
+            {
+                E.Creature = Creature;
                 E.Manager = Manager;
                 return E;
             }
-            E.Reset();
             return null;
         }
-        public static T Send(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager)
+        public static T FromPoolEquipment(GameObject Equipment, NaturalEquipmentManager Manager)
+        {
+            T E = FromPool();
+            E.Reset();
+            if (Equipment != null && Manager != null)
+            {
+                E.Equipment = Equipment;
+                E.Manager = Manager;
+                return E;
+            }
+            return null;
+        }
+
+        public static T Send(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentOperator Operator)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
@@ -71,10 +104,10 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(Equipment)}: {Equipment?.DebugName}, "
                 + $"{nameof(Creature)}: {Creature?.DebugName}, "
                 + $"{nameof(BodyPart)}: {BodyPart?.DebugName()}, "
-                + $"{nameof(Manager)})",
+                + $"{nameof(Operator)})",
                 Indent: 0, Toggle: doDebug);
 
-            T E = FromPool(Equipment, Creature, BodyPart, Manager);
+            T E = FromPool(Equipment, Creature, BodyPart, Operator);
 
             E.CheckFor();
 
@@ -85,7 +118,7 @@ namespace HNPS_GigantismPlus
         {
             return ProcessEvent();
         }
-        public static bool CheckFor(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager)
+        public static bool CheckFor(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentOperator Operator)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
@@ -94,10 +127,10 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(Equipment)}: {Equipment?.DebugName}, "
                 + $"{nameof(Creature)}: {Creature?.DebugName}, "
                 + $"{nameof(BodyPart)}: {BodyPart?.DebugName()}, "
-                + $"{nameof(Manager)})",
+                + $"{nameof(Operator)})",
                 Indent: indent, Toggle: doDebug);
 
-            T E = FromPool(Equipment, Creature, BodyPart, Manager);
+            T E = FromPool(Equipment, Creature, BodyPart, Operator);
 
             bool checkResult = E.CheckFor();
             E.Reset();
@@ -105,36 +138,123 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return checkResult;
         }
-        public static bool WantToProceed(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentManager Manager, out bool CreatureWantsMin, out bool EquipmentWantsMin, out bool CreatureWantsStr, out bool EquipmentWantsStr)
+        public virtual bool GetFor()
         {
+            return ProcessEvent();
+        }
+        public static bool GetForCreature(GameObject Creature, NaturalEquipmentManager Manager)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"! {typeof(T).Name}."
+                + $"{nameof(GetForCreature)}("
+                + $"{nameof(Creature)}: {Creature?.DebugName}, "
+                + $"{nameof(Manager)})",
+                Indent: indent, Toggle: doDebug);
+
+            T E = FromPoolCreature(Creature, Manager);
+
+            bool checkResult = E.GetFor();
+            E.Reset();
+
+            Debug.LastIndent = indent;
+            return checkResult;
+        }
+        public static bool GetForEquipment(GameObject Equipment, NaturalEquipmentManager Manager)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"! {typeof(T).Name}."
+                + $"{nameof(GetForEquipment)}("
+                + $"{nameof(Equipment)}: {Equipment?.DebugName}, "
+                + $"{nameof(Manager)})",
+                Indent: indent, Toggle: doDebug);
+
+            T E = FromPoolEquipment(Equipment, Manager);
+
+            bool checkResult = E.GetFor();
+            E.Reset();
+
+            Debug.LastIndent = indent;
+            return checkResult;
+        }
+        public static bool WantToProceed(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentOperator Operator, NaturalEquipmentManager Manager, out bool CreatureWantsMin, out bool EquipmentWantsMin, out bool CreatureWantsStr, out bool EquipmentWantsStr)
+        {
+            int indent = Debug.LastIndent;
+
+            Debug.Entry(4,
+                $"* {typeof(T).Name}."
+                + $"{nameof(WantToProceed)}() for"
+                + $"{nameof(Equipment)}: {Equipment?.DebugName ?? NULL}, "
+                + $"{nameof(Creature)}: {Creature?.DebugName ?? NULL}, "
+                + $"{nameof(BodyPart)}: {BodyPart?.DebugName() ?? NULL}",
+                Indent: indent + 1, Toggle: doDebug);
+
             bool haveCreature = Creature != null;
             bool haveEquipment = Equipment != null;
             bool haveBodyPart = BodyPart != null;
+            bool haveOperator = Operator != null;
             bool haveManager = Manager != null;
 
-            CreatureWantsMin = haveCreature && Creature.WantEvent(ID, CascadeLevel);
-            EquipmentWantsMin = haveEquipment && Equipment.WantEvent(ID, CascadeLevel);
+            Debug.LoopItem(4, $"{nameof(haveCreature)}", $"{haveCreature}",
+                Good: haveCreature, Indent: indent + 2, Toggle: doDebug);
 
-            CreatureWantsStr = haveCreature && Creature.HasRegisteredEvent(RegisteredEventID);
-            EquipmentWantsStr = haveEquipment && Equipment.HasRegisteredEvent(RegisteredEventID);
+            Debug.LoopItem(4, $"{nameof(haveEquipment)}", $"{haveEquipment}",
+                Good: haveEquipment, Indent: indent + 2, Toggle: doDebug);
 
-            if (!haveBodyPart || !haveManager)
+            Debug.LoopItem(4, $"{nameof(haveBodyPart)}", $"{haveBodyPart}",
+                Good: haveBodyPart, Indent: indent + 2, Toggle: doDebug);
+
+            Debug.LoopItem(4, $"{nameof(haveOperator)}", $"{haveOperator}",
+                Good: haveOperator, Indent: indent + 2, Toggle: doDebug);
+
+            Debug.LoopItem(4, $"{nameof(haveManager)}", $"{haveManager}",
+                Good: haveManager, Indent: indent + 2, Toggle: doDebug);
+
+            CreatureWantsMin = false;
+            EquipmentWantsMin = false;
+            CreatureWantsStr = false;
+            EquipmentWantsStr = false;
+
+            bool haveNecessaryParts = (haveBodyPart && haveOperator) || haveManager;
+
+            Debug.LoopItem(4, $"{nameof(haveNecessaryParts)}", $"{haveNecessaryParts}",
+                Good: haveNecessaryParts, Indent: indent + 2, Toggle: doDebug);
+
+            if ((haveBodyPart && haveOperator) || haveManager)
             {
-                CreatureWantsMin = false;
-                EquipmentWantsMin = false;
-                CreatureWantsStr = false;
-                EquipmentWantsStr= false;
+                CreatureWantsMin = haveCreature && Creature.WantEvent(ID, CascadeLevel);
+                EquipmentWantsMin = haveEquipment && Equipment.WantEvent(ID, CascadeLevel);
+
+                CreatureWantsStr = haveCreature && Creature.HasRegisteredEvent(RegisteredEventID);
+                EquipmentWantsStr = haveEquipment && Equipment.HasRegisteredEvent(RegisteredEventID);
+
+                Debug.LoopItem(4, $"{nameof(CreatureWantsMin)}", $"{CreatureWantsMin}",
+                    Good: CreatureWantsMin, Indent: indent + 3, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(EquipmentWantsMin)}", $"{EquipmentWantsMin}",
+                    Good: EquipmentWantsMin, Indent: indent + 3, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(CreatureWantsStr)}", $"{CreatureWantsStr}",
+                    Good: CreatureWantsStr, Indent: indent + 3, Toggle: doDebug);
+
+                Debug.LoopItem(4, $"{nameof(EquipmentWantsStr)}", $"{EquipmentWantsStr}",
+                    Good: EquipmentWantsStr, Indent: indent + 3, Toggle: doDebug);
             }
+            Debug.LastIndent = indent;
             return  CreatureWantsMin || EquipmentWantsMin || CreatureWantsStr || EquipmentWantsStr;
         }
         private bool ProcessEvent()
         {
-            bool proceed = WantToProceed(Equipment, Creature, BodyPart, Manager,
+            bool anyWants = WantToProceed(Equipment, Creature, BodyPart, Operator, Manager,
                 out bool CreatureWantsMin,
                 out bool EquipmentWantsMin,
                 out bool CreatureWantsStr,
                 out bool EquipmentWantsStr);
-            if (proceed)
+
+            bool proceed = true;
+
+            if (anyWants)
             {
                 if (proceed && CreatureWantsMin)
                 {
@@ -150,7 +270,7 @@ namespace HNPS_GigantismPlus
                     @event.SetParameter(nameof(Equipment), Equipment);
                     @event.SetParameter(nameof(Creature), Creature);
                     @event.SetParameter(nameof(BodyPart), BodyPart);
-                    @event.SetParameter(nameof(Manager), Manager);
+                    @event.SetParameter(nameof(Operator), Operator);
 
                     if (proceed && CreatureWantsStr)
                     {

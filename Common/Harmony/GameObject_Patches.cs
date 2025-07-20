@@ -38,10 +38,16 @@ namespace HNPS_GigantismPlus.Harmony
                     + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})", 
                     Indent: indent, Toggle: doDebug);
 
-                // this is an extremely important line of code that guarantees that default equipment is considered equipped.
-                // removing it completely breaks the NaturalEquipmentManager.
-                if (@this?.Physics != null && @this.Physics.Equipped != Equipper)
+                bool didTheThing = false;
+                if (false && Equipper != null && Equipper.TryGetPart(out NaturalEquipmentManager naturalEquipmentManager) 
+                    && @this != null && @this.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator))
                 {
+                    didTheThing = naturalEquipmentManager.AddOperator(naturalEquipmentOperator);
+                }
+                if (false && !didTheThing && @this?.Physics != null && @this.Physics.Equipped != Equipper)
+                {
+                    // this used to be an extremely important line of code that guarantees that default equipment is considered equipped.
+                    // removing it completely breaks the NaturalEquipmentOperator.
                     physicsEquipped = @this.Physics.Equipped = Equipper;
                     Debug.Entry(4, 
                         $"{@this?.DebugName ?? NULL} is equipped by {@this?.Physics?.Equipped?.DebugName ?? NULL}", 

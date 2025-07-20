@@ -436,7 +436,7 @@ namespace XRL.World.Parts
                 Debug.Entry(4,
                     $"x {typeof(WrassleGear).Name}." 
                     + $"{nameof(HandleEvent)}({typeof(GetKineticResistanceEvent).Name} " 
-                    + $"E.Object: [{Object.ManagerID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
+                    + $"E.Object: [{Object.OperatorID}:{Object.ShortDisplayNameStripped}]) WrassleID: {WrassleID} !//",
                     Indent: 0);
                 */
                 return false;

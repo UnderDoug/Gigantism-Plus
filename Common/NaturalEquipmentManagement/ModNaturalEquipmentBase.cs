@@ -119,7 +119,7 @@ namespace XRL.World.Parts
                 string output = string.Empty;
                 if (ShowID)
                 {
-                    output += $"[{(ID != null ? ID : "No ManagerID")}::{ParentNaturalEquipmentMod}]";
+                    output += $"[{(ID != null ? ID : "No OperatorID")}::{ParentNaturalEquipmentMod}]";
                 }
                 output += ToString();
                 return output;
@@ -353,15 +353,15 @@ namespace XRL.World.Parts
         private GameObject _wielder = null;
         public GameObject Wielder
         {
-            get => _wielder ??= ParentObject?.Equipped;
+            get => _wielder ??= Operator?.Manager.ParentObject;
             set => _wielder = value;
         }
 
-        private NaturalEquipmentManager _manager = null;
-        public NaturalEquipmentManager Manager
+        private NaturalEquipmentOperator _operator = null;
+        public NaturalEquipmentOperator Operator
         {
-            get => _manager ??= ParentObject?.GetPart<NaturalEquipmentManager>();
-            set => _manager = value;
+            get => _operator ??= ParentObject?.GetPart<NaturalEquipmentOperator>();
+            set => _operator = value;
         }
 
         [NonSerialized]

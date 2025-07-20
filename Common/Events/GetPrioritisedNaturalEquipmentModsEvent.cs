@@ -65,7 +65,7 @@ namespace HNPS_GigantismPlus
             if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
             {
                 Debug.Warn(2,
-                    $"{nameof(NaturalEquipmentManager)}",
+                    $"{nameof(NaturalEquipmentOperator)}",
                     $"{nameof(AddNaturalEquipmentMod)}()",
                     $"[{NaturalEquipmentMod.ModPriority}]" +
                     $"{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " +

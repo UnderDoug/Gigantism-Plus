@@ -48,7 +48,7 @@ namespace XRL.World.Parts
 
         public T AssigningPart
         {
-            get => _assigningPart ??= ParentObject?.Equipped?.GetManagedNaturalEquipmentCompatiblePart<T>();
+            get => _assigningPart ??= Operator?.Manager?.GetManagedNaturalEquipmentCompatiblePart<T>();
             set => _assigningPart = value;
         }
 

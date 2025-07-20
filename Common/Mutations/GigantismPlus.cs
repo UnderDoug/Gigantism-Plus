@@ -955,7 +955,7 @@ namespace XRL.World.Parts.Mutation
                 || ID == CanEnterInteriorEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
                 || ID == PooledEvent<GetSlotsRequiredEvent>.ID
-                || ID == BeforeBodyPartsUpdatedEvent.ID
+                || ID == BodyPartsUpdatedEvent.ID
                 || (wantAddGroundPound && ID == AfterAddSkillEvent.ID)
                 || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID)
                 || (wantJumped && ID == JumpedEvent.ID)
@@ -1087,7 +1087,7 @@ namespace XRL.World.Parts.Mutation
             }
             return base.HandleEvent(E);
         }
-        public override bool HandleEvent(BeforeBodyPartsUpdatedEvent E)
+        public override bool HandleEvent(BodyPartsUpdatedEvent E)
         {
             if (!E.Creature.HasBodyPart("Hand", false))
             {

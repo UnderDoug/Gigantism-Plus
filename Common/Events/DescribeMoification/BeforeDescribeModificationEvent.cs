@@ -14,13 +14,11 @@ namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
     public class BeforeDescribeModificationEvent<T> : IDescribeModificationEvent<BeforeDescribeModificationEvent<T>, T> 
-        where T 
-        : IModification
+        where T : IModification
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModificationEvent<T>));
 
         public BeforeDescribeModificationEvent()
-            : base()
         {
         }
 

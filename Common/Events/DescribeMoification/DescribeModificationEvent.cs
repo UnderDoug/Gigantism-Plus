@@ -22,7 +22,6 @@ namespace HNPS_GigantismPlus
         public BeforeDescribeModificationEvent<T> BeforeEvent;
 
         public DescribeModificationEvent()
-            : base()
         {
         }
 

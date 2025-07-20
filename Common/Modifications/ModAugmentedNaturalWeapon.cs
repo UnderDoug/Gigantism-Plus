@@ -28,7 +28,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            if(ParentObject.TryGetPart(out NaturalEquipmentManager manager))
+            if(ParentObject.TryGetPart(out NaturalEquipmentOperator manager))
             {
                 manager.DoDynamicTile = false;
             }

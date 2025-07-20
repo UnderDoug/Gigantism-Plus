@@ -869,10 +869,10 @@ namespace HNPS_GigantismPlus
             return BodyPart.DefaultBehavior == Object;
         }
 
-        public static BodyPart EquippingPart(this GameObject Object)
+        public static BodyPart EquippingPart(this GameObject Object, GameObject Wielder = null)
         {
-            Body body = Object?.Equipped?.Body;
-            if (body != null && Object != null)
+            Body body = Object?.Equipped?.Body ?? Wielder?.Body;
+            if (Object != null && body != null)
             {
                 foreach (BodyPart part in body.LoopParts())
                 {
@@ -1084,7 +1084,7 @@ namespace HNPS_GigantismPlus
             if (Object.HasPart<Tombstone>())
                 return "tombstone";
 
-            if (Object.HasPart<NaturalEquipmentManager>())
+            if (Object.HasPart<NaturalEquipmentOperator>())
             {
                 if (Object.IsPlural && Object.HasPropertyOrTag("DisplayNameSingular"))
                 {

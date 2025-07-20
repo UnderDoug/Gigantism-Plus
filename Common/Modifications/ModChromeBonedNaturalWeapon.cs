@@ -30,19 +30,19 @@ namespace XRL.World.Parts
         public override string GetColoredAdjective()
         {
             bool inorganic = ParentObject != null && !ParentObject.IsOrganic;
-            bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Manager.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
+            bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Operator.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
             return AssigningPart?.GetNaturalEquipmentColoredAdjective(Inorganic: inorganic, Metalic: metalic) ?? base.GetColoredAdjective();
         }
         public override string GetAdjective()
         {
             bool inorganic = ParentObject != null && !ParentObject.IsOrganic;
-            bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Manager.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
+            bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Operator.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
             return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1, Inorganic: inorganic, Metalic: metalic).Strip() ?? base.GetAdjective();
         }
 
         public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsManagedHandBones>> E)
         {
-            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT && Wielder.HasPart<GigantismPlus>())
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT && (Wielder != null && Wielder.HasPart<GigantismPlus>()))
             {
                 E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die count");
             }

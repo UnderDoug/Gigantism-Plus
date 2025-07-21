@@ -2601,7 +2601,7 @@ namespace HNPS_GigantismPlus
         public static bool MeetsCondition<T>(this T Subject, ICondition<T> Condition)
             where T : class, new()
         {
-            return Condition.Check(Subject);
+            return Condition[Subject];
         }
 
         public static bool NotMeetsCondition<T>(this T Subject, ICondition<T> Condition)

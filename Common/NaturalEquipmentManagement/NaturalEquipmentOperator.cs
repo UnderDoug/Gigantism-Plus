@@ -38,13 +38,14 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
-                nameof(GetNaturalEquipmentOperatorsEvent),
-                nameof(ManageDefaultNaturalEquipmentEvent),
             };
             List<object> dontList = new()
             {
                 'R',    // Removal
-                "S"     // Serialisation
+                "S",    // Serialisation
+                nameof(GetNaturalEquipmentOperatorsEvent),
+                nameof(ManageDefaultNaturalEquipmentEvent),
+                nameof(EquippedEvent),
             };
 
             if (what != null && doList.Contains(what))

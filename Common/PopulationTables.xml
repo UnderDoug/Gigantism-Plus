@@ -192,24 +192,23 @@
 
   <population Name="Tier5CaveCreatures" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="5" Number="2-4" Blueprint="Templar Giant-Slayer" />
-      <object Weight="1" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="5" Number="1-3" Blueprint="Templar Giant-Slayer" />
+      <object Weight="1" Number="1" Blueprint="Giant-Slayer Commander" />
       <table Weight="2" Number="1" Name="Templar Giant-Hunter Party Minor" />
     </group>
   </population>
 
   <population Name="Tier3CavePopulation" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
-      <object Weight="1" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="1" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
       <object Weight="1" Number="1" Blueprint="Templar Giant-Slayer" />
     </group>
   </population>
 
   <population Name="Tier4CavePopulation" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="2" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
-      <object Weight="5" Number="1-3" Blueprint="Templar Giant-Slayer" />
+      <object Weight="2" Number="2-3" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="5" Number="1-2" Blueprint="Templar Giant-Slayer" />
       <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Minor" />
     </group>
   </population>
@@ -250,37 +249,37 @@
 
   <population Name="Tier2RuinsCreatures" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="2" Number="0-2" Blueprint="Templar Squire Giant-Slayer" />
     </group>
   </population>
 
   <population Name="Tier3RuinsCreatures" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="2" Number="1-2" Blueprint="Templar Squire Giant-Slayer" />
-      <object Weight="1" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="2" Number="0-2" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="1" Number="1-3" Blueprint="Templar Squire Giant-Slayer" />
       <object Weight="1" Number="1" Blueprint="Templar Giant-Slayer" />
     </group>
   </population>
 
   <population Name="Tier4RuinsCreatures" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="2" Number="2-4" Blueprint="Templar Squire Giant-Slayer" />
-      <object Weight="5" Number="1-3" Blueprint="Templar Giant-Slayer" />
+      <object Weight="2" Number="1-3" Blueprint="Templar Squire Giant-Slayer" />
+      <object Weight="5" Number="0-2" Blueprint="Templar Giant-Slayer" />
       <table Weight="1" Number="1" Name="Templar Giant-Hunter Party Minor" />
     </group>
   </population>
 
   <population Name="Tier5RuinsCreatures" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="5" Number="2-4" Blueprint="Templar Giant-Slayer" />
-      <object Weight="1" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="5" Number="1-3" Blueprint="Templar Giant-Slayer" />
+      <object Weight="1" Number="0-2" Blueprint="Giant-Slayer Commander" />
       <table Weight="2" Number="1" Name="Templar Giant-Hunter Party Minor" />
     </group>
   </population>
 
   <population Name="Tier6RuinsCreatures" Load="Merge">
     <group Name="Creatures" Load="Merge">
-      <object Weight="5" Number="1-2" Blueprint="Giant-Slayer Commander" />
+      <object Weight="5" Number="0-2" Blueprint="Giant-Slayer Commander" />
       <object Weight="1" Number="1" Blueprint="Uplifted Giant-Slayer Commander" />
       <table Weight="5" Number="1" Name="Templar Giant-Hunter Party Minor" />
     </group>

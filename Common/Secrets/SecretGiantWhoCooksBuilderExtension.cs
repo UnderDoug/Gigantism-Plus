@@ -13,23 +13,19 @@ using XRL.Names;
 using XRL.Rules;
 using XRL.UI;
 using XRL.Wish;
-using XRL.World;
-using XRL.World.Anatomy;
 using XRL.World.Capabilities;
-using XRL.World.Conversations;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
-using XRL.World.Skills.Cooking;
-using XRL.World.WorldBuilders;
 using XRL.World.ZoneBuilders;
+
+using HNPS_GigantismPlus;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static XRL.World.ZoneBuilderPriority;
 
-namespace HNPS_GigantismPlus
+namespace XRL.World.WorldBuilders
 {
     [HasWishCommand]
     [JoppaWorldBuilderExtension]
@@ -83,6 +79,19 @@ namespace HNPS_GigantismPlus
                 $"{nameof(GigantifyWrasslers)}(WorldID: {WorldID})",
                 Indent: 0, Toggle: getDoDebug());
 
+            Debug.Entry(4, $"Waking up Unique Giant...", Indent: 1, Toggle: getDoDebug());
+            GameObject UniqueGiant = GetTheGiant();
+
+            if (UniqueGiant == null)
+            {
+                Debug.Warn(2,
+                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                    $"{nameof(GigantifyWrasslers)}(JoppaWorldBuilder builder) ",
+                    $"failed to instantiate {nameof(UniqueGiant)}. Placement aborted.",
+                    Indent: 0);
+                return;
+            }
+
             Debug.Entry(4, $"Getting coordinates...", Indent: 1, Toggle: getDoDebug());
             Location2D location = Builder.popMutableLocationOfTerrain("Mountains", centerOnly: true);
             Debug.LoopItem(4, $"{nameof(location)}: [{location}]", Indent: 2, Toggle: getDoDebug());
@@ -131,6 +140,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4, $"Skipping TerainBuilders and flaggign NoBiomes...", Indent: 1, Toggle: getDoDebug());
             zoneManager.SetZoneProperty(SecretZoneID, "SkipTerrainBuilders", true);
             zoneManager.SetZoneProperty(SecretZoneID, "NoBiomes", "Yes");
+            zoneManager.SetZoneProperty(SecretZoneID, "faction", SCRT_GNT_VLG_FCT);
 
             Debug.Entry(4, $"Setting ZoneName...", Indent: 1, Toggle: getDoDebug());
             zoneManager.SetZoneName(SecretZoneID, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
@@ -142,19 +152,6 @@ namespace HNPS_GigantismPlus
                 Debug.Entry(4, $"Setting up OverLandEncounters option...", Indent: 1, Toggle: getDoDebug());
                 pTravel.ParentObject.Render.RenderString = "G";
                 pTravel.ParentObject.Render.SetForegroundColor('Z');
-            }
-
-            Debug.Entry(4, $"Waking up Unique Giant...", Indent: 1, Toggle: getDoDebug());
-            GameObject UniqueGiant = GetTheGiant();
-
-            if (UniqueGiant == null)
-            {
-                Debug.Warn(2,
-                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
-                    $"{nameof(GigantifyWrasslers)}(JoppaWorldBuilder builder) ",
-                    $"failed to instantiate {nameof(UniqueGiant)}. Placement aborted.",
-                    Indent: 0);
-                return;
             }
 
             string wrasslerColor = null;
@@ -190,22 +187,54 @@ namespace HNPS_GigantismPlus
             wrasslerColor = wrassleID?.SecondaryColor;
             wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
             Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
-           
+
             /*
             wrassleRingColor ??= UD_QWE.WrassleRingColors.GetRandomElement();
             Debug.Entry(4, $"{nameof(EnablePrereleaseContent)} is {EnablePrereleaseContent}...", Indent: 1, Toggle: getDoDebug());
             Debug.CheckNah(4, $"Skipping Wrassler Content", Indent: 2, Toggle: getDoDebug());
             */
 
+            int approxZoneTier = (int)((location.X + 3) / 3.0) / 10; // 80 parasangs wide, 8 Tiers, divide parasangs by 10
+            Tier.Constrain(ref approxZoneTier); 
+
             Debug.Entry(4, $"Assigning GiantAbodePopulator if it's necessary...", Indent: 1, Toggle: getDoDebug());
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE) // This specific map has the widgets necessary for the specified builder to work
             {
                 Debug.CheckYeh(4, $"Map is correct, adding {nameof(GiantAbodePopulator)}...", Indent: 2, Toggle: getDoDebug());
-                zoneManager.AddZonePostBuilder(
-                    ZoneID: SecretZoneID,
-                    Class: nameof(GiantAbodePopulator),
-                    Key1: "GiantID",
-                    Value1: zoneManager.CacheObject(UniqueGiant));
+                if (TryGenerateGiantVillagers(approxZoneTier, 
+                    out GameObject tinkerGiant, 
+                    out GameObject apothecaryGiant, 
+                    out GameObject dromadGiant, 
+                    out GameObject petGiant))
+                {
+                    zoneManager.AddZonePostBuilder(
+                        ZoneID: SecretZoneID,
+                        Class: nameof(GiantAbodePopulator),
+                        Key1: "GiantID",
+                        Value1: zoneManager.CacheObject(UniqueGiant),
+                        Key2: "TinkerID",
+                        Value2: zoneManager.CacheObject(tinkerGiant),
+                        Key3: "ApothecaryID",
+                        Value3: zoneManager.CacheObject(apothecaryGiant),
+                        Key4: "DromadID",
+                        Value4: zoneManager.CacheObject(dromadGiant),
+                        Key5: "PetID",
+                        Value5: zoneManager.CacheObject(petGiant));
+                }
+                else
+                {
+                    Debug.Warn(2,
+                        $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                        $"{nameof(GigantifyWrasslers)}",
+                        $"Failed to instantiate one or more of the Giant Villagers",
+                        Indent: 1);
+
+                    zoneManager.AddZonePostBuilder(
+                        ZoneID: SecretZoneID,
+                        Class: nameof(GiantAbodePopulator),
+                        Key1: "GiantID",
+                        Value1: zoneManager.CacheObject(UniqueGiant));
+                }
             }
             else
             {
@@ -322,6 +351,342 @@ namespace HNPS_GigantismPlus
                     ProvideInventory: null);
 
             return creature;
+        }
+        public static void GigantifyVillager(GameObject Villager)
+        {
+            DieRoll dieRoll = new(Villager.GetStringProperty(GNT_START_STEWS_PROPLABEL, "1d1"));
+            dieRoll.AdjustDieCount(Stat.RandomCosmetic(0, 1));
+            dieRoll.AdjustDieSize(Stat.RandomCosmetic(1, 3));
+            Villager.SetStringProperty(GNT_START_STEWS_PROPLABEL, dieRoll.ToString());
+            Gigantifier.Apply(Villager, "Village");
+        }
+        public static bool TryGenerateGiantVillagers(int ApproxZoneTier, out GameObject TinkerGiant, out  GameObject ApothecaryGiant, out GameObject DromadGiant, out GameObject PetGiant)
+        {
+            string tinkerBlueprint = $"HumanTinker{ApproxZoneTier}";
+            string apothecaryBlueprint = $"HumanApothecary{ApproxZoneTier}";
+            string dromadBlueprint = $"DromadTrader{ApproxZoneTier}";
+            string petBlueprint = PopulationManager.RollOneFrom($"DynamicInheritsTable:BaseAnimal:Tier{ApproxZoneTier}").Blueprint;
+
+            If.d100(10, () => tinkerBlueprint = WrassleGiantHero.GetOldGiantEligibleBlueprint());
+            If.d100(10, () => apothecaryBlueprint = WrassleGiantHero.GetOldGiantEligibleBlueprint());
+
+            TinkerGiant = null;
+            ApothecaryGiant = null;
+            DromadGiant = null;
+            PetGiant = null;
+
+            string xContext = $"{nameof(SecretGiantWhoCooksBuilderExtension)}.{nameof(TryGenerateGiantVillagers)}() ";
+
+            Debug.Entry(4, $"Crafting up {nameof(TinkerGiant)}...", Indent: 1, Toggle: getDoDebug());
+            try
+            {
+                TinkerGiant = GameObjectFactory.Factory.CreateObject(tinkerBlueprint, GigantifyVillager);
+                PrepareGiantMerchant(TinkerGiant, "Tinker", ApproxZoneTier);
+            }
+            catch (Exception x)
+            {
+                MetricsManager.LogException(xContext + "Tinker", x);
+            }
+
+            Debug.Entry(4, $"Teaching {nameof(ApothecaryGiant)}...", Indent: 1, Toggle: getDoDebug());
+            try
+            {
+                ApothecaryGiant = GameObjectFactory.Factory.CreateObject(apothecaryBlueprint, GigantifyVillager);
+                PrepareGiantMerchant(ApothecaryGiant, "Apothecary", ApproxZoneTier);
+            }
+            catch (Exception x)
+            {
+                MetricsManager.LogException(xContext + "Apothecary", x);
+            }
+
+            Debug.Entry(4, $"Finding {nameof(DromadGiant)}...", Indent: 1, Toggle: getDoDebug());
+            try
+            {
+                DromadGiant = GameObjectFactory.Factory.CreateObject(dromadBlueprint, GigantifyVillager);
+                PrepareGiantMerchant(DromadGiant, "Merchant", ApproxZoneTier);
+            }
+            catch (Exception x)
+            {
+                MetricsManager.LogException(xContext + "Merchant", x);
+            }
+
+            Debug.Entry(4, $"Adopting {nameof(PetGiant)}...", Indent: 1, Toggle: getDoDebug());
+            try
+            {
+                PetGiant = GameObjectFactory.Factory.CreateObject(petBlueprint, GigantifyVillager);
+                PrepareGiantMerchant(PetGiant, "Pet", ApproxZoneTier);
+            }
+            catch (Exception x)
+            {
+                MetricsManager.LogException(xContext + "Pet", x);
+            }
+
+            return TinkerGiant != null && ApothecaryGiant != null && DromadGiant != null && PetGiant != null;
+        }
+        public static GameObject PrepareGiantMerchant(GameObject Villager, string Context = null, int Tier = 1)
+        {
+            int indent = Debug.LastIndent;
+
+            bool isTinker = Context == "Tinker";
+            bool isApothecary = Context == "Apothecary";
+            bool isDromad = Context == "Merchant";
+            bool isPet = Context == "Pet";
+
+            Villager.Brain = Villager.RequirePart<Brain>();
+
+            Villager.RemovePart<Lovely>();
+            Villager.RemovePart<SecretObject>();
+            Villager.RemovePart<ConvertSpawner>();
+            Villager.RemovePart<AIShopper>();
+            Villager.RemovePart<AIPilgrim>();
+            Villager.RemovePart<ConversationScript>();
+
+            Villager.Brain.Factions = "";
+            Villager.Brain.Allegiance.Clear();
+            Villager.Brain.Allegiance.Add(SCRT_GNT_VLG_FCT, 100);
+            Villager.Brain.Allegiance.Hostile = false;
+            Villager.Brain.Allegiance.Calm = true;
+            Villager.Brain.Wanders = true;
+            Villager.Brain.WandersRandomly = true;
+            Villager.SetIntProperty("ParticipantVillager", 1);
+            Villager.SetIntProperty("SecretGiantVillager", 1);
+
+            GenericInventoryRestocker inventoryRestocker = null;
+            ConversationScript conversationScript = null;
+            Interesting interesting = Villager.RequirePart<Interesting>();
+
+            string conversationScriptID = null;
+
+            if (!isPet)
+            {
+                Villager.SetStringProperty("Merchant", "You betcha!");
+                inventoryRestocker = Villager.RequirePart<GenericInventoryRestocker>();
+                conversationScript = Villager.RequirePart<ConversationScript>();
+            }
+
+            Statistic hitpoints = Villager.GetStat("Hitpoints");
+            Statistic level = Villager.GetStat("Level");
+            Statistic xP = Villager.GetStat("XP");
+            string baseVillagerBlueprintName = null;
+            string heroTemplate = Context;
+            if (isTinker)
+            {
+                conversationScriptID = "tinker";
+                if (!Villager.InheritsFrom("HumanTinker"))
+                {
+                    baseVillagerBlueprintName = "HumanTinker";
+                    string conversationText = "Need a gadget repaired or identified, =player.formalAddressTerm=? " +
+                        "Or if you're a tinker =player.reflexive=, perhaps you'd like to peruse my schematics?";
+                    ConversationsAPI.addSimpleConversationToObject(
+                        Object: Villager, 
+                        Text: conversationText, 
+                        Goodbye: "Live and drink, tinker.", 
+                        ClearLost: true);
+                }
+            }
+            if (isApothecary)
+            {
+                baseVillagerBlueprintName = "HumanApothecary";
+            }
+
+            if ((isTinker && !Villager.InheritsFrom("HumanTinker")) || (isApothecary && !Villager.InheritsFrom("HumanApothecary")))
+            {
+                GameObjectBlueprint baseMerchantBlueprint = GameObjectFactory.Factory.GetBlueprintIfExists($"{baseVillagerBlueprintName}{Tier}");
+
+                inventoryRestocker.Table = $"Village {Context} {Tier}";
+
+                Villager.SetStringProperty("Role", "Skirmisher");
+                Villager.SetIntProperty("SuppressSimpleConversation", 1);
+
+                int blueprintHitpoints = baseMerchantBlueprint.Stats["Hitpoints"].BaseValue;
+                int blueprintLevel = baseMerchantBlueprint.Stats["Level"].BaseValue;
+                int blueprintXP = baseMerchantBlueprint.Stats["XP"].BaseValue;
+
+                if (hitpoints.BaseValue < blueprintHitpoints)
+                {
+                    hitpoints.BaseValue = blueprintHitpoints;
+                }
+                if (level.BaseValue < blueprintLevel)
+                {
+                    level.BaseValue = blueprintLevel;
+                }
+
+                if (isTinker)
+                {
+
+                    Villager.GetStat("Intelligence").BaseValue = Math.Max(baseMerchantBlueprint.Stats["Intelligence"].BaseValue, 16);
+                }
+                if(isApothecary)
+                {
+                    Villager.GetStat("Intelligence").BaseValue = Math.Max(baseMerchantBlueprint.Stats["Intelligence"].BaseValue, 15);
+                    Villager.GetStat("Toughness").BaseValue = Math.Max(baseMerchantBlueprint.Stats["Toughness"].BaseValue, 15);
+                }
+
+                if (baseMerchantBlueprint != null)
+                {
+                    if (!baseMerchantBlueprint.Skills.IsNullOrEmpty())
+                    {
+                        foreach ((string name, GamePartBlueprint blueprint) in baseMerchantBlueprint.Skills)
+                        {
+                            Villager.AddSkill(name);
+                        }
+                    }
+                    if (!baseMerchantBlueprint.Inventory.IsNullOrEmpty())
+                    {
+                        foreach (InventoryObject inventoryObject in baseMerchantBlueprint.Inventory)
+                        {
+                            if (inventoryObject.Chance.in100())
+                            {
+                                int itemAmount = Stat.Roll(inventoryObject.Number);
+                                string autoMod = nameof(ModGigantic);
+                                Villager.ReceiveObject(Blueprint: inventoryObject.Blueprint, Number: itemAmount, AutoMod: autoMod);
+                            }
+                        }
+                    }
+                }
+            }
+            if (isDromad)
+            {
+                conversationScriptID = "DromadTrader";
+                if (Villager.TryGetPart(out DromadCaravan dromadCaravan))
+                {
+                    Villager.RemovePart(dromadCaravan);
+                }
+                ConversationsAPI.addSimpleConversationToObject(
+                        Object: Villager,
+                        Text: "Welcome, =player.species=. What do you desire?",
+                        Goodbye: "Live and drink.",
+                        ClearLost: true);
+
+                for (int i = 0; i <= 2 && Tier > i; i++)
+                {
+                    inventoryRestocker.Clear();
+                    inventoryRestocker.AddTable($"Tier{(Tier - i).ToStringCached()}Wares");
+                }
+                heroTemplate = $"Dromad{Context}";
+                string dromadTitle = NameMaker.MakeTitle(For: Villager, Special: Context);
+                if (!dromadTitle.IsNullOrEmpty())
+                {
+                    Villager.RequirePart<Titles>().AddTitle(dromadTitle, -5);
+                }
+                if (Villager.Brain.Allegiance.IsNullOrEmpty())
+                {
+                    Villager.Brain.Factions = SCRT_GNT_VLG_FCT + "-100";
+                }
+                else if (!Villager.Brain.Allegiance.ContainsKey(SCRT_GNT_VLG_FCT))
+                {
+                    Villager.Brain.Allegiance[SCRT_GNT_VLG_FCT] = 25;
+                }
+            }
+            if (isPet)
+            {
+                string petTitle = NameMaker.MakeTitle(Villager);
+                Villager.GiveProperName();
+                if (!petTitle.IsNullOrEmpty())
+                {
+                    Villager.RequirePart<Titles>().AddTitle(petTitle, -5);
+                }
+                Villager.RequirePart<SmartuseForceTwiddles>();
+
+                Villager.RemovePart<Pettable>();
+                Pettable pettable = Villager.RequirePart<Pettable>();
+                pettable.PettableIfPositiveFeeling = true;
+                pettable.UseFactionForFeelingFloor = SCRT_GNT_VLG_FCT;
+
+                Villager.SetIntProperty("VillagePet", 1);
+                Villager.RequirePart<Interesting>().Key = "VillagePet";
+
+                ConversationsAPI.addSimpleConversationToObject(
+                    Object: Villager, 
+                    Text: Villager.GetTag("SimpleConversation", "*does not react*"), 
+                    Goodbye: "Live and drink.");
+            }
+
+            if (!conversationScriptID.IsNullOrEmpty() && conversationScript != null)
+            {
+                conversationScript.ConversationID = conversationScriptID;
+            }
+
+            Villager.SetStringProperty("Culture", "WrassleGiant");
+
+            Villager = HeroMaker.MakeHero(Villager, $"SpecialVillagerHeroTemplate_{heroTemplate}", -1, Context);
+
+            string villagerEpithet = NameMaker.MakeEpithet(
+                For: null,
+                Genotype: null,
+                Subtype: null,
+                Species: null,
+                Culture: null,
+                Faction: "WrassleGiants",
+                Region: null,
+                Gender: null,
+                Mutations: null,
+                Tag: null,
+                Special: Context,
+                NamingContext: null,
+                SpecialFaildown: true,
+                HasHonorific: null,
+                HasEpithet: null);
+
+            Debug.LoopItem(4, $"{nameof(villagerEpithet)}", villagerEpithet ?? NULL, Good: villagerEpithet != null, Indent: indent + 2, Toggle: getDoDebug());
+
+            string villagerName = NameMaker.MakeName(
+                For: null,
+                Genotype: null,
+                Subtype: null,
+                Species: null,
+                Culture: null,
+                Faction: "WrassleGiants",
+                Region: null,
+                Gender: null,
+                Mutations: null,
+                Tag: null,
+                Special: Context,
+                NamingContext: null,
+                SpecialFaildown: true,
+                HasHonorific: null,
+                HasEpithet: null);
+
+            Debug.LoopItem(4, $"{nameof(villagerName)}", villagerName ?? NULL, Good: villagerName != null, Indent: indent + 2, Toggle: getDoDebug());
+
+            if (villagerName.Contains("NameGenFail"))
+            {
+                villagerName = null;
+            }
+            else
+            {
+                villagerName = villagerName.OptionalColorYuge();
+            }
+
+            Villager.GiveProperName(
+                Name: villagerName,
+                Force: true,
+                Special: "Hero",
+                SpecialFaildown: true,
+                HasHonorific: null,
+                HasEpithet: null,
+                NamingContext: null);
+
+            if (!villagerEpithet.IsNullOrEmpty())
+            {
+                if (Villager.TryGetPart(out Epithets epithets))
+                {
+                    Villager.RemovePart(epithets);
+                }
+                epithets = Villager.RequirePart<Epithets>();
+                epithets.Primary = GameText.VariableReplace(villagerEpithet).Color("y");
+            }
+
+            int xPThisLevel = Leveler.GetXPForLevel(level.BaseValue);
+            int xPNextLevel = Leveler.GetXPForLevel(level.BaseValue + 1);
+            xP.BaseValue = Stat.RandomCosmetic(xPThisLevel, xPNextLevel);
+
+            Villager.FireEvent("VillageInit");
+            Villager.SetIntProperty($"Village{Context}", 1);
+            Villager.SetIntProperty("NamedVillager", 1);
+            TakeOnRoleEvent.Send(Villager, Context);
+            inventoryRestocker?.PerformRestock(Silent: true);
+            return Villager;
         }
 
         [WishCommand(Command = "go2giant")]

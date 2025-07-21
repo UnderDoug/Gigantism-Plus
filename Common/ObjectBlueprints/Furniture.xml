@@ -973,6 +973,12 @@
   <object Name="Gigantic Ornate Table" Inherits="Ornate Table">
     <part Name="ModGigantic" />
   </object>
+  <object Name="Gigantic GunsmithTable" Inherits="GunsmithTable">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Gigantic Alchemist Table" Inherits="Alchemist Table">
+    <part Name="ModGigantic" />
+  </object>
 
   <!-- Gigantic Arts/crafts/culture/decorations -->
 

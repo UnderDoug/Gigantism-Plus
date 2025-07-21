@@ -337,6 +337,524 @@
         </templatevar>
       </templatevars>
     </namestyle>
+
+    <namestyle Name="WrassleGiant Villager Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Hero" Faction="WrassleGiants" Priority="200" Combine="false" />
+      </scopes>
+      <templates>
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+      </templates>
+    </namestyle>
+
+    <namestyle Name="WrassleGiant Tinker Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Tinker" Faction="WrassleGiants" Priority="200" Combine="false" />
+      </scopes>
+      <templates>
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+      </templates>
+      <templatevars>
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Heavyweight" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Tinker" />
+          <value Name="Crafter" />
+          <value Name="Maker" />
+          <value Name="Dissassembler" />
+          <value Name="Repairer" />
+          <value Name="Modifier" />
+        </templatevar>
+        <templatevar Name="Actioner">
+          <value Name="Tinker" />
+          <value Name="Crafter" />
+          <value Name="Maker" />
+          <value Name="Dissassembler" />
+          <value Name="Repairer" />
+          <value Name="Fixer" />
+          <value Name="Drafter" />
+          <value Name="Modifier" />
+        </templatevar>
+        <templatevar Name="Noun">
+          <value Name="Artifact" />
+          <value Name="Scrap" />
+          <value Name="Tech" />
+          <value Name="Thinger" />
+          <value Name="Stuff" />
+          <value Name="Thing" />
+          <value Name="Gadget" />
+          <value Name="Gizmo" />
+          <value Name="Widget" />
+          <value Name="Modification" />
+        </templatevar>
+        <templatevar Name="Subject">
+          <value Name="Artifacts" />
+          <value Name="Scrap" />
+          <value Name="Tech" />
+          <value Name="Thingers" />
+          <value Name="Stuff" />
+          <value Name="Things" />
+          <value Name="Gadgets" />
+          <value Name="Gizmos" />
+          <value Name="Widgets" />
+          <value Name="Doohickies" />
+          <value Name="Modifications" />
+        </templatevar>
+        <templatevar Name="Verbs">
+          <value Name="Tinkers" />
+          <value Name="Crafts" />
+          <value Name="Makes" />
+          <value Name="Dissassembles" />
+          <value Name="Repairs" />
+          <value Name="Fixes" />
+          <value Name="Drafts" />
+          <value Name="Modifies" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
+
+    <namestyle Name="WrassleGiant Apothecary Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Apothecary" Faction="WrassleGiants" Priority="210" Combine="false" />
+      </scopes>
+      <templates>
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+      </templates>
+      <templatevars>
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Heavyweight" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Apothecary" />
+          <value Name="Healer" />
+          <value Name="Brewer" />
+          <value Name="Distiller" />
+          <value Name="Chemist" />
+          <value Name="Alchemist" />
+          <value Name="Medic" />
+          <value Name="Giver of Aid" />
+        </templatevar>
+        <templatevar Name="Actioner">
+          <value Name="Healer" />
+          <value Name="Carer" />
+          <value Name="Helper" />
+          <value Name="Soother" />
+          <value Name="Suturer" />
+          <value Name="Curer" />
+        </templatevar>
+        <templatevar Name="Noun">
+          <value Name="Salves" />
+          <value Name="Tinctures" />
+          <value Name="Nostrums" />
+          <value Name="Mixtures" />
+          <value Name="Remedies" />
+          <value Name="Fowl Soup" />
+        </templatevar>
+        <templatevar Name="Subject">
+          <value Name="Wounds" />
+          <value Name="Sores" />
+          <value Name="Ills" />
+          <value Name="Aches" />
+          <value Name="Pains" />
+          <value Name="Infections" />
+          <value Name="Maladies" />
+          <value Name="Ailments" />
+        </templatevar>
+        <templatevar Name="Verbs">
+          <value Name="Heals" />
+          <value Name="Mends" />
+          <value Name="Cures" />
+          <value Name="Helps" />
+          <value Name="Aids" />
+          <value Name="Provides" />
+          <value Name="Mixes" />
+          <value Name="Restores" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
+
+    <namestyle Name="WrassleGiant Merchant Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Merchant" Faction="WrassleGiants" Priority="210" Combine="false" />
+      </scopes>
+      <templates>
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+      </templates>
+      <templatevars>
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Heavyweight" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Merchant" />
+          <value Name="Dealer" />
+          <value Name="Trader" />
+          <value Name="Quartermaster" />
+          <value Name="Procurer" />
+          <value Name="Artisan" />
+          <value Name="Connoisseur" />
+          <value Name="Plyer of Wares" />
+          <value Name="Acquirer" />
+        </templatevar>
+        <templatevar Name="Actioner">
+          <value Name="Dealer" />
+          <value Name="Trader" />
+          <value Name="Procurer" />
+          <value Name="Plyer" />
+          <value Name="Acquirer" />
+        </templatevar>
+        <templatevar Name="Noun">
+          <value Name="Wares" />
+          <value Name="Stock" />
+          <value Name="Artifacts" />
+          <value Name="Armors" />
+          <value Name="Weapons" />
+          <value Name="Rare Objects" />
+          <value Name="Goods" />
+          <value Name="Sundry" />
+        </templatevar>
+        <templatevar Name="Subject">
+          <value Name="Wares" />
+          <value Name="Stock" />
+          <value Name="Artifacts" />
+          <value Name="Armors" />
+          <value Name="Weapons" />
+          <value Name="Rare Objects" />
+          <value Name="Goods" />
+          <value Name="Sundry Objects" />
+        </templatevar>
+        <templatevar Name="Verbs">
+          <value Name="Sells" />
+          <value Name="Trades" />
+          <value Name="Deals" />
+          <value Name="Procures" />
+          <value Name="Plies" />
+          <value Name="Acquires" />
+          <value Name="Plies Wares" />
+          <value Name="Plies Goods" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
+
+    <namestyle Name="WrassleGiant Pet Epithet">
+      <scopes>
+        <scope Name="Main" Type="Epithet" Special="Pet" Faction="WrassleGiants" Priority="210" Combine="false" />
+      </scopes>
+      <templates>
+        <!-- the Adjective Role -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=" />
+
+        <!-- the Adjective -->
+        <template Name="the =optionalColorYuge:*Adjective*=" />
+
+        <!-- who Verbs -->
+        <template Name="who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- of the Noun -->
+        <template Name="of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Adjective*=, of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+
+        <!-- the Role, of the Noun, who Verbs -->
+        <template Name="the =optionalColorYuge:*Role*= of the =optionalColorYuge:*Noun*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Actioner of the Subject, who Verbs -->
+        <template Name="the =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=, who =optionalColorYuge:*Verbs*=" />
+
+        <!-- the Adjective Role, of the Noun -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Role*=, of the =optionalColorYuge:*Noun*=" />
+
+        <!-- the Adjective Actioner of the Subject -->
+        <template Name="the =optionalColorYuge:*Adjective*= =optionalColorYuge:*Actioner*= of the =optionalColorYuge:*Subject*=" />
+      </templates>
+      <templatevars>
+        <templatevar Name="Adjective">
+          <value Name="Giant" />
+          <value Name="Gentle" />
+          <value Name="Swole" />
+          <value Name="Thick" />
+          <value Name="Thicc" />
+          <value Name="Hefty" />
+          <value Name="Immense" />
+          <value Name="Thoughtful" />
+          <value Name="Mighty" />
+          <value Name="Enormous" />
+          <value Name="Huge" />
+          <value Name="Yuge" />
+          <value Name="Heavyweight" />
+        </templatevar>
+        <templatevar Name="Role">
+          <value Name="Mascot" />
+          <value Name="Muse" />
+          <value Name="Friend" />
+          <value Name="Companion" />
+          <value Name="Protector" />
+          <value Name="Stray" />
+          <value Name="Good Boi" />
+          <value Name="Heckin Chonker" />
+          <value Name="Squish" />
+        </templatevar>
+        <templatevar Name="Actioner">
+          <value Name="Scratcher" />
+          <value Name="Biter" />
+          <value Name="Cuddler" />
+          <value Name="Snubber" />
+          <value Name="Ignorer" />
+          <value Name="Scarer" />
+        </templatevar>
+        <templatevar Name="Noun">
+          <value Name="Chew Toy" />
+          <value Name="Missing Sock" />
+          <value Name="Food Bowl" />
+          <value Name="Water Bowl" />
+          <value Name="Collar" />
+          <value Name="Treats" />
+          <value Name="Tricks" />
+          <value Name="Yarn" />
+          <value Name="Claw" />
+          <value Name="Tooth" />
+          <value Name="Fur" />
+        </templatevar>
+        <templatevar Name="Subject">
+          <value Name="Pests" />
+          <value Name="Enemies of the Village" />
+          <value Name="Friends of the Village" />
+          <value Name="Hands" />
+          <value Name="Rumps" />
+          <value Name="Ankles" />
+          <value Name="Visitors" />
+          <value Name="Strangers" />
+        </templatevar>
+        <templatevar Name="Verbs">
+          <value Name="Stinks" />
+          <value Name="Is Covered In Dirt" />
+          <value Name="Buries Important Objects" />
+          <value Name="Chews" />
+          <value Name="Bites" />
+          <value Name="Howls" />
+          <value Name="Begs" />
+          <value Name="Does Tricks" />
+          <value Name="Is A Good Boi" />
+          <value Name="Growls" />
+          <value Name="Plays" />
+          <value Name="Plays Dead" />
+          <value Name="Rolls Over" />
+          <value Name="Speaks" />
+        </templatevar>
+      </templatevars>
+    </namestyle>
     
     <namestyle Name="WrassleGiant Master Title">
       <scopes>

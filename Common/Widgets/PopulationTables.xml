@@ -116,6 +116,13 @@
       <table Weight="1" Name="Gigantic Table Luxury" />
     </group>
   </population>
+  <population Name="Gigantic Tinker Table">
+    <group Name="Items" Style="pickone">
+      <table Weight="5" Name="Gigantic Metal Table" />
+      <table Weight="5" Name="Gigantic Workbench" />
+      <table Weight="5" Name="Gigantic Metal Workbench" />
+    </group>
+  </population>
 
   <population Name="Gigantic Chair Basic">
     <group Name="Items" Style="pickone">
@@ -189,6 +196,13 @@
     </group>
   </population>
 
+  <population Name="Gigantic Basket">
+    <group Name="Items" Style="pickone">
+      <object Weight="4" Number="1" Blueprint="Gigantic Woven Basket" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Preserved Food Basket" />
+    </group>
+  </population>
+
   <population Name="Gigantic Vessel">
     <group Name="Items" Style="pickone">
       <group Name="Empty" Style="pickone" Weight="25">
@@ -224,59 +238,107 @@
     </group>
   </population>
 
-  <population Name="Gigantic Decoration Plain">
+  <population Name="Gigantic Decoration Plants">
     <group Name="Items" Style="pickone">
-      <group Name="Basic" Style="pickone" Weight="35">
-        <object Weight="3" Number="1" Blueprint="Gigantic Globe" />
-        <object Weight="8" Number="1" Blueprint="Gigantic Clockthing" />
-        <object Weight="5" Number="1" Blueprint="Gigantic Telescope" />
-        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 1" />
-        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 2" />
-        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 3" />
-        <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 4" />
-        <object Weight="8" Number="1" Blueprint="Gigantic Chalkboard" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Unfinished Sculpture" />
-        <object Weight="15" Number="1" Blueprint="Gigantic Mushroom Case" />
-        <object Weight="5" Number="1" Blueprint="Gigantic Anvil" />
-      </group>
-      <group Name="Plants" Style="pickone" Weight="25">
-        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 1" />
-        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 2" />
-        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 3" />
-        <object Number="1" Blueprint="Gigantic Ornate Potted Plant 4" />
-      </group>
-      <group Name="Learned" Style="pickone" Weight="35">
-        <object Weight="10" Number="1" Blueprint="Gigantic Globe" />
-        <object Weight="3" Number="1" Blueprint="Gigantic Orrery" />
-        <object Weight="15" Number="1" Blueprint="Gigantic Clockthing" />
-        <object Weight="3" Number="1" Blueprint="Gigantic Powerless Electrothing" />
-        <object Weight="1" Number="1" Blueprint="Gigantic Powerless Unicomputer" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Telescope" />
-        <object Weight="3" Number="1" Blueprint="Gigantic Chalkboard" />
-        <object Weight="1" Number="1" Blueprint="Gigantic Display Breadboard" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Mushroom Case" />
-      </group>
-      <group Name="Creative" Style="pickone" Weight="25">
-        <object Weight="5" Number="1" Blueprint="Gigantic Chalkboard" />
-        <object Weight="3" Number="1" Blueprint="Gigantic Display Breadboard" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Unfinished Sculpture" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Anvil" />
-      </group>
-      <group Name="Musical" Style="pickone" Weight="15">
-        <object Number="1" Blueprint="Gigantic Harp" />
-        <object Number="1" Blueprint="Gigantic Rectangular Bells" />
-        <object Number="1" Blueprint="Gigantic Hammered Dulcimer" />
-      </group>
-      <group Name="Fancy" Style="pickone" Weight="15">
-        <object Weight="8" Number="1" Blueprint="Gigantic Globe" />
-        <object Weight="8" Number="1" Blueprint="Gigantic Orrery" />
-        <object Weight="12" Number="1" Blueprint="Gigantic Clockthing" />
-        <object Weight="15" Number="1" Blueprint="Gigantic Bust of K4K5" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Light Sculpture" />
-        <object Weight="8" Number="1" Blueprint="Gigantic Brain Sculpture" />
-        <object Weight="8" Number="1" Blueprint="Gigantic Mushroom Case" />
-        <object Weight="10" Number="1" Blueprint="Gigantic Random Stone Statue" />
-      </group>
+      <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 1" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 2" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 3" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Ornate Potted Plant 4" />
+    </group>
+  </population>
+  <population Name="Gigantic Decoration Basic">
+    <group Name="Items" Style="pickone">
+      <object Weight="3" Number="1" Blueprint="Gigantic Globe" />
+      <object Weight="8" Number="1" Blueprint="Gigantic Clockthing" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Telescope" />
+      <table Weight="20" Number="1" Name="Gigantic Decoration Plants" />
+      <object Weight="8" Number="1" Blueprint="Gigantic Chalkboard" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Unfinished Sculpture" />
+      <object Weight="15" Number="1" Blueprint="Gigantic Mushroom Case" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Anvil" />
+    </group>
+  </population>
+  <population Name="Gigantic Decoration Learned">
+    <group Name="Items" Style="pickone">
+      <object Weight="10" Number="1" Blueprint="Gigantic Globe" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Orrery" />
+      <object Weight="15" Number="1" Blueprint="Gigantic Clockthing" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Powerless Electrothing" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Powerless Unicomputer" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Telescope" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Chalkboard" />
+      <object Weight="1" Number="1" Blueprint="Gigantic Display Breadboard" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Mushroom Case" />
+    </group>
+  </population>
+  <population Name="Gigantic Decoration Creative">
+    <group Name="Items" Style="pickone">
+      <object Weight="5" Number="1" Blueprint="Gigantic Chalkboard" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Display Breadboard" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Unfinished Sculpture" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Anvil" />
+    </group>
+  </population>
+  <population Name="Gigantic Decoration Musical">
+    <group Name="Items" Style="pickone">
+      <object Number="1" Blueprint="Gigantic Harp" />
+      <object Number="1" Blueprint="Gigantic Rectangular Bells" />
+      <object Number="1" Blueprint="Gigantic Hammered Dulcimer" />
+    </group>
+  </population>
+  <population Name="Gigantic Decoration Fancy">
+    <group Name="Items" Style="pickone">
+      <object Weight="8" Number="1" Blueprint="Gigantic Globe" />
+      <object Weight="8" Number="1" Blueprint="Gigantic Orrery" />
+      <object Weight="12" Number="1" Blueprint="Gigantic Clockthing" />
+      <object Weight="15" Number="1" Blueprint="Gigantic Bust of K4K5" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Light Sculpture" />
+      <object Weight="8" Number="1" Blueprint="Gigantic Brain Sculpture" />
+      <object Weight="8" Number="1" Blueprint="Gigantic Mushroom Case" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Random Stone Statue" />
+    </group>
+  </population>
+  
+  <population Name="Gigantic Decoration General">
+    <group Name="Items" Style="pickone">
+      <table Weight="35" Number="1" Name="Gigantic Decoration Basic" />
+      <table Weight="25" Number="1" Name="Gigantic Decoration Plants" />
+      <table Weight="35" Number="1" Name="Gigantic Decoration Learned" />
+      <table Weight="25" Number="1" Name="Gigantic Decoration Creative" />
+      <table Weight="15" Number="1" Name="Gigantic Decoration Musical" />
+      <table Weight="15" Number="1" Name="Gigantic Decoration Fancy" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Decoration Tinker">
+    <group Name="Items" Style="pickone">
+      <object Weight="15" Number="1" Blueprint="Gigantic Clockthing" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Bust of K4K5" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Powerless Bubblething" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Powerless Fluxthing" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Powerless Electrothing" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Powerless Unicomputer" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Bubblething" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Fluxthing" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Electrothing" />
+      <object Weight="5" Number="1" Blueprint="Gigantic Unicomputer" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Telescope" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Loudspeaker" />
+    </group>
+  </population>
+  <population Name="Gigantic Decoration Apothecary">
+    <group Name="Items" Style="pickone">
+      <object Weight="5" Number="1" Blueprint="Gigantic Globe" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Clockthing" />
+      <object Weight="10" Number="1" Blueprint="Gigantic Chalkboard" />
+      <object Weight="15" Number="1" Blueprint="Gigantic Mushroom Case" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Powerlines">
+    <group Name="Items" Style="pickone">
+      <object Weight="4" Number="1" Blueprint="Gigantic PowerLine" />
+      <object Weight="1" Number="1" Blueprint="Gigantic HeavyPowerLine" />
     </group>
   </population>
   
@@ -301,8 +363,8 @@
       </group>
 
       <group Name="Decor" Style="pickeach">
-        <table Chance="75" Number="1" Name="Gigantic Decoration Plain" Hint="InsideCorner" />
-        <table Chance="75" Number="1" Name="Gigantic Decoration Plain" Hint="AlongWall" />
+        <table Chance="75" Number="1" Name="Gigantic Decoration General" Hint="InsideCorner" />
+        <table Chance="75" Number="1" Name="Gigantic Decoration General" Hint="AlongWall" />
       </group>
     </group>
   </population>
@@ -326,6 +388,82 @@
       <table Chance="100" Number="1" Name="Gigantic Bookshelves" Hint="AlongWall" />
       
       <object Chance="100" Number="1" Blueprint="Gigantic Oven" Hint="AlongWall" />
+    </group>
+  </population>
+
+  <population Name="Giant Abode Tinker">
+    <group Name="Contents" Style="pickeach">
+      <object Chance="100" Number="1" Blueprint="Gigantic Wire Extruder" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Fusion Power Station" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
+      
+      <table Chance="100" Name="Giant Abode Base" />
+      
+      <table Chance="100" Number="1" Name="Gigantic Tinker Table" Hint="AlongWall,AdjacentToEndsWith: Chair" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Multicabinet" Hint="AlongWall" />
+      
+      <table Chance="100" Number="1" Name="Gigantic Decoration Tinker" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
+      
+    </group>
+  </population>
+
+  <population Name="Giant Abode Apothecary">
+    <group Name="Contents" Style="pickeach">
+      <table Chance="100" Name="Giant Abode Base" />
+
+      <table Chance="100" Number="2-4" Name="Gigantic Basket" />
+      <table Chance="100" Number="1-3" Name="Gigantic Vessel" Hint="AdjacentToEndsWith: Basket" />
+
+      <table Chance="75" Number="1" Name="Gigantic Bookshelves" Hint="AlongWall" />
+      
+      <object Chance="100" Number="1" Blueprint="Gigantic Alchemist Table" Hint="AdjacentToEndsWith: Chair" />
+      
+      <table Chance="100" Number="1" Name="Gigantic Decoration Apothecary" Hint="AlongWall" />
+    </group>
+  </population>
+
+  <population Name="Giant Abode Dromad">
+    <group Name="Contents" Style="pickeach">
+      <table Chance="100" Name="Giant Abode Base" />
+      
+      <group Chance="100" Name="Table" Style="pickone">
+        <table Weight="3" Number="1" Name="Gigantic Table Basic" Hint="AdjacentToEndsWith: Chair" />
+        <table Weight="1" Number="1" Name="Gigantic Table Nice" Hint="AdjacentToEndsWith: Chair" />
+      </group>
+
+      <table Chance="100" Number="1-2" Name="Gigantic Vessel" Hint="AlongWall" />
+      
+      <table Chance="75" Number="1-2" Name="Gigantic Bookshelves" Hint="AlongWall" />
+      
+      <table Chance="100" Number="2-4" Name="Gigantic Decoration Plants" />
+      <table Chance="50" Number="1-2" Name="Gigantic Decoration Fancy" />
+    </group>
+  </population>
+
+  <!-- 
+  
+        Dynamic Merchant Tables 
+        
+  -->
+  <population Name="Giant Tinker Wares">
+    <group Name="Items" Style="pickeach">
+      <table Name="Village Tinker {zonetier}" />
+    </group>
+  </population>
+
+  <population Name="Giant Apothecary Wares">
+    <group Name="Items" Style="pickeach">
+      <table Name="Village Apothecary {zonetier}" />
+    </group>
+  </population>
+
+  <population Name="Giant Merchant Wares">
+    <group Name="Items" Style="PickOne">
+      <table Weight="50" Name="Tier{zonetier}Wares" />
+      <table Chance="5" Name="Tier{zonetier-1}Wares" />
+      <table Chance="1000" Name="Tier{zonetier+1}Wares" />
     </group>
   </population>
   

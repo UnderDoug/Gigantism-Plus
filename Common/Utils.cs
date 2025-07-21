@@ -719,6 +719,28 @@ namespace HNPS_GigantismPlus
         {
             return Rumble((float)Cause, DurationFactor, DurationMax, Async);
         }
+
+        public static int Clamp(int Low, int Value, int High)
+        {
+            return Math.Max(Low, Math.Min(Value, High));
+        }
+        public static uint Clamp(uint Low, uint Value, uint High)
+        {
+            return Math.Max(Low, Math.Min(Value, High));
+        }
+        public static float Clamp(float Low, float Value, float High)
+        {
+            return Math.Max(Low, Math.Min(Value, High));
+        }
+        public static double Clamp(double Low, double Value, double High)
+        {
+            return Math.Max(Low, Math.Min(Value, High));
+        }
+        public static byte Clamp(byte Low, byte Value, byte High)
+        {
+            return Math.Max(Low, Math.Min(Value, High));
+        }
+
     } //!-- public static class Utils
 
 }

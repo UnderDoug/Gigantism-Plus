@@ -511,6 +511,17 @@ You cannot wear equipment on your body." />
     <tag Name="EquipmentFrameColors" Value="McMc" />
   </object>
 
+
+  <!-- 
+      
+      Fixes 
+      
+  -->
+  <object Name="Sandals" Load="Merge">
+    <!-- this object is both a plural and has DisplayName="antlers" resulting in "antlerses" -->
+    <tag Name="DisplayNameSingular" Value="sandle" />
+  </object>
+
   <!-- 
       
       Testing 

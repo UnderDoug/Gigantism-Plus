@@ -8,6 +8,7 @@ using Qud.API;
 using XRL.Rules;
 using XRL.World.AI.Pathfinding;
 using XRL.World.ObjectBuilders;
+using XRL.World.WorldBuilders;
 using XRL.World.Parts;
 
 using static XRL.Core.XRLCore;
@@ -53,11 +54,19 @@ namespace XRL.World.ZoneBuilders
         public Dictionary<string, Dictionary<string, List<Cell>>> Regions;
 
         public string GiantID;
+        public string TinkerID;
+        public string ApothecaryID;
+        public string DromadID;
+        public string PetID;
 
         public GiantAbodePopulator()
         {
             Regions = new();
-            GiantID = "";
+            GiantID = null;
+            TinkerID = null;
+            ApothecaryID = null;
+            DromadID = null;
+            PetID = null;
         }
 
         public bool BuildZone(Zone Z)
@@ -75,304 +84,531 @@ namespace XRL.World.ZoneBuilders
             List<GameObject> trashCan = new();
 
             Cell giantOvenCell = null;
+            Cell giantMulticabinetCell = null;
+            Cell giantAlchemistTableCell = null;
 
             int abodeNumber = 0;
-            foreach (GameObject abodeSpawner in zone.GetObjectsThatInheritFrom("GiantAbodeSpawner"))
+            int abodeNumberTotal = 0;
+
+            List<GameObject> abodeSpawners = Event.NewGameObjectList(zone.GetObjectsThatInheritFrom("GiantAbodeSpawner"));
+
+            Dictionary<string, int> abodeAllocations = new()
             {
-                bool isUnique = abodeSpawner.Blueprint == "GiantAbodeSpawner Cook";
-                string abodeLabel = $"HNPS_GigantismPlus::Abode:{(isUnique ? "Cook" : ++abodeNumber)}::";
-                string DoorDirection = abodeSpawner.GetTagOrStringProperty("DoorDirection");
-                string ContentsTable = abodeSpawner.GetTagOrStringProperty("ContentsTable");
-                string Floor = abodeSpawner.GetTagOrStringProperty("Floor");
-                string Wall = abodeSpawner.GetTagOrStringProperty("Wall");
-                int radius = abodeSpawner.GetIntProperty("Radius");
-                bool DoorRandom = abodeSpawner.HasTagOrStringProperty("DoorRandom");
-                bool Constrained = DoorRandom && abodeSpawner.GetTagOrStringProperty("DoorRandom") == "Constrained";
-                radius = radius != 0 ? radius : 2;
+                { "Tinker", 1 },
+                { "Apothecary", 1 },
+                { "Dromad", 1 },
+                { "Base", abodeSpawners.Count - 4 },
+            };
 
-                trashCan.Add(abodeSpawner);
-
-                Cell cell = abodeSpawner.CurrentCell;
-                cell.RemoveObject(abodeSpawner, Forced: true, Silent: true);
-
-                cell.Clear();
-                int x1 = cell.X - radius;
-                int y1 = cell.Y - radius;
-                int x2 = cell.X + radius;
-                int y2 = cell.Y + radius;
-                int doorXRnd = Stat.Roll(x1 + 1, x2 - 1);
-                int doorYRnd = Stat.Roll(y1 + 1, y2 - 1);
-                int doorX = Constrained ? doorXRnd : cell.X;
-                int doorY = Constrained ? doorYRnd : cell.Y;
-                Point2D doorLocation = DoorDirection switch
+            if (!abodeSpawners.IsNullOrEmpty())
+            {
+                foreach (GameObject abodeSpawner in abodeSpawners)
                 {
-                    "N" => new Point2D(doorX, y1),
-                    "S" => new Point2D(doorX, y2),
-                    "E" => new Point2D(x2, doorY),
-                    "W" => new Point2D(x1, doorY),
-                    "NW" => new Point2D(x1, y1),
-                    "NE" => new Point2D(x2, y1),
-                    "SW" => new Point2D(x1, y2),
-                    "SE" => new Point2D(x2, y2),
-                    _ => new Point2D(),
-                };
-                if (DoorRandom && !Constrained)
-                {
-                    doorLocation = new(doorXRnd, doorYRnd);
-                }
-                Rect2D R = new(x1, y1, x2, y2, doorLocation);
-
-                Dictionary<string, List<Cell>> Region = Z.GetHutRegion(R, true);
-                Regions.Add($"Abode:{(isUnique ? "Cook" : abodeNumber)}", Region);
-
-                foreach (Cell outerCell in Region[OUTER])
-                {
-                    if (Region[INNER].Contains(outerCell))
-                        Region[INNER].Remove(outerCell);
-                    regionCells.Add(outerCell);
-                    outerCell.ClearAndAddObject(8.in100() ? "WallOrDebrisLimestoneNoSmall" : Wall);
-                }
-                foreach (Cell innerCell in Region[INNER])
-                {
-                    regionCells.Add(innerCell);
-                    PaintCell(innerCell.Clear(), Floor);
-                }
-                Cell doorCell = Region[DOOR][0];
-                R.Door.x = doorCell.X;
-                R.Door.y = doorCell.Y;
-
-                Rect2D P = R.GetCellSide(R.Door) switch
-                {
-                    "N" => new(R.x1, R.y1 + 1, R.x2, R.y2, R.Door),
-                    "S" => new(R.x1, R.y1, R.x2, R.y2 - 1, R.Door),
-                    "E" => new(R.x1, R.y1, R.x2 - 1, R.y2, R.Door),
-                    "W" => new(R.x1 + 1, R.y1, R.x2, R.y2, R.Door),
-                    _ => R,
-                };
-
-                List<Location2D> popArea = new();
-                List<Cell> popCells = new();
-                foreach (Point2D point in P.ReduceBy(1,1).getPoints())
-                {
-                    Cell pointCell = Z.GetCell(point);
-                    Location2D pointLocation = pointCell.Location;
-                    if (!popArea.Contains(pointLocation))
-                        popArea.Add(pointLocation);
-                    if (!popCells.Contains(pointCell))
-                        popCells.Add(pointCell);
-                }
-                Region.Add(POPULATION, popCells);
-
-                doorCell.Clear();
-                foreach (Cell adjacentCell in doorCell.GetCardinalAdjacentCells())
-                {
-                    if (!Region[OUTER].Contains(adjacentCell) && !Region[INNER].Contains(adjacentCell))
+                    abodeNumberTotal++;
+                    bool isUnique = abodeSpawner.Blueprint == "GiantAbodeSpawner Cook";
+                    string abodeType = isUnique ? "Cook" : abodeAllocations.Draw();
+                    bool isBasic = abodeType == "Base";
+                    bool isTinker = abodeType == "Tinker";
+                    bool isApothecary = abodeType == "Apothecary";
+                    bool isDromad = abodeType == "Dromad";
+                    if (!isBasic && !isUnique)
                     {
-                        adjacentCell.Clear().RequireObject("DirtPath");
+                        abodeSpawner.SetStringProperty("ContentsTable", $"Giant Abode {abodeType}");
                     }
-                }
+                    string abodeDesignation = $"Abode:{(!isBasic ? abodeType : ++abodeNumber)}";
+                    string abodeLabel = $"HNPS_GigantismPlus::{abodeDesignation}::";
 
-                GameObject door = EncountersAPI.GetAnObject((GameObjectBlueprint blueprint)
-                => blueprint.InheritsFrom("Door")
-                && !blueprint.HasTag("BaseObject")
-                && !blueprint.Name.Contains("Double")
-                && blueprint.Parts.ContainsKey("ModGigantic")
-                && blueprint.Tier < 3
-                && !blueprint.Name.Contains("Gate"));
-                if (door != null)
-                    doorCell.AddObject(door);
+                    string DoorDirection = abodeSpawner.GetTagOrStringProperty("DoorDirection");
+                    string ContentsTable = abodeSpawner.GetTagOrStringProperty("ContentsTable");
+                    string Floor = abodeSpawner.GetTagOrStringProperty("Floor");
+                    string Wall = abodeSpawner.GetTagOrStringProperty("Wall");
+                    int radius = abodeSpawner.GetIntProperty("Radius");
+                    bool DoorRandom = abodeSpawner.HasTagOrStringProperty("DoorRandom");
+                    bool Constrained = DoorRandom && abodeSpawner.GetTagOrStringProperty("DoorRandom") == "Constrained";
+                    radius = radius != 0 ? radius : 2;
 
-                string popRegionString = string.Empty;
-                foreach (Location2D popLocation in popArea)
-                {
-                    popRegionString += popRegionString == string.Empty ? $"[{popLocation}]" : $",[{popLocation}]";
-                }
-                Debug.Entry(4, $"populationRegion: {popRegionString}", Indent: 1, Toggle: getDoDebug());
-                Debug.Entry(4,
-                    $"> foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()})",
-                    Indent: 1, Toggle: getDoDebug());
-                foreach (PopulationResult item in PopulationManager.Generate(ContentsTable, "zonetier", Z.NewTier.ToString()))
-                {
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
+                    trashCan.Add(abodeSpawner);
 
-                    Debug.Entry(4, $"item: {item.Blueprint}, number: {item.Number}", Indent: 1, Toggle: getDoDebug());
+                    Cell cell = abodeSpawner.CurrentCell;
+                    cell.RemoveObject(abodeSpawner, Forced: true, Silent: true);
 
-                    Debug.Entry(4,
-                        $"> for (int num = 0; num < item.Number; num++)",
-                        Indent: 2);
-                    for (int num = 0; num < item.Number; num++)
+                    cell.Clear();
+                    int x1 = cell.X - radius;
+                    int y1 = cell.Y - radius;
+                    int x2 = cell.X + radius;
+                    int y2 = cell.Y + radius;
+                    int doorXRnd = Stat.Roll(x1 + 1, x2 - 1);
+                    int doorYRnd = Stat.Roll(y1 + 1, y2 - 1);
+                    int doorX = Constrained ? doorXRnd : cell.X;
+                    int doorY = Constrained ? doorYRnd : cell.Y;
+                    Point2D doorLocation = DoorDirection switch
                     {
+                        "N" => new Point2D(doorX, y1),
+                        "S" => new Point2D(doorX, y2),
+                        "E" => new Point2D(x2, doorY),
+                        "W" => new Point2D(x1, doorY),
+                        "NW" => new Point2D(x1, y1),
+                        "NE" => new Point2D(x2, y1),
+                        "SW" => new Point2D(x1, y2),
+                        "SE" => new Point2D(x2, y2),
+                        _ => new Point2D(),
+                    };
+                    if (DoorRandom && !Constrained)
+                    {
+                        doorLocation = new(doorXRnd, doorYRnd);
+                    }
+                    Rect2D R = new(x1, y1, x2, y2, doorLocation);
+
+                    Dictionary<string, List<Cell>> Region = Z.GetHutRegion(R, true);
+                    Regions.Add(abodeDesignation, Region);
+
+                    foreach (Cell outerCell in Region[OUTER])
+                    {
+                        if (Region[INNER].Contains(outerCell))
+                            Region[INNER].Remove(outerCell);
+                        regionCells.Add(outerCell);
+                        outerCell.ClearAndAddObject(8.in100() ? "WallOrDebrisLimestoneNoSmall" : Wall);
+                    }
+                    foreach (Cell innerCell in Region[INNER])
+                    {
+                        regionCells.Add(innerCell);
+                        PaintCell(innerCell.Clear(), Floor);
+                    }
+                    Cell doorCell = Region[DOOR][0];
+                    R.Door.x = doorCell.X;
+                    R.Door.y = doorCell.Y;
+
+                    Rect2D P = R.GetCellSide(R.Door) switch
+                    {
+                        "N" => new(R.x1, R.y1 + 1, R.x2, R.y2, R.Door),
+                        "S" => new(R.x1, R.y1, R.x2, R.y2 - 1, R.Door),
+                        "E" => new(R.x1, R.y1, R.x2 - 1, R.y2, R.Door),
+                        "W" => new(R.x1 + 1, R.y1, R.x2, R.y2, R.Door),
+                        _ => R,
+                    };
+
+                    List<Location2D> popArea = new();
+                    List<Cell> popCells = new();
+                    foreach (Point2D point in P.ReduceBy(1, 1).getPoints())
+                    {
+                        Cell pointCell = Z.GetCell(point);
+                        Location2D pointLocation = pointCell.Location;
+                        if (!popArea.Contains(pointLocation))
+                            popArea.Add(pointLocation);
+                        if (!popCells.Contains(pointCell))
+                            popCells.Add(pointCell);
+                    }
+                    Region.Add(POPULATION, popCells);
+
+                    doorCell.Clear();
+                    foreach (Cell adjacentCell in doorCell.GetCardinalAdjacentCells())
+                    {
+                        if (!Region[OUTER].Contains(adjacentCell) && !Region[INNER].Contains(adjacentCell))
+                        {
+                            adjacentCell.Clear().RequireObject("DirtPath");
+                        }
+                    }
+
+                    GameObject door = EncountersAPI.GetAnObject((GameObjectBlueprint blueprint)
+                    => blueprint.InheritsFrom("Door")
+                    && !blueprint.HasTag("BaseObject")
+                    && !blueprint.Name.Contains("Double")
+                    && blueprint.Parts.ContainsKey("ModGigantic")
+                    && blueprint.Tier < 3
+                    && !blueprint.Name.Contains("Gate"));
+                    if (door != null)
+                        doorCell.AddObject(door);
+
+                    string popRegionString = string.Empty;
+                    foreach (Location2D popLocation in popArea)
+                    {
+                        popRegionString += popRegionString == string.Empty ? $"[{popLocation}]" : $",[{popLocation}]";
+                    }
+                    Debug.Entry(4, $"populationRegion: {popRegionString}", Indent: 1, Toggle: getDoDebug());
+                    Debug.Entry(4,
+                        $"> foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()})",
+                        Indent: 1, Toggle: getDoDebug());
+                    foreach (PopulationResult item in PopulationManager.Generate(ContentsTable, "zonetier", Z.NewTier.ToString()))
+                    {
+                        Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
+
+                        Debug.Entry(4, $"item: {item.Blueprint}, number: {item.Number}", Indent: 1, Toggle: getDoDebug());
+
+                        Debug.Entry(4,
+                            $"> for (int num = 0; num < item.Number; num++)",
+                            Indent: 2);
+                        for (int num = 0; num < item.Number; num++)
+                        {
+                            Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: getDoDebug());
+                            Debug.Entry(4,
+                                $"item: {item.Blueprint}, " +
+                                $"number: {num + 1}/{item.Number}, " +
+                                $"hint: {item.Hint.Quote()}",
+                                Indent: 2, Toggle: getDoDebug());
+
+                            GameObject gameObject = GameObjectFactory.Factory.CreateObject(item.Blueprint);
+                            if (!PlaceObjectInArea(Z, new LocationList(popArea), gameObject, 0, 0, item.Hint))
+                            {
+                                Debug.CheckNah(4, $"Failed to place [{num + 1}]{item.Blueprint}", Indent: 3, Toggle: getDoDebug());
+                            }
+                            else
+                            {
+                                Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3, Toggle: getDoDebug());
+                                if ((gameObject.GetBlueprint().HasTag("Furniture") || gameObject.GetBlueprint().HasTag("Vessel"))
+                                    && gameObject.Physics != null)
+                                {
+                                    string owningFaction = "WrassleGiants";
+                                    gameObject.Physics.Owner = owningFaction;
+                                    Debug.CheckYeh(4, $"{item.Blueprint}: owner set to {owningFaction}", Indent: 4, Toggle: getDoDebug());
+                                }
+                                if (isUnique && item.Blueprint == "Gigantic Oven")
+                                {
+                                    giantOvenCell = gameObject?.CurrentCell;
+                                    Debug.CheckYeh(4, $"Giant Oven location stored", Indent: 4, Toggle: getDoDebug());
+                                }
+                                if (isTinker && item.Blueprint == "Gigantic Multicabinet")
+                                {
+                                    giantMulticabinetCell = gameObject?.CurrentCell;
+                                    Debug.CheckYeh(4, $"Giant Multicabinet location stored", Indent: 4, Toggle: getDoDebug());
+                                }
+                                if (isApothecary && item.Blueprint == "Gigantic Alchemist Table")
+                                {
+                                    giantMulticabinetCell = gameObject?.CurrentCell;
+                                    Debug.CheckYeh(4, $"Giant Alchemist Table location stored", Indent: 4, Toggle: getDoDebug());
+                                }
+                            }
+                        }
                         Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: getDoDebug());
-                        Debug.Entry(4, 
-                            $"item: {item.Blueprint}, " + 
-                            $"number: {num + 1}/{item.Number}, " + 
-                            $"hint: {item.Hint.Quote()}", 
+                        Debug.Entry(4,
+                            $"x for (int num = 0; num < item.Number; num++) >//",
                             Indent: 2, Toggle: getDoDebug());
+                    }
+                    Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
+                    Debug.Entry(4, 
+                        $"x foreach ({nameof(PopulationResult)} item in {nameof(ContentsTable)}: {ContentsTable.Quote()}) >//", 
+                        Indent: 1, Toggle: getDoDebug());
 
-                        GameObject gameObject = GameObjectFactory.Factory.CreateObject(item.Blueprint);
-                        if (!PlaceObjectInArea(Z, new LocationList(popArea), gameObject, 0, 0, item.Hint))
+                    string abodeRegionString = string.Empty;
+                    foreach ((string regionLabel, List<Cell> cells) in Region)
+                    {
+                        zone.SetZoneProperty(abodeLabel + regionLabel, cells.ToStringList().Join(";"));
+                    }
+                }
+                zone.SetZoneProperty($"HNPS_GigantismPlus::Abodes", $"{abodeNumber}");
+                zone.SetZoneProperty($"HNPS_GigantismPlus::AbodesTotal", $"{abodeNumberTotal}");
+                foreach (GameObject trash in trashCan)
+                {
+                    trash.Obliterate(null, true);
+                }
+
+                List<Cell> nonRegionEmptyCells = new();
+                foreach (Cell emptyCell in Z.GetEmptyCells())
+                {
+                    if (!regionCells.Contains(emptyCell)) nonRegionEmptyCells.Add(emptyCell);
+                }
+
+                foreach ((_, Dictionary<string, List<Cell>> region) in Regions)
+                {
+                    Cell nearestEmptyCell = null;
+                    Cell doorCell = region[DOOR][0];
+                    foreach (Cell emptyCell in nonRegionEmptyCells)
+                    {
+                        nearestEmptyCell ??= emptyCell;
+                        if (doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y) < doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y))
+                            nearestEmptyCell = emptyCell;
+                    }
+                    CleanQueue<SortPoint> avoidCells = new();
+                    foreach (Cell avoidCell in regionCells)
+                    {
+                        SortPoint avoidPoint = new(avoidCell.X, avoidCell.Y);
+                        if (!avoidCells.Contains(avoidPoint)) avoidCells.Enqueue(avoidPoint);
+                    }
+                    FindPath path = new(doorCell, nearestEmptyCell, Avoid: avoidCells);
+                    foreach (Cell step in path.Steps)
+                    {
+                        if (step == doorCell) continue;
+                        step.Clear();
+                        if (85.in100())
                         {
-                            Debug.CheckNah(4, $"Failed to place [{num + 1}]{item.Blueprint}", Indent: 3, Toggle: getDoDebug());
+                            step.RequireObject("DirtPath");
                         }
-                        else
+                        if (getDoDebug("CH"))
                         {
-                            Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3, Toggle: getDoDebug());
-                            if (isUnique && item.Blueprint == "Gigantic Oven")
+                            step.HighlightBlue(12);
+                        }
+                    }
+                }
+
+                foreach (Cell cell in GraniteCells)
+                {
+                    if (!cell.GetObjectsThatInheritFrom("Wall").IsNullOrEmpty() && !cell.HasObject("Granite"))
+                    {
+                        bool doRemplacement = true;
+                        foreach (Cell ordinalCell in cell.GetOrdinalAdjacentCells())
+                        {
+                            if (!ordinalCell.GetObjectsThatInheritFrom("Door").IsNullOrEmpty())
                             {
-                                giantOvenCell = gameObject?.CurrentCell;
-                                Debug.CheckYeh(4, $"Giant Oven location stored", Indent: 4, Toggle: getDoDebug());
+                                doRemplacement = false;
+                                break;
                             }
                         }
-                    }
-                    Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: getDoDebug());
-                    Debug.Entry(4,
-                        $"x for (int num = 0; num < item.Number; num++) >//",
-                        Indent: 2, Toggle: getDoDebug());
-                }
-                Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
-                Debug.Entry(4, $"x foreach (PopulationResult item in ContentsTable: {ContentsTable.Quote()}) >//", Indent: 1, Toggle: getDoDebug());
-
-                string abodeRegionString = string.Empty;
-                foreach ((string regionLabel, List<Cell> cells) in Region)
-                {
-                    zone.SetZoneProperty(abodeLabel+regionLabel, cells.ToStringList().Join(";"));
-                }
-            }
-            zone.SetZoneProperty($"HNPS_GigantismPlus::Abodes", $"{abodeNumber}");
-            foreach (GameObject trash in trashCan)
-            {
-                trash.Obliterate(null, true);
-            }
-
-            List<Cell> nonRegionEmptyCells = new();
-            foreach (Cell emptyCell in Z.GetEmptyCells())
-            {
-                if (!regionCells.Contains(emptyCell)) nonRegionEmptyCells.Add(emptyCell);
-            }
-
-            foreach ((_,Dictionary<string, List<Cell>> region) in Regions)
-            {
-                Cell nearestEmptyCell = null;
-                Cell doorCell = region[DOOR][0];
-                foreach (Cell emptyCell in nonRegionEmptyCells)
-                {
-                    nearestEmptyCell ??= emptyCell;
-                    if (doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y) < doorCell.CosmeticDistanceTo(emptyCell.X, emptyCell.Y))
-                        nearestEmptyCell = emptyCell;
-                }
-                CleanQueue<SortPoint> avoidCells = new();
-                foreach(Cell avoidCell in regionCells)
-                {
-                    SortPoint avoidPoint = new(avoidCell.X, avoidCell.Y);
-                    if (!avoidCells.Contains(avoidPoint)) avoidCells.Enqueue(avoidPoint);
-                }
-                FindPath path = new(doorCell, nearestEmptyCell, Avoid: avoidCells);
-                foreach (Cell step in path.Steps)
-                {
-                    if (step == doorCell) continue;
-                    step.Clear();
-                    if (85.in100())
-                    {
-                        step.RequireObject("DirtPath");
-                    }
-                    if (getDoDebug("CH"))
-                    {
-                        step.HighlightBlue(12);
-                    }
-                }
-            }
-
-            foreach (Cell cell in GraniteCells)
-            {
-                if (!cell.GetObjectsThatInheritFrom("Wall").IsNullOrEmpty() && !cell.HasObject("Granite"))
-                {
-                    bool doRemplacement = true;
-                    foreach (Cell ordinalCell in cell.GetOrdinalAdjacentCells())
-                    {
-                        if (!ordinalCell.GetObjectsThatInheritFrom("Door").IsNullOrEmpty())
+                        if (doRemplacement)
                         {
-                            doRemplacement = false;
-                            break;
+                            cell.Clear().AddObject("WallOrDebrisGraniteNoSmall");
                         }
                     }
-                    if (doRemplacement)
-                    {
-                        cell.Clear().AddObject("WallOrDebrisGraniteNoSmall");
-                    }
                 }
-            }
 
-            if (getDoDebug("CH"))
-            {
-                foreach ((_, Dictionary<string, List<Cell>> Region) in Regions)
+                if (getDoDebug("CH"))
                 {
-                    foreach ((string label, List<Cell> subregion) in Region)
+                    foreach ((_, Dictionary<string, List<Cell>> Region) in Regions)
                     {
-                        foreach (Cell cell in subregion)
+                        foreach ((string label, List<Cell> subregion) in Region)
                         {
-                            switch (label)
+                            foreach (Cell cell in subregion)
                             {
-                                case "Inner":
-                                    cell.HighlightCyan(5);
-                                    break;
-                                case "Outer":
-                                    cell.HighlightPurple(3);
-                                    break;
-                                case "Door":
-                                    cell.HighlightRed(8);
-                                    break;
-                                case "Population":
-                                    cell.HighlightGreen(10);
-                                    break;
-                                default:
-                                    break;
+                                switch (label)
+                                {
+                                    case "Inner":
+                                        cell.HighlightCyan(5);
+                                        break;
+                                    case "Outer":
+                                        cell.HighlightPurple(3);
+                                        break;
+                                    case "Door":
+                                        cell.HighlightRed(8);
+                                        break;
+                                    case "Population":
+                                        cell.HighlightGreen(10);
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            GameObject UniqueGiant = The.ZoneManager.PullCachedObject(GiantID, false);
-            if (UniqueGiant == null)
+                GameObject UniqueGiant = The.ZoneManager.PullCachedObject(GiantID, false);
+                if (UniqueGiant == null)
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    UniqueGiant = SecretGiantWhoCooksBuilderExtension.GetTheGiant();
+                }
+                bool failedToGetTinker = false;
+                bool failedToGetApothecary = false;
+                bool failedToGetDromad = false;
+                bool failedToGetPet = false;
+
+                GameObject tinkerGiant = The.ZoneManager.PullCachedObject(TinkerID, false);
+                GameObject apothecaryGiant = The.ZoneManager.PullCachedObject(ApothecaryID, false);
+                GameObject dromadGiant = The.ZoneManager.PullCachedObject(DromadID, false);
+                GameObject petGiant = The.ZoneManager.PullCachedObject(PetID, false);
+
+                if (tinkerGiant == null)
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive {nameof(tinkerGiant)} Villager from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    failedToGetTinker = true;
+                }
+                if (apothecaryGiant == null)
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive {nameof(apothecaryGiant)} Villager from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    failedToGetApothecary = true;
+                }
+                if (dromadGiant == null)
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive {nameof(dromadGiant)} Villager from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    failedToGetDromad = true;
+                }
+                if (petGiant == null)
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive {nameof(petGiant)} Villager from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    failedToGetPet = true;
+                }
+                if (SecretGiantWhoCooksBuilderExtension.TryGenerateGiantVillagers(zone.wX / 10,
+                    out GameObject altTinkerGiant,
+                    out GameObject altApothecaryGiant,
+                    out GameObject altDromadGiant,
+                    out GameObject altPetGiant))
+                {
+                    if (failedToGetTinker)
+                    {
+                        tinkerGiant = altTinkerGiant;
+                    }
+                    if (failedToGetApothecary)
+                    {
+                        apothecaryGiant = altApothecaryGiant;
+                    }
+                    if (failedToGetDromad)
+                    {
+                        petGiant = altPetGiant;
+                    }
+                    if (failedToGetPet)
+                    {
+                        petGiant = altPetGiant;
+                    }
+                }
+
+                List<Cell> uniqueAbodeEmptyInnerCells = Event.NewCellList(
+                    from c in Regions["Abode:Cook"][INNER]
+                    where c.IsEmptyFor(UniqueGiant)
+                    select c);
+                List<Cell> tinkerAbodeEmptyInnerCells = Event.NewCellList(
+                    from c in Regions["Abode:Tinker"][INNER]
+                    where c.IsEmptyFor(tinkerGiant)
+                    select c);
+                List<Cell> apothecaryAbodeEmptyInnerCells = Event.NewCellList(
+                    from c in Regions["Abode:Apothecary"][INNER]
+                    where c.IsEmptyFor(apothecaryGiant)
+                    select c);
+                List<Cell> dromadAbodeEmptyInnerCells = Event.NewCellList(
+                    from c in Regions["Abode:Dromad"][INNER]
+                    where c.IsEmptyFor(dromadGiant)
+                    select c);
+
+                Cell uniqueGiantLocation =
+                    giantOvenCell?.GetEmptyAdjacentCells()?.GetRandomElement()
+                 ?? uniqueAbodeEmptyInnerCells?.GetRandomElement()
+                 ?? zone?.FindFirstObject("Gigantic Oven")?.CurrentCell.GetEmptyAdjacentCells()?.GetRandomElement()
+                 ?? nonRegionEmptyCells?.GetRandomElement()
+                 ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+                Cell tinkerGiantLocation =
+                    giantMulticabinetCell?.GetEmptyAdjacentCells()?.GetRandomElement()
+                 ?? tinkerAbodeEmptyInnerCells?.GetRandomElement()
+                 ?? zone?.FindFirstObject("Gigantic Multicabinet")?.CurrentCell.GetEmptyAdjacentCells()?.GetRandomElement()
+                 ?? nonRegionEmptyCells?.GetRandomElement()
+                 ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+                Cell apothecaryGiantLocation =
+                    giantAlchemistTableCell?.GetEmptyAdjacentCells()?.GetRandomElement()
+                 ?? apothecaryAbodeEmptyInnerCells?.GetRandomElement()
+                 ?? zone?.FindFirstObject("Gigantic Alchemist Table")?.CurrentCell.GetEmptyAdjacentCells()?.GetRandomElement()
+                 ?? nonRegionEmptyCells?.GetRandomElement()
+                 ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+                Cell dromadGiantLocation =
+                    dromadAbodeEmptyInnerCells?.GetRandomElement()
+                 ?? nonRegionEmptyCells?.GetRandomElement()
+                 ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+                Cell petGiantLocation =
+                    nonRegionEmptyCells?.GetRandomElement()
+                 ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+                if (UniqueGiant != null)
+                {
+                    if (uniqueGiantLocation != null)
+                    {
+                        uniqueGiantLocation.AddObject(UniqueGiant);
+                        if (UniqueGiant.Brain != null)
+                        {
+                            UniqueGiant.Brain.StartingCell = new();
+                            UniqueGiant.Brain.StartingCell.SetCell(uniqueGiantLocation);
+                            UniqueGiant.Brain.Wanders = true;
+                            UniqueGiant.Brain.WandersRandomly = true;
+                        }
+                        if (UniqueGiant.TryGetPart(out StewBelly stewBelly))
+                        {
+                            stewBelly.ProcessStartingStews();
+                        }
+                    }
+                    else
+                    {
+                        Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to find suitable cell" +
+                        $"in zone {zone?.ZoneID} " +
+                        $"for Unique {nameof(WrassleGiantHero)} {UniqueGiant?.DebugName ?? NULL}",
+                        Indent: 1);
+                    }
+                }
+                else
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
+                        $"in zone {zone?.ZoneID} " +
+                        $"for cell [{uniqueGiantLocation?.Location}]",
+                        Indent: 1);
+                }
+
+                if (PlaceGiantVillagerInCell(tinkerGiant, tinkerGiantLocation, zone, "Tinker")
+                    && PlaceGiantVillagerInCell(apothecaryGiant, apothecaryGiantLocation, zone, "Apothecary")
+                    && PlaceGiantVillagerInCell(dromadGiant, dromadGiantLocation, zone, "Dromad") 
+                    && PlaceGiantVillagerInCell(petGiant, petGiantLocation, zone, "Pet"))
+                {
+                    Debug.CheckYeh(4, $"all four Giant Villagers successfully placed", 
+                        Indent: 1, Toggle: getDoDebug());
+                }
+                else
+                {
+                    Debug.CheckNah(4, $"at least one Giant Villager failed to be placed",
+                        Indent: 1, Toggle: getDoDebug());
+                }
+            }
+            else
             {
                 Debug.Warn(2,
                     $"{nameof(GiantAbodePopulator)}",
                     $"{nameof(BuildZone)}",
-                    $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
+                    $"Failed to find and {nameof(abodeSpawners)} " +
                     $"in zone {zone?.ZoneID}",
                     Indent: 1);
-
-                UniqueGiant = SecretGiantWhoCooksBuilderExtension.GetTheGiant();
             }
 
-            List<Cell> emptyInnerCells =
-                    (from c in Regions["Abode:Cook"][INNER]
-                     where c.IsEmptyFor(UniqueGiant)
-                     select c).ToList();
+            return true;
+        } //!-- public bool BuildZone(Zone Z)
 
-            Cell giantLocation = 
-                giantOvenCell?.GetEmptyAdjacentCells()?.GetRandomElement()
-             ?? emptyInnerCells?.GetRandomElement()
-             ?? zone?.FindFirstObject("Gigantic Oven")?.CurrentCell.GetEmptyAdjacentCells()?.GetRandomElement()
-             ?? nonRegionEmptyCells?.GetRandomElement() 
-             ?? zone?.GetEmptyCells()?.GetRandomElement();
-
-            if (UniqueGiant != null)
+        public static bool PlaceGiantVillagerInCell(GameObject Villager, Cell HomeCell, Zone Zone, string Context = null)
+        {
+            if (Villager != null)
             {
-                if (giantLocation != null)
+                if (HomeCell != null)
                 {
-                    giantLocation.AddObject(UniqueGiant);
-                    if (UniqueGiant.Brain != null)
+                    HomeCell.AddObject(Villager);
+                    if (Villager.Brain != null)
                     {
-                        UniqueGiant.Brain.StartingCell = new();
-                        UniqueGiant.Brain.StartingCell.SetCell(giantLocation);
-                        UniqueGiant.Brain.Wanders = true;
-                        UniqueGiant.Brain.WandersRandomly = true;
+                        Villager.Brain.StartingCell = new();
+                        Villager.Brain.StartingCell.SetCell(HomeCell);
                     }
-                    if (UniqueGiant.TryGetPart(out StewBelly stewBelly))
+                    if (Villager.TryGetPart(out StewBelly stewBelly))
                     {
                         stewBelly.ProcessStartingStews();
                     }
+                    return true;
                 }
                 else
                 {
@@ -380,24 +616,24 @@ namespace XRL.World.ZoneBuilders
                     $"{nameof(GiantAbodePopulator)}",
                     $"{nameof(BuildZone)}",
                     $"Failed to find suitable cell" +
-                    $"in zone {zone?.ZoneID} " +
-                    $"for Unique {nameof(WrassleGiantHero)} {UniqueGiant?.DebugName ?? NULL}",
+                    $"in {nameof(Zone)} {Zone?.ZoneID} " +
+                    $"for Giant Villager {Context} {Villager?.DebugName ?? NULL}",
                     Indent: 1);
+                    return false;
                 }
             }
-            else 
+            else
             {
                 Debug.Warn(2,
                     $"{nameof(GiantAbodePopulator)}",
                     $"{nameof(BuildZone)}",
                     $"Failed to retreive Unique {nameof(WrassleGiantHero)} from cache " +
-                    $"in zone {zone?.ZoneID} " + 
-                    $"for cell [{giantLocation?.Location}]",
+                    $"in zone {Zone?.ZoneID} " +
+                    $"for cell [{HomeCell?.Location}]",
                     Indent: 1);
+                return false;
             }
-
-            return true;
-        } //!-- public bool BuildZone(Zone Z)
+        }
 
         public static void PaintCell(Cell C, string Floor = null, bool Overwrite = true)
         {

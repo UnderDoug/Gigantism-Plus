@@ -30,9 +30,6 @@ namespace HNPS_GigantismPlus
         private static bool doDebug => true;
         public static bool getDoDebug(string MethodName)
         {
-            if (MethodName == nameof(GigantifyInventory))
-                return false;
-
             if (MethodName == nameof(GetPrioritisedNaturalEquipmentMods))
                 return false;
 
@@ -457,273 +454,10 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false, bool Wish = false, bool Force = false)
+        public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false, bool Wish = false, bool Force = false, string Context = null)
         {
-            if (Creature == null) return; // need to have a creature.
-
-            string creatureBlueprint = Creature?.Blueprint;
-
-            bool creatureIsMerchant = Creature.HasPart<GenericInventoryRestocker>();
-            (DieRoll die, int high) merchantBaseChance = (new("1d5"), 4);
-            (DieRoll die, int high) merchantGrenades = (new("1d2"), 2);
-            (DieRoll die, int high) merchantTradeGoods = (new("1d4"), 4);
-            (DieRoll die, int high) merchantTonics = (new("1d4"), 4);
-            (DieRoll die, int high) merchantRareTonics = (new("1d10"), 10);
-
-            if (Creature.ID.Is("1") && !Creature.HasPart<GigantismPlus>() && !Force) return; // redundancy, just in case.
-            if (!Option && !Force) return; // skip if Option disabled
-            if (!Creature.IsCreature && !Force) return; // skip non-creatures
-            if (Creature.Inventory == null) return; // skip creatures without inventory
-
-            Debug.Entry(3, $"* GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}, Force: {Force})", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-            Debug.Divider(3, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-
-            if (Force)
-            {
-                Option = Force;
-                GrenadeOption = Force;
-            }
-
-            Debug.Entry(3, "Making inventory items gigantic for creature", creatureBlueprint, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-            Debug.Entry(3, $"Creature is merchant", creatureIsMerchant ? "Yeh" : "Nah", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-
-            // Create a copy of the items list to avoid modifying during enumeration
-            List<GameObject> itemsToProcess = new(Creature.GetInventoryAndEquipment());
-
-            if (!itemsToProcess.IsNullOrEmpty())
-            {
-                Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                foreach (GameObject item in itemsToProcess)
-                {
-                    string ItemDebug = item.DebugName;
-                    string ItemName = item.Blueprint;
-                    Debug.DiveIn(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                    int NoThanks = 0;
-                    // Can the item have the gigantic modifier applied?
-                    if (ItemModding.ModificationApplicable("ModGigantic", item))
-                    {
-                        Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        // Is the item already gigantic? Don't attempt to apply it again.
-                        if (item.HasPart<ModGigantic>())
-                        {
-                            Debug.CheckNah(4, "already gigantic", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            NoThanks++;
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4, "not already gigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        // Is the item a natural equipment the creature starts with? don't gigantify.
-                        if (item.IsNaturalEquipment())
-                        {
-                            Debug.CheckNah(4, "Natural Equipment", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            NoThanks++;
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4, "not already gigantic", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        // Is the item a grenade, and is the option not set to include them?
-                        if (item.HasTag("Grenade"))
-                        {
-                            if (!GrenadeOption || creatureIsMerchant)
-                            {
-                                if (!GrenadeOption && !creatureIsMerchant)
-                                {
-                                    Debug.CheckNah(4, "grenade (excluded)", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                    NoThanks++;
-                                }
-                                if (creatureIsMerchant)
-                                {
-                                    Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                    NoThanks++;
-                                }
-                                if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high)
-                                {
-                                    Debug.LoopItem(4,
-                                        $"but!] merchantGrenades {merchantGrenades.die} rolled at or above {merchantGrenades.high}",
-                                        $"NoThanks--;",
-                                        Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                    NoThanks--;
-                                }
-                            }
-                            else if (GrenadeOption)
-                            {
-                                Debug.CheckYeh(4, "grenade (included)", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            }
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4, "not grenade", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
-                        if (item.HasTag("DynamicObjectsTable:TradeGoods") || item.InheritsFrom("BaseCurrency"))
-                        {
-                            Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            NoThanks++;
-
-                            if (creatureIsMerchant && merchantTradeGoods.die.Resolve() >= merchantTradeGoods.high)
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] merchantTradeGoods {merchantTradeGoods.die} rolled at or above {merchantTradeGoods.high}",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                            if (item.HasTagOrProperty("InventoryGigantifierAlwaysAllow"))
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] InventoryGigantifierAlwaysAllow",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4, "not TradeGoods", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        // Is the item a non-rare tonic? Double doses are basically useless in the early game
-                        if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
-                        {
-                            Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            NoThanks++;
-
-                            if (creatureIsMerchant && merchantTonics.die.Resolve() >= merchantTonics.high)
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] merchantTonics {merchantTonics.die} rolled at or above {merchantTonics.high}",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                            if (item.HasTagOrProperty("InventoryGigantifierAlwaysAllow"))
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] InventoryGigantifierAlwaysAllow",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4, "not Tonics_NonRare", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        // Is the item a rare tonic? Double doses are basically useless in the early game
-                        if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
-                        {
-                            Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            NoThanks++;
-
-                            if (creatureIsMerchant && merchantRareTonics.die.Resolve() >= merchantRareTonics.high)
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] merchantRareTonics {merchantRareTonics.die} rolled at or above {merchantRareTonics.high}",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                            if (item.HasTagOrProperty("InventoryGigantifierAlwaysAllow"))
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] InventoryGigantifierAlwaysAllow",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4, "not Rare Tonics", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        // Is the item held by a merchant, and did their roll fail?
-                        if (creatureIsMerchant)
-                        {
-                            Debug.CheckNah(4, "creatureIsMerchant is True", "NoThanks++; x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            NoThanks++;
-
-                            if (merchantBaseChance.die.Resolve() >= merchantBaseChance.high)
-                            {
-                                Debug.LoopItem(4,
-                                    $"but!] merchantBaseChance {merchantBaseChance.die} rolled at or above {merchantBaseChance.high}",
-                                    $"NoThanks--;",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                                NoThanks--;
-                            }
-                            else
-                            {
-                                Debug.LoopItem(4,
-                                    $"and!] merchantBaseChance {merchantBaseChance.die} rolled below {merchantBaseChance.high}",
-                                    "Bummer!",
-                                    Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            }
-                        }
-                        else
-                        {
-                            Debug.CheckYeh(4,
-                                $"creatureIsMerchant is False",
-                                Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        if (NoThanks > 0 && !Wish)
-                        {
-                            Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                            continue;
-                        }
-
-                        string byWish = Wish ? ", by Wish!" : "";
-                        Debug.Entry(3, 
-                            $"Gigantifying {ItemName}{byWish}", 
-                            Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-
-                        item.ApplyModification("ModGigantic");
-                        if (!item.HasPart<ModGigantic>())
-                        {
-                            Debug.Entry(3, ItemName, "/!\\ Gigantification Failed",
-                                Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-                        else
-                        {
-                            Debug.Entry(3, 
-                                ItemName, "has been Gigantified", 
-                                Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        }
-
-                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                    }
-                    else
-                    {
-                        Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                    }
-                }
-                Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                Debug.Entry(4, "x foreach (GameObject item in itemsToProcess) >//", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-            }
-            
-            // Now equip all items that should be equipped
-            if (!Wish)
-            {
-                Debug.Entry(3, "Creature.WantToReequip()", Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-                Creature.WantToReequip();
-            }
-
-            Debug.Divider(3, Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-            Debug.Entry(3, 
-                $"x GigantifyInventory(Option: {Option}, GrenadeOption: {GrenadeOption}) *//", 
-                Indent: 1, Toggle: getDoDebug(nameof(GigantifyInventory)));
-        } //!-- public static void GigantifyInventory(this GameObject Creature, bool Option = true, bool GrenadeOption = false)
+            InventoryGigantifier.GigantifyInventory(Creature, Option, GrenadeOption, Wish, Force, Context);
+        }
         
         public static void SetSwingSound(this GameObject Object, string Path)
         {
@@ -1783,10 +1517,12 @@ namespace HNPS_GigantismPlus
         public static T Draw<T>(this Dictionary<T, int> WeightedList)
             where T : class
         {
-            T Output = WeightedList.Sample();
-            if(--WeightedList[Output] == 0)
-                WeightedList.Remove(Output);
-            return Output;
+            T ticket = WeightedList.Sample();
+            if (--WeightedList[ticket] == 0)
+            {
+                WeightedList.Remove(ticket);
+            }
+            return ticket;
         }
         public static void AddTicket<T>(this Dictionary<T, int> WeightedList, T Ticket)
             where T : class

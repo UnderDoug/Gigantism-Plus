@@ -198,7 +198,7 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             bool wantObjectCreated = ParentObject.InheritsFrom(BASE_WRASSLE_GEAR);
-            bool wantKineticResist = ParentObject.InheritsFrom(WRASSLE_RING_ROPES);
+            bool wantKineticResist = EnablePrereleaseContent && ParentObject.InheritsFrom(WRASSLE_RING_ROPES);
             bool wantEquipped =
                 ParentObject.InheritsFrom(BASE_WRASSLE_GEAR)
              || ParentObject.InheritsFrom(FOLDING_CHAIR)
@@ -207,7 +207,8 @@ namespace XRL.World.Parts
                 ParentObject.InheritsFrom(BASE_WRASSLE_GEAR)
              || (ParentObject.HasPart<Armor>() && ParentObject.HasPart<MeleeWeapon>());
             bool wantLateBeforeApplyDamage =
-                ParentObject.InheritsFrom(WRASSLE_RING_ROPES)
+                EnablePrereleaseContent 
+             && ParentObject.InheritsFrom(WRASSLE_RING_ROPES)
              || ParentObject.InheritsFrom(FOLDING_CHAIR);
             bool wantInventoryActions =
                 ParentObject.InheritsFrom(WRASSLE_RING_ROPES);

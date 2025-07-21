@@ -67,14 +67,18 @@ namespace XRL.World.ObjectBuilders
         {
             bool isMeal = Context == "Meal";
 
+            bool isVillage = Context == "Village";
+
             int Level = !isMeal ? GetLevel() : 1;
             int Stews = !isMeal ? GetStews() : 0;
             int ObjectTier = GetObjectTier(Object);
             int Tier = GetTier(ObjectTier);
 
+            string namePrefix = !isVillage ? NamePrefix : null;
+
             bool asThoughMutant = isMeal;
 
-            Gigantify(Object, Level, Stews, Tier, NamePrefix, Context, asThoughMutant);
+            Gigantify(Object, Level, Stews, Tier, namePrefix, Context, asThoughMutant);
         }
 
         public static int GetLevel(int StartsAt = 1, string DieString = "1d3", int Step = 2, int Limit = 16, int Indent = 2)
@@ -143,9 +147,13 @@ namespace XRL.World.ObjectBuilders
                 Debug.Entry(4, $"Rolling Stews...", Indent: indent + 1, Toggle: getDoDebug());
                 int startingStews = Stews ?? Stat.Roll("2d2");
 
+                string generatesWithStews = Creature.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, "");
+                Creature.SetStringProperty(GNT_START_STEWS_PROPLABEL, $"{generatesWithStews}+{startingStews}");
                 Debug.LoopItem(4, nameof(startingStews), $"{startingStews}", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, nameof(generatesWithStews), $"{generatesWithStews}", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, nameof(GNT_START_STEWS_PROPLABEL), Creature.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, ""), 
+                    Indent: indent + 2, Toggle: getDoDebug());
 
-                Creature.SetIntProperty(GNT_START_STEWS_PROPLABEL, startingStews);
                 if (!Creature.TryGetPart(out StewBelly stewBelly))
                 {
                     stewBelly = Creature.RequirePart<StewBelly>();

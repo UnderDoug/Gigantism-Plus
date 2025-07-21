@@ -1,6 +1,6 @@
-﻿using HNPS_GigantismPlus.Harmony;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
 using XRL;
 using XRL.World;
 using XRL.World.Capabilities;
@@ -8,7 +8,11 @@ using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
+using XRL.World.WorldBuilders;
 using XRL.World.ZoneBuilders;
+
+using HNPS_GigantismPlus.Harmony;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
 using static XRL.World.Parts.ModNaturalEquipmentBase;

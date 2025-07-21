@@ -63,6 +63,7 @@ namespace HNPS_GigantismPlus
         public const string SCRT_GNT_ZONE_MAP1_CENTRE = "HNPS_GiantCrater_01_Center.rpm";
         public const string SCRT_GNT_ZONE_MAP2_CENTRE = "HNPS_GiantCrater_02_Center.rpm";
         public const string SCRT_GNT_SCRT_ID = "$HNPS_Giant_KnowsHowToCook";
+        public const string SCRT_GNT_VLG_FCT = "WrassleGiants";
         public const string SCRT_GNT_UNQ_STATE = "HNPS_Giant_KnowsHowToCook_State";
         public const string SCRT_GNT_HERO_TMPLT = "HNPS_SpecialHeroTemplate_SecretGiant";
         public const string SCRT_GNT_RECIPE = "SeriouslyThickStew";

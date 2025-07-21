@@ -255,7 +255,7 @@ namespace HNPS_GigantismPlus
                 }
                 if (itemConvertor.ConversionTag == "WireExtruderOutput")
                 {
-                    E.AddGeneralElement("extrudes", "double the additional wire from gigantic materials");
+                    E.AddGeneralElement("extrude", "double the additional wire from gigantic materials");
                 }
             }
 

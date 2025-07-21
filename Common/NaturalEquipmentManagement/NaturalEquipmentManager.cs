@@ -33,13 +33,14 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
-                nameof(BodyPartsUpdatedEvent),
-                nameof(AfterBodyPartsUpdatedEvent),
             };
             List<object> dontList = new()
             {
                 'R',    // Removal
-                "S"     // Serialisation
+                "S",    // Serialisation
+                nameof(BodyPartsUpdatedEvent),
+                nameof(AfterBodyPartsUpdatedEvent),
+                nameof(BeforeUpdateBodyPartsEvent),
             };
 
             if (what != null && doList.Contains(what))
@@ -232,7 +233,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(BodyPartsUpdatedEvent)} E)",
+                + $"{nameof(BeforeUpdateBodyPartsEvent)} E)",
                 Indent: 0, Toggle: doDebug);
 
             if (E.Creature != null && E.Creature == ParentObject)
@@ -259,7 +260,7 @@ namespace XRL.World.Parts
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(BodyPartsUpdatedEvent)}"
+                + $"{nameof(BeforeUpdateBodyPartsEvent)}"
                 + $" E.Creature: {E.Creature?.DebugName ?? NULL}) @//",
                 Indent: 0, Toggle: doDebug);
 

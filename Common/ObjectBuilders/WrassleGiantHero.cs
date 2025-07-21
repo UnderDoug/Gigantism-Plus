@@ -135,11 +135,7 @@ namespace XRL.World.ObjectBuilders
 
             Debug.LoopItem(4, $"Unique?", Good: Unique, Indent: indent + 1, Toggle: getDoDebug());
 
-            string nameSpecial = Unique ? "Unique" : "Hero";
-
-            Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: indent + 1, Toggle: getDoDebug());
-
-            Creature.SetStringProperty("Culture", "WrassleGiant");
+            
 
             Creature.SetStringProperty("Role", Unique ? "Leader" : "Hero");
 
@@ -315,6 +311,8 @@ namespace XRL.World.ObjectBuilders
 
             Debug.LoopItem(4, $"Configuring Brain", Indent: indent + 1, Toggle: getDoDebug());
 
+            Creature.Brain ??= Creature.RequirePart<Brain>();
+
             Creature.Brain.Mobile = true;
             Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}", 
                 Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
@@ -340,6 +338,11 @@ namespace XRL.World.ObjectBuilders
             {
                 Debug.LoopItem(4, $"{creatureFaction}", $"{creatureRep}", Indent: indent + 3, Toggle: getDoDebug());
             }
+            string nameSpecial = Unique ? "Unique" : "Hero";
+
+            Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: indent + 1, Toggle: getDoDebug());
+
+            Creature.SetStringProperty("Culture", "WrassleGiant");
 
             int MentalMutations = 0;
             int PhysicalMutations = 0;
@@ -914,6 +917,31 @@ namespace XRL.World.ObjectBuilders
             {
                 Debug.CheckYeh(4, $"Removed {nameof(ReplaceObject)}", Indent: indent + 3, Toggle: getDoDebug());
                 Creature.RemovePart(replaceObject);
+            }
+            if (Creature.TryGetPart(out Lovely lovely))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(Lovely)}", Indent: indent + 3, Toggle: getDoDebug());
+                Creature.RemovePart(lovely);
+            }
+            if (Creature.TryGetPart(out SecretObject secretObject))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(SecretObject)}", Indent: indent + 3, Toggle: getDoDebug());
+                Creature.RemovePart(secretObject);
+            }
+            if (Creature.TryGetPart(out ConvertSpawner convertSpawner))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(ConvertSpawner)}", Indent: indent + 3, Toggle: getDoDebug());
+                Creature.RemovePart(convertSpawner);
+            }
+            if (Creature.TryGetPart(out AIShopper aIShopper))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(AIShopper)}", Indent: indent + 3, Toggle: getDoDebug());
+                Creature.RemovePart(aIShopper);
+            }
+            if (Creature.TryGetPart(out AIPilgrim aIPilgrim))
+            {
+                Debug.CheckYeh(4, $"Removed {nameof(AIPilgrim)}", Indent: indent + 3, Toggle: getDoDebug());
+                Creature.RemovePart(aIPilgrim);
             }
 
             Creature.FireEvent("VillageInit");

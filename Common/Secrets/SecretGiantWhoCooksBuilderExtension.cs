@@ -461,6 +461,8 @@ namespace XRL.World.WorldBuilders
             {
                 Villager.SetStringProperty("Merchant", "You betcha!");
                 inventoryRestocker = Villager.RequirePart<GenericInventoryRestocker>();
+                inventoryRestocker.Clear();
+                inventoryRestocker.AddTable($"Giant {Context} Wares");
                 conversationScript = Villager.RequirePart<ConversationScript>();
             }
 
@@ -561,7 +563,7 @@ namespace XRL.World.WorldBuilders
 
                 for (int i = 0; i <= 2 && Tier > i; i++)
                 {
-                    inventoryRestocker.Clear();
+                    
                     inventoryRestocker.AddTable($"Tier{(Tier - i).ToStringCached()}Wares");
                 }
                 heroTemplate = $"Dromad{Context}";

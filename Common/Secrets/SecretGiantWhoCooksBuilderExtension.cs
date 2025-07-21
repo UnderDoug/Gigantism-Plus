@@ -487,6 +487,7 @@ namespace XRL.World.WorldBuilders
             if (isApothecary)
             {
                 baseVillagerBlueprintName = "HumanApothecary";
+                conversationScriptID = "herbalist";
             }
 
             if ((isTinker && !Villager.InheritsFrom("HumanTinker")) || (isApothecary && !Villager.InheritsFrom("HumanApothecary")))

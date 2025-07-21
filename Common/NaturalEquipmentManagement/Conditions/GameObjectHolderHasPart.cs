@@ -1,5 +1,6 @@
 ﻿using System;
 using XRL.World;
+using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
@@ -22,12 +23,21 @@ namespace HNPS_GigantismPlus
             : this(Source?.Part)
         {
         }
+        public GameObjectHolderHasPart(GameObjectWielderHasPart Source)
+            : this(Source?.Part)
+        {
+        }
 
         public override bool Check(GameObject GameObject)
         {
             return (GameObject?.Holder == null && !FalseIfSubjectNull)
                 || Part.IsNullOrEmpty() 
                 || GameObject.Holder.HasPart(Part);
+        }
+
+        public static implicit operator GameObjectHolderHasPart(GameObjectWielderHasPart Condition)
+        {
+            return new(Condition);
         }
     }
 }

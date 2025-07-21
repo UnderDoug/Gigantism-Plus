@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using XRL.Collections;
 using XRL.World;
+using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
@@ -28,7 +29,7 @@ namespace HNPS_GigantismPlus
     /// </code>
     /// </example>
     [Serializable]
-    public abstract class ICondition<T> : IComposite 
+    public abstract class ICondition<T> : IComposite
         where T : class, new()
     {
         public bool FalseIfSubjectNull;
@@ -37,7 +38,7 @@ namespace HNPS_GigantismPlus
         {
             FalseIfSubjectNull = false;
         }
-        public ICondition(bool FalseIfSubjectNull)
+        public ICondition(bool FalseIfSubjectNull = false)
         {
             this.FalseIfSubjectNull = FalseIfSubjectNull;
         }
@@ -83,5 +84,7 @@ namespace HNPS_GigantismPlus
             return (Subject == null && !FalseIfSubjectNull)
                 || !Check(Subject);
         }
+
+        public virtual bool this[T Subject] => Check(Subject);
     }
 }

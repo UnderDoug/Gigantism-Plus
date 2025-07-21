@@ -127,15 +127,15 @@ namespace XRL.World.Parts
 
             public virtual bool CheckCondition(GameObject Equipment = null)
             {
-                return Equipment == null || Condition == null || Condition.Check(Equipment);
+                return Equipment == null || Condition == null || Condition[Equipment];
             }
             public virtual bool CheckAnyConditions(GameObject Equipment = null)
             {
-                return Equipment == null || AnyConditions.IsNullOrEmpty() || AnyConditions.Check(Equipment);
+                return Equipment == null || AnyConditions.IsNullOrEmpty() || AnyConditions[Equipment];
             }
             public virtual bool CheckAllConditions(GameObject Equipment = null)
             {
-                return Equipment == null || AllConditions.IsNullOrEmpty() || AllConditions.Check(Equipment);
+                return Equipment == null || AllConditions.IsNullOrEmpty() || AllConditions[Equipment];
             }
             public virtual bool Check(GameObject Equipment = null)
             {

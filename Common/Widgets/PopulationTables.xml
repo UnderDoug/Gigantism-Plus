@@ -393,11 +393,12 @@
 
   <population Name="Giant Abode Tinker">
     <group Name="Contents" Style="pickeach">
-      <object Chance="100" Number="1" Blueprint="Gigantic Wire Extruder" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AlongWall" />
       <object Chance="100" Number="1" Blueprint="Gigantic Fusion Power Station" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Wire Extruder" Hint="AdjacentToEndsWith: PowerLine" />
       
       <table Chance="100" Name="Giant Abode Base" />
       
@@ -442,6 +443,23 @@
     </group>
   </population>
 
+  <population Name="Giant Abode Gutsmonger">
+    <group Name="Contents" Style="pickeach">
+      <table Chance="100" Name="Giant Abode Base" />
+      
+      <group Chance="100" Name="Table" Style="pickone">
+        <table Weight="3" Number="1" Name="Gigantic Table Basic" Hint="AdjacentToEndsWith: Chair" />
+        <table Weight="1" Number="1" Name="Gigantic Table Nice" Hint="AdjacentToEndsWith: Chair" />
+      </group>
+
+      <object Chance="100" Number="1" Blueprint="CyberneticsTerminal2" Hint="AlongWall" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Unicomputer"  Hint="AdjacentToEndsWith: Corpse"/>
+      <object Chance="100" Number="1" Blueprint="Gigantic Fusion Pumping Station" Hint="AdjacentToEndsWith: Gigantic Unicomputer" />
+      
+      <table Chance="100" Number="0-2" Name="Gigantic Bookshelves" Hint="AlongWall" />
+    </group>
+  </population>
+
   <!-- 
   
         Dynamic Merchant Tables 
@@ -462,8 +480,20 @@
   <population Name="Giant Merchant Wares">
     <group Name="Items" Style="PickOne">
       <table Weight="50" Name="Tier{zonetier}Wares" />
-      <table Chance="5" Name="Tier{zonetier-1}Wares" />
-      <table Chance="1000" Name="Tier{zonetier+1}Wares" />
+      <table Weight="5" Name="Tier{zonetier-1}Wares" />
+      <table Weight="1000" Name="Tier{zonetier+1}Wares" />
+    </group>
+  </population>
+
+  <population Name="Giant Gutsmonger Wares">
+    <group Name="Items" Style="Pickeach">
+      <table Name="Cybernetics{zonetier}" Number="2-3" />
+      <table Name="Cybernetics{zonetier+1}" Number="2-3" />
+      <table Name="Cybernetics{zonetier-1}" Number="2-3" />
+      <table Chance="5" Name="Cybernetics2" Number="0-2" />
+      <table Chance="50" Name="Cybernetics4" Number="0-2" />
+      <table Chance="35" Name="Cybernetics6" Number="0-2" />
+      <table Chance="5" Name="Cybernetics8" Number="0-2" />
     </group>
   </population>
   

@@ -57,6 +57,7 @@ namespace XRL.World.ZoneBuilders
         public string TinkerID;
         public string ApothecaryID;
         public string DromadID;
+        public string GutsmongerID;
         public string PetID;
 
         public GiantAbodePopulator()
@@ -66,6 +67,7 @@ namespace XRL.World.ZoneBuilders
             TinkerID = null;
             ApothecaryID = null;
             DromadID = null;
+            GutsmongerID = null;
             PetID = null;
         }
 
@@ -97,8 +99,13 @@ namespace XRL.World.ZoneBuilders
                 { "Tinker", 1 },
                 { "Apothecary", 1 },
                 { "Dromad", 1 },
-                { "Base", abodeSpawners.Count - 4 },
+                { "Gutsmonger", 1 },
             };
+
+            if (abodeSpawners.Count - 5 > 0)
+            {
+                abodeAllocations.Add("Base", abodeSpawners.Count - 5);
+            }
 
             if (!abodeSpawners.IsNullOrEmpty())
             {
@@ -111,6 +118,7 @@ namespace XRL.World.ZoneBuilders
                     bool isTinker = abodeType == "Tinker";
                     bool isApothecary = abodeType == "Apothecary";
                     bool isDromad = abodeType == "Dromad";
+                    bool isGutsmonger = abodeType == "Gutsmonger";
                     if (!isBasic && !isUnique)
                     {
                         abodeSpawner.SetStringProperty("ContentsTable", $"Giant Abode {abodeType}");
@@ -404,11 +412,13 @@ namespace XRL.World.ZoneBuilders
                 bool failedToGetTinker = false;
                 bool failedToGetApothecary = false;
                 bool failedToGetDromad = false;
+                bool failedToGetGutsmonger = false;
                 bool failedToGetPet = false;
 
                 GameObject tinkerGiant = The.ZoneManager.PullCachedObject(TinkerID, false);
                 GameObject apothecaryGiant = The.ZoneManager.PullCachedObject(ApothecaryID, false);
                 GameObject dromadGiant = The.ZoneManager.PullCachedObject(DromadID, false);
+                GameObject gutsmongerGiant = The.ZoneManager.PullCachedObject(GutsmongerID, false);
                 GameObject petGiant = The.ZoneManager.PullCachedObject(PetID, false);
 
                 if (tinkerGiant == null)
@@ -444,6 +454,17 @@ namespace XRL.World.ZoneBuilders
 
                     failedToGetDromad = true;
                 }
+                if (gutsmongerGiant == null)
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive {nameof(gutsmongerGiant)} Villager from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    failedToGetGutsmonger = true;
+                }
                 if (petGiant == null)
                 {
                     Debug.Warn(2,
@@ -456,9 +477,11 @@ namespace XRL.World.ZoneBuilders
                     failedToGetPet = true;
                 }
                 if (SecretGiantWhoCooksBuilderExtension.TryGenerateGiantVillagers(zone.wX / 10,
+                    HeroDetailColor: UniqueGiant.WrassleID()?.SecondaryColor,
                     out GameObject altTinkerGiant,
                     out GameObject altApothecaryGiant,
                     out GameObject altDromadGiant,
+                    out GameObject altGutsmongerGiant,
                     out GameObject altPetGiant))
                 {
                     if (failedToGetTinker)
@@ -471,7 +494,11 @@ namespace XRL.World.ZoneBuilders
                     }
                     if (failedToGetDromad)
                     {
-                        petGiant = altPetGiant;
+                        dromadGiant = altDromadGiant;
+                    }
+                    if (failedToGetGutsmonger)
+                    {
+                        gutsmongerGiant = altGutsmongerGiant;
                     }
                     if (failedToGetPet)
                     {
@@ -493,6 +520,10 @@ namespace XRL.World.ZoneBuilders
                     select c);
                 List<Cell> dromadAbodeEmptyInnerCells = Event.NewCellList(
                     from c in Regions["Abode:Dromad"][INNER]
+                    where c.IsEmptyFor(dromadGiant)
+                    select c);
+                List<Cell> gutsmongerAbodeEmptyInnerCells = Event.NewCellList(
+                    from c in Regions["Abode:Gutsmonger"][INNER]
                     where c.IsEmptyFor(dromadGiant)
                     select c);
 
@@ -519,6 +550,11 @@ namespace XRL.World.ZoneBuilders
 
                 Cell dromadGiantLocation =
                     dromadAbodeEmptyInnerCells?.GetRandomElement()
+                 ?? nonRegionEmptyCells?.GetRandomElement()
+                 ?? zone?.GetEmptyCells()?.GetRandomElement();
+
+                Cell gutsmongerGiantLocation =
+                    gutsmongerAbodeEmptyInnerCells?.GetRandomElement()
                  ?? nonRegionEmptyCells?.GetRandomElement()
                  ?? zone?.GetEmptyCells()?.GetRandomElement();
 
@@ -568,9 +604,10 @@ namespace XRL.World.ZoneBuilders
                 if (PlaceGiantVillagerInCell(tinkerGiant, tinkerGiantLocation, zone, "Tinker")
                     && PlaceGiantVillagerInCell(apothecaryGiant, apothecaryGiantLocation, zone, "Apothecary")
                     && PlaceGiantVillagerInCell(dromadGiant, dromadGiantLocation, zone, "Dromad") 
+                    && PlaceGiantVillagerInCell(gutsmongerGiant, gutsmongerGiantLocation, zone, "Gutsmonger")
                     && PlaceGiantVillagerInCell(petGiant, petGiantLocation, zone, "Pet"))
                 {
-                    Debug.CheckYeh(4, $"all four Giant Villagers successfully placed", 
+                    Debug.CheckYeh(4, $"all five Giant Villagers successfully placed", 
                         Indent: 1, Toggle: getDoDebug());
                 }
                 else

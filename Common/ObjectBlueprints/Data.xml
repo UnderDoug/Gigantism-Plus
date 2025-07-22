@@ -35,5 +35,14 @@
     <tag Name="HeroSelfPreservationThreshold" Value="30" />
     <tag Name="HeroMinLevel" Value="25" />
   </object>
+
+  <object Name="SpecialVillagerHeroTemplate_Gutsmonger" Inherits="SpecialVillagerHeroTemplate">
+    <tag Name="HeroEgoBoost" Value="3" />
+    <tag Name="HeroColorString" Value="&amp;w" />
+    <tag Name="HeroTileColor" Value="&amp;w" />
+    <tag Name="HeroMentalMutations" Value="0" />
+    <tag Name="HeroPhysicalMutations" Value="0" />
+    <tag Name="HeroSelfPreservationThreshold" Value="25" />
+  </object>
   
 </objects>

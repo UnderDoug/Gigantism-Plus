@@ -619,9 +619,9 @@ namespace HNPS_GigantismPlus
             return null;
         }
 
-        public static bool InheritsFrom(this GameObject Object, string Blueprint)
+        public static bool InheritsFrom(this GameObject Object, string Blueprint, bool IncludeSelf = true)
         {
-            return Object.Blueprint == Blueprint || Object.GetBlueprint().InheritsFrom(Blueprint);
+            return (IncludeSelf && Object.Blueprint == Blueprint) || Object.GetBlueprint().InheritsFrom(Blueprint);
         }
 
         // partially repurposed from https://stackoverflow.com/a/32184652
@@ -2188,7 +2188,7 @@ namespace HNPS_GigantismPlus
         public static bool TryAdd<T>(this List<T> List, T Item)
             where T : class
         {
-            if (!List.Contains(Item))
+            if (Item != null && !List.Contains(Item))
             {
                 List.Add(Item);
                 return true;

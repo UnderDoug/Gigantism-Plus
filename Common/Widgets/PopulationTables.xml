@@ -60,10 +60,14 @@
     </group>
   </population>
 
-  <population Name="Gigantic Bed Basic">
+  <population Name="Gigantic Bed Camp">
     <group Name="Items" Style="pickone">
       <object Weight="3" Number="1" Blueprint="Gigantic Bedroll" />
-      <object Weight="1" Number="1" Blueprint="Gigantic Crib" />
+      <object Weight="2" Number="1" Blueprint="Gigantic Hammock" />
+    </group>
+  </population>
+  <population Name="Gigantic Bed Basic">
+    <group Name="Items" Style="pickone">
       <object Weight="1" Number="1" Blueprint="Gigantic Folding Cot" />
       <object Weight="2" Number="1" Blueprint="Gigantic Hammock" />
       <object Weight="1" Number="1" Blueprint="Gigantic Kline" />
@@ -81,6 +85,12 @@
     <group Name="Items" Style="pickone">
       <table Weight="3" Name="Gigantic Bed Basic" />
       <table Weight="1" Name="Gigantic Bed Luxury" />
+    </group>
+  </population>
+  <population Name="Gigantic Bed Additional">
+    <group Name="Items" Style="pickone">
+      <object Weight="1" Number="1" Blueprint="Gigantic Crib" />
+      <table Weight="3" Name="Gigantic Bed Camp" />
     </group>
   </population>
 
@@ -335,7 +345,7 @@
     </group>
   </population>
 
-  <population Name="Gigantic Powerlines">
+  <population Name="Gigantic PowerLines">
     <group Name="Items" Style="pickone">
       <object Weight="4" Number="1" Blueprint="Gigantic PowerLine" />
       <object Weight="1" Number="1" Blueprint="Gigantic HeavyPowerLine" />
@@ -356,6 +366,7 @@
       <table Chance="100" Number="1" Name="Gigantic Chair" Hint="AdjacentToEndsWith: Table" />
       
       <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AlongWall" />
+      <table Chance="35" Number="1" Name="Gigantic Bed Additional" />
 
       <group Name="Storage" Style="pickeach">
         <table Number="1" Chance="75" Name="Gigantic Container Not Chest" Hint="InsideCorner" />
@@ -393,11 +404,14 @@
 
   <population Name="Giant Abode Tinker">
     <group Name="Contents" Style="pickeach">
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AlongWall" />
+      <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AlongWall" />
       <object Chance="100" Number="1" Blueprint="Gigantic Fusion Power Station" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
-      <table Chance="100" Number="1" Blueprint="Gigantic Powerlines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="75" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="50" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <object Chance="100" Number="1" Blueprint="Gigantic Wire Extruder" Hint="AdjacentToEndsWith: PowerLine" />
       
       <table Chance="100" Name="Giant Abode Base" />
@@ -453,8 +467,14 @@
       </group>
 
       <object Chance="100" Number="1" Blueprint="CyberneticsTerminal2" Hint="AlongWall" />
-      <object Chance="100" Number="1" Blueprint="Gigantic Unicomputer"  Hint="AdjacentToEndsWith: Corpse"/>
-      <object Chance="100" Number="1" Blueprint="Gigantic Fusion Pumping Station" Hint="AdjacentToEndsWith: Gigantic Unicomputer" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Unicomputer"  Hint="AdjacentToEndsWith: CyberneticsTerminal2"/>
+      <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: Unicomputer" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Fusion Power Station" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="75" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="50" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       
       <table Chance="100" Number="0-2" Name="Gigantic Bookshelves" Hint="AlongWall" />
     </group>
@@ -487,7 +507,7 @@
 
   <population Name="Giant Gutsmonger Wares">
     <group Name="Items" Style="Pickeach">
-      <table Name="Cybernetics{zonetier}" Number="2-3" />
+      <table Name="Cybernetics{zonetier}" Number="3-5" />
       <table Name="Cybernetics{zonetier+1}" Number="2-3" />
       <table Name="Cybernetics{zonetier-1}" Number="2-3" />
       <table Chance="5" Name="Cybernetics2" Number="0-2" />

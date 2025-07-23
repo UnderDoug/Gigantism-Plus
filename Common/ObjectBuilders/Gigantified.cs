@@ -16,8 +16,8 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.ObjectBuilders
 {
-    [Serializable]
     [HasWishCommand]
+    [Serializable]
     public class Gigantified : IObjectBuilder
     {
         private static bool doDebug => getClassDoDebug(nameof(Gigantified));
@@ -199,6 +199,8 @@ namespace XRL.World.ObjectBuilders
                 + $" Context: {Context?.Quote() ?? NULL})",
                 Indent: indent, Toggle: getDoDebug());
 
+            bool isVillage = Context == "Village";
+
             bool success = false;
             if (Creature != null && Creature.IsCreature && Creature.IsTrueKin())
             {
@@ -263,82 +265,102 @@ namespace XRL.World.ObjectBuilders
                 Debug.Entry(4, $"Getting Exoframe Object...", Indent: indent + 1, Toggle: getDoDebug());
                 GameObject exoframeObject = GameObjectFactory.Factory.CreateObject(exoframe);
                 Debug.LoopItem(4, nameof(exoframeObject), exoframeObject?.DebugName ?? NULL, Indent: indent + 2, Toggle: getDoDebug());
-                if (exoframeObject != null && exoframeObject.TryGetPart(out CyberneticsGiganticExoframe exoframeCybernetic))
+
+                CyberneticsGiganticExoframe exoframeCybernetic = Creature?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
+                bool alreadyInstalled = false;
+
+                if (exoframeCybernetic != null && !(exoframeCybernetic.ImplantObject.GetTier() < exoframeObject.GetTier()))
+                {
+                    exoframeObject = exoframeCybernetic.ImplantObject;
+                    alreadyInstalled = true;
+                }
+
+                if (exoframeObject != null && exoframeObject.TryGetPart(out exoframeCybernetic))
                 {
                     Debug.CheckYeh(4, $"{nameof(exoframeObject)} not null, and have {nameof(CyberneticsGiganticExoframe)} part", Indent: indent + 1, Toggle: getDoDebug());
 
-                    NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
-                    Debug.LoopItem(4, nameof(NamePrefix), exoframe, Indent: indent + 2, Toggle: getDoDebug());
-
-                    Debug.Entry(4, $"Checking Context...", Indent: indent + 1, Toggle: getDoDebug());
-                    Debug.LoopItem(4, nameof(Context), Context, Indent: indent + 2, Toggle: getDoDebug());
-                    if (Context == "Initialization" || Context == "GameStarted" || Context == "Wish" || Context == "Creation" || Context == "Sample")
+                    if (!isVillage)
                     {
-                        Debug.Entry(4, $"Context requires {nameof(CyberneticsHasImplants)}...", Indent: indent + 1, Toggle: getDoDebug());
+                        NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
+                    }
+                    Debug.LoopItem(4, nameof(NamePrefix), NamePrefix, Indent: indent + 2, Toggle: getDoDebug());
 
-                        string addImplant = exoframe + "@body";
-                        Creature.RequirePart<CyberneticsHasImplants>();
-                        CyberneticsHasImplants hasImplants = Creature.RequirePart<CyberneticsHasImplants>();
+                    if (!alreadyInstalled)
+                    {
+                        Debug.Entry(4, $"Checking Context...", Indent: indent + 1, Toggle: getDoDebug());
+                        Debug.LoopItem(4, nameof(Context), Context, Indent: indent + 2, Toggle: getDoDebug());
+                        if (Context == "Initialization" || Context == "GameStarted" || Context == "Wish" || Context == "Creation" || Context == "Sample")
+                        {
+                            Debug.Entry(4, $"Context requires {nameof(CyberneticsHasImplants)}...", Indent: indent + 1, Toggle: getDoDebug());
 
-                        Debug.LoopItem(4, nameof(hasImplants.Implants), hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
-                        if (hasImplants.Implants.IsNullOrEmpty())
-                        {
-                            Debug.Entry(4, $"{nameof(hasImplants.Implants)} Empty, Adding...", Indent: indent + 1, Toggle: getDoDebug());
-                            hasImplants.Implants = addImplant;
-                        }
-                        else if (hasImplants.Implants.Contains(","))
-                        {
-                            Debug.Entry(4, $"{nameof(hasImplants.Implants)} has multiple entires, Inserting...", Indent: indent + 1, Toggle: getDoDebug());
+                            string addImplant = exoframe + "@body";
+                            Creature.RequirePart<CyberneticsHasImplants>();
+                            CyberneticsHasImplants hasImplants = Creature.RequirePart<CyberneticsHasImplants>();
 
-                            List<string> implants = new(hasImplants.Implants.Split(","));
-                            bool found = false;
-                            for (int i = 0; i < implants.Count(); i++)
+                            Debug.LoopItem(4, nameof(hasImplants.Implants), hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
+                            if (hasImplants.Implants.IsNullOrEmpty())
                             {
-                                Debug.LoopItem(4, $"{i}] {implants[i]}", Indent: indent + 3, Toggle: getDoDebug());
-                                if (implants[i].Contains("@body"))
-                                {
-                                    Debug.CheckYeh(4, $"replaceing [{implants[i]}] with [{addImplant}]", Indent: indent + 4, Toggle: getDoDebug());
-                                    found = true;
-                                    implants[i] = addImplant;
-                                    break;
-                                }
-                            }
-                            if (!found)
-                            {
-                                Debug.CheckYeh(4, $"existing entry not found, adding [{addImplant}]", Indent: indent + 3, Toggle: getDoDebug());
-                                implants.Add(addImplant);
-                            }
-                            hasImplants.Implants = implants.Join(",");
-                        }
-                        else
-                        {
-                            Debug.Entry(4, $"{nameof(hasImplants.Implants)} has single entry, Prepending or replacing...", Indent: indent + 1, Toggle: getDoDebug());
-                            Debug.LoopItem(4, hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
-                            if (hasImplants.Implants.Contains("@body"))
-                            {
-                                Debug.CheckYeh(4, $"replaceing [{hasImplants.Implants}] with [{addImplant}]", Indent: indent + 3, Toggle: getDoDebug());
+                                Debug.Entry(4, $"{nameof(hasImplants.Implants)} Empty, Adding...", Indent: indent + 1, Toggle: getDoDebug());
                                 hasImplants.Implants = addImplant;
+                            }
+                            else if (hasImplants.Implants.Contains(","))
+                            {
+                                Debug.Entry(4, $"{nameof(hasImplants.Implants)} has multiple entires, Inserting...", Indent: indent + 1, Toggle: getDoDebug());
+
+                                List<string> implants = new(hasImplants.Implants.Split(","));
+                                bool found = false;
+                                for (int i = 0; i < implants.Count(); i++)
+                                {
+                                    Debug.LoopItem(4, $"{i}] {implants[i]}", Indent: indent + 3, Toggle: getDoDebug());
+                                    if (implants[i].Contains("@body"))
+                                    {
+                                        Debug.CheckYeh(4, $"replaceing [{implants[i]}] with [{addImplant}]", Indent: indent + 4, Toggle: getDoDebug());
+                                        found = true;
+                                        implants[i] = addImplant;
+                                        break;
+                                    }
+                                }
+                                if (!found)
+                                {
+                                    Debug.CheckYeh(4, $"existing entry not found, adding [{addImplant}]", Indent: indent + 3, Toggle: getDoDebug());
+                                    implants.Add(addImplant);
+                                }
+                                hasImplants.Implants = implants.Join(",");
                             }
                             else
                             {
-                                Debug.CheckYeh(4, $"existing entry not found, prepending [{addImplant}]", Indent: indent + 3, Toggle: getDoDebug());
-                                hasImplants.Implants = $"{addImplant},{hasImplants.Implants}";
+                                Debug.Entry(4, $"{nameof(hasImplants.Implants)} has single entry, Prepending or replacing...", Indent: indent + 1, Toggle: getDoDebug());
+                                Debug.LoopItem(4, hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
+                                if (hasImplants.Implants.Contains("@body"))
+                                {
+                                    Debug.CheckYeh(4, $"replaceing [{hasImplants.Implants}] with [{addImplant}]", Indent: indent + 3, Toggle: getDoDebug());
+                                    hasImplants.Implants = addImplant;
+                                }
+                                else
+                                {
+                                    Debug.CheckYeh(4, $"existing entry not found, prepending [{addImplant}]", Indent: indent + 3, Toggle: getDoDebug());
+                                    hasImplants.Implants = $"{addImplant},{hasImplants.Implants}";
+                                }
                             }
+                            Debug.LoopItem(4, nameof(hasImplants.Implants), hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
+                            success = hasImplants.Implants.Contains(addImplant);
+                            exoframeObject?.Obliterate();
                         }
-                        Debug.LoopItem(4, nameof(hasImplants.Implants), hasImplants.Implants, Indent: indent + 2, Toggle: getDoDebug());
-                        success = hasImplants.Implants.Contains(addImplant);
-                        exoframeObject?.Obliterate();
+                        else
+                        {
+                            Debug.Entry(4, $"Context allows direct implantation...", Indent: indent + 1, Toggle: getDoDebug());
+                            Creature.Body.GetBody().Implant(exoframeObject, Silent: true);
+                            success = Creature.Body.HasInstalledCybernetics(exoframe);
+                        }
                     }
                     else
                     {
-                        Debug.Entry(4, $"Context allows direct implantation...", Indent: indent + 1, Toggle: getDoDebug());
-                        Creature.Body.GetBody().Implant(exoframeObject, Silent: true);
                         success = Creature.Body.HasInstalledCybernetics(exoframe);
                     }
 
                     Debug.LoopItem(4, $"{nameof(success)}?", $"{success}", Good: success, Indent: indent + 1, Toggle: getDoDebug());
 
-                    if (success)
+                    if (success && !isVillage)
                     {
                         Debug.Entry(4, $"Performing Color Changes...", Indent: indent + 1, Toggle: getDoDebug());
 

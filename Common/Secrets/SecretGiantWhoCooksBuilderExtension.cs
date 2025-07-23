@@ -185,7 +185,9 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"{nameof(wrassleID)}.{nameof(wrassleID.ID)}", $"{wrassleID.GetID(Silent: true)}", Indent: 1, Toggle: getDoDebug());
 
             wrasslerColor = wrassleID?.SecondaryColor;
-            wrassleRingColor = wrasslerColor ?? UD_QWE.WrassleRingColors.GetRandomElement();
+            wrassleRingColor = wrasslerColor 
+                ?? UniqueGiant.GetStringProperty("WrassleColor", null) 
+                ?? UD_QWE.WrassleRingColors.GetRandomElement();
             Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
 
             /*
@@ -385,7 +387,7 @@ namespace XRL.World.WorldBuilders
             try
             {
                 TinkerGiant = GameObjectFactory.Factory.CreateObject(tinkerBlueprint, GigantifyVillager);
-                PrepareGiantMerchant(TinkerGiant, "Tinker", ApproxZoneTier, HeroDetailColor);
+                PrepareGiantVillager(TinkerGiant, "Tinker", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
             {
@@ -397,7 +399,7 @@ namespace XRL.World.WorldBuilders
             try
             {
                 ApothecaryGiant = GameObjectFactory.Factory.CreateObject(apothecaryBlueprint, GigantifyVillager);
-                PrepareGiantMerchant(ApothecaryGiant, "Apothecary", ApproxZoneTier, HeroDetailColor);
+                PrepareGiantVillager(ApothecaryGiant, "Apothecary", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
             {
@@ -409,7 +411,7 @@ namespace XRL.World.WorldBuilders
             try
             {
                 DromadGiant = GameObjectFactory.Factory.CreateObject(dromadBlueprint, GigantifyVillager);
-                PrepareGiantMerchant(DromadGiant, "Merchant", ApproxZoneTier, HeroDetailColor);
+                PrepareGiantVillager(DromadGiant, "Merchant", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
             {
@@ -420,8 +422,14 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Finding {nameof(GutsmongerGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                GutsmongerGiant = GameObjectFactory.Factory.CreateObject(gutsmongerBlueprint, GigantifyVillager);
-                PrepareGiantMerchant(GutsmongerGiant, "Gutsmonger", ApproxZoneTier, HeroDetailColor);
+                void gigantifyGutsmonger(GameObject Gutsmonger)
+                {
+                    Gutsmonger.GetStat("Level").BaseValue = 5 * ApproxZoneTier - 1;
+                    Gutsmonger.Body.GetBody().Implant(GameObjectFactory.Factory.CreateObject("GiganticExoframeSigma"));
+                    GigantifyVillager(Gutsmonger);
+                }
+                GutsmongerGiant = GameObjectFactory.Factory.CreateObject(gutsmongerBlueprint, gigantifyGutsmonger);
+                PrepareGiantVillager(GutsmongerGiant, "Gutsmonger", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
             {
@@ -433,7 +441,7 @@ namespace XRL.World.WorldBuilders
             try
             {
                 PetGiant = GameObjectFactory.Factory.CreateObject(petBlueprint, GigantifyVillager);
-                PrepareGiantMerchant(PetGiant, "Pet", ApproxZoneTier, HeroDetailColor);
+                PrepareGiantVillager(PetGiant, "Pet", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
             {
@@ -443,7 +451,7 @@ namespace XRL.World.WorldBuilders
 
             return TinkerGiant != null && ApothecaryGiant != null && DromadGiant != null && PetGiant != null;
         }
-        public static GameObject PrepareGiantMerchant(GameObject Villager, string Context = null, int Tier = 1, string HeroDetailColor = null)
+        public static GameObject PrepareGiantVillager(GameObject Villager, string Context = null, int Tier = 1, string HeroDetailColor = null)
         {
             int indent = Debug.LastIndent;
 
@@ -464,20 +472,17 @@ namespace XRL.World.WorldBuilders
 
             Villager.Brain.Factions = "";
             Villager.Brain.Allegiance.Clear();
-            Villager.Brain.Allegiance.Add(SCRT_GNT_VLG_FCT, 100);
-            if (isGutsmonger)
-            {
-                Villager.Brain.Allegiance.Add("Wardens", 50);
-            }
+            Villager.Brain.Allegiance.Add("Giants", 100);
+            Villager.Brain.Allegiance.Add(SCRT_GNT_VLG_FCT, 50);
             Villager.Brain.Allegiance.Hostile = false;
             Villager.Brain.Allegiance.Calm = true;
             Villager.Brain.Wanders = true;
             Villager.Brain.WandersRandomly = true;
             Villager.SetIntProperty("ParticipantVillager", 1);
             Villager.SetIntProperty("SecretGiantVillager", 1);
-            Villager.SetStringProperty("HeroNameColor", null);
-            Villager.SetStringProperty("HeroTileColor", null);
-            Villager.SetStringProperty("HeroColorString", null);
+            Villager.SetStringProperty("HeroNameColor", "Y");
+            // Villager.SetStringProperty("HeroColorString", "same");
+            // Villager.SetStringProperty("HeroTileColor", "same");
             Villager.SetStringProperty("HeroDetailColor", HeroDetailColor);
 
             GenericInventoryRestocker inventoryRestocker = null;
@@ -590,6 +595,7 @@ namespace XRL.World.WorldBuilders
             if (isDromad)
             {
                 conversationScriptID = "DromadTrader";
+                Villager.SetStringProperty("HeroTileColor", "&w");
                 if (Villager.TryGetPart(out DromadCaravan dromadCaravan))
                 {
                     Villager.RemovePart(dromadCaravan);
@@ -602,8 +608,7 @@ namespace XRL.World.WorldBuilders
 
                 for (int i = 0; i <= 2 && Tier > i; i++)
                 {
-                    
-                    inventoryRestocker.AddTable($"Tier{(Tier - i).ToStringCached()}Wares");
+                    // inventoryRestocker.AddTable($"Tier{(Tier - i).ToStringCached()}Wares");
                 }
                 heroTemplate = $"Dromad{Context}";
                 string dromadTitle = NameMaker.MakeTitle(For: Villager, Special: Context);
@@ -613,16 +618,19 @@ namespace XRL.World.WorldBuilders
                 }
                 if (Villager.Brain.Allegiance.IsNullOrEmpty())
                 {
-                    Villager.Brain.Factions = $"{SCRT_GNT_VLG_FCT}-100";
+                    Villager.Brain.Factions = $"Giants-100";
+                    Villager.Brain.Factions = $"{SCRT_GNT_VLG_FCT}-50";
                 }
                 else if (!Villager.Brain.Allegiance.ContainsKey(SCRT_GNT_VLG_FCT))
                 {
+                    Villager.Brain.Allegiance["Giants"] = 75;
                     Villager.Brain.Allegiance[SCRT_GNT_VLG_FCT] = 25;
                 }
             }
             if (isGutsmonger)
             {
                 Villager.SetIntProperty("SuppressSimpleConversation", 1);
+                Villager.SetStringProperty("HeroTileColor", "&B");
 
                 conversationScriptID = "gutsmonger";
                 ConversationsAPI.addSimpleConversationToObject(
@@ -638,15 +646,18 @@ namespace XRL.World.WorldBuilders
                 }
                 if (Villager.Brain.Allegiance.IsNullOrEmpty())
                 {
-                    Villager.Brain.Factions = $"{SCRT_GNT_VLG_FCT}-100";
+                    Villager.Brain.Factions = $"Giants-100";
+                    Villager.Brain.Factions = $"{SCRT_GNT_VLG_FCT}-50";
                 }
                 else if (!Villager.Brain.Allegiance.ContainsKey(SCRT_GNT_VLG_FCT))
                 {
+                    Villager.Brain.Allegiance["Giants"] = 75;
                     Villager.Brain.Allegiance[SCRT_GNT_VLG_FCT] = 25;
                 }
             }
             if (isPet)
             {
+                Villager.SetStringProperty("HeroTileColor", "&z");
                 string petTitle = NameMaker.MakeTitle(Villager);
                 Villager.GiveProperName();
                 if (!petTitle.IsNullOrEmpty())

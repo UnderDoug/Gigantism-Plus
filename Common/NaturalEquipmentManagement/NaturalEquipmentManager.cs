@@ -52,13 +52,12 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public List<NaturalEquipmentOperator> NaturalEquipmentOperators;
+        public List<NaturalEquipmentOperator> NaturalEquipmentOperators => GetNaturalEquipmentOperators(ParentObject, this);
 
         public bool WantsToManage => ParentObject != null && ParentObject.IsCreature;
 
         public NaturalEquipmentManager()
         {
-            NaturalEquipmentOperators = new();
         }
 
         public override void Initialize()
@@ -71,61 +70,51 @@ namespace XRL.World.Parts
         }
         public override void Remove()
         {
-            ClearNaturalEquipmentOperators();
             base.Remove();
         }
 
-        public void ClearNaturalEquipmentOperators()
+        public void SyncOperators()
         {
-            NaturalEquipmentOperators ??= new();
-            if (!NaturalEquipmentOperators.IsNullOrEmpty())
+            foreach (NaturalEquipmentOperator naturalEquipmentOperator in NaturalEquipmentOperators)
             {
-                foreach (NaturalEquipmentOperator naturalEquipmentOperator in  NaturalEquipmentOperators)
-                {
-                    RemoveOperator(naturalEquipmentOperator);
-                }
-                NaturalEquipmentOperators = new();
+                naturalEquipmentOperator.Manager = this;
             }
         }
-        public bool AddOperator(NaturalEquipmentOperator NaturalEquipmentOperator)
-        {
-            NaturalEquipmentOperators ??= new();
-            NaturalEquipmentOperators.TryAdd(NaturalEquipmentOperator);
-            NaturalEquipmentOperator.Manager = this;
-            return NaturalEquipmentOperators.Contains(NaturalEquipmentOperator) && NaturalEquipmentOperator.Manager == this;
-        }
-        public bool RemoveOperator(NaturalEquipmentOperator NaturalEquipmentOperator)
-        {
-            NaturalEquipmentOperators ??= new();
-            NaturalEquipmentOperators.Remove(NaturalEquipmentOperator);
-            NaturalEquipmentOperator.Manager = null;
-            return !NaturalEquipmentOperators.Contains(NaturalEquipmentOperator) && NaturalEquipmentOperator.Manager != this;
-        }
 
-        public bool CollectNaturalEquipmentOperators(GameObject Creature = null)
+        public static List<NaturalEquipmentOperator> GetNaturalEquipmentOperators(GameObject Creature, NaturalEquipmentManager Manager)
         {
-            Creature ??= ParentObject;
-            NaturalEquipmentOperators = new();
+            GetNaturalEquipmentOperatorsEvent getNaturalEquipmentOperatorsEvent = GetNaturalEquipmentOperatorsEvent.FromPool();
+            getNaturalEquipmentOperatorsEvent.Manager = Manager;
+            getNaturalEquipmentOperatorsEvent.Creature = Creature;
+            getNaturalEquipmentOperatorsEvent.Operators = new();
+
+            getNaturalEquipmentOperatorsEvent.GetForCreature();
+
+            // List<NaturalEquipmentOperator> naturalEquipmentOperators = GetNaturalEquipmentOperatorsEvent.GetForCreature(Creature, Manager);
+
             List<BodyPart> bodyParts = Creature?.Body?.GetParts();
-
-            GetNaturalEquipmentOperatorsEvent.GetForCreature(Creature, this);
             if (!bodyParts.IsNullOrEmpty())
             {
                 foreach (BodyPart bodyPart in bodyParts)
                 {
-                    GameObject equipment = bodyPart.DefaultBehavior;
-                    if (equipment != null && equipment.IsNaturalEquipment())
+                    getNaturalEquipmentOperatorsEvent.Equipment = bodyPart.DefaultBehavior;
+                    if (getNaturalEquipmentOperatorsEvent.Equipment != null && getNaturalEquipmentOperatorsEvent.Equipment.IsNaturalEquipment())
                     {
-                        GetNaturalEquipmentOperatorsEvent.GetForEquipment(equipment, this);
+                        getNaturalEquipmentOperatorsEvent.GetForEquipment();
+                        // naturalEquipmentOperators.TryAdd(GetNaturalEquipmentOperatorsEvent.GetForEquipment(equipment, Manager));
                     }
-                    equipment = bodyPart.Equipped;
-                    if (equipment != null && equipment.IsNaturalEquipment())
+                    getNaturalEquipmentOperatorsEvent.Equipment = bodyPart.Equipped;
+                    if (getNaturalEquipmentOperatorsEvent.Equipment != null && getNaturalEquipmentOperatorsEvent.Equipment.IsNaturalEquipment())
                     {
-                        GetNaturalEquipmentOperatorsEvent.GetForEquipment(equipment, this);
+                        getNaturalEquipmentOperatorsEvent.GetForEquipment();
+                        // naturalEquipmentOperators.TryAdd(GetNaturalEquipmentOperatorsEvent.GetForEquipment(equipment, Manager));
                     }
                 }
             }
-            return !NaturalEquipmentOperators.IsNullOrEmpty();
+            List<NaturalEquipmentOperator> naturalEquipmentOperators = getNaturalEquipmentOperatorsEvent.Operators;
+            getNaturalEquipmentOperatorsEvent.Reset();
+
+            return naturalEquipmentOperators;
         }
 
         public IEnumerable<IManagedDefaultNaturalEquipment> GetManagedNaturalEquipmentCompatibleParts()
@@ -189,7 +178,7 @@ namespace XRL.World.Parts
         }
         public static List<int> WantEvents = new()
         {
-            EquippedEvent.ID,
+            EquipperEquippedEvent.ID,
             BodyPartsUpdatedEvent.ID,
             AfterBodyPartsUpdatedEvent.ID,
         };
@@ -198,12 +187,12 @@ namespace XRL.World.Parts
             return base.WantEvent(ID, cascade)
                 || (WantsToManage && WantEvents.Contains(ID));
         }
-        public override bool HandleEvent(EquippedEvent E)
+        public override bool HandleEvent(EquipperEquippedEvent E)
         {
             Debug.Entry(4,
                 $"@ {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(EquippedEvent)} E)",
+                + $"{nameof(EquipperEquippedEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             if (E.Actor == ParentObject)
@@ -214,7 +203,7 @@ namespace XRL.World.Parts
 
                 if (E.Item.IsNaturalEquipment() && E.Item.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator))
                 {
-                    AddOperator(naturalEquipmentOperator);
+                    naturalEquipmentOperator.Manager = this;
                 }
             }
 
@@ -242,9 +231,10 @@ namespace XRL.World.Parts
                     $"Creature: {E?.Creature?.DebugName ?? NULL}",
                     Indent: 1, Toggle: doDebug);
 
-                if (CollectNaturalEquipmentOperators(E.Creature))
+                List<NaturalEquipmentOperator> naturalEquipmentOperators = NaturalEquipmentOperators;
+                if (!naturalEquipmentOperators.IsNullOrEmpty())
                 {
-                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in NaturalEquipmentOperators)
+                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in naturalEquipmentOperators)
                     {
                         BodyPart parentLimb = naturalEquipmentOperator.ParentLimb;
                         Debug.LoopItem(4,
@@ -281,11 +271,12 @@ namespace XRL.World.Parts
                     $"Creature: {E?.Creature?.DebugName ?? NULL}",
                     Indent: 1, Toggle: doDebug);
 
-                if (CollectNaturalEquipmentOperators(E.Creature))
+                List<NaturalEquipmentOperator> naturalEquipmentOperators = NaturalEquipmentOperators;
+                if (!naturalEquipmentOperators.IsNullOrEmpty())
                 {
-                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in NaturalEquipmentOperators)
+                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in naturalEquipmentOperators)
                     {
-                        BodyPart parentLimb = naturalEquipmentOperator.ParentLimb;
+                        BodyPart parentLimb = naturalEquipmentOperator?.ParentLimb;
                         Debug.LoopItem(4,
                             $"Limb: [{parentLimb?.ID}:{parentLimb?.Type}] {parentLimb?.Description ?? NULL}",
                             Indent: 2, Toggle: doDebug);
@@ -317,11 +308,10 @@ namespace XRL.World.Parts
 
             if (E.Creature != null && E.Creature == ParentObject)
             {
-                NaturalEquipmentOperators = new();
-
-                if (CollectNaturalEquipmentOperators(E.Creature))
+                List<NaturalEquipmentOperator> naturalEquipmentOperators = NaturalEquipmentOperators;
+                if (!naturalEquipmentOperators.IsNullOrEmpty())
                 {
-                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in NaturalEquipmentOperators)
+                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in naturalEquipmentOperators)
                     {
                         GameObject naturalEquipment = naturalEquipmentOperator.ParentObject;
                         BodyPart equipmentLimb = naturalEquipmentOperator.ParentLimb;
@@ -358,21 +348,16 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-        public override void Write(GameObject Basis, SerializationWriter Writer)
-        {
-            base.Write(Basis, Writer);
-            Writer.Write(NaturalEquipmentOperators);
-        }
-        public override void Read(GameObject Basis, SerializationReader Reader)
-        {
-            base.Read(Basis, Reader);
-            NaturalEquipmentOperators = Reader.ReadList<NaturalEquipmentOperator>() ?? new();
-        }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             NaturalEquipmentManager naturalEquipmentManager = base.DeepCopy(Parent, MapInv) as NaturalEquipmentManager;
-            naturalEquipmentManager.NaturalEquipmentOperators = new();
             return naturalEquipmentManager;
+        }
+
+        public override void FinalizeCopyEarly(GameObject Source, bool CopyEffects, bool CopyID, Func<GameObject, GameObject> MapInv)
+        {
+            base.FinalizeCopyEarly(Source, CopyEffects, CopyID, MapInv);
+            SyncOperators();
         }
 
     } //!-- public class NaturalEquipmentOperator 

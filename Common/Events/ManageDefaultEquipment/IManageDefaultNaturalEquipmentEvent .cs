@@ -138,46 +138,6 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return checkResult;
         }
-        public virtual bool GetFor()
-        {
-            return ProcessEvent();
-        }
-        public static bool GetForCreature(GameObject Creature, NaturalEquipmentManager Manager)
-        {
-            int indent = Debug.LastIndent;
-            Debug.Entry(4,
-                $"! {typeof(T).Name}."
-                + $"{nameof(GetForCreature)}("
-                + $"{nameof(Creature)}: {Creature?.DebugName}, "
-                + $"{nameof(Manager)})",
-                Indent: indent, Toggle: doDebug);
-
-            T E = FromPoolCreature(Creature, Manager);
-
-            bool checkResult = E.GetFor();
-            E.Reset();
-
-            Debug.LastIndent = indent;
-            return checkResult;
-        }
-        public static bool GetForEquipment(GameObject Equipment, NaturalEquipmentManager Manager)
-        {
-            int indent = Debug.LastIndent;
-            Debug.Entry(4,
-                $"! {typeof(T).Name}."
-                + $"{nameof(GetForEquipment)}("
-                + $"{nameof(Equipment)}: {Equipment?.DebugName}, "
-                + $"{nameof(Manager)})",
-                Indent: indent, Toggle: doDebug);
-
-            T E = FromPoolEquipment(Equipment, Manager);
-
-            bool checkResult = E.GetFor();
-            E.Reset();
-
-            Debug.LastIndent = indent;
-            return checkResult;
-        }
         public static bool WantToProceed(GameObject Equipment, GameObject Creature, BodyPart BodyPart, NaturalEquipmentOperator Operator, NaturalEquipmentManager Manager, out bool CreatureWantsMin, out bool EquipmentWantsMin, out bool CreatureWantsStr, out bool EquipmentWantsStr)
         {
             int indent = Debug.LastIndent;
@@ -244,7 +204,7 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
             return  CreatureWantsMin || EquipmentWantsMin || CreatureWantsStr || EquipmentWantsStr;
         }
-        private bool ProcessEvent()
+        public bool ProcessEvent()
         {
             bool anyWants = WantToProceed(Equipment, Creature, BodyPart, Operator, Manager,
                 out bool CreatureWantsMin,

@@ -98,6 +98,7 @@ namespace XRL.World.Parts
 
             bool creatureIsMerchant = Creature.HasPart<GenericInventoryRestocker>();
             bool creatureIsSecretGiantVillager = Creature.HasPropertyOrTag("SecretGiantVillager");
+            bool creatureIsSecretGiantGutsmonger = Creature.InheritsFrom("Giant Gutsmonger");
 
             (DieRoll die, int high) merchantBaseChance = !creatureIsSecretGiantVillager ? (new("1d5"), 4) : (new("1d7"), 2);
             (DieRoll die, int high) merchantGrenades = !creatureIsSecretGiantVillager ? (new("1d2"), 2) : (new("1d5"), 2);
@@ -146,7 +147,8 @@ namespace XRL.World.Parts
 
             // Create a copy of the items list to avoid modifying during enumeration
             List<GameObject> itemsToProcess = new(Creature.GetInventoryAndEquipment());
-
+            
+            bool wantstoUpdateBody = false;
             if (!itemsToProcess.IsNullOrEmpty())
             {
                 Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)", 
@@ -158,6 +160,7 @@ namespace XRL.World.Parts
                     string ItemName = item.Blueprint;
                     bool inventoryGigantifierAlwaysAllow = item.HasTagOrProperty("InventoryGigantifierAlwaysAllow");
                     bool inventoryGigantifierAlwaysStockGiant = item.HasTagOrProperty("InventoryGigantifierAlwaysStockGiant");
+                    bool itemIsCybernetic = item.HasPart<CyberneticsBaseItem>();
 
                     string alwaysStockGiantExtra = !inventoryGigantifierAlwaysStockGiant
                         ? $""
@@ -167,7 +170,8 @@ namespace XRL.World.Parts
                     Debug.DiveIn(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
                     int NoThanks = 0;
                     // Can the item have the gigantic modifier applied?
-                    if (ItemModding.ModificationApplicable("ModGigantic", item))
+                    if (ItemModding.ModificationApplicable("ModGigantic", item) 
+                        || (creatureIsSecretGiantGutsmonger && itemIsCybernetic))
                     {
                         Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 2, Toggle: doDebug);
                         // Is the item already gigantic? Don't attempt to apply it again.
@@ -367,11 +371,24 @@ namespace XRL.World.Parts
                         }
 
                         Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2, Toggle: doDebug);
-                        if (NoThanks > 0 && !Wish)
+                        Debug.Entry(3, $"Checking if item is Cybernetic and in inventory of Secret Giant Gutsmonger and 7 in 10...", 
+                            Indent: 2, Toggle: doDebug);
+
+                        if (!(creatureIsSecretGiantGutsmonger && itemIsCybernetic && 7.in10()))
                         {
-                            Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: doDebug);
-                            Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
-                            continue;
+                            Debug.CheckNah(4, "item is not Cybernetic in inventory of Secret Giant Gutsmonger and 7 in 10", 
+                                Indent: 3, Toggle: doDebug);
+                            if (NoThanks > 0 && !Wish && !(creatureIsSecretGiantVillager && item.HasPart<CyberneticsBaseItem>() && 7.in10()))
+                            {
+                                Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: doDebug);
+                                Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            Debug.CheckYeh(4, "item is Cybernetic in inventory of Secret Giant Gutsmonger and 7 in 10", 
+                                Indent: 3, Toggle: doDebug);
                         }
 
                         string byWish = Wish ? ", by Wish!" : "";
@@ -404,6 +421,14 @@ namespace XRL.World.Parts
                     else
                     {
                         Debug.CheckNah(4, "ineligible to be made ModGigantic x/", Indent: 2, Toggle: doDebug);
+
+                        if (item.IsNaturalEquipment() && !item.TryGetPart(out NaturalEquipmentOperator @operator))
+                        {
+                            NaturalEquipmentManager manager= Creature.RequirePart<NaturalEquipmentManager>();
+                            @operator.Manager = manager;
+                            wantstoUpdateBody = true;
+                        }
+
                         Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: doDebug);
                         Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
                     }
@@ -417,6 +442,11 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(3, "Creature.WantToReequip()", Indent: 1, Toggle: doDebug);
                 Creature.WantToReequip();
+            }
+
+            if (wantstoUpdateBody)
+            {
+                Creature.Body.UpdateBodyParts();
             }
 
             Debug.Divider(3, Indent: 1, Toggle: doDebug);

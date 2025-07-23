@@ -263,6 +263,7 @@ namespace XRL.World.ZoneBuilders
                             {
                                 Debug.CheckYeh(4, $"[{num + 1}]{item.Blueprint} placed successfully", Indent: 3, Toggle: getDoDebug());
                                 if ((gameObject.GetBlueprint().HasTag("Furniture") || gameObject.GetBlueprint().HasTag("Vessel"))
+                                    && !gameObject.InheritsFrom("Wire Extruder")
                                     && gameObject.Physics != null)
                                 {
                                     string owningFaction = "WrassleGiants";

@@ -18,6 +18,7 @@ using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
+using XRL.World.ZoneBuilders;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -343,6 +344,8 @@ namespace XRL.World.ObjectBuilders
             Debug.CheckYeh(4, $"nameSpecial", $"{nameSpecial}", Indent: indent + 1, Toggle: getDoDebug());
 
             Creature.SetStringProperty("Culture", "WrassleGiant");
+            Creature.SetIntProperty("ParticipantVillager", 1);
+            Creature.SetIntProperty("SecretGiantVillager", 1);
 
             int MentalMutations = 0;
             int PhysicalMutations = 0;
@@ -978,8 +981,10 @@ namespace XRL.World.ObjectBuilders
             }
 
             Creature.AddSkills(HeroSkills);
-            if (Unique) 
+            if (Unique)
+            {
                 Creature.AddSkills(UniqueHeroSkills);
+            }
 
             Debug.CheckYeh(4, $"Skills Added", Indent: indent + 2, Toggle: getDoDebug());
             foreach (BaseSkill skill in Creature.GetPartsDescendedFrom<BaseSkill>())
@@ -1087,6 +1092,12 @@ namespace XRL.World.ObjectBuilders
                     }
                 }
                 gigantism.CapOverride = capOverride > gigantism.Level ? capOverride : - 1;
+            }
+            string wrassleColor = $"{wrassleID?.SecondaryColor ?? UD_QWE.WrassleRingColors.GetRandomElement()}";
+            Creature.SetStringProperty("WrassleColor", wrassleColor);
+            if (Unique && !EnablePrereleaseContent)
+            {
+                Creature.Render.DetailColor = wrassleColor;
             }
 
             Debug.LastIndent = indent;

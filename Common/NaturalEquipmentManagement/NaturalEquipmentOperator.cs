@@ -57,6 +57,7 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
+        [NonSerialized]
         public NaturalEquipmentManager Manager;
 
         public Guid OperatorID = Guid.Empty;
@@ -127,7 +128,6 @@ namespace XRL.World.Parts
         public override void Remove()
         {
             ClearShortDescriptionCache();
-            Manager?.RemoveOperator(this);
             base.Remove();
         }
 
@@ -595,8 +595,8 @@ namespace XRL.World.Parts
 
             if (ParentObject == E.Item && E.Item != null && Manager != null)
             {
-                E.Actor.RequirePart<NaturalEquipmentManager>().AddOperator(this);
-                Debug.CheckYeh(4, $"Added {Name} to {Manager.Name}", Indent: indent + 2, Toggle: doDebug);
+                Manager = E.Actor.RequirePart<NaturalEquipmentManager>();
+                Debug.CheckYeh(4, $"Added {Manager.Name} to {Name}", Indent: indent + 2, Toggle: doDebug);
             }
             else
             {
@@ -625,7 +625,7 @@ namespace XRL.World.Parts
 
             if (ParentObject == E.Equipment && E.Equipment != null)
             {
-                E.Manager.AddOperator(this);
+                E.AddOperator(this);
                 Debug.CheckYeh(4, $"Added {Name} to {E.Manager.Name}", Indent: indent + 2, Toggle: doDebug);
             }
             else
@@ -706,6 +706,7 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
+            Manager.Write(Basis, Writer);
             Writer.Write(AccumulatedDamageDie.Count);
             Writer.Write(AccumulatedDamageDie.Size);
             Writer.Write(AccumulatedDamageDie.Bonus);
@@ -715,6 +716,7 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
 
+            Manager = Reader.ReadObject() as NaturalEquipmentManager;
             AccumulatedDamageDie = new()
             {
                 Count = Reader.ReadInt32(),

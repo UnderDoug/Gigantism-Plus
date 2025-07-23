@@ -42,7 +42,7 @@ namespace HNPS_GigantismPlus.Harmony
                 if (false && Equipper != null && Equipper.TryGetPart(out NaturalEquipmentManager naturalEquipmentManager) 
                     && @this != null && @this.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator))
                 {
-                    didTheThing = naturalEquipmentManager.AddOperator(naturalEquipmentOperator);
+                    // didTheThing = naturalEquipmentManager.AddOperator(naturalEquipmentOperator);
                 }
                 if (false && !didTheThing && @this?.Physics != null && @this.Physics.Equipped != Equipper)
                 {

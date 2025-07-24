@@ -362,6 +362,7 @@
       </group>
       
       <table Chance="100" Number="1" Name="Gigantic Light" Hint="AlongWall" />
+      <table Chance="30" Number="1" Name="Gigantic Light" Hint="AlongWall" />
       <table Chance="100" Number="1" Name="Gigantic Bed" />
       <table Chance="100" Number="1" Name="Gigantic Chair" Hint="AdjacentToEndsWith: Table" />
       
@@ -374,8 +375,8 @@
       </group>
 
       <group Name="Decor" Style="pickeach">
-        <table Chance="75" Number="1" Name="Gigantic Decoration General" Hint="InsideCorner" />
-        <table Chance="75" Number="1" Name="Gigantic Decoration General" Hint="AlongWall" />
+        <table Chance="65" Number="1" Name="Gigantic Decoration General" Hint="InsideCorner" />
+        <table Chance="65" Number="1" Name="Gigantic Decoration General" Hint="AlongWall" />
       </group>
     </group>
   </population>
@@ -384,6 +385,37 @@
     <group Name="Contents" Style="pickeach">
       <table Chance="100" Name="Giant Abode Base" />
       <table Chance="75" Number="1" Name="Gigantic Table Basic" Hint="AlongWall,AdjacentToEndsWith: Chair" />
+    </group>
+    <group Name="Contents Additional" Style="pickone">
+      <group Weight="5" Name="Well Read" Style="pickeach">
+        <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
+        <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
+        <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
+        <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
+        <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
+      </group>
+      <group Weight="5" Name="Artsy" Style="pickeach">
+        <table Chance="35" Number="1" Name="Gigantic Decoration Creative" />
+        <table Chance="35" Number="1" Name="Gigantic Decoration Creative" />
+        <table Chance="35" Number="1" Name="Gigantic Decoration Creative" />
+        <table Chance="35" Number="1" Name="Gigantic Decoration Creative" />
+      </group>
+      <group Weight="5" Name="Dormitory" Style="pickeach">
+        <table Chance="35" Number="1" Name="Gigantic Bed" />
+        <table Chance="35" Number="1" Name="Gigantic Bed" />
+        <table Chance="35" Number="1" Name="Gigantic Bed" />
+        <table Chance="35" Number="1" Name="Gigantic Bed" />
+        <table Chance="35" Number="1" Name="Gigantic Bed" />
+      </group>
+      <group Weight="5" Name="Class Room" Style="pickeach">
+        <object Chance="100" Number="1" Blueprint="Gigantic Chalkboard" />
+        <object Chance="100" Number="1" Blueprint="Gigantic Chair" />
+        <object Chance="100" Number="1" Blueprint="Gigantic Desk" Hint="AdjacentToEndsWith: Chair" />
+        <object Chance="100" Number="1" Blueprint="Gigantic Chair" />
+        <object Chance="100" Number="1" Blueprint="Gigantic Desk" Hint="AdjacentToEndsWith: Chair" />
+        <object Chance="100" Number="1" Blueprint="Gigantic Chair" />
+        <object Chance="100" Number="1" Blueprint="Gigantic Desk" Hint="AdjacentToEndsWith: Chair" />
+      </group>
     </group>
   </population>
 
@@ -416,7 +448,7 @@
       
       <table Chance="100" Name="Giant Abode Base" />
       
-      <table Chance="100" Number="1" Name="Gigantic Tinker Table" Hint="AlongWall,AdjacentToEndsWith: Chair" />
+      <table Chance="100" Number="1" Name="Gigantic Tinker Table" Hint="AlongWall" />
       <object Chance="100" Number="1" Blueprint="Gigantic Multicabinet" Hint="AlongWall" />
       
       <table Chance="100" Number="1" Name="Gigantic Decoration Tinker" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
@@ -428,14 +460,12 @@
     <group Name="Contents" Style="pickeach">
       <table Chance="100" Name="Giant Abode Base" />
 
-      <table Chance="100" Number="2-4" Name="Gigantic Basket" />
-      <table Chance="100" Number="1-3" Name="Gigantic Vessel" Hint="AdjacentToEndsWith: Basket" />
+      <table Chance="100" Number="1-2" Name="Gigantic Basket" />
+      <table Chance="100" Number="1-2" Name="Gigantic Vessel" Hint="AdjacentToEndsWith: Basket" />
 
       <table Chance="75" Number="1" Name="Gigantic Bookshelves" Hint="AlongWall" />
       
       <object Chance="100" Number="1" Blueprint="Gigantic Alchemist Table" Hint="AdjacentToEndsWith: Chair" />
-      
-      <table Chance="100" Number="1" Name="Gigantic Decoration Apothecary" Hint="AlongWall" />
     </group>
   </population>
 
@@ -475,6 +505,7 @@
       <table Chance="50" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
+      <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       
       <table Chance="100" Number="0-2" Name="Gigantic Bookshelves" Hint="AlongWall" />
     </group>
@@ -500,20 +531,76 @@
   <population Name="Giant Merchant Wares">
     <group Name="Items" Style="PickOne">
       <table Weight="50" Name="Tier{zonetier}Wares" />
-      <table Weight="5" Name="Tier{zonetier-1}Wares" />
-      <table Weight="1000" Name="Tier{zonetier+1}Wares" />
+      <table Weight="10" Name="Tier{zonetier+1}Wares" />
     </group>
   </population>
 
   <population Name="Giant Gutsmonger Wares">
     <group Name="Items" Style="Pickeach">
-      <table Name="Cybernetics{zonetier}" Number="3-5" />
+      <table Name="Cybernetics{zonetier}" Number="3-4" />
       <table Name="Cybernetics{zonetier+1}" Number="2-3" />
-      <table Name="Cybernetics{zonetier-1}" Number="2-3" />
+      <table Name="Gigantic Exoframe Stock {zonetier}" Number="1-2" />
+      <table Name="Gigantic Exoframe Stock {zonetier+1}" Number="0-1" />
       <table Chance="5" Name="Cybernetics2" Number="0-2" />
       <table Chance="50" Name="Cybernetics4" Number="0-2" />
       <table Chance="35" Name="Cybernetics6" Number="0-2" />
       <table Chance="5" Name="Cybernetics8" Number="0-2" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 1">
+    <group Name="Items" Style="PickOne">
+      <table Chance="50" Name="Gigantic Exoframe Stock 2" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 2">
+    <group Name="Items" Style="PickOne">
+      <table Weight="10" Name="Gigantic Exoframe Stock 1" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Alpha" />
+      <table Weight="15" Name="Gigantic Exoframe Stock 3" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 3">
+    <group Name="Items" Style="PickOne">
+      <table Weight="5" Name="Gigantic Exoframe Stock 2" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Alpha" />
+      <Object Weight="15" Blueprint="Gigantic Exoframe Delta" />
+      <table Weight="5" Name="Gigantic Exoframe Stock 4" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 4">
+    <group Name="Items" Style="PickOne">
+      <table Weight="10" Name="Gigantic Exoframe Stock 3" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Delta" />
+      <table Weight="15" Name="Gigantic Exoframe Stock 5" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 5">
+    <group Name="Items" Style="PickOne">
+      <table Weight="5" Name="Gigantic Exoframe Stock 4" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Delta" />
+      <Object Weight="15" Blueprint="Gigantic Exoframe Sigma" />
+      <table Weight="5" Name="Gigantic Exoframe Stock 6" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 6">
+    <group Name="Items" Style="PickOne">
+      <table Weight="10" Name="Gigantic Exoframe Stock 5" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Sigma" />
+      <table Weight="15" Name="Gigantic Exoframe Stock 7" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 7">
+    <group Name="Items" Style="PickOne">
+      <table Weight="5" Name="Gigantic Exoframe Stock 6" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Sigma" />
+      <Object Weight="15" Blueprint="Gigantic Exoframe Omega" />
+      <table Weight="5" Name="Gigantic Exoframe Stock 8" />
+    </group>
+  </population>
+  <population Name="Gigantic Exoframe Stock 8">
+    <group Name="Items" Style="PickOne">
+      <table Weight="25" Name="Gigantic Exoframe Stock 7" />
+      <Object Weight="75" Blueprint="Gigantic Exoframe Omega" />
     </group>
   </population>
   

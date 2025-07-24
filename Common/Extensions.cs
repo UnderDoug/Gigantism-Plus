@@ -2610,5 +2610,10 @@ namespace HNPS_GigantismPlus
             return Condition.NotCheck(Subject);
         }
 
+        public static string AsCardinal(this int Number)
+        {
+            return Grammar.Cardinal(Number);
+        }
+
     } //!-- Extensions
 }

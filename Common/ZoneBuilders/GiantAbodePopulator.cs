@@ -17,6 +17,7 @@ using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+using XRL.Language;
 
 namespace XRL.World.ZoneBuilders
 {
@@ -58,7 +59,9 @@ namespace XRL.World.ZoneBuilders
         public string ApothecaryID;
         public string DromadID;
         public string GutsmongerID;
+        public Dictionary<string, string> MerchantIDs;
         public string PetID;
+        public List<string> ResidentIDs;
 
         public GiantAbodePopulator()
         {
@@ -68,7 +71,15 @@ namespace XRL.World.ZoneBuilders
             ApothecaryID = null;
             DromadID = null;
             GutsmongerID = null;
+            MerchantIDs = new()
+            {
+                { nameof(TinkerID), null },
+                { nameof(ApothecaryID), null },
+                { nameof(DromadID), null },
+                { nameof(GutsmongerID), null },
+            };
             PetID = null;
+            ResidentIDs = new();
         }
 
         public bool BuildZone(Zone Z)
@@ -415,12 +426,53 @@ namespace XRL.World.ZoneBuilders
                 bool failedToGetDromad = false;
                 bool failedToGetGutsmonger = false;
                 bool failedToGetPet = false;
+                bool failedToGetResidents = false;
 
-                GameObject tinkerGiant = The.ZoneManager.PullCachedObject(TinkerID, false);
-                GameObject apothecaryGiant = The.ZoneManager.PullCachedObject(ApothecaryID, false);
-                GameObject dromadGiant = The.ZoneManager.PullCachedObject(DromadID, false);
-                GameObject gutsmongerGiant = The.ZoneManager.PullCachedObject(GutsmongerID, false);
-                GameObject petGiant = The.ZoneManager.PullCachedObject(PetID, false);
+                GameObject tinkerGiant = null;
+                GameObject apothecaryGiant = null;
+                GameObject dromadGiant = null;
+                GameObject gutsmongerGiant = null;
+                GameObject petGiant = null;
+                if (!MerchantIDs.IsNullOrEmpty())
+                {
+                    foreach ((string LabelID, string ID) in MerchantIDs)
+                    {
+                        GameObject merchant = The.ZoneManager.PullCachedObject(ID, false);
+                        switch (LabelID)
+                        {
+                            case nameof(TinkerID):
+                                tinkerGiant = merchant;
+                                break;
+                            case nameof(ApothecaryID):
+                                apothecaryGiant = merchant;
+                                break;
+                            case nameof(DromadID):
+                                dromadGiant = merchant;
+                                break;
+                            case nameof(GutsmongerID):
+                                gutsmongerGiant = merchant;
+                                break;
+                        }
+                    }
+                }
+
+                tinkerGiant ??= The.ZoneManager.PullCachedObject(TinkerID, false);
+                apothecaryGiant ??= The.ZoneManager.PullCachedObject(ApothecaryID, false);
+                dromadGiant ??= The.ZoneManager.PullCachedObject(DromadID, false);
+                gutsmongerGiant ??= The.ZoneManager.PullCachedObject(GutsmongerID, false);
+                petGiant ??= The.ZoneManager.PullCachedObject(PetID, false);
+
+                List<GameObject> residentGiants = Event.NewGameObjectList();
+                if (!ResidentIDs.IsNullOrEmpty())
+                {
+                    foreach (string ID in ResidentIDs)
+                    {
+                        if (The.ZoneManager.PullCachedObject(ID, false) is GameObject residentGiant && residentGiant != null)
+                        {
+                            residentGiants.Add(residentGiant);
+                        }
+                    }
+                }
 
                 if (tinkerGiant == null)
                 {
@@ -477,13 +529,25 @@ namespace XRL.World.ZoneBuilders
 
                     failedToGetPet = true;
                 }
+                if (residentGiants.IsNullOrEmpty())
+                {
+                    Debug.Warn(2,
+                        $"{nameof(GiantAbodePopulator)}",
+                        $"{nameof(BuildZone)}",
+                        $"Failed to retreive {nameof(residentGiants)} Villagers from cache " +
+                        $"in zone {zone?.ZoneID}",
+                        Indent: 1);
+
+                    failedToGetResidents = true;
+                }
                 if (SecretGiantWhoCooksBuilderExtension.TryGenerateGiantVillagers(zone.wX / 10,
                     HeroDetailColor: UniqueGiant.WrassleID()?.SecondaryColor,
                     out GameObject altTinkerGiant,
                     out GameObject altApothecaryGiant,
                     out GameObject altDromadGiant,
                     out GameObject altGutsmongerGiant,
-                    out GameObject altPetGiant))
+                    out GameObject altPetGiant,
+                    out List<GameObject> altResidentGiants))
                 {
                     if (failedToGetTinker)
                     {
@@ -504,6 +568,10 @@ namespace XRL.World.ZoneBuilders
                     if (failedToGetPet)
                     {
                         petGiant = altPetGiant;
+                    }
+                    if (failedToGetResidents)
+                    {
+                        residentGiants = altResidentGiants;
                     }
                 }
 
@@ -608,13 +676,34 @@ namespace XRL.World.ZoneBuilders
                     && PlaceGiantVillagerInCell(gutsmongerGiant, gutsmongerGiantLocation, zone, "Gutsmonger")
                     && PlaceGiantVillagerInCell(petGiant, petGiantLocation, zone, "Pet"))
                 {
-                    Debug.CheckYeh(4, $"all five Giant Villagers successfully placed", 
+                    Debug.CheckYeh(4, $"all five Giant Villager Merchants (and Pet) successfully placed", 
                         Indent: 1, Toggle: getDoDebug());
                 }
                 else
                 {
-                    Debug.CheckNah(4, $"at least one Giant Villager failed to be placed",
+                    Debug.CheckNah(4, $"at least one Giant Villager Merchants (and Pet) failed to be placed",
                         Indent: 1, Toggle: getDoDebug());
+                }
+
+                if (!residentGiants.IsNullOrEmpty())
+                {
+                    bool allPlaced = true;
+                    foreach (GameObject residentGiant in residentGiants)
+                    {
+                        Cell residentGiantLocation = nonRegionEmptyCells?.GetRandomElement()
+                            ?? zone?.GetEmptyCells()?.GetRandomElement();
+                        allPlaced = PlaceGiantVillagerInCell(residentGiant, residentGiantLocation, zone, "Resident") && allPlaced;
+                    }
+                    if (allPlaced)
+                    {
+                        Debug.CheckYeh(4, $"all {residentGiants.Count.AsCardinal()} Giant Villager Residents successfully placed",
+                            Indent: 1, Toggle: getDoDebug());
+                    }
+                    else
+                    {
+                        Debug.CheckNah(4, $"at least one Giant Villager Residents failed to be placed",
+                            Indent: 1, Toggle: getDoDebug());
+                    }
                 }
             }
             else
@@ -637,7 +726,7 @@ namespace XRL.World.ZoneBuilders
                 if (HomeCell != null)
                 {
                     HomeCell.AddObject(Villager);
-                    if (Villager.Brain != null)
+                    if (Villager.Brain != null && Context != "Resident" && Context != "Pet")
                     {
                         Villager.Brain.StartingCell = new();
                         Villager.Brain.StartingCell.SetCell(HomeCell);

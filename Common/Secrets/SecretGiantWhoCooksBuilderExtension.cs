@@ -25,6 +25,8 @@ using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 
+using static XRL.World.ObjectBuilders.WrassleGiantHero;
+
 namespace XRL.World.WorldBuilders
 {
     [HasWishCommand]
@@ -109,7 +111,7 @@ namespace XRL.World.WorldBuilders
                     ZoneID: SecretZoneID,
                     text: SCRT_GNT_LCTN_TEXT,
                     category: SCRT_GNT_LCTN_CATEGORY,
-                    attributes: WrassleGiantHero.SecretAttributes,
+                    attributes: SecretAttributes,
                     secretId: SCRT_GNT_SCRT_ID
                 );
             }
@@ -145,6 +147,11 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Setting ZoneName...", Indent: 1, Toggle: getDoDebug());
             zoneManager.SetZoneName(SecretZoneID, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneID, false);
+
+            Debug.Entry(4, $"Setting ZoneTierOverride...", Indent: 1, Toggle: getDoDebug());
+            int approxZoneTier = (int)((location.X + 3) / 3.0) / 10; // 80 parasangs wide, 8 Tiers, divide parasangs by 10
+            Tier.Constrain(ref approxZoneTier);
+            zoneManager.SetZoneProperty(SecretZoneID, "ZoneTierOverride", approxZoneTier);
 
             TerrainTravel pTravel = Builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
             if (XRL.UI.Options.ShowOverlandEncounters && pTravel != null)
@@ -196,9 +203,6 @@ namespace XRL.World.WorldBuilders
             Debug.CheckNah(4, $"Skipping Wrassler Content", Indent: 2, Toggle: getDoDebug());
             */
 
-            int approxZoneTier = (int)((location.X + 3) / 3.0) / 10; // 80 parasangs wide, 8 Tiers, divide parasangs by 10
-            Tier.Constrain(ref approxZoneTier); 
-
             Debug.Entry(4, $"Assigning GiantAbodePopulator if it's necessary...", Indent: 1, Toggle: getDoDebug());
             if (MapFileName == SCRT_GNT_ZONE_MAP2_CENTRE) // This specific map has the widgets necessary for the specified builder to work
             {
@@ -208,30 +212,41 @@ namespace XRL.World.WorldBuilders
                     out GameObject apothecaryGiant,
                     out GameObject dromadGiant,
                     out GameObject gutsmongerGiant,
-                    out GameObject petGiant))
+                    out GameObject petGiant,
+                    out List<GameObject> residentGiants))
                 {
+                    string uniqueGiantID = zoneManager.CacheObject(UniqueGiant);
+                    Dictionary<string, string> merchantGiantsIDs = new()
+                    {
+                        { "TinkerID", zoneManager.CacheObject(tinkerGiant) },
+                        { "ApothecaryID", zoneManager.CacheObject(apothecaryGiant) },
+                        { "DromadID", zoneManager.CacheObject(dromadGiant) },
+                        { "GutsmongerID", zoneManager.CacheObject(gutsmongerGiant) },
+                    };
+                    string petID = zoneManager.CacheObject(petGiant);
+                    List<string> residentGiantsIDs = new();
+                    if (!residentGiants.IsNullOrEmpty())
+                    {
+                        foreach (GameObject residentGiant in residentGiants)
+                        {
+                            residentGiantsIDs.Add(zoneManager.CacheObject(residentGiant));
+                        }
+                    }
                     zoneManager.AddZonePostBuilder(
                         ZoneID: SecretZoneID,
                         Class: nameof(GiantAbodePopulator),
-                        Key1: "GiantID",
-                        Value1: zoneManager.CacheObject(UniqueGiant),
-                        Key2: "TinkerID",
-                        Value2: zoneManager.CacheObject(tinkerGiant),
-                        Key3: "ApothecaryID",
-                        Value3: zoneManager.CacheObject(apothecaryGiant),
-                        Key4: "DromadID",
-                        Value4: zoneManager.CacheObject(dromadGiant),
-                        Key5: "DromadID",
-                        Value5: zoneManager.CacheObject(dromadGiant),
-                        Key6: "PetID",
-                        Value6: zoneManager.CacheObject(petGiant));
+                        Key1: nameof(GiantAbodePopulator.GiantID), Value1: uniqueGiantID,
+                        Key2: nameof(GiantAbodePopulator.MerchantIDs), Value2: merchantGiantsIDs,
+                        Key3: nameof(GiantAbodePopulator.PetID), Value3: petID,
+                        Key4: nameof(GiantAbodePopulator.ResidentIDs), Value4: residentGiantsIDs);
                 }
                 else
                 {
                     Debug.Warn(2,
                         $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
                         $"{nameof(GigantifyWrasslers)}",
-                        $"Failed to instantiate one or more of the Giant Villagers",
+                        $"Failed to instantiate one or more of the Giant Villagers, " +
+                        $"allowing {nameof(GiantAbodePopulator)} to attempt Villager generation",
                         Indent: 1);
 
                     zoneManager.AddZonePostBuilder(
@@ -341,8 +356,8 @@ namespace XRL.World.WorldBuilders
         {
             GameObject creature;
             GameObjectBlueprint creatureBlueprint = Unique 
-                ? WrassleGiantHero.GetAUniqueGiantHeroBlueprintModel()
-                : WrassleGiantHero.GetAGiantHeroBlueprintModel()
+                ? GetAUniqueGiantHeroBlueprintModel()
+                : GetAGiantHeroBlueprintModel()
                 ;
 
             void ApplyBuilder(GameObject Creature) 
@@ -357,15 +372,24 @@ namespace XRL.World.WorldBuilders
 
             return creature;
         }
-        public static void GigantifyVillager(GameObject Villager)
+        public static void SetGiantVillagerStews(GameObject Villager)
         {
             DieRoll dieRoll = new(Villager.GetStringProperty(GNT_START_STEWS_PROPLABEL, "1d1"));
             dieRoll.AdjustDieCount(Stat.RandomCosmetic(0, 1));
             dieRoll.AdjustDieSize(Stat.RandomCosmetic(1, 3));
             Villager.SetStringProperty(GNT_START_STEWS_PROPLABEL, dieRoll.ToString());
-            Gigantifier.Apply(Villager, "Village");
         }
-        public static bool TryGenerateGiantVillagers(int ApproxZoneTier, string HeroDetailColor, out GameObject TinkerGiant, out  GameObject ApothecaryGiant, out GameObject DromadGiant, out GameObject GutsmongerGiant, out GameObject PetGiant)
+        public static void GigantifyMerchant(GameObject Merchant)
+        {
+            SetGiantVillagerStews(Merchant);
+            Gigantifier.Apply(Merchant, "GiantVillageMerchant");
+        }
+        public static void GigantifyResident(GameObject Resident)
+        {
+            SetGiantVillagerStews(Resident);
+            Gigantifier.Apply(Resident, "GiantVillageResident");
+        }
+        public static bool TryGenerateGiantVillagers(int ApproxZoneTier, string HeroDetailColor, out GameObject TinkerGiant, out  GameObject ApothecaryGiant, out GameObject DromadGiant, out GameObject GutsmongerGiant, out GameObject PetGiant, out List<GameObject> Residents)
         {
             string tinkerBlueprint = $"HumanTinker{ApproxZoneTier}";
             string apothecaryBlueprint = $"HumanApothecary{ApproxZoneTier}";
@@ -373,8 +397,8 @@ namespace XRL.World.WorldBuilders
             string gutsmongerBlueprint = $"Giant Gutsmonger";
             string petBlueprint = PopulationManager.RollOneFrom($"DynamicInheritsTable:BaseAnimal:Tier{ApproxZoneTier}").Blueprint;
 
-            If.d100(10, () => tinkerBlueprint = WrassleGiantHero.GetOldGiantEligibleBlueprint());
-            If.d100(10, () => apothecaryBlueprint = WrassleGiantHero.GetOldGiantEligibleBlueprint());
+            If.d100(10, () => tinkerBlueprint = GetOldGiantEligibleBlueprint());
+            If.d100(10, () => apothecaryBlueprint = GetOldGiantEligibleBlueprint());
 
             TinkerGiant = null;
             ApothecaryGiant = null;
@@ -386,7 +410,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Crafting up {nameof(TinkerGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                TinkerGiant = GameObjectFactory.Factory.CreateObject(tinkerBlueprint, GigantifyVillager);
+                TinkerGiant = GameObjectFactory.Factory.CreateObject(tinkerBlueprint, GigantifyMerchant);
                 PrepareGiantVillager(TinkerGiant, "Tinker", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -398,7 +422,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Teaching {nameof(ApothecaryGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                ApothecaryGiant = GameObjectFactory.Factory.CreateObject(apothecaryBlueprint, GigantifyVillager);
+                ApothecaryGiant = GameObjectFactory.Factory.CreateObject(apothecaryBlueprint, GigantifyMerchant);
                 PrepareGiantVillager(ApothecaryGiant, "Apothecary", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -410,7 +434,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Finding {nameof(DromadGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                DromadGiant = GameObjectFactory.Factory.CreateObject(dromadBlueprint, GigantifyVillager);
+                DromadGiant = GameObjectFactory.Factory.CreateObject(dromadBlueprint, GigantifyMerchant);
                 PrepareGiantVillager(DromadGiant, "Merchant", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -426,7 +450,7 @@ namespace XRL.World.WorldBuilders
                 {
                     Gutsmonger.GetStat("Level").BaseValue = 5 * ApproxZoneTier - 1;
                     Gutsmonger.Body.GetBody().Implant(GameObjectFactory.Factory.CreateObject("GiganticExoframeSigma"));
-                    GigantifyVillager(Gutsmonger);
+                    GigantifyMerchant(Gutsmonger);
                 }
                 GutsmongerGiant = GameObjectFactory.Factory.CreateObject(gutsmongerBlueprint, gigantifyGutsmonger);
                 PrepareGiantVillager(GutsmongerGiant, "Gutsmonger", ApproxZoneTier, HeroDetailColor);
@@ -440,7 +464,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Adopting {nameof(PetGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                PetGiant = GameObjectFactory.Factory.CreateObject(petBlueprint, GigantifyVillager);
+                PetGiant = GameObjectFactory.Factory.CreateObject(petBlueprint, GigantifyMerchant);
                 PrepareGiantVillager(PetGiant, "Pet", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -449,7 +473,32 @@ namespace XRL.World.WorldBuilders
                 MetricsManager.LogException(xContext + "Pet", x);
             }
 
-            return TinkerGiant != null && ApothecaryGiant != null && DromadGiant != null && PetGiant != null;
+            int residentsRoll = Stat.Random(3, 6);
+            Debug.Entry(4, $"Immigrating {residentsRoll} {nameof(Residents)}...", Indent: 1, Toggle: getDoDebug());
+            try
+            {
+                Residents = Event.NewGameObjectList();
+                GameObject resident = null;
+                for (int i = 0; i < residentsRoll; i++)
+                {
+                    resident = GameObjectFactory.Factory.CreateObject(GetGiantHeroEligibleBlueprint(), GigantifyResident);
+                    if (resident != null && Residents.TryAdd(PrepareGiantVillager(resident, "Resident", ApproxZoneTier, HeroDetailColor)))
+                    {
+                        Debug.CheckYeh(4, $"{nameof(resident)} {resident} Added", Indent: 2, Toggle: getDoDebug());
+                    }
+                    else
+                    {
+                        Debug.CheckNah(4, $"Failed to instantiate {nameof(resident)}", Indent: 2, Toggle: getDoDebug());
+                    }
+                }
+            }
+            catch (Exception x)
+            {
+                Residents = null;
+                MetricsManager.LogException(xContext + "Resident", x);
+            }
+
+            return TinkerGiant != null && ApothecaryGiant != null && DromadGiant != null && PetGiant != null && Residents != null;
         }
         public static GameObject PrepareGiantVillager(GameObject Villager, string Context = null, int Tier = 1, string HeroDetailColor = null)
         {
@@ -460,6 +509,7 @@ namespace XRL.World.WorldBuilders
             bool isDromad = Context == "Merchant";
             bool isGutsmonger = Context == "Gutsmonger";
             bool isPet = Context == "Pet";
+            bool isResident = Context == "Resident";
 
             Villager.Brain = Villager.RequirePart<Brain>();
 
@@ -470,28 +520,64 @@ namespace XRL.World.WorldBuilders
             Villager.RemovePart<AIPilgrim>();
             Villager.RemovePart<ConversationScript>();
 
+            string noHateFactions = Villager.GetPropertyOrTag("NoHateFactions");
+            if (noHateFactions.IsNullOrEmpty() || !noHateFactions.Contains("Wardens"))
+            {
+                noHateFactions = !noHateFactions.IsNullOrEmpty() ? $"{noHateFactions},Wardens" : "Wardens";
+            }
+            if (noHateFactions.IsNullOrEmpty() || !noHateFactions.Contains("Dromad"))
+            {
+                noHateFactions = !noHateFactions.IsNullOrEmpty() ? $"{noHateFactions},Dromad" : "Dromad";
+            }
+            if (noHateFactions.IsNullOrEmpty() || !noHateFactions.Contains("SCRT_GNT_VLG_FCT"))
+            {
+                noHateFactions = !noHateFactions.IsNullOrEmpty() ? $"{noHateFactions},{SCRT_GNT_VLG_FCT}" : SCRT_GNT_VLG_FCT;
+            }
+            if (noHateFactions.IsNullOrEmpty() || !noHateFactions.Contains("Giants"))
+            {
+                noHateFactions = !noHateFactions.IsNullOrEmpty() ? $"{noHateFactions},Giants" : "Giants";
+            }
+            Villager.SetStringProperty("NoHateFactions", noHateFactions);
+
             Villager.Brain.Factions = "";
             Villager.Brain.Allegiance.Clear();
             Villager.Brain.Allegiance.Add("Giants", 100);
-            Villager.Brain.Allegiance.Add(SCRT_GNT_VLG_FCT, 50);
+            if (!isResident)
+            {
+                Villager.Brain.Allegiance.Add(SCRT_GNT_VLG_FCT, 50);
+            }
             Villager.Brain.Allegiance.Hostile = false;
             Villager.Brain.Allegiance.Calm = true;
             Villager.Brain.Wanders = true;
             Villager.Brain.WandersRandomly = true;
-            Villager.SetIntProperty("ParticipantVillager", 1);
-            Villager.SetIntProperty("SecretGiantVillager", 1);
-            Villager.SetStringProperty("HeroNameColor", "Y");
-            // Villager.SetStringProperty("HeroColorString", "same");
-            // Villager.SetStringProperty("HeroTileColor", "same");
-            Villager.SetStringProperty("HeroDetailColor", HeroDetailColor);
 
             GenericInventoryRestocker inventoryRestocker = null;
             ConversationScript conversationScript = null;
-            Interesting interesting = Villager.RequirePart<Interesting>();
+            Interesting interesting = null;
+
+            Villager.SetIntProperty("SuppressSimpleConversation", 1);
+            Villager.SetIntProperty("ParticipantVillager", 1);
+
+            if (!isResident)
+            {
+                Villager.SetIntProperty("SecretGiantVillager", 1);
+                Villager.SetStringProperty("HeroNameColor", "Y");
+                // Villager.SetStringProperty("HeroColorString", "same");
+                // Villager.SetStringProperty("HeroTileColor", "same");
+                Villager.SetStringProperty("HeroDetailColor", HeroDetailColor);
+                interesting = Villager.RequirePart<Interesting>();
+            }
+            else
+            {
+                if (Villager.Render != null)
+                {
+                    Villager.Render.DetailColor = HeroDetailColor;
+                }
+            }
 
             string conversationScriptID = null;
 
-            if (!isPet)
+            if (!isPet && !isResident)
             {
                 Villager.SetStringProperty("Merchant", "You betcha!");
                 inventoryRestocker = Villager.RequirePart<GenericInventoryRestocker>();
@@ -542,7 +628,7 @@ namespace XRL.World.WorldBuilders
 
                 inventoryRestocker.Table = $"Village {Context} {Tier}";
 
-                Villager.SetIntProperty("SuppressSimpleConversation", 1);
+                // Villager.SetIntProperty("SuppressSimpleConversation", 1);
 
                 int blueprintHitpoints = baseMerchantBlueprint.Stats["Hitpoints"].BaseValue;
                 int blueprintLevel = baseMerchantBlueprint.Stats["Level"].BaseValue;
@@ -629,7 +715,7 @@ namespace XRL.World.WorldBuilders
             }
             if (isGutsmonger)
             {
-                Villager.SetIntProperty("SuppressSimpleConversation", 1);
+                // Villager.SetIntProperty("SuppressSimpleConversation", 1);
                 Villager.SetStringProperty("HeroTileColor", "&B");
 
                 conversationScriptID = "gutsmonger";
@@ -679,80 +765,106 @@ namespace XRL.World.WorldBuilders
                     Text: Villager.GetTag("SimpleConversation", "*does not react*"), 
                     Goodbye: "Live and drink.");
             }
+            if (isResident)
+            {
+                string response = Villager.GetTag("SimpleConversation",
+                    "Moon and Sun. Wisdom and will.~" +
+                    "May the earth yield for us this season.~" +
+                    "Peace, =player.formalAddressTerm=.");
+                ConversationsAPI.addSimpleConversationToObject(
+                    Object: Villager,
+                    Text: response,
+                    Goodbye: "Live and drink.");
+            }
 
             if (!conversationScriptID.IsNullOrEmpty() && conversationScript != null)
             {
                 conversationScript.ConversationID = conversationScriptID;
             }
 
-            Villager.SetStringProperty("Culture", "WrassleGiant");
-
-            Villager = HeroMaker.MakeHero(Villager, $"SpecialVillagerHeroTemplate_{heroTemplate}", -1, Context);
-
-            string villagerEpithet = NameMaker.MakeEpithet(
-                For: null,
-                Genotype: null,
-                Subtype: null,
-                Species: null,
-                Culture: null,
-                Faction: "WrassleGiants",
-                Region: null,
-                Gender: null,
-                Mutations: null,
-                Tag: null,
-                Special: Context,
-                NamingContext: null,
-                SpecialFaildown: true,
-                HasHonorific: null,
-                HasEpithet: null);
-
-            Debug.LoopItem(4, $"{nameof(villagerEpithet)}", villagerEpithet ?? NULL, Good: villagerEpithet != null, Indent: indent + 2, Toggle: getDoDebug());
-
-            string villagerName = NameMaker.MakeName(
-                For: null,
-                Genotype: null,
-                Subtype: null,
-                Species: null,
-                Culture: null,
-                Faction: "WrassleGiants",
-                Region: null,
-                Gender: null,
-                Mutations: null,
-                Tag: null,
-                Special: Context,
-                NamingContext: null,
-                SpecialFaildown: true,
-                HasHonorific: null,
-                HasEpithet: null);
-
-            Debug.LoopItem(4, $"{nameof(villagerName)}", villagerName ?? NULL, Good: villagerName != null, Indent: indent + 2, Toggle: getDoDebug());
-
-            if (villagerName.Contains("NameGenFail"))
+            Villager.SetStringProperty("Culture", isResident ? "Giant" : "WrassleGiant");
+            if (!isGutsmonger)
             {
-                villagerName = null;
+                Villager.SetStringProperty("Species", "Giant");
+            }
+
+            if (!isResident)
+            {
+                Villager = HeroMaker.MakeHero(Villager, $"SpecialVillagerHeroTemplate_{heroTemplate}", -1, Context);
+
+                string villagerEpithet = NameMaker.MakeEpithet(
+                    For: null,
+                    Genotype: null,
+                    Subtype: null,
+                    Species: null,
+                    Culture: null,
+                    Faction: "WrassleGiants",
+                    Region: null,
+                    Gender: null,
+                    Mutations: null,
+                    Tag: null,
+                    Special: Context,
+                    NamingContext: null,
+                    SpecialFaildown: true,
+                    HasHonorific: null,
+                    HasEpithet: null);
+
+                Debug.LoopItem(4, $"{nameof(villagerEpithet)}", villagerEpithet ?? NULL, Good: villagerEpithet != null, Indent: indent + 2, Toggle: getDoDebug());
+
+                string villagerName = NameMaker.MakeName(
+                    For: null,
+                    Genotype: null,
+                    Subtype: null,
+                    Species: null,
+                    Culture: null,
+                    Faction: "WrassleGiants",
+                    Region: null,
+                    Gender: null,
+                    Mutations: null,
+                    Tag: null,
+                    Special: Context,
+                    NamingContext: null,
+                    SpecialFaildown: true,
+                    HasHonorific: null,
+                    HasEpithet: null);
+
+                Debug.LoopItem(4, $"{nameof(villagerName)}", villagerName ?? NULL, Good: villagerName != null, Indent: indent + 2, Toggle: getDoDebug());
+
+                if (villagerName.Contains("NameGenFail"))
+                {
+                    villagerName = null;
+                }
+                else
+                {
+                    villagerName = villagerName.OptionalColorYuge();
+                }
+
+                Villager.GiveProperName(
+                    Name: villagerName,
+                    Force: true,
+                    Special: "Hero",
+                    SpecialFaildown: true,
+                    HasHonorific: null,
+                    HasEpithet: null,
+                    NamingContext: null);
+
+                if (!villagerEpithet.IsNullOrEmpty())
+                {
+                    if (Villager.TryGetPart(out Epithets epithets))
+                    {
+                        Villager.RemovePart(epithets);
+                    }
+                    epithets = Villager.RequirePart<Epithets>();
+                    epithets.Primary = GameText.VariableReplace(villagerEpithet).Color("y");
+                }
+                Villager.SetIntProperty($"Village{Context}", 1);
+                Villager.SetIntProperty("NamedVillager", 1);
+                TakeOnRoleEvent.Send(Villager, Context);
+                inventoryRestocker?.PerformRestock(Silent: true);
             }
             else
             {
-                villagerName = villagerName.OptionalColorYuge();
-            }
-
-            Villager.GiveProperName(
-                Name: villagerName,
-                Force: true,
-                Special: "Hero",
-                SpecialFaildown: true,
-                HasHonorific: null,
-                HasEpithet: null,
-                NamingContext: null);
-
-            if (!villagerEpithet.IsNullOrEmpty())
-            {
-                if (Villager.TryGetPart(out Epithets epithets))
-                {
-                    Villager.RemovePart(epithets);
-                }
-                epithets = Villager.RequirePart<Epithets>();
-                epithets.Primary = GameText.VariableReplace(villagerEpithet).Color("y");
+                Villager.SetIntProperty("Villager", 1);
             }
 
             int xPThisLevel = Leveler.GetXPForLevel(level.BaseValue);
@@ -760,10 +872,6 @@ namespace XRL.World.WorldBuilders
             xP.BaseValue = Stat.RandomCosmetic(xPThisLevel, xPNextLevel);
 
             Villager.FireEvent("VillageInit");
-            Villager.SetIntProperty($"Village{Context}", 1);
-            Villager.SetIntProperty("NamedVillager", 1);
-            TakeOnRoleEvent.Send(Villager, Context);
-            inventoryRestocker?.PerformRestock(Silent: true);
             return Villager;
         }
 

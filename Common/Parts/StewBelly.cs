@@ -278,7 +278,7 @@ namespace XRL.World.Parts
         {
             if (Grumble)
             {
-                DidX("seriously hanker", "for more stew", "!", $"{Grammar.MakePossessive(ParentObject.ShortDisplayName)} Stew Belly", UseVisibilityOf: ParentObject);
+                DidX("seriously hankers", "for more stew", "!", ParentObject.poss("Stew Belly"), UseVisibilityOf: ParentObject);
                 int nearness = 7;
                 if (!ParentObject.IsPlayer())
                 {

@@ -706,7 +706,7 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
-            Manager.Write(Basis, Writer);
+            Writer.WriteObject(Manager);
             Writer.Write(AccumulatedDamageDie.Count);
             Writer.Write(AccumulatedDamageDie.Size);
             Writer.Write(AccumulatedDamageDie.Bonus);

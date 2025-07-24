@@ -114,6 +114,10 @@ namespace XRL.World.ObjectBuilders
                 + $" Context: {Context?.Quote() ?? NULL})",
                 Indent: indent, Toggle: getDoDebug());
 
+            bool isGiantVillageMerchant = Context == "GiantVillageMerchant";
+            bool isGiantVillageResident = Context == "GiantVillageResident";
+            bool isGiantVillager = isGiantVillageMerchant || isGiantVillageResident;
+
             bool success = false;
             if (Creature != null && Creature.IsCreature && (DoForTrueKin || !Creature.IsTrueKin()))
             {
@@ -162,7 +166,7 @@ namespace XRL.World.ObjectBuilders
                 stewBelly.ProcessStartingStews();
 
                 Debug.Entry(4, $"Applying NamePrefix...", Indent: indent + 1, Toggle: getDoDebug());
-                if (!NamePrefix.IsNullOrEmpty() && Context != "Hero" && Context != "Unique")
+                if (!NamePrefix.IsNullOrEmpty() && Context != "Hero" && Context != "Unique" && !isGiantVillageMerchant)
                 {
                     Debug.CheckYeh(4, $"Creature eligible for NamePrefix", Indent: indent + 2, Toggle: getDoDebug());
                     Creature.RequirePart<DisplayNameAdjectives>().AddAdjective(NamePrefix);
@@ -199,7 +203,9 @@ namespace XRL.World.ObjectBuilders
                 + $" Context: {Context?.Quote() ?? NULL})",
                 Indent: indent, Toggle: getDoDebug());
 
-            bool isVillage = Context == "Village";
+            bool isGiantVillageMerchant = Context == "GiantVillageMerchant";
+            bool isGiantVillageResident = Context == "GiantVillageResident";
+            bool isGiantVillager = isGiantVillageMerchant || isGiantVillageResident;
 
             bool success = false;
             if (Creature != null && Creature.IsCreature && Creature.IsTrueKin())
@@ -279,7 +285,7 @@ namespace XRL.World.ObjectBuilders
                 {
                     Debug.CheckYeh(4, $"{nameof(exoframeObject)} not null, and have {nameof(CyberneticsGiganticExoframe)} part", Indent: indent + 1, Toggle: getDoDebug());
 
-                    if (!isVillage)
+                    if (!isGiantVillageMerchant)
                     {
                         NamePrefix = exoframeCybernetic.GetNaturalEquipmentColoredAdjective();
                     }
@@ -287,9 +293,17 @@ namespace XRL.World.ObjectBuilders
 
                     if (!alreadyInstalled)
                     {
+                        List<string> contextFilter = new()
+                        {
+                            "Initialization",
+                            "GameStarted",
+                            "Wish",
+                            "Creation",
+                            "Sample",
+                        };
                         Debug.Entry(4, $"Checking Context...", Indent: indent + 1, Toggle: getDoDebug());
                         Debug.LoopItem(4, nameof(Context), Context, Indent: indent + 2, Toggle: getDoDebug());
-                        if (Context == "Initialization" || Context == "GameStarted" || Context == "Wish" || Context == "Creation" || Context == "Sample")
+                        if (contextFilter.Contains(Context))
                         {
                             Debug.Entry(4, $"Context requires {nameof(CyberneticsHasImplants)}...", Indent: indent + 1, Toggle: getDoDebug());
 
@@ -360,7 +374,7 @@ namespace XRL.World.ObjectBuilders
 
                     Debug.LoopItem(4, $"{nameof(success)}?", $"{success}", Good: success, Indent: indent + 1, Toggle: getDoDebug());
 
-                    if (success && !isVillage)
+                    if (success && !isGiantVillageMerchant)
                     {
                         Debug.Entry(4, $"Performing Color Changes...", Indent: indent + 1, Toggle: getDoDebug());
 

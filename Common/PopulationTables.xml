@@ -426,15 +426,38 @@
 
   <population Name="Implants_4PlusPointers" Load="Merge">
     <group Name="Items" Load="Merge">
-      <object Weight="12" Number="1" Blueprint="GiganticExoframeDelta" />
-      <object Weight="5" Number="1" Blueprint="GiganticExoframeSigma" />
-      <object Weight="1" Number="1" Blueprint="GiganticExoframeOmega" />
+      <table Weight="15" Number="1" Name="Implants_GiganticExoframes_Tier4" />
+    </group>
+  </population>
+
+  <population Name="Implants_GiganticExoframes_Tier4">
+    <group Name="Items" Style="pickone">
+      <object Weight="60" Number="1" Blueprint="Gigantic Exoframe Delta" />
+      <object Weight="30" Number="1" Blueprint="Gigantic Exoframe Sigma" />
+      <table Weight="1" Number="1" Name="Implants_GiganticExoframes_Tier6" />
+    </group>
+  </population>
+
+  <population Name="Implants_GiganticExoframes_Tier6">
+    <group Name="Items" Style="pickone">
+      <object Weight="30" Number="1" Blueprint="Gigantic Exoframe Delta" />
+      <object Weight="60" Number="1" Blueprint="Gigantic Exoframe Sigma" />
+      <object Weight="3" Number="1" Blueprint="Gigantic Exoframe Omega" />
+      <table Weight="1" Number="1" Name="Implants_GiganticExoframes_Tier8" />
+    </group>
+  </population>
+
+  <population Name="Implants_GiganticExoframes_Tier8">
+    <group Name="Items" Style="pickone">
+      <object Weight="30" Number="1" Blueprint="Gigantic Exoframe Sigma" />
+      <object Weight="60" Number="1" Blueprint="Gigantic Exoframe Omega" />
     </group>
   </population>
 
   <population Name="Implants_4PlusPointersWithCathedras" Load="Merge">
     <group Name="Items" Load="Merge">
-      <object Weight="30" Number="1" Blueprint="GiganticExoframeOmega" />
+      <object Weight="15" Number="1" Blueprint="Gigantic Exoframe Omega" />
+      <table Weight="15" Number="1" Name="Implants_GiganticExoframes_Tier8" />
       <!-- Weight is set so high because there are 4 Cathedras and only 1 Gigantic Exoframe Omega
            40/70 to get a Cathedra (any), 30/70 to get a Gigantic Exoframe Omega 
            Exoframe is slightly less likely than any Cathedra but 3 times as likely as a specific one -->

@@ -234,8 +234,8 @@
     <stat Name="Hitpoints" Value="300" sValue="5,2d4,(t-1)d10,(v)" />
     <part Name="GivesRep" />
     <xtagWaterRitual NoJoin="true" SellSkill="SingleWeaponFighting_OpportuneAttacks" SellBlueprints="true" numRecipes="1"></xtagWaterRitual>
-    <tag Name="staticFaction1" Value="GiantTemplar,hate,grand larsony and illegal sale of cybernetics" />
-    <tag Name="staticFaction2" Value="WrassleGiants,love,grand larsony and illegal sale of cybernetics" />
+    <tag Name="staticFaction1" Value="GiantTemplar,hate,grand larsony and the illegal sale of cybernetics" />
+    <tag Name="staticFaction2" Value="WrassleGiants,love,grand larsony and the illegal sale of cybernetics" />
     <tag Name="staticFaction3" Value="Wardens,friend,reasons they won't talk about" />
     <tag Name="NoHateFactions" Value="WrassleGiants,Giants,Wardens,Dromad" />
     <xtagGrammar Proper="true" />
@@ -255,7 +255,7 @@
     <stat Name="HeatResistance" Value="25" />
     <stat Name="ColdResistance" Value="15" />
     <stat Name="ElectricResistance" Value="15" />
-    <part Name="CyberneticsHasImplants" Implants="GiganticExoframeSigma@body,CrysteelHandBones@hands,ReactiveCranialPlating@head" />
+    <part Name="CyberneticsHasImplants" Implants="Gigantic Exoframe Sigma@body,CrysteelHandBones@hands,ReactiveCranialPlating@head" />
     <inventoryobject Blueprint="Sandals" AutoMod="ModGigantic" IntProperties="AlwaysEquipAsArmor:1" />
     <inventoryobject Blueprint="Spectacles" AutoMod="ModGigantic" IntProperties="AlwaysEquipAsArmor:1" />
     <inventoryobject Blueprint="Leather Apron" AutoMod="ModGigantic" IntProperties="AlwaysEquipAsArmor:1" />

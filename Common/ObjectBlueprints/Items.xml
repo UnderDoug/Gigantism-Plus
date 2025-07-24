@@ -74,7 +74,8 @@ You cannot wear equipment on your body." />
   
   <!-- End Base -->
   
-  <object Name="GiganticExoframeAlpha" Inherits="BaseGiganticExoframe">
+  <object Name="Gigantic Exoframe Alpha" Inherits="BaseGiganticExoframe"
+          PreviousName="GiganticExoframeAlpha">
     <part Name="Physics" Weight="15" />
     <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}" DetailColor="b" />
     <part Name="Armor" 
@@ -96,7 +97,8 @@ You cannot wear equipment on your body." />
     <tag Name="Tier" Value="2" />
   </object>
 
-  <object Name="GiganticExoframeDelta" Inherits="BaseGiganticExoframe">
+  <object Name="Gigantic Exoframe Delta" Inherits="BaseGiganticExoframe"
+          PreviousName="GiganticExoframeDelta">
     <part Name="Physics" Weight="18" />
     <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}" DetailColor="K" />
     <part Name="Armor" 
@@ -117,7 +119,8 @@ You cannot wear equipment on your body." />
     <tag Name="Tier" Value="4" />
   </object>
 
-  <object Name="GiganticExoframeSigma" Inherits="BaseGiganticExoframe">
+  <object Name="Gigantic Exoframe Sigma" Inherits="BaseGiganticExoframe"
+          PreviousName="GiganticExoframeSigma">
     <part Name="Physics" Weight="9" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
@@ -144,7 +147,8 @@ You cannot wear equipment on your body." />
     <tag Name="Tier" Value="6" />
   </object>
 
-  <object Name="GiganticExoframeOmega" Inherits="BaseGiganticExoframe">
+  <object Name="Gigantic Exoframe Omega" Inherits="BaseGiganticExoframe"
+          PreviousName="GiganticExoframeOmega">
     <part Name="Physics" Weight="6" />
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />

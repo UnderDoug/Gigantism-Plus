@@ -299,20 +299,19 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            Debug.Entry(4,
-                $"{nameof(StewBelly)}." + 
-                $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
-                Indent: 0, Toggle: getDoDebug());
-
-            Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());
-            Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1, Toggle: getDoDebug());
-            Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1, Toggle: getDoDebug());
-            Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1, Toggle: getDoDebug());
-            Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1, Toggle: getDoDebug());
-            Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1, Toggle: getDoDebug());
-
             if (StewBellyDebugDescriptions && Stews > 0)
             {
+                Debug.Entry(4,
+                    $"{nameof(StewBelly)}." + 
+                    $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
+                    Indent: 0, Toggle: getDoDebug());
+
+                Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"StartingStewsPocessed", $"{StartingStewsPocessed}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"StartingHankering", $"{StartingHankering}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"Hankering", $"{Hankering}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"Gains", $"{Gains}", Indent: 1, Toggle: getDoDebug());
+                Debug.Entry(4, $"mutationMod", $"{mutationMod}", Indent: 1, Toggle: getDoDebug());
                 E.Postfix
                     .AppendLine()
                     .Append($"{"Stew Belly".OptionalColorYuge(Colorfulness)}: ")

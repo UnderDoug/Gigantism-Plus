@@ -148,13 +148,13 @@ namespace XRL.World.WorldBuilders
             zoneManager.SetZoneName(SecretZoneID, SCRT_GNT_LCTN_TEXT, Article: "the", Proper: true);
             zoneManager.SetZoneIncludeStratumInZoneDisplay(SecretZoneID, false);
 
-            Debug.Entry(4, $"Setting ZoneTierOverride...", Indent: 1, Toggle: getDoDebug());
             int approxZoneTier = (int)((location.X + 3) / 3.0) / 10; // 80 parasangs wide, 8 Tiers, divide parasangs by 10
             Tier.Constrain(ref approxZoneTier);
-            zoneManager.SetZoneProperty(SecretZoneID, "ZoneTierOverride", approxZoneTier);
+            Debug.Entry(4, $"Setting ZoneTierOverride to {nameof(approxZoneTier)} ({approxZoneTier})...", Indent: 1, Toggle: getDoDebug());
+            zoneManager.SetZoneProperty(SecretZoneID, "ZoneTierOverride", approxZoneTier.ToString());
 
             TerrainTravel pTravel = Builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
-            if (XRL.UI.Options.ShowOverlandEncounters && pTravel != null)
+            if (UI.Options.ShowOverlandEncounters && pTravel != null)
             {
                 Debug.Entry(4, $"Setting up OverLandEncounters option...", Indent: 1, Toggle: getDoDebug());
                 pTravel.ParentObject.Render.RenderString = "G";
@@ -410,7 +410,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Crafting up {nameof(TinkerGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                TinkerGiant = GameObjectFactory.Factory.CreateObject(tinkerBlueprint, GigantifyMerchant);
+                TinkerGiant = GameObjectFactory.Factory.CreateObject(tinkerBlueprint, AfterObjectCreated: GigantifyMerchant);
                 PrepareGiantVillager(TinkerGiant, "Tinker", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -422,7 +422,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Teaching {nameof(ApothecaryGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                ApothecaryGiant = GameObjectFactory.Factory.CreateObject(apothecaryBlueprint, GigantifyMerchant);
+                ApothecaryGiant = GameObjectFactory.Factory.CreateObject(apothecaryBlueprint, AfterObjectCreated: GigantifyMerchant);
                 PrepareGiantVillager(ApothecaryGiant, "Apothecary", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -434,7 +434,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Finding {nameof(DromadGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                DromadGiant = GameObjectFactory.Factory.CreateObject(dromadBlueprint, GigantifyMerchant);
+                DromadGiant = GameObjectFactory.Factory.CreateObject(dromadBlueprint, AfterObjectCreated: GigantifyMerchant);
                 PrepareGiantVillager(DromadGiant, "Merchant", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -452,7 +452,7 @@ namespace XRL.World.WorldBuilders
                     Gutsmonger.Body.GetBody().Implant(GameObjectFactory.Factory.CreateObject("GiganticExoframeSigma"));
                     GigantifyMerchant(Gutsmonger);
                 }
-                GutsmongerGiant = GameObjectFactory.Factory.CreateObject(gutsmongerBlueprint, gigantifyGutsmonger);
+                GutsmongerGiant = GameObjectFactory.Factory.CreateObject(gutsmongerBlueprint, AfterObjectCreated: gigantifyGutsmonger);
                 PrepareGiantVillager(GutsmongerGiant, "Gutsmonger", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -464,7 +464,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Adopting {nameof(PetGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
-                PetGiant = GameObjectFactory.Factory.CreateObject(petBlueprint, GigantifyMerchant);
+                PetGiant = GameObjectFactory.Factory.CreateObject(petBlueprint, AfterObjectCreated: GigantifyMerchant);
                 PrepareGiantVillager(PetGiant, "Pet", ApproxZoneTier, HeroDetailColor);
             }
             catch (Exception x)
@@ -481,7 +481,7 @@ namespace XRL.World.WorldBuilders
                 GameObject resident = null;
                 for (int i = 0; i < residentsRoll; i++)
                 {
-                    resident = GameObjectFactory.Factory.CreateObject(GetGiantHeroEligibleBlueprint(), GigantifyResident);
+                    resident = GameObjectFactory.Factory.CreateObject(GetGiantHeroEligibleBlueprint(), AfterObjectCreated: GigantifyResident);
                     if (resident != null && Residents.TryAdd(PrepareGiantVillager(resident, "Resident", ApproxZoneTier, HeroDetailColor)))
                     {
                         Debug.CheckYeh(4, $"{nameof(resident)} {resident} Added", Indent: 2, Toggle: getDoDebug());
@@ -514,8 +514,10 @@ namespace XRL.World.WorldBuilders
             Villager.Brain = Villager.RequirePart<Brain>();
 
             Villager.RemovePart<Lovely>();
+            Villager.RemovePart<Breeder>();
             Villager.RemovePart<SecretObject>();
             Villager.RemovePart<ConvertSpawner>();
+            Villager.RemovePart<Rummager>();
             Villager.RemovePart<AIShopper>();
             Villager.RemovePart<AIPilgrim>();
             Villager.RemovePart<ConversationScript>();
@@ -565,6 +567,18 @@ namespace XRL.World.WorldBuilders
                 // Villager.SetStringProperty("HeroColorString", "same");
                 // Villager.SetStringProperty("HeroTileColor", "same");
                 Villager.SetStringProperty("HeroDetailColor", HeroDetailColor);
+                if (isGutsmonger && HeroDetailColor == "B")
+                {
+                    List<string> colors = new()
+                    {
+                        "Y",
+                        "y",
+                        "C",
+                        "c",
+                        "b",
+                    };
+                    Villager.SetStringProperty("HeroDetailColor", colors.GetRandomElement());
+                }
                 interesting = Villager.RequirePart<Interesting>();
             }
             else

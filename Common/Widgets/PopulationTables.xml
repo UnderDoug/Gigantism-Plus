@@ -387,7 +387,7 @@
       <table Chance="75" Number="1" Name="Gigantic Table Basic" Hint="AlongWall,AdjacentToEndsWith: Chair" />
     </group>
     <group Name="Contents Additional" Style="pickone">
-      <group Weight="5" Name="Well Read" Style="pickeach">
+      <group Weight="5" Name="Library" Style="pickeach">
         <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
         <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
         <table Chance="35" Number="1" Name="Gigantic Bookshelves" Hint="AdjacentToStartsWith: Gigantic ishelf" />
@@ -436,6 +436,12 @@
 
   <population Name="Giant Abode Tinker">
     <group Name="Contents" Style="pickeach">
+      
+      <table Chance="100" Name="Giant Abode Base" />
+      
+      <table Chance="100" Number="1" Name="Gigantic Tinker Table" Hint="AlongWall" />
+      <object Chance="100" Number="1" Blueprint="Gigantic Multicabinet" Hint="AlongWall" />
+      
       <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AlongWall" />
       <object Chance="100" Number="1" Blueprint="Gigantic Fusion Power Station" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
       <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
@@ -445,11 +451,6 @@
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <object Chance="100" Number="1" Blueprint="Gigantic Wire Extruder" Hint="AdjacentToEndsWith: PowerLine" />
-      
-      <table Chance="100" Name="Giant Abode Base" />
-      
-      <table Chance="100" Number="1" Name="Gigantic Tinker Table" Hint="AlongWall" />
-      <object Chance="100" Number="1" Blueprint="Gigantic Multicabinet" Hint="AlongWall" />
       
       <table Chance="100" Number="1" Name="Gigantic Decoration Tinker" Hint="AlongWall,AdjacentToEndsWith: PowerLine" />
       
@@ -496,6 +497,8 @@
         <table Weight="1" Number="1" Name="Gigantic Table Nice" Hint="AdjacentToEndsWith: Chair" />
       </group>
 
+      <table Chance="100" Number="0-2" Name="Gigantic Bookshelves" Hint="AlongWall" />
+      
       <object Chance="100" Number="1" Blueprint="CyberneticsTerminal2" Hint="AlongWall" />
       <object Chance="100" Number="1" Blueprint="Gigantic Unicomputer"  Hint="AdjacentToEndsWith: CyberneticsTerminal2"/>
       <table Chance="100" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: Unicomputer" />
@@ -506,8 +509,6 @@
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
       <table Chance="25" Number="1" Name="Gigantic PowerLines" Hint="AdjacentToEndsWith: PowerLine" />
-      
-      <table Chance="100" Number="0-2" Name="Gigantic Bookshelves" Hint="AlongWall" />
     </group>
   </population>
 
@@ -537,10 +538,13 @@
 
   <population Name="Giant Gutsmonger Wares">
     <group Name="Items" Style="Pickeach">
+      <table Name="GeneralMerchantWares" Number="1" />
       <table Name="Cybernetics{zonetier}" Number="3-4" />
       <table Name="Cybernetics{zonetier+1}" Number="2-3" />
       <table Name="Gigantic Exoframe Stock {zonetier}" Number="1-2" />
       <table Name="Gigantic Exoframe Stock {zonetier+1}" Number="0-1" />
+      <table Name="Gigantic Grenades Stock" Number="1" />
+      <table Name="Gigantic Guns Stock" Number="1" />
       <table Chance="5" Name="Cybernetics2" Number="0-2" />
       <table Chance="50" Name="Cybernetics4" Number="0-2" />
       <table Chance="35" Name="Cybernetics6" Number="0-2" />
@@ -601,6 +605,84 @@
     <group Name="Items" Style="PickOne">
       <table Weight="25" Name="Gigantic Exoframe Stock 7" />
       <Object Weight="75" Blueprint="Gigantic Exoframe Omega" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Grenades Stock">
+    <group Name="Items" Style="pickeach">
+      <object Chance="35" Blueprint="Oilskin" Number="1" />
+      <table Name="Explosives 1" Number="2-3" />
+      <table Name="Explosives 2" Number="1-2" />
+      <table Name="Explosives 3" Number="0-2" />
+    </group>
+  </population>
+
+  <population Name="Gigantic Guns Stock">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock {zonetier}" Number="1" />
+      <table Name="Guns 1" Number="1-2" />
+      <table Name="Guns 2" Number="1-2" />
+      <table Name="Guns 3" Number="0-1" />
+      <table Name="Guns {zonetier}" Number="2-3" />
+    </group>
+  </population>
+
+  <population Name="ZoneTier Ammo Stock 1">
+    <group Name="Items" Style="pickeach">
+      <object Blueprint="Lead Slug" Number="30-50" />
+      <object Blueprint="Shotgun Shell" Number="15-30" />
+      <group Name="Cells" Style="pickone">
+        <object Chance="20" Blueprint="Chem Cell" Number="1" />
+        <object Chance="20"  Blueprint="Solar Cell" Number="1" />
+        <object Chance="10"  Blueprint="Fidget Cell" Number="1" />
+      </group>
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 2">
+    <group Name="Items" Style="pickeach">
+      <object Chance="50" Blueprint="Lead Slug" Number="20-35" Hint="Stack" />
+      <object Chance="50" Blueprint="Shotgun Shell" Number="8-16" Hint="Stack" />
+      <table Name="ZoneTier Ammo Stock 1" Number="1" />
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 3">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock 1" Number="1" />
+      <table Name="ZoneTier Ammo Stock 2" Number="1" />
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 4">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock 2" Number="1" />
+      <table Name="ZoneTier Ammo Stock 3" Number="1" />
+      <object Chance="20" Blueprint="Nuclear Cell" Number="1" />
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 5">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock 3" Number="1" />
+      <table Name="ZoneTier Ammo Stock 4" Number="1" />
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 6">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock 4" Number="1" />
+      <table Name="ZoneTier Ammo Stock 5" Number="1" />
+      <object Chance="40" Blueprint="Nuclear Cell" Number="1" />
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 7">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock 5" Number="1" />
+      <table Name="ZoneTier Ammo Stock 6" Number="1" />
+      <object Chance="20" Blueprint="Antimatter Cell" Number="1" />
+    </group>
+  </population>
+  <population Name="ZoneTier Ammo Stock 8">
+    <group Name="Items" Style="pickeach">
+      <table Name="ZoneTier Ammo Stock 6" Number="1" />
+      <table Name="ZoneTier Ammo Stock 7" Number="1" />
+      <object Chance="40" Blueprint="Antimatter Cell" Number="1" />
     </group>
   </population>
   

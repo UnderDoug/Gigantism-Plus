@@ -48,8 +48,8 @@ namespace HNPS_GigantismPlus
             { nameof(UD_QuillsPlus), true },
             { nameof(CyberneticsGiganticExoframe), true },
             { nameof(StewBelly), true },
-            { nameof(Tactics_Vault), false },
-            { nameof(Vaultable), false },
+            { nameof(Tactics_Vault), true },
+            { nameof(Vaultable), true },
             { nameof(Gigantified), true },
             { nameof(InventoryGigantifier), true },
             { nameof(SecretGiantWhoCooksBuilderExtension), true },
@@ -75,8 +75,11 @@ namespace HNPS_GigantismPlus
             { nameof(AfterModGiganticAppliedEvent), false },
             { nameof(BeforeRapidAdvancementEvent), false },
             { nameof(AfterRapidAdvancementEvent), false },
+
+            { "IVaultedEvent", false },
             { nameof(BeforeVaultEvent), false },
             { nameof(VaultedEvent), false },
+
             { nameof(CrayonsGetColorsEvent), false },
 
             { "IDescribeModificationEvent", false },

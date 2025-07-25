@@ -2615,5 +2615,35 @@ namespace HNPS_GigantismPlus
             return Grammar.Cardinal(Number);
         }
 
-    } //!-- Extensions
+        public static bool IsGrenade(this GameObject Item)
+        {
+            return Item.HasTag("Grenade")
+                || Item.InheritsFrom("Grenade")
+                || Item.GetTag("AmmoName") == "Grenade"
+                || Item.GetTag("TinkerCategory") == "Grenade"
+                || (Item.Physics != null && Item.Physics.Category == "Grenades");
+        }
+
+        public static bool IsTradeGood(this GameObject Item)
+        {
+            return Item.HasTag("DynamicObjectsTable:TradeGoods") 
+                || Item.InheritsFrom("BaseCurrency")
+                || Item.HasPropertyOrTag("Currency")
+                || (Item.Physics != null && Item.Physics.Category == "Trade Goods");
+        }
+
+        public static bool IsTonic(this GameObject Item)
+        {
+            return ((Item.InheritsFrom("Tonic") || Item.HasPart<Tonic>()) && Item.HasPart<PreservableItem>())
+                || (Item.Physics != null && Item.Physics.Category == "Tonics");
+        }
+        public static bool IsBasicTonic(this GameObject Item)
+        {
+            return Item.IsTonic() && Item.HasTag("DynamicObjectsTable:Tonics_NonRare");
+        }
+        public static bool IsRareTonic(this GameObject Item)
+        {
+            return Item.IsTonic() && !Item.HasTag("DynamicObjectsTable:Tonics_NonRare");
+        }
+    }
 }

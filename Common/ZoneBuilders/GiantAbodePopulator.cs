@@ -293,7 +293,7 @@ namespace XRL.World.ZoneBuilders
                                 }
                                 if (isApothecary && item.Blueprint == "Gigantic Alchemist Table")
                                 {
-                                    giantMulticabinetCell = gameObject?.CurrentCell;
+                                    giantAlchemistTableCell = gameObject?.CurrentCell;
                                     Debug.CheckYeh(4, $"Giant Alchemist Table location stored", Indent: 4, Toggle: getDoDebug());
                                 }
                             }

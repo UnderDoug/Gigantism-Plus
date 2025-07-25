@@ -24,7 +24,9 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Skill
 {
     [Serializable]
-    public class Tactics_Vault : BaseSkill
+    public class Tactics_Vault 
+        : BaseSkill
+        , IModEventHandler<AfterVaultedEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(Tactics_Vault));
         private static bool getDoDebug(object what = null)
@@ -32,11 +34,11 @@ namespace XRL.World.Parts.Skill
             List<object> doList = new()
             {
                 "SD",   // ShortDescription
+                'V',    // Vomit
+                "AV",   // AttemptVault
             };
             List<object> dontList = new()
             {
-                'V',    // Vomit
-                "AV",   // AttemptVault
             };
 
             if (what != null && doList.Contains(what))
@@ -47,6 +49,8 @@ namespace XRL.World.Parts.Skill
 
             return doDebug;
         }
+
+        private bool VaultingEnabled => GetEnabled();
 
         public static readonly string COMMAND_NAME = "CommandTacticsVault";
         public static readonly string COMMAND_TOGGLE = "CommandToggleTacticsVault";
@@ -104,13 +108,9 @@ namespace XRL.World.Parts.Skill
 
         }
 
-        public override void Attach()
+        public bool GetEnabled()
         {
-            base.Attach();
-            if (!EnablePrereleaseContent)
-            {
-                ParentObject?.RemovePart(this);
-            }
+            return EnablePrereleaseContent || ParentObject.IsPlayerControlled();
         }
 
         public Tactics_Vault ClearCells()
@@ -279,7 +279,7 @@ namespace XRL.World.Parts.Skill
         }
         public bool CanNormallyVault(GameObject Vaultee)
         {
-            return CanNormallyVault(ParentObject, Vaultee);
+            return VaultingEnabled && CanNormallyVault(ParentObject, Vaultee);
         }
 
         public static bool CanVault(GameObject Vaulter, GameObject Vaultee, out Tactics_Vault VaultSkill, bool? SizeMatters = false, bool? RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null, bool Silent = false)
@@ -324,7 +324,9 @@ namespace XRL.World.Parts.Skill
                 Indent: 0, Toggle: getDoDebug("AV"));
 
             if (!CanVault(Vaulter, Vaultee, out Tactics_Vault vaultSkill, Silent))
+            {
                 return false;
+            }
 
             vaultSkill.Clear().Vomit(4, $"{nameof(AttemptVault)}", "Start", Indent: 1, Toggle: getDoDebug('V'));
 
@@ -366,7 +368,6 @@ namespace XRL.World.Parts.Skill
                 + $" FromEvent: {FromEvent?.GetType()?.Name ?? NULL},"
                 + $" Silent: {Silent}) *//",
                 Indent: 0, Toggle: getDoDebug("AV"));
-
             return true;
         }
         public static bool AttemptVault(GameObject Vaulter, GameObject Vaultee, Cell OriginCell = null, IEvent FromEvent = null, bool Silent = false)
@@ -506,7 +507,7 @@ namespace XRL.World.Parts.Skill
         }
         public bool IsTargetCellValidDestination(Cell Target)
         {
-            return IsTargetCellValidDestination(ParentObject, Target);
+            return VaultingEnabled && IsTargetCellValidDestination(ParentObject, Target);
         }
 
         public static bool TryGetValidDestinationCell(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, Cell OverCell, out Cell DestinationCell)
@@ -733,6 +734,11 @@ namespace XRL.World.Parts.Skill
                 vaultSkill.Vaulted = false;
             }
 
+            if (vaulted)
+            {
+                AfterVaultedEvent.Send(Vaulter, OriginCell, Over, DestinationCell);
+            }
+
             Debug.Entry(4,
                 $"x {nameof(Tactics_Vault)}."
                 + $"{nameof(Vault)}"
@@ -818,7 +824,7 @@ namespace XRL.World.Parts.Skill
             Tactics_Vault vaultSkill = null;
             bool vaulterNotNull = Vaulter != null;
             bool isPlayer = vaulterNotNull && Vaulter.IsPlayerControlled();
-            bool haveSkill = vaulterNotNull && Vaulter.TryGetPart(out vaultSkill);
+            bool haveSkill = vaulterNotNull && Vaulter.TryGetPart(out vaultSkill) && vaultSkill.VaultingEnabled;
             bool wasAutoActing = haveSkill && vaultSkill.WasAutoActing;
             bool haveAutoActSetting = haveSkill && !vaultSkill.AutoActSetting.IsNullOrEmpty();
             bool autoActSettingIsMovement = haveAutoActSetting && vaultSkill.AutoActSetting.StartsWith("M");
@@ -918,6 +924,11 @@ namespace XRL.World.Parts.Skill
         {
             return true;
         }
+        public override bool WantTurnTick()
+        {
+            return base.WantTurnTick()
+                || true;
+        }
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
             Registrar.Register(COMMAND_TOGGLE);
@@ -935,7 +946,16 @@ namespace XRL.World.Parts.Skill
                 || ID == CommandEvent.ID
                 || ID == GetItemElementsEvent.ID
                 || ID == PooledEvent<ShouldAttackToReachTargetEvent>.ID
-                || ID == PooledEvent<PathAsBurrowerEvent>.ID;
+                || ID == PooledEvent<PathAsBurrowerEvent>.ID
+                || ID == AfterVaultedEvent.ID;
+        }
+        public override void TurnTick(long TimeTick, int Amount)
+        {
+            if (Vaulted)
+            {
+                Vaulted = false;
+            }
+            base.TurnTick(TimeTick, Amount);
         }
         public override bool HandleEvent(BeforeAbilityManagerOpenEvent E)
         {
@@ -944,7 +964,7 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            if (The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
+            if (VaultingEnabled && The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
             {
                 bool haveOrigin = Origin != null;
                 bool haveOver = Over != null;
@@ -972,12 +992,15 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(GetMovementCapabilitiesEvent E)
         {
-            E.Add("Vault over square", COMMAND_NAME, 7000);
+            if (VaultingEnabled)
+            {
+                E.Add("Vault over square", COMMAND_NAME, 7000);
+            }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(CommandEvent E)
         {
-            if (E.Command == COMMAND_NAME && E.Actor == ParentObject)
+            if (VaultingEnabled && E.Command == COMMAND_NAME && E.Actor == ParentObject)
             {
                 if (AttemptVault(E.Target, E.TargetCell, E, E.Silent))
                 {
@@ -989,7 +1012,7 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(GetItemElementsEvent E)
         {
-            if (E.IsRelevantCreature(ParentObject))
+            if (VaultingEnabled && E.IsRelevantCreature(ParentObject))
             {
                 E.Add("travel", 1);
             }
@@ -997,7 +1020,12 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(ObjectLeavingCellEvent E)
         {
-            if (WantToVault && ParentObject != null && !ParentObject.IsFlying && E.Actor == ParentObject && E.Cell != null && E.Cell == ParentObject.CurrentCell)
+            if (VaultingEnabled
+                && WantToVault && ParentObject != null
+                && !ParentObject.IsFlying
+                && E.Actor == ParentObject
+                && E.Cell != null
+                && E.Cell == ParentObject.CurrentCell)
             {
                 GameObject Vaulter = ParentObject;
                 GameObject Vaultee = null;
@@ -1096,7 +1124,9 @@ namespace XRL.World.Parts.Skill
 
                 } // if (Vaultee != null)
             } // if (E.Actor == ParentObject && ParentObject != null && WantToVault)
-            if (false && E.Cell.InActiveZone && IsBurrowerWantsToVault)
+            if (false 
+                && E.Cell.InActiveZone 
+                && IsBurrowerWantsToVault)
             {
                 GameObject Vaulter = ParentObject;
 
@@ -1160,7 +1190,7 @@ namespace XRL.World.Parts.Skill
                     }
                 }
             }
-            if (E.Blocking != null)
+            if (VaultingEnabled && E.Blocking != null)
             {
                 Debug.Entry(4, $"BLOCKED: E.Cell: [{E.Cell.Location}], E.Blocking in [{E.Blocking.CurrentCell.Location}]", 
                     Indent: 1, Toggle: getDoDebug());
@@ -1169,7 +1199,11 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(EnteredCellEvent E)
         {
-            if (false && E.Cell.InActiveZone && E.Actor == ParentObject && IsBurrowerWantsToVault && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
+            if (false 
+                && E.Cell.InActiveZone 
+                && E.Actor == ParentObject 
+                && IsBurrowerWantsToVault 
+                && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
             {
                 GameObject Vaulter = E.Actor;
 
@@ -1243,7 +1277,11 @@ namespace XRL.World.Parts.Skill
         }
         public override bool HandleEvent(PathAsBurrowerEvent E)
         {
-            if (E.Object != null && E.Object == ParentObject && IsBurrowerWantsToVault && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
+            if (VaultingEnabled 
+                && E.Object != null 
+                && E.Object == ParentObject 
+                && IsBurrowerWantsToVault 
+                && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
             {
                 GameObject Vaulter = E.Object;
                 Cell vaulterCell = Vaulter.CurrentCell;
@@ -1440,7 +1478,7 @@ namespace XRL.World.Parts.Skill
             Debug.LoopItem(4, $"{nameof(shouldNotAttack)}", $"{shouldNotAttack}",
                 Good: shouldNotAttack, Indent: 1, Toggle: getDoDebug());
 
-            if (shouldNotAttack)
+            if (VaultingEnabled && shouldNotAttack)
             {
                 E.ShouldAttack = false;
 
@@ -1457,9 +1495,26 @@ namespace XRL.World.Parts.Skill
             }
             return base.HandleEvent(E);
         }
+        public virtual bool HandleEvent(AfterVaultedEvent E)
+        {
+            GameObject Vaulter = E.Vaulter;
+
+            Debug.Entry(4,
+                $"@ {nameof(Tactics_Vault)}."
+                + $"{nameof(HandleEvent)}("
+                + $"{nameof(ShouldAttackToReachTargetEvent)} E)",
+                Indent: 0, Toggle: getDoDebug());
+
+            Debug.Entry(4, $"{nameof(Vaulter)}", $"{Vaulter?.DebugName ?? NULL}",
+                Indent: 1, Toggle: getDoDebug());
+
+            Clear();
+
+            return base.HandleEvent(E);
+        }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == COMMAND_TOGGLE)
+            if (VaultingEnabled && E.ID == COMMAND_TOGGLE)
             {
                 ToggleMyActivatedAbility(ActivatedAbilityID, null, Silent: true, null);
                 Debug.CheckYeh(3, 
@@ -1467,7 +1522,12 @@ namespace XRL.World.Parts.Skill
                     $"{WantToVault}", 
                     Indent: 0, Toggle: getDoDebug());
             }
-            if (false && E.ID == BEGIN_ATTACK_EVENT && WantToVault && ParentObject != null && ParentObject.IsPlayer() && AutoAct.IsAnyMovement())
+            if (false 
+                && E.ID == BEGIN_ATTACK_EVENT 
+                && WantToVault 
+                && ParentObject != null 
+                && ParentObject.IsPlayer() 
+                && AutoAct.IsAnyMovement())
             {
                 Debug.Entry(4,
                     $"@ {nameof(Tactics_Vault)}."

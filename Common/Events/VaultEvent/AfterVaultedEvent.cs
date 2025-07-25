@@ -11,9 +11,9 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
-public class BeforeVaultEvent : IVaultedEvent<BeforeVaultEvent>
+public class AfterVaultedEvent : IVaultedEvent<AfterVaultedEvent>
 {
-    private static bool doDebug => getClassDoDebug(nameof(BeforeVaultEvent));
+    private static bool doDebug => getClassDoDebug(nameof(AfterVaultedEvent));
 
     public override int GetCascadeLevel()
     {
@@ -25,7 +25,7 @@ public class BeforeVaultEvent : IVaultedEvent<BeforeVaultEvent>
         return RegisteredEventID;
     }
 
-    public BeforeVaultEvent()
+    public AfterVaultedEvent()
     {
 
     }

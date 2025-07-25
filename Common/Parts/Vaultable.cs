@@ -25,6 +25,8 @@ namespace XRL.World.Parts
     {
         private static bool doDebug => getClassDoDebug(nameof(Vaultable));
 
+        private bool VaultingEnabled => GetEnabled();
+
         public static readonly string COMMAND_VAULT_OVER_ME = "VaultOverMe";
 
         public bool SizeMatters;
@@ -59,10 +61,11 @@ namespace XRL.World.Parts
                 OverridingPartsList = new(vaultable.OverridingPartsList);
                 ParentObject.RemovePart(vaultable);
             }
-            if (!EnablePrereleaseContent)
-            {
-                ParentObject?.RemovePart(this);
-            }
+        }
+
+        public bool GetEnabled()
+        {
+            return EnablePrereleaseContent || ParentObject.InheritsFrom("WrassleRingRopes");
         }
 
         public Dictionary<Cell, Cell> GetVaultableCellPairs(GameObject For = null)
@@ -150,7 +153,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            if(The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
+            if(VaultingEnabled && The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
             {
                 int navWeight = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, false);
                 int navWeightAuto = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, true);
@@ -255,7 +258,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetItemElementsEvent E)
         {
-            if (E.IsRelevantCreature(ParentObject))
+            if (VaultingEnabled && E.IsRelevantCreature(ParentObject))
             {
                 E.Add("travel", 1);
             }
@@ -268,7 +271,7 @@ namespace XRL.World.Parts
              && E.Actor.TryGetPart(out Tactics_Vault vaultSkill)
              && vaultSkill.CanNormallyVault(E.Object);
 
-            if (wantInventoryAction)
+            if (VaultingEnabled && wantInventoryAction)
             {
                 int priority = 0;
                 priority -= E.Object.IsCreature ? 5 : 0;
@@ -291,7 +294,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(InventoryActionEvent E)
         {
-            if (E.Command == COMMAND_VAULT_OVER_ME && E.Item == ParentObject)
+            if (VaultingEnabled && E.Command == COMMAND_VAULT_OVER_ME && E.Item == ParentObject)
             {
                 GameObject vaulter = E.Actor;
                 GameObject vaultee = E.Item;
@@ -335,7 +338,8 @@ namespace XRL.World.Parts
         public override bool HandleEvent(CanSmartUseEvent E)
         {
             bool canSmartUse =
-                E.Item == ParentObject
+                VaultingEnabled
+             && E.Item == ParentObject
              && !E.Item.IsCreature
              && !E.Item.HasPart<Container>()
              && !E.Item.HasPart<Pettable>()
@@ -351,7 +355,8 @@ namespace XRL.World.Parts
         public override bool HandleEvent(CommandSmartUseEvent E)
         {
             bool shouldSmartUse =
-                !E.Item.IsCreature
+                VaultingEnabled
+             && !E.Item.IsCreature
              && !E.Item.HasPart<Container>()
              && !E.Item.HasPart<Pettable>()
              && !E.Item.HasTagOrProperty("ForceSmartUse");
@@ -391,7 +396,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetNavigationWeightEvent E)
         {
-            if (E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null && !E.Actor.IsFlying)
+            if (VaultingEnabled && E.Cell == ParentObject.CurrentCell && ParentObject.Physics.Solid && E.Actor != null && !E.Actor.IsFlying)
             {
                 Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
                 if (!originDestinationPairs.IsNullOrEmpty() && Tactics_Vault.CanVault(E.Actor, ParentObject, out Tactics_Vault vaultSkill) && vaultSkill.WantToVault)
@@ -420,7 +425,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetAdjacentNavigationWeightEvent E)
         {
-            if (E.Actor != null && E.AdjacentCell != null && E.AdjacentCell != ParentObject.CurrentCell)
+            if (VaultingEnabled && E.Actor != null && E.AdjacentCell != null && E.AdjacentCell != ParentObject.CurrentCell)
             {
                 Dictionary<Cell, Cell> originDestinationPairs = GetVaultableCellPairs(E.Actor);
                 bool isValidVaultCell = !originDestinationPairs.IsNullOrEmpty() && (originDestinationPairs.ContainsKey(E.AdjacentCell) || originDestinationPairs.ContainsValue(E.AdjacentCell));
@@ -462,7 +467,8 @@ namespace XRL.World.Parts
             bool actingAutomatically = notPlayer || autoActActive;
 
             bool shouldBlock =
-                vaulterNotNull
+                VaultingEnabled
+             && vaulterNotNull
              && flyoverFlyingMismatch
              && cellIsSolidForVaulter
              && haveSkill
@@ -620,8 +626,10 @@ namespace XRL.World.Parts
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "BeforePhysicsRejectObjectEntringCell" && E.HasFlag("Actual") 
-                && E.GetGameObjectParameter("Object") is GameObject Vaulter && Vaulter != null && !Vaulter.IsFlying)
+            if (E.ID == "BeforePhysicsRejectObjectEntringCell" 
+                && E.HasFlag("Actual") 
+                && E.GetGameObjectParameter("Object") is GameObject Vaulter 
+                && Vaulter != null && !Vaulter.IsFlying)
             {
                 Debug.Entry(4,
                     $"@ {nameof(Vaultable)}."
@@ -632,7 +640,7 @@ namespace XRL.World.Parts
                 GameObject Vaultee = ParentObject;
 
                 bool vaulterNotNull = Vaulter != null;
-                bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill);
+                bool haveSkill = Vaulter.TryGetPart(out Tactics_Vault vaultSkill) && VaultingEnabled;
                 bool notMidVault = haveSkill && !vaultSkill.MidVault;
                 bool vaulted = haveSkill && vaultSkill.Vaulted;
                 bool wantToVault = haveSkill && vaultSkill.WantToVault;

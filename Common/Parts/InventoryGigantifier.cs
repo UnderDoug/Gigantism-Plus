@@ -111,7 +111,7 @@ namespace XRL.World.Parts
                 : $" ({nameof(creatureIsSecretGiantVillager)})"
                 ;
 
-            if (Creature.ID.Is("1") && !Creature.HasPart<GigantismPlus>() && !Force)
+            if (Creature.ID == "1" && !Creature.HasPart<GigantismPlus>() && !Force)
             {
                 return; // redundancy, just in case.
             }
@@ -161,6 +161,7 @@ namespace XRL.World.Parts
                     bool inventoryGigantifierAlwaysAllow = item.HasTagOrProperty("InventoryGigantifierAlwaysAllow");
                     bool inventoryGigantifierAlwaysStockGiant = item.HasTagOrProperty("InventoryGigantifierAlwaysStockGiant");
                     bool itemIsCybernetic = item.HasPart<CyberneticsBaseItem>();
+                    bool itemLiquidContainer = item.InheritsFrom("WaterContainer");
 
                     string alwaysStockGiantExtra = !inventoryGigantifierAlwaysStockGiant
                         ? $""
@@ -170,8 +171,9 @@ namespace XRL.World.Parts
                     Debug.DiveIn(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
                     int NoThanks = 0;
                     // Can the item have the gigantic modifier applied?
-                    if (ItemModding.ModificationApplicable("ModGigantic", item) 
-                        || (creatureIsSecretGiantGutsmonger && itemIsCybernetic))
+                    if (ItemModding.ModificationApplicable("ModGigantic", item)
+                        || (creatureIsSecretGiantGutsmonger && itemIsCybernetic)
+                        || (creatureIsSecretGiantVillager && itemLiquidContainer))
                     {
                         Debug.CheckYeh(4, "eligible to be made ModGigantic", Indent: 2, Toggle: doDebug);
                         // Is the item already gigantic? Don't attempt to apply it again.
@@ -193,11 +195,11 @@ namespace XRL.World.Parts
                         }
                         else
                         {
-                            Debug.CheckYeh(4, "not already gigantic", Indent: 2, Toggle: doDebug);
+                            Debug.CheckYeh(4, "not natural equipment", Indent: 2, Toggle: doDebug);
                         }
 
                         // Is the item a grenade, and is the option not set to include them?
-                        if (item.HasTag("Grenade"))
+                        if (item.IsGrenade())
                         {
                             if (!GrenadeOption || creatureIsMerchant)
                             {
@@ -243,7 +245,7 @@ namespace XRL.World.Parts
                         }
 
                         // Is the item a trade good? We don't want gigantic copper nuggets making the start too easy
-                        if (item.HasTag("DynamicObjectsTable:TradeGoods") || item.InheritsFrom("BaseCurrency"))
+                        if (item.IsTradeGood())
                         {
                             Debug.CheckNah(4, "TradeGoods", "NoThanks++; x/", Indent: 2, Toggle: doDebug);
                             NoThanks++;
@@ -274,7 +276,7 @@ namespace XRL.World.Parts
                         }
 
                         // Is the item a non-rare tonic? Double doses are basically useless in the early game
-                        if (item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                        if (item.IsBasicTonic())
                         {
                             Debug.CheckNah(4, "Tonics_NonRare", "NoThanks++; x/", Indent: 2, Toggle: doDebug);
                             NoThanks++;
@@ -306,7 +308,7 @@ namespace XRL.World.Parts
                         }
 
                         // Is the item a rare tonic? Double doses are basically useless in the early game
-                        if (item.HasPart<Tonic>() && !item.HasTag("DynamicObjectsTable:Tonics_NonRare"))
+                        if (item.IsRareTonic())
                         {
                             Debug.CheckNah(4, "Rare Tonic", "NoThanks++; x/", Indent: 2, Toggle: doDebug);
                             NoThanks++;

@@ -3,10 +3,19 @@
   
   <!-- 
       
+      "Fixes"
+      
+   -->
+  <object Name="Widget" Load="Merge">
+    <tag Name="HideInNearbyItemsList" />
+    <tag Name="HideCon" />
+  </object>
+  
+  <!-- 
+      
       Zone mutators, Tile mutators, Multi-tile presets, Quest triggers, UI widgets
       
    -->
-
   <object Name="Cell Highlighter" Inherits="Widget">
     <part Name="Render" DisplayName="[Cell Highlighter]"
           RenderString="*" RenderLayer="9"

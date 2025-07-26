@@ -204,7 +204,7 @@ namespace XRL.World.Parts.Mutation
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
 
-                Adjustments = new(),
+                PartAdjustments = new(),
 
                 AddedIntProps = new()
                 {
@@ -274,24 +274,34 @@ namespace XRL.World.Parts.Mutation
 
         public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
         {
-            if (NaturalEquipmentMod.Adjective == "closed") 
+            if (NaturalEquipmentMod.Adjective == "closed")
+            {
                 return 0;
+            }
 
-            if (NaturalEquipmentMod.BodyPartType == "Head") 
+            if (NaturalEquipmentMod.BodyPartType == "Head")
+            {
                 return 2;
+            }
 
-            if (NaturalEquipmentMod.BodyPartType == "Hand") 
+            if (NaturalEquipmentMod.BodyPartType == "Hand")
+            {
                 return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
+            }
 
             return 0;
         }
         public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
         {
-            if (NaturalEquipmentMod.Adjective == "closed") 
+            if (NaturalEquipmentMod.Adjective == "closed")
+            {
                 return 0;
+            }
 
-            if (NaturalEquipmentMod.BodyPartType == "Head") 
+            if (NaturalEquipmentMod.BodyPartType == "Head")
+            {
                 return 5;
+            }
 
             if (NaturalEquipmentMod.BodyPartType == "Hand")
             {
@@ -303,14 +313,20 @@ namespace XRL.World.Parts.Mutation
         }
         public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
         {
-            if (NaturalEquipmentMod.Adjective == "closed") 
+            if (NaturalEquipmentMod.Adjective == "closed")
+            {
                 return 0;
+            }
 
-            if (NaturalEquipmentMod.BodyPartType == "Head") 
+            if (NaturalEquipmentMod.BodyPartType == "Head")
+            {
                 return 3;
+            }
 
-            if (NaturalEquipmentMod.BodyPartType == "Hand") 
+            if (NaturalEquipmentMod.BodyPartType == "Hand")
+            {
                 return -3 + (int)Math.Floor(Level / 2.0);
+            }
 
             return 0;
         }

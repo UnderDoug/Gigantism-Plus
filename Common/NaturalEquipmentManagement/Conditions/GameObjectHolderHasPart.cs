@@ -20,12 +20,14 @@ namespace HNPS_GigantismPlus
         {
         }
         public GameObjectHolderHasPart(GameObjectHolderHasPart Source)
-            : this(Source?.Part)
+            : base(Source)
         {
+            Part = Source.Part;
         }
         public GameObjectHolderHasPart(GameObjectWielderHasPart Source)
-            : this(Source?.Part)
+            : base(Source)
         {
+            Part = Source.Part;
         }
 
         public override bool Check(GameObject GameObject)

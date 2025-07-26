@@ -75,7 +75,7 @@ namespace XRL.World.Parts
                 AdjectiveColor = assigningPart.AugmentAdjectiveColor,
                 AdjectiveColorFallback = "c",
 
-                Adjustments = new(),
+                PartAdjustments = new(),
 
                 AddedParts = new(),
 

@@ -53,11 +53,11 @@ namespace XRL.World.Parts
         {
             if (E.NaturalEquipmentMod == nameof(ModGiganticNaturalWeapon) && E.Adjustment.Target == RENDER && E.Adjustment.Field == "DetailColor")
             {
-                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {E.Adjustment.Field} Adjustment",
+                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {E.Adjustment.Field} PartAdjustment",
                     Indent: Debug.LastIndent + 1, Toggle: doDebug);
                 Debug.LastIndent--;
 
-                foreach (PartAdjustment adjustment in Adjustments)
+                foreach (PartAdjustment adjustment in PartAdjustments)
                 {
                     if (adjustment.HasSameTargetAs(E.Adjustment))
                     {

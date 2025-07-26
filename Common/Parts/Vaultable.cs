@@ -685,7 +685,6 @@ namespace XRL.World.Parts
 
                 if (shouldResumeAfterVault)
                 {
-
                     if (vaultSkill.ResumeAfterVault())
                     {
                         Debug.CheckYeh(4, $"Resume Successful, allowing through", Indent: 1, Toggle: doDebug);
@@ -701,7 +700,6 @@ namespace XRL.World.Parts
                     }
 
                     Debug.CheckNah(4, $"Resume Failed, blocking", Indent: 1, Toggle: doDebug);
-
                 }
                 Debug.Entry(4,
                     $"x {nameof(Vaultable)}."

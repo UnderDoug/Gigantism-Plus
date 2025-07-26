@@ -134,16 +134,19 @@ namespace HNPS_GigantismPlus
         public static bool AdjustDamageDieCount(this MeleeWeapon MeleeWeapon, int Amount)
         {
             MeleeWeapon.BaseDamage = MeleeWeapon.BaseDamage.AdjustDieCount(Amount);
+            DamageDieCountAdjustedEvent.Send(MeleeWeapon.ParentObject, MeleeWeapon, Amount);
             return true;
         }
         public static bool AdjustDamageDieCount(this ThrownWeapon ThrownWeapon, int Amount)
         {
             ThrownWeapon.Damage = ThrownWeapon.Damage.AdjustDieCount(Amount);
+            DamageDieCountAdjustedEvent.Send(ThrownWeapon.ParentObject, ThrownWeapon, Amount);
             return true;
         }
         public static bool AdjustDamageDieCount(this Projectile Projectile, int Amount)
         {
             Projectile.BaseDamage = Projectile.BaseDamage.AdjustDieCount(Amount);
+            DamageDieCountAdjustedEvent.Send(Projectile.ParentObject, Projectile, Amount);
             return true;
         }
 

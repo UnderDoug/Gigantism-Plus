@@ -245,7 +245,7 @@ namespace XRL.World.Parts
                     Debug.Entry(4, $"{nameof(Target)}: {targetPart?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: doDebug);
                     if (targetPart != null)
                     {
-                        if (BeforeApplyPartAdjustmentEvent.Send(Equipment, ParentNaturalEquipmentMod, this) && Value != null)
+                        if (BeforeApplyPartAdjustmentEvent.CheckFor(Equipment, ParentNaturalEquipmentMod, this) && Value != null)
                         {
                             Debug.CheckYeh(4, $"Have {targetPart.GetType().Name}", Indent: indent + 2, Toggle: doDebug);
                             Traverse targetPartTraverse = new(targetPart);
@@ -365,7 +365,9 @@ namespace XRL.World.Parts
         }
 
         [NonSerialized]
-        public List<PartAdjustment> Adjustments;
+        public List<PartAdjustment> PartAdjustments;
+
+        public Adjustments Adjustments;
 
         public string BodyPartType;
 
@@ -397,6 +399,7 @@ namespace XRL.World.Parts
 
         public ModNaturalEquipmentBase()
         {
+            PartAdjustments = new();
             Adjustments = new();
             ForceNoun = false;
             ExludeFromDynamicTile = false;
@@ -407,14 +410,16 @@ namespace XRL.World.Parts
         public ModNaturalEquipmentBase(int Tier)
             : base(Tier)
         {
-            Adjustments = new();
+            PartAdjustments = new();
         }
         public ModNaturalEquipmentBase(ModNaturalEquipmentBase Source)
             : this()
         {
             BodyPartType = Source.BodyPartType;
 
-            Adjustments = new(Source.Adjustments ??= new());
+            PartAdjustments = new(Source.PartAdjustments ??= new());
+
+            Adjustments = new(Adjustments ??= new());
 
             ModPriority = Source.ModPriority;
             DescriptionPriority = Source.DescriptionPriority;
@@ -456,8 +461,8 @@ namespace XRL.World.Parts
         public virtual Guid AddAdjustment(Type Target, string Field, object Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
             PartAdjustment adjustment = new(GetType().Name, Target, Field, Priority, Value, Condition, AnyConditions, AllConditions);
-            Adjustments ??= new();
-            Adjustments.Add(adjustment);
+            PartAdjustments ??= new();
+            PartAdjustments.Add(adjustment);
             return adjustment.ID;
         }
         public virtual Guid AddAdjustment(Type Target, string Field, object Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
@@ -466,11 +471,40 @@ namespace XRL.World.Parts
             return AddAdjustment(Target, Field, Value, modPriority, Condition, AnyConditions, AllConditions);
         }
 
+        public virtual void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            Adjustments ??= new();
+            Adjustment.Condition ??= Condition;
+            Adjustment.AnyConditions ??= AnyConditions;
+            Adjustment.AllConditions ??= AllConditions;
+            int indent = Debug.LastIndent;
+            Debug.LoopItem(4, $"Adding {nameof(Adjustment)}: {Adjustment.Source.Name}.{Adjustment.GetType().Name}", Indent: indent + 1, Toggle: true);
+            Adjustments.Add(Adjustment);
+            Debug.LastIndent = indent;
+        }
+
+        public virtual void AddAdjustment(IAdjustment Adjustment, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            Adjustment.Priority = Priority;
+            AddAdjustment(Adjustment, Condition, AnyConditions, AllConditions);
+        }
+        public virtual void AddAdjustment(IAdjustment Adjustment, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            int modPriority = FlipPriority ? -ModPriority : ModPriority;
+            AddAdjustment(Adjustment, modPriority, Condition, AnyConditions, AllConditions);
+        }
+
         public virtual Guid AddNounAdjustment(int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
             string noun = GetNoun();
             if (noun != null)
             {
+                IAdjustment adjustment = new ChangeRenderDisplayName() 
+                { 
+                    DisplayName = noun, 
+                    Source = GetType(), 
+                };
+                AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
                 return AddAdjustment(RENDER, "DisplayName", noun, Priority, Condition, AnyConditions, AllConditions);
             }
             return Guid.Empty;
@@ -483,6 +517,12 @@ namespace XRL.World.Parts
 
         public virtual Guid AddSkillAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
+            IAdjustment adjustment = new ChangeSkill()
+            {
+                Skill = Value,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(MELEEWEAPON, "Skill", Value, Priority, Condition, AnyConditions, AllConditions);
         }
         public virtual Guid AddSkillAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
@@ -493,6 +533,12 @@ namespace XRL.World.Parts
 
         public virtual Guid AddStatAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
+            IAdjustment adjustment = new ChangeStat()
+            {
+                Stat = Value,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(MELEEWEAPON, "Stat", Value, Priority, Condition, AnyConditions, AllConditions);
         }
         public virtual Guid AddStatAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
@@ -503,6 +549,12 @@ namespace XRL.World.Parts
 
         public virtual Guid AddTileAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
+            IAdjustment adjustment = new ChangeTile()
+            {
+                Tile = Value,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "Tile", Value, Priority, Condition, AnyConditions, AllConditions);
         }
         public virtual Guid AddTileAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
@@ -513,6 +565,12 @@ namespace XRL.World.Parts
 
         public virtual Guid AddColorStringAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
+            IAdjustment adjustment = new ChangeColorString()
+            {
+                ColorString = Value,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "ColorString", Value, Priority, Condition, AnyConditions, AllConditions);
         }
         public virtual Guid AddColorStringAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
@@ -523,6 +581,12 @@ namespace XRL.World.Parts
 
         public virtual Guid AddTileColorAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
+            IAdjustment adjustment = new ChangeTileColor()
+            {
+                TileColor = Value,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "TileColor", Value, Priority, Condition, AnyConditions, AllConditions);
         }
         public virtual Guid AddTileColorAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
@@ -533,12 +597,68 @@ namespace XRL.World.Parts
 
         public virtual Guid AddDetailColorAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
+            IAdjustment adjustment = new ChangeDetailColor()
+            {
+                DetailColor = Value,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "DetailColor", Value, Priority, Condition, AnyConditions, AllConditions);
         }
         public virtual Guid AddDetailColorAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddDetailColorAdjustment(Value, modPriority, Condition, AnyConditions, AllConditions);
+        }
+
+        public virtual void AddDamageDieCountAdjustment(int Amount, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            IAdjustment adjustment = new AdjustDamageDieCount()
+            {
+                Amount = Amount,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
+        }
+
+        public virtual void AddDamageDieSizeAdjustment(int Amount, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            IAdjustment adjustment = new AdjustDamageDieSize()
+            {
+                Amount = Amount,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
+        }
+
+        public virtual void AddDamageBonusAdjustment(int Amount, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            IAdjustment adjustment = new AdjustDamageBonus()
+            {
+                Amount = Amount,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
+        }
+
+        public virtual void AddHitBonusAdjustment(int Amount, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            IAdjustment adjustment = new AdjustHitBonus()
+            {
+                Amount = Amount,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
+        }
+
+        public virtual void AddPenBonusAdjustment(int Amount, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            IAdjustment adjustment = new AdjustPenBonus()
+            {
+                Amount = Amount,
+                Source = GetType(),
+            };
+            AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
         }
 
         public virtual int GetDamageDieCount()
@@ -657,7 +777,7 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
-            Writer.Write(Adjustments ??= new());
+            Writer.Write(PartAdjustments ??= new());
             Writer.Write(AddedParts ??= new());
             Writer.Write(AddedStringProps ??= new());
             Writer.Write(AddedIntProps ??= new());
@@ -666,7 +786,7 @@ namespace XRL.World.Parts
         {
             base.Read(Basis, Reader);
 
-            Adjustments = Reader.ReadList<PartAdjustment>() ?? new();
+            PartAdjustments = Reader.ReadList<PartAdjustment>() ?? new();
             AddedParts = Reader.ReadList<string>() ?? new();
             AddedStringProps = Reader.ReadDictionary<string, string>() ?? new();
             AddedIntProps = Reader.ReadDictionary<string, int>() ?? new();
@@ -675,7 +795,7 @@ namespace XRL.World.Parts
         {
             ModNaturalEquipmentBase naturalEquipmentMod = base.DeepCopy(Parent, MapInv) as ModNaturalEquipmentBase;
 
-            naturalEquipmentMod.Adjustments = new(Adjustments ??= new());
+            naturalEquipmentMod.PartAdjustments = new(PartAdjustments ??= new());
 
             naturalEquipmentMod.AddedParts = new(AddedParts ?? new());
             naturalEquipmentMod.AddedStringProps = new(AddedStringProps ?? new());
@@ -687,7 +807,7 @@ namespace XRL.World.Parts
         {
             ModNaturalEquipmentBase naturalEquipmentMod = base.DeepCopy(Parent) as ModNaturalEquipmentBase;
 
-            naturalEquipmentMod.Adjustments = new(Adjustments ??= new());
+            naturalEquipmentMod.PartAdjustments = new(PartAdjustments ??= new());
 
             naturalEquipmentMod.BodyPartType = BodyPartType;
 

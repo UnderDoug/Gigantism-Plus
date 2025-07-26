@@ -56,6 +56,8 @@ namespace HNPS_GigantismPlus
             { nameof(GiantAbodePopulator), true },
             { nameof(WeaponElongator), true },
 
+            { "IAdjustment", true },
+
             // Events
             { "IBodyPartsUpdatedEvent", false },
             { nameof(BeforeUpdateBodyPartsEvent), false },

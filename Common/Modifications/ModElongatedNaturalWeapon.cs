@@ -30,7 +30,7 @@ namespace XRL.World.Parts
             AdjectiveColor = "giant";
             AdjectiveColorFallback = "w";
 
-            Adjustments = new();
+            PartAdjustments = new();
 
             AddedStringProps = new()
             {

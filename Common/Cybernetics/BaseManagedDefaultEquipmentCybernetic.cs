@@ -169,6 +169,12 @@ namespace XRL.World.Parts
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
+            NaturalEquipmentMod.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level));
+            NaturalEquipmentMod.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level));
+            NaturalEquipmentMod.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level));
+            NaturalEquipmentMod.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level));
+            NaturalEquipmentMod.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level));
+
             NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,

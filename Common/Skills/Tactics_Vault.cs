@@ -624,6 +624,14 @@ namespace XRL.World.Parts.Skill
                     Debug.LoopItem(4, $"WasAutoActing", $"{vaultSkill.WasAutoActing}", Good: vaultSkill.WasAutoActing,
                         Indent: 2, Toggle: getDoDebug());
                 }
+                else
+                {
+                    vaultSkill.AutoActSetting = !AutoAct.Setting.IsNullOrEmpty() ? AutoAct.Setting : AutoAct.ResumeSetting;
+                    vaultSkill.WasAutoActing = !vaultSkill.AutoActSetting.IsNullOrEmpty();
+                    Debug.CheckYeh(4, $"AutoActSetting", $"{vaultSkill.AutoActSetting}", Indent: 2, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"WasAutoActing", $"{vaultSkill.WasAutoActing}", Good: vaultSkill.WasAutoActing,
+                        Indent: 2, Toggle: getDoDebug());
+                }
 
                 Debug.LoopItem(4, $"Interrupting AutoAct...", Indent: 2, Toggle: getDoDebug());
                 AutoAct.Interrupt();
@@ -836,8 +844,7 @@ namespace XRL.World.Parts.Skill
              && isPlayer
              && haveSkill
              && wasAutoActing
-             && haveAutoActSetting
-             && autoActSettingIsMovementOrExplore;
+             && haveAutoActSetting;
 
             Debug.Entry(4, $"Determining whether to resume AutoAct", Indent: 1, Toggle: getDoDebug());
 
@@ -1502,13 +1509,13 @@ namespace XRL.World.Parts.Skill
             Debug.Entry(4,
                 $"@ {nameof(Tactics_Vault)}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(ShouldAttackToReachTargetEvent)} E)",
+                + $"{nameof(AfterVaultedEvent)} E)",
                 Indent: 0, Toggle: getDoDebug());
 
             Debug.Entry(4, $"{nameof(Vaulter)}", $"{Vaulter?.DebugName ?? NULL}",
                 Indent: 1, Toggle: getDoDebug());
 
-            Clear();
+            // Clear();
 
             return base.HandleEvent(E);
         }

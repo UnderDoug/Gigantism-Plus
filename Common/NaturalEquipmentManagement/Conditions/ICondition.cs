@@ -47,38 +47,20 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        /// <summary>
-        ///     Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the success or failure of that test.
-        /// </summary>
-        /// <remarks>
-        ///     By default, <see cref="Check(T)" /> will return true if the <paramref name="Subject"/> is null.<br></br>
-        ///     This behaviour can be flipped by assigning true to the <see cref="FalseIfSubjectNull" /> field.
-        /// </remarks>
-        /// 
-        /// <param name="Subject">An instance of the class on which this check is performed.</param>
-        /// 
-        /// <returns>
-        ///     true if the check is successful or the <paramref name="Subject"/> is null and member <see cref="FalseIfSubjectNull" /> is false; false, otherwise.
-        /// </returns>
+        /// <summary>Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the success or failure of that test.</summary>
+        /// <remarks>By default, <see cref="Check(T)" /> will return <see langword="true" /> if the <paramref name="Subject"/> is <see langword="null" />.<br></br>This behaviour can be flipped by assigning <see langword="true" /> to the <see cref="FalseIfSubjectNull" /> field.</remarks>
+        /// <param name="Subject">An instance of the <see langword="class" /> on which this check is performed.</param>
+        /// <returns><see langword="true" /> if the check is successful or the <paramref name="Subject"/> is <see langword="null" /> and member <see cref="FalseIfSubjectNull" /> is <see langword="false" />;<br></br><see langword="false" />, otherwise.</returns>
         public virtual bool Check(T Subject)
         {
             return (Subject == null && !FalseIfSubjectNull)
                 || true;
         }
 
-        /// <summary>
-        ///     Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the inverted success or failure of that test.
-        /// </summary>
-        /// <remarks>
-        ///     By default, <see cref="NotCheck(T)" /> will return true if the <paramref name="Subject"/> is null.<br></br>
-        ///     This behaviour can be flipped by assigning true to the <see cref="FalseIfSubjectNull" /> field.
-        /// </remarks>
-        /// 
-        /// <param name="Subject">An instance of the class on which this check is performed.</param>
-        /// 
-        /// <returns>
-        ///     true if <see cref="Check(T)" /> would fail unless the <paramref name="Subject"/> is null and member <see cref="FalseIfSubjectNull" /> is false; false, otherwise.
-        /// </returns>
+        /// <summary>Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the inverted success or failure of that test.</summary>
+        /// <remarks>By default, <see cref="NotCheck(T)" /> will return <see langword="true" /> if the <paramref name="Subject"/> is <see langword="null" />.<br></br>This behaviour can be flipped by assigning <see langword="true" /> to the <see cref="FalseIfSubjectNull" /> field.</remarks>
+        /// <param name="Subject">An instance of the <see langword="class" /> on which this check is performed.</param>
+        /// <returns><see langword="true" /> if <see cref="Check(T)" /> would fail unless the <paramref name="Subject"/> is <see langword="null" /> and member <see cref="FalseIfSubjectNull" /> is <see langword="false" />;<br></br><see langword="false" />, otherwise.</returns>
         public virtual bool NotCheck(T Subject)
         {
             return (Subject == null && !FalseIfSubjectNull)

@@ -255,10 +255,10 @@ namespace HNPS_GigantismPlus
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AdjectiveColor)}", $"{NaturalEquipmentMod.AdjectiveColor}", Indent: indent + 1, Toggle: Toggle);
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AdjectiveColorFallback)}", $"{NaturalEquipmentMod.AdjectiveColorFallback}", Indent: indent + 1, Toggle: Toggle);
 
-                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.Adjustments)}", Indent: indent + 1, Toggle: Toggle);
-                if (!NaturalEquipmentMod.Adjustments.IsNullOrEmpty())
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.PartAdjustments)}", Indent: indent + 1, Toggle: Toggle);
+                if (!NaturalEquipmentMod.PartAdjustments.IsNullOrEmpty())
                 {
-                    foreach (PartAdjustment partAdjustment in NaturalEquipmentMod.Adjustments)
+                    foreach (PartAdjustment partAdjustment in NaturalEquipmentMod.PartAdjustments)
                     {
                         LoopItem(Verbosity, partAdjustment.ToString(), Indent: indent + 2, Toggle: Toggle);
                     }

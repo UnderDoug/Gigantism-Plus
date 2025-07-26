@@ -22,11 +22,11 @@ namespace HNPS_GigantismPlus
 
         public static readonly string RegisteredEventID = nameof(BeforeApplyPartAdjustmentEvent);
 
-        public GameObject Equipment;
-
-        public string NaturalEquipmentMod;
+        public GameObject Subject;
 
         public PartAdjustment Adjustment;
+
+        public string NaturalEquipmentMod;
 
         public override int GetCascadeLevel()
         {
@@ -40,22 +40,17 @@ namespace HNPS_GigantismPlus
         public override void Reset()
         {
             base.Reset();
-            Equipment = null;
-            NaturalEquipmentMod = null;
+            Subject = null;
             Adjustment = null;
+            NaturalEquipmentMod = null;
         }
 
-        public static BeforeApplyPartAdjustmentEvent FromPool(GameObject Equipment, string NaturalEquipmentMod, PartAdjustment Adjustment)
+        public static bool CheckFor(GameObject Equipment, string NaturalEquipmentMod, PartAdjustment Adjustment)
         {
             BeforeApplyPartAdjustmentEvent E = FromPool();
-            E.Equipment = Equipment;
+            E.Subject = Equipment;
             E.NaturalEquipmentMod = NaturalEquipmentMod;
             E.Adjustment = Adjustment;
-            return E;
-        }
-        public static bool Send(GameObject Equipment, string NaturalEquipmentMod, PartAdjustment Adjustment)
-        {
-            BeforeApplyPartAdjustmentEvent E = FromPool(Equipment, NaturalEquipmentMod, Adjustment);
 
             bool haveObject = Equipment != null;
 
@@ -64,9 +59,9 @@ namespace HNPS_GigantismPlus
 
             bool anyWants = objectWantsMin || objectWantsStr;
 
-            bool proceed = anyWants;
+            bool proceed = haveObject;
 
-            if (proceed)
+            if (proceed && anyWants)
             {
                 if (proceed && objectWantsMin)
                 {
@@ -77,7 +72,7 @@ namespace HNPS_GigantismPlus
                 {
                     Event @event = Event.New(nameof(BeforeApplyPartAdjustmentEvent));
                     @event.SetParameter(nameof(Equipment), Equipment);
-                    @event.SetParameter(nameof(NaturalEquipmentMod), NaturalEquipmentMod);
+                    @event.SetParameter(nameof(NaturalEquipmentMod), NaturalEquipmentMod.ToString());
                     @event.SetParameter(nameof(Adjustment), Adjustment);
                     proceed = Equipment.FireEvent(@event);
                     Adjustment.SetValue(@event.GetParameter(nameof(Adjustment), E.Adjustment).Value);

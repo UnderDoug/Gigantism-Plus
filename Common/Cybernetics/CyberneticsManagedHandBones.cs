@@ -76,7 +76,7 @@ namespace XRL.World.Parts
                 AdjectiveColorFallback = assigningPart.BonesAdjectiveColor,
                 ExludeFromDynamicTile = true,
 
-                Adjustments = new(),
+                PartAdjustments = new(),
 
                 AddedParts = new(),
 

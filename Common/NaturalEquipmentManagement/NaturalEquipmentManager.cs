@@ -119,7 +119,7 @@ namespace XRL.World.Parts
 
         public IEnumerable<IManagedDefaultNaturalEquipment> GetManagedNaturalEquipmentCompatibleParts()
         {
-            List<IManagedDefaultNaturalEquipment> managedDefaultNaturalEquipmentParts = ParentObject.GetPartsDescendedFrom<IManagedDefaultNaturalEquipment>();
+            List<IManagedDefaultNaturalEquipment> managedDefaultNaturalEquipmentParts = ParentObject?.GetPartsDescendedFrom<IManagedDefaultNaturalEquipment>();
             if (!managedDefaultNaturalEquipmentParts.IsNullOrEmpty())
             {
                 foreach (IManagedDefaultNaturalEquipment managedDefaultNaturalEquipmentPart in ParentObject.GetPartsDescendedFrom<IManagedDefaultNaturalEquipment>())

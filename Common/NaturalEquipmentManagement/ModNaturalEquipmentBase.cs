@@ -20,6 +20,7 @@ namespace XRL.World.Parts
     [Serializable]
     public abstract class ModNaturalEquipmentBase 
         : IModification
+        , IModEventHandler<BeforeApplyAdjustmentEvent>
         , IModEventHandler<BeforeApplyPartAdjustmentEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
@@ -766,7 +767,12 @@ namespace XRL.World.Parts
         {
             return base.WantEvent(ID, cascade)
                 || ID == PooledEvent<GetDisplayNameEvent>.ID
+                || ID == BeforeApplyAdjustmentEvent.ID
                 || ID == BeforeApplyPartAdjustmentEvent.ID;
+        }
+        public virtual bool HandleEvent(BeforeApplyAdjustmentEvent E)
+        {
+            return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
         {

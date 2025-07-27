@@ -9,18 +9,15 @@ namespace HNPS_GigantismPlus
 {
     public class ChangeDetailColor : RenderAdjustment
     {
-        public string DetailColor;
-
         public ChangeDetailColor()
             : base()
         {
-            DetailColor = null;
         }
 
         public ChangeDetailColor(string DetailColor = null)
             : this()
         {
-            this.DetailColor = DetailColor;
+            Value = DetailColor;
         }
         public ChangeDetailColor(ChangeDetailColor Source)
             : base(Source)
@@ -29,7 +26,7 @@ namespace HNPS_GigantismPlus
         public ChangeDetailColor(ChangeTileColor Source)
             : base(Source)
         {
-            DetailColor = Source.TileColor;
+            Value = Source.Value;
         }
         public ChangeDetailColor(Render Source)
             : this(Source.DetailColor)
@@ -40,7 +37,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.Render.DetailColor = DetailColor;
+                Subject.Render.DetailColor = Value;
                 return true;
             }
             return false;

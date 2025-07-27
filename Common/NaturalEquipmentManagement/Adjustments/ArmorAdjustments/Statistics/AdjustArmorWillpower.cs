@@ -6,35 +6,38 @@ using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustHitBonus : MeleeWeaponCumulativeAdjustment
+    public class AdjustArmorWillpower : ArmorCumulativeAdjustment
     {
-        public AdjustHitBonus()
+        public AdjustArmorWillpower()
             : base()
         {
         }
-        public AdjustHitBonus(int Amount = 0)
+        public AdjustArmorWillpower(int Amount = 0)
             : base()
         {
             this.Amount = Amount;
         }
-        public AdjustHitBonus(MeleeWeaponCumulativeAdjustment Source)
+        public AdjustArmorWillpower(ArmorCumulativeAdjustment Source)
             : base(Source)
         {
         }
-        public AdjustHitBonus(int Amount, MeleeWeaponCumulativeAdjustment Source)
+        public AdjustArmorWillpower(int Amount, ArmorCumulativeAdjustment Source)
             : base(Source)
         {
             this.Amount = Amount;
+        }
+        public AdjustArmorWillpower(Armor Source)
+            : this(Source.Willpower)
+        {
         }
 
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().HitBonus += (int)Amount;
-                return true;
+                Subject.GetPart<Armor>().Willpower += (int)Amount;
             }
-            return false;
+            return GetApplied();
         }
     }
 }

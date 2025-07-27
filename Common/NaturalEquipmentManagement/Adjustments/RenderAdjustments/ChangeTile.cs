@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine.UIElements;
 using XRL.World;
 using XRL.World.Parts;
 
@@ -8,18 +9,15 @@ namespace HNPS_GigantismPlus
 {
     public class ChangeTile : RenderAdjustment
     {
-        public string Tile;
-
         public ChangeTile()
             : base()
         {
-            Tile = null;
         }
 
         public ChangeTile(string Tile = null)
             : this()
         {
-            this.Tile = Tile;
+            Value = Tile;
         }
         public ChangeTile(ChangeTile Source)
             : base(Source)
@@ -34,7 +32,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.Render.Tile = Tile;
+                Subject.Render.Tile = Value;
                 return true;
             }
             return false;

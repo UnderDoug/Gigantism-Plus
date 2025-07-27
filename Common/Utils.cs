@@ -59,69 +59,6 @@ namespace HNPS_GigantismPlus
         public static GiantHero GiantHeroBuilder = new();
         public static WrassleGiantHero WrassleGiantHeroBuilder => UD_QWE.WrassleGiantHeroBuilder;
 
-        public struct DescriptionElement
-        {
-            private static bool doDebug => getClassDoDebug(nameof(DescriptionElement));
-
-            public string Verb;
-            public string Effect;
-
-            public DescriptionElement(string Verb, string Effect)
-            {
-                this.Verb = Verb;
-                this.Effect = Effect;
-            }
-
-            public DescriptionElement(List<string> Source)
-            {
-                Verb = null;
-                Effect = null;
-                if (!Source.IsNullOrEmpty())
-                {
-                    Verb = Source[0];
-                    if (Source.Count > 1)
-                    {
-                        Effect = Source[1];
-                    }
-                }
-            }
-
-            public readonly List<string> ToList()
-            {
-                return new List<string>()
-                {
-                    Verb,
-                    Effect,
-                };
-            }
-
-            public override readonly string ToString()
-            {
-                if (Verb == "")
-                {
-                    return "It " + Effect;
-                }
-                if (Verb == null)
-                {
-                    return "It is " + Effect;
-                }
-                return Grammar.ThirdPerson(Verb, PrependSpace: false) + " " + Effect;
-            }
-
-            public readonly string ToString(GameObject Object)
-            {
-                if (Verb == "")
-                {
-                    return Object.It + " " + Effect;
-                }
-                if (Verb == null)
-                {
-                    return Object.Itis + " " + Effect;
-                }
-                return Object.GetVerb(Verb, PrependSpace: false) + " " + Effect;
-            }
-        }
-
         public static List<DescriptionElement> IterateDataBucketTags(GameObject Object, GameObjectBlueprint GigantismPlusModGiganticDescriptions, string When, string Where)
         {
             List<DescriptionElement> Output = new();

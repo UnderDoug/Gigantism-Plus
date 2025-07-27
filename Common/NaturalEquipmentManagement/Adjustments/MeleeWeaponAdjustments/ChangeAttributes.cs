@@ -11,13 +11,12 @@ namespace HNPS_GigantismPlus
         public ChangeAttributes()
             : base()
         {
-            Attributes = null;
         }
 
         public ChangeAttributes(string Attributes = null)
             : this()
         {
-            this.Attributes = Attributes;
+            Value = Attributes;
         }
         public ChangeAttributes(ChangeAttributes Source)
             : base(Source)
@@ -32,7 +31,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().Attributes = Attributes;
+                Subject.GetPart<MeleeWeapon>().Attributes = Value;
                 return true;
             }
             return false;

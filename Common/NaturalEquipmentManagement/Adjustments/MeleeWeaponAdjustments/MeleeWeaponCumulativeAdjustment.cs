@@ -8,8 +8,6 @@ namespace HNPS_GigantismPlus
 {
     public abstract class MeleeWeaponCumulativeAdjustment : MeleeWeaponAdjustment
     {
-        public int Amount;
-
         public MeleeWeaponCumulativeAdjustment()
             : base()
         {

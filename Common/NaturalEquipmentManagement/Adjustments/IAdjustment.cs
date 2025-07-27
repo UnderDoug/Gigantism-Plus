@@ -26,6 +26,9 @@ namespace HNPS_GigantismPlus
         private static bool doDebug => getClassDoDebug(nameof(IAdjustment));
 
         [NonSerialized]
+        private bool SendAfterEvent; // Whether Apply() should send AfterApplyAdjustmentEvent.
+
+        [NonSerialized]
         private bool Applied; // Whether the adjustment has been applied.
 
         [NonSerialized]
@@ -46,30 +49,46 @@ namespace HNPS_GigantismPlus
         [NonSerialized]
         public AllConditions<GameObject> AllConditions;
 
+        [NonSerialized]
+        public string Value;
+
+        [NonSerialized]
+        public int? Amount;
+
+        [NonSerialized]
+        public bool? State;
+
         public IAdjustment()
         {
+            SendAfterEvent = false;
+
             Applied = false;
             Source = null;
             Prioritize = true;
             Priority = 0;
+
             Condition = null;
             AnyConditions = new();
             AllConditions = new();
+
+            Value = null;
+            Amount = null;
+            State = null;
         }
 
-        public IAdjustment(bool Prioritize, int AdjustmentPriority)
+        public IAdjustment(bool Prioritize, int Priority)
             : this()
         {
             this.Prioritize = Prioritize;
-            this.Priority = AdjustmentPriority;
+            this.Priority = Priority;
         }
 
-        public IAdjustment(bool Prioritize, int AdjustmentPriority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
-            : this(Prioritize, AdjustmentPriority)
+        public IAdjustment(bool Prioritize, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null, List<DescriptionElement> DescriptionElements = null)
+            : this(Prioritize, Priority)
         {
             this.Condition = Condition;
-            this.Condition = AnyConditions ?? new();
-            this.Condition = AllConditions ?? new();
+            this.AnyConditions = AnyConditions ?? new();
+            this.AllConditions = AllConditions ?? new();
         }
 
         public IAdjustment(IAdjustment Source)
@@ -85,6 +104,101 @@ namespace HNPS_GigantismPlus
         public virtual bool GetApplied()
         {
             return Applied;
+        }
+
+        public virtual bool GetSendAfterEvent()
+        {
+            return SendAfterEvent;
+        }
+
+        public override string ToString()
+        {
+            return $"{Source.Name}.{GetType().Name}";
+        }
+
+        public string ToString(bool ShowApplied, bool Short)
+        {
+            string applied = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
+            string addToString = !Short ? AddToString() : null;
+            return $"{applied}{ToString()}{addToString}";
+        }
+
+        public virtual string AddToString()
+        {
+            List<string> outputList = new();
+            string valueString = Value != null ? Value.Quote() : null;
+            if (!valueString.IsNullOrEmpty())
+            {
+                outputList.Add(valueString);
+            }
+            int amount = (int)Amount;
+            string amountString = Amount != null ? amount.Signed() : null;
+            if (!amountString.IsNullOrEmpty())
+            {
+                outputList.Add(valueString);
+            }
+            bool state = (bool)State;
+            string stateString = State != null ? Quote($"{state}") : null;
+            if (!stateString.IsNullOrEmpty())
+            {
+                outputList.Add(valueString);
+            }
+            string output = null;
+            if (!outputList.IsNullOrEmpty())
+            {
+                output = outputList.Join(", ");
+            } 
+            return output;
+        }
+
+        public virtual DescriptionElement GetWeaponDescriptionElement()
+        {
+            return DescriptionElement.Empty;
+        }
+        public virtual List<DescriptionElement> GetWeaponDescriptionElements()
+        {
+            List<DescriptionElement> descriptionElements = new();
+
+            DescriptionElement descriptionElement = GetWeaponDescriptionElement();
+
+            if (descriptionElement != DescriptionElement.Empty)
+            {
+                descriptionElements.Add(descriptionElement);
+            }
+            return new();
+        }
+
+        public virtual DescriptionElement GetGeneralDescriptionElement()
+        {
+            return DescriptionElement.Empty;
+        }
+        public virtual List<DescriptionElement> GetGeneralDescriptionElements()
+        {
+            List<DescriptionElement> descriptionElements = new();
+
+            DescriptionElement descriptionElement = GetGeneralDescriptionElement();
+
+            if (descriptionElement != DescriptionElement.Empty)
+            {
+                descriptionElements.Add(descriptionElement);
+            }
+            return new();
+        }
+
+        public bool TryGetDescriptionElements(out List<DescriptionElement> DescriptionElements)
+        {
+            DescriptionElements = new();
+            List<DescriptionElement> descriptionElements = GetWeaponDescriptionElements();
+            if (!descriptionElements.IsNullOrEmpty())
+            {
+                DescriptionElements.AddRange(descriptionElements);
+            }
+            descriptionElements = GetGeneralDescriptionElements();
+            if (!descriptionElements.IsNullOrEmpty())
+            {
+                DescriptionElements.AddRange(descriptionElements);
+            }
+            return !DescriptionElements.IsNullOrEmpty();
         }
 
         public virtual bool CheckCondition(GameObject Subject)
@@ -191,12 +305,25 @@ namespace HNPS_GigantismPlus
             if (!Applied && Subject != null && Check(Subject) && BeforeApplyAdjustmentEvent.CheckFor(Subject, Source, this))
             {
                 Applied = true;
+                SendAfterEvent = true;
+            }
+            if (SendAfterEvent)
+            {
+                EarlyAfterApplyAdjustmentEvent.Send(Subject, Source, this);
+                SendAfterEvent = !AfterApply(Subject);
             }
             return Applied;
         }
 
+        public virtual bool AfterApply(GameObject Subject)
+        {
+            AfterApplyAdjustmentEvent.Send(Subject, Source, this);
+            return SendAfterEvent;
+        }
+
         public virtual void Write(SerializationWriter Writer)
         {
+            Writer.Write(SendAfterEvent);
             Writer.Write(Applied);
             Writer.WriteObject(Source);
             Writer.Write(Prioritize);
@@ -204,9 +331,13 @@ namespace HNPS_GigantismPlus
             Writer.WriteObject(Condition);
             Writer.WriteObject(AnyConditions);
             Writer.WriteObject(AllConditions);
+            Writer.WriteOptimized(Value);
+            Writer.WriteNullable(Amount);
+            Writer.WriteNullable(State);
         }
         public virtual void Read(SerializationReader Reader)
         {
+            SendAfterEvent = Reader.ReadBoolean();
             Applied = Reader.ReadBoolean();
             Source = Reader.ReadObject() as Type;
             Prioritize = Reader.ReadBoolean();
@@ -214,6 +345,9 @@ namespace HNPS_GigantismPlus
             Condition = Reader.ReadObject() as ICondition<GameObject>;
             AnyConditions = Reader.ReadObject() as AnyConditions<GameObject>;
             AllConditions = Reader.ReadObject() as AllConditions<GameObject>;
+            Value = Reader.ReadOptimizedString();
+            Amount = Reader.ReadObject() as int?;
+            State = Reader.ReadObject() as bool?;
         }
     }
 }

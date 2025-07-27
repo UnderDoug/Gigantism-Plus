@@ -31,7 +31,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().AdjustDamageDieCount(Amount);
+                Subject.GetPart<MeleeWeapon>().AdjustDamageDieCount((int)Amount);
                 return true;
             }
             return false;

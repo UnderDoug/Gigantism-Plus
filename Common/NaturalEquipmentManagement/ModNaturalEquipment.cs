@@ -71,6 +71,14 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
+        public override void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        {
+            Adjustment.Source ??= GetType();
+            int indent = Debug.LastIndent;
+            base.AddAdjustment(Adjustment, Condition, AnyConditions, AllConditions);
+            Debug.LastIndent = indent;
+        }
+
         public virtual void ApplyPartAndPropChanges(GameObject Object)
         {
             Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4, Toggle: getDoDebug("APP"));

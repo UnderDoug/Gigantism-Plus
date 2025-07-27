@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine.Tilemaps;
 using XRL.World;
 using XRL.World.Parts;
 
@@ -8,18 +9,15 @@ namespace HNPS_GigantismPlus
 {
     public class ChangeRenderDisplayName : RenderAdjustment
     {
-        public string DisplayName;
-
         public ChangeRenderDisplayName()
             : base()
         {
-            DisplayName = null;
         }
 
         public ChangeRenderDisplayName(string DisplayName = null)
             : this()
         {
-            this.DisplayName = DisplayName;
+            Value = DisplayName;
         }
         public ChangeRenderDisplayName(ChangeRenderDisplayName Source)
             : base(Source)
@@ -34,7 +32,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.Render.DisplayName = DisplayName;
+                Subject.Render.DisplayName = Value;
                 return true;
             }
             return false;

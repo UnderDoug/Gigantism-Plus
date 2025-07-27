@@ -34,7 +34,7 @@ namespace HNPS_GigantismPlus
                 MeleeWeapon meleeWeapon = Subject.GetPart<MeleeWeapon>();
                 if (meleeWeapon.MaxStrengthBonus < 999)
                 {
-                    meleeWeapon.AdjustBonusCap(Amount);
+                    meleeWeapon.AdjustBonusCap((int)Amount);
                 }
                 return true;
             }

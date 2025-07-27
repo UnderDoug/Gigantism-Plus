@@ -8,18 +8,15 @@ namespace HNPS_GigantismPlus
 {
     public class AddAttributes : MeleeWeaponAdjustment
     {
-        public string Attributes;
-
         public AddAttributes()
             : base()
         {
-            Attributes = null;
         }
 
         public AddAttributes(string Attributes = null)
             : this()
         {
-            this.Attributes = Attributes;
+            Value = Attributes;
         }
         public AddAttributes(AddAttributes Source)
             : base(Source)
@@ -40,7 +37,7 @@ namespace HNPS_GigantismPlus
                 {
                     attributes += " ";
                 }
-                attributes += Attributes;
+                attributes += Value;
                 meleeWeapon.Attributes = attributes;
                 return true;
             }

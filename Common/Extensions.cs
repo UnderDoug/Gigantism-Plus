@@ -2065,7 +2065,7 @@ namespace HNPS_GigantismPlus
             {
                 foreach (T item in List)
                 {
-                    output += $"{(output == string.Empty ? "" : Delimiter)}{item}";
+                    output += $"{(output.IsNullOrEmpty() ? "" : Delimiter)}{item}";
                 }
             }
             return output;

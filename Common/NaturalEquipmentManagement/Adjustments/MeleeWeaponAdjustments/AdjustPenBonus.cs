@@ -31,7 +31,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().PenBonus += Amount;
+                Subject.GetPart<MeleeWeapon>().PenBonus += (int)Amount;
                 return true;
             }
             return false;

@@ -8,18 +8,15 @@ namespace HNPS_GigantismPlus
 {
     public class ChangeStat : MeleeWeaponAdjustment
     {
-        public string Stat;
-
         public ChangeStat()
             : base()
         {
-            Stat = null;
         }
 
         public ChangeStat(string Skill = null)
             : this()
         {
-            this.Stat = Skill;
+            Value = Skill;
         }
         public ChangeStat(ChangeStat Source)
             : base(Source)
@@ -34,7 +31,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().Stat = Stat;
+                Subject.GetPart<MeleeWeapon>().Stat = Value;
                 return true;
             }
             return false;

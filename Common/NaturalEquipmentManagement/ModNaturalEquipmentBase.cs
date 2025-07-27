@@ -475,6 +475,7 @@ namespace XRL.World.Parts
         public virtual void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
         {
             Adjustments ??= new();
+            Adjustment.Source ??= GetType();
             Adjustment.Condition ??= Condition;
             Adjustment.AnyConditions ??= AnyConditions;
             Adjustment.AllConditions ??= AllConditions;
@@ -503,7 +504,6 @@ namespace XRL.World.Parts
                 IAdjustment adjustment = new ChangeRenderDisplayName() 
                 { 
                     DisplayName = noun, 
-                    Source = GetType(), 
                 };
                 AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
                 return AddAdjustment(RENDER, "DisplayName", noun, Priority, Condition, AnyConditions, AllConditions);
@@ -521,7 +521,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new ChangeSkill()
             {
                 Skill = Value,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(MELEEWEAPON, "Skill", Value, Priority, Condition, AnyConditions, AllConditions);
@@ -537,7 +536,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new ChangeStat()
             {
                 Stat = Value,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(MELEEWEAPON, "Stat", Value, Priority, Condition, AnyConditions, AllConditions);
@@ -553,7 +551,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new ChangeTile()
             {
                 Tile = Value,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "Tile", Value, Priority, Condition, AnyConditions, AllConditions);
@@ -569,7 +566,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new ChangeColorString()
             {
                 ColorString = Value,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "ColorString", Value, Priority, Condition, AnyConditions, AllConditions);
@@ -585,7 +581,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new ChangeTileColor()
             {
                 TileColor = Value,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "TileColor", Value, Priority, Condition, AnyConditions, AllConditions);
@@ -601,7 +596,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new ChangeDetailColor()
             {
                 DetailColor = Value,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Priority, Condition, AnyConditions, AllConditions);
             return AddAdjustment(RENDER, "DetailColor", Value, Priority, Condition, AnyConditions, AllConditions);
@@ -617,7 +611,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new AdjustDamageDieCount()
             {
                 Amount = Amount,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
         }
@@ -627,7 +620,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new AdjustDamageDieSize()
             {
                 Amount = Amount,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
         }
@@ -637,7 +629,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new AdjustDamageBonus()
             {
                 Amount = Amount,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
         }
@@ -647,7 +638,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new AdjustHitBonus()
             {
                 Amount = Amount,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
         }
@@ -657,7 +647,6 @@ namespace XRL.World.Parts
             IAdjustment adjustment = new AdjustPenBonus()
             {
                 Amount = Amount,
-                Source = GetType(),
             };
             AddAdjustment(adjustment, Condition, AnyConditions, AllConditions);
         }

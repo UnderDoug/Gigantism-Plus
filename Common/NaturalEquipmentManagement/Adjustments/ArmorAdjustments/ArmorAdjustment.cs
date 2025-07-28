@@ -19,7 +19,14 @@ namespace HNPS_GigantismPlus
 
         public override bool Apply(GameObject Subject)
         {
-            return Subject.HasPart<Armor>() && base.Apply(Subject);
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"* {GetType().Name}.{nameof(Apply)}()", Indent: indent + 1, Toggle: true);
+
+            bool baseApply = Subject.HasPart<Armor>() && base.Apply(Subject);
+
+            Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: true);
+            Debug.LastIndent = indent;
+            return baseApply;
         }
     }
 }

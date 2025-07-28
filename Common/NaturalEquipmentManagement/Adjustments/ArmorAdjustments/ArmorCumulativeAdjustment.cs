@@ -64,11 +64,22 @@ namespace HNPS_GigantismPlus
 
         public override bool AfterApply(GameObject Subject)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"! {GetType().Name}.{nameof(AfterApply)}()", Indent: indent + 1, Toggle: true);
+
             if (NeedsShifter)
             {
-                Subject?.GetPart<Armor>()?.UpdateStatShifts();
+                GameObject who = null;
+                if (Subject.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator) && naturalEquipmentOperator.Wielder != null)
+                {
+                    who = naturalEquipmentOperator.Wielder;
+                }
+                Subject?.GetPart<Armor>()?.UpdateStatShifts(who);
             }
-            return base.AfterApply(Subject);
+            bool baseAfterApply = base.AfterApply(Subject);
+            Debug.Entry(4, $"x {GetType().Name}.{nameof(AfterApply)}() !//", Indent: indent + 1, Toggle: true);
+            Debug.LastIndent = indent;
+            return baseAfterApply;
         }
     }
 }

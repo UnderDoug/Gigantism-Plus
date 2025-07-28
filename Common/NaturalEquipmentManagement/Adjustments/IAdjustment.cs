@@ -135,7 +135,7 @@ namespace HNPS_GigantismPlus
             return $"{Source.Name}.{GetType().Name}";
         }
 
-        public string ToString(bool ShowApplied, bool Short)
+        public string ToString(bool ShowApplied, bool Short = false)
         {
             string applied = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
             string addToString = !Short ? AddToString() : null;
@@ -145,27 +145,30 @@ namespace HNPS_GigantismPlus
         public virtual string AddToString()
         {
             List<string> outputList = new();
-            string valueString = Value != null ? Value.Quote() : null;
-            if (!valueString.IsNullOrEmpty())
+            
+            if (Value != null)
             {
+                string valueString = Value.Quote();
                 outputList.Add(valueString);
             }
-            int amount = (int)Amount;
-            string amountString = Amount != null ? amount.Signed() : null;
-            if (!amountString.IsNullOrEmpty())
+            int amount;
+            if (Amount != null)
             {
-                outputList.Add(valueString);
+                amount = (int)Amount;
+                string amountString = amount.Signed();
+                outputList.Add(amountString);
             }
-            bool state = (bool)State;
-            string stateString = State != null ? Quote($"{state}") : null;
-            if (!stateString.IsNullOrEmpty())
+            bool state;
+            if (State != null)
             {
-                outputList.Add(valueString);
+                state = (bool)State;
+                string stateString = Quote($"{state}");
+                outputList.Add(stateString);
             }
             string output = null;
             if (!outputList.IsNullOrEmpty())
             {
-                output = outputList.Join(", ");
+                output = ": " + outputList.Join(", ");
             } 
             return output;
         }
@@ -324,22 +327,47 @@ namespace HNPS_GigantismPlus
 
         public virtual bool Apply(GameObject Subject)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"* {GetType().Name}.{nameof(Apply)}()", Indent: indent + 1, Toggle: doDebug);
+
             if (!Applied && Subject != null && Check(Subject) && BeforeApplyAdjustmentEvent.CheckFor(Subject, Source, this))
             {
+                Debug.LoopItem(4, $"2] !{nameof(Applied)} and {nameof(Check)}({nameof(Subject)})", Indent: indent + 2, Toggle: doDebug);
+
                 Applied = true;
-                SendAfterEvent = true;
-            }
-            if (SendAfterEvent)
-            {
+                // SendAfterEvent = true;
+
+                Debug.CheckYeh(4, $"{nameof(Applied)}: {Applied}", Indent: indent + 3, Toggle: doDebug);
+                // Debug.CheckYeh(4, $"{nameof(SendAfterEvent)}: {SendAfterEvent}", Indent: indent + 3, Toggle: doDebug);
+
+                Apply(Subject);
                 EarlyAfterApplyAdjustmentEvent.Send(Subject, Source, this);
-                SendAfterEvent = !AfterApply(Subject);
+                AfterApply(Subject);
+                return false;
             }
-            return Applied;
+            Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: doDebug);
+            Debug.LastIndent = indent;
+            return true;
         }
 
         public virtual bool AfterApply(GameObject Subject)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"! {GetType().Name}.{nameof(AfterApply)}()", Indent: indent + 1, Toggle: doDebug);
+
+            Debug.CheckYeh(4, $"Doing AfterApply", Indent: indent + 2, Toggle: true);
             AfterApplyAdjustmentEvent.Send(Subject, Source, this);
+            if (SendAfterEvent)
+            {
+                // Debug.CheckYeh(4, $"Doing AfterApply", Indent: indent + 2, Toggle: true);
+                // AfterApplyAdjustmentEvent.Send(Subject, Source, this);
+            }
+            else
+            {
+                // Debug.CheckNah(4, $"Doing AfterApply", Indent: indent + 2, Toggle: true);
+            }
+            Debug.Entry(4, $"x {GetType().Name}.{nameof(AfterApply)}() !//", Indent: indent + 1, Toggle: doDebug);
+            Debug.LastIndent = indent;
             return SendAfterEvent;
         }
 

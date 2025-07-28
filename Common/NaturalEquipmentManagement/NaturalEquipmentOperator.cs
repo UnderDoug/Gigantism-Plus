@@ -312,10 +312,10 @@ namespace XRL.World.Parts
                     Adjustments ??= new();
                     foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                     {
-                        Debug.LoopItem(4, $"{naturalEquipmentMod.GetType().Name}]", Indent: 1, Toggle: doDebug);
+                        Debug.LoopItem(4, $"{naturalEquipmentMod.GetType().Name}<{naturalEquipmentMod.Adjective}>]", Indent: 1, Toggle: doDebug);
                         foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
-                            Debug.LoopItem(4, $"{adjustment.Source.Name}{adjustment.GetType().Name}", Indent: 2, Toggle: doDebug);
+                            Debug.Entry(4, $"{adjustment.ToString()}", Indent: 2, Toggle: doDebug);
                             Adjustments.Add(adjustment);
                         }
                     }
@@ -326,7 +326,7 @@ namespace XRL.World.Parts
                         {
                             if (adjustment.Apply(ParentObject))
                             {
-                                AppliedAdjustments.Add($"{adjustment.Source.Name}:{adjustment.GetType().Name}");
+                                AppliedAdjustments.Add($"{adjustment.ToString(ShowApplied: true)}");
                             }
                         }
 

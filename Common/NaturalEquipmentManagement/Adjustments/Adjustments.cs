@@ -288,7 +288,7 @@ namespace HNPS_GigantismPlus
         {
             if (!Items.IsNullOrEmpty())
             {
-                foreach (IAdjustment adjustment in Items)
+                foreach (IAdjustment adjustment in this)
                 {
                     if (adjustment.IsApplied())
                     {
@@ -306,7 +306,7 @@ namespace HNPS_GigantismPlus
         {
             if (!Items.IsNullOrEmpty())
             {
-                foreach (IAdjustment adjustment in Items)
+                foreach (IAdjustment adjustment in this)
                 {
                     if (!adjustment.IsApplied())
                     {
@@ -321,9 +321,12 @@ namespace HNPS_GigantismPlus
         {
             if (!Items.IsNullOrEmpty() && base.Apply(Subject))
             {
-                foreach (IAdjustment adjustment in Items)
+                foreach (IAdjustment adjustment in this)
                 {
-                    adjustment.Apply(Subject);
+                    if (!adjustment.IsApplied())
+                    {
+                        adjustment.Apply(Subject);
+                    }
                 }
                 return true;
             }

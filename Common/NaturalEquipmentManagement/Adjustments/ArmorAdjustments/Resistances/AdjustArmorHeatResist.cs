@@ -37,7 +37,7 @@ namespace HNPS_GigantismPlus
             {
                 Subject.GetPart<Armor>().Heat += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

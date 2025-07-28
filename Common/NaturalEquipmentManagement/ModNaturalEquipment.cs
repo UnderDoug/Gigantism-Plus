@@ -71,11 +71,12 @@ namespace XRL.World.Parts
             AssigningPart = NewAssigningPart;
         }
 
-        public override void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null)
+        public override void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
         {
-            Adjustment.Source ??= GetType();
             int indent = Debug.LastIndent;
-            base.AddAdjustment(Adjustment, Condition, AnyConditions, AllConditions);
+            Adjustments ??= new();
+            Adjustment.Source ??= GetType();
+            base.AddAdjustment(Adjustment, Condition, AllConditions, AnyConditions);
             Debug.LastIndent = indent;
         }
 
@@ -245,6 +246,26 @@ namespace XRL.World.Parts
                 {
                     E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
                 }
+
+                List<IAdjustment> appliedAdjustments = new(Adjustments.GetApplied());
+                if (!appliedAdjustments.IsNullOrEmpty())
+                {
+                    foreach (IAdjustment adjustment in appliedAdjustments)
+                    {
+                        if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> weaponElements, out List<DescriptionElement> generalElements))
+                        {
+                            if (!weaponElements.IsNullOrEmpty())
+                            {
+                                E.GeneralDescriptions.AddRange(weaponElements);
+                            }
+                            if (!generalElements.IsNullOrEmpty())
+                            {
+                                E.WeaponDescriptions.AddRange(generalElements);
+                            }
+                        }
+                    }
+                }
+
                 if (E.WeaponDescriptions.IsNullOrEmpty() && E.GeneralDescriptions.IsNullOrEmpty())
                 {
                     E.AddWeaponElement("gain", "some manner of adjustments");

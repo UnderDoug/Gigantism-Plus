@@ -38,7 +38,7 @@ namespace HNPS_GigantismPlus
                 NeedsShifter = false;
                 Subject.GetPart<Armor>().CarryBonus += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

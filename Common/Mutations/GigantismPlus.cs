@@ -214,6 +214,10 @@ namespace XRL.World.Parts.Mutation
             };
             giganticBodMod.AddStatAdjustment("Strength", -100);
 
+            giganticBodMod.AddArmorAVAdjustment(10);
+            giganticBodMod.AddArmorDVAdjustment(-10);
+            giganticBodMod.AddArmorStatisticAdjustment("Toughness", 30);
+
             giganticBodMod.AddColorStringAdjustment("&Z", true);
             giganticBodMod.AddTileColorAdjustment("&Z", true);
             giganticBodMod.AddDetailColorAdjustment("z", true);

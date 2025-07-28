@@ -6,23 +6,29 @@ using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustArmorWillpower : ArmorCumulativeAdjustment
+    public class AdjustArmorWillpower : AdjustArmorStatistic
     {
         public AdjustArmorWillpower()
-            : base()
+            : base(nameof(Armor.Willpower))
         {
         }
-        public AdjustArmorWillpower(int Amount = 0)
-            : base()
+        public AdjustArmorWillpower(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorWillpower(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorWillpower(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorWillpower(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorWillpower(AdjustArmorStatistic SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = nameof(Armor.Willpower);
+        }
+        public AdjustArmorWillpower(int Amount, AdjustArmorStatistic SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
@@ -37,7 +43,7 @@ namespace HNPS_GigantismPlus
             {
                 Subject.GetPart<Armor>().Willpower += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

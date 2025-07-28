@@ -6,23 +6,29 @@ using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustArmorIntelligence : ArmorCumulativeAdjustment
+    public class AdjustArmorIntelligence : AdjustArmorStatistic
     {
         public AdjustArmorIntelligence()
-            : base()
+            : base(nameof(Armor.Intelligence))
         {
         }
-        public AdjustArmorIntelligence(int Amount = 0)
-            : base()
+        public AdjustArmorIntelligence(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorIntelligence(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorIntelligence(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorIntelligence(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorIntelligence(AdjustArmorStatistic SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = nameof(Armor.Intelligence);
+        }
+        public AdjustArmorIntelligence(int Amount, AdjustArmorStatistic SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
@@ -37,7 +43,7 @@ namespace HNPS_GigantismPlus
             {
                 Subject.GetPart<Armor>().Intelligence += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

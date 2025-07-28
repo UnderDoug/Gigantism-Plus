@@ -44,10 +44,10 @@ namespace HNPS_GigantismPlus
         public ICondition<GameObject> Condition;
 
         [NonSerialized]
-        public AnyConditions<GameObject> AnyConditions;
+        public AllConditions<GameObject> AllConditions;
 
         [NonSerialized]
-        public AllConditions<GameObject> AllConditions;
+        public AnyConditions<GameObject> AnyConditions;
 
         [NonSerialized]
         public string Value;
@@ -57,6 +57,12 @@ namespace HNPS_GigantismPlus
 
         [NonSerialized]
         public bool? State;
+
+        [NonSerialized]
+        public string Verb;
+
+        [NonSerialized]
+        public string Effect;
 
         public IAdjustment()
         {
@@ -68,31 +74,44 @@ namespace HNPS_GigantismPlus
             Priority = 0;
 
             Condition = null;
-            AnyConditions = new();
             AllConditions = new();
+            AnyConditions = new();
 
             Value = null;
             Amount = null;
             State = null;
-        }
 
-        public IAdjustment(bool Prioritize, int Priority)
+            Verb = null;
+            Effect = null;
+        }
+        public IAdjustment(Type Source, bool Prioritize, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null, string Value = null, int? Amount = null, bool? State = null, string Verb = null, string Effect = null)
             : this()
         {
+            this.Source = Source;
             this.Prioritize = Prioritize;
             this.Priority = Priority;
-        }
-
-        public IAdjustment(bool Prioritize, int Priority, ICondition<GameObject> Condition = null, AnyConditions<GameObject> AnyConditions = null, AllConditions<GameObject> AllConditions = null, List<DescriptionElement> DescriptionElements = null)
-            : this(Prioritize, Priority)
-        {
             this.Condition = Condition;
-            this.AnyConditions = AnyConditions ?? new();
             this.AllConditions = AllConditions ?? new();
+            this.AnyConditions = AnyConditions ?? new();
+            this.Value = Value;
+            this.Amount = Amount;
+            this.State = State;
+            this.Verb = Verb;
+            this.Effect = Effect;
         }
-
-        public IAdjustment(IAdjustment Source)
-            : this(Source.Prioritize, Source.Priority, Source.Condition, Source.AnyConditions, Source.AllConditions)
+        public IAdjustment(IAdjustment SourceAdjustment)
+            : this(
+                  Source: SourceAdjustment.Source,
+                  Prioritize: SourceAdjustment.Prioritize,
+                  Priority: SourceAdjustment.Priority,
+                  Condition: SourceAdjustment.Condition,
+                  AllConditions: SourceAdjustment.AllConditions,
+                  AnyConditions: SourceAdjustment.AnyConditions,
+                  Value: SourceAdjustment.Value,
+                  Amount: SourceAdjustment.Amount,
+                  State: SourceAdjustment.State,
+                  Verb: SourceAdjustment.Verb,
+                  Effect: SourceAdjustment.Effect)
         {
         }
 
@@ -101,7 +120,7 @@ namespace HNPS_GigantismPlus
             Applied = false;
         }
 
-        public virtual bool GetApplied()
+        public virtual bool IsApplied()
         {
             return Applied;
         }
@@ -151,15 +170,15 @@ namespace HNPS_GigantismPlus
             return output;
         }
 
-        public virtual DescriptionElement GetWeaponDescriptionElement()
+        public virtual DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
         {
             return DescriptionElement.Empty;
         }
-        public virtual List<DescriptionElement> GetWeaponDescriptionElements()
+        public virtual List<DescriptionElement> GetWeaponDescriptionElements(GameObject Subject)
         {
             List<DescriptionElement> descriptionElements = new();
 
-            DescriptionElement descriptionElement = GetWeaponDescriptionElement();
+            DescriptionElement descriptionElement = GetWeaponDescriptionElement(Subject);
 
             if (descriptionElement != DescriptionElement.Empty)
             {
@@ -168,15 +187,15 @@ namespace HNPS_GigantismPlus
             return new();
         }
 
-        public virtual DescriptionElement GetGeneralDescriptionElement()
+        public virtual DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
         {
             return DescriptionElement.Empty;
         }
-        public virtual List<DescriptionElement> GetGeneralDescriptionElements()
+        public virtual List<DescriptionElement> GetGeneralDescriptionElements(GameObject Subject)
         {
             List<DescriptionElement> descriptionElements = new();
 
-            DescriptionElement descriptionElement = GetGeneralDescriptionElement();
+            DescriptionElement descriptionElement = GetGeneralDescriptionElement(Subject);
 
             if (descriptionElement != DescriptionElement.Empty)
             {
@@ -185,38 +204,41 @@ namespace HNPS_GigantismPlus
             return new();
         }
 
-        public bool TryGetDescriptionElements(out List<DescriptionElement> DescriptionElements)
+        public bool TryGetDescriptionElements(GameObject Subject, out List<DescriptionElement> WeaponDescriptionElements, out List<DescriptionElement> GeneralDescriptionElements)
         {
-            DescriptionElements = new();
-            List<DescriptionElement> descriptionElements = GetWeaponDescriptionElements();
+            WeaponDescriptionElements = new();
+            GeneralDescriptionElements = new();
+
+            List<DescriptionElement> descriptionElements = GetWeaponDescriptionElements(Subject);
             if (!descriptionElements.IsNullOrEmpty())
             {
-                DescriptionElements.AddRange(descriptionElements);
+                WeaponDescriptionElements.AddRange(descriptionElements);
             }
-            descriptionElements = GetGeneralDescriptionElements();
+
+            descriptionElements = GetGeneralDescriptionElements(Subject);
             if (!descriptionElements.IsNullOrEmpty())
             {
-                DescriptionElements.AddRange(descriptionElements);
+                GeneralDescriptionElements.AddRange(descriptionElements);
             }
-            return !DescriptionElements.IsNullOrEmpty();
+            return !WeaponDescriptionElements.IsNullOrEmpty() || !GeneralDescriptionElements.IsNullOrEmpty();
         }
 
         public virtual bool CheckCondition(GameObject Subject)
         {
             return Subject == null || Condition == null || Condition[Subject];
         }
-        public virtual bool CheckAnyConditions(GameObject Subject = null)
-        {
-            return Subject == null || AnyConditions.IsNullOrEmpty() || AnyConditions[Subject];
-        }
-        public virtual bool CheckAllConditions(GameObject Subject = null)
+        public virtual bool CheckAllConditions(GameObject Subject)
         {
             return Subject == null || AllConditions.IsNullOrEmpty() || AllConditions[Subject];
         }
-
-        public virtual bool Check(GameObject Subject = null)
+        public virtual bool CheckAnyConditions(GameObject Subject)
         {
-            return Subject == null || (CheckCondition(Subject) && CheckAnyConditions(Subject) && CheckAllConditions(Subject));
+            return Subject == null || AnyConditions.IsNullOrEmpty() || AnyConditions[Subject];
+        }
+
+        public virtual bool Check(GameObject Subject)
+        {
+            return Subject == null || (CheckCondition(Subject) && CheckAllConditions(Subject) && CheckAnyConditions(Subject));
         }
 
         public virtual bool IsTruerThan(GameObject Subject, IAdjustment OtherAdjustment)
@@ -329,11 +351,13 @@ namespace HNPS_GigantismPlus
             Writer.Write(Prioritize);
             Writer.Write(Priority);
             Writer.WriteObject(Condition);
-            Writer.WriteObject(AnyConditions);
             Writer.WriteObject(AllConditions);
+            Writer.WriteObject(AnyConditions);
             Writer.WriteOptimized(Value);
             Writer.WriteNullable(Amount);
             Writer.WriteNullable(State);
+            Writer.WriteOptimized(Verb);
+            Writer.WriteOptimized(Effect);
         }
         public virtual void Read(SerializationReader Reader)
         {
@@ -343,11 +367,13 @@ namespace HNPS_GigantismPlus
             Prioritize = Reader.ReadBoolean();
             Priority = Reader.ReadInt32();
             Condition = Reader.ReadObject() as ICondition<GameObject>;
-            AnyConditions = Reader.ReadObject() as AnyConditions<GameObject>;
             AllConditions = Reader.ReadObject() as AllConditions<GameObject>;
+            AnyConditions = Reader.ReadObject() as AnyConditions<GameObject>;
             Value = Reader.ReadOptimizedString();
             Amount = Reader.ReadObject() as int?;
             State = Reader.ReadObject() as bool?;
+            Verb = Reader.ReadOptimizedString();
+            Effect = Reader.ReadOptimizedString();
         }
     }
 }

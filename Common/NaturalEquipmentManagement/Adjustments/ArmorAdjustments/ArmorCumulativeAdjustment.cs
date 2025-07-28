@@ -10,11 +10,7 @@ namespace HNPS_GigantismPlus
     {
         public bool NeedsShifter;
 
-        public string Verb;
-
-        public string AffectedStat;
-
-        public string Effect;
+        public string AffectedParameter;
 
         public ArmorCumulativeAdjustment()
             : base()
@@ -23,32 +19,48 @@ namespace HNPS_GigantismPlus
             NeedsShifter = true;
             Amount = 0;
             Verb = "have";
-            AffectedStat = null;
             Effect = null;
+            AffectedParameter = null;
         }
-        public ArmorCumulativeAdjustment(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public ArmorCumulativeAdjustment(Type Source, int Amount, string AffectedParameter)
+            : this()
         {
-            Prioritize = false;
-            Amount = Source.Amount;
+            this.Source = Source;
+            this.Amount = Amount;
+            this.AffectedParameter = AffectedParameter;
         }
-        public ArmorCumulativeAdjustment(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public ArmorCumulativeAdjustment(Type Source, int Amount, string Verb, string Effect, string AffectedParameter = null)
+            : this(Source, Amount, AffectedParameter)
         {
-            Prioritize = false;
+            this.Verb = Verb;
+            this.Effect = Effect;
+        }
+        public ArmorCumulativeAdjustment(ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = SourceAdjustment.AffectedParameter;
+        }
+        public ArmorCumulativeAdjustment(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
+        {
             this.Amount = Amount;
         }
-
-        /*
-        public override DescriptionElement GetGeneralDescriptionElement()
+        public ArmorCumulativeAdjustment(Type Source, int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : this(Amount, SourceAdjustment)
         {
-            if (AffectedStat != null)
+            this.Source = Source;
+        }
+
+        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null)
             {
-                Effect = $"";
+                string amount = ((int)Amount).Signed();
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
             }
             return new(Verb, Effect);
         }
-        */
 
         public override bool AfterApply(GameObject Subject)
         {

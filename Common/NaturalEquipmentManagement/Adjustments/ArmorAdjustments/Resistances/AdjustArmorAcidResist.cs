@@ -17,12 +17,12 @@ namespace HNPS_GigantismPlus
         {
             this.Amount = Amount;
         }
-        public AdjustArmorAcidResist(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorAcidResist(ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
         {
         }
-        public AdjustArmorAcidResist(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorAcidResist(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
         {
             this.Amount = Amount;
         }
@@ -37,7 +37,7 @@ namespace HNPS_GigantismPlus
             {
                 Subject.GetPart<Armor>().Acid += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

@@ -6,23 +6,29 @@ using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustArmorEgo : ArmorCumulativeAdjustment
+    public class AdjustArmorEgo : AdjustArmorStatistic
     {
         public AdjustArmorEgo()
-            : base()
+            : base(nameof(Armor.Ego))
         {
         }
-        public AdjustArmorEgo(int Amount = 0)
-            : base()
+        public AdjustArmorEgo(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorEgo(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorEgo(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorEgo(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorEgo(AdjustArmorStatistic SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = nameof(Armor.Ego);
+        }
+        public AdjustArmorEgo(int Amount, AdjustArmorStatistic SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
@@ -37,7 +43,7 @@ namespace HNPS_GigantismPlus
             {
                 Subject.GetPart<Armor>().Ego += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

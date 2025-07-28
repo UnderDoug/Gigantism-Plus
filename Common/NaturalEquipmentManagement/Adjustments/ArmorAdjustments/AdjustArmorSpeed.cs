@@ -46,7 +46,7 @@ namespace HNPS_GigantismPlus
                     armor.SpeedPenalty += amount;
                 }
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

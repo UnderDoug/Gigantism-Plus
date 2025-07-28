@@ -37,7 +37,7 @@ namespace HNPS_GigantismPlus
             {
                 Subject.GetPart<Armor>().Elec += (int)Amount;
             }
-            return GetApplied();
+            return IsApplied();
         }
     }
 }

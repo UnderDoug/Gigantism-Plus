@@ -8,6 +8,14 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public class GameObjectHasAllParts : AllConditions<GameObject>
     {
+        public GameObjectHasAllParts()
+            : base()
+        {
+        }
+        public GameObjectHasAllParts(GameObjectHasAllParts Source)
+            : base(Source)
+        {
+        }
         public GameObjectHasAllParts(IEnumerable<GameObjectHasPart> Conditions)
             : base(Conditions as AllConditions<GameObject>)
         {

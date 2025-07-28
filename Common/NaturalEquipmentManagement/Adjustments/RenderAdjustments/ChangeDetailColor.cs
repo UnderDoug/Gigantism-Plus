@@ -19,14 +19,14 @@ namespace HNPS_GigantismPlus
         {
             Value = DetailColor;
         }
-        public ChangeDetailColor(ChangeDetailColor Source)
-            : base(Source)
+        public ChangeDetailColor(ChangeDetailColor SourceAdjustment)
+            : base(SourceAdjustment)
         {
         }
-        public ChangeDetailColor(ChangeTileColor Source)
-            : base(Source)
+        public ChangeDetailColor(ChangeTileColor SourceAdjustment)
+            : base(SourceAdjustment)
         {
-            Value = Source.Value;
+            Value = SourceAdjustment.Value;
         }
         public ChangeDetailColor(Render Source)
             : this(Source.DetailColor)

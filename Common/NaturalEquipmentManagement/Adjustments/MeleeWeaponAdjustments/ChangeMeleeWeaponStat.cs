@@ -6,24 +6,24 @@ using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class ChangeSkill : MeleeWeaponAdjustment
+    public class ChangeMeleeWeaponStat : MeleeWeaponAdjustment
     {
-        public ChangeSkill()
+        public ChangeMeleeWeaponStat()
             : base()
         {
         }
 
-        public ChangeSkill(string Skill = null)
+        public ChangeMeleeWeaponStat(string Skill = null)
             : this()
         {
             Value = Skill;
         }
-        public ChangeSkill(ChangeSkill Source)
+        public ChangeMeleeWeaponStat(ChangeMeleeWeaponStat Source)
             : base(Source)
         {
         }
-        public ChangeSkill(MeleeWeapon Source)
-            : this(Source.Skill)
+        public ChangeMeleeWeaponStat(MeleeWeapon Source)
+            : this(Source.Stat)
         {
         }
 
@@ -31,7 +31,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().Skill = Value;
+                Subject.GetPart<MeleeWeapon>().Stat = Value;
                 return true;
             }
             return false;

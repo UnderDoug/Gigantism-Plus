@@ -281,6 +281,42 @@ namespace HNPS_GigantismPlus
             yield break;
         }
 
+        /// <summary>Returns an <see cref="IEnumerable{IAdjustment}" /> that contains each of the stored <see cref="IAdjustment" /> that have their <see cref="IAdjustment.Applied" /> member set to  <see langword="true" />.</summary>
+        /// <remarks> Inverse of <see cref="GetUnapplied" />.</remarks>
+        /// <returns>An <see cref="IEnumerable{IAdjustment}" /> that contains each of the stored <see cref="IAdjustment" /> that have their <see cref="IAdjustment.Applied" /> member set to  <see langword="true" />.</returns>
+        public IEnumerable<IAdjustment> GetApplied()
+        {
+            if (!Items.IsNullOrEmpty())
+            {
+                foreach (IAdjustment adjustment in Items)
+                {
+                    if (adjustment.IsApplied())
+                    {
+                        yield return adjustment;
+                    }
+                }
+            }
+            yield break;
+        }
+
+        /// <summary>Returns an <see cref="IEnumerable{IAdjustment}" /> that contains each of the stored <see cref="IAdjustment" /> that have their <see cref="IAdjustment.Applied" /> member set to  <see langword="false" />.</summary>
+        /// <remarks> Inverse of <see cref="GetApplied" />.</remarks>
+        /// <returns>An <see cref="IEnumerable{IAdjustment}" /> that contains each of the stored <see cref="IAdjustment" /> that have their <see cref="IAdjustment.Applied" /> member set to  <see langword="false" />.</returns>
+        public IEnumerable<IAdjustment> GetUnapplied()
+        {
+            if (!Items.IsNullOrEmpty())
+            {
+                foreach (IAdjustment adjustment in Items)
+                {
+                    if (!adjustment.IsApplied())
+                    {
+                        yield return adjustment;
+                    }
+                }
+            }
+            yield break;
+        }
+
         public override bool Apply(GameObject Subject)
         {
             if (!Items.IsNullOrEmpty() && base.Apply(Subject))

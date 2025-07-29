@@ -9,20 +9,26 @@ namespace HNPS_GigantismPlus
     public class AdjustArmorToHit : ArmorCumulativeAdjustment
     {
         public AdjustArmorToHit()
-            : base()
+            : base("To Hit")
         {
         }
-        public AdjustArmorToHit(int Amount = 0)
-            : base()
+        public AdjustArmorToHit(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorToHit(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorToHit(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorToHit(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorToHit(ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = "To Hit";
+        }
+        public AdjustArmorToHit(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }

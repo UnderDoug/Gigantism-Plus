@@ -9,26 +9,43 @@ namespace HNPS_GigantismPlus
     public class AdjustArmorCarryBonus : ArmorCumulativeAdjustment
     {
         public AdjustArmorCarryBonus()
-            : base()
+            : base("Carry Capacity")
         {
         }
-        public AdjustArmorCarryBonus(int Amount = 0)
-            : base()
+        public AdjustArmorCarryBonus(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorCarryBonus(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorCarryBonus(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorCarryBonus(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorCarryBonus(ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = "Carry Capacity";
+        }
+        public AdjustArmorCarryBonus(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
         public AdjustArmorCarryBonus(Armor Source)
             : this(Source.CarryBonus)
         {
+        }
+
+        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null)
+            {
+                string amount = ((int)Amount).Signed();
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount}% {bonusPenalty} to {AffectedParameter}";
+            }
+            return new(Verb, Effect);
         }
 
         public override bool Apply(GameObject Subject)

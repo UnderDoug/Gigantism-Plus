@@ -31,13 +31,14 @@ namespace HNPS_GigantismPlus
 
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
         {
-            if (AffectedParameter != null)
+            if (AffectedParameter != null && Amount != null && Amount != 0)
             {
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
-                Effect = $"a {bonusPenalty} of {amount} to {AffectedParameter}";
+                Effect = $"a {bonusPenalty} of {amount} {AffectedParameter}";
+                return new(Verb, Effect);
             }
-            return new(Verb, Effect);
+            return DescriptionElement.Empty;
         }
     }
 }

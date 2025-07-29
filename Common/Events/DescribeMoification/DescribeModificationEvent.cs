@@ -32,12 +32,12 @@ namespace HNPS_GigantismPlus
 
         public override void Reset()
         {
-            base.Reset();
             if (BeforeEvent != null)
             {
                 BeforeEvent.Reset();
                 BeforeEvent = null;
             }
+            base.Reset();
         }
 
         public static DescribeModificationEvent<T> FromPool(BeforeDescribeModificationEvent<T> BeforeEvent)
@@ -169,6 +169,31 @@ namespace HNPS_GigantismPlus
 
             Reset();
             return Event.FinalizeString(SB);
+        }
+
+        public static implicit operator DescribeModificationEvent<IModification>(DescribeModificationEvent<T> E)
+        {
+            return E as DescribeModificationEvent<IModification>;
+        }
+        public static implicit operator DescribeModificationEvent<T>(DescribeModificationEvent<IModification>  E)
+        {
+            return E as DescribeModificationEvent<T>;
+        }
+
+        public static implicit operator DescribeModificationEvent<T>(BeforeDescribeModificationEvent<T> E)
+        {
+            return E as DescribeModificationEvent<T>;
+        }
+        public static implicit operator DescribeModificationEvent<T>(BeforeDescribeModificationEvent<IModification> E)
+        {
+            return E as DescribeModificationEvent<T>;
+        }
+
+        public DescribeModificationEvent<T> TransferFrom(DescribeModificationEvent<IModification> E)
+        {
+            DescribeModificationEvent<T> F = FromPool(E.Object, E.Adjective, E.ObjectNoun, E.WeaponDescriptions, E.GeneralDescriptions, E.Context);
+            E.Reset();
+            return F;
         }
     }
 }

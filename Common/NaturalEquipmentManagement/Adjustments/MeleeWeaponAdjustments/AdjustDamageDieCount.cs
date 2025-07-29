@@ -9,27 +9,45 @@ namespace HNPS_GigantismPlus
     public class AdjustDamageDieCount : MeleeWeaponCumulativeAdjustment
     {
         public AdjustDamageDieCount()
-            : base()
+            : base("damage die")
         {
+            Verb = "gain";
         }
-        public AdjustDamageDieCount(int Amount = 0)
-            : base()
+        public AdjustDamageDieCount(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustDamageDieCount(MeleeWeaponCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustDamageDieCount(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustDamageDieCount(int Amount, MeleeWeaponCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustDamageDieCount(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = "damage die";
+            Verb = "gain";
+        }
+        public AdjustDamageDieCount(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
 
+        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null && Amount > 0)
+            {
+                string amount = ((int)Amount).Signed();
+                Effect = $"{amount} additional {AffectedParameter}";
+            }
+            return new(Verb, Effect);
+        }
+
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject))
+            if (base.Apply(Subject) && Amount > 0)
             {
                 Subject.GetPart<MeleeWeapon>().AdjustDamageDieCount((int)Amount);
                 return true;

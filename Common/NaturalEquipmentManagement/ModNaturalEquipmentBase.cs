@@ -523,15 +523,15 @@ namespace XRL.World.Parts
             return AddSkillAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
         }
 
-        public virtual Guid AddStatAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddMeleeStatAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
         {
             AddAdjustment(new ChangeMeleeWeaponStat(Value), Priority, Condition, AllConditions, AnyConditions);
             return AddAdjustment(MELEEWEAPON, "Stat", Value, Priority, Condition, AllConditions, AnyConditions);
         }
-        public virtual Guid AddStatAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddMeleeStatAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddStatAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddMeleeStatAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
         }
 
         public virtual Guid AddTileAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)

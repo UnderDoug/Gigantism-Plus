@@ -9,20 +9,26 @@ namespace HNPS_GigantismPlus
     public class AdjustArmorAV : ArmorCumulativeAdjustment
     {
         public AdjustArmorAV()
-            : base()
+            : base(nameof(Armor.AV))
         {
         }
-        public AdjustArmorAV(int Amount = 0)
-            : base()
+        public AdjustArmorAV(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorAV(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorAV(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorAV(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorAV(ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = nameof(Armor.AV);
+        }
+        public AdjustArmorAV(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }

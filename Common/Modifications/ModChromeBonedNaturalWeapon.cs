@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 using XRL.Language;
 using XRL.World.Parts.Mutation;
+using XRL.World.Anatomy;
 
 using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using UnityEngine.UIElements;
-using XRL.World.Anatomy;
 
 namespace XRL.World.Parts
 {
@@ -67,5 +67,23 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-    } //!-- public class ModChromeBonedNaturalWeapon : ModNaturalWeaponBase<CyberneticsManagedHandBones>
+        public override bool HandleEvent(BeforeApplyAdjustmentEvent E)
+        {
+            if (E.Adjustment.Source == typeof(ModGiganticNaturalWeapon) && E.Adjustment.GetType() == typeof(ChangeDetailColor))
+            {
+                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {nameof(ChangeDetailColor)} {nameof(E.Adjustment)}",
+                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
+                Debug.LastIndent--;
+
+                foreach (IAdjustment adjustment in Adjustments)
+                {
+                    if (adjustment.SameAs(E.Adjustment))
+                    {
+                        // E.Adjustment.Value = adjustment.Value;
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
+    }
 }

@@ -38,7 +38,7 @@ namespace XRL.World.Parts
                 { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked" }
             };
             AddSkillAdjustment("ShortBlades", true);
-            AddStatAdjustment("Agility", -120);
+            AddMeleeStatAdjustment("Agility", -120);
 
             AddNounAdjustment(true, AllConditions: new() { IsOrganicFist });
 

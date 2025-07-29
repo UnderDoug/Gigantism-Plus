@@ -22,12 +22,16 @@ namespace HNPS_GigantismPlus
             Effect = null;
             AffectedParameter = null;
         }
-        public ArmorCumulativeAdjustment(Type Source, int Amount, string AffectedParameter)
+        public ArmorCumulativeAdjustment(string AffectedParameter)
             : this()
+        {
+            this.AffectedParameter = AffectedParameter;
+        }
+        public ArmorCumulativeAdjustment(Type Source, int Amount, string AffectedParameter)
+            : this(AffectedParameter)
         {
             this.Source = Source;
             this.Amount = Amount;
-            this.AffectedParameter = AffectedParameter;
         }
         public ArmorCumulativeAdjustment(Type Source, int Amount, string Verb, string Effect, string AffectedParameter = null)
             : this(Source, Amount, AffectedParameter)
@@ -53,13 +57,14 @@ namespace HNPS_GigantismPlus
 
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
         {
-            if (AffectedParameter != null)
+            if (AffectedParameter != null && Amount != null && Amount != 0)
             {
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
                 Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
+                return new(Verb, Effect);
             }
-            return new(Verb, Effect);
+            return DescriptionElement.Empty;
         }
 
         public override bool AfterApply(GameObject Subject)

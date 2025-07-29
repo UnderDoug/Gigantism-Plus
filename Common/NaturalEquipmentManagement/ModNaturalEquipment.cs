@@ -247,10 +247,9 @@ namespace XRL.World.Parts
                     E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
                 }
 
-                List<IAdjustment> appliedAdjustments = new(Adjustments.GetApplied());
-                if (!appliedAdjustments.IsNullOrEmpty())
+                if (!Adjustments.IsNullOrEmpty() && !Adjustments.GetApplied().IsNullOrEmpty())
                 {
-                    foreach (IAdjustment adjustment in appliedAdjustments)
+                    foreach (IAdjustment adjustment in Adjustments.GetApplied())
                     {
                         if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> weaponElements, out List<DescriptionElement> generalElements))
                         {

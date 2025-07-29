@@ -83,6 +83,8 @@ namespace HNPS_GigantismPlus
 
             Verb = null;
             Effect = null;
+
+            Configure();
         }
         public IAdjustment(Type Source, bool Prioritize, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null, string Value = null, int? Amount = null, bool? State = null, string Verb = null, string Effect = null)
             : this()
@@ -112,6 +114,10 @@ namespace HNPS_GigantismPlus
                   State: SourceAdjustment.State,
                   Verb: SourceAdjustment.Verb,
                   Effect: SourceAdjustment.Effect)
+        {
+        }
+
+        public virtual void Configure()
         {
         }
 
@@ -183,11 +189,17 @@ namespace HNPS_GigantismPlus
 
             DescriptionElement descriptionElement = GetWeaponDescriptionElement(Subject);
 
+            int indent = Debug.LastIndent;
+            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
+            Debug.Entry(4, $"{GetType().Name}.{nameof(GetWeaponDescriptionElements)}: {elementString}", Indent: indent + 1, Toggle: true);
+
             if (descriptionElement != DescriptionElement.Empty)
             {
                 descriptionElements.Add(descriptionElement);
             }
-            return new();
+
+            Debug.LastIndent = indent;
+            return descriptionElements;
         }
 
         public virtual DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
@@ -200,11 +212,17 @@ namespace HNPS_GigantismPlus
 
             DescriptionElement descriptionElement = GetGeneralDescriptionElement(Subject);
 
+            int indent = Debug.LastIndent;
+            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
+            Debug.Entry(4, $"{GetType().Name}.{nameof(GetGeneralDescriptionElement)}: {elementString}", Indent: indent + 1, Toggle: true);
+
             if (descriptionElement != DescriptionElement.Empty)
             {
                 descriptionElements.Add(descriptionElement);
             }
-            return new();
+
+            Debug.LastIndent = indent;
+            return descriptionElements;
         }
 
         public bool TryGetDescriptionElements(GameObject Subject, out List<DescriptionElement> WeaponDescriptionElements, out List<DescriptionElement> GeneralDescriptionElements)
@@ -212,16 +230,16 @@ namespace HNPS_GigantismPlus
             WeaponDescriptionElements = new();
             GeneralDescriptionElements = new();
 
-            List<DescriptionElement> descriptionElements = GetWeaponDescriptionElements(Subject);
-            if (!descriptionElements.IsNullOrEmpty())
+            List<DescriptionElement> weaponDescriptionElements = GetWeaponDescriptionElements(Subject);
+            if (!weaponDescriptionElements.IsNullOrEmpty())
             {
-                WeaponDescriptionElements.AddRange(descriptionElements);
+                WeaponDescriptionElements.AddRange(weaponDescriptionElements);
             }
 
-            descriptionElements = GetGeneralDescriptionElements(Subject);
-            if (!descriptionElements.IsNullOrEmpty())
+            List<DescriptionElement> generalDescriptionElements = GetGeneralDescriptionElements(Subject);
+            if (!generalDescriptionElements.IsNullOrEmpty())
             {
-                GeneralDescriptionElements.AddRange(descriptionElements);
+                GeneralDescriptionElements.AddRange(generalDescriptionElements);
             }
             return !WeaponDescriptionElements.IsNullOrEmpty() || !GeneralDescriptionElements.IsNullOrEmpty();
         }
@@ -340,7 +358,7 @@ namespace HNPS_GigantismPlus
                 Debug.CheckYeh(4, $"{nameof(Applied)}: {Applied}", Indent: indent + 3, Toggle: doDebug);
                 // Debug.CheckYeh(4, $"{nameof(SendAfterEvent)}: {SendAfterEvent}", Indent: indent + 3, Toggle: doDebug);
 
-                Apply(Subject);
+                Applied = Apply(Subject);
                 EarlyAfterApplyAdjustmentEvent.Send(Subject, Source, this);
                 AfterApply(Subject);
                 return false;

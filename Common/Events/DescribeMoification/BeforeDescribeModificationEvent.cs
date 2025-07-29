@@ -64,5 +64,34 @@ namespace HNPS_GigantismPlus
                 Context: Context
                 )?.Send();
         }
+
+        public static implicit operator BeforeDescribeModificationEvent<IModification>(BeforeDescribeModificationEvent<T> E)
+        {
+            return E as BeforeDescribeModificationEvent<IModification>;
+        }
+        public static implicit operator BeforeDescribeModificationEvent<T>(BeforeDescribeModificationEvent<IModification> E)
+        {
+            return E as BeforeDescribeModificationEvent<T>;
+        }
+        
+        public static implicit operator BeforeDescribeModificationEvent<T>(DescribeModificationEvent<T> E)
+        {
+            return E as BeforeDescribeModificationEvent<T>;
+        }
+        public static implicit operator BeforeDescribeModificationEvent<T>(DescribeModificationEvent<IModification> E)
+        {
+            return E as BeforeDescribeModificationEvent<T>;
+        }
+
+        public BeforeDescribeModificationEvent<T> TransferFrom(BeforeDescribeModificationEvent<IModification> E)
+        {
+            E.Object = Object;
+            E.Adjective = Adjective;
+            E.ObjectNoun = ObjectNoun;
+            E.WeaponDescriptions = WeaponDescriptions;
+            E.GeneralDescriptions = GeneralDescriptions;
+            E.Context = Context;
+            return E;
+        }
     }
 }

@@ -13,8 +13,9 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModGiganticNaturalWeapon 
         : ModNaturalEquipment<GigantismPlus>
-        , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
-        , IModEventHandler<DescribeModificationEvent<ModGigantic>>
+        , IDescribeModificationHandler<ModGigantic>
+     // , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
+     // , IModEventHandler<DescribeModificationEvent<ModGigantic>>
     {
         private static bool doDebug => getClassDoDebug(nameof(ModGiganticNaturalWeapon));
 
@@ -34,7 +35,7 @@ namespace XRL.World.Parts
                 { "ModGiganticNoShortDescription", 1 },
                 { "ModGiganticNoDisplayName", 1 }
             };
-            AddStatAdjustment("Strength", -100);
+            AddMeleeStatAdjustment("Strength", -100);
 
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
@@ -109,9 +110,12 @@ namespace XRL.World.Parts
             {
                 return base.GetInstanceDescription(Object);
             }
-            return DescribeModificationEvent<ModGigantic>
-                .Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
-                .Process(PluralizeObject: true);
+
+            return new DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>()
+                .TransferFrom(
+                    DescribeModificationEvent<ModGigantic>.Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
+                    )
+                .Send().Process(PluralizeObject: true);
         }
 
     } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>

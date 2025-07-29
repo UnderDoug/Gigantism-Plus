@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
 using XRL;
 using XRL.Language;
 using XRL.World;
+using XRL.World.AI.GoalHandlers;
+using XRL.World.Capabilities;
 using XRL.World.Parts;
-
+using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -47,13 +47,13 @@ namespace HNPS_GigantismPlus
 
         public override void Reset()
         {
-            base.Reset();
             Object = null;
             Adjective = null;
             ObjectNoun = null;
             WeaponDescriptions = null;
             GeneralDescriptions = null;
             Context = null;
+            base.Reset();
         }
         public T Send()
         {
@@ -67,9 +67,9 @@ namespace HNPS_GigantismPlus
 
             bool anyWants = gameWants || objectWantsMin || objectWantsStr;
 
-            bool proceed = anyWants;
+            bool proceed = true;
 
-            if (proceed)
+            if (proceed && anyWants)
             {
                 if (proceed && gameWants)
                 {
@@ -181,6 +181,24 @@ namespace HNPS_GigantismPlus
         public List<DescriptionElement> RemoveGeneralElement(DescriptionElement DescriptionElement)
         {
             return GeneralDescriptions = RemoveElement(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+
+        public static implicit operator DescribeModificationEvent<IModification>(IDescribeModificationEvent<T, M> E)
+        {
+            return E as DescribeModificationEvent<IModification>;
+        }
+        public static implicit operator IDescribeModificationEvent<T, M>(DescribeModificationEvent<IModification> E)
+        {
+            return E as IDescribeModificationEvent<T, M>;
+        }
+
+        public static implicit operator BeforeDescribeModificationEvent<IModification>(IDescribeModificationEvent<T, M> E)
+        {
+            return E as BeforeDescribeModificationEvent<IModification>;
+        }
+        public static implicit operator IDescribeModificationEvent<T, M>(BeforeDescribeModificationEvent<IModification> E)
+        {
+            return E as IDescribeModificationEvent<T, M>;
         }
     }
 }

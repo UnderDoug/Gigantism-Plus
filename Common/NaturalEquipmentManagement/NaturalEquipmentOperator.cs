@@ -306,36 +306,9 @@ namespace XRL.World.Parts
             {
                 if (!NaturalEquipmentMods.IsNullOrEmpty())
                 {
-                    // Collect the "starting" values for damage if the NaturalEquipment is a defaultFistWeapon
-                    // Accumulate bonuses from NaturalEquipmentMods
-                    // Apply the finalised values over the top
-                    Adjustments ??= new();
-                    foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                    if (EnablePrereleaseContent)
                     {
-                        Debug.LoopItem(4, $"{naturalEquipmentMod.GetType().Name}<{naturalEquipmentMod.Adjective}>]", Indent: 1, Toggle: doDebug);
-                        foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
-                        {
-                            Debug.Entry(4, $"{adjustment.ToString()}", Indent: 2, Toggle: doDebug);
-                            Adjustments.Add(adjustment);
-                        }
-                    }
-
-                    if (!Adjustments.IsNullOrEmpty())
-                    {
-                        foreach (IAdjustment adjustment in Adjustments)
-                        {
-                            if (adjustment.Apply(ParentObject))
-                            {
-                                AppliedAdjustments.Add($"{adjustment.ToString(ShowApplied: true)}");
-                            }
-                        }
-
-                        Debug.Entry(4, $"Applied Adjustments:", Indent: 1, Toggle: doDebug);
-                        foreach (string appliedAdjustment in AppliedAdjustments)
-                        {
-                            Debug.LoopItem(4, $"{appliedAdjustment}]", Indent: 2, Toggle: doDebug);
-                        }
-
+                        Debug.Entry(4, $"Applying {NaturalEquipmentMods}...", Indent: 1, Toggle: doDebug);
                         ApplyNaturalEquipmentMods(NaturalEquipmentMods);
                         NaturalEquipmentMods = ParentObject.GetPrioritisedNaturalEquipmentMods();
 
@@ -343,9 +316,46 @@ namespace XRL.World.Parts
                         {
                             ParentObject.RemovePart(makersMark);
                         }
+
+                        Debug.Entry(4, $"Collecting Adjustments...", Indent: 1, Toggle: doDebug);
+                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                        Adjustments ??= new();
+                        foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                        {
+                            Debug.LoopItem(4, $"{naturalEquipmentMod.GetType().Name}<{naturalEquipmentMod.Adjective}>]", Indent: 2, Toggle: doDebug);
+                            foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
+                            {
+                                Debug.Entry(4, $"{adjustment}", Indent: 3, Toggle: doDebug);
+                                Adjustments.Add(adjustment);
+                                bool wasAdded = Adjustments.Contains(adjustment);
+                                Debug.LoopItem(4, $"Added", $"{wasAdded}", Good: wasAdded, Indent: 3, Toggle: doDebug);
+                            }
+                        }
+                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                    }
+
+                    if (EnablePrereleaseContent && !Adjustments.IsNullOrEmpty())
+                    {
+                        Debug.Entry(4, $"Applying Adjustments...", Indent: 1, Toggle: doDebug);
+                        foreach (IAdjustment adjustment in Adjustments)
+                        {
+                            Debug.LoopItem(4, $"{adjustment}", Indent: 2, Toggle: doDebug);
+                            if (adjustment.Apply(ParentObject))
+                            {
+                                Debug.CheckYeh(4, $"Applied", Indent: 3, Toggle: doDebug);
+                                AppliedAdjustments.Add($"{adjustment.ToString(ShowApplied: true)}");
+                            }
+                            else
+                            {
+                                Debug.CheckNah(4, $"Not Applied", Indent: 3, Toggle: doDebug);
+                            }
+                        }
                     }
                     else
                     {
+                        // Collect the "starting" values for damage if the NaturalEquipment is a defaultFistWeapon
+                        // Accumulate bonuses from NaturalEquipmentMods
+                        // Apply the finalised values over the top
                         Debug.Entry(4, $"? if (ParentMeleeWeapon != null)", Indent: 1, Toggle: doDebug);
                         if (ParentMeleeWeapon != null)
                         {

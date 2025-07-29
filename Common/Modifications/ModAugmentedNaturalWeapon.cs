@@ -5,10 +5,10 @@ using XRL.Language;
 using XRL.World.Parts.Mutation;
 
 using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
-using UnityEngine.UIElements;
 
 namespace XRL.World.Parts
 {
@@ -77,5 +77,23 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-    } //!-- public class ModAugmentedNaturalWeapon : ModNaturalWeaponBase<CyberneticsGiganticExoframe>
+        public override bool HandleEvent(BeforeApplyAdjustmentEvent E)
+        {
+            if (E.Adjustment.Source == typeof(ModClosedGiganticNaturalWeapon) && E.Adjustment.GetType() == typeof(ChangeTile) && E.Subject is GameObject equipment)
+            {
+                Debug.Entry(4, $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {nameof(ChangeTile)} {nameof(E.Adjustment)}",
+                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
+                Debug.LastIndent--;
+
+                foreach (IAdjustment adjustment in Adjustments)
+                {
+                    if (adjustment.Check(equipment))
+                    {
+                        E.Adjustment.Value = adjustment.Value;
+                    }
+                }
+            }
+            return base.HandleEvent(E);
+        }
+    } 
 }

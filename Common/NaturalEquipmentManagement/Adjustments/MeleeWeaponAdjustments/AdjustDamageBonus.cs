@@ -9,20 +9,26 @@ namespace HNPS_GigantismPlus
     public class AdjustDamageBonus : MeleeWeaponCumulativeAdjustment
     {
         public AdjustDamageBonus()
-            : base()
+            : base("damage")
         {
         }
-        public AdjustDamageBonus(int Amount = 0)
-            : base()
+        public AdjustDamageBonus(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustDamageBonus(MeleeWeaponCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustDamageBonus(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustDamageBonus(int Amount, MeleeWeaponCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustDamageBonus(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = "damage";
+        }
+        public AdjustDamageBonus(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }

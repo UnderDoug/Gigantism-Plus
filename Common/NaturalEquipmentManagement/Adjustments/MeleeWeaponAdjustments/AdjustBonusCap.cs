@@ -9,22 +9,32 @@ namespace HNPS_GigantismPlus
     public class AdjustBonusCap : MeleeWeaponCumulativeAdjustment
     {
         public AdjustBonusCap()
-            : base()
+            : base("penetration cap")
         {
         }
-        public AdjustBonusCap(int Amount = 0)
-            : base()
+        public AdjustBonusCap(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustBonusCap(MeleeWeaponCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustBonusCap(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustBonusCap(int Amount, MeleeWeaponCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustBonusCap(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = "penetration cap";
+        }
+        public AdjustBonusCap(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
+        }
+        public AdjustBonusCap(MeleeWeapon Source)
+            : this(Source.MaxStrengthBonus)
+        {
         }
 
         public override bool Apply(GameObject Subject)

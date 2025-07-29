@@ -212,7 +212,7 @@ namespace XRL.World.Parts.Mutation
                     { "ModGiganticNoDisplayName", 1 }
                 },
             };
-            giganticBodMod.AddStatAdjustment("Strength", -100);
+            giganticBodMod.AddMeleeStatAdjustment("Strength", -100);
 
             giganticBodMod.AddArmorAVAdjustment(10);
             giganticBodMod.AddArmorDVAdjustment(-10);

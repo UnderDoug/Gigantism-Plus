@@ -9,20 +9,26 @@ namespace HNPS_GigantismPlus
     public class AdjustArmorSpeed : ArmorCumulativeAdjustment
     {
         public AdjustArmorSpeed()
-            : base()
+            : base("Speed")
         {
         }
-        public AdjustArmorSpeed(int Amount = 0)
-            : base()
+        public AdjustArmorSpeed(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorSpeed(ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorSpeed(Type Source, int Amount)
+            : this(Amount)
         {
+            this.Source = Source;
         }
-        public AdjustArmorSpeed(int Amount, ArmorCumulativeAdjustment Source)
-            : base(Source)
+        public AdjustArmorSpeed(ArmorCumulativeAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
+        {
+            AffectedParameter = "Speed";
+        }
+        public AdjustArmorSpeed(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }

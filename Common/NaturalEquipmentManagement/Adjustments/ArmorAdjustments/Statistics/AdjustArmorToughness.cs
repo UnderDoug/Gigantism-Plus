@@ -46,7 +46,7 @@ namespace HNPS_GigantismPlus
             {
                 Debug.CheckYeh(4, $"Doing Apply", Indent: indent + 2, Toggle: true);
                 Subject.GetPart<Armor>().Toughness += (int)Amount;
-                return true;
+                // return false;
             }
             else
             {
@@ -54,7 +54,7 @@ namespace HNPS_GigantismPlus
             }
             Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: true);
             Debug.LastIndent = indent;
-            return false;
+            return IsApplied();
         }
     }
 }

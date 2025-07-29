@@ -359,7 +359,7 @@ namespace HNPS_GigantismPlus
                     AfterApply(Subject);
                     AfterApplyAdjustmentEvent.Send(Subject, Source, this);
                 }
-                return Applied;
+                return !Applied;
             }
             Applying = false;
 
@@ -370,7 +370,7 @@ namespace HNPS_GigantismPlus
 
             Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return false;
+            return Applied;
         }
 
         public virtual void AfterApply(GameObject Subject)

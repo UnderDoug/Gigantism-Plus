@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -2647,6 +2648,16 @@ namespace HNPS_GigantismPlus
         public static bool IsRareTonic(this GameObject Item)
         {
             return Item.IsTonic() && !Item.HasTag("DynamicObjectsTable:Tonics_NonRare");
+        }
+
+        public static bool IsNullOrZero([NotNullWhen(false)] this int? value)
+        {
+            if (value != null)
+            {
+                return value == 0;
+            }
+
+            return true;
         }
     }
 }

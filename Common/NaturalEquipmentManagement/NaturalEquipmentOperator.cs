@@ -350,6 +350,19 @@ namespace XRL.World.Parts
                                 Debug.CheckNah(4, $"Not Applied", Indent: 3, Toggle: doDebug);
                             }
                         }
+
+                        Debug.Entry(4, $"Showing Applied Adjustments...", Indent: 1, Toggle: doDebug);
+                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                        Adjustments ??= new();
+                        foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                        {
+                            Debug.LoopItem(4, $"{naturalEquipmentMod.GetType().Name}<{naturalEquipmentMod.Adjective}>]", Indent: 2, Toggle: doDebug);
+                            foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
+                            {
+                                Debug.Entry(4, $"{adjustment.ToString(ShowApplied: true)}", Indent: 3, Toggle: doDebug);
+                            }
+                        }
+                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
                     }
                     else
                     {

@@ -11,7 +11,6 @@ namespace HNPS_GigantismPlus
         public AdjustArmorStatistic()
             : base()
         {
-            Verb = "confer";
         }
         public AdjustArmorStatistic(string AffectedParameter)
             : this()
@@ -26,19 +25,29 @@ namespace HNPS_GigantismPlus
         public AdjustArmorStatistic(AdjustArmorStatistic Source)
             : base(Source)
         {
+        }
+
+        public override void Configure()
+        {
+            base.Configure();
             Verb = "confer";
+        }
+
+        public override bool Apply(GameObject Subject)
+        {
+            return !Amount.IsNullOrZero() && base.Apply(Subject);
         }
 
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
         {
-            if (AffectedParameter != null && Amount != null && Amount != 0)
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
                 Effect = $"a {bonusPenalty} of {amount} {AffectedParameter}";
                 return new(Verb, Effect);
             }
-            return DescriptionElement.Empty;
+            return base.GetGeneralDescriptionElement(Subject);
         }
     }
 }

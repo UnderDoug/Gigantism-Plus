@@ -1086,7 +1086,7 @@ namespace XRL.World.ObjectBuilders
                 int capOverride = 0;
                 foreach (LevelCalculation levelCalculation in gigantism.GetLevelCalculations())
                 {
-                    if (!levelCalculation.reason.EndsWith(" due to your level."))
+                    if (!levelCalculation.reason.IsNullOrEmpty() && !levelCalculation.reason.EndsWith(" due to your level."))
                     {
                         capOverride += levelCalculation.bonus;
                     }

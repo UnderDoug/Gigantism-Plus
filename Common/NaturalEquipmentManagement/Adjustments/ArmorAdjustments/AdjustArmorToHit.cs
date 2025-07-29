@@ -6,7 +6,7 @@ using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustArmorToHit : ArmorCumulativeAdjustment
+    public class AdjustArmorToHit : AdjustArmorStatistic
     {
         public AdjustArmorToHit()
             : base("To Hit")
@@ -22,12 +22,12 @@ namespace HNPS_GigantismPlus
         {
             this.Source = Source;
         }
-        public AdjustArmorToHit(ArmorCumulativeAdjustment SourceAdjustment)
+        public AdjustArmorToHit(AdjustArmorStatistic SourceAdjustment)
             : base(SourceAdjustment)
         {
             AffectedParameter = "To Hit";
         }
-        public AdjustArmorToHit(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
+        public AdjustArmorToHit(int Amount, AdjustArmorStatistic SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
@@ -37,14 +37,32 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override void Configure()
+        {
+            base.Configure();
+            Verb = "confer";
+            NeedsShifter = false;
+        }
+
+        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
+            {
+                string amount = ((int)Amount).Signed();
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount} {AffectedParameter} {bonusPenalty}";
+                return new(Verb, Effect);
+            }
+            return base.GetGeneralDescriptionElement(Subject);
+        }
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject))
+            if (base.Apply(Subject) && !Amount.IsNullOrZero())
             {
-                NeedsShifter = false;
                 Subject.GetPart<Armor>().ToHit += (int)Amount;
+                return true;
             }
-            return IsApplied();
+            return false;
         }
     }
 }

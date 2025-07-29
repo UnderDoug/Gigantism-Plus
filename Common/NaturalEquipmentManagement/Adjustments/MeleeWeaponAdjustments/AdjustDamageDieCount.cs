@@ -35,14 +35,15 @@ namespace HNPS_GigantismPlus
             this.Amount = Amount;
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && Amount > 0)
             {
                 string amount = ((int)Amount).Signed();
                 Effect = $"{amount} additional {AffectedParameter}";
+                return new(Verb, Effect);
             }
-            return new(Verb, Effect);
+            return base.GetWeaponDescriptionElement(Subject);
         }
 
         public override bool Apply(GameObject Subject)

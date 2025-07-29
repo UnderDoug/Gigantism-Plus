@@ -15,10 +15,7 @@ namespace HNPS_GigantismPlus
         public ArmorCumulativeAdjustment()
             : base()
         {
-            Prioritize = false;
-            NeedsShifter = true;
             Amount = 0;
-            Verb = "have";
             Effect = null;
             AffectedParameter = null;
         }
@@ -55,36 +52,44 @@ namespace HNPS_GigantismPlus
             this.Source = Source;
         }
 
+        public override void Configure()
+        {
+            base.Configure();
+            Verb = "have";
+            Prioritize = false;
+            NeedsShifter = true;
+        }
+
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
         {
-            if (AffectedParameter != null && Amount != null && Amount != 0)
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
                 Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
                 return new(Verb, Effect);
             }
-            return DescriptionElement.Empty;
+            return base.GetGeneralDescriptionElement(Subject);
         }
 
-        public override bool AfterApply(GameObject Subject)
+        public override void AfterApply(GameObject Subject)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"! {GetType().Name}.{nameof(AfterApply)}()", Indent: indent + 1, Toggle: true);
 
-            if (NeedsShifter)
+            if (NeedsShifter && !Amount.IsNullOrZero())
             {
                 GameObject who = null;
-                if (Subject.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator) && naturalEquipmentOperator.Wielder != null)
+                if (Subject.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator)
+                    && naturalEquipmentOperator.Wielder is GameObject wielder)
                 {
-                    who = naturalEquipmentOperator.Wielder;
+                    who = wielder;
                 }
                 Subject?.GetPart<Armor>()?.UpdateStatShifts(who);
             }
-            bool baseAfterApply = base.AfterApply(Subject);
+            base.AfterApply(Subject);
             Debug.Entry(4, $"x {GetType().Name}.{nameof(AfterApply)}() !//", Indent: indent + 1, Toggle: true);
             Debug.LastIndent = indent;
-            return baseAfterApply;
         }
     }
 }

@@ -39,14 +39,14 @@ namespace HNPS_GigantismPlus
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject))
+            if (base.Apply(Subject) && !Amount.IsNullOrZero())
             {
                 MeleeWeapon meleeWeapon = Subject.GetPart<MeleeWeapon>();
-                if (meleeWeapon.MaxStrengthBonus < 999)
+                if ((meleeWeapon.MaxStrengthBonus < 999 && Amount > 0) || Amount < 0)
                 {
                     meleeWeapon.AdjustBonusCap((int)Amount);
+                    return true;
                 }
-                return true;
             }
             return false;
         }

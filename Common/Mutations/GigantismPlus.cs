@@ -815,10 +815,10 @@ namespace XRL.World.Parts.Mutation
                 NewGiganticMugMod(NewAssigner),
                 NewGiganticBodMod(NewAssigner),
             };
-            return (from ModNaturalEquipment<GigantismPlus> naturalEquipmentMod 
+            return (from ModNaturalEquipment<GigantismPlus> mod 
                     in naturalEquipmentModsList
-                    where Filter(naturalEquipmentMod)
-                    select naturalEquipmentMod).ToList();
+                    where Filter(mod)
+                    select mod).ToList();
         }
 
         public override bool Mutate(GameObject GO, int Level)

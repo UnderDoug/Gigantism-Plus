@@ -39,7 +39,7 @@ namespace HNPS_GigantismPlus
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject))
+            if (base.Apply(Subject) && !Amount.IsNullOrZero())
             {
                 Armor armor = Subject.GetPart<Armor>();
                 int amount = Math.Abs((int)Amount);
@@ -51,8 +51,9 @@ namespace HNPS_GigantismPlus
                 {
                     armor.SpeedPenalty += amount;
                 }
+                return true;
             }
-            return IsApplied();
+            return false;
         }
     }
 }

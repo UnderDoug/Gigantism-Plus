@@ -42,8 +42,9 @@ namespace HNPS_GigantismPlus
             if (base.Apply(Subject))
             {
                 Subject.GetPart<Armor>().Ego += (int)Amount;
+                return false;
             }
-            return IsApplied();
+            return true;
         }
     }
 }

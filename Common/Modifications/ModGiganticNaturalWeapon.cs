@@ -75,11 +75,11 @@ namespace XRL.World.Parts
                 int hitBonus = GetHitBonus();
                 int cleaveBonus = -(damageBonus - 2);
 
-                if (dieCount > 0)
+                if (!EnablePrereleaseContent && dieCount > 0)
                 {
                     E.AddWeaponElement("gain", $"{dieCount} additional damage die");
                 }
-                if (damageBonus != 0)
+                if (!EnablePrereleaseContent && damageBonus != 0)
                 {
                     E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
                 }
@@ -87,7 +87,7 @@ namespace XRL.World.Parts
                 {
                     E.AddWeaponElement("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
                 }
-                if (hitBonus != 0)
+                if (!EnablePrereleaseContent && hitBonus != 0)
                 {
                     E.AddWeaponElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
                 }
@@ -111,12 +111,19 @@ namespace XRL.World.Parts
                 return base.GetInstanceDescription(Object);
             }
 
-            return new DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>()
-                .TransferFrom(
-                    DescribeModificationEvent<ModGigantic>.Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
-                    )
-                .Send().Process(PluralizeObject: true);
-        }
+            DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>.Send(
+                Object: Object, 
+                Adjective: GetColoredAdjective(),
+                WeaponDescriptions: out List<DescriptionElement> weaponDescriptions,
+                GeneralDescriptions: out List<DescriptionElement> generalDescriptions,
+                Context: NATURAL_EQUIPMENT);
 
-    } //!-- public class ModGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
+            return DescribeModificationEvent<ModGigantic>.Send(
+                Object: Object,
+                Adjective: GetColoredAdjective(),
+                WeaponDescriptions: weaponDescriptions,
+                GeneralDescriptions: generalDescriptions,
+                Context: NATURAL_EQUIPMENT).Process(PluralizeObject: true);
+        }
+    }
 }

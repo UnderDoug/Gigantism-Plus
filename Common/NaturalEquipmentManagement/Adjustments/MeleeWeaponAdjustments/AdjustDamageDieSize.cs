@@ -35,19 +35,20 @@ namespace HNPS_GigantismPlus
             this.Amount = Amount;
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
         {
-            if (AffectedParameter != null)
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
                 string amount = ((int)Amount).Signed();
                 Effect = $"{amount} {AffectedParameter}";
+                return new(Verb, Effect);
             }
-            return new(Verb, Effect);
+            return base.GetWeaponDescriptionElement(Subject);
         }
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject))
+            if (base.Apply(Subject) && !Amount.IsNullOrZero())
             {
                 Subject.GetPart<MeleeWeapon>().AdjustDamageDieSize((int)Amount);
                 return true;

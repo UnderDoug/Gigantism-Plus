@@ -42,8 +42,9 @@ namespace HNPS_GigantismPlus
             if (base.Apply(Subject))
             {
                 Subject.GetPart<Armor>().Willpower += (int)Amount;
+                return true;
             }
-            return IsApplied();
+            return false;
         }
     }
 }

@@ -85,13 +85,9 @@ namespace HNPS_GigantismPlus
 
         public BeforeDescribeModificationEvent<T> TransferFrom(BeforeDescribeModificationEvent<IModification> E)
         {
-            E.Object = Object;
-            E.Adjective = Adjective;
-            E.ObjectNoun = ObjectNoun;
-            E.WeaponDescriptions = WeaponDescriptions;
-            E.GeneralDescriptions = GeneralDescriptions;
-            E.Context = Context;
-            return E;
+            BeforeDescribeModificationEvent<T> F = FromPool(E?.Object, E?.Adjective, E?.ObjectNoun, E?.WeaponDescriptions, E?.GeneralDescriptions, E?.Context);
+            E?.Reset();
+            return F;
         }
     }
 }

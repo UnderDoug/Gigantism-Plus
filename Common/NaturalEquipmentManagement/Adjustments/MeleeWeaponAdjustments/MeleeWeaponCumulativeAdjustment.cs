@@ -13,7 +13,6 @@ namespace HNPS_GigantismPlus
         public MeleeWeaponCumulativeAdjustment()
             : base()
         {
-            Prioritize = false;
             Amount = 0;
             Verb = "have";
             AffectedParameter = null;
@@ -37,6 +36,7 @@ namespace HNPS_GigantismPlus
         public MeleeWeaponCumulativeAdjustment(MeleeWeaponCumulativeAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
+            Verb = "have";
             AffectedParameter = SourceAdjustment.AffectedParameter;
         }
         public MeleeWeaponCumulativeAdjustment(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
@@ -50,15 +50,22 @@ namespace HNPS_GigantismPlus
             this.Source = Source;
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override void Configure()
+        {
+            base.Configure();
+            Prioritize = false;
+        }
+
+        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && Amount != null && Amount != 0)
             {
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
                 Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
+                return new(Verb, Effect);
             }
-            return new(Verb, Effect);
+            return base.GetWeaponDescriptionElement(Subject);
         }
     }
 }

@@ -75,15 +75,16 @@ namespace HNPS_GigantismPlus
             }
             return E;
         }
-
         public static DescribeModificationEvent<T> Send(BeforeDescribeModificationEvent<T> BeforeEvent)
         {
             return FromPool(BeforeEvent)?.Send();
         }
         public static DescribeModificationEvent<T> Send(
             GameObject Object,
-            string Adjective,
+            string Adjective, 
             string ObjectNoun = null,
+            List<DescriptionElement> WeaponDescriptions = null,
+            List<DescriptionElement> GeneralDescriptions = null,
             string Context = null)
         {
             return Send(
@@ -91,8 +92,34 @@ namespace HNPS_GigantismPlus
                     Object: Object,
                     Adjective: Adjective,
                     ObjectNoun: ObjectNoun,
+                    WeaponDescriptions: WeaponDescriptions, 
+                    GeneralDescriptions: GeneralDescriptions,
                     Context: Context)
                 );
+        }
+        public static DescribeModificationEvent<T> Send(
+            GameObject Object,
+            string Adjective,
+            out List<DescriptionElement> WeaponDescriptions,
+            out List<DescriptionElement> GeneralDescriptions,
+            string ObjectNoun = null,
+            string Context = null)
+        {
+            WeaponDescriptions = new();
+            GeneralDescriptions = new();
+            DescribeModificationEvent <T> E = Send(
+                BeforeDescribeModificationEvent<T>.Send(
+                    Object: Object,
+                    Adjective: Adjective,
+                    ObjectNoun: ObjectNoun,
+                    Context: Context)
+                );
+            if (E != null)
+            {
+                WeaponDescriptions = E.WeaponDescriptions;
+                GeneralDescriptions = E.GeneralDescriptions;
+            }
+            return E;
         }
         public string Process(bool PluralizeObject = true)
         {
@@ -191,8 +218,8 @@ namespace HNPS_GigantismPlus
 
         public DescribeModificationEvent<T> TransferFrom(DescribeModificationEvent<IModification> E)
         {
-            DescribeModificationEvent<T> F = FromPool(E.Object, E.Adjective, E.ObjectNoun, E.WeaponDescriptions, E.GeneralDescriptions, E.Context);
-            E.Reset();
+            DescribeModificationEvent<T> F = FromPool(E?.Object, E?.Adjective, E?.ObjectNoun, E?.WeaponDescriptions, E?.GeneralDescriptions, E?.Context);
+            E?.Reset();
             return F;
         }
     }

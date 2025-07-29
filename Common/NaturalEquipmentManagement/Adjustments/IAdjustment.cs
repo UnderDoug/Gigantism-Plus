@@ -25,10 +25,8 @@ namespace HNPS_GigantismPlus
     {
         private static bool doDebug => getClassDoDebug(nameof(IAdjustment));
 
-        [NonSerialized]
-        private bool SendAfterEvent; // Whether Apply() should send AfterApplyAdjustmentEvent.
+        private bool Applying; // Whether Apply() should send AfterApplyAdjustmentEvent.
 
-        [NonSerialized]
         private bool Applied; // Whether the adjustment has been applied.
 
         [NonSerialized]
@@ -66,7 +64,7 @@ namespace HNPS_GigantismPlus
 
         public IAdjustment()
         {
-            SendAfterEvent = false;
+            Applying = false;
 
             Applied = false;
             Source = null;
@@ -129,11 +127,6 @@ namespace HNPS_GigantismPlus
         public virtual bool IsApplied()
         {
             return Applied;
-        }
-
-        public virtual bool GetSendAfterEvent()
-        {
-            return SendAfterEvent;
         }
 
         public override string ToString()
@@ -348,50 +341,47 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"* {GetType().Name}.{nameof(Apply)}()", Indent: indent + 1, Toggle: doDebug);
 
-            if (!Applied && Subject != null && Check(Subject) && BeforeApplyAdjustmentEvent.CheckFor(Subject, Source, this))
+            if (!Applying && Subject != null && Check(Subject) && BeforeApplyAdjustmentEvent.CheckFor(Subject, Source, this))
             {
-                Debug.LoopItem(4, $"2] !{nameof(Applied)} and {nameof(Check)}({nameof(Subject)})", Indent: indent + 2, Toggle: doDebug);
+                Debug.LoopItem(4, $"1] !{nameof(Applying)} and {nameof(Check)}({nameof(Subject)}) and {nameof(BeforeApplyAdjustmentEvent)}", 
+                    Indent: indent + 2, Toggle: doDebug);
 
+                Applying = true;
+
+                Debug.CheckYeh(4, $"Set {nameof(Applying)}: {Applying}", Indent: indent + 3, Toggle: doDebug);
                 Applied = true;
-                // SendAfterEvent = true;
-
-                Debug.CheckYeh(4, $"{nameof(Applied)}: {Applied}", Indent: indent + 3, Toggle: doDebug);
-                // Debug.CheckYeh(4, $"{nameof(SendAfterEvent)}: {SendAfterEvent}", Indent: indent + 3, Toggle: doDebug);
-
                 Applied = Apply(Subject);
-                EarlyAfterApplyAdjustmentEvent.Send(Subject, Source, this);
-                AfterApply(Subject);
-                return false;
+                Debug.CheckYeh(4, $"Set {nameof(Applied)}: {Applied}", Indent: indent + 3, Toggle: doDebug);
+
+                if (Applied)
+                {
+                    EarlyAfterApplyAdjustmentEvent.Send(Subject, Source, this);
+                    AfterApply(Subject);
+                    AfterApplyAdjustmentEvent.Send(Subject, Source, this);
+                }
+                return Applied;
             }
+            Applying = false;
+
+            Debug.LoopItem(4, $"2] {nameof(Applying)} or !{nameof(Check)}({nameof(Subject)}) or !{nameof(BeforeApplyAdjustmentEvent)}", 
+                Indent: indent + 2, Toggle: doDebug);
+
+            Debug.CheckYeh(4, $"Set {nameof(Applying)}: {Applying}", Indent: indent + 3, Toggle: doDebug);
+
             Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return true;
+            return false;
         }
 
-        public virtual bool AfterApply(GameObject Subject)
+        public virtual void AfterApply(GameObject Subject)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"! {GetType().Name}.{nameof(AfterApply)}()", Indent: indent + 1, Toggle: doDebug);
-
-            Debug.CheckYeh(4, $"Doing AfterApply", Indent: indent + 2, Toggle: true);
-            AfterApplyAdjustmentEvent.Send(Subject, Source, this);
-            if (SendAfterEvent)
-            {
-                // Debug.CheckYeh(4, $"Doing AfterApply", Indent: indent + 2, Toggle: true);
-                // AfterApplyAdjustmentEvent.Send(Subject, Source, this);
-            }
-            else
-            {
-                // Debug.CheckNah(4, $"Doing AfterApply", Indent: indent + 2, Toggle: true);
-            }
-            Debug.Entry(4, $"x {GetType().Name}.{nameof(AfterApply)}() !//", Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return SendAfterEvent;
         }
 
         public virtual void Write(SerializationWriter Writer)
         {
-            Writer.Write(SendAfterEvent);
             Writer.Write(Applied);
             Writer.WriteObject(Source);
             Writer.Write(Prioritize);
@@ -407,7 +397,6 @@ namespace HNPS_GigantismPlus
         }
         public virtual void Read(SerializationReader Reader)
         {
-            SendAfterEvent = Reader.ReadBoolean();
             Applied = Reader.ReadBoolean();
             Source = Reader.ReadObject() as Type;
             Prioritize = Reader.ReadBoolean();

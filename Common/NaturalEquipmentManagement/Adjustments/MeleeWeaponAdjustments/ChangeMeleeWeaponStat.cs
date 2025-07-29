@@ -33,20 +33,19 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public override void Configure()
+        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
         {
-            base.Configure();
-            Effect = $"bonus penetration from {Value}";
-        }
-
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
-        {
-            return new(Verb, Effect);
+            if (Value != null)
+            {
+                Effect = $"bonus penetration from {Value}";
+                return new(Verb, Effect);
+            }
+            return GetWeaponDescriptionElement(Subject);
         }
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && Subject.GetPart<MeleeWeapon>().Stat != Value)
+            if (base.Apply(Subject) && Value != null && Subject.GetPart<MeleeWeapon>().Stat != Value)
             {
                 Subject.GetPart<MeleeWeapon>().Stat = Value;
                 return true;

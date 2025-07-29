@@ -218,7 +218,27 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<T>> E)
         {
-            if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            if (EnablePrereleaseContent && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                if (!Adjustments.IsNullOrEmpty() && !Adjustments.GetApplied().IsNullOrEmpty())
+                {
+                    foreach (IAdjustment adjustment in Adjustments.GetApplied())
+                    {
+                        if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> weaponElements, out List<DescriptionElement> generalElements))
+                        {
+                            if (!weaponElements.IsNullOrEmpty())
+                            {
+                                E.GeneralDescriptions.AddRange(weaponElements);
+                            }
+                            if (!generalElements.IsNullOrEmpty())
+                            {
+                                E.WeaponDescriptions.AddRange(generalElements);
+                            }
+                        }
+                    }
+                }
+            }
+            else if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 int dieCount = GetDamageDieCount();
                 int dieSize = GetDamageDieSize();
@@ -246,29 +266,10 @@ namespace XRL.World.Parts
                 {
                     E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
                 }
-
-                if (!Adjustments.IsNullOrEmpty() && !Adjustments.GetApplied().IsNullOrEmpty())
-                {
-                    foreach (IAdjustment adjustment in Adjustments.GetApplied())
-                    {
-                        if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> weaponElements, out List<DescriptionElement> generalElements))
-                        {
-                            if (!weaponElements.IsNullOrEmpty())
-                            {
-                                E.GeneralDescriptions.AddRange(weaponElements);
-                            }
-                            if (!generalElements.IsNullOrEmpty())
-                            {
-                                E.WeaponDescriptions.AddRange(generalElements);
-                            }
-                        }
-                    }
-                }
-
-                if (E.WeaponDescriptions.IsNullOrEmpty() && E.GeneralDescriptions.IsNullOrEmpty())
-                {
-                    E.AddWeaponElement("gain", "some manner of adjustments");
-                }
+            }
+            if (E.WeaponDescriptions.IsNullOrEmpty() && E.GeneralDescriptions.IsNullOrEmpty())
+            {
+                E.AddWeaponElement("gain", "some manner of adjustments");
             }
             return base.HandleEvent(E);
         }

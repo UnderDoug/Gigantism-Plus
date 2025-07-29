@@ -33,29 +33,20 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public override void Configure()
+        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
         {
-            base.Configure();
             if (Value != null)
             {
                 string skillName = Skills.GetGenericSkill(Value)?.GetWeaponCriticalDescription();
                 Effect ??= $"as a {skillName}";
-            }
-
-        }
-
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
-        {
-            if (Value != null)
-            {
                 return new(Verb, Effect);
             }
-            return DescriptionElement.Empty;
+            return GetWeaponDescriptionElement(Subject);
         }
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && Subject.GetPart<MeleeWeapon>().Skill != Value)
+            if (base.Apply(Subject) && Value != null && Subject.GetPart<MeleeWeapon>().Skill != Value)
             {
                 Subject.GetPart<MeleeWeapon>().Skill = Value;
                 return true;

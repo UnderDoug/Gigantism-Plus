@@ -1,28 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustArmorAcidResist : ArmorCumulativeAdjustment
+    [Serializable]
+    public class AdjustArmorAcidResist : AdjustArmorResistance
     {
         public AdjustArmorAcidResist()
-            : base()
+            : base(Statistic.GetStatCapitalizedDisplayName("AcidResistance"))
         {
         }
-        public AdjustArmorAcidResist(int Amount = 0)
-            : base()
+        public AdjustArmorAcidResist(int Amount)
+            : this()
         {
             this.Amount = Amount;
         }
-        public AdjustArmorAcidResist(ArmorCumulativeAdjustment SourceAdjustment)
+        public AdjustArmorAcidResist(Type Source, int Amount)
+            : this(Amount)
+        {
+            this.Source = Source;
+        }
+        public AdjustArmorAcidResist(AdjustArmorResistance SourceAdjustment)
             : base(SourceAdjustment)
         {
+            AffectedParameter = Statistic.GetStatCapitalizedDisplayName("AcidResistance");
         }
-        public AdjustArmorAcidResist(int Amount, ArmorCumulativeAdjustment SourceAdjustment)
-            : base(SourceAdjustment)
+        public AdjustArmorAcidResist(int Amount, AdjustArmorResistance SourceAdjustment)
+            : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }

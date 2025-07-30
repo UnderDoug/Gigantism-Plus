@@ -7,31 +7,25 @@ using XRL.World;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public abstract class AdjustArmorStatistic : ArmorCumulativeAdjustment
+    public abstract class AdjustArmorResistance : ArmorCumulativeAdjustment
     {
-        public AdjustArmorStatistic()
+        public AdjustArmorResistance()
             : base()
         {
         }
-        public AdjustArmorStatistic(string AffectedParameter)
+        public AdjustArmorResistance(string AffectedParameter)
             : this()
         {
             this.AffectedParameter = AffectedParameter;
         }
-        public AdjustArmorStatistic(int Amount, string AffectedParameter = null)
+        public AdjustArmorResistance(int Amount, string AffectedParameter = null)
             : this(AffectedParameter)
         {
             this.Amount = Amount;
         }
-        public AdjustArmorStatistic(AdjustArmorStatistic Source)
-            : base(Source)
+        public AdjustArmorResistance(AdjustArmorResistance SourceAdjustment)
+            : base(SourceAdjustment)
         {
-        }
-
-        public override void Configure()
-        {
-            base.Configure();
-            Verb = "confer";
         }
 
         public override bool Check(GameObject Subject)

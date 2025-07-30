@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine.UIElements;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class ChangeColorString : RenderAdjustment
     {
         public ChangeColorString()
             : base()
         {
         }
-
         public ChangeColorString(string TileColor = null)
             : this()
         {
@@ -33,14 +33,19 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return Subject.Render.ColorString != Value 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))
             {
                 Subject.Render.ColorString = Value;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

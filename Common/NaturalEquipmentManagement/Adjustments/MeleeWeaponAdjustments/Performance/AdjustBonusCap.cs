@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustBonusCap : MeleeWeaponCumulativeAdjustment
     {
         public AdjustBonusCap()
@@ -37,18 +39,20 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return (Subject.GetPart<MeleeWeapon>().MaxStrengthBonus < 999 && Amount > 0) 
+                || Amount < 0 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
+            if (base.Apply(Subject))
             {
-                MeleeWeapon meleeWeapon = Subject.GetPart<MeleeWeapon>();
-                if ((meleeWeapon.MaxStrengthBonus < 999 && Amount > 0) || Amount < 0)
-                {
-                    meleeWeapon.AdjustBonusCap((int)Amount);
-                    return true;
-                }
+                Subject.GetPart<MeleeWeapon>().AdjustBonusCap((int)Amount);
             }
-            return false;
+            return IsApplied();
         }
     }
 }

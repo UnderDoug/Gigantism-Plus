@@ -111,19 +111,31 @@ namespace XRL.World.Parts
                 return base.GetInstanceDescription(Object);
             }
 
-            DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>.Send(
-                Object: Object, 
-                Adjective: GetColoredAdjective(),
-                WeaponDescriptions: out List<DescriptionElement> weaponDescriptions,
-                GeneralDescriptions: out List<DescriptionElement> generalDescriptions,
-                Context: NATURAL_EQUIPMENT);
+            if (EnablePrereleaseContent)
+            {
+                DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>.Send(
+                    Object: Object,
+                    Adjective: GetColoredAdjective(),
+                    WeaponDescriptions: out List<DescriptionElement> weaponDescriptions,
+                    GeneralDescriptions: out List<DescriptionElement> generalDescriptions,
+                    Context: NATURAL_EQUIPMENT);
 
-            return DescribeModificationEvent<ModGigantic>.Send(
-                Object: Object,
-                Adjective: GetColoredAdjective(),
-                WeaponDescriptions: weaponDescriptions,
-                GeneralDescriptions: generalDescriptions,
-                Context: NATURAL_EQUIPMENT).Process(PluralizeObject: true);
+                return DescribeModificationEvent<ModGigantic>.Send(
+                    Object: Object,
+                    Adjective: GetColoredAdjective(),
+                    WeaponDescriptions: weaponDescriptions,
+                    GeneralDescriptions: generalDescriptions,
+                    Context: NATURAL_EQUIPMENT)
+                    .Process(PluralizeObject: true);
+            }
+            else
+            {
+                return DescribeModificationEvent<ModGigantic>.Send(
+                    Object: Object,
+                    Adjective: GetColoredAdjective(),
+                    Context: NATURAL_EQUIPMENT)
+                    .Process(PluralizeObject: true);
+            }
         }
     }
 }

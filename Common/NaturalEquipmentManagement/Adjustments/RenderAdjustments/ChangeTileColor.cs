@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class ChangeTileColor : RenderAdjustment
     {
-
         public ChangeTileColor()
             : base()
         {
@@ -33,14 +34,19 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return Subject.Render.TileColor != Value 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))
             {
                 Subject.Render.TileColor = Value;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

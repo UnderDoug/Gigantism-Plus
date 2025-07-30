@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine.UIElements;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class ChangeTile : RenderAdjustment
     {
         public ChangeTile()
@@ -28,14 +29,19 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return Subject.Render.Tile != Value 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))
             {
                 Subject.Render.Tile = Value;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

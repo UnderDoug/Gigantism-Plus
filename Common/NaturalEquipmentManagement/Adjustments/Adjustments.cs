@@ -317,9 +317,27 @@ namespace HNPS_GigantismPlus
             yield break;
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            bool anyCheckPasses = false;
+            if (!Items.IsNullOrEmpty())
+            {
+                foreach (bool result in Checks(Subject))
+                {
+                    if (result)
+                    {
+                        anyCheckPasses = true;
+                        break;
+                    }
+                }
+            }
+            return anyCheckPasses 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
-            if (!Items.IsNullOrEmpty() && base.Apply(Subject))
+            if (base.Apply(Subject))
             {
                 foreach (IAdjustment adjustment in this)
                 {
@@ -328,9 +346,8 @@ namespace HNPS_GigantismPlus
                         adjustment.Apply(Subject);
                     }
                 }
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

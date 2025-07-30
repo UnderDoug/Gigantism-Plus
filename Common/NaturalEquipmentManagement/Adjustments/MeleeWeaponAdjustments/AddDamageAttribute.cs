@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AddDamageAttribute : MeleeWeaponAdjustment
     {
         public string AttributeName;
@@ -38,6 +40,28 @@ namespace HNPS_GigantismPlus
             Verb = "add";
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return !Value.IsNullOrEmpty() 
+                && (Subject.GetPart<MeleeWeapon>().Attributes.IsNullOrEmpty() || !Subject.GetPart<MeleeWeapon>().Attributes.Contains(Value)) 
+                && base.Check(Subject);
+        }
+
+        public override bool Apply(GameObject Subject)
+        {
+            if (base.Apply(Subject))
+            {
+                MeleeWeapon meleeWeapon = Subject.GetPart<MeleeWeapon>();
+                meleeWeapon.Attributes ??= "";
+                if (!meleeWeapon.Attributes.IsNullOrEmpty())
+                {
+                    meleeWeapon.Attributes += " ";
+                }
+                meleeWeapon.Attributes += Value;
+            }
+            return IsApplied();
+        }
+
         public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
         {
             if (Value != null)
@@ -46,27 +70,6 @@ namespace HNPS_GigantismPlus
                 return new(Verb, Effect);
             }
             return base.GetWeaponDescriptionElement(Subject);
-        }
-
-        public override bool Apply(GameObject Subject)
-        {
-            if (base.Apply(Subject) && Value != null)
-            {
-                MeleeWeapon meleeWeapon = Subject.GetPart<MeleeWeapon>();
-                string attributes = meleeWeapon.Attributes;
-                if (!attributes.IsNullOrEmpty() && attributes.Contains(Value))
-                {
-                    return false;
-                }
-                else if (!attributes.IsNullOrEmpty())
-                {
-                    attributes += " ";
-                }
-                attributes += Value;
-                meleeWeapon.Attributes = attributes;
-                return true;
-            }
-            return false;
         }
     }
 }

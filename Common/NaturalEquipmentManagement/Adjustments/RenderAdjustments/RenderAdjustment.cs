@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class RenderAdjustment : IAdjustment
+    [Serializable]
+    public abstract class RenderAdjustment : IAdjustment
     {
         public RenderAdjustment()
             : base()
         {
         }
-        public RenderAdjustment(RenderAdjustment Source)
-            : base(Source)
+        public RenderAdjustment(RenderAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
         {
         }
 
-        public override bool Apply(GameObject Subject)
+        public override bool Check(GameObject Subject)
         {
-            return Subject.Render != null && base.Apply(Subject);
+            return Subject.Render != null 
+                && !Value.IsNullOrEmpty() 
+                && base.Check(Subject);
         }
     }
 }

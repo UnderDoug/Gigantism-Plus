@@ -15,8 +15,9 @@ namespace XRL.World.Parts
     [Serializable]
     public class ModNaturalEquipment<T> 
         : ModNaturalEquipmentBase
-        , IModEventHandler<BeforeDescribeModificationEvent<ModNaturalEquipment<T>>>
-        , IModEventHandler<DescribeModificationEvent<ModNaturalEquipment<T>>>
+        , IDescribeModificationHandler<ModNaturalEquipment<T>>
+        // , IModEventHandler<BeforeDescribeModificationEvent<ModNaturalEquipment<T>>>
+        // , IModEventHandler<DescribeModificationEvent<ModNaturalEquipment<T>>>
         where T 
         : IPart
         , IManagedDefaultNaturalEquipment<T>
@@ -220,23 +221,42 @@ namespace XRL.World.Parts
         {
             if (EnablePrereleaseContent && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
+                int indent = Debug.LastIndent;
+                Debug.LoopItem(4, 
+                    $"{GetType().Name}.{nameof(HandleEvent)}({nameof(BeforeDescribeModificationEvent<ModNaturalEquipment<T>>)} E)", 
+                    Indent: indent + 1, Toggle: true);
+
                 if (!Adjustments.IsNullOrEmpty() && !Adjustments.GetApplied().IsNullOrEmpty())
                 {
+                    Debug.CheckYeh(4, $"Have Adjustments", Indent: indent + 2, Toggle: true);
                     foreach (IAdjustment adjustment in Adjustments.GetApplied())
                     {
+                        Debug.Entry(4, $"{adjustment.ToString(true)}", Indent: indent + 3, Toggle: true);
                         if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> weaponElements, out List<DescriptionElement> generalElements))
                         {
                             if (!weaponElements.IsNullOrEmpty())
                             {
-                                E.GeneralDescriptions.AddRange(weaponElements);
+                                Debug.LoopItem(4, $"{nameof(weaponElements)}", Indent: indent + 4, Toggle: true);
+                                foreach (DescriptionElement element in weaponElements)
+                                {
+                                    Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: true);
+                                }
+                                E.WeaponDescriptions.AddRange(weaponElements);
                             }
                             if (!generalElements.IsNullOrEmpty())
                             {
-                                E.WeaponDescriptions.AddRange(generalElements);
+                                Debug.LoopItem(4, $"{nameof(generalElements)}", Indent: indent + 4, Toggle: true);
+                                foreach (DescriptionElement element in generalElements)
+                                {
+                                    Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: true);
+                                }
+                                E.GeneralDescriptions.AddRange(generalElements);
                             }
                         }
                     }
                 }
+
+                Debug.LastIndent = indent;
             }
             else if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {

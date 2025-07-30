@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustArmorStrength : AdjustArmorStatistic
     {
         public AdjustArmorStrength()
-            : base(nameof(Armor.Strength))
+            : base(Statistic.GetStatCapitalizedDisplayName(nameof(Armor.Strength)))
         {
         }
         public AdjustArmorStrength(int Amount)
@@ -25,7 +27,7 @@ namespace HNPS_GigantismPlus
         public AdjustArmorStrength(AdjustArmorStatistic SourceAdjustment)
             : base(SourceAdjustment)
         {
-            AffectedParameter = nameof(Armor.Strength);
+            AffectedParameter = Statistic.GetStatCapitalizedDisplayName(nameof(Armor.Strength));
         }
         public AdjustArmorStrength(int Amount, AdjustArmorStatistic SourceAdjustment)
             : this(SourceAdjustment)
@@ -42,9 +44,8 @@ namespace HNPS_GigantismPlus
             if (base.Apply(Subject))
             {
                 Subject.GetPart<Armor>().Strength += (int)Amount;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

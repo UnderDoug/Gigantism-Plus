@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustArmorWillpower : AdjustArmorStatistic
     {
         public AdjustArmorWillpower()
-            : base(nameof(Armor.Willpower))
+            : base(Statistic.GetStatCapitalizedDisplayName(nameof(Armor.Willpower)))
         {
         }
         public AdjustArmorWillpower(int Amount)
@@ -25,7 +27,7 @@ namespace HNPS_GigantismPlus
         public AdjustArmorWillpower(AdjustArmorStatistic SourceAdjustment)
             : base(SourceAdjustment)
         {
-            AffectedParameter = nameof(Armor.Willpower);
+            AffectedParameter = Statistic.GetStatCapitalizedDisplayName(nameof(Armor.Willpower));
         }
         public AdjustArmorWillpower(int Amount, AdjustArmorStatistic SourceAdjustment)
             : this(SourceAdjustment)
@@ -42,9 +44,8 @@ namespace HNPS_GigantismPlus
             if (base.Apply(Subject))
             {
                 Subject.GetPart<Armor>().Willpower += (int)Amount;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

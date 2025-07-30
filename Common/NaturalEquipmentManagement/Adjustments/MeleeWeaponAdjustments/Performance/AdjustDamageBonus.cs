@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustDamageBonus : MeleeWeaponCumulativeAdjustment
     {
         public AdjustDamageBonus()
@@ -35,12 +37,11 @@ namespace HNPS_GigantismPlus
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
+            if (base.Apply(Subject))
             {
                 Subject.GetPart<MeleeWeapon>().AdjustDamage((int)Amount);
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

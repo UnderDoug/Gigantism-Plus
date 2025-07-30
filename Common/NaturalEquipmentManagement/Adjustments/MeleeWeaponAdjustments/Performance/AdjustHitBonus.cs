@@ -1,40 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustPenBonus : MeleeWeaponCumulativeAdjustment
+    [Serializable]
+    public class AdjustHitBonus : MeleeWeaponPerformanceAdjustment
     {
-        public AdjustPenBonus()
-            : base("penetration")
+        public AdjustHitBonus()
+            : base("hit")
         {
         }
-        public AdjustPenBonus(int Amount)
+        public AdjustHitBonus(int Amount)
             : this()
         {
             this.Amount = Amount;
         }
-        public AdjustPenBonus(Type Source, int Amount)
+        public AdjustHitBonus(Type Source, int Amount)
             : this(Amount)
         {
             this.Source = Source;
         }
-        public AdjustPenBonus(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public AdjustHitBonus(MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
-            AffectedParameter = "penetration";
+            AffectedParameter = "hit";
         }
-        public AdjustPenBonus(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public AdjustHitBonus(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
-        public AdjustPenBonus(MeleeWeapon Source)
-            : this(Source.PenBonus)
+        public AdjustHitBonus(MeleeWeapon Source)
+            : this(Source.HitBonus)
         {
+        }
+
+        public override bool Apply(GameObject Subject)
+        {
+            if (base.Apply(Subject))
+            {
+                Subject.GetPart<MeleeWeapon>().HitBonus += (int)Amount;
+            }
+            return IsApplied();
         }
 
         public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
@@ -47,16 +58,6 @@ namespace HNPS_GigantismPlus
                 return new(Verb, Effect);
             }
             return base.GetWeaponDescriptionElement(Subject);
-        }
-
-        public override bool Apply(GameObject Subject)
-        {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
-            {
-                Subject.GetPart<MeleeWeapon>().PenBonus += (int)Amount;
-                return true;
-            }
-            return false;
         }
     }
 }

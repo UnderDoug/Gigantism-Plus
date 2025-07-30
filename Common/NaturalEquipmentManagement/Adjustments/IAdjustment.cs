@@ -131,14 +131,14 @@ namespace HNPS_GigantismPlus
 
         public override string ToString()
         {
-            return $"{Source.Name}.{GetType().Name}";
+            return ToString(ShowApplied: false, Short: false);
         }
 
         public string ToString(bool ShowApplied, bool Short = false)
         {
-            string applied = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
+            string appliedString = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
             string addToString = !Short ? AddToString() : null;
-            return $"{applied}{ToString()}{addToString}";
+            return $"{appliedString}{Source.Name}.{GetType().Name}{addToString}";
         }
 
         public virtual string AddToString()
@@ -170,71 +170,6 @@ namespace HNPS_GigantismPlus
                 output = ": " + outputList.Join(", ");
             } 
             return output;
-        }
-
-        public virtual DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
-        {
-            return DescriptionElement.Empty;
-        }
-        public virtual List<DescriptionElement> GetWeaponDescriptionElements(GameObject Subject)
-        {
-            List<DescriptionElement> descriptionElements = new();
-
-            DescriptionElement descriptionElement = GetWeaponDescriptionElement(Subject);
-
-            int indent = Debug.LastIndent;
-            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
-            Debug.Entry(4, $"{GetType().Name}.{nameof(GetWeaponDescriptionElements)}: {elementString}", Indent: indent + 1, Toggle: true);
-
-            if (descriptionElement != DescriptionElement.Empty)
-            {
-                descriptionElements.Add(descriptionElement);
-            }
-
-            Debug.LastIndent = indent;
-            return descriptionElements;
-        }
-
-        public virtual DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
-        {
-            return DescriptionElement.Empty;
-        }
-        public virtual List<DescriptionElement> GetGeneralDescriptionElements(GameObject Subject)
-        {
-            List<DescriptionElement> descriptionElements = new();
-
-            DescriptionElement descriptionElement = GetGeneralDescriptionElement(Subject);
-
-            int indent = Debug.LastIndent;
-            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
-            Debug.Entry(4, $"{GetType().Name}.{nameof(GetGeneralDescriptionElement)}: {elementString}", Indent: indent + 1, Toggle: true);
-
-            if (descriptionElement != DescriptionElement.Empty)
-            {
-                descriptionElements.Add(descriptionElement);
-            }
-
-            Debug.LastIndent = indent;
-            return descriptionElements;
-        }
-
-        public bool TryGetDescriptionElements(GameObject Subject, out List<DescriptionElement> WeaponDescriptionElements, out List<DescriptionElement> GeneralDescriptionElements)
-        {
-            WeaponDescriptionElements = new();
-            GeneralDescriptionElements = new();
-
-            List<DescriptionElement> weaponDescriptionElements = GetWeaponDescriptionElements(Subject);
-            if (!weaponDescriptionElements.IsNullOrEmpty())
-            {
-                WeaponDescriptionElements.AddRange(weaponDescriptionElements);
-            }
-
-            List<DescriptionElement> generalDescriptionElements = GetGeneralDescriptionElements(Subject);
-            if (!generalDescriptionElements.IsNullOrEmpty())
-            {
-                GeneralDescriptionElements.AddRange(generalDescriptionElements);
-            }
-            return !WeaponDescriptionElements.IsNullOrEmpty() || !GeneralDescriptionElements.IsNullOrEmpty();
         }
 
         public virtual bool CheckCondition(GameObject Subject)
@@ -348,10 +283,8 @@ namespace HNPS_GigantismPlus
 
                 Applying = true;
 
-                Debug.CheckYeh(4, $"Set {nameof(Applying)}: {Applying}", Indent: indent + 3, Toggle: doDebug);
                 Applied = true;
                 Applied = Apply(Subject);
-                Debug.CheckYeh(4, $"Set {nameof(Applied)}: {Applied}", Indent: indent + 3, Toggle: doDebug);
 
                 if (Applied)
                 {
@@ -359,14 +292,14 @@ namespace HNPS_GigantismPlus
                     AfterApply(Subject);
                     AfterApplyAdjustmentEvent.Send(Subject, Source, this);
                 }
+                Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: doDebug);
+                Debug.LastIndent = indent;
                 return !Applied;
             }
             Applying = false;
 
             Debug.LoopItem(4, $"2] {nameof(Applying)} or !{nameof(Check)}({nameof(Subject)}) or !{nameof(BeforeApplyAdjustmentEvent)}", 
                 Indent: indent + 2, Toggle: doDebug);
-
-            Debug.CheckYeh(4, $"Set {nameof(Applying)}: {Applying}", Indent: indent + 3, Toggle: doDebug);
 
             Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
@@ -378,6 +311,71 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"! {GetType().Name}.{nameof(AfterApply)}()", Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
+        }
+
+        public virtual DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
+        {
+            return DescriptionElement.Empty;
+        }
+        public virtual List<DescriptionElement> GetWeaponDescriptionElements(GameObject Subject)
+        {
+            List<DescriptionElement> descriptionElements = new();
+
+            DescriptionElement descriptionElement = GetWeaponDescriptionElement(Subject);
+
+            int indent = Debug.LastIndent;
+            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
+            Debug.Entry(4, $"{GetType().Name}.{nameof(GetWeaponDescriptionElements)}: {elementString}", Indent: indent + 1, Toggle: true);
+
+            if (descriptionElement != DescriptionElement.Empty)
+            {
+                descriptionElements.Add(descriptionElement);
+            }
+
+            Debug.LastIndent = indent;
+            return descriptionElements;
+        }
+
+        public virtual DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
+        {
+            return DescriptionElement.Empty;
+        }
+        public virtual List<DescriptionElement> GetGeneralDescriptionElements(GameObject Subject)
+        {
+            List<DescriptionElement> descriptionElements = new();
+
+            DescriptionElement descriptionElement = GetGeneralDescriptionElement(Subject);
+
+            int indent = Debug.LastIndent;
+            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
+            Debug.Entry(4, $"{GetType().Name}.{nameof(GetGeneralDescriptionElement)}: {elementString}", Indent: indent + 1, Toggle: true);
+
+            if (descriptionElement != DescriptionElement.Empty)
+            {
+                descriptionElements.Add(descriptionElement);
+            }
+
+            Debug.LastIndent = indent;
+            return descriptionElements;
+        }
+
+        public bool TryGetDescriptionElements(GameObject Subject, out List<DescriptionElement> WeaponDescriptionElements, out List<DescriptionElement> GeneralDescriptionElements)
+        {
+            WeaponDescriptionElements = new();
+            GeneralDescriptionElements = new();
+
+            List<DescriptionElement> weaponDescriptionElements = GetWeaponDescriptionElements(Subject);
+            if (!weaponDescriptionElements.IsNullOrEmpty())
+            {
+                WeaponDescriptionElements.AddRange(weaponDescriptionElements);
+            }
+
+            List<DescriptionElement> generalDescriptionElements = GetGeneralDescriptionElements(Subject);
+            if (!generalDescriptionElements.IsNullOrEmpty())
+            {
+                GeneralDescriptionElements.AddRange(generalDescriptionElements);
+            }
+            return !WeaponDescriptionElements.IsNullOrEmpty() || !GeneralDescriptionElements.IsNullOrEmpty();
         }
 
         public virtual void Write(SerializationWriter Writer)

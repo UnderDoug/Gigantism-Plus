@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class ChangeMeleeWeaponSkill : MeleeWeaponAdjustment
     {
         public ChangeMeleeWeaponSkill()
@@ -33,25 +35,31 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
+        public override bool Check(GameObject Subject)
         {
-            if (Value != null)
-            {
-                string skillName = Skills.GetGenericSkill(Value)?.GetWeaponCriticalDescription();
-                Effect ??= $"as a {skillName}";
-                return new(Verb, Effect);
-            }
-            return GetWeaponDescriptionElement(Subject);
+            return !Value.IsNullOrEmpty() 
+                && Subject.GetPart<MeleeWeapon>().Skill != Value 
+                && base.Check(Subject);
         }
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && Value != null && Subject.GetPart<MeleeWeapon>().Skill != Value)
+            if (base.Apply(Subject))
             {
                 Subject.GetPart<MeleeWeapon>().Skill = Value;
-                return true;
             }
-            return false;
+            return IsApplied();
+        }
+
+        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
+        {
+            if (!Value.IsNullOrEmpty())
+            {
+                string skillName = Skills.GetGenericSkill(Value)?.DisplayName;
+                Effect ??= $"as a {skillName}";
+                return new(Verb, Effect);
+            }
+            return GetWeaponDescriptionElement(Subject);
         }
     }
 }

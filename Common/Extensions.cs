@@ -2659,5 +2659,11 @@ namespace HNPS_GigantismPlus
 
             return true;
         }
+
+        public static bool InheritsFrom(this Type T, Type Type, bool IncludeSelf = true)
+        {
+            List<Type> inheritedTypes = new(T.YieldInheritedTypes());
+            return (IncludeSelf && T == Type) || inheritedTypes.Contains(Type);
+        }
     }
 }

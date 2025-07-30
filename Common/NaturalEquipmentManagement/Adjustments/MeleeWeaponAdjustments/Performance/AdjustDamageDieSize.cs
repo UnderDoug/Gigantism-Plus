@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
-    public class AdjustDamageDieSize : MeleeWeaponCumulativeAdjustment
+    [Serializable]
+    public class AdjustDamageDieSize : MeleeWeaponPerformanceAdjustment
     {
         public AdjustDamageDieSize()
             : base("damage die size")
@@ -23,16 +25,25 @@ namespace HNPS_GigantismPlus
         {
             this.Source = Source;
         }
-        public AdjustDamageDieSize(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public AdjustDamageDieSize(MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
             AffectedParameter = "damage die size";
             Verb = "gain";
         }
-        public AdjustDamageDieSize(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public AdjustDamageDieSize(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
+        }
+
+        public override bool Apply(GameObject Subject)
+        {
+            if (base.Apply(Subject))
+            {
+                Subject.GetPart<MeleeWeapon>().AdjustDamageDieSize((int)Amount);
+            }
+            return IsApplied();
         }
 
         public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
@@ -44,16 +55,6 @@ namespace HNPS_GigantismPlus
                 return new(Verb, Effect);
             }
             return base.GetWeaponDescriptionElement(Subject);
-        }
-
-        public override bool Apply(GameObject Subject)
-        {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
-            {
-                Subject.GetPart<MeleeWeapon>().AdjustDamageDieSize((int)Amount);
-                return true;
-            }
-            return false;
         }
     }
 }

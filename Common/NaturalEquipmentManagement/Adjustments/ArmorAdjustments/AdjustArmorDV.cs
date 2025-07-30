@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustArmorDV : ArmorCumulativeAdjustment
     {
         public AdjustArmorDV()
@@ -37,14 +39,19 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return !Amount.IsNullOrZero() 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
+            if (base.Apply(Subject))
             {
                 Subject.GetPart<Armor>().DV += (int)Amount;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

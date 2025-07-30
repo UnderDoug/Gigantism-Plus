@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustDamageDieCount : MeleeWeaponCumulativeAdjustment
     {
         public AdjustDamageDieCount()
@@ -35,6 +37,21 @@ namespace HNPS_GigantismPlus
             this.Amount = Amount;
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return Amount > 0 
+                && base.Check(Subject);
+        }
+
+        public override bool Apply(GameObject Subject)
+        {
+            if (base.Apply(Subject))
+            {
+                Subject.GetPart<MeleeWeapon>().AdjustDamageDieCount((int)Amount);
+            }
+            return IsApplied();
+        }
+
         public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && Amount > 0)
@@ -44,16 +61,6 @@ namespace HNPS_GigantismPlus
                 return new(Verb, Effect);
             }
             return base.GetWeaponDescriptionElement(Subject);
-        }
-
-        public override bool Apply(GameObject Subject)
-        {
-            if (base.Apply(Subject) && Amount > 0)
-            {
-                Subject.GetPart<MeleeWeapon>().AdjustDamageDieCount((int)Amount);
-                return true;
-            }
-            return false;
         }
     }
 }

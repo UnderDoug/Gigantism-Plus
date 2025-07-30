@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustArmorSpeed : ArmorCumulativeAdjustment
     {
         public AdjustArmorSpeed()
@@ -37,9 +39,15 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return !Amount.IsNullOrZero() 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
+            if (base.Apply(Subject))
             {
                 Armor armor = Subject.GetPart<Armor>();
                 int amount = Math.Abs((int)Amount);
@@ -51,9 +59,8 @@ namespace HNPS_GigantismPlus
                 {
                     armor.SpeedPenalty += amount;
                 }
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

@@ -121,6 +121,7 @@ namespace HNPS_GigantismPlus
         }
         public static List<DescriptionElement> AddElement(List<DescriptionElement> Descriptions, string Verb, string Effect)
         {
+            Descriptions ??= new();
             Descriptions.Add(new(Verb, Effect));
             return Descriptions;
         }
@@ -151,8 +152,55 @@ namespace HNPS_GigantismPlus
             return AddElement(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
         }
 
+        public static List<DescriptionElement> AddElements(List<DescriptionElement> Descriptions, List<DescriptionElement> AddDescriptions)
+        {
+            Descriptions ??= new();
+            if (!AddDescriptions.IsNullOrEmpty())
+            {
+                foreach (DescriptionElement descriptionElement in AddDescriptions)
+                {
+                    if (descriptionElement != DescriptionElement.Empty)
+                    {
+                        Descriptions = AddElement(Descriptions, descriptionElement.Verb, descriptionElement.Effect);
+                    }
+                }
+            }
+            return Descriptions;
+        }
+        public List<DescriptionElement> AddWeaponElements(List<DescriptionElement> AddDescriptions)
+        {
+            return WeaponDescriptions = AddElements(WeaponDescriptions, AddDescriptions);
+        }
+        public List<DescriptionElement> AddGeneralElements(List<DescriptionElement> AddDescriptions)
+        {
+            return GeneralDescriptions = AddElements(GeneralDescriptions, AddDescriptions);
+        }
+
+        public static List<DescriptionElement> AddElements(List<DescriptionElement> Descriptions, List<List<string>> AddDescriptions)
+        {
+            Descriptions ??= new();
+            List<DescriptionElement> addDescriptions = new();
+            if (!AddDescriptions.IsNullOrEmpty())
+            {
+                foreach (List<string> descriptionStringElement in AddDescriptions)
+                {
+                    addDescriptions.Add(new(descriptionStringElement));
+                }
+            }
+            return AddElements(Descriptions, addDescriptions);
+        }
+        public List<DescriptionElement> AddWeaponElements(List<List<string>> AddDescriptions)
+        {
+            return WeaponDescriptions = AddElements(WeaponDescriptions, AddDescriptions);
+        }
+        public List<DescriptionElement> AddGeneralElements(List<List<string>> AddDescriptions)
+        {
+            return GeneralDescriptions = AddElements(GeneralDescriptions, AddDescriptions);
+        }
+
         public static List<DescriptionElement> RemoveElement(List<DescriptionElement> Descriptions, string Verb, string Effect)
         {
+            Descriptions ??= new();
             Descriptions.RemoveAll(x => x.Verb == Verb && x.Effect == Effect);
             return Descriptions;
         }
@@ -181,6 +229,49 @@ namespace HNPS_GigantismPlus
         public List<DescriptionElement> RemoveGeneralElement(DescriptionElement DescriptionElement)
         {
             return GeneralDescriptions = RemoveElement(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+
+        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, List<DescriptionElement> RemoveDescriptions)
+        {
+            Descriptions ??= new();
+            if (!RemoveDescriptions.IsNullOrEmpty())
+            {
+                foreach (DescriptionElement descriptionElement in RemoveDescriptions)
+                {
+                    Descriptions = RemoveElement(Descriptions, descriptionElement.Verb, descriptionElement.Effect);
+                }
+            }
+            return Descriptions;
+        }
+        public List<DescriptionElement> RemoveWeaponElements(List<DescriptionElement> DescriptionElements)
+        {
+            return WeaponDescriptions = RemoveElements(WeaponDescriptions, DescriptionElements);
+        }
+        public List<DescriptionElement> RemoveGeneralElements(List<DescriptionElement> DescriptionElements)
+        {
+            return GeneralDescriptions = RemoveElements(GeneralDescriptions, DescriptionElements);
+        }
+
+        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, List<List<string>> RemoveDescriptions)
+        {
+            Descriptions ??= new();
+            List<DescriptionElement> removeDescriptions = new();
+            if (!RemoveDescriptions.IsNullOrEmpty())
+            {
+                foreach (List<string> descriptionStringElement in RemoveDescriptions)
+                {
+                    removeDescriptions.Add(new(descriptionStringElement));
+                }
+            }
+            return RemoveElements(Descriptions, removeDescriptions);
+        }
+        public List<DescriptionElement> RemoveWeaponElements(List<List<string>> DescriptionElements)
+        {
+            return WeaponDescriptions = RemoveElements(WeaponDescriptions, DescriptionElements);
+        }
+        public List<DescriptionElement> RemoveGeneralElements(List<List<string>> DescriptionElements)
+        {
+            return GeneralDescriptions = RemoveElements(GeneralDescriptions, DescriptionElements);
         }
 
         public static implicit operator DescribeModificationEvent<IModification>(IDescribeModificationEvent<T, M> E)

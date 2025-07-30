@@ -7,43 +7,40 @@ using XRL.World;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public abstract class MeleeWeaponCumulativeAdjustment : MeleeWeaponAdjustment
+    public abstract class MeleeWeaponPerformanceAdjustment : MeleeWeaponCumulativeAdjustment
     {
-        public string AffectedParameter;
-
-        public MeleeWeaponCumulativeAdjustment()
+        public MeleeWeaponPerformanceAdjustment()
             : base()
         {
-            Amount = 0;
-            AffectedParameter = null;
         }
-        public MeleeWeaponCumulativeAdjustment(string AffectedParameter)
+        public MeleeWeaponPerformanceAdjustment(string AffectedParameter)
             : this()
         {
             this.AffectedParameter = AffectedParameter;
         }
-        public MeleeWeaponCumulativeAdjustment(Type Source, int Amount, string AffectedParameter)
+        public MeleeWeaponPerformanceAdjustment(Type Source, int Amount, string AffectedParameter)
             : this(AffectedParameter)
         {
             this.Source = Source;
             this.Amount = Amount;
         }
-        public MeleeWeaponCumulativeAdjustment(Type Source, int Amount, string Verb, string AffectedParameter = null)
+        public MeleeWeaponPerformanceAdjustment(Type Source, int Amount, string Verb, string AffectedParameter = null)
             : this(Source, Amount, AffectedParameter)
         {
             this.Verb = Verb;
         }
-        public MeleeWeaponCumulativeAdjustment(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public MeleeWeaponPerformanceAdjustment(MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
+            Verb = "have";
             AffectedParameter = SourceAdjustment.AffectedParameter;
         }
-        public MeleeWeaponCumulativeAdjustment(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public MeleeWeaponPerformanceAdjustment(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
-        public MeleeWeaponCumulativeAdjustment(Type Source, int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public MeleeWeaponPerformanceAdjustment(Type Source, int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : this(Amount, SourceAdjustment)
         {
             this.Source = Source;
@@ -53,7 +50,12 @@ namespace HNPS_GigantismPlus
         {
             base.Configure();
             Prioritize = false;
-            Verb = "have";
+        }
+
+        public override bool Check(GameObject Subject)
+        {
+            return !Amount.IsNullOrZero() 
+                && base.Check(Subject);
         }
 
         public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)

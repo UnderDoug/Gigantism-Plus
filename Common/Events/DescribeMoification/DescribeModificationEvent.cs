@@ -50,6 +50,8 @@ namespace HNPS_GigantismPlus
                 Object: BeforeEvent.Object,
                 Adjective: BeforeEvent.Adjective,
                 ObjectNoun: BeforeEvent.ObjectNoun,
+                WeaponDescriptions: BeforeEvent.WeaponDescriptions,
+                GeneralDescriptions: BeforeEvent.GeneralDescriptions,
                 Context: BeforeEvent.Context);
             E.BeforeEvent = BeforeEvent;
             return E;
@@ -107,19 +109,23 @@ namespace HNPS_GigantismPlus
         {
             WeaponDescriptions = new();
             GeneralDescriptions = new();
-            DescribeModificationEvent <T> E = Send(
+            return Send( // return DescribeModificationEvent <T> E = Send(
                 BeforeDescribeModificationEvent<T>.Send(
                     Object: Object,
                     Adjective: Adjective,
                     ObjectNoun: ObjectNoun,
+                    WeaponDescriptions: WeaponDescriptions,
+                    GeneralDescriptions: GeneralDescriptions,
                     Context: Context)
                 );
+            /*
             if (E != null)
             {
                 WeaponDescriptions = E.WeaponDescriptions;
                 GeneralDescriptions = E.GeneralDescriptions;
             }
-            return E;
+            return E; 
+            */
         }
         public string Process(bool PluralizeObject = true)
         {
@@ -131,22 +137,16 @@ namespace HNPS_GigantismPlus
             {
                 if (!BeforeEvent.WeaponDescriptions.IsNullOrEmpty())
                 {
-                    weaponDescriptions.AddRange(BeforeEvent.WeaponDescriptions);
+                    weaponDescriptions = AddElements(weaponDescriptions, BeforeEvent.WeaponDescriptions);
                 }
                 if (!BeforeEvent.GeneralDescriptions.IsNullOrEmpty())
                 {
-                    generalDescriptions.AddRange(BeforeEvent.GeneralDescriptions);
+                    generalDescriptions = AddElements(generalDescriptions, BeforeEvent.GeneralDescriptions);
                 }
             }
 
-            if (!WeaponDescriptions.IsNullOrEmpty())
-            {
-                weaponDescriptions.AddRange(WeaponDescriptions);
-            }
-            if (!GeneralDescriptions.IsNullOrEmpty())
-            {
-                generalDescriptions.AddRange(GeneralDescriptions);
-            }
+            weaponDescriptions ??= AddElements(weaponDescriptions, WeaponDescriptions);
+            generalDescriptions ??= AddElements(generalDescriptions, GeneralDescriptions);
 
             StringBuilder SB = Event.NewStringBuilder();
 
@@ -184,9 +184,13 @@ namespace HNPS_GigantismPlus
             }
             else if (weaponDescriptions.Count == 0)
             {
-                if (typeof(T) == typeof(ModGigantic))
+                if (typeof(T).InheritsFrom(typeof(ModGigantic)))
                 {
                     SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
+                }
+                else if (typeof(T).InheritsFrom(typeof(ModNaturalEquipmentBase)))
+                {
+                    SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
                 }
                 else
                 {
@@ -214,13 +218,6 @@ namespace HNPS_GigantismPlus
         public static implicit operator DescribeModificationEvent<T>(BeforeDescribeModificationEvent<IModification> E)
         {
             return E as DescribeModificationEvent<T>;
-        }
-
-        public DescribeModificationEvent<T> TransferFrom(DescribeModificationEvent<IModification> E)
-        {
-            DescribeModificationEvent<T> F = FromPool(E?.Object, E?.Adjective, E?.ObjectNoun, E?.WeaponDescriptions, E?.GeneralDescriptions, E?.Context);
-            E?.Reset();
-            return F;
         }
     }
 }

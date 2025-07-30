@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustArmorCarryBonus : ArmorCumulativeAdjustment
     {
         public AdjustArmorCarryBonus()
@@ -43,26 +45,19 @@ namespace HNPS_GigantismPlus
             NeedsShifter = false;
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override bool Check(GameObject Subject)
         {
-            if (AffectedParameter != null && !Amount.IsNullOrZero())
-            {
-                string amount = ((int)Amount).Signed();
-                string bonusPenalty = amount.BonusOrPenalty();
-                Effect = $"a {amount}% {bonusPenalty} to {AffectedParameter}";
-                return new(Verb, Effect);
-            }
-            return base.GetGeneralDescriptionElement(Subject);
+            return !Amount.IsNullOrZero() 
+                && base.Check(Subject);
         }
 
         public override bool Apply(GameObject Subject)
         {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
+            if (base.Apply(Subject))
             {
                 Subject.GetPart<Armor>().CarryBonus += (int)Amount;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
 
         public override void AfterApply(GameObject Subject)
@@ -73,6 +68,18 @@ namespace HNPS_GigantismPlus
                 wielder.FlushCarriedWeightCache();
             }
             base.AfterApply(Subject);
+        }
+
+        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
+            {
+                string amount = ((int)Amount).Signed();
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount}% {bonusPenalty} to {AffectedParameter}";
+                return new(Verb, Effect);
+            }
+            return base.GetGeneralDescriptionElement(Subject);
         }
     }
 }

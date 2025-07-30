@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine.Tilemaps;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class ChangeRenderDisplayName : RenderAdjustment
     {
         public ChangeRenderDisplayName()
@@ -19,8 +20,8 @@ namespace HNPS_GigantismPlus
         {
             Value = DisplayName;
         }
-        public ChangeRenderDisplayName(ChangeRenderDisplayName Source)
-            : base(Source)
+        public ChangeRenderDisplayName(ChangeRenderDisplayName SourceAdjustment)
+            : base(SourceAdjustment)
         {
         }
         public ChangeRenderDisplayName(Render Source)
@@ -28,14 +29,19 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return Subject.Render.DisplayName != Value 
+                && base.Check(Subject);
+        }
+
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))
             {
                 Subject.Render.DisplayName = Value;
-                return true;
             }
-            return false;
+            return IsApplied();
         }
     }
 }

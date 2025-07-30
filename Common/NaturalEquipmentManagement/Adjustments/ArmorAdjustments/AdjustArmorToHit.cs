@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public class AdjustArmorToHit : AdjustArmorStatistic
     {
         public AdjustArmorToHit()
@@ -44,6 +46,20 @@ namespace HNPS_GigantismPlus
             NeedsShifter = false;
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return !Amount.IsNullOrZero() 
+                && base.Check(Subject);
+        }
+        public override bool Apply(GameObject Subject)
+        {
+            if (base.Apply(Subject))
+            {
+                Subject.GetPart<Armor>().ToHit += (int)Amount;
+            }
+            return IsApplied();
+        }
+
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && !Amount.IsNullOrZero())
@@ -54,15 +70,6 @@ namespace HNPS_GigantismPlus
                 return new(Verb, Effect);
             }
             return base.GetGeneralDescriptionElement(Subject);
-        }
-        public override bool Apply(GameObject Subject)
-        {
-            if (base.Apply(Subject) && !Amount.IsNullOrZero())
-            {
-                Subject.GetPart<Armor>().ToHit += (int)Amount;
-                return true;
-            }
-            return false;
         }
     }
 }

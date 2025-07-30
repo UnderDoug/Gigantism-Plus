@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+
 using XRL.World;
 using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
+    [Serializable]
     public abstract class ArmorCumulativeAdjustment : ArmorAdjustment
     {
         public bool NeedsShifter;
@@ -60,23 +62,14 @@ namespace HNPS_GigantismPlus
             NeedsShifter = true;
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override bool Check(GameObject Subject)
         {
-            if (AffectedParameter != null && !Amount.IsNullOrZero())
-            {
-                string amount = ((int)Amount).Signed();
-                string bonusPenalty = amount.BonusOrPenalty();
-                Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
-                return new(Verb, Effect);
-            }
-            return base.GetGeneralDescriptionElement(Subject);
+            return !Amount.IsNullOrZero() 
+                && base.Check(Subject);
         }
 
         public override void AfterApply(GameObject Subject)
         {
-            int indent = Debug.LastIndent;
-            Debug.Entry(4, $"! {GetType().Name}.{nameof(AfterApply)}()", Indent: indent + 1, Toggle: true);
-
             if (NeedsShifter && !Amount.IsNullOrZero())
             {
                 GameObject who = null;
@@ -88,8 +81,18 @@ namespace HNPS_GigantismPlus
                 Subject?.GetPart<Armor>()?.UpdateStatShifts(who);
             }
             base.AfterApply(Subject);
-            Debug.Entry(4, $"x {GetType().Name}.{nameof(AfterApply)}() !//", Indent: indent + 1, Toggle: true);
-            Debug.LastIndent = indent;
+        }
+
+        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
+            {
+                string amount = ((int)Amount).Signed();
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
+                return new(Verb, Effect);
+            }
+            return base.GetGeneralDescriptionElement(Subject);
         }
     }
 }

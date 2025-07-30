@@ -201,13 +201,13 @@ namespace XRL.World.Parts
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
+            Registrar.Register(BeforeDescribeModificationEvent<ModNaturalEquipment<T>>.ID, EventOrder.EXTREMELY_EARLY);
             Registrar.Register(DescribeModificationEvent<ModNaturalEquipment<T>>.ID, EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
         {
-            return base.WantEvent(ID, cascade)
-                || ID == BeforeDescribeModificationEvent<ModNaturalEquipment<T>>.ID;
+            return base.WantEvent(ID, cascade);
         }
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
@@ -286,10 +286,6 @@ namespace XRL.World.Parts
                 {
                     E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
                 }
-            }
-            if (E.WeaponDescriptions.IsNullOrEmpty() && E.GeneralDescriptions.IsNullOrEmpty())
-            {
-                E.AddWeaponElement("gain", "some manner of adjustments");
             }
             return base.HandleEvent(E);
         }

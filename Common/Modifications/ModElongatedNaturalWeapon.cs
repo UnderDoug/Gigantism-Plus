@@ -48,27 +48,11 @@ namespace XRL.World.Parts
             AddDetailColorAdjustment("z", true);
         }
 
-        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
+        public override bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
         {
-            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            if (EnablePrereleaseContent && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
-                E.BeforeEvent.ClearDescriptionElements();
                 string scalingStat = ElongatedPaws.SCALE_STAT;
-                int dieSize = GetDamageDieSize();
-                int damageBonus = GetDamageBonus();
-
-                if (E.Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.Stat == scalingStat)
-                {
-                    E.AddWeaponElement("get", $"bonus penetration from {scalingStat}");
-                }
-                if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
-                {
-                    E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
-                }
-                if (damageBonus != 0)
-                {
-                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
-                }
                 if (E.WeaponDescriptions.IsNullOrEmpty())
                 {
                     E.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's {scalingStat} Modifier");
@@ -85,5 +69,43 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-    } //!-- public class ModElongatedNaturalWeapon : ModNaturalWeaponBase<ElongatedPaws>
+        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
+        {
+            if (!EnablePrereleaseContent && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            {
+                string scalingStat = ElongatedPaws.SCALE_STAT;
+                BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> D = E.BeforeEvent;
+                D.ClearDescriptionElements();
+                int dieSize = GetDamageDieSize();
+                int damageBonus = GetDamageBonus();
+
+                if (E.Object.TryGetPart(out MeleeWeapon meleeWeapon) && meleeWeapon.Stat == scalingStat)
+                {
+                    D.AddWeaponElement("get", $"bonus penetration from {scalingStat}");
+                }
+                if (dieSize > 0 && (!AssigningPart.HasGigantism || !AssigningPart.HasBurrowing))
+                {
+                    D.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
+                }
+                if (damageBonus != 0)
+                {
+                    D.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                }
+                if (E.BeforeEvent.WeaponDescriptions.IsNullOrEmpty())
+                {
+                    D.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's {scalingStat} Modifier");
+                }
+                else
+                {
+                    D.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's {scalingStat} Modifier");
+                }
+                if (AssigningPart.HasGigantism || AssigningPart.HasBurrowing)
+                {
+                    D.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
+                }
+            }
+            return base.HandleEvent(E);
+        }
+
+    }
 }

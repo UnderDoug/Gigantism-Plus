@@ -82,10 +82,12 @@ namespace XRL.World.Parts.Mutation
 
                 PartAdjustments = new(),
 
+                /*
                 AddedParts = new()
                 {
                     nameof(DiggingTool),
                 },
+                */
 
                 AddedStringProps = new()
                 {
@@ -93,6 +95,12 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
                 },
             };
+            if (!EnablePrereleaseContent)
+            {
+                burrowingClawsMod.AddedParts ??= new();
+                burrowingClawsMod.AddedParts.Add(nameof(DiggingTool));
+            }
+
             burrowingClawsMod.AddSkillAdjustment("ShortBlades", true);
 
             burrowingClawsMod.AddNounAdjustment(true);
@@ -101,6 +109,25 @@ namespace XRL.World.Parts.Mutation
             burrowingClawsMod.AddColorStringAdjustment("&w", true);
             burrowingClawsMod.AddTileColorAdjustment("&w", true);
             burrowingClawsMod.AddDetailColorAdjustment("W", true);
+
+            if (EnablePrereleaseContent)
+            {
+                burrowingClawsMod.AddAdjustment(new AddPartAdjustment<DiggingTool>(), false);
+
+                DiminishingReturns diminishingReturns = new("increases to damage die size")
+                {
+                    AllConditions = new()
+                    {
+                        new GameObjectWielderHasPart<GigantismPlus>(),
+                        new NotAnyConditions<GameObject>()
+                        {
+                            new GameObjectWielderHasPart<ElongatedPaws>(),
+                            new GameObjectWielderHasPart<UD_ManagedCrystallinity>(),
+                        },
+                    }
+                };
+                burrowingClawsMod.AddAdjustment(diminishingReturns, true);
+            }
             return burrowingClawsMod;
         }
 
@@ -217,11 +244,16 @@ namespace XRL.World.Parts.Mutation
             NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
             NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
 
-            NaturalEquipmentMod.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level));
+            if (EnablePrereleaseContent)
+            {
+                NaturalEquipmentMod.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level));
+                NaturalEquipmentMod.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level));
+                NaturalEquipmentMod.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level));
+                NaturalEquipmentMod.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level));
+                NaturalEquipmentMod.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level));
+
+                NaturalEquipmentMod.AddAdjustment(new AddBurrowingClawsProperties(GetWallBonusPenetration(), GetWallBonusPercentage()), true);
+            }
 
             NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 

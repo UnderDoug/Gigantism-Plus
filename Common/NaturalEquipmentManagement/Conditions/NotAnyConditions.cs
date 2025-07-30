@@ -19,16 +19,25 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(T Subject)
         {
-            if (!Results(Subject).IsNullOrEmpty())
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"* {nameof(NotAnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+
+            List<bool> results = new(Results(Subject));
+            if (!results.IsNullOrEmpty())
             {
+                Debug.Entry(4, $"x {nameof(NotAnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject) *//", Indent: indent + 1, Toggle: true);
+                Debug.LastIndent = indent;
                 return base.NotCheck(Subject);
             }
+            Debug.Entry(4, $"x {nameof(NotAnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject) *//", Indent: indent + 1, Toggle: true);
+            Debug.LastIndent = indent;
             return !FalseIfSubjectNull;
         }
 
         public override bool NotCheck(T Subject)
         {
-            if (!Results(Subject).IsNullOrEmpty())
+            List<bool> results = new(Results(Subject));
+            if (results.IsNullOrEmpty())
             {
                 return base.Check(Subject);
             }

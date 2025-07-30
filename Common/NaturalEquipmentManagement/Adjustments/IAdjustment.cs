@@ -138,6 +138,10 @@ namespace HNPS_GigantismPlus
         {
             string appliedString = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
             string addToString = !Short ? AddToString() : null;
+            if (!addToString.IsNullOrEmpty())
+            {
+                addToString = ": " + addToString;
+            }
             return $"{appliedString}{Source.Name}.{GetType().Name}{addToString}";
         }
 
@@ -167,7 +171,7 @@ namespace HNPS_GigantismPlus
             string output = null;
             if (!outputList.IsNullOrEmpty())
             {
-                output = ": " + outputList.Join(", ");
+                output = outputList.Join(", ");
             } 
             return output;
         }

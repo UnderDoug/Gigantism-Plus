@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using XRL.Collections;
 using XRL.World;
 
+using static HNPS_GigantismPlus.Const;
+
 namespace HNPS_GigantismPlus
 {
     [Serializable]
@@ -271,13 +273,22 @@ namespace HNPS_GigantismPlus
         /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.</returns>
         public IEnumerable<bool> Results(T Subject)
         {
-            if (!Items.IsNullOrEmpty())
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"* {nameof(ICondition<T>)}.{nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+            if (!this.IsNullOrEmpty())
             {
-                foreach (ICondition<T> condition in Items)
+                foreach (ICondition<T> condition in this)
                 {
-                    yield return condition.Check(Subject);
+                    Debug.LoopItem(4, $"{nameof(condition)}: {condition?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: true);
+                    if (condition != null)
+                    {
+                        Debug.LastIndent = indent;
+                        yield return condition.Check(Subject);
+                    }
                 }
             }
+            Debug.Entry(4, $"x {nameof(ICondition<T>)}.{nameof(Results)}({typeof(T).Name} Subject) *//", Indent: indent + 1, Toggle: true);
+            Debug.LastIndent = indent;
             yield break;
         }
 
@@ -286,11 +297,14 @@ namespace HNPS_GigantismPlus
         /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.</returns>
         public IEnumerable<bool> NotResults(T Subject)
         {
-            if (!Items.IsNullOrEmpty())
+            if (!this.IsNullOrEmpty())
             {
-                foreach (ICondition<T> condition in Items)
+                foreach (ICondition<T> condition in this)
                 {
-                    yield return condition.NotCheck(Subject);
+                    if (condition != null)
+                    {
+                        yield return condition.NotCheck(Subject);
+                    }
                 }
             }
             yield break;

@@ -67,6 +67,13 @@ namespace HNPS_GigantismPlus
             return PartParameter != null;
         }
 
+        public override bool SameAs(IAdjustment OtherAdjustment)
+        {
+            return OtherAdjustment is AdjustArbitraryPart<T> aAP 
+                && aAP.Parameter == Parameter
+                && base.SameAs(OtherAdjustment);
+        }
+
         public override bool Check(GameObject Subject)
         {
             return TryGetPartParameter(Subject, out _) 

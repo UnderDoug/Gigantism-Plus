@@ -190,7 +190,7 @@ namespace HNPS_GigantismPlus
                 }
                 else if (typeof(T).InheritsFrom(typeof(ModNaturalEquipmentBase)))
                 {
-                    SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
+                    SB.Append($"{Object.Does("gain")} some manner of adjustments");
                 }
                 else
                 {

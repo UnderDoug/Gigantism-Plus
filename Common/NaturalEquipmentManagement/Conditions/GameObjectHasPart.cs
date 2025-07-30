@@ -30,9 +30,9 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject GameObject)
         {
-            return (GameObject == null && !FalseIfSubjectNull)
-                || Part.IsNullOrEmpty() 
-                || GameObject.HasPart(Part);
+            return base.Check(GameObject)
+                && Part.IsNullOrEmpty() 
+                || (GameObject != null && GameObject.HasPart(Part));
         }
     }
 }

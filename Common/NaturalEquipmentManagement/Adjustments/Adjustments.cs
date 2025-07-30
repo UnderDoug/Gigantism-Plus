@@ -286,7 +286,7 @@ namespace HNPS_GigantismPlus
         /// <returns>An <see cref="IEnumerable{IAdjustment}" /> that contains each of the stored <see cref="IAdjustment" /> that have their <see cref="IAdjustment.Applied" /> member set to  <see langword="true" />.</returns>
         public IEnumerable<IAdjustment> GetApplied()
         {
-            if (!Items.IsNullOrEmpty())
+            if (!this.IsNullOrEmpty())
             {
                 foreach (IAdjustment adjustment in this)
                 {
@@ -304,7 +304,7 @@ namespace HNPS_GigantismPlus
         /// <returns>An <see cref="IEnumerable{IAdjustment}" /> that contains each of the stored <see cref="IAdjustment" /> that have their <see cref="IAdjustment.Applied" /> member set to  <see langword="false" />.</returns>
         public IEnumerable<IAdjustment> GetUnapplied()
         {
-            if (!Items.IsNullOrEmpty())
+            if (!this.IsNullOrEmpty())
             {
                 foreach (IAdjustment adjustment in this)
                 {
@@ -320,7 +320,7 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject Subject)
         {
             bool anyCheckPasses = false;
-            if (!Items.IsNullOrEmpty())
+            if (!this.IsNullOrEmpty())
             {
                 foreach (bool result in Checks(Subject))
                 {

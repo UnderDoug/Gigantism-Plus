@@ -37,9 +37,12 @@ namespace HNPS_GigantismPlus
             Prioritize = false;
         }
 
-        public override string AddToString()
+        public override List<string> AddToString()
         {
-            return $"{typeof(T).Name}";
+            return new(base.AddToString())
+            {
+                typeof(T).Name
+            };
         }
 
         public override bool Check(GameObject Subject)

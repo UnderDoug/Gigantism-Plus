@@ -2665,5 +2665,10 @@ namespace HNPS_GigantismPlus
             List<Type> inheritedTypes = new(T.YieldInheritedTypes());
             return (IncludeSelf && T == Type) || inheritedTypes.Contains(Type);
         }
+
+        public static GameObject Wielder(this GameObject NaturalEquipment)
+        {
+            return NaturalEquipment?.GetPart<NaturalEquipmentOperator>()?.Manager?.ParentObject;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL.World;
 
 namespace HNPS_GigantismPlus
@@ -14,6 +15,14 @@ namespace HNPS_GigantismPlus
         public GameObjectHasPart(GameObjectHasPart<T> Source)
             : base(Source)
         {
+        }
+
+        public override List<string> AddToString()
+        {
+            return new(base.AddToString())
+            {
+                typeof(T).Name
+            };
         }
 
         public override bool Check(GameObject GameObject)

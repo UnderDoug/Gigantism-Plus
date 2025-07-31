@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL.World;
+
+using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -26,6 +29,14 @@ namespace HNPS_GigantismPlus
             : base(Source)
         {
             Part = Source.Part;
+        }
+
+        public override List<string> AddToString()
+        {
+            return new(base.AddToString())
+            {
+                Part ?? NULL
+            };
         }
 
         public override bool Check(GameObject GameObject)

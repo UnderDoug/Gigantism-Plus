@@ -243,24 +243,28 @@ namespace HNPS_GigantismPlus
             CopyTo(Array, 0);
         }
 
-        /// <summary>Performs the specified action on each element of the Conditions <see cref="List{ICondition{T}}" />.</summary>
-        /// <param name="Action">The <see cref="T:System.Action`1" /> <see langword="delegate" /> to perform on each element of the Conditions <see cref="List{ICondition{T}}" />.</param>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="Action" /> is <see langword="null" />.</exception>
-        /// <exception cref="T:System.InvalidOperationException">An element in the collection has been modified.</exception>
-        public void ForEach(Action<ICondition<T>> Action)
+        /// <summary>Performs the specified action on each element of the collection allowing for the inclusion of a <paramref name="Subject"/> for each <see cref="ICondition{T}" /> to interact with.</summary>
+        /// <param name="Action">The <see cref="Action{ICondition{T},T}" /> <see langword="delegate" /> to perform on each element of the Conditions <see cref="List{ICondition{T}}" />.</param>
+        /// <param name="Subject">A <see cref="T" /> on which each <see cref="ICondition{T}" /> can interact with while performing the <paramref name="Action"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="Action" /> is <see langword="null" />.</exception>
+        /// <exception cref="InvalidOperationException">An element in the collection has been modified.</exception>
+        public void ForEach(Action<ICondition<T>, T> Action, T Subject = null)
         {
             if (Action == null)
             {
                 throw new ArgumentNullException($"{nameof(Action)} is null");
             }
             int version = Version;
-            for (int i = 0; i < Size; i++)
+            foreach (ICondition<T> condition in this)
             {
                 if (version != Version)
                 {
                     break;
                 }
-                Action(Items[i]);
+                if (condition != null)
+                {
+                    Action(condition, Subject);
+                }
             }
             if (version != Version)
             {
@@ -268,18 +272,46 @@ namespace HNPS_GigantismPlus
             }
         }
 
-        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.</summary>
+        /// <summary>Performs the specified action on each element of the collection.</summary>
+        /// <param name="Action">The <see cref="Action{ICondition{T}}" /> <see langword="delegate" /> to perform on each element of the collection.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="Action" /> is <see langword="null" />.</exception>
+        /// <exception cref="InvalidOperationException">An element in the collection has been modified.</exception>
+        public void ForEach(Action<ICondition<T>> Action)
+        {
+            if (Action == null)
+            {
+                throw new ArgumentNullException($"{nameof(Action)} is null");
+            }
+            int version = Version;
+            foreach (ICondition<T> condition in this)
+            {
+                if (version != Version)
+                {
+                    break;
+                }
+                if (condition != null)
+                {
+                    Action(condition);
+                }
+            }
+            if (version != Version)
+            {
+                throw new InvalidOperationException($"An element in the collection has been modified.");
+            }
+        }
+
+        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the collection.</summary>
         /// <param name="Subject">An instance of the <see langword="class" /> on which <see cref="ICondition{T}.Check(T)" /> is performed.</param>
-        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.</returns>
+        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the collection.</returns>
         public IEnumerable<bool> Results(T Subject)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, $"* {nameof(ICondition<T>)}.{nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+            Debug.Entry(4, $"> {nameof(IConditions<T>)}.{nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
                 foreach (ICondition<T> condition in this)
                 {
-                    Debug.LoopItem(4, $"{nameof(condition)}: {condition?.GetType()?.Name ?? NULL}", Indent: indent + 2, Toggle: true);
+                    Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
                     if (condition != null)
                     {
                         Debug.LastIndent = indent;
@@ -287,26 +319,30 @@ namespace HNPS_GigantismPlus
                     }
                 }
             }
-            Debug.Entry(4, $"x {nameof(ICondition<T>)}.{nameof(Results)}({typeof(T).Name} Subject) *//", Indent: indent + 1, Toggle: true);
             Debug.LastIndent = indent;
             yield break;
         }
 
-        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.</summary>
+        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the collection.</summary>
         /// <param name="Subject">An instance of the <see langword="class" /> on which <see cref="ICondition{T}.NotCheck(T)" /> is performed.</param>
-        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the Conditions <see cref="List{ICondition{T}}" />.</returns>
+        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the collection.</returns>
         public IEnumerable<bool> NotResults(T Subject)
         {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"> {nameof(IConditions<T>)}.{nameof(NotResults)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
                 foreach (ICondition<T> condition in this)
                 {
+                    Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
                     if (condition != null)
                     {
+                        Debug.LastIndent = indent;
                         yield return condition.NotCheck(Subject);
                     }
                 }
             }
+            Debug.LastIndent = indent;
             yield break;
         }
     }

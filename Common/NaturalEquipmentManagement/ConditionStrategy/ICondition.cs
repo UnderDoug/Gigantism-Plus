@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using XRL.Collections;
+
 using XRL.World;
 using XRL.World.Parts;
+
+using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -47,14 +50,38 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override string ToString()
+        {
+            return ToString(ShowResult: false, Subject: null, Short: false);
+        }
+
+        public string ToString(bool ShowResult = false, T Subject = null, bool Short = false)
+        {
+            string resultString = null;
+            if (ShowResult)
+            {
+                resultString = $"[{(Check(Subject) ? TICK : CROSS)}] ";
+            }
+            string addToString = !Short ? AddToString().Join("; ") : null;
+            if (!addToString.IsNullOrEmpty())
+            {
+                addToString = ": " + addToString;
+            }
+            return $"{resultString}{GetType().Name}{addToString}";
+        }
+
+        public virtual List<string> AddToString()
+        {
+            return new();
+        }
+
         /// <summary>Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the success or failure of that test.</summary>
         /// <remarks>By default, <see cref="Check(T)" /> will return <see langword="true" /> if the <paramref name="Subject"/> is <see langword="null" />.<br></br>This behaviour can be flipped by assigning <see langword="true" /> to the <see cref="FalseIfSubjectNull" /> field.</remarks>
         /// <param name="Subject">An instance of the <see langword="class" /> on which this check is performed.</param>
         /// <returns><see langword="true" /> if the check is successful or the <paramref name="Subject"/> is <see langword="null" /> and member <see cref="FalseIfSubjectNull" /> is <see langword="false" />;<br></br><see langword="false" />, otherwise.</returns>
         public virtual bool Check(T Subject)
         {
-            return (Subject == null && !FalseIfSubjectNull)
-                || true;
+            return (Subject == null && !FalseIfSubjectNull);
         }
 
         /// <summary>Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the inverted success or failure of that test.</summary>
@@ -63,8 +90,7 @@ namespace HNPS_GigantismPlus
         /// <returns><see langword="true" /> if <see cref="Check(T)" /> would fail unless the <paramref name="Subject"/> is <see langword="null" /> and member <see cref="FalseIfSubjectNull" /> is <see langword="false" />;<br></br><see langword="false" />, otherwise.</returns>
         public virtual bool NotCheck(T Subject)
         {
-            return (Subject == null && !FalseIfSubjectNull)
-                || !Check(Subject);
+            return (Subject == null && !FalseIfSubjectNull);
         }
 
         public virtual bool this[T Subject] => Check(Subject);

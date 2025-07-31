@@ -137,7 +137,7 @@ namespace HNPS_GigantismPlus
         public string ToString(bool ShowApplied, bool Short = false)
         {
             string appliedString = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
-            string addToString = !Short ? AddToString() : null;
+            string addToString = !Short ? AddToString().Join("; ") : null;
             if (!addToString.IsNullOrEmpty())
             {
                 addToString = ": " + addToString;
@@ -145,10 +145,10 @@ namespace HNPS_GigantismPlus
             return $"{appliedString}{Source.Name}.{GetType().Name}{addToString}";
         }
 
-        public virtual string AddToString()
+        public virtual List<string> AddToString()
         {
             List<string> outputList = new();
-            
+
             if (Value != null)
             {
                 string valueString = Value.Quote();
@@ -168,12 +168,8 @@ namespace HNPS_GigantismPlus
                 string stateString = Quote($"{state}");
                 outputList.Add(stateString);
             }
-            string output = null;
-            if (!outputList.IsNullOrEmpty())
-            {
-                output = outputList.Join(", ");
-            } 
-            return output;
+
+            return outputList;
         }
 
         public virtual bool CheckCondition(GameObject Subject)
@@ -327,16 +323,10 @@ namespace HNPS_GigantismPlus
 
             DescriptionElement descriptionElement = GetWeaponDescriptionElement(Subject);
 
-            int indent = Debug.LastIndent;
-            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
-            Debug.Entry(4, $"{GetType().Name}.{nameof(GetWeaponDescriptionElements)}: {elementString}", Indent: indent + 1, Toggle: true);
-
             if (descriptionElement != DescriptionElement.Empty)
             {
                 descriptionElements.Add(descriptionElement);
             }
-
-            Debug.LastIndent = indent;
             return descriptionElements;
         }
 
@@ -350,16 +340,10 @@ namespace HNPS_GigantismPlus
 
             DescriptionElement descriptionElement = GetGeneralDescriptionElement(Subject);
 
-            int indent = Debug.LastIndent;
-            string elementString = descriptionElement != DescriptionElement.Empty ? $"{descriptionElement}" : nameof(DescriptionElement.Empty);
-            Debug.Entry(4, $"{GetType().Name}.{nameof(GetGeneralDescriptionElement)}: {elementString}", Indent: indent + 1, Toggle: true);
-
             if (descriptionElement != DescriptionElement.Empty)
             {
                 descriptionElements.Add(descriptionElement);
             }
-
-            Debug.LastIndent = indent;
             return descriptionElements;
         }
 

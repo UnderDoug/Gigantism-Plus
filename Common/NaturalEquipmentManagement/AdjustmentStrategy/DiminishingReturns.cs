@@ -54,6 +54,14 @@ namespace HNPS_GigantismPlus
             this.Priority = Priority;
         }
 
+        public override List<string> AddToString()
+        {
+            return new(base.AddToString())
+            {
+                Affected.Quote(),
+            };
+        }
+
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
         {
             if (!Affected.IsNullOrEmpty())

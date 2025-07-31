@@ -32,7 +32,10 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject GameObject)
         {
-            return base.Check(GameObject?.GetPart<NaturalEquipmentOperator>()?.Wielder);
+            GameObject wielder = GameObject?.Wielder();
+            Debug.Entry(4, $"{nameof(wielder)} is {wielder?.DebugName ?? Const.NULL}", Indent: Debug.LastIndent + 1, Toggle: true);
+            Debug.LastIndent--;
+            return base.Check(wielder);
         }
 
         public static implicit operator GameObjectWielderHasPart(GameObjectHolderHasPart Condition)

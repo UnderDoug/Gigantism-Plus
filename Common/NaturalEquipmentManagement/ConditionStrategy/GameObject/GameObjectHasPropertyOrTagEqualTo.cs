@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL.World;
 
 namespace HNPS_GigantismPlus
@@ -27,6 +28,14 @@ namespace HNPS_GigantismPlus
             : base(Source)
         {
             this.Value = Value;
+        }
+
+        public override List<string> AddToString()
+        {
+            return new(base.AddToString())
+            {
+                $"{nameof(Value)}, {Value}"
+            };
         }
 
         public override bool Check(GameObject GameObject)

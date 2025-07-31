@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL.World;
+
+using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus
 {
@@ -25,6 +28,14 @@ namespace HNPS_GigantismPlus
         public GameObjectHasPropertyOrTag(GameObjectHasPropertyOrTagEqualTo Source)
             : this(Source.PropertyOrTag)
         {
+        }
+
+        public override List<string> AddToString()
+        {
+            return new(base.AddToString())
+            {
+                PropertyOrTag ?? NULL
+            };
         }
 
         public override bool Check(GameObject GameObject)

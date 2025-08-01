@@ -159,24 +159,24 @@ namespace HNPS_GigantismPlus
             SB.Append(objectNoun).Append(" "); // "fist "
             // "Gigantic: This fist "
 
-            bool capitalizeSecondList = false;
+            bool fisrtList = true;
             if (weaponDescriptions.Count != 0)
             {
                 List<string> processedWeaponDescription = new();
                 foreach (DescriptionElement weaponEnrty in weaponDescriptions)
                 {
-                    processedWeaponDescription.Add(weaponEnrty.GetProcessedItem(second: false, weaponDescriptions, Object));
+                    processedWeaponDescription.Add(weaponEnrty.GetProcessedItem(First: fisrtList, weaponDescriptions, Object));
                 }
                 if (!processedWeaponDescription.IsNullOrEmpty())
                 {
                     SB.Append(Utils.MakeAndList(processedWeaponDescription, IgnoreCommas: true) + ". ");
-                    capitalizeSecondList = true;
+                    fisrtList = false;
                 }
             }
             List<string> processedGeneralDescription = new();
             foreach (DescriptionElement entry in generalDescriptions)
             {
-                processedGeneralDescription.Add(entry.GetProcessedItem(second: capitalizeSecondList, generalDescriptions, Object));
+                processedGeneralDescription.Add(entry.GetProcessedItem(First: fisrtList, generalDescriptions, Object));
             }
             if (!processedGeneralDescription.IsNullOrEmpty())
             {

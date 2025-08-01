@@ -727,14 +727,14 @@ namespace HNPS_GigantismPlus
             return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
         }
 
-        public static string GetProcessedItem(this DescriptionElement DescriptionElement, bool second, List<DescriptionElement> DescriptionElements, GameObject obj)
+        public static string GetProcessedItem(this DescriptionElement DescriptionElement, bool First, List<DescriptionElement> DescriptionElements, GameObject obj)
         {
             string verb = DescriptionElement.Verb;
             string effect = DescriptionElement.Effect;
 
             if (verb == "")
             {
-                if (second && DescriptionElement.Equals(DescriptionElements[0]))
+                if (!First && DescriptionElement.Equals(DescriptionElements[0]))
                 {
                     return obj.It + " " + effect;
                 }
@@ -742,7 +742,7 @@ namespace HNPS_GigantismPlus
             }
             if (verb == null)
             {
-                if (second && DescriptionElement.Equals(DescriptionElements[0]))
+                if (!First && DescriptionElement.Equals(DescriptionElements[0]))
                 {
                     return obj.Itis + " " + effect;
                 }
@@ -764,7 +764,7 @@ namespace HNPS_GigantismPlus
                 }
                 return obj.GetVerb("are", PrependSpace: false) + " " + effect;
             }
-            if (second && DescriptionElement.Equals(DescriptionElements[0]))
+            if (!First && DescriptionElement.Equals(DescriptionElements[0]))
             {
                 return obj.It + obj.GetVerb(verb) + " " + effect;
             }

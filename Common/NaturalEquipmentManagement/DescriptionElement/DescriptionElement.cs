@@ -10,8 +10,7 @@ using static HNPS_GigantismPlus.Options;
 
 namespace HNPS_GigantismPlus
 {
-    [Serializable]
-    public struct DescriptionElement : IComposite
+    public partial struct DescriptionElement
     {
         private static bool doDebug => getClassDoDebug(nameof(DescriptionElement));
 
@@ -68,7 +67,7 @@ namespace HNPS_GigantismPlus
 
         public readonly List<string> ToList()
         {
-            return new List<string>()
+            return new()
             {
                 Verb,
                 Effect,
@@ -77,60 +76,54 @@ namespace HNPS_GigantismPlus
 
         public override readonly string ToString()
         {
+            string verb;
             if (Verb == "")
             {
-                return "It " + Effect;
+                verb = "It";
             }
-            if (Verb == null)
+            else if (Verb == null)
             {
-                return "It is " + Effect;
+                verb = "It is";
             }
-            return Grammar.ThirdPerson(Verb, PrependSpace: false) + " " + Effect;
+            else
+            {
+                verb = Grammar.ThirdPerson(Verb, PrependSpace: false);
+            }
+            return $"{verb} {Effect}";
         }
 
         public readonly string ToString(GameObject Object)
         {
+            if (Object == null)
+            {
+                return ToString();
+            }
+            string verb;
             if (Verb == "")
             {
-                return Object.It + " " + Effect;
+                verb = Object.It;
             }
-            if (Verb == null)
+            else if (Verb == null)
             {
-                return Object.Itis + " " + Effect;
+                verb = Object.Itis;
             }
-            return Object.GetVerb(Verb, PrependSpace: false) + " " + Effect;
+            else
+            {
+                verb = Object.GetVerb(Verb, PrependSpace: false);
+            }
+            return $"{verb} {Effect}";
         }
 
-        public void Write(SerializationWriter Writer)
-        {
-            Writer.WriteOptimized(Priority);
-            Writer.WriteOptimized(Verb);
-            Writer.WriteOptimized(Effect);
-        }
-        public void Read(SerializationReader Reader)
-        {
-            Priority = Reader.ReadOptimizedInt32();
-            Verb = Reader.ReadOptimizedString();
-            Effect = Reader.ReadOptimizedString();
-        }
+        public static implicit operator int(DescriptionElement operand) => operand.Priority;
+        public static implicit operator uint(DescriptionElement operand) => (uint)operand.Priority;
+        public static implicit operator double(DescriptionElement operand) => operand.Priority;
+        public static implicit operator float(DescriptionElement operand) => operand.Priority;
+        public static implicit operator long(DescriptionElement operand) => operand.Priority;
 
-        public static bool operator ==(DescriptionElement DE1,  DescriptionElement DE2)
-        {
-            return DE1.Priority == DE2.Priority && DE1.Verb == DE2.Verb && DE1.Effect == DE2.Effect;
-        }
-        public static bool operator !=(DescriptionElement DE1, DescriptionElement DE2) => !(DE1 == DE2);
-        
-        public override readonly bool Equals(object obj)
-        {
-            return obj != null 
-                && GetType() == obj.GetType() 
-                && obj is DescriptionElement DE2 
-                && this == DE2;
-        }
+        public static implicit operator string(DescriptionElement operand) => operand.ToString();
+        public static implicit operator DescriptionElement(string operand) => new(null, operand);
 
-        public override readonly int GetHashCode()
-        {
-            return Priority.GetHashCode() ^ Verb.GetHashCode() ^ Effect.GetHashCode();
-        }
+        public static implicit operator List<string>(DescriptionElement operand) => new() { operand.Verb, operand.Effect };
+        public static implicit operator DescriptionElement(List<string> operand) => new(operand);
     }
 }

@@ -354,14 +354,14 @@ namespace XRL.World.Parts
         private GameObject _wielder = null;
         public GameObject Wielder
         {
-            get => _wielder ??= Operator?.Manager.ParentObject;
+            get => _wielder ??= GetWielder();
             set => _wielder = value;
         }
 
         private NaturalEquipmentOperator _operator = null;
         public NaturalEquipmentOperator Operator
         {
-            get => _operator ??= ParentObject?.GetPart<NaturalEquipmentOperator>();
+            get => _operator ??= GetOperator();
             set => _operator = value;
         }
 
@@ -457,6 +457,16 @@ namespace XRL.World.Parts
         {
             return Object.HasPart<Physics>() 
                 && Object.IsNaturalEquipment();
+        }
+
+        public GameObject GetWielder()
+        {
+            return ParentObject?.Wielder();
+        }
+
+        public NaturalEquipmentOperator GetOperator()
+        {
+            return ParentObject?.NaturalEquipmentOperator();
         }
 
         public virtual Guid AddAdjustment(Type Target, string Field, object Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)

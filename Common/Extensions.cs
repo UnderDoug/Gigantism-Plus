@@ -2666,69 +2666,18 @@ namespace HNPS_GigantismPlus
             return (IncludeSelf && T == Type) || inheritedTypes.Contains(Type);
         }
 
-        public static GameObject Wielder(this GameObject NaturalEquipment)
+        public static NaturalEquipmentOperator NaturalEquipmentOperator(this GameObject NaturalEquipment)
         {
-            return NaturalEquipment?.GetPart<NaturalEquipmentOperator>()?.Manager?.ParentObject;
+            return NaturalEquipment?.GetPart<NaturalEquipmentOperator>();
         }
 
-        public static IEnumerable<DescriptionElement> GetPrioritizedDescriptionElements(this IEnumerable<DescriptionElement> Source)
+        public static GameObject Wielder(this NaturalEquipmentOperator NaturalEquipmentOperator)
         {
-            if (!Source.IsNullOrEmpty())
-            {
-                SortedDictionary<int, DescriptionElement> sortedList = new();
-                int priority;
-                int plusOffset = 1;
-                int minusOffset = 1;
-                int attempts = 0;
-                int maxAttempts = 100;
-                foreach (DescriptionElement element in Source)
-                {
-                    priority = element.Priority;
-                    if (priority == 0 || sortedList.Keys.Contains(priority))
-                    {
-                        if (priority < 0)
-                        {
-                            priority -= minusOffset++;
-                        }
-                        else
-                        {
-                            priority += plusOffset++;
-                        }
-                    }
-                    while (sortedList.Keys.Contains(priority) && attempts < maxAttempts)
-                    {
-                        attempts++;
-                        if (priority < 0)
-                        {
-                            priority -= minusOffset++;
-                        }
-                        else
-                        {
-                            priority += plusOffset++;
-                        }
-                    }
-                    if (!sortedList.Keys.Contains(priority))
-                    {
-                        sortedList.Add(priority, element);
-                    }
-                    else
-                    {
-                        Debug.Warn(2,
-                            ClassName: nameof(Extensions),
-                            MethodName: nameof(GetPrioritizedDescriptionElements),
-                            Issue: $"failed to find empty position for element {element} in {nameof(sortedList)}",
-                            Indent: Debug.LastIndent);
-                    }
-                }
-                if (!sortedList.IsNullOrEmpty())
-                {
-                    foreach ((int _, DescriptionElement element) in sortedList)
-                    {
-                        yield return element;
-                    }
-                }
-            }
-            yield break;
+            return NaturalEquipmentOperator?.Manager?.ParentObject;
+        }
+        public static GameObject Wielder(this GameObject NaturalEquipment)
+        {
+            return NaturalEquipment?.NaturalEquipmentOperator()?.Wielder();
         }
     }
 }

@@ -8,7 +8,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class DiminishingReturns : IAdjustment
+    public class DiminishingReturns : ArbitraryDescription
     {
         public string Affected;
 
@@ -17,11 +17,18 @@ namespace HNPS_GigantismPlus
         {
             Prioritize = false;
             Affected = null;
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE;
         }
         public DiminishingReturns(string Affected)
             : this()
         {
             this.Affected = Affected;
+        }
+        public DiminishingReturns(int DescriptionOrder, string Affected)
+            : this()
+        {
+            this.Affected = Affected;
+            this.DescriptionOrder = DescriptionOrder;
         }
         public DiminishingReturns(Type Source, string Affected)
             : this(Affected)
@@ -33,10 +40,16 @@ namespace HNPS_GigantismPlus
         {
             this.Priority = Priority;
         }
+        public DiminishingReturns(Type Source, int Priority, int DescriptionOrder, string Affected)
+            : this(Source, Priority, Affected)
+        {
+            this.DescriptionOrder = DescriptionOrder;
+        }
         public DiminishingReturns(DiminishingReturns SourceAdjustment)
             : base(SourceAdjustment)
         {
             Prioritize = false;
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE;
         }
         public DiminishingReturns(string Affected, DiminishingReturns SourceAdjustment)
             : this(SourceAdjustment)
@@ -62,12 +75,24 @@ namespace HNPS_GigantismPlus
             };
         }
 
+        public override bool Check(GameObject Subject)
+        {
+            return !Affected.IsNullOrEmpty() && base.Check(Subject);
+        }
+        public override bool Apply(GameObject Subject)
+        {
+            if (base.Apply(Subject))
+            {
+                Effect = $"suffering diminishing returns on {Affected}";
+                GeneralDescription = new(DescriptionElement.ORDER_ADJUST_VERY_LATE, null, Effect);
+            }
+            return IsApplied();
+        }
+
         public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
         {
             if (!Affected.IsNullOrEmpty())
             {
-                Effect = $"suffering diminishing returns on {Affected}";
-                return new(null, Effect);
             }
             return base.GetGeneralDescriptionElement(Subject);
         }

@@ -46,6 +46,46 @@ namespace XRL.World.Parts
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);
+
+            if (EnablePrereleaseContent)
+            {
+                AnyConditions<GameObject> arbitraryAnyConditions = new()
+            {
+                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustDamageDieCount>(),
+                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustDamageDieSize>(),
+                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustDamageBonus>(),
+                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustHitBonus>(),
+                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustPenBonus>(),
+            };
+
+                ArbitraryDescription arbitraryCumulativeMeleeDescription = new(
+                    GetType(),
+                    DescriptionElement.Empty,
+                    new("", $"subject.Possessive bonus damage scale by half =subject.Possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier"))
+                {
+                    Condition = arbitraryAnyConditions
+                };
+                AddAdjustment(arbitraryCumulativeMeleeDescription, true);
+
+                ArbitraryDescription arbitraryNoCumulativeMeleeDescription = new(
+                    GetType(),
+                    DescriptionElement.Empty,
+                    new("have", $"subject.Possessive bonus damage scale by half =subject.Possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier"))
+                {
+                    Condition = new NotAnyConditions<GameObject>(arbitraryAnyConditions),
+                };
+                AddAdjustment(arbitraryNoCumulativeMeleeDescription, true);
+
+                DiminishingReturns diminishingReturns = new("increases to damage die size")
+                {
+                    AnyConditions = new()
+                    {
+                        new GameObjectWielderHasPart<GigantismPlus>(),
+                        new GameObjectWielderHasPart<UD_ManagedBurrowingClaws>(),
+                    }
+                };
+                AddAdjustment(diminishingReturns, true);
+            }
         }
 
         public override bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)

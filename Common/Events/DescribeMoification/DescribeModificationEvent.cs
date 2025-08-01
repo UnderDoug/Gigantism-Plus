@@ -148,6 +148,9 @@ namespace HNPS_GigantismPlus
             weaponDescriptions ??= AddElements(weaponDescriptions, WeaponDescriptions);
             generalDescriptions ??= AddElements(generalDescriptions, GeneralDescriptions);
 
+            weaponDescriptions.Sort();
+            generalDescriptions.Sort();
+
             StringBuilder SB = Event.NewStringBuilder();
 
             string adjective = Grammar.MakeTitleCase(Adjective).Color('y');
@@ -159,43 +162,58 @@ namespace HNPS_GigantismPlus
             SB.Append(objectNoun).Append(" "); // "fist "
             // "Gigantic: This fist "
 
-            bool fisrtList = true;
-            if (weaponDescriptions.Count != 0)
+            if (weaponDescriptions.IsNullOrEmpty() && generalDescriptions.IsNullOrEmpty())
             {
+                generalDescriptions ??= new();
+                if (typeof(T).InheritsFrom(typeof(ModGigantic)))
+                {
+                    generalDescriptions.Add(new(null, "really big. Like, massive! Yuge!"));
+                    // SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
+                }
+                else if (typeof(T).InheritsFrom(typeof(ModNaturalEquipmentBase)))
+                {
+                    generalDescriptions.Add(new("gain", "some manner of adjustments."));
+                    // SB.Append($"{Object.Does("gain")} some manner of adjustments");
+                }
+                else
+                {
+                    generalDescriptions.Add(new(null, "mysterious. Like, strange! Indescribable!"));
+                    // SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
+                }
+            }
+
+            bool isFirstList = true;
+            if (!weaponDescriptions.IsNullOrEmpty())
+            {
+                SB.AppendDescription(Object, weaponDescriptions, isFirstList);
+                isFirstList = false;
+                /*
                 List<string> processedWeaponDescription = new();
                 foreach (DescriptionElement weaponEnrty in weaponDescriptions)
                 {
-                    processedWeaponDescription.Add(weaponEnrty.GetProcessedItem(First: fisrtList, weaponDescriptions, Object));
+                    processedWeaponDescription.Add(weaponEnrty.GetProcessedItem(IsFirstSentence: isFirstList, weaponDescriptions, Object));
                 }
                 if (!processedWeaponDescription.IsNullOrEmpty())
                 {
                     SB.Append(Utils.MakeAndList(processedWeaponDescription, IgnoreCommas: true) + ". ");
-                    fisrtList = false;
+                    isFirstList = false;
                 }
+                */
             }
-            List<string> processedGeneralDescription = new();
-            foreach (DescriptionElement entry in generalDescriptions)
+            if (!generalDescriptions.IsNullOrEmpty())
             {
-                processedGeneralDescription.Add(entry.GetProcessedItem(First: fisrtList, generalDescriptions, Object));
-            }
-            if (!processedGeneralDescription.IsNullOrEmpty())
-            {
-                SB.Append(Utils.MakeAndList(processedGeneralDescription, IgnoreCommas: true) + ".");
-            }
-            else if (weaponDescriptions.Count == 0)
-            {
-                if (typeof(T).InheritsFrom(typeof(ModGigantic)))
+                SB.AppendDescription(Object, generalDescriptions, isFirstList);
+                /*
+                List<string> processedGeneralDescription = new();
+                foreach (DescriptionElement entry in generalDescriptions)
                 {
-                    SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
+                    processedGeneralDescription.Add(entry.GetProcessedItem(IsFirstSentence: isFirstList, generalDescriptions, Object));
                 }
-                else if (typeof(T).InheritsFrom(typeof(ModNaturalEquipmentBase)))
+                if (!processedGeneralDescription.IsNullOrEmpty())
                 {
-                    SB.Append($"{Object.Does("gain")} some manner of adjustments");
+                    SB.Append(Utils.MakeAndList(processedGeneralDescription, IgnoreCommas: true) + ".");
                 }
-                else
-                {
-                    SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
-                }
+                */
             }
 
             Reset();

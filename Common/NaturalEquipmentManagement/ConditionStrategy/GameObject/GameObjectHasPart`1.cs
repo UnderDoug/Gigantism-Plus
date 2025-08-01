@@ -6,7 +6,7 @@ namespace HNPS_GigantismPlus
 {
     [Serializable]
     public class GameObjectHasPart<T> : ICondition<GameObject>
-        where T : IPart, new()
+        where T : IPart
     {
         public GameObjectHasPart()
             : base()

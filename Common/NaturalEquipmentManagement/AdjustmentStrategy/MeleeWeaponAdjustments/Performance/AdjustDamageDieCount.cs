@@ -58,7 +58,7 @@ namespace HNPS_GigantismPlus
             {
                 string amount = ((int)Amount).Signed();
                 Effect = $"{amount} additional {AffectedParameter}";
-                return new(Verb, Effect);
+                return new(DescriptionElement.ORDER_ADJUST_EXTREMELY_EARLY + 1, Verb, Effect);
             }
             return base.GetWeaponDescriptionElement(Subject);
         }

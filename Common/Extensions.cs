@@ -688,26 +688,26 @@ namespace HNPS_GigantismPlus
 
         public static string GetProcessedItem(this List<string> item, bool second, List<List<string>> items, GameObject obj)
         {
-            if (item[0] == "")
+            if (item[0] == "") // verb
             {
                 if (second && item == items[0])
                 {
-                    return obj.It + " " + item[1];
+                    return obj.It + " " + item[1]; // it effect
                 }
                 return item[1];
             }
-            if (item[0] == null)
+            if (item[0] == null) // verb
             {
                 if (second && item == items[0])
                 {
-                    return obj.Itis + " " + item[1];
+                    return obj.Itis + " " + item[1]; // it is effect
                 }
                 if (item != items[0])
                 {
                     bool flag = true;
                     foreach (List<string> item2 in items)
                     {
-                        if (item2[0] != null)
+                        if (item2[0] != null) // verb
                         {
                             flag = false;
                             break;
@@ -715,60 +715,26 @@ namespace HNPS_GigantismPlus
                     }
                     if (flag)
                     {
-                        return item[1];
+                        return item[1]; // effect
                     }
                 }
-                return obj.GetVerb("are", PrependSpace: false) + " " + item[1];
+                return obj.Are() + " " + item[1]; // is effect
             }
             if (second && item == items[0])
             {
-                return obj.It + obj.GetVerb(item[0]) + " " + item[1];
+                return obj.It + obj.GetVerb(item[0]) + " " + item[1]; // it verbs effect
             }
-            return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1];
+            return obj.GetVerb(item[0], PrependSpace: false) + " " + item[1]; // verbs effect
         }
 
-        public static string GetProcessedItem(this DescriptionElement DescriptionElement, bool First, List<DescriptionElement> DescriptionElements, GameObject obj)
+        public static StringBuilder AppendDescription(this StringBuilder SB, GameObject Object, List<DescriptionElement> DescriptionElements, bool IsFirstSentence = false)
         {
-            string verb = DescriptionElement.Verb;
-            string effect = DescriptionElement.Effect;
-
-            if (verb == "")
+            string descriptionSentence = DescriptionElement.MakeAndList(DescriptionElements, Object, IsFirstSentence);
+            if (!descriptionSentence.IsNullOrEmpty())
             {
-                if (!First && DescriptionElement.Equals(DescriptionElements[0]))
-                {
-                    return obj.It + " " + effect;
-                }
-                return effect;
+                SB.Append(descriptionSentence);
             }
-            if (verb == null)
-            {
-                if (!First && DescriptionElement.Equals(DescriptionElements[0]))
-                {
-                    return obj.Itis + " " + effect;
-                }
-                if (!DescriptionElement.Equals(DescriptionElements[0]))
-                {
-                    bool flag = true;
-                    foreach (DescriptionElement descriptionElement in DescriptionElements)
-                    {
-                        if (descriptionElement.Verb != null)
-                        {
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag)
-                    {
-                        return effect;
-                    }
-                }
-                return obj.GetVerb("are", PrependSpace: false) + " " + effect;
-            }
-            if (!First && DescriptionElement.Equals(DescriptionElements[0]))
-            {
-                return obj.It + obj.GetVerb(verb) + " " + effect;
-            }
-            return obj.GetVerb(verb, PrependSpace: false) + " " + effect;
+            return SB;
         }
 
         public static string GetObjectNoun(this GameObject Object)
@@ -1709,7 +1675,12 @@ namespace HNPS_GigantismPlus
 
         public static string Quote(this string @string)
         {
-            return @string.IsNullOrEmpty() ? NULL : Utils.Quote($"{@string}");
+            return @string.IsNullOrEmpty() ? Utils.Quote(NULL) : Utils.Quote($"{@string}");
+        }
+
+        public static string Quote(this object @object)
+        {
+            return @object is string @string && !@string.IsNullOrEmpty() ? Utils.Quote($"{@string}") : Utils.Quote(NULL);
         }
 
         public static Dictionary<string,List<Cell>> GetHutRegion(this Zone Z, Rect2D R, bool Round = false)

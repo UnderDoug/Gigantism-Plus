@@ -119,37 +119,82 @@ namespace HNPS_GigantismPlus
         {
             return GeneralDescriptions = new();
         }
-        public static List<DescriptionElement> AddElement(List<DescriptionElement> Descriptions, string Verb, string Effect)
+        public static List<DescriptionElement> AddElement(List<DescriptionElement> Descriptions, int Priority, string Verb, string Effect)
         {
             Descriptions ??= new();
-            Descriptions.Add(new(Verb, Effect));
+            DescriptionElement descriptionElement = new(Priority, Verb, Effect);
+            if (!Descriptions.Contains(descriptionElement))
+            {
+                Descriptions.Add(descriptionElement);
+            }
             return Descriptions;
+        }
+        public static List<DescriptionElement> AddElement(List<DescriptionElement> Descriptions, int Priority, DescriptionElement Element)
+        {
+            Descriptions ??= new();
+            DescriptionElement descriptionElement = new(Priority, Element);
+            if (!Descriptions.Contains(descriptionElement))
+            {
+                Descriptions.Add(descriptionElement);
+            }
+            return Descriptions;
+        }
+        public static List<DescriptionElement> AddElement(List<DescriptionElement> Descriptions, DescriptionElement Element)
+        {
+            Descriptions ??= new();
+            if (!Descriptions.Contains(Element))
+            {
+                Descriptions.Add(Element);
+            }
+            return Descriptions;
+        }
+        public List<DescriptionElement> AddWeaponElement(int Priority, string Verb, string Effect)
+        {
+            return WeaponDescriptions = AddElement(WeaponDescriptions, Priority, Verb, Effect);
         }
         public List<DescriptionElement> AddWeaponElement(string Verb, string Effect)
         {
-            return WeaponDescriptions = AddElement(WeaponDescriptions, Verb, Effect);
+            return WeaponDescriptions = AddElement(WeaponDescriptions, 0, Verb, Effect);
+        }
+        public List<DescriptionElement> AddGeneralElement(int Priority, string Verb, string Effect)
+        {
+            return GeneralDescriptions = AddElement(GeneralDescriptions, Priority, Verb, Effect);
         }
         public List<DescriptionElement> AddGeneralElement(string Verb, string Effect)
         {
-            return GeneralDescriptions = AddElement(GeneralDescriptions, Verb, Effect);
+            return GeneralDescriptions = AddElement(GeneralDescriptions, 0, Verb, Effect);
+        }
+        public List<DescriptionElement> AddWeaponElement(int Priority, List<string> Entry)
+        {
+            return AddElement(WeaponDescriptions, Priority, Entry);
         }
         public List<DescriptionElement> AddWeaponElement(List<string> Entry)
         {
-            DescriptionElement descriptionElement = new(Entry);
-            return AddElement(WeaponDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+            return AddElement(WeaponDescriptions, 0, Entry);
+        }
+        public List<DescriptionElement> AddGeneralElement(int Priority, List<string> Entry)
+        {
+            return AddElement(GeneralDescriptions, Priority, Entry);
         }
         public List<DescriptionElement> AddGeneralElement(List<string> Entry)
         {
-            DescriptionElement descriptionElement = new(Entry);
-            return AddElement(GeneralDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+            return AddElement(GeneralDescriptions, 0, Entry);
+        }
+        public List<DescriptionElement> AddWeaponElement(int Priority, DescriptionElement DescriptionElement)
+        {
+            return AddElement(WeaponDescriptions, Priority, DescriptionElement);
         }
         public List<DescriptionElement> AddWeaponElement(DescriptionElement DescriptionElement)
         {
-            return AddElement(WeaponDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+            return AddElement(WeaponDescriptions, 0, DescriptionElement.Verb, DescriptionElement.Effect);
+        }
+        public List<DescriptionElement> AddGeneralElement(int Priority, DescriptionElement DescriptionElement)
+        {
+            return AddElement(GeneralDescriptions, Priority, DescriptionElement.Verb, DescriptionElement.Effect);
         }
         public List<DescriptionElement> AddGeneralElement(DescriptionElement DescriptionElement)
         {
-            return AddElement(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+            return AddElement(GeneralDescriptions, 0, DescriptionElement.Verb, DescriptionElement.Effect);
         }
 
         public static List<DescriptionElement> AddElements(List<DescriptionElement> Descriptions, List<DescriptionElement> AddDescriptions)
@@ -161,7 +206,7 @@ namespace HNPS_GigantismPlus
                 {
                     if (descriptionElement != DescriptionElement.Empty)
                     {
-                        Descriptions = AddElement(Descriptions, descriptionElement.Verb, descriptionElement.Effect);
+                        Descriptions = AddElement(Descriptions, descriptionElement);
                     }
                 }
             }
@@ -184,7 +229,7 @@ namespace HNPS_GigantismPlus
             {
                 foreach (List<string> descriptionStringElement in AddDescriptions)
                 {
-                    addDescriptions.Add(new(descriptionStringElement));
+                    addDescriptions.Add(descriptionStringElement);
                 }
             }
             return AddElements(Descriptions, addDescriptions);
@@ -198,61 +243,105 @@ namespace HNPS_GigantismPlus
             return GeneralDescriptions = AddElements(GeneralDescriptions, AddDescriptions);
         }
 
-        public static List<DescriptionElement> RemoveElement(List<DescriptionElement> Descriptions, string Verb, string Effect)
+        public static List<DescriptionElement> RemoveElement(List<DescriptionElement> Descriptions, int Priority, string Verb, string Effect, bool IgnorePriority = false)
         {
             Descriptions ??= new();
-            Descriptions.RemoveAll(x => x.Verb == Verb && x.Effect == Effect);
+            Descriptions.RemoveAll(x => (x.Priority == Priority || IgnorePriority) && x.Verb == Verb && x.Effect == Effect);
             return Descriptions;
+        }
+        public static List<DescriptionElement> RemoveElement(List<DescriptionElement> Descriptions, string Verb, string Effect)
+        {
+            return RemoveElement(Descriptions, 0, Verb, Effect, true);
+        }
+        public static List<DescriptionElement> RemoveElement(List<DescriptionElement> Descriptions, DescriptionElement ElementToRemove, bool IgnorePriority = false)
+        {
+            Descriptions ??= new();
+            Descriptions.RemoveAll(x => x == ElementToRemove || (IgnorePriority && x.ToString() == ElementToRemove.ToString()));
+            return Descriptions;
+        }
+        public static List<DescriptionElement> RemoveElement(List<DescriptionElement> Descriptions, DescriptionElement ElementToRemove)
+        {
+            return RemoveElement(Descriptions, ElementToRemove, true);
+        }
+        public List<DescriptionElement> RemoveWeaponElement(int Priority, string Verb, string Effect, bool IgnorePriority = false)
+        {
+            return WeaponDescriptions = RemoveElement(WeaponDescriptions, Priority, Verb, Effect, IgnorePriority);
         }
         public List<DescriptionElement> RemoveWeaponElement(string Verb, string Effect)
         {
-            return WeaponDescriptions = RemoveElement(WeaponDescriptions, Verb, Effect);
+            return WeaponDescriptions = RemoveElement(WeaponDescriptions, 0, Verb, Effect, true);
+        }
+        public List<DescriptionElement> RemoveGeneralElement(int Priority, string Verb, string Effect, bool IgnorePriority = false)
+        {
+            return GeneralDescriptions = RemoveElement(GeneralDescriptions, Priority, Verb, Effect, IgnorePriority);
         }
         public List<DescriptionElement> RemoveGeneralElement(string Verb, string Effect)
         {
-            return GeneralDescriptions = RemoveElement(GeneralDescriptions, Verb, Effect);
+            return GeneralDescriptions = RemoveElement(GeneralDescriptions, 0, Verb, Effect, true);
+        }
+        public List<DescriptionElement> RemoveWeaponElement(int Priority, List<string> Entry, bool IgnorePriority = false)
+        {
+            return WeaponDescriptions = RemoveElement(WeaponDescriptions, new(Priority, Entry), IgnorePriority);
         }
         public List<DescriptionElement> RemoveWeaponElement(List<string> Entry)
         {
-            DescriptionElement descriptionElement = new(Entry);
-            return WeaponDescriptions = RemoveElement(WeaponDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+            return WeaponDescriptions = RemoveElement(WeaponDescriptions, Entry, true);
+        }
+        public List<DescriptionElement> RemoveGeneralElement(int Priority, List<string> Entry, bool IgnorePriority = false)
+        {
+            return GeneralDescriptions = RemoveElement(GeneralDescriptions, new(Priority, Entry), IgnorePriority);
         }
         public List<DescriptionElement> RemoveGeneralElement(List<string> Entry)
         {
-            DescriptionElement descriptionElement = new(Entry);
-            return GeneralDescriptions = RemoveElement(GeneralDescriptions, descriptionElement.Verb, descriptionElement.Effect);
+            return GeneralDescriptions = RemoveElement(GeneralDescriptions, Entry, true);
+        }
+        public List<DescriptionElement> RemoveWeaponElement(DescriptionElement DescriptionElement, bool IgnorePriority = false)
+        {
+            return WeaponDescriptions = RemoveElement(WeaponDescriptions, DescriptionElement, IgnorePriority);
         }
         public List<DescriptionElement> RemoveWeaponElement(DescriptionElement DescriptionElement)
         {
-            return WeaponDescriptions = RemoveElement(WeaponDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+            return WeaponDescriptions = RemoveElement(WeaponDescriptions, DescriptionElement, true);
+        }
+        public List<DescriptionElement> RemoveGeneralElement(DescriptionElement DescriptionElement, bool IgnorePriority = false)
+        {
+            return GeneralDescriptions = RemoveElement(GeneralDescriptions, DescriptionElement, IgnorePriority);
         }
         public List<DescriptionElement> RemoveGeneralElement(DescriptionElement DescriptionElement)
         {
-            return GeneralDescriptions = RemoveElement(GeneralDescriptions, DescriptionElement.Verb, DescriptionElement.Effect);
+            return GeneralDescriptions = RemoveElement(GeneralDescriptions, DescriptionElement, true);
         }
 
-        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, List<DescriptionElement> RemoveDescriptions)
+        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, List<DescriptionElement> RemoveDescriptions, bool IgnorePriority = false)
         {
             Descriptions ??= new();
             if (!RemoveDescriptions.IsNullOrEmpty())
             {
-                foreach (DescriptionElement descriptionElement in RemoveDescriptions)
+                if (!IgnorePriority)
                 {
-                    Descriptions = RemoveElement(Descriptions, descriptionElement.Verb, descriptionElement.Effect);
+                    Descriptions.RemoveAll(x => RemoveDescriptions.Contains(x));
                 }
+                else
+                {
+                    foreach (DescriptionElement descriptionElement in RemoveDescriptions)
+                    {
+                        Descriptions = RemoveElement(Descriptions, descriptionElement, IgnorePriority);
+                    }
+                }
+                
             }
             return Descriptions;
         }
-        public List<DescriptionElement> RemoveWeaponElements(List<DescriptionElement> DescriptionElements)
+        public List<DescriptionElement> RemoveWeaponElements(List<DescriptionElement> DescriptionElements, bool IgnorePriority = false)
         {
-            return WeaponDescriptions = RemoveElements(WeaponDescriptions, DescriptionElements);
+            return WeaponDescriptions = RemoveElements(WeaponDescriptions, DescriptionElements, IgnorePriority);
         }
-        public List<DescriptionElement> RemoveGeneralElements(List<DescriptionElement> DescriptionElements)
+        public List<DescriptionElement> RemoveGeneralElements(List<DescriptionElement> DescriptionElements, bool IgnorePriority = false)
         {
-            return GeneralDescriptions = RemoveElements(GeneralDescriptions, DescriptionElements);
+            return GeneralDescriptions = RemoveElements(GeneralDescriptions, DescriptionElements, IgnorePriority);
         }
 
-        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, List<List<string>> RemoveDescriptions)
+        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, int Priority, List<List<string>> RemoveDescriptions, bool IgnorePriority = false)
         {
             Descriptions ??= new();
             List<DescriptionElement> removeDescriptions = new();
@@ -260,18 +349,35 @@ namespace HNPS_GigantismPlus
             {
                 foreach (List<string> descriptionStringElement in RemoveDescriptions)
                 {
-                    removeDescriptions.Add(new(descriptionStringElement));
+                    DescriptionElement descriptionElement = new(descriptionStringElement);
+                    if (!IgnorePriority)
+                    {
+                        descriptionElement.Priority = Priority;
+                    }
+                    removeDescriptions.Add(descriptionElement);
                 }
             }
-            return RemoveElements(Descriptions, removeDescriptions);
+            return RemoveElements(Descriptions, removeDescriptions, IgnorePriority);
+        }
+        public static List<DescriptionElement> RemoveElements(List<DescriptionElement> Descriptions, List<List<string>> RemoveDescriptions)
+        {
+            return RemoveElements(Descriptions, 0, RemoveDescriptions, true);
+        }
+        public List<DescriptionElement> RemoveWeaponElements(int Priority, List<List<string>> DescriptionElements, bool IgnorePriority = false)
+        {
+            return WeaponDescriptions = RemoveElements(WeaponDescriptions, Priority, DescriptionElements, IgnorePriority);
         }
         public List<DescriptionElement> RemoveWeaponElements(List<List<string>> DescriptionElements)
         {
-            return WeaponDescriptions = RemoveElements(WeaponDescriptions, DescriptionElements);
+            return WeaponDescriptions = RemoveElements(WeaponDescriptions, 0, DescriptionElements, true);
+        }
+        public List<DescriptionElement> RemoveGeneralElements(int Priority, List<List<string>> DescriptionElements, bool IgnorePriority = false)
+        {
+            return GeneralDescriptions = RemoveElements(GeneralDescriptions, Priority, DescriptionElements, IgnorePriority);
         }
         public List<DescriptionElement> RemoveGeneralElements(List<List<string>> DescriptionElements)
         {
-            return GeneralDescriptions = RemoveElements(GeneralDescriptions, DescriptionElements);
+            return GeneralDescriptions = RemoveElements(GeneralDescriptions, 0, DescriptionElements, true);
         }
 
         public static implicit operator DescribeModificationEvent<IModification>(IDescribeModificationEvent<T, M> E)

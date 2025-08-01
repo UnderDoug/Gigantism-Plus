@@ -617,12 +617,26 @@ namespace HNPS_GigantismPlus
         public static string MakeAndList(IReadOnlyList<string> Words, bool Serial = true, bool IgnoreCommas = false)
         {
             List<string> replacedList = new();
-            foreach (string entry in Words)
+            string entry;
+            string andList;
+            foreach (string word in Words)
             {
-                replacedList.Add(entry.Replace(",", ";;"));
+                if (IgnoreCommas)
+                {
+                    entry = word.Replace(",", ";;");
+                }
+                else
+                {
+                    entry = word;
+                }
+                replacedList.Add(entry);
             }
-            string andList = Grammar.MakeAndList(replacedList, Serial);
-            return andList.Replace(";;", ",");
+            andList = Grammar.MakeAndList(replacedList, Serial);
+            if (IgnoreCommas)
+            {
+                andList.Replace(";;", ",");
+            }
+            return andList;
         }
         public static string Quote(string @string)
         {

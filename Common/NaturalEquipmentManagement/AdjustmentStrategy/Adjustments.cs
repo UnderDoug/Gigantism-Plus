@@ -241,6 +241,18 @@ namespace HNPS_GigantismPlus
             CopyTo(Array, 0);
         }
 
+        public bool Contains(Type AdjustmentType)
+        {
+            foreach (IAdjustment adjustment in this)
+            {
+                if (adjustment.GetType() == AdjustmentType)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /// <summary>Performs the specified action on each element of the Adjustments <see cref="List{IAdjustment}" />.</summary>
         /// <param name="Action">The <see cref="T:System.Action`1" /> <see langword="delegate" /> to perform on each element of the Adjustments <see cref="List{IAdjustment}" />.</param>
         /// <exception cref="T:System.ArgumentNullException"><paramref name="Action" /> is <see langword="null" />.</exception>

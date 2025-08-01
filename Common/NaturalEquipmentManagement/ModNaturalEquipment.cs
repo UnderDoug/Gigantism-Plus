@@ -321,10 +321,5 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod;
         }
 
-    } //!-- public class ModNaturalEquipment<T>
-      //        : ModNaturalEquipmentBase
-      //        where T
-      //        : IPart
-      //        , IManagedDefaultNaturalEquipment<T>
-      //        , new()
+    }
 }

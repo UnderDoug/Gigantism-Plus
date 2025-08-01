@@ -45,6 +45,14 @@ namespace HNPS_GigantismPlus
         {
             this.Priority = Priority;
         }
+        public DescriptionElement(DescriptionElement SourceElement)
+            : this(SourceElement.Priority, SourceElement.Verb, SourceElement.Effect)
+        {
+        }
+        public DescriptionElement(int Priority, DescriptionElement SourceElement)
+            : this(Priority, SourceElement.Verb, SourceElement.Effect)
+        {
+        }
         public DescriptionElement(List<string> Source)
         {
             Priority = 0;
@@ -101,17 +109,87 @@ namespace HNPS_GigantismPlus
             string verb;
             if (Verb == "")
             {
-                verb = Object.It;
+                verb = $"{Object.It} ";
             }
             else if (Verb == null)
             {
-                verb = Object.Itis;
+                verb = $"{Object.Itis} ";
             }
             else
             {
-                verb = Object.GetVerb(Verb, PrependSpace: false);
+                verb = $"{Object.GetVerb(Verb, PrependSpace: false)} ";
             }
-            return $"{verb} {Effect}";
+            return $"{verb}{Effect}";
+        }
+
+        public readonly string GetProcessedItem(bool IsFirstSentence, IReadOnlyList<DescriptionElement> DescriptionElements, GameObject Object)
+        {
+            string verb = Verb;
+            string effect = Effect;
+            DescriptionElement firstElement = DescriptionElements[0];
+            bool isFirstInList = this == firstElement;
+            string does = Object.GetVerb(verb, PrependSpace: false);
+            string @is = Object.Are();
+            switch (Verb)
+            {
+                // "It effect" || "effect"
+                case "":
+                    if (!IsFirstSentence && isFirstInList)
+                    {
+                        verb = $"{Object.It} ";
+                    }
+                    break;
+
+                // "It is effect" || "is effect"
+                case null:
+                    if (!IsFirstSentence && isFirstInList)
+                    {
+                        verb = $"{Object.Itis} ";
+                    }
+                    else
+                    {
+                        bool skipIsVerb = true;
+                        if (!isFirstInList)
+                        {
+                            foreach (DescriptionElement element in DescriptionElements)
+                            {
+                                if (element.Verb != null)
+                                {
+                                    skipIsVerb = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!skipIsVerb)
+                        {
+                            verb = $"{@is} ";
+                        }
+                    }
+                    break;
+
+                // "It verbs" || "verbs"
+                default:
+                    if (!IsFirstSentence && isFirstInList)
+                    {
+                        verb = $"{Object.It} {does} ";
+                    }
+                    else
+                    {
+                        verb = $"{does} ";
+                    }
+                    break;
+            }
+            return GameText.VariableReplace($"{verb}{effect}", Object);
+        }
+
+        public static string MakeAndList(IReadOnlyList<DescriptionElement> DescriptionElements, GameObject Object, bool IsFirstList = false)
+        {
+            List<string> replacedList = new();
+            foreach (DescriptionElement descriptionElement in DescriptionElements)
+            {
+                replacedList.Add(descriptionElement.GetProcessedItem(IsFirstList, DescriptionElements, Object));
+            }
+            return $"{Utils.MakeAndList(replacedList, true)}. ";
         }
 
         public static implicit operator int(DescriptionElement operand) => operand.Priority;

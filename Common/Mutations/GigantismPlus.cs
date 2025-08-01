@@ -220,7 +220,7 @@ namespace XRL.World.Parts.Mutation
                 giganticBodMod.AddArmorDVAdjustment(-10);
                 giganticBodMod.AddArmorStatisticAdjustment("Toughness", 30);
 
-                giganticBodMod.AddAdjustment(new AdjustArbitraryPart<Render>(nameof(Parts.Render.DisplayName), "test", "have", "a test Display Name"), -999);
+                // giganticBodMod.AddAdjustment(new AdjustArbitraryPart<Render>(nameof(Parts.Render.DisplayName), "test", "have", "a test Display Name"), -999);
 
             }
 

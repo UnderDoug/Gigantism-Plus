@@ -38,6 +38,7 @@ namespace HNPS_GigantismPlus
             { nameof(ModBurrowingNaturalWeapon), true },
             { nameof(ModCrystallineNaturalWeapon), true },
             { nameof(ModAugmentedNaturalWeapon), true },
+            { nameof(IManagedDefaultNaturalEquipment), true },
             { "BaseManagedDefaultEquipmentMutation", true },
             { "BaseManagedDefaultEquipmentCybernetic", true },
             { nameof(GigantismPlus), true },

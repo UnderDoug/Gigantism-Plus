@@ -1,16 +1,15 @@
-﻿using System;
-using System.Text;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using XRL.Rules;
+using System.Reflection;
+using System.Text;
 using XRL.Language;
+using XRL.Rules;
 using XRL.World.Anatomy;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -41,8 +40,9 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
+        public NaturalEquipmentManager NaturalEquipmentManager => ParentObject?.RequirePart<NaturalEquipmentManager>();
+
         public virtual List<ModNaturalEquipment<UD_ManagedCrystallinity>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
@@ -64,11 +64,11 @@ namespace XRL.World.Parts.Mutation
             RefractAdded = Crystallinity.RefractAdded;
         }
 
-        public static ModCrystallineNaturalWeapon NewCrystallinePointMod(UD_ManagedCrystallinity assigningPart)
+        public static ModCrystallineNaturalWeapon NewCrystallinePointMod(NaturalEquipmentManager NewManager)
         {
             ModCrystallineNaturalWeapon crystalinePointMod = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = 100,
@@ -83,10 +83,7 @@ namespace XRL.World.Parts.Mutation
 
                 PartAdjustments = new(),
 
-                AddedParts = new()
-                {
-                    "Inorganic",
-                },
+                AddedParts = new(),
 
                 AddedStringProps = new()
                 {
@@ -94,6 +91,16 @@ namespace XRL.World.Parts.Mutation
                     { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
                 },
             };
+
+            if (!EnablePrereleaseContent)
+            {
+                crystalinePointMod.AddedParts.Add(nameof(Inorganic));
+            }
+            else
+            {
+                crystalinePointMod.AddAdjustment(new AddPartAdjustment<Inorganic>(), false);
+            }
+
             crystalinePointMod.AddSkillAdjustment("ShortBlades", true);
 
             crystalinePointMod.AddNounAdjustment(true);
@@ -169,29 +176,78 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedIntProps;
         }
-        public virtual ModNaturalEquipment<UD_ManagedCrystallinity> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, UD_ManagedCrystallinity NewAssigner = null)
-        {
-            ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = NewCrystallinePointMod(NewAssigner ?? this);
-            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : null;
-        }
-        public virtual List<ModNaturalEquipment<UD_ManagedCrystallinity>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, UD_ManagedCrystallinity NewAssigner = null)
+
+        public List<ModNaturalEquipment<UD_ManagedCrystallinity>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, NaturalEquipmentManager NewManager = null)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"* {nameof(UD_ManagedCrystallinity)}."
+                $"* {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(GetNaturalEquipmentMods)}("
                 + $"{nameof(Filter)}, "
-                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                + $"{nameof(NewManager)}: {NewManager?.Name})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NewAssigner ??= this;
+            NewManager ??= NaturalEquipmentManager;
             List<ModNaturalEquipment<UD_ManagedCrystallinity>> naturalEquipmentModsList = new();
-            ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
-            if (naturalEquipmentMod != null)
-            {
-                naturalEquipmentModsList.Add(naturalEquipmentMod);
-            }
 
+            List<MethodInfo> managedBaseMethods = new(typeof(UD_ManagedCrystallinity).GetMethods());
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                managedBaseMethods.RemoveAll(m => !m.IsStatic || !m.IsPublic || !m.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<UD_ManagedCrystallinity>)));
+            }
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                Debug.CheckYeh(4, $"Have Methods", Indent: indent + 2, Toggle: getDoDebug());
+                foreach (MethodInfo managedMethod in managedBaseMethods)
+                {
+                    if (!managedMethod.IsStatic || !managedMethod.IsPublic)
+                    {
+                        continue;
+                    }
+                    Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
+
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsStatic)}: {managedMethod.IsStatic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.ReturnType)}: {managedMethod.ReturnType.Name}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+
+                    if (managedMethod.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<UD_ManagedCrystallinity>))
+                        && managedMethod.IsStatic
+                        && managedMethod.IsPublic)
+                    {
+                        ParameterInfo[] parameters = managedMethod.GetParameters();
+                        if (parameters.Length == 1
+                            && parameters[0].ParameterType.InheritsFrom(typeof(NaturalEquipmentManager)))
+                        {
+                            Debug.CheckYeh(4,
+                                $"public static {managedMethod.ReturnType.Name} " +
+                                $"{managedMethod.Name}(" +
+                                $"{parameters[0].ParameterType.Name} {parameters[0].Name})",
+                                Indent: indent + 5, Toggle: getDoDebug());
+
+                            if (managedMethod.Invoke(null, new object[1] { NewManager }) is ModNaturalEquipment<UD_ManagedCrystallinity> naturalEquipmentMod)
+                            {
+                                Debug.CheckYeh(4, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                                if (Filter(naturalEquipmentMod))
+                                {
+                                    Debug.CheckYeh(4, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: getDoDebug());
+                                    naturalEquipmentModsList.Add(naturalEquipmentMod);
+                                }
+                                else
+                                {
+                                    Debug.CheckNah(4, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: getDoDebug());
+                                }
+                            }
+                            else
+                            {
+                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                            }
+                        }
+                    }
+                }
+            }
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }

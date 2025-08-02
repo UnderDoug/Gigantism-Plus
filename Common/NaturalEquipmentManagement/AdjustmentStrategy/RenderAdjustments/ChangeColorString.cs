@@ -35,8 +35,8 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return Subject.Render.ColorString != Value 
-                && base.Check(Subject);
+            return base.Check(Subject) 
+                && Subject.Render.ColorString != Value;
         }
 
         public override bool Apply(GameObject Subject)

@@ -48,17 +48,12 @@ namespace XRL.World.Parts.Mutation
         {
         }
 
-        public static ModElongatedNaturalWeapon NewElongatedWeaponMod(ElongatedPaws assigningPart)
+        public static ModElongatedNaturalWeapon NewElongatedWeaponMod(NaturalEquipmentManager NewManager)
         {
             return new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
             };
-        }
-        public override ModNaturalEquipment<ElongatedPaws> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<ElongatedPaws>> Filter = null, ElongatedPaws NewAssigner = null)
-        {
-            ModNaturalEquipment<ElongatedPaws> naturalEquipmentMod = NewElongatedWeaponMod(NewAssigner ?? this);
-            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
         public bool HasGigantism => ParentObject != null && ParentObject.HasPart<GigantismPlus>();
@@ -133,7 +128,7 @@ namespace XRL.World.Parts.Mutation
             {
                 Body body = E.Object?.Body;
 
-                if (body != null && NaturalEquipmentMod != null)
+                if (body != null)
                 {
                     StatChangeEventAttempts++;
                     body.UpdateBodyParts();

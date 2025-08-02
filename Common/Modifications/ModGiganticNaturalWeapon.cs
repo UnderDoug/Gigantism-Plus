@@ -35,11 +35,16 @@ namespace XRL.World.Parts
                 { "ModGiganticNoShortDescription", 1 },
                 { "ModGiganticNoDisplayName", 1 }
             };
-            AddMeleeStatAdjustment("Strength", -100);
+            AddMeleeStatAdjustment("Strength", -100, new GameObjectHasPart<MeleeWeapon>());
 
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);
+        }
+        public ModGiganticNaturalWeapon(NaturalEquipmentManager NewManager)
+            : this()
+        {
+            Manager = NewManager;
         }
 
         public override void ApplyModification(GameObject Object)

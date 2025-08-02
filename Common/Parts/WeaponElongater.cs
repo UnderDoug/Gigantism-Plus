@@ -37,11 +37,10 @@ namespace XRL.World.Parts
         public MeleeWeapon MeleeWeapon => ParentObject?.GetPart<MeleeWeapon>();
 
         private ModNaturalEquipment<ElongatedPaws> _naturalEquipmentMod = null;
-
         public ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod
         {
             get => _naturalEquipmentMod ??= ElongatedPaws?.UpdateNaturalEquipmentMod(
-                ElongatedPaws?.GetNaturalEquipmentMod(),
+                ElongatedPaws.NewElongatedWeaponMod(ElongatedPaws.NaturalEquipmentManager),
                     (int) ElongatedPaws?.Level);
             set => _naturalEquipmentMod = value;
         }

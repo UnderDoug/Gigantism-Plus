@@ -1,5 +1,4 @@
-﻿using Genkit;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using UnityEngine.UIElements;
+
+using Genkit;
+
 using XRL;
 using XRL.Language;
 using XRL.Rules;
@@ -19,7 +20,7 @@ using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.Parts.Skill;
-using XRL.World.Tinkering;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -60,6 +61,9 @@ namespace HNPS_GigantismPlus
 
             if (MethodName == nameof(DrawSeededToken))
                 return false;
+
+            if (MethodName == nameof(InheritsFrom))
+                return true;
 
             return doDebug;
         }
@@ -2631,10 +2635,36 @@ namespace HNPS_GigantismPlus
             return true;
         }
 
-        public static bool InheritsFrom(this Type T, Type Type, bool IncludeSelf = true)
+        public static bool InheritsFrom(this Type T, Type Type, bool IncludeSelf = true, bool Silent = true)
         {
+            int indent = Debug.LastIndent;
+            bool doDebug = !Silent && getClassDoDebug(nameof(InheritsFrom));
+            Debug.Entry(4,
+                $"* {nameof(Extensions)}."
+                + $"{nameof(InheritsFrom)}("
+                + $"{nameof(T)}: {T.Name}, "
+                + $"{nameof(Type)}: {Type.Name}, "
+                + $"{nameof(IncludeSelf)}: {IncludeSelf})",
+                Indent: indent + 1, Toggle: doDebug);
+
             List<Type> inheritedTypes = new(T.YieldInheritedTypes());
-            return (IncludeSelf && T == Type) || inheritedTypes.Contains(Type);
+
+            bool includesSelf = IncludeSelf && T == Type;
+            bool isSubclassOf = Type.IsSubclassOf(T);
+            bool isAssignableFrom = T.IsAssignableFrom(Type);
+            bool inheritedContains = inheritedTypes.Contains(Type);
+
+            Debug.LoopItem(4, $"{nameof(includesSelf)}: {includesSelf}",
+                Good: includesSelf, Indent: indent + 2, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(isSubclassOf)}: {isSubclassOf}",
+                Good: isSubclassOf, Indent: indent + 2, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(isAssignableFrom)}: {isAssignableFrom}",
+                Good: isAssignableFrom, Indent: indent + 2, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(inheritedContains)}: {inheritedContains}",
+                Good: inheritedContains, Indent: indent + 2, Toggle: doDebug);
+
+            Debug.LastIndent = indent;
+            return (IncludeSelf && T == Type) || Type.IsSubclassOf(T) || T.IsAssignableFrom(Type) || inheritedTypes.Contains(Type);
         }
 
         public static NaturalEquipmentOperator NaturalEquipmentOperator(this GameObject NaturalEquipment)

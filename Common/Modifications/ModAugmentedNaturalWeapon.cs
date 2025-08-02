@@ -20,17 +20,16 @@ namespace XRL.World.Parts
         public ModAugmentedNaturalWeapon()
         {
         }
-
-        public ModAugmentedNaturalWeapon(int Tier)
-            : base(Tier)
+        public ModAugmentedNaturalWeapon(NaturalEquipmentManager NewManager)
+            : base(NewManager)
         {
         }
 
         public override void ApplyModification(GameObject Object)
         {
-            if(ParentObject.TryGetPart(out NaturalEquipmentOperator manager))
+            if (Operator != null)
             {
-                manager.DoDynamicTile = false;
+                Operator.DoDynamicTile = false;
             }
             base.ApplyModification(Object);
         }

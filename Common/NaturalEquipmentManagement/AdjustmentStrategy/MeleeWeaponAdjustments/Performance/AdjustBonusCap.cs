@@ -41,9 +41,9 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return (Subject.GetPart<MeleeWeapon>().MaxStrengthBonus < 999 && Amount > 0) 
-                || Amount < 0 
-                && base.Check(Subject);
+            return Amount < 0 
+                && base.Check(Subject) 
+                && (Subject.GetPart<MeleeWeapon>().MaxStrengthBonus < 999 && Amount > 0);
         }
 
         public override bool Apply(GameObject Subject)

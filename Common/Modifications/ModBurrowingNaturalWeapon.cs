@@ -20,9 +20,8 @@ namespace XRL.World.Parts
         public ModBurrowingNaturalWeapon()
         {
         }
-
-        public ModBurrowingNaturalWeapon(int Tier)
-            : base(Tier)
+        public ModBurrowingNaturalWeapon(NaturalEquipmentManager NewManager)
+            : base(NewManager)
         {
         }
 

@@ -28,5 +28,13 @@ namespace HNPS_GigantismPlus
                 Add(new GameObjectHasPart(part));
             }
         }
+        public GameObjectHasAllParts(IEnumerable<Type> Parts)
+            : base()
+        {
+            foreach (Type part in Parts)
+            {
+                Add(new GameObjectHasPart(part.Name));
+            }
+        }
     }
 }

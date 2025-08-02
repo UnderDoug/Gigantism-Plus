@@ -21,9 +21,8 @@ namespace XRL.World.Parts
         public ModChromeBonedNaturalWeapon()
         {
         }
-
-        public ModChromeBonedNaturalWeapon(int Tier)
-            : base(Tier)
+        public ModChromeBonedNaturalWeapon(NaturalEquipmentManager NewManager)
+            : base(NewManager)
         {
         }
 

@@ -152,11 +152,11 @@ namespace XRL.World.Parts.Mutation
         {
         }
 
-        public static ModGiganticNaturalWeapon NewGiganticFistMod(GigantismPlus assigningPart)
+        public static ModGiganticNaturalWeapon NewGiganticFistMod(NaturalEquipmentManager NewManager)
         {
             ModGiganticNaturalWeapon giganticFistMod = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 Noun = "fist",
@@ -169,32 +169,32 @@ namespace XRL.World.Parts.Mutation
             };
             giganticFistMod.AddSkillAdjustment("Cudgel", true);
 
-            giganticFistMod.AddNounAdjustment(true, AllConditions: new() { IsOrganicFist });
-            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, AllConditions: new() { IsOrganicFist });
+            giganticFistMod.AddNounAdjustment(true, Condition: IsOrganicFist);
+            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: IsOrganicFist);
 
             return giganticFistMod;
         }
-        public static ModGiganticNaturalWeapon NewGiganticNogginMod(GigantismPlus assigningPart)
+        public static ModGiganticNaturalWeapon NewGiganticNogginMod(NaturalEquipmentManager NewManager)
         {
             return new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Head",
             };
         }
-        public static ModGiganticNaturalWeapon NewGiganticMugMod(GigantismPlus assigningPart)
+        public static ModGiganticNaturalWeapon NewGiganticMugMod(NaturalEquipmentManager NewManager)
         {
             return new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Face",
             };
         }
-        public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(GigantismPlus assigningPart)
+        public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(NaturalEquipmentManager NewManager)
         {
             ModNaturalEquipment<GigantismPlus> giganticBodMod = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Body",
 
                 ModPriority = 40,
@@ -229,11 +229,17 @@ namespace XRL.World.Parts.Mutation
             giganticBodMod.AddDetailColorAdjustment("z", true);
             return giganticBodMod;
         }
-        public static ModClosedGiganticNaturalWeapon NewClosedFistMod(GigantismPlus assigningPart)
+        public static ModClosedGiganticNaturalWeapon NewClosedFistMod(NaturalEquipmentManager NewManager)
         {
+            GigantismPlus gigantismPlus = NewManager?.ParentObject?.GetPart<GigantismPlus>();
+            if (gigantismPlus == null 
+                || !gigantismPlus.IsMyActivatedAbilityToggledOn(gigantismPlus.CloseFistActivatedAbilityID))
+            {
+                return null;
+            }
             ModClosedGiganticNaturalWeapon closedGiganticFist = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = -999999, // -999,999
@@ -258,15 +264,6 @@ namespace XRL.World.Parts.Mutation
 
             closedGiganticFist.AddTileAdjustment("NaturalWeapons/GiganticFist.png", false);
             return closedGiganticFist;
-        }
-        public override ModNaturalEquipment<GigantismPlus> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<GigantismPlus>> Filter = null, GigantismPlus NewAssigner = null)
-        {
-            ModNaturalEquipment<GigantismPlus> naturalEquipmentMod = NewClosedFistMod(NewAssigner ?? this);
-            if (IsMyActivatedAbilityToggledOn(CloseFistActivatedAbilityID) && (Filter == null || Filter(naturalEquipmentMod)))
-            {
-                return naturalEquipmentMod;
-            }
-            return base.GetNaturalEquipmentMod(Filter, NewAssigner);
         }
 
         public override bool CanLevel() { return true; }
@@ -682,9 +679,9 @@ namespace XRL.World.Parts.Mutation
             if (ParentObject != null)
             {
                 WeaponNoun = ParentObject?.Body?.GetFirstPart("Hand")?.DefaultBehavior?.Render?.DisplayName ?? WeaponNoun;
-                FistDamageDieCount = GetNaturalWeaponDamageDieCount(NewGiganticFistMod(this), Level);
-                FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(NewGiganticFistMod(this), Level));
-                FistHitBonus = GetNaturalWeaponHitBonus(NewGiganticFistMod(this), Level);
+                FistDamageDieCount = GetNaturalWeaponDamageDieCount(NewGiganticFistMod(NaturalEquipmentManager), Level);
+                FistDamageBonus = Math.Max(3, GetNaturalWeaponDamageBonus(NewGiganticFistMod(NaturalEquipmentManager), Level));
+                FistHitBonus = GetNaturalWeaponHitBonus(NewGiganticFistMod(NaturalEquipmentManager), Level);
                 StunningForceJumpLevel = GetStunningForceLevel(Level);
                 stunningForceDamageIncrement = StunningForce.GetDamageIncrement(StunningForceJumpLevel);
             }
@@ -809,22 +806,6 @@ namespace XRL.World.Parts.Mutation
                 }
             }
             return removed;
-        }
-
-        public override List<ModNaturalEquipment<GigantismPlus>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<GigantismPlus>> Filter = null, GigantismPlus NewAssigner = null)
-        {
-            NewAssigner ??= this;
-            List<ModNaturalEquipment<GigantismPlus>> naturalEquipmentModsList = new(base.GetNaturalEquipmentMods(Filter, NewAssigner))
-            {
-                NewGiganticFistMod(NewAssigner),
-                NewGiganticNogginMod(NewAssigner),
-                NewGiganticMugMod(NewAssigner),
-                NewGiganticBodMod(NewAssigner),
-            };
-            return (from ModNaturalEquipment<GigantismPlus> mod 
-                    in naturalEquipmentModsList
-                    where Filter(mod)
-                    select mod).ToList();
         }
 
         public override bool Mutate(GameObject GO, int Level)
@@ -1407,12 +1388,6 @@ namespace XRL.World.Parts.Mutation
                 Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
 
                 ToggledOn = true;
-
-                if (NaturalEquipmentMod == null)
-                {
-                    Debug.Entry(4, "NaturalEquipmentMod Failed to instantiate", Indent: 1, Toggle: doDebug);
-                    ToggledOn = false;
-                }
             }
             else
             {

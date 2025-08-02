@@ -1,10 +1,12 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
+
+using HNPS_GigantismPlus;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
@@ -44,8 +46,10 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
+
+        public NaturalEquipmentManager NaturalEquipmentManager => ParentObject?.RequirePart<NaturalEquipmentManager>();
+
         public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public virtual ModNaturalEquipment<T> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public int Level { get; set; }
 
@@ -127,28 +131,84 @@ namespace XRL.World.Parts
             return NaturalEquipmentMod.AddedIntProps;
         }
 
-        public virtual ModNaturalEquipment<T> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
-        {
-            return null;
-        }
-        public virtual List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null)
+        public List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, NaturalEquipmentManager NewManager = null)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(GetNaturalEquipmentMods)}("
                 + $"{nameof(Filter)}, "
-                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                + $"{nameof(NewManager)})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NewAssigner ??= (T)this;
+            NewManager ??= NaturalEquipmentManager;
             List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
-            ModNaturalEquipment<T> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
-            if (naturalEquipmentMod != null)
-            {
-                naturalEquipmentModsList.Add(naturalEquipmentMod);
-            }
 
+            List<MethodInfo> managedBaseMethods = new(typeof(T).GetMethods());
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                managedBaseMethods.RemoveAll(m => !m.IsStatic || !m.IsPublic || !m.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>)));
+            }
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                Debug.CheckYeh(4, $"Have Methods", Indent: indent + 2, Toggle: getDoDebug());
+                foreach (MethodInfo managedMethod in managedBaseMethods)
+                {
+                    if (!managedMethod.IsStatic || !managedMethod.IsPublic)
+                    {
+                        continue;
+                    }
+                    Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
+
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsStatic)}: {managedMethod.IsStatic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.ReturnType)}: {managedMethod.ReturnType.Name}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+
+                    if (managedMethod.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>))
+                        && managedMethod.IsStatic
+                        && managedMethod.IsPublic)
+                    {
+                        ParameterInfo[] parameters = managedMethod.GetParameters();
+                        if (parameters.Length == 1
+                            && parameters[0].ParameterType.InheritsFrom(typeof(NaturalEquipmentManager)))
+                        {
+                            Debug.CheckYeh(4,
+                                $"public static {managedMethod.ReturnType.Name} " +
+                                $"{managedMethod.Name}(" +
+                                $"{parameters[0].ParameterType.Name} {parameters[0].Name})",
+                                Indent: indent + 5, Toggle: getDoDebug());
+
+                            if (managedMethod.Invoke(null, new object[1] { NewManager }) is ModNaturalEquipment<T> naturalEquipmentMod)
+                            {
+                                Debug.CheckYeh(4, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                                if (Filter(naturalEquipmentMod))
+                                {
+                                    Debug.CheckYeh(4, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: getDoDebug());
+                                    naturalEquipmentModsList.Add(naturalEquipmentMod);
+                                }
+                                else
+                                {
+                                    Debug.CheckNah(4, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: getDoDebug());
+                                }
+                            }
+                            else
+                            {
+                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                            }
+                        }
+                    }
+                }
+            }
+            /*
+            ModNaturalEquipment<T> singleNaturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
+            if (singleNaturalEquipmentMod != null)
+            {
+                naturalEquipmentModsList.Add(singleNaturalEquipmentMod);
+            }
+            */
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }

@@ -21,7 +21,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public abstract class IAdjustment : IComposite
+    public abstract class IAdjustment : IComposite, IConditional<GameObject>
     {
         private static bool doDebug => getClassDoDebug(nameof(IAdjustment));
 
@@ -40,12 +40,6 @@ namespace HNPS_GigantismPlus
        
         [NonSerialized]
         public ICondition<GameObject> Condition;
-
-        [NonSerialized]
-        public AllConditions<GameObject> AllConditions;
-
-        [NonSerialized]
-        public AnyConditions<GameObject> AnyConditions;
 
         [NonSerialized]
         public string Value;
@@ -72,8 +66,6 @@ namespace HNPS_GigantismPlus
             Priority = 0;
 
             Condition = null;
-            AllConditions = new();
-            AnyConditions = new();
 
             Value = null;
             Amount = null;
@@ -91,8 +83,6 @@ namespace HNPS_GigantismPlus
             this.Prioritize = Prioritize;
             this.Priority = Priority;
             this.Condition = Condition;
-            this.AllConditions = AllConditions ?? new();
-            this.AnyConditions = AnyConditions ?? new();
             this.Value = Value;
             this.Amount = Amount;
             this.State = State;
@@ -105,8 +95,6 @@ namespace HNPS_GigantismPlus
                   Prioritize: SourceAdjustment.Prioritize,
                   Priority: SourceAdjustment.Priority,
                   Condition: SourceAdjustment.Condition,
-                  AllConditions: SourceAdjustment.AllConditions,
-                  AnyConditions: SourceAdjustment.AnyConditions,
                   Value: SourceAdjustment.Value,
                   Amount: SourceAdjustment.Amount,
                   State: SourceAdjustment.State,
@@ -174,20 +162,12 @@ namespace HNPS_GigantismPlus
 
         public virtual bool CheckCondition(GameObject Subject)
         {
-            return Subject == null || Condition == null || Condition[Subject];
-        }
-        public virtual bool CheckAllConditions(GameObject Subject)
-        {
-            return Subject == null || AllConditions.IsNullOrEmpty() || AllConditions[Subject];
-        }
-        public virtual bool CheckAnyConditions(GameObject Subject)
-        {
-            return Subject == null || AnyConditions.IsNullOrEmpty() || AnyConditions[Subject];
+            return Subject != null && (Condition == null || Condition[Subject]);
         }
 
         public virtual bool Check(GameObject Subject)
         {
-            return Subject == null || (CheckCondition(Subject) && CheckAllConditions(Subject) && CheckAnyConditions(Subject));
+            return CheckCondition(Subject);
         }
 
         public virtual bool IsTruerThan(GameObject Subject, IAdjustment OtherAdjustment)
@@ -373,8 +353,6 @@ namespace HNPS_GigantismPlus
             Writer.Write(Prioritize);
             Writer.Write(Priority);
             Writer.WriteObject(Condition);
-            Writer.WriteObject(AllConditions);
-            Writer.WriteObject(AnyConditions);
             Writer.WriteOptimized(Value);
             Writer.WriteNullable(Amount);
             Writer.WriteNullable(State);
@@ -388,8 +366,6 @@ namespace HNPS_GigantismPlus
             Prioritize = Reader.ReadBoolean();
             Priority = Reader.ReadInt32();
             Condition = Reader.ReadObject() as ICondition<GameObject>;
-            AllConditions = Reader.ReadObject() as AllConditions<GameObject>;
-            AnyConditions = Reader.ReadObject() as AnyConditions<GameObject>;
             Value = Reader.ReadOptimizedString();
             Amount = Reader.ReadObject() as int?;
             State = Reader.ReadObject() as bool?;

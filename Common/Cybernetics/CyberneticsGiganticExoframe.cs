@@ -58,11 +58,16 @@ namespace XRL.World.Parts
         public CyberneticsGiganticExoframe()
         {
         }
-        public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(CyberneticsGiganticExoframe assigningPart)
+        public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(NaturalEquipmentManager NewManager)
         {
+            CyberneticsGiganticExoframe giganticExoframe = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsGiganticExoframe>();
+            if (giganticExoframe == null)
+            {
+                return null;
+            }
             ModAugmentedNaturalWeapon augmentedManipulator = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = -500,
@@ -72,7 +77,7 @@ namespace XRL.World.Parts
                 Noun = "manipulator",
 
                 Adjective = "augmented",
-                AdjectiveColor = assigningPart.AugmentAdjectiveColor,
+                AdjectiveColor = giganticExoframe.AugmentAdjectiveColor,
                 AdjectiveColorFallback = "c",
 
                 PartAdjustments = new(),
@@ -84,40 +89,36 @@ namespace XRL.World.Parts
             };
             augmentedManipulator.AddNounAdjustment();
 
-            augmentedManipulator.AddTileAdjustment(assigningPart.AugmentTile);
-            augmentedManipulator.AddColorStringAdjustment(assigningPart.AugmentTileColorString, true);
-            augmentedManipulator.AddTileColorAdjustment(assigningPart.AugmentTileColorString, true);
-            augmentedManipulator.AddDetailColorAdjustment(assigningPart.AugmentTileDetailColor);
+            augmentedManipulator.AddTileAdjustment(giganticExoframe.AugmentTile);
+            augmentedManipulator.AddColorStringAdjustment(giganticExoframe.AugmentTileColorString, true);
+            augmentedManipulator.AddTileColorAdjustment(giganticExoframe.AugmentTileColorString, true);
+            augmentedManipulator.AddDetailColorAdjustment(giganticExoframe.AugmentTileDetailColor);
 
-            assigningPart.ProcessNaturalEquipmentAddedParts(augmentedManipulator, assigningPart.AugmentAddParts);
-            assigningPart.ProcessNaturalEquipmentAddedProps(augmentedManipulator, assigningPart.AugmentAddProps);
+            giganticExoframe.ProcessNaturalEquipmentAddedParts(augmentedManipulator, giganticExoframe.AugmentAddParts);
+            giganticExoframe.ProcessNaturalEquipmentAddedProps(augmentedManipulator, giganticExoframe.AugmentAddProps);
 
-            if (!assigningPart.AugmentSwingSound.IsNullOrEmpty())
+            if (!giganticExoframe.AugmentSwingSound.IsNullOrEmpty())
             {
-                augmentedManipulator.AddedStringProps["SwingSound"] = assigningPart.AugmentSwingSound;
+                augmentedManipulator.AddedStringProps["SwingSound"] = giganticExoframe.AugmentSwingSound;
             }
-            if (!assigningPart.AugmentBlockedSound.IsNullOrEmpty())
+            if (!giganticExoframe.AugmentBlockedSound.IsNullOrEmpty())
             {
-                augmentedManipulator.AddedStringProps["BlockedSound"] = assigningPart.AugmentBlockedSound;
+                augmentedManipulator.AddedStringProps["BlockedSound"] = giganticExoframe.AugmentBlockedSound;
             }
-            if (!assigningPart.AugmentEquipmentFrameColors.IsNullOrEmpty())
+            if (!giganticExoframe.AugmentEquipmentFrameColors.IsNullOrEmpty())
             {
-                augmentedManipulator.AddedStringProps["EquipmentFrameColors"] = assigningPart.AugmentEquipmentFrameColors;
+                augmentedManipulator.AddedStringProps["EquipmentFrameColors"] = giganticExoframe.AugmentEquipmentFrameColors;
             }
 
             return augmentedManipulator;
         }
-        public override ModNaturalEquipment<CyberneticsGiganticExoframe> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<CyberneticsGiganticExoframe>> Filter = null, CyberneticsGiganticExoframe NewAssigner = null)
-        {
-            ModNaturalEquipment<CyberneticsGiganticExoframe> naturalEquipmentMod = NewAugmentedManipulatorMod(NewAssigner ?? this);
-            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
-        }
 
         public string GetAugmentAdjective(int Colorfulness = 0)
         {
-            string augmentedColor = NaturalEquipmentMod.AdjectiveColor;
-            string augmentedColorFallback = NaturalEquipmentMod.AdjectiveColorFallback;
-            string adjective = NaturalEquipmentMod.Adjective;
+            ModAugmentedNaturalWeapon naturalEquipmentMod = NewAugmentedManipulatorMod(NaturalEquipmentManager);
+            string augmentedColor = naturalEquipmentMod.AdjectiveColor;
+            string augmentedColorFallback = naturalEquipmentMod.AdjectiveColorFallback;
+            string adjective = naturalEquipmentMod.Adjective;
             return adjective.OptionalColor(augmentedColor, augmentedColorFallback, Colorfulness);
         }
         public string GetAugmentPrefix(int Colorfulness = 0)

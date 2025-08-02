@@ -358,6 +358,9 @@ namespace XRL.World.Parts
             set => _wielder = value;
         }
 
+        [NonSerialized]
+        public NaturalEquipmentManager Manager;
+
         private NaturalEquipmentOperator _operator = null;
         public NaturalEquipmentOperator Operator
         {
@@ -400,6 +403,7 @@ namespace XRL.World.Parts
 
         public ModNaturalEquipmentBase()
         {
+            Manager = null;
             PartAdjustments = new();
             Adjustments = new();
             ForceNoun = false;
@@ -408,14 +412,16 @@ namespace XRL.World.Parts
             AddedStringProps = new();
             AddedIntProps = new();
         }
-        public ModNaturalEquipmentBase(int Tier)
-            : base(Tier)
+        public ModNaturalEquipmentBase(NaturalEquipmentManager NewManager)
+            : this()
         {
-            PartAdjustments = new();
+            Manager = NewManager;
         }
         public ModNaturalEquipmentBase(ModNaturalEquipmentBase Source)
             : this()
         {
+            Manager = Source.Manager;
+
             BodyPartType = Source.BodyPartType;
 
             PartAdjustments = new(Source.PartAdjustments ??= new());
@@ -442,6 +448,11 @@ namespace XRL.World.Parts
             AddedParts = new(Source.AddedParts ?? new());
             AddedStringProps = new(Source.AddedStringProps ?? new());
             AddedIntProps = new(Source.AddedIntProps ?? new());
+        }
+        public ModNaturalEquipmentBase(NaturalEquipmentManager NewManager, ModNaturalEquipmentBase Source)
+            : this(Source)
+        {
+            Manager = NewManager;
         }
 
         public override void Configure()
@@ -482,149 +493,147 @@ namespace XRL.World.Parts
             return AddAdjustment(Target, Field, Value, modPriority, Condition, AllConditions, AnyConditions);
         }
 
-        public virtual void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null)
         {
             int indent = Debug.LastIndent;
             Adjustments ??= new();
             Adjustment.Source ??= GetType();
             Adjustment.Condition ??= Condition;
-            Adjustment.AnyConditions ??= AnyConditions;
-            Adjustment.AllConditions ??= AllConditions;
-            Debug.LoopItem(4, $"Adding {nameof(Adjustment)}: {Adjustment.Source.Name}.{Adjustment.GetType().Name}", Indent: indent + 1, Toggle: true);
+            Debug.LoopItem(4, $"Adding: {Adjustment}", Indent: indent + 1, Toggle: true);
             Adjustments.Add(Adjustment);
             Debug.LastIndent = indent;
         }
 
-        public virtual void AddAdjustment(IAdjustment Adjustment, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddAdjustment(IAdjustment Adjustment, int Priority, ICondition<GameObject> Condition = null)
         {
             Adjustment.Priority = Priority;
-            AddAdjustment(Adjustment, Condition, AllConditions, AnyConditions);
+            AddAdjustment(Adjustment, Condition);
         }
-        public virtual void AddAdjustment(IAdjustment Adjustment, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddAdjustment(IAdjustment Adjustment, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            AddAdjustment(Adjustment, modPriority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(Adjustment, modPriority, Condition);
         }
 
-        public virtual Guid AddNounAdjustment(int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddNounAdjustment(int Priority, ICondition<GameObject> Condition = null)
         {
             string noun = GetNoun();
             if (noun != null)
             {
-                AddAdjustment(new ChangeRenderDisplayName(noun), Priority, Condition, AllConditions, AnyConditions);
-                return AddAdjustment(RENDER, "DisplayName", noun, Priority, Condition, AllConditions, AnyConditions);
+                AddAdjustment(new ChangeRenderDisplayName(noun), Priority, Condition);
+                return AddAdjustment(RENDER, "DisplayName", noun, Priority, Condition);
             }
             return Guid.Empty;
         }
-        public virtual Guid AddNounAdjustment(bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddNounAdjustment(bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddNounAdjustment(modPriority, Condition, AllConditions, AnyConditions);
+            return AddNounAdjustment(modPriority, Condition);
         }
 
-        public virtual Guid AddSkillAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddSkillAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new ChangeMeleeWeaponSkill(Value), Priority, Condition, AllConditions, AnyConditions);
-            return AddAdjustment(MELEEWEAPON, "Skill", Value, Priority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(new ChangeMeleeWeaponSkill(Value), Priority, Condition);
+            return AddAdjustment(MELEEWEAPON, "Skill", Value, Priority, Condition);
         }
-        public virtual Guid AddSkillAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddSkillAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddSkillAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddSkillAdjustment(Value, modPriority, Condition);
         }
 
-        public virtual Guid AddMeleeStatAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddMeleeStatAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new ChangeMeleeWeaponStat(Value), Priority, Condition, AllConditions, AnyConditions);
-            return AddAdjustment(MELEEWEAPON, "Stat", Value, Priority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(new ChangeMeleeWeaponStat(Value), Priority, Condition);
+            return AddAdjustment(MELEEWEAPON, "Stat", Value, Priority, Condition);
         }
-        public virtual Guid AddMeleeStatAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddMeleeStatAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddMeleeStatAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddMeleeStatAdjustment(Value, modPriority, Condition);
         }
 
-        public virtual Guid AddTileAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddTileAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new ChangeTile(Value), Priority, Condition, AllConditions, AnyConditions);
-            return AddAdjustment(RENDER, "Tile", Value, Priority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(new ChangeTile(Value), Priority, Condition);
+            return AddAdjustment(RENDER, "Tile", Value, Priority, Condition);
         }
-        public virtual Guid AddTileAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddTileAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddTileAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddTileAdjustment(Value, modPriority, Condition);
         }
 
-        public virtual Guid AddColorStringAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddColorStringAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new ChangeColorString(Value), Priority, Condition, AllConditions, AnyConditions);
-            return AddAdjustment(RENDER, "ColorString", Value, Priority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(new ChangeColorString(Value), Priority, Condition);
+            return AddAdjustment(RENDER, "ColorString", Value, Priority, Condition);
         }
-        public virtual Guid AddColorStringAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddColorStringAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddColorStringAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddColorStringAdjustment(Value, modPriority, Condition);
         }
 
-        public virtual Guid AddTileColorAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddTileColorAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new ChangeTileColor(Value), Priority, Condition, AllConditions, AnyConditions);
-            return AddAdjustment(RENDER, "TileColor", Value, Priority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(new ChangeTileColor(Value), Priority, Condition);
+            return AddAdjustment(RENDER, "TileColor", Value, Priority, Condition);
         }
-        public virtual Guid AddTileColorAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddTileColorAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddTileColorAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddTileColorAdjustment(Value, modPriority, Condition);
         }
 
-        public virtual Guid AddDetailColorAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddDetailColorAdjustment(string Value, int Priority, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new ChangeDetailColor(Value), Priority, Condition, AllConditions, AnyConditions);
-            return AddAdjustment(RENDER, "DetailColor", Value, Priority, Condition, AllConditions, AnyConditions);
+            AddAdjustment(new ChangeDetailColor(Value), Priority, Condition);
+            return AddAdjustment(RENDER, "DetailColor", Value, Priority, Condition);
         }
-        public virtual Guid AddDetailColorAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual Guid AddDetailColorAdjustment(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
-            return AddDetailColorAdjustment(Value, modPriority, Condition, AllConditions, AnyConditions);
+            return AddDetailColorAdjustment(Value, modPriority, Condition);
         }
 
-        public virtual void AddDamageDieCountAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddDamageDieCountAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
             
-            AddAdjustment(new AdjustDamageDieCount(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustDamageDieCount(Amount), Condition);
         }
 
-        public virtual void AddDamageDieSizeAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddDamageDieSizeAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new AdjustDamageDieSize(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustDamageDieSize(Amount), Condition);
         }
 
-        public virtual void AddDamageBonusAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddDamageBonusAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new AdjustDamageBonus(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustDamageBonus(Amount), Condition);
         }
 
-        public virtual void AddHitBonusAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddHitBonusAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new AdjustHitBonus(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustHitBonus(Amount), Condition);
         }
 
-        public virtual void AddPenBonusAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddPenBonusAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new AdjustPenBonus(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustPenBonus(Amount), Condition);
         }
 
-        public virtual void AddArmorAVAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddArmorAVAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new AdjustArmorAV(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustArmorAV(Amount), Condition);
         }
 
-        public virtual void AddArmorDVAdjustment(int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddArmorDVAdjustment(int Amount, ICondition<GameObject> Condition = null)
         {
-            AddAdjustment(new AdjustArmorDV(Amount), Condition, AllConditions, AnyConditions);
+            AddAdjustment(new AdjustArmorDV(Amount), Condition);
         }
 
-        public virtual void AddArmorStatisticAdjustment(string Statistic, int Amount, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public virtual void AddArmorStatisticAdjustment(string Statistic, int Amount, ICondition<GameObject> Condition = null)
         {
             AdjustArmorStatistic adjustment = Statistic switch
             {
@@ -636,7 +645,7 @@ namespace XRL.World.Parts
                 "Ego" => new AdjustArmorEgo(Amount),
                 _ => null,
             };
-            AddAdjustment(adjustment, Condition, AllConditions, AnyConditions);
+            AddAdjustment(adjustment, Condition);
         }
 
         public virtual int GetDamageDieCount()
@@ -822,7 +831,14 @@ namespace XRL.World.Parts
         public static ModNaturalEquipmentBase ClearForCopy(ModNaturalEquipmentBase NaturalEquipmentMod)
         {
             NaturalEquipmentMod.Wielder = null;
+            NaturalEquipmentMod.Manager = null;
             return NaturalEquipmentMod;
+        }
+
+        public override void FinalizeCopy(GameObject Source, bool CopyEffects, bool CopyID, Func<GameObject, GameObject> MapInv)
+        {
+            base.FinalizeCopy(Source, CopyEffects, CopyID, MapInv);
+            Manager = Operator?.Manager;
         }
 
     } //!-- public class ModNaturalEquipmentBase : ModPart

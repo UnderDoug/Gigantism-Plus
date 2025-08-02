@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using XRL.World;
+using XRL.World.Parts;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
@@ -15,11 +16,17 @@ namespace HNPS_GigantismPlus
         public static AnyConditions<GameObject> IsOrganicFist => new()
         {
             new GameObjectBlueprintIs("DefaultFist"),
-            new NotCondition<GameObject>(new GameObjectHasAnyParts(new string[]
+            new NotCondition<GameObject>(new GameObjectHasAnyParts(new Type[]
             {
-                "Inorganic",
-                "Metal",
+                typeof(Inorganic),
+                typeof(Metal),
             }))
         };
+
+        public static GameObjectHasNatEquipModWithAnyCumultiveMelee<T> ThisModAdjustsMeleeCumulatively<T>()
+            where T : ModNaturalEquipmentBase, new()
+        {
+            return new();
+        }
     }
 }

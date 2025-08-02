@@ -48,7 +48,7 @@ namespace HNPS_GigantismPlus
 
         public bool TryGetPartParameter(GameObject Subject, out Traverse PartParameter)
         {
-            T targetPart = Subject.GetPart<T>();
+            T targetPart = Subject?.GetPart<T>();
             PartParameter = null;
             if (targetPart != null && !Parameter.IsNullOrEmpty() && Value != null)
             {
@@ -76,8 +76,8 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return TryGetPartParameter(Subject, out _) 
-                && base.Check(Subject);
+            return base.Check(Subject)
+                && TryGetPartParameter(Subject, out _);
         }
 
         public override bool Apply(GameObject Subject)

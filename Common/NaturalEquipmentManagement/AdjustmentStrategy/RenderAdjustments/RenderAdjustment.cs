@@ -21,9 +21,9 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return Subject.Render != null 
+            return base.Check(Subject) 
                 && !Value.IsNullOrEmpty() 
-                && base.Check(Subject);
+                && Subject.Render != null;
         }
     }
 }

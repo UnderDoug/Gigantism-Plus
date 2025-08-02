@@ -40,37 +40,26 @@ namespace XRL.World.Parts
             AddSkillAdjustment("ShortBlades", true);
             AddMeleeStatAdjustment("Agility", -120);
 
-            AddNounAdjustment(true, AllConditions: new() { IsOrganicFist });
+            AddNounAdjustment(true, Condition: IsOrganicFist);
 
-            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, AllConditions: new() { IsOrganicFist });
+            AddTileAdjustment("NaturalWeapons/ElongatedPaw.png", true, Condition: IsOrganicFist);
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);
 
             if (EnablePrereleaseContent)
             {
-                AnyConditions<GameObject> arbitraryAnyConditions = new()
-            {
-                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustDamageDieCount>(),
-                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustDamageDieSize>(),
-                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustDamageBonus>(),
-                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustHitBonus>(),
-                new GameObjectHasNaturalEquipmentModWithCumulativeDamage<ModNaturalEquipment<ElongatedPaws>, AdjustPenBonus>(),
-            };
+                AnyConditions<GameObject> arbitraryAnyConditions = ThisModAdjustsMeleeCumulatively<ElongatedPaws>();
 
-                ArbitraryDescription arbitraryCumulativeMeleeDescription = new(
-                    GetType(),
-                    DescriptionElement.Empty,
-                    new("", $"subject.Possessive bonus damage scale by half =subject.Possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier"))
+                string arbitraryEffect = $"=subject.possessive= bonus damage scale by half =subject.possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier";
+                DescriptionElement emptyElement = DescriptionElement.Empty;
+                ArbitraryDescription arbitraryCumulativeMeleeDescription = new(GetType(), emptyElement, new("", arbitraryEffect))
                 {
-                    Condition = arbitraryAnyConditions
+                    Condition = arbitraryAnyConditions,
                 };
                 AddAdjustment(arbitraryCumulativeMeleeDescription, true);
 
-                ArbitraryDescription arbitraryNoCumulativeMeleeDescription = new(
-                    GetType(),
-                    DescriptionElement.Empty,
-                    new("have", $"subject.Possessive bonus damage scale by half =subject.Possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier"))
+                ArbitraryDescription arbitraryNoCumulativeMeleeDescription = new(GetType(), emptyElement, new("have", arbitraryEffect))
                 {
                     Condition = new NotAnyConditions<GameObject>(arbitraryAnyConditions),
                 };
@@ -78,14 +67,15 @@ namespace XRL.World.Parts
 
                 DiminishingReturns diminishingReturns = new("increases to damage die size")
                 {
-                    AnyConditions = new()
-                    {
-                        new GameObjectWielderHasPart<GigantismPlus>(),
-                        new GameObjectWielderHasPart<UD_ManagedBurrowingClaws>(),
-                    }
+                    Condition = new GameObjectHasAnyParts(new Type[] { typeof(GigantismPlus), typeof(UD_ManagedBurrowingClaws) }),
                 };
                 AddAdjustment(diminishingReturns, true);
             }
+        }
+        public ModElongatedNaturalWeapon(NaturalEquipmentManager NewManager)
+            : this()
+        {
+            Manager = NewManager;
         }
 
         public override bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<ElongatedPaws>> E)
@@ -95,15 +85,15 @@ namespace XRL.World.Parts
                 string scalingStat = ElongatedPaws.SCALE_STAT;
                 if (E.WeaponDescriptions.IsNullOrEmpty())
                 {
-                    E.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    // E.AddWeaponElement("have", $"{E.Object.its} bonus damage scale by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
                 else
                 {
-                    E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    // E.AddWeaponElement("", $"{E.Object.its} bonus damage scales by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
                 if (AssigningPart.HasGigantism || AssigningPart.HasBurrowing)
                 {
-                    E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
+                    // E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size");
                 }
             }
             return base.HandleEvent(E);

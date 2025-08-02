@@ -42,8 +42,8 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject Subject)
         {
             return !Value.IsNullOrEmpty() 
-                && Subject.GetPart<MeleeWeapon>().Stat != Value 
-                && base.Check(Subject);
+                && base.Check(Subject) 
+                && Subject.GetPart<MeleeWeapon>().Stat != Value;
         }
 
         public override bool Apply(GameObject Subject)

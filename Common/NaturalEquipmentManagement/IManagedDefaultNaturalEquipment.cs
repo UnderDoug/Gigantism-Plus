@@ -19,8 +19,9 @@ namespace XRL.World
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
+        public abstract NaturalEquipmentManager NaturalEquipmentManager { get; }
+
         public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public virtual ModNaturalEquipment<T> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public abstract bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts);
 
@@ -42,9 +43,7 @@ namespace XRL.World
 
         public abstract Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod);
 
-        public abstract ModNaturalEquipment<T> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null);
-
-        public abstract List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, T NewAssigner = null);
+        public abstract List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, NaturalEquipmentManager NewManager = null);
 
         public abstract ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 

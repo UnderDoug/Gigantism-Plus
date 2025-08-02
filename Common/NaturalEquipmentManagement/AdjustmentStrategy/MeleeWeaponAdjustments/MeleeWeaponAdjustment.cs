@@ -14,14 +14,14 @@ namespace HNPS_GigantismPlus
             : base()
         {
         }
-        public MeleeWeaponAdjustment(MeleeWeaponAdjustment Source)
-            : base(Source)
+        public MeleeWeaponAdjustment(MeleeWeaponAdjustment SourceAdjustment)
+            : base(SourceAdjustment)
         {
         }
         public override bool Check(GameObject Subject)
         {
-            return Subject.HasPart<MeleeWeapon>() 
-                && base.Check(Subject);
+            return base.Check(Subject) 
+                && Subject.HasPart<MeleeWeapon>();
         }
     }
 }

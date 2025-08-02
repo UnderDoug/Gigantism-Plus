@@ -20,9 +20,8 @@ namespace XRL.World.Parts
         public ModCrystallineNaturalWeapon()
         {
         }
-
-        public ModCrystallineNaturalWeapon(int Tier)
-            : base(Tier)
+        public ModCrystallineNaturalWeapon(NaturalEquipmentManager NewManager)
+            : base(NewManager)
         {
         }
 

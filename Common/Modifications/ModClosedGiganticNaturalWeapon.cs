@@ -19,17 +19,16 @@ namespace XRL.World.Parts
         public ModClosedGiganticNaturalWeapon()
         {
         }
-
-        public ModClosedGiganticNaturalWeapon(int Tier)
-            : base(Tier)
+        public ModClosedGiganticNaturalWeapon(NaturalEquipmentManager NewManager)
+            : base(NewManager)
         {
         }
 
         public override void ApplyModification(GameObject Object)
         {
-            if (ParentObject.TryGetPart(out NaturalEquipmentOperator manager))
+            if (Operator != null)
             {
-                manager.DoDynamicTile = false;
+                Operator.DoDynamicTile = false;
             }
             base.ApplyModification(Object);
         }
@@ -50,5 +49,5 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
 
-    } //!-- public class ModClosedGiganticNaturalWeapon : ModNaturalEquipment<GigantismPlus>
+    }
 }

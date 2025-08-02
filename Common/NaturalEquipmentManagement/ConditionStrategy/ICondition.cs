@@ -26,13 +26,13 @@ namespace HNPS_GigantismPlus
     ///
     ///     public override bool Check(GameObject GameObject)
     ///     {
-    ///         return !PropertyOrTag.IsNullOrEmpty() &amp;&amp; GameObject.PropertyOrTag == PropertyOrTag;
+    ///         return !PropertyOrTag.IsNullOrEmpty() &amp;&amp; GameObject != null &amp;&amp; GameObject.PropertyOrTag == PropertyOrTag;
     ///     }
     /// }
     /// </code>
     /// </example>
     [Serializable]
-    public abstract class ICondition<T> : IComposite
+    public abstract class ICondition<T> : IComposite, IConditional<T>
         where T : class, new()
     {
         public bool FalseIfSubjectNull;

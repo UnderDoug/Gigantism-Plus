@@ -45,31 +45,24 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        private T _assigningPart = null;
-
-        public T AssigningPart
-        {
-            get => _assigningPart ??= Operator?.Manager?.GetManagedNaturalEquipmentCompatiblePart<T>();
-            set => _assigningPart = value;
-        }
+        public T AssigningPart => 
+            Manager?.GetManagedNaturalEquipmentCompatiblePart<T>() 
+         ?? Operator?.Manager?.GetManagedNaturalEquipmentCompatiblePart<T>();
 
         public ModNaturalEquipment()
         {
         }
-        public ModNaturalEquipment(int Tier)
-            : base(Tier)
+        public ModNaturalEquipment(NaturalEquipmentManager NewManager)
+            : base(NewManager)
         {
-            base.Tier = Tier;
         }
         public ModNaturalEquipment(ModNaturalEquipment<T> Source)
             : base(Source)
         {
-            AssigningPart = Source.AssigningPart;
         }
-        public ModNaturalEquipment(ModNaturalEquipment<T> Source, T NewAssigningPart)
-            : base(Source)
+        public ModNaturalEquipment(NaturalEquipmentManager NewManager, ModNaturalEquipment<T> Source)
+            : base(NewManager, Source)
         {
-            AssigningPart = NewAssigningPart;
         }
 
         public override void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
@@ -160,11 +153,8 @@ namespace XRL.World.Parts
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
-            if(AssigningPart.Is(null))
-            {
-               AssigningPart = who.GetPart<T>();
-            }
-            if(AssigningPart.Is(null))
+            Operator.Manager ??= who?.RequirePart<NaturalEquipmentManager>();
+            if (AssigningPart != null)
             {
                 Debug.Warn(2,
                     $"{typeof(ModNaturalEquipment<T>).Name}<{GetSource()}>",
@@ -317,7 +307,6 @@ namespace XRL.World.Parts
         }
         public static ModNaturalEquipment<T> ClearForCopy(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
-            NaturalEquipmentMod.AssigningPart = null;
             return NaturalEquipmentMod;
         }
 

@@ -1,15 +1,14 @@
-﻿using System;
+﻿using HNPS_GigantismPlus;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using XRL.Rules;
+using System.Reflection;
 using XRL.Language;
+using XRL.Rules;
 using XRL.World.Anatomy;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -40,8 +39,9 @@ namespace XRL.World.Parts.Mutation
             return doDebug;
         }
 
+        public NaturalEquipmentManager NaturalEquipmentManager => ParentObject?.RequirePart<NaturalEquipmentManager>();
+
         public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod => GetNaturalEquipmentMod();
 
         public bool HasGigantism =>  ParentObject != null && ParentObject.HasPart<GigantismPlus>();
 
@@ -63,11 +63,11 @@ namespace XRL.World.Parts.Mutation
             EnableActivatedAbilityID = BurrowingClaws.EnableActivatedAbilityID;
         }
 
-        public static ModBurrowingNaturalWeapon NewBurrowingWeaponMod(UD_ManagedBurrowingClaws assigningPart)
+        public static ModBurrowingNaturalWeapon NewBurrowingWeaponMod(NaturalEquipmentManager NewManager)
         {
             ModBurrowingNaturalWeapon burrowingClawsMod = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = 80,
@@ -82,12 +82,7 @@ namespace XRL.World.Parts.Mutation
 
                 PartAdjustments = new(),
 
-                /*
-                AddedParts = new()
-                {
-                    nameof(DiggingTool),
-                },
-                */
+                AddedParts = new(),
 
                 AddedStringProps = new()
                 {
@@ -97,8 +92,11 @@ namespace XRL.World.Parts.Mutation
             };
             if (!EnablePrereleaseContent)
             {
-                burrowingClawsMod.AddedParts ??= new();
                 burrowingClawsMod.AddedParts.Add(nameof(DiggingTool));
+            }
+            else
+            {
+                burrowingClawsMod.AddAdjustment(new AddPartAdjustment<DiggingTool>(), false);
             }
 
             burrowingClawsMod.AddSkillAdjustment("ShortBlades", true);
@@ -112,11 +110,9 @@ namespace XRL.World.Parts.Mutation
 
             if (EnablePrereleaseContent)
             {
-                burrowingClawsMod.AddAdjustment(new AddPartAdjustment<DiggingTool>(), false);
-
                 DiminishingReturns diminishingReturns = new("increases to damage die size")
                 {
-                    AllConditions = new()
+                    Condition = new AllConditions<GameObject>()
                     {
                         new GameObjectWielderHasPart<GigantismPlus>(),
                         new NotAnyConditions<GameObject>()
@@ -202,29 +198,78 @@ namespace XRL.World.Parts.Mutation
         {
             return NaturalEquipmentMod.AddedIntProps;
         }
-        public virtual ModNaturalEquipment<UD_ManagedBurrowingClaws> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, UD_ManagedBurrowingClaws NewAssigner = null)
-        {
-            ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = NewBurrowingWeaponMod(NewAssigner ?? this);
-            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : null;
-        }
-        public virtual List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, UD_ManagedBurrowingClaws NewAssigner = null)
+
+        public List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, NaturalEquipmentManager NewManager = null)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(GetNaturalEquipmentMods)}("
                 + $"{nameof(Filter)}, "
-                + $"{nameof(NewAssigner)}: {NewAssigner?.Name})",
+                + $"{nameof(NewManager)}: {NewManager?.Name})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NewAssigner ??= this;
+            NewManager ??= NaturalEquipmentManager;
             List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> naturalEquipmentModsList = new();
-            ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
-            if (naturalEquipmentMod != null)
-            {
-                naturalEquipmentModsList.Add(naturalEquipmentMod);
-            }
 
+            List<MethodInfo> managedBaseMethods = new(typeof(UD_ManagedBurrowingClaws).GetMethods());
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                managedBaseMethods.RemoveAll(m => !m.IsStatic || !m.IsPublic || !m.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<UD_ManagedBurrowingClaws>)));
+            }
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                Debug.CheckYeh(4, $"Have Methods", Indent: indent + 2, Toggle: getDoDebug());
+                foreach (MethodInfo managedMethod in managedBaseMethods)
+                {
+                    if (!managedMethod.IsStatic || !managedMethod.IsPublic)
+                    {
+                        continue;
+                    }
+                    Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
+
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsStatic)}: {managedMethod.IsStatic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.ReturnType)}: {managedMethod.ReturnType.Name}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+
+                    if (managedMethod.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<UD_ManagedBurrowingClaws>))
+                        && managedMethod.IsStatic
+                        && managedMethod.IsPublic)
+                    {
+                        ParameterInfo[] parameters = managedMethod.GetParameters();
+                        if (parameters.Length == 1
+                            && parameters[0].ParameterType.InheritsFrom(typeof(NaturalEquipmentManager)))
+                        {
+                            Debug.CheckYeh(4,
+                                $"public static {managedMethod.ReturnType.Name} " +
+                                $"{managedMethod.Name}(" +
+                                $"{parameters[0].ParameterType.Name} {parameters[0].Name})",
+                                Indent: indent + 5, Toggle: getDoDebug());
+
+                            if (managedMethod.Invoke(null, new object[1] { NewManager }) is ModNaturalEquipment<UD_ManagedBurrowingClaws> naturalEquipmentMod)
+                            {
+                                Debug.CheckYeh(4, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                                if (Filter(naturalEquipmentMod))
+                                {
+                                    Debug.CheckYeh(4, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: getDoDebug());
+                                    naturalEquipmentModsList.Add(naturalEquipmentMod);
+                                }
+                                else
+                                {
+                                    Debug.CheckNah(4, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: getDoDebug());
+                                }
+                            }
+                            else
+                            {
+                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                            }
+                        }
+                    }
+                }
+            }
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }

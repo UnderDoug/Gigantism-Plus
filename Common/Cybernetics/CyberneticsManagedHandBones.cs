@@ -61,19 +61,24 @@ namespace XRL.World.Parts
         public CyberneticsManagedHandBones()
         {
         }
-        public static ModChromeBonedNaturalWeapon NewChromeBonedNaturalWeaponMod(CyberneticsManagedHandBones assigningPart)
+        public static ModChromeBonedNaturalWeapon NewChromeBonedNaturalWeaponMod(NaturalEquipmentManager NewManager)
         {
+            CyberneticsManagedHandBones chromeHandBones = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsManagedHandBones>();
+            if (chromeHandBones == null)
+            {
+                return null;
+            }
             ModChromeBonedNaturalWeapon chromeBonedNaturalWeapon = new()
             {
-                AssigningPart = assigningPart,
+                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = 490,
                 DescriptionPriority = 490,
 
                 Adjective = "boned",
-                AdjectiveColor = assigningPart.BonesAdjectiveColor,
-                AdjectiveColorFallback = assigningPart.BonesAdjectiveColor,
+                AdjectiveColor = chromeHandBones.BonesAdjectiveColor,
+                AdjectiveColorFallback = chromeHandBones.BonesAdjectiveColor,
                 ExludeFromDynamicTile = true,
 
                 PartAdjustments = new(),
@@ -83,46 +88,43 @@ namespace XRL.World.Parts
                 AddedIntProps = new(),
                 AddedStringProps = new(),
             };
-            chromeBonedNaturalWeapon.AddTileAdjustment(assigningPart.BonesTile, AllConditions: new() { IsOrganicFist });
-            chromeBonedNaturalWeapon.AddColorStringAdjustment(assigningPart.BonesTileColorString);
-            chromeBonedNaturalWeapon.AddTileColorAdjustment(assigningPart.BonesTileColorString);
-            chromeBonedNaturalWeapon.AddDetailColorAdjustment(assigningPart.BonesTileDetailColor, true);
+            chromeBonedNaturalWeapon.AddTileAdjustment(chromeHandBones.BonesTile, Condition: IsOrganicFist);
+            chromeBonedNaturalWeapon.AddColorStringAdjustment(chromeHandBones.BonesTileColorString);
+            chromeBonedNaturalWeapon.AddTileColorAdjustment(chromeHandBones.BonesTileColorString);
+            chromeBonedNaturalWeapon.AddDetailColorAdjustment(chromeHandBones.BonesTileDetailColor, true);
 
-            assigningPart.ProcessNaturalEquipmentAddedParts(chromeBonedNaturalWeapon, assigningPart.BonesAddParts);
-            assigningPart.ProcessNaturalEquipmentAddedProps(chromeBonedNaturalWeapon, assigningPart.BonesAddProps);
+            chromeHandBones.ProcessNaturalEquipmentAddedParts(chromeBonedNaturalWeapon, chromeHandBones.BonesAddParts);
+            chromeHandBones.ProcessNaturalEquipmentAddedProps(chromeBonedNaturalWeapon, chromeHandBones.BonesAddProps);
 
-            if (!assigningPart.BonesSwingSound.IsNullOrEmpty())
+            if (!chromeHandBones.BonesSwingSound.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddedStringProps["SwingSound"] = assigningPart.BonesSwingSound;
+                chromeBonedNaturalWeapon.AddedStringProps["SwingSound"] = chromeHandBones.BonesSwingSound;
             }
-            if (!assigningPart.BonesBlockedSound.IsNullOrEmpty())
+            if (!chromeHandBones.BonesBlockedSound.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddedStringProps["BlockedSound"] = assigningPart.BonesBlockedSound;
+                chromeBonedNaturalWeapon.AddedStringProps["BlockedSound"] = chromeHandBones.BonesBlockedSound;
             }
-            if (!assigningPart.BonesEquipmentFrameColors.IsNullOrEmpty())
+            if (!chromeHandBones.BonesEquipmentFrameColors.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddedStringProps["EquipmentFrameColors"] = assigningPart.BonesEquipmentFrameColors;
+                chromeBonedNaturalWeapon.AddedStringProps["EquipmentFrameColors"] = chromeHandBones.BonesEquipmentFrameColors;
             }
 
             return chromeBonedNaturalWeapon;
         }
-        public override ModNaturalEquipment<CyberneticsManagedHandBones> GetNaturalEquipmentMod(Predicate<ModNaturalEquipment<CyberneticsManagedHandBones>> Filter = null, CyberneticsManagedHandBones NewAssigner = null)
-        {
-            ModNaturalEquipment<CyberneticsManagedHandBones> naturalEquipmentMod = NewChromeBonedNaturalWeaponMod(NewAssigner ?? this);
-            return Filter == null || Filter(naturalEquipmentMod) ? naturalEquipmentMod : base.GetNaturalEquipmentMod(Filter, NewAssigner);
-        }
 
         public string GetMaterialAdjective(int Colorfulness = 0)
         {
-            string materialColor = NaturalEquipmentMod.AdjectiveColor;
+            ModChromeBonedNaturalWeapon naturalEquipmentMod = NewChromeBonedNaturalWeaponMod(NaturalEquipmentManager);
+            string materialColor = naturalEquipmentMod.AdjectiveColor;
             string material = Material;
             return $"{material.OptionalColor(materialColor, materialColor, Colorfulness)}";
         }
         public string GetBonedAdjective(int Colorfulness = 0, bool Inorganic = false, bool Metalic = false)
         {
+            ModChromeBonedNaturalWeapon naturalEquipmentMod = NewChromeBonedNaturalWeaponMod(NaturalEquipmentManager);
             Inorganic = Metalic ? Metalic : Inorganic;
             string bonesColor = "r";
-            string adjective = NaturalEquipmentMod.Adjective;
+            string adjective = naturalEquipmentMod.Adjective;
             if (Inorganic)
             {
                 bonesColor = "K";

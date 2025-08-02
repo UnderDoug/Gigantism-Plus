@@ -17,7 +17,7 @@ namespace HNPS_GigantismPlus
         {
         }
         public GameObjectHasAnyParts(IEnumerable<GameObjectHasPart> Conditions)
-            : base(Conditions as AllConditions<GameObject>)
+            : base(Conditions as AnyConditions<GameObject>)
         {
         }
         public GameObjectHasAnyParts(IEnumerable<string> Parts)
@@ -26,6 +26,14 @@ namespace HNPS_GigantismPlus
             foreach (string part in Parts)
             {
                 Add(new GameObjectHasPart(part));
+            }
+        }
+        public GameObjectHasAnyParts(IEnumerable<Type> Parts)
+            : base()
+        {
+            foreach (Type part in Parts)
+            {
+                Add(new GameObjectHasPart(part.Name));
             }
         }
     }

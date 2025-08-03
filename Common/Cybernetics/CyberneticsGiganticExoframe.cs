@@ -65,27 +65,9 @@ namespace XRL.World.Parts
             {
                 return null;
             }
-            ModAugmentedNaturalWeapon augmentedManipulator = new()
+            ModAugmentedNaturalWeapon augmentedManipulator = new(NewManager)
             {
-                Manager = NewManager,
-                BodyPartType = "Hand",
-
-                ModPriority = -500,
-                DescriptionPriority = -500,
-
-                ForceNoun = true,
-                Noun = "manipulator",
-
-                Adjective = "augmented",
                 AdjectiveColor = giganticExoframe.AugmentAdjectiveColor,
-                AdjectiveColorFallback = "c",
-
-                PartAdjustments = new(),
-
-                AddedParts = new(),
-
-                AddedIntProps = new(),
-                AddedStringProps = new(),
             };
             augmentedManipulator.AddNounAdjustment();
 
@@ -94,22 +76,44 @@ namespace XRL.World.Parts
             augmentedManipulator.AddTileColorAdjustment(giganticExoframe.AugmentTileColorString, true);
             augmentedManipulator.AddDetailColorAdjustment(giganticExoframe.AugmentTileDetailColor);
 
-            giganticExoframe.ProcessNaturalEquipmentAddedParts(augmentedManipulator, giganticExoframe.AugmentAddParts);
-            giganticExoframe.ProcessNaturalEquipmentAddedProps(augmentedManipulator, giganticExoframe.AugmentAddProps);
-
             if (!giganticExoframe.AugmentSwingSound.IsNullOrEmpty())
             {
-                augmentedManipulator.AddedStringProps["SwingSound"] = giganticExoframe.AugmentSwingSound;
+                augmentedManipulator.AddAdjustment(new SetSwingSound(giganticExoframe.AugmentSwingSound));
             }
             if (!giganticExoframe.AugmentBlockedSound.IsNullOrEmpty())
             {
-                augmentedManipulator.AddedStringProps["BlockedSound"] = giganticExoframe.AugmentBlockedSound;
+                augmentedManipulator.AddAdjustment(new SetBlockedSound(giganticExoframe.AugmentBlockedSound));
             }
             if (!giganticExoframe.AugmentEquipmentFrameColors.IsNullOrEmpty())
             {
-                augmentedManipulator.AddedStringProps["EquipmentFrameColors"] = giganticExoframe.AugmentEquipmentFrameColors;
+                augmentedManipulator.AddAdjustment(new SetEquipmentFrameColors(giganticExoframe.AugmentEquipmentFrameColors, true));
             }
-
+            if (!giganticExoframe.AugmentAddParts.IsNullOrEmpty())
+            {
+                foreach (string addedPart in giganticExoframe.AugmentAddParts.CachedCommaExpansion())
+                {
+                    augmentedManipulator.AddAdjustment(new AddPart(addedPart));
+                }
+            }
+            if (!giganticExoframe.AugmentAddProps.IsNullOrEmpty()
+                && giganticExoframe.AugmentAddProps.ParseProps(out Dictionary<string, string> stringProps, out Dictionary<string, int> intProps))
+            {
+                if (!stringProps.IsNullOrEmpty())
+                {
+                    foreach ((string label, string prop) in stringProps)
+                    {
+                        augmentedManipulator.AddAdjustment(new SetStringProperty(label, prop));
+                    }
+                }
+                if (!intProps.IsNullOrEmpty())
+                {
+                    foreach ((string label, int prop) in intProps)
+                    {
+                        augmentedManipulator.AddAdjustment(new SetIntProperty(label, prop));
+                    }
+                }
+            }
+            
             return augmentedManipulator;
         }
 

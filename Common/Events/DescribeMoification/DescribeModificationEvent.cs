@@ -50,8 +50,8 @@ namespace HNPS_GigantismPlus
                 Object: BeforeEvent.Object,
                 Adjective: BeforeEvent.Adjective,
                 ObjectNoun: BeforeEvent.ObjectNoun,
-                WeaponDescriptions: BeforeEvent.WeaponDescriptions,
-                GeneralDescriptions: BeforeEvent.GeneralDescriptions,
+                WeaponDescriptions: BeforeEvent.PrimaryDescriptions,
+                GeneralDescriptions: BeforeEvent.SecondaryDescriptions,
                 Context: BeforeEvent.Context);
             E.BeforeEvent = BeforeEvent;
             return E;
@@ -71,8 +71,8 @@ namespace HNPS_GigantismPlus
                 E.Object = Object;
                 E.Adjective = Adjective;
                 E.ObjectNoun = ObjectNoun;
-                E.WeaponDescriptions = WeaponDescriptions ?? new();
-                E.GeneralDescriptions = GeneralDescriptions ?? new();
+                E.PrimaryDescriptions = WeaponDescriptions ?? new();
+                E.SecondaryDescriptions = GeneralDescriptions ?? new();
                 E.Context = Context;
             }
             return E;
@@ -135,18 +135,18 @@ namespace HNPS_GigantismPlus
 
             if (BeforeEvent != null)
             {
-                if (!BeforeEvent.WeaponDescriptions.IsNullOrEmpty())
+                if (!BeforeEvent.PrimaryDescriptions.IsNullOrEmpty())
                 {
-                    weaponDescriptions = AddElements(weaponDescriptions, BeforeEvent.WeaponDescriptions);
+                    weaponDescriptions = AddElements(weaponDescriptions, BeforeEvent.PrimaryDescriptions);
                 }
-                if (!BeforeEvent.GeneralDescriptions.IsNullOrEmpty())
+                if (!BeforeEvent.SecondaryDescriptions.IsNullOrEmpty())
                 {
-                    generalDescriptions = AddElements(generalDescriptions, BeforeEvent.GeneralDescriptions);
+                    generalDescriptions = AddElements(generalDescriptions, BeforeEvent.SecondaryDescriptions);
                 }
             }
 
-            weaponDescriptions ??= AddElements(weaponDescriptions, WeaponDescriptions);
-            generalDescriptions ??= AddElements(generalDescriptions, GeneralDescriptions);
+            weaponDescriptions ??= AddElements(weaponDescriptions, PrimaryDescriptions);
+            generalDescriptions ??= AddElements(generalDescriptions, SecondaryDescriptions);
 
             weaponDescriptions.Sort();
             generalDescriptions.Sort();
@@ -167,17 +167,17 @@ namespace HNPS_GigantismPlus
                 generalDescriptions ??= new();
                 if (typeof(T).InheritsFrom(typeof(ModGigantic)))
                 {
-                    generalDescriptions.Add(new(null, "really big. Like, massive! Yuge!"));
+                    generalDescriptions.Add(new(null, "really big. Like, massive! Yuge"));
                     // SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
                 }
                 else if (typeof(T).InheritsFrom(typeof(ModNaturalEquipmentBase)))
                 {
-                    generalDescriptions.Add(new("gain", "some manner of adjustments."));
+                    generalDescriptions.Add(new("gain", "some manner of adjustments"));
                     // SB.Append($"{Object.Does("gain")} some manner of adjustments");
                 }
                 else
                 {
-                    generalDescriptions.Add(new(null, "mysterious. Like, strange! Indescribable!"));
+                    generalDescriptions.Add(new(null, "mysterious. Like, strange! Indescribable"));
                     // SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
                 }
             }

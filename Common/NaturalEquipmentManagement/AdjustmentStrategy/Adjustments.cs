@@ -8,11 +8,41 @@ using XRL;
 using XRL.Collections;
 using XRL.World;
 
+using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
+
 namespace HNPS_GigantismPlus
 {
     [Serializable]
     public partial class Adjustments : IAdjustment
     {
+        private static bool doDebug => getClassDoDebug(nameof(IAdjustment));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+                "OC",   // ObjectCreation
+            };
+            List<object> dontList = new()
+            {
+                'R',    // Removal
+                "S",    // Serialisation
+                nameof(BodyPartsUpdatedEvent),
+                nameof(AfterBodyPartsUpdatedEvent),
+                nameof(BeforeUpdateBodyPartsEvent),
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
+
         protected IAdjustment[] Items = Array.Empty<IAdjustment>();
 
         protected int Size;
@@ -60,6 +90,36 @@ namespace HNPS_GigantismPlus
                     throw new ArgumentOutOfRangeException();
                 }
                 Items[Index] = value;
+                Variant++;
+            }
+        }
+
+
+        public virtual void Add(IAdjustment Adjustment, GameObject Subject)
+        {
+            IAdjustment higherPriorityAdjustment = null;
+            if (!Items.IsNullOrEmpty())
+            {
+                for (int i = 0; i < Size; i++)
+                {
+                    if (Items[i] == null)
+                    {
+                        continue;
+                    }
+                    if (Adjustment.TryGetHigherPriorityAdjustment(Subject, Items[i], out higherPriorityAdjustment))
+                    {
+                        Items[i] = higherPriorityAdjustment;
+                        break;
+                    }
+                }
+            }
+            if (higherPriorityAdjustment == null)
+            {
+                if (Length == Size)
+                {
+                    Resize(Length * 2);
+                }
+                Items[Length++] = Adjustment;
                 Variant++;
             }
         }

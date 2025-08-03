@@ -40,7 +40,7 @@ namespace HNPS_GigantismPlus
                 && base.Check(Subject);
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
@@ -49,7 +49,7 @@ namespace HNPS_GigantismPlus
                 Effect = $"a {bonusPenalty} of {amount} {AffectedParameter}";
                 return new(Verb, Effect);
             }
-            return base.GetGeneralDescriptionElement(Subject);
+            return base.GetSecondaryDescriptionElement(Subject);
         }
     }
 }

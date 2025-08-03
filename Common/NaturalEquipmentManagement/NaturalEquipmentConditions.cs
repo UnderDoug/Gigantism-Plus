@@ -4,6 +4,7 @@ using System.Text;
 
 using XRL.World;
 using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
 
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
@@ -16,17 +17,20 @@ namespace HNPS_GigantismPlus
         public static AnyConditions<GameObject> IsOrganicFist => new()
         {
             new GameObjectBlueprintIs("DefaultFist"),
-            new NotCondition<GameObject>(new GameObjectHasAnyParts(new Type[]
-            {
-                typeof(Inorganic),
-                typeof(Metal),
-            }))
+            new NotCondition<GameObject>(new GameObjectHasAnyParts(new Type[] { typeof(Inorganic), typeof(Metal) })),
         };
 
+        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<GigantismPlus>> IsGigantic => new();
+        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<ElongatedPaws>> IsElongated => new();
+        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<UD_ManagedBurrowingClaws>> IsBurrowing => new();
+        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<UD_ManagedCrystallinity>> IsCrystalline => new();
+
+        public static GameObjectWielderHasPart<GigantismPlus> WielderHasGigantismPlus => new();
+        public static GameObjectWielderHasPart<ElongatedPaws> WielderHasElongatedPaws => new();
+        public static GameObjectWielderHasPart<UD_ManagedBurrowingClaws> WielderHasBurrowingClaws => new();
+        public static GameObjectWielderHasPart<UD_ManagedCrystallinity> WielderHasCrystallinity => new();
+
         public static GameObjectHasNatEquipModWithAnyCumultiveMelee<T> ThisModAdjustsMeleeCumulatively<T>()
-            where T : ModNaturalEquipmentBase, new()
-        {
-            return new();
-        }
+            where T : ModNaturalEquipmentBase, new() => new();
     }
 }

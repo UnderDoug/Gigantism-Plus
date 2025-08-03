@@ -223,7 +223,8 @@ namespace HNPS_GigantismPlus
                 Debug.Warn(2,
                     $"{nameof(Extensions)}",
                     $"{nameof(GetPrioritisedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
-                    $"{nameof(Equipment)} {Equipment?.DebugName ?? NULL} has no {nameof(naturalEquipmentMods)} when it was expected {Equipment?.it ?? "it"} would",
+                    $"{nameof(Equipment)} {Equipment?.DebugName ?? NULL} has no {nameof(naturalEquipmentMods)} " +
+                    $"when it was expected {Equipment?.it ?? "it"} would",
                     Indent: indent + 2);
             }
 
@@ -524,19 +525,20 @@ namespace HNPS_GigantismPlus
             {
                 return Object.GetPart(Part.Name);
             }
-            Part.ParentObject = Object;
             return Object.AddPart(Part, DoRegistration: DoRegistration, Creation: Creation);
         }
-        public static IPart RequirePart(this GameObject Object, string Part, bool DoRegistration = true, bool Creation = false)
+        public static IPart RequirePart(this GameObject Object, string Part, string Namespace = null, bool DoRegistration = true, bool Creation = false)
         {
             if (Object.HasPart(Part))
             {
                 return Object.GetPart(Part);
             }
-            GamePartBlueprint gamePartBlueprint = new(Part);
-            if (gamePartBlueprint == null) return null;
+            GamePartBlueprint gamePartBlueprint = Namespace.IsNullOrEmpty() ? new(Part) : new(Namespace, Part);
+            if (gamePartBlueprint == null)
+            {
+                return null;
+            }
             IPart part = gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
-            part.ParentObject = Object;
             gamePartBlueprint.InitializePartInstance(part);
             return Object.AddPart(part, DoRegistration: DoRegistration, Creation: Creation);
         }

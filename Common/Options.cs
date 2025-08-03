@@ -30,7 +30,6 @@ namespace HNPS_GigantismPlus
             // General
             { nameof(NaturalEquipmentOperator), true },
             { nameof(ModNaturalEquipmentBase), true },
-            { nameof(PartAdjustment), true },
             { "ModNaturalEquipment", true },
             { nameof(ModGiganticNaturalWeapon), true },
             { nameof(ModClosedGiganticNaturalWeapon), true },
@@ -57,7 +56,8 @@ namespace HNPS_GigantismPlus
             { nameof(GiantAbodePopulator), true },
             { nameof(WeaponElongator), true },
 
-            { "IAdjustment", true },
+            { nameof(IAdjustment), true },
+            { nameof(Adjustments), true },
 
             // Events
             { "IBodyPartsUpdatedEvent", false },
@@ -73,7 +73,6 @@ namespace HNPS_GigantismPlus
             { nameof(ManageDefaultNaturalEquipmentEvent), false },
             { nameof(AfterManageDefaultNaturalEquipmentEvent), false },
 
-            { nameof(BeforeApplyPartAdjustmentEvent), true },
             { nameof(BeforeModGiganticAppliedEvent), false },
             { nameof(AfterModGiganticAppliedEvent), false },
             { nameof(BeforeRapidAdvancementEvent), false },

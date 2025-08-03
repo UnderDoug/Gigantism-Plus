@@ -122,6 +122,11 @@ namespace HNPS_GigantismPlus
             return $"{verb}{Effect}";
         }
 
+        public readonly bool IsEmpty()
+        {
+            return this == Empty;
+        }
+
         public readonly string GetProcessedItem(bool IsFirstSentence, IReadOnlyList<DescriptionElement> DescriptionElements, GameObject Object)
         {
             string verb = Verb;

@@ -56,31 +56,6 @@ namespace XRL.World.Parts.Mutation
         {
         }
 
-        public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod, string Parts)
-        {
-            if (Parts == null) return false;
-            NaturalEquipmentMod.AddedParts ??= new();
-            if (Parts.Contains(","))
-            {
-                string[] parts = Parts.Split(',');
-                foreach (string part in parts)
-                {
-                    NaturalEquipmentMod.AddedParts.TryAdd(part);
-                }
-            }
-            else
-            {
-                NaturalEquipmentMod.AddedParts.TryAdd(Parts);
-            }
-            return !NaturalEquipmentMod.AddedParts.IsNullOrEmpty();
-        }
-        public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<T> NaturalEquipmentMod, string Props)
-        {
-            if (Props == null) return false;
-            Props.ParseProps(out NaturalEquipmentMod.AddedStringProps, out NaturalEquipmentMod.AddedIntProps);
-            return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
-        }
-
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<T> NaturalEquipmentMod = null, int Level = 1)
         {
             return 0;
@@ -100,19 +75,6 @@ namespace XRL.World.Parts.Mutation
         public virtual int GetNaturalWeaponPenBonus(ModNaturalEquipment<T> NaturalEquipmentMod = null, int Level = 1)
         {
             return 0;
-        }
-
-        public virtual List<string> GetNaturalEquipmentAddedParts(ModNaturalEquipment<T> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedParts;
-        }
-        public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<T> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedStringProps;
-        }
-        public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<T> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedIntProps;
         }
 
         public List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, NaturalEquipmentManager NewManager = null)
@@ -142,6 +104,9 @@ namespace XRL.World.Parts.Mutation
                     {
                         continue;
                     }
+
+                    Debug.Divider(4, HONLY, Indent: indent + 3, Toggle: getDoDebug());
+
                     Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
 
                     Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}", 
@@ -180,19 +145,13 @@ namespace XRL.World.Parts.Mutation
                             }
                             else
                             {
-                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)} (May be that the mod is conditionally produced)", Indent: indent + 3, Toggle: getDoDebug());
                             }
                         }
                     }
                 }
+                Debug.Divider(4, HONLY, Indent: indent + 3, Toggle: getDoDebug());
             }
-            /*
-            ModNaturalEquipment<T> singleNaturalEquipmentMod = GetNaturalEquipmentMod(Filter, NewAssigner);
-            if (singleNaturalEquipmentMod != null)
-            {
-                naturalEquipmentModsList.Add(singleNaturalEquipmentMod);
-            }
-            */
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
         }
@@ -207,22 +166,13 @@ namespace XRL.World.Parts.Mutation
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            if (NaturalEquipmentMod != null)
-            {
-                NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
-                NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
-                NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-                NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
-                NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
-
-                NaturalEquipmentMod.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level));
-
-                NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
-            }
+            NaturalEquipmentMod?.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level))
+                ?.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level))
+                ?.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
+                ?.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
+                ?.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
+                    
+                ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,
                 $"x {typeof(T).Name}."

@@ -81,7 +81,7 @@ namespace HNPS_GigantismPlus
         /// <returns><see langword="true" /> if the check is successful or the <paramref name="Subject"/> is <see langword="null" /> and member <see cref="FalseIfSubjectNull" /> is <see langword="false" />;<br></br><see langword="false" />, otherwise.</returns>
         public virtual bool Check(T Subject)
         {
-            return (Subject == null && !FalseIfSubjectNull);
+            return Subject != null || !FalseIfSubjectNull;
         }
 
         /// <summary>Performs a test on the <paramref name="Subject"/> returning a <see cref="bool" /> value which should represent the inverted success or failure of that test.</summary>
@@ -90,7 +90,7 @@ namespace HNPS_GigantismPlus
         /// <returns><see langword="true" /> if <see cref="Check(T)" /> would fail unless the <paramref name="Subject"/> is <see langword="null" /> and member <see cref="FalseIfSubjectNull" /> is <see langword="false" />;<br></br><see langword="false" />, otherwise.</returns>
         public virtual bool NotCheck(T Subject)
         {
-            return (Subject == null && !FalseIfSubjectNull);
+            return Subject != null || !FalseIfSubjectNull;
         }
 
         public virtual bool this[T Subject] => Check(Subject);

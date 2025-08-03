@@ -29,10 +29,10 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
-                E.BeforeEvent.AddGeneralElement(null, $"inorganic");
+                E.BeforeEvent.AddSecondaryElement(null, $"inorganic");
                 if (AssigningPart.HasGigantism && (AssigningPart.HasElongated || AssigningPart.HasBurrowing))
                 {
-                    E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die size and damage bonus");
+                    E.AddSecondaryElement(null, "suffering diminishing returns on increases to damage die size and damage bonus");
                 }
             }
             return base.HandleEvent(E);

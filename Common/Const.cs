@@ -25,10 +25,17 @@ namespace HNPS_GigantismPlus
         public const string SMLE = "\u263A";  // ☺︎
         public const string SMLE2 = "\u263B"; // ☻
 
-        public const string VANDR = "\u251C"; // ├
         public const string VONLY = "\u2502"; // │
-        public const string TANDR = "\u2514"; // └
         public const string HONLY = "\u2500"; // ─
+
+        public const string BANDR = "\u250C"; // ┌
+        public const string VANDR = "\u251C"; // ├
+        public const string TANDR = "\u2514"; // └
+
+        public const string BANDL = "\u2510"; // ┐
+        public const string VANDL = "\u2524"; // ┤
+        public const string TANDL = "\u2518"; // ┘
+
         public const string SPACE = "\u0020"; //" "
         public const string NBSP  = "\u00A0"; //" " (NBSP)
 

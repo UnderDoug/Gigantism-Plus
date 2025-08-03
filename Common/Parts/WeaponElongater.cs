@@ -143,15 +143,15 @@ namespace XRL.World.Parts
                 int penCapBonus = AppliedElongatedBonusCap;
                 if (penCapBonus != 0)
                 {
-                    E.AddWeaponElement("get", $"a {penCapBonus.Signed()} {penCapBonus.Signed().BonusOrPenalty()} to penetration cap");
+                    E.AddPrimaryElement("get", $"a {penCapBonus.Signed()} {penCapBonus.Signed().BonusOrPenalty()} to penetration cap");
                 }
-                if (E.WeaponDescriptions.IsNullOrEmpty())
+                if (E.PrimaryDescriptions.IsNullOrEmpty())
                 {
-                    E.AddWeaponElement("have", $"{E.Object.its} penetration cap is increased by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    E.AddPrimaryElement("have", $"{E.Object.its} penetration cap is increased by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
                 else
                 {
-                    E.AddWeaponElement("", $"{E.Object.its} penetration cap increases by half {E.Object.its} wielder's {scalingStat} Modifier");
+                    E.AddPrimaryElement("", $"{E.Object.its} penetration cap increases by half {E.Object.its} wielder's {scalingStat} Modifier");
                 }
             }
             return base.HandleEvent(E);

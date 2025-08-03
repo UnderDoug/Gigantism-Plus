@@ -8,7 +8,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class AddBurrowingClawsProperties : AddPartAdjustment<BurrowingClawsProperties>
+    public class AddBurrowingClawsProperties : AddPart<BurrowingClawsProperties>
     {
         public int WallBonusPenetration;
         public double WallBonusPercentage;
@@ -25,14 +25,14 @@ namespace HNPS_GigantismPlus
             this.WallBonusPenetration = WallBonusPenetration;
             this.WallBonusPercentage = WallBonusPercentage;
         }
-        public AddBurrowingClawsProperties(List<DescriptionElement> WeaponDescriptionElements = null, List<DescriptionElement> GeneralDescriptionElements = null)
+        public AddBurrowingClawsProperties(List<DescriptionElement> PrimaryDescriptionElements = null, List<DescriptionElement> SecondaryDescriptionElements = null)
             : this()
         {
-            this.WeaponDescriptionElements = WeaponDescriptionElements ?? new();
-            this.GeneralDescriptionElements = GeneralDescriptionElements ?? new();
+            this.PrimaryDescriptionElements = PrimaryDescriptionElements ?? new();
+            this.SecondaryDescriptionElements = SecondaryDescriptionElements ?? new();
         }
         public AddBurrowingClawsProperties(AddBurrowingClawsProperties SourceAdjustment)
-            : this(SourceAdjustment.WeaponDescriptionElements, SourceAdjustment.GeneralDescriptionElements)
+            : this(SourceAdjustment.PrimaryDescriptionElements, SourceAdjustment.SecondaryDescriptionElements)
         {
         }
 
@@ -48,11 +48,11 @@ namespace HNPS_GigantismPlus
                 burrowingClawsProperties.WallBonusPenetration = WallBonusPenetration;
                 burrowingClawsProperties.WallBonusPercentage = WallBonusPercentage;
 
-                WeaponDescriptionElements ??= new();
-                GeneralDescriptionElements ??= new();
+                PrimaryDescriptionElements ??= new();
+                SecondaryDescriptionElements ??= new();
 
-                WeaponDescriptionElements.Add(new("get", $"{WallBonusPenetration.Signed()} penetration vs. walls"));
-                GeneralDescriptionElements.Add(new("destroy", $"walls after {Drill.GetWallHitsRequired(WallBonusPercentage)} penetrating hits"));
+                PrimaryDescriptionElements.Add(new("get", $"{WallBonusPenetration.Signed()} penetration vs. walls"));
+                SecondaryDescriptionElements.Add(new("destroy", $"walls after {Drill.GetWallHitsRequired(WallBonusPercentage)} penetrating hits"));
             }
             base.AfterApply(Subject);
         }

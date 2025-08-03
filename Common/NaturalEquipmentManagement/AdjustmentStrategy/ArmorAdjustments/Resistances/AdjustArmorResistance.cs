@@ -12,6 +12,7 @@ namespace HNPS_GigantismPlus
         public AdjustArmorResistance()
             : base()
         {
+            Verb = "give";
         }
         public AdjustArmorResistance(string AffectedParameter)
             : this()
@@ -26,6 +27,7 @@ namespace HNPS_GigantismPlus
         public AdjustArmorResistance(AdjustArmorResistance SourceAdjustment)
             : base(SourceAdjustment)
         {
+            Verb = "give";
         }
 
         public override bool Check(GameObject Subject)
@@ -34,16 +36,16 @@ namespace HNPS_GigantismPlus
                 && base.Check(Subject);
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
-                Effect = $"a {bonusPenalty} of {amount} {AffectedParameter}";
+                Effect = $"{amount} {AffectedParameter}";
                 return new(Verb, Effect);
             }
-            return base.GetGeneralDescriptionElement(Subject);
+            return base.GetSecondaryDescriptionElement(Subject);
         }
     }
 }

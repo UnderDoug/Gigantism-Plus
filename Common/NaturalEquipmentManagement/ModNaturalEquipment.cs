@@ -65,103 +65,27 @@ namespace XRL.World.Parts
         {
         }
 
-        public override void AddAdjustment(IAdjustment Adjustment, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null)
+        public override ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, bool FlipPriority, ICondition<GameObject> Condition = null)
         {
             int indent = Debug.LastIndent;
             Adjustments ??= new();
             Adjustment.Source ??= GetType();
-            base.AddAdjustment(Adjustment, Condition, AllConditions, AnyConditions);
+            base.AddAdjustment(Adjustment, Priority, FlipPriority, Condition);
             Debug.LastIndent = indent;
-        }
-
-        public virtual void ApplyPartAndPropChanges(GameObject Object)
-        {
-            Debug.Entry(4, $"* {nameof(ApplyPartAndPropChanges)}(GameObject Object)", Indent: 4, Toggle: getDoDebug("APP"));
-            Debug.Entry(4, $"{AssigningPart?.Name}; Level: {(int)AssigningPart?.Level}", Indent: 5, Toggle: getDoDebug("APP"));
-
-            if (AddedParts != null)
-            {
-                Debug.Entry(4, "> foreach (string part in NaturalEquipmentMod.GetAddedParts())", Indent: 5, Toggle: getDoDebug("APP"));
-                foreach (string part in AddedParts)
-                {
-                    Debug.LoopItem(4, "part", part, Indent: 6, Toggle: getDoDebug("APP"));
-                    Object.RequirePart(part);
-                }
-                Debug.Entry(4, $"x foreach (string part in NaturalEquipmentMod.GetAddedParts()) >//", Indent: 5, Toggle: getDoDebug("APP"));
-            }
-
-            if (AddedStringProps != null)
-            {
-                bool priorityPropExists = Object.HasIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY);
-                int priorityPropValue = Object.GetIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY);
-                bool priorityPropBeaten = priorityPropValue > -ModPriority;
-                if (!priorityPropExists || priorityPropBeaten)
-                {
-                    Object.SetIntProperty(NATEQUIPMANAGER_STRINGPROP_PRIORITY, -ModPriority);
-
-                    Debug.Entry(4, "> foreach ((string Name, string Value) in AddedStringProps)", Indent: 5, Toggle: getDoDebug("APP"));
-                    foreach ((string Name, string Value) in AddedStringProps)
-                    {
-                        Debug.LoopItem(4, $"{Name}", $"{Value}", Indent: 6, Toggle: getDoDebug("APP"));
-                        Object.SetStringProperty(Name: Name, Value: Value, RemoveIfNull: true);
-                    }
-                    Debug.Entry(4, $"x foreach ((string Name, string Value) in AddedStringProps) >//", Indent: 5, Toggle: getDoDebug("APP"));
-                }
-                else
-                {
-                    Debug.CheckNah(4,
-                        $"{NATEQUIPMANAGER_STRINGPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}",
-                        Indent: 5, Toggle: getDoDebug("APP"));
-                }
-            }
-            else
-            {
-                Debug.CheckNah(4, $"No StringProps", Indent: 5, Toggle: getDoDebug("APP"));
-            }
-
-            if (AddedIntProps != null)
-            {
-                bool priorityPropExists = Object.HasIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY);
-                int priorityPropValue = Object.GetIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY);
-                bool priorityPropBeaten = priorityPropValue > -ModPriority;
-                if (!priorityPropExists || priorityPropBeaten)
-                {
-                    Object.SetIntProperty(NATEQUIPMANAGER_INTPROP_PRIORITY, -ModPriority);
-
-                    Debug.Entry(4, $"> foreach ((string Name, int Value) in AddedIntProps", Indent: 5, Toggle: getDoDebug("APP"));
-                    foreach ((string Name, int Value) in AddedIntProps)
-                    {
-                        Debug.CheckYeh(4, $"{Name}", $"{Value}", Indent: 6, Toggle: getDoDebug("APP"));
-                        Object.SetIntProperty(Name: Name, Value: Value, RemoveIfZero: true);
-                    }
-                    Debug.Entry(4, $"x foreach ((string Name, int Value) in AddedIntProps) >//", Indent: 5, Toggle: getDoDebug("APP"));
-                }
-                else
-                {
-                    Debug.CheckNah(4, 
-                        $"{NATEQUIPMANAGER_INTPROP_PRIORITY} ({priorityPropValue}) <= ModPriority {-ModPriority}", 
-                        Indent: 5, Toggle: getDoDebug("APP"));
-                }
-            }
-            else
-            {
-                Debug.CheckNah(4, $"No IntProps", Indent: 5, Toggle: getDoDebug("APP"));
-            }
-
-            Debug.Entry(4, $"x {nameof(ApplyPartAndPropChanges)}(GameObject Object) *//", Indent: 4, Toggle: getDoDebug("APP"));
+            return this;
         }
 
         public override bool BeingAppliedBy(GameObject obj, GameObject who)
         {
             Operator.Manager ??= who?.RequirePart<NaturalEquipmentManager>();
-            if (AssigningPart != null)
+            if (AssigningPart == null || AssigningPart.GetType() != typeof(T))
             {
                 Debug.Warn(2,
                     $"{typeof(ModNaturalEquipment<T>).Name}<{GetSource()}>",
                     $"{nameof(BeingAppliedBy)}(" +
                     $"obj: {obj?.DebugName ?? NULL}, " +
                     $"who: {who?.DebugName ?? NULL})",
-                    $"Failed to assign {GetSource()} as AssigningPart",
+                    $"Failed to assign {typeof(T).Name} as {nameof(AssigningPart)}",
                     Indent: 0);
             }
             return base.BeingAppliedBy(obj, who);
@@ -174,7 +98,7 @@ namespace XRL.World.Parts
                 + $"(Object: \"{Object.BaseDisplayName}\")", 
                 Indent: 3, Toggle: getDoDebug("AM"));
             
-            ApplyPartAndPropChanges(Object);
+            // Do Code?
 
             Debug.Entry(4, 
                 $"x {Name}[{GetSource()}]."
@@ -209,7 +133,7 @@ namespace XRL.World.Parts
         }
         public virtual bool HandleEvent(BeforeDescribeModificationEvent<ModNaturalEquipment<T>> E)
         {
-            if (EnablePrereleaseContent && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
+            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 int indent = Debug.LastIndent;
                 Debug.LoopItem(4, 
@@ -231,7 +155,7 @@ namespace XRL.World.Parts
                                 {
                                     Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: true);
                                 }
-                                E.WeaponDescriptions.AddRange(weaponElements);
+                                E.PrimaryDescriptions.AddRange(weaponElements);
                             }
                             if (!generalElements.IsNullOrEmpty())
                             {
@@ -240,42 +164,13 @@ namespace XRL.World.Parts
                                 {
                                     Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: true);
                                 }
-                                E.GeneralDescriptions.AddRange(generalElements);
+                                E.SecondaryDescriptions.AddRange(generalElements);
                             }
                         }
                     }
                 }
 
                 Debug.LastIndent = indent;
-            }
-            else if (E.Adjective == GetColoredAdjective() && E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
-            {
-                int dieCount = GetDamageDieCount();
-                int dieSize = GetDamageDieSize();
-                int damageBonus = GetDamageBonus();
-                int hitBonus = GetHitBonus();
-                int penBonus = GetPenBonus();
-
-                if (dieCount != 0)
-                {
-                    E.AddWeaponElement("gain", $"{dieCount} additional damage die");
-                }
-                if (dieSize != 0)
-                {
-                    E.AddWeaponElement("gain", $"{dieSize.Signed()} damage die size");
-                }
-                if (damageBonus != 0)
-                {
-                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
-                }
-                if (hitBonus != 0)
-                {
-                    E.AddWeaponElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
-                }
-                if (penBonus != 0)
-                {
-                    E.AddWeaponElement("have", $"a {penBonus.Signed()} penetration {penBonus.Signed().BonusOrPenalty()}");
-                }
             }
             return base.HandleEvent(E);
         }

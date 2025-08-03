@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
-using HarmonyLib;
-
 using XRL;
-using XRL.World;
 using XRL.Language;
+using XRL.World;
 using XRL.World.Anatomy;
+using XRL.World.Parts;
 
-using HNPS_GigantismPlus;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -24,6 +23,25 @@ namespace HNPS_GigantismPlus
     public abstract class IAdjustment : IComposite, IConditional<GameObject>
     {
         private static bool doDebug => getClassDoDebug(nameof(IAdjustment));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                'V',    // Vomit
+            };
+            List<object> dontList = new()
+            {
+                nameof(IsTruerThan),
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
 
         private bool Applying; // Whether Apply() should send AfterApplyAdjustmentEvent.
 
@@ -125,12 +143,13 @@ namespace HNPS_GigantismPlus
         public string ToString(bool ShowApplied, bool Short = false)
         {
             string appliedString = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
+            string priorityString = $"@({Priority.ToString().PadLeft(7)})";
             string addToString = !Short ? AddToString().Join("; ") : null;
             if (!addToString.IsNullOrEmpty())
             {
                 addToString = ": " + addToString;
             }
-            return $"{appliedString}{Source.Name}.{GetType().Name}{addToString}";
+            return $"{appliedString}{Source.Name}.{priorityString}{GetType().Name}{addToString}";
         }
 
         public virtual List<string> AddToString()
@@ -173,8 +192,12 @@ namespace HNPS_GigantismPlus
         public virtual bool IsTruerThan(GameObject Subject, IAdjustment OtherAdjustment)
         {
             int indent = Debug.LastIndent;
+            bool doDebug = getDoDebug(nameof(IsTruerThan));
 
-            if (Subject == null || OtherAdjustment == null) return true;
+            if (Subject == null || OtherAdjustment == null)
+            {
+                return true;
+            }
 
             bool otherCondition = true;
             bool condition = true;
@@ -229,10 +252,12 @@ namespace HNPS_GigantismPlus
         public virtual bool TryGetHigherPriorityAdjustment(GameObject Subject, IAdjustment OtherAdjustment, out IAdjustment HigherProrityAdjustment)
         {
             HigherProrityAdjustment = null;
-            return IsTruerThan(Subject, OtherAdjustment) && TryGetHigherPriorityAdjustment(OtherAdjustment, out HigherProrityAdjustment) && HigherProrityAdjustment != null;
+            return IsTruerThan(Subject, OtherAdjustment) 
+                && TryGetHigherPriorityAdjustment(OtherAdjustment, out HigherProrityAdjustment) 
+                && HigherProrityAdjustment != null;
         }
 
-        public virtual bool SameAs(IAdjustment OtherAdjustment)
+        public virtual bool SameAs(IAdjustment OtherAdjustment, bool ConsiderSource = true)
         {
             if (OtherAdjustment == null)
             {
@@ -246,7 +271,7 @@ namespace HNPS_GigantismPlus
             bool sameSource = Source == OtherAdjustment.Source;
             if (!Prioritize && sameType)
             {
-                 return sameSource;
+                 return sameSource && ConsiderSource;
             }
             return sameType;
         }
@@ -293,15 +318,15 @@ namespace HNPS_GigantismPlus
             Debug.LastIndent = indent;
         }
 
-        public virtual DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
+        public virtual DescriptionElement GetPrimaryDescriptionElement(GameObject Subject)
         {
             return DescriptionElement.Empty;
         }
-        public virtual List<DescriptionElement> GetWeaponDescriptionElements(GameObject Subject)
+        public virtual List<DescriptionElement> GetPrimaryDescriptionElements(GameObject Subject)
         {
             List<DescriptionElement> descriptionElements = new();
 
-            DescriptionElement descriptionElement = GetWeaponDescriptionElement(Subject);
+            DescriptionElement descriptionElement = GetPrimaryDescriptionElement(Subject);
 
             if (descriptionElement != DescriptionElement.Empty)
             {
@@ -310,15 +335,15 @@ namespace HNPS_GigantismPlus
             return descriptionElements;
         }
 
-        public virtual DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
+        public virtual DescriptionElement GetSecondaryDescriptionElement(GameObject Subject)
         {
             return DescriptionElement.Empty;
         }
-        public virtual List<DescriptionElement> GetGeneralDescriptionElements(GameObject Subject)
+        public virtual List<DescriptionElement> GetSecondaryDescriptionElements(GameObject Subject)
         {
             List<DescriptionElement> descriptionElements = new();
 
-            DescriptionElement descriptionElement = GetGeneralDescriptionElement(Subject);
+            DescriptionElement descriptionElement = GetSecondaryDescriptionElement(Subject);
 
             if (descriptionElement != DescriptionElement.Empty)
             {
@@ -332,13 +357,13 @@ namespace HNPS_GigantismPlus
             WeaponDescriptionElements = new();
             GeneralDescriptionElements = new();
 
-            List<DescriptionElement> weaponDescriptionElements = GetWeaponDescriptionElements(Subject);
+            List<DescriptionElement> weaponDescriptionElements = GetPrimaryDescriptionElements(Subject);
             if (!weaponDescriptionElements.IsNullOrEmpty())
             {
                 WeaponDescriptionElements.AddRange(weaponDescriptionElements);
             }
 
-            List<DescriptionElement> generalDescriptionElements = GetGeneralDescriptionElements(Subject);
+            List<DescriptionElement> generalDescriptionElements = GetSecondaryDescriptionElements(Subject);
             if (!generalDescriptionElements.IsNullOrEmpty())
             {
                 GeneralDescriptionElements.AddRange(generalDescriptionElements);
@@ -371,6 +396,28 @@ namespace HNPS_GigantismPlus
             State = Reader.ReadObject() as bool?;
             Verb = Reader.ReadOptimizedString();
             Effect = Reader.ReadOptimizedString();
+        }
+
+        public virtual IAdjustment DeepCopy(bool CopyApplied = true)
+        {
+            IAdjustment adjustment = (IAdjustment)Activator.CreateInstance(GetType());
+            FieldInfo[] fields = GetType().GetFields();
+            foreach (FieldInfo fieldInfo in fields)
+            {
+                if ((fieldInfo.Attributes & FieldAttributes.NotSerialized) != FieldAttributes.PrivateScope || fieldInfo.IsLiteral)
+                {
+                    continue;
+                }
+                if (fieldInfo.Name != nameof(Applied) || CopyApplied)
+                {
+                    fieldInfo.SetValue(adjustment, fieldInfo.GetValue(this));
+                }
+                else
+                {
+                    fieldInfo.SetValue(adjustment, false);
+                }
+            }
+            return adjustment;
         }
     }
 }

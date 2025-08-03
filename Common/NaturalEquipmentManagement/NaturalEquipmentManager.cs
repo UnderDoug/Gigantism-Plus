@@ -101,13 +101,11 @@ namespace XRL.World.Parts
                     if (getNaturalEquipmentOperatorsEvent.Equipment != null && getNaturalEquipmentOperatorsEvent.Equipment.IsNaturalEquipment())
                     {
                         getNaturalEquipmentOperatorsEvent.GetForEquipment();
-                        // naturalEquipmentOperators.TryAdd(GetNaturalEquipmentOperatorsEvent.GetForEquipment(equipment, Manager));
                     }
                     getNaturalEquipmentOperatorsEvent.Equipment = bodyPart.Equipped;
                     if (getNaturalEquipmentOperatorsEvent.Equipment != null && getNaturalEquipmentOperatorsEvent.Equipment.IsNaturalEquipment())
                     {
                         getNaturalEquipmentOperatorsEvent.GetForEquipment();
-                        // naturalEquipmentOperators.TryAdd(GetNaturalEquipmentOperatorsEvent.GetForEquipment(equipment, Manager));
                     }
                 }
             }
@@ -359,9 +357,5 @@ namespace XRL.World.Parts
             base.FinalizeCopyEarly(Source, CopyEffects, CopyID, MapInv);
             SyncOperators();
         }
-
-    } //!-- public class NaturalEquipmentOperator 
-      //: IScribedPart
-      //, IModEventHandler<BeforeBodyPartsUpdatedEvent>
-      //, IModEventHandler<AfterBodyPartsUpdatedEvent>
+    }
 }

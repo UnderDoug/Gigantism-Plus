@@ -43,29 +43,11 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT && (Wielder != null && Wielder.HasPart<GigantismPlus>()))
             {
-                E.AddGeneralElement(null, "suffering diminishing returns on increases to damage die count");
+                E.AddSecondaryElement(null, "suffering diminishing returns on increases to damage die count");
             }
             return base.HandleEvent(E);
         }
 
-        public override bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
-        {
-            if (E.NaturalEquipmentMod == nameof(ModGiganticNaturalWeapon) && E.Adjustment.Target == RENDER && E.Adjustment.Field == "DetailColor")
-            {
-                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {E.Adjustment.Field} PartAdjustment",
-                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
-                Debug.LastIndent--;
-
-                foreach (PartAdjustment adjustment in PartAdjustments)
-                {
-                    if (adjustment.HasSameTargetAs(E.Adjustment))
-                    {
-                        // E.Value = adjustment.Value;
-                    }
-                }
-            }
-            return base.HandleEvent(E);
-        }
         public override bool HandleEvent(BeforeApplyAdjustmentEvent E)
         {
             if (E.Adjustment.Source == typeof(ModGiganticNaturalWeapon) && E.Adjustment.GetType() == typeof(ChangeDetailColor))
@@ -76,7 +58,7 @@ namespace XRL.World.Parts
 
                 foreach (IAdjustment adjustment in Adjustments)
                 {
-                    if (adjustment.SameAs(E.Adjustment))
+                    if (adjustment.SameAs(E.Adjustment, false))
                     {
                         // E.Adjustment.Value = adjustment.Value;
                     }

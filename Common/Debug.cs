@@ -85,15 +85,16 @@ namespace HNPS_GigantismPlus
                 Message(output);
         }
 
-        public static void Divider(int Verbosity = 0, string String = null, int Count = 60, int Indent = 0, bool Toggle = true)
+        public static void Divider(int Verbosity = 0, string String = null, int Count = 60, string Starter = "", string Finisher = "", int Indent = 0, bool Toggle = true)
         {
-            string output = "";
+            string output = Starter;
             if (String == null) String = "\u003D"; // =
             else String = String[..1];
             for (int i = 0; i < Count; i++)
             {
                 output += String;
             }
+            output += Finisher;
             Entry(Verbosity, output, Indent, Toggle: Toggle);
         }
 
@@ -114,13 +115,13 @@ namespace HNPS_GigantismPlus
 
         public static void DiveIn(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Divider(Verbosity, HONLY, 25, Indent + 1, Toggle: Toggle); // > "\u003E"
-            Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
+            Divider(Verbosity, HONLY, 25, Starter: TANDR, Finisher: BANDL, Indent: Indent, Toggle: Toggle); // > "\u003E"
+            Entry(Verbosity, Text, Indent, Toggle: Toggle);
         }
         public static void DiveOut(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
-            // Divider(Verbosity, "\u003C", 25, Indent, Toggle: Toggle); // <
+            Entry(Verbosity, Text, Indent, Toggle: Toggle);
+            Divider(Verbosity, HONLY, 25, Starter: BANDR, Finisher: TANDL, Indent, Toggle: Toggle); // <
         }
 
         public static void Warn(int Verbosity, string ClassName, string MethodName, string Issue = null, int Indent = 0)
@@ -241,71 +242,29 @@ namespace HNPS_GigantismPlus
 
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.ModPriority)}", $"{NaturalEquipmentMod.ModPriority}", Indent: indent + 1, Toggle: Toggle);
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DescriptionPriority)}", $"{NaturalEquipmentMod.DescriptionPriority}", Indent: indent + 1, Toggle: Toggle);
-            }
 
-            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DamageDieCount)}", $"{NaturalEquipmentMod.DamageDieCount}", Indent: indent + 1, Toggle: Toggle);
-            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DamageDieSize)}", $"{NaturalEquipmentMod.DamageDieSize}", Indent: indent + 1, Toggle: Toggle);
-            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.DamageBonus)}", $"{NaturalEquipmentMod.DamageBonus}", Indent: indent + 1, Toggle: Toggle);
-            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.HitBonus)}", $"{NaturalEquipmentMod.HitBonus}", Indent: indent + 1, Toggle: Toggle);
-            LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.PenBonus)}", $"{NaturalEquipmentMod.PenBonus}", Indent: indent + 1, Toggle: Toggle);
-
-            if (!DamageOnly)
-            {
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.Adjective)}", $"{NaturalEquipmentMod.Adjective}", Indent: indent + 1, Toggle: Toggle);
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AdjectiveColor)}", $"{NaturalEquipmentMod.AdjectiveColor}", Indent: indent + 1, Toggle: Toggle);
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AdjectiveColorFallback)}", $"{NaturalEquipmentMod.AdjectiveColorFallback}", Indent: indent + 1, Toggle: Toggle);
+            }
 
-                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.PartAdjustments)}", Indent: indent + 1, Toggle: Toggle);
-                if (!NaturalEquipmentMod.PartAdjustments.IsNullOrEmpty())
+            if (!DamageOnly)
+            {
+                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.Adjustments)}", Indent: indent + 1, Toggle: Toggle);
+            }
+            if (!NaturalEquipmentMod.Adjustments.IsNullOrEmpty())
+            {
+                foreach (IAdjustment adjustment in NaturalEquipmentMod.Adjustments)
                 {
-                    foreach (PartAdjustment partAdjustment in NaturalEquipmentMod.PartAdjustments)
+                    if (adjustment.GetType().InheritsFrom(typeof(MeleeWeaponCumulativeAdjustment)) || !DamageOnly)
                     {
-                        LoopItem(Verbosity, partAdjustment.ToString(), Indent: indent + 2, Toggle: Toggle);
+                        Entry(Verbosity, adjustment.ToString(ShowApplied: true), Indent: indent + (DamageOnly ? 1 : 2), Toggle: Toggle);
                     }
                 }
-                else
-                {
-                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
-                }
-
-                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AddedParts)}", Indent: indent + 1, Toggle: Toggle);
-                if (!NaturalEquipmentMod.AddedParts.IsNullOrEmpty())
-                {
-                    foreach (string addedPart in NaturalEquipmentMod.AddedParts)
-                    {
-                        LoopItem(Verbosity, addedPart, Indent: indent + 2, Toggle: Toggle);
-                    }
-                }
-                else
-                {
-                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
-                }
-
-                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AddedStringProps)}", Indent: indent + 1, Toggle: Toggle);
-                if (!NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty())
-                {
-                    foreach ((string prop, string value) in NaturalEquipmentMod.AddedStringProps)
-                    {
-                        LoopItem(Verbosity, prop, value, Indent: indent + 2, Toggle: Toggle);
-                    }
-                }
-                else
-                {
-                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
-                }
-
-                LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.AddedIntProps)}", Indent: indent + 1, Toggle: Toggle);
-                if (!NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty())
-                {
-                    foreach ((string prop, int value) in NaturalEquipmentMod.AddedIntProps)
-                    {
-                        LoopItem(Verbosity, prop, $"{value}", Indent: indent + 2, Toggle: Toggle);
-                    }
-                }
-                else
-                {
-                    LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
-                }
+            }
+            else
+            {
+                LoopItem(Verbosity, "empty", Indent: indent + 2, Toggle: Toggle);
             }
 
             LastIndent = Indent;
@@ -521,17 +480,17 @@ namespace HNPS_GigantismPlus
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
             return List;
         }
-        public static List<PartAdjustment> Vomit(this List<PartAdjustment> List, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
+        public static Adjustments Vomit(this Adjustments Adjustments, int Verbosity, string Label, bool LoopItem = false, bool? Good = null, string DivAfter = "", int Indent = 0, bool Toggle = true)
         {
             if (LoopItem) Debug.LoopItem(Verbosity, Label, Good: Good, Indent: Indent, Toggle: Toggle);
             else Entry(Verbosity, Label, Indent: Indent, Toggle: Toggle);
-            foreach (PartAdjustment item in List)
+            foreach (IAdjustment adjustment in Adjustments)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, $"{item}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
-                else Entry(Verbosity, $"{item}", Indent: Indent + 1, Toggle: Toggle);
+                if (LoopItem) Debug.LoopItem(Verbosity, $"{adjustment}", Good: Good, Indent: Indent + 1, Toggle: Toggle);
+                else Entry(Verbosity, $"{adjustment}", Indent: Indent + 1, Toggle: Toggle);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
-            return List;
+            return Adjustments;
         }
 
         public static void InheritanceTree(GameObject Object, bool Toggle = true)

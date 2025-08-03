@@ -28,18 +28,14 @@ namespace XRL.World.Parts
             AdjectiveColor = "gigantic";
             AdjectiveColorFallback = "w";
 
-            PartAdjustments = new();
-
-            AddedIntProps = new()
-            {
-                { "ModGiganticNoShortDescription", 1 },
-                { "ModGiganticNoDisplayName", 1 }
-            };
             AddMeleeStatAdjustment("Strength", -100, new GameObjectHasPart<MeleeWeapon>());
 
             AddColorStringAdjustment("&Z", true);
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);
+
+            AddAdjustment(new DisableModGiganticShortDescription());
+            AddAdjustment(new DisableModGiganticDisplayName());
         }
         public ModGiganticNaturalWeapon(NaturalEquipmentManager NewManager)
             : this()
@@ -82,19 +78,19 @@ namespace XRL.World.Parts
 
                 if (!EnablePrereleaseContent && dieCount > 0)
                 {
-                    E.AddWeaponElement("gain", $"{dieCount} additional damage die");
+                    E.AddPrimaryElement("gain", $"{dieCount} additional damage die");
                 }
                 if (!EnablePrereleaseContent && damageBonus != 0)
                 {
-                    E.AddWeaponElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
+                    E.AddPrimaryElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
                 }
                 if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
                 {
-                    E.AddWeaponElement("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
+                    E.AddPrimaryElement("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
                 }
                 if (!EnablePrereleaseContent && hitBonus != 0)
                 {
-                    E.AddWeaponElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
+                    E.AddPrimaryElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
                 }
             }
             return base.HandleEvent(E);
@@ -103,8 +99,8 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
-                E.RemoveWeaponElement("have", "+3 damage");
-                E.RemoveWeaponElement("cleave", "for -3 AV");
+                E.RemovePrimaryElement("have", "+3 damage");
+                E.RemovePrimaryElement("cleave", "for -3 AV");
             }
             return base.HandleEvent(E);
         }

@@ -106,81 +106,83 @@ namespace HNPS_GigantismPlus
             GameObject Object = E.Object;
 
             GameObjectBlueprint GigantismPlusModGiganticDescriptions = GameObjectFactory.Factory.GetBlueprint(MODGIGANTIC_DESCRIPTIONBUCKET);
-            E.WeaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
-            E.GeneralDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "General"));
+            E.PrimaryDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "Weapon"));
+            E.SecondaryDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "Before", "General"));
+
+            int priority = 1;
 
             if (Object.InheritsFrom("FoldingChair"))
             {
-                E.AddWeaponElement(null, "the ultimate in wrestling weapons");
+                E.AddPrimaryElement(priority++, null, "the ultimate in wrestling weapons");
             }
 
             if (Object.HasPart<Chair>())
             {
                 if (!Object.InheritsFrom("FoldingChair"))
-                    E.AddGeneralElement("support", "gigantic rumps");
+                    E.AddSecondaryElement(priority++, "support", "gigantic rumps");
             }
             if (Object.HasPart<Bed>())
             {
-                E.AddGeneralElement("support", "gigantic sleepers");
+                E.AddSecondaryElement(priority++, "support", "gigantic sleepers");
             }
 
             if (Object.LiquidVolume != null)
             {
-                E.AddGeneralElement("hold", "twice as much liquid");
+                E.AddSecondaryElement(priority++, "hold", "twice as much liquid");
             }
             if (Object.HasPart<EnergyCell>())
             {
-                E.AddGeneralElement("have", "twice the energy capacity");
+                E.AddSecondaryElement(priority++, "have", "twice the energy capacity");
             }
             if (Object.HasPartDescendedFrom<IGrenade>())
             {
-                E.AddGeneralElement("have", "twice as large a radius of effect");
+                E.AddSecondaryElement(priority++, "have", "twice as large a radius of effect");
             }
             if (Object.HasPart<Tonic>())
             {
-                E.AddGeneralElement("contain", "double the tonic dosage");
+                E.AddSecondaryElement(priority++, "contain", "double the tonic dosage");
             }
             if (Object.GetIntProperty("Currency") > 0)
             {
-                E.AddGeneralElement(null, "much more valuable");
+                E.AddSecondaryElement(priority++, null, "much more valuable");
             }
             if (Object.HasPart<Container>())
             {
-                E.AddGeneralElement("store", "twice as many things (don't ask, it's fine)");
+                E.AddSecondaryElement(priority++, "store", "twice as many things (don't ask, it's fine)");
             }
             if (Object.HasPart<Enclosing>())
             {
-                E.AddGeneralElement("provide", "twice as much AV");
-                E.AddGeneralElement("penalise", "DV half again as much");
-                E.AddGeneralElement("have", "+3 higher save to exit");
+                E.AddSecondaryElement(priority++, "provide", "twice as much AV");
+                E.AddSecondaryElement(priority++, "penalise", "DV half again as much");
+                E.AddSecondaryElement(priority++, "have", "+3 higher save to exit");
             }
             if (Object.TryGetPart(out Chat chat) && chat.ShowInShortDescription)
             {
-                E.AddGeneralElement("convey", "its message with substantially more clarity");
+                E.AddSecondaryElement(priority++, "convey", "its message with substantially more clarity");
             }
             if (Object.HasPart<Tombstone>() || Object.HasTagOrProperty("Burial"))
             {
-                E.AddGeneralElement("inspire", "greater sorrow");
+                E.AddSecondaryElement(priority++, "inspire", "greater sorrow");
             }
 
             if (Object.HasPart<Backpack>())
             {
-                E.AddGeneralElement("support", "twice and a half as much weight");
+                E.AddSecondaryElement(priority++, "support", "twice and a half as much weight");
             }
 
             if (Object.HasPart<Armor>() && Object.GetPart<Armor>().CarryBonus > 0)
             {
-                E.AddGeneralElement("have", "a quarter more carry capcity");
+                E.AddSecondaryElement(priority++, "have", "a quarter more carry capcity");
             }
 
             if (Object.HasTagOrProperty("Ornate") || Object.HasTagOrProperty("Door"))
             {
-                E.AddGeneralElement("inspire", "awe with its immensity");
+                E.AddSecondaryElement(priority++, "inspire", "awe with its immensity");
             }
 
             if (Object.HasTagOrProperty("Wall") || Object.HasTagOrProperty("Door"))
             {
-                E.AddGeneralElement("stand", "much taller than usual");
+                E.AddSecondaryElement(priority++, "stand", "much taller than usual");
             }
 
             MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
@@ -188,25 +190,25 @@ namespace HNPS_GigantismPlus
             bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
             if (meleeWeapon != null && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
             {
-                E.AddWeaponElement("have", "+3 damage");
+                E.AddPrimaryElement("have", "+3 damage");
                 if (meleeWeapon.Skill == "Cudgel")
                 {
-                    E.AddWeaponElement(null, $"twice as effective when you Slam with {Object.them}");
+                    E.AddPrimaryElement(priority++, null, $"twice as effective when you Slam with {Object.them}");
                 }
                 else if (meleeWeapon.Skill == "Axe")
                 {
-                    E.AddWeaponElement("cleave", "for -3 AV");
+                    E.AddPrimaryElement(priority++, "cleave", "for -3 AV");
                 }
             }
             else if (Object.HasPart<MissileWeapon>())
             {
-                E.AddWeaponElement("have", "+3 damage");
+                E.AddPrimaryElement(priority++, "have", "+3 damage");
             }
             else if (Object.HasPart<ThrownWeapon>())
             {
                 if (!Object.HasPartDescendedFrom<IGrenade>())
                 {
-                    E.AddWeaponElement("have", "+3 damage");
+                    E.AddPrimaryElement(priority++, "have", "+3 damage");
                 }
             }
 
@@ -224,77 +226,77 @@ namespace HNPS_GigantismPlus
                     || Object.HasPart<Shield>()))
                 {
                     string effect = $"must be wielded {(Object.UsesTwoSlots ? "four" : "two")}-handed by non-gigantic creatures";
-                    E.AddGeneralElement("", effect);
+                    E.AddSecondaryElement(priority++, "", effect);
                 }
                 else
                 {
-                    E.AddGeneralElement("", "can only be equipped by gigantic creatures");
+                    E.AddSecondaryElement(priority++, "", "can only be equipped by gigantic creatures");
                 }
             }
 
             if (Object.HasPart<DiggingTool>() || Object.HasPart<Drill>())
             {
-                E.AddWeaponElement("dig", "twice as fast");
+                E.AddPrimaryElement(priority++, "dig", "twice as fast");
             }
 
             if (Object.HasPart<DeploymentMaintainer>() && isFurniture)
             {
-                E.AddGeneralElement("enforce", "its effect twice far");
+                E.AddSecondaryElement(priority++, "enforce", "its effect twice far");
             }
 
             if (Object.TryGetPart(out LiquidProducer liquidProducer) && liquidProducer.Rate != 0 && isFurniture)
             {
-                E.AddGeneralElement("produce", "liquid twice as fast");
+                E.AddSecondaryElement(priority++, "produce", "liquid twice as fast");
             }
 
             if (Object.TryGetPart(out ItemConvertor itemConvertor) && isFurniture)
             {
                 if (itemConvertor.ConversionTag == "RockTumblerOutput")
                 {
-                    E.AddGeneralElement("process", "rocks twice as effectively");
+                    E.AddSecondaryElement(priority++, "process", "rocks twice as effectively");
                 }
                 if (itemConvertor.ConversionTag == "WireExtruderOutput")
                 {
-                    E.AddGeneralElement("extrude", "double the additional wire from gigantic materials");
+                    E.AddSecondaryElement(priority++, "extrude", "double the additional wire from gigantic materials");
                 }
             }
 
             if (Object.HasPart<Fan>() && isFurniture)
             {
-                E.AddGeneralElement("blow", "with twice the strength");
-                E.AddGeneralElement("blow", "half again as far");
+                E.AddSecondaryElement(priority++, "blow", "with twice the strength");
+                E.AddSecondaryElement(priority++, "blow", "half again as far");
             }
 
             if (Object.HasPart<LiquidPump>() && isFurniture)
             {
-                E.AddGeneralElement("pump", "five times as much liquid");
+                E.AddSecondaryElement(priority++, "pump", "five times as much liquid");
             }
 
             if (Object.HasPart<Capacitor>() && isFurniture)
             {
-                E.AddGeneralElement("hold", "twice the maximum charge");
+                E.AddSecondaryElement(priority++, "hold", "twice the maximum charge");
             }
 
             if (Object.HasPart<RegenTank>() && isFurniture)
             {
-                E.AddGeneralElement("require", "twice the minimum liquid to operate");
+                E.AddSecondaryElement(priority++, "require", "twice the minimum liquid to operate");
             }
 
             if (Object.TryGetPart(out TemperatureAdjuster temperatureAdjuster) && isFurniture)
             {
                 if (temperatureAdjuster.TemperatureAmount != 0)
                 {
-                    E.AddGeneralElement("affect", "temperature twice as effectively");
+                    E.AddSecondaryElement(priority++, "affect", "temperature twice as effectively");
                 }
                 if (temperatureAdjuster.TemperatureThreshold != 0)
                 {
-                    E.AddGeneralElement("have", "half again its temperature threshold");
+                    E.AddSecondaryElement(priority++, "have", "half again its temperature threshold");
                 }
             }
 
             if (Object.HasPart<DamageContents>() && isFurniture)
             {
-                E.AddGeneralElement(null, "twice as destructive to its contents");
+                E.AddSecondaryElement(priority++, null, "twice as destructive to its contents");
             }
 
             bool chargeUseIncreased2x = isFurniture && (
@@ -332,7 +334,7 @@ namespace HNPS_GigantismPlus
                     && liquidProducer.ChargeUse != 0));
             if (chargeUseIncreased2x)
             {
-                E.AddGeneralElement("draw", "twice the charge to power");
+                E.AddSecondaryElement(priority++, "draw", "twice the charge to power");
             }
 
             bool chargeRateIncreased2x = isFurniture && (
@@ -350,7 +352,7 @@ namespace HNPS_GigantismPlus
                     && electricalPowerTransmission.ChargeRate != 0 && electricalPowerTransmission.IsConsumer));
             if (chargeRateIncreased2x)
             {
-                E.AddGeneralElement("charge", "at twice the rate");
+                E.AddSecondaryElement(priority++, "charge", "at twice the rate");
             }
 
             bool chargeTransmissionIncreased2x = isFurniture && (
@@ -362,24 +364,24 @@ namespace HNPS_GigantismPlus
                     && mechanicalPowerTransmission.ChargeRate != 0 && !mechanicalPowerTransmission.IsConsumer));
             if (chargeTransmissionIncreased2x)
             {
-                E.AddGeneralElement("transmit", "power at twice the rate");
+                E.AddSecondaryElement(priority++, "transmit", "power at twice the rate");
             }
 
             if (!isDefaultBehavior)
             {
-                E.AddGeneralElement(null, "much heavier than usual");
+                E.AddSecondaryElement(priority++, null, "much heavier than usual");
             }
             else
             {
-                E.AddGeneralElement(null, "unusually large");
+                E.AddSecondaryElement(priority++, null, "unusually large");
             }
             if (Object.HasPart<Campfire>())
             {
-                E.AddGeneralElement("", "could probably make some seriously thick stew..");
+                E.AddSecondaryElement(priority++, "", "could probably make some seriously thick stew..");
             }
 
-            E.WeaponDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "Weapon"));
-            E.GeneralDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "General"));
+            E.PrimaryDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "Weapon"));
+            E.SecondaryDescriptions.AddRange(IterateDataBucketTags(Object, GigantismPlusModGiganticDescriptions, "After", "General"));
 
             // DescribeModification(E, E.ModPart);
 

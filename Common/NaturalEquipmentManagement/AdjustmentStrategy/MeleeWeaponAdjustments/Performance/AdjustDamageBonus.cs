@@ -44,7 +44,7 @@ namespace HNPS_GigantismPlus
             return IsApplied();
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
@@ -53,7 +53,7 @@ namespace HNPS_GigantismPlus
                 Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
                 return new(DescriptionElement.ORDER_ADJUST_EXTREMELY_EARLY + 3, Verb, Effect);
             }
-            return base.GetWeaponDescriptionElement(Subject);
+            return base.GetPrimaryDescriptionElement(Subject);
         }
     }
 }

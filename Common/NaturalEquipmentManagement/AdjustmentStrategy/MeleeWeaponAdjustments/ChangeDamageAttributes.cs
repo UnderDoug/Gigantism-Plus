@@ -50,7 +50,7 @@ namespace HNPS_GigantismPlus
             return IsApplied();
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject)
         {
             if (Value != null)
             {
@@ -64,7 +64,7 @@ namespace HNPS_GigantismPlus
                 Effect = $"{attributes} type damage";
                 return new(Verb, Effect);
             }
-            return base.GetWeaponDescriptionElement(Subject);
+            return base.GetPrimaryDescriptionElement(Subject);
         }
     }
 }

@@ -18,11 +18,23 @@ namespace XRL.World.Parts
         private static bool doDebug => getClassDoDebug(nameof(ModAugmentedNaturalWeapon));
 
         public ModAugmentedNaturalWeapon()
+            : base()
         {
+            BodyPartType = "Hand";
+
+            ModPriority = -500;
+            DescriptionPriority = -500;
+
+            ForceNoun = true;
+            Noun = "manipulator";
+
+            Adjective = "augmented";
+            AdjectiveColorFallback = "c";
         }
         public ModAugmentedNaturalWeapon(NaturalEquipmentManager NewManager)
-            : base(NewManager)
+            : this()
         {
+            Manager = NewManager;
         }
 
         public override void ApplyModification(GameObject Object)
@@ -47,32 +59,10 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
-                string cyberneticsObject = AssigningPart?.ImplantObject?.ShortDisplayName;
+                string cyberneticsObject = AssigningPart?.ImplantObject?.GetDisplayName(Short:true, AsIfKnown: true);
 
                 E.BeforeEvent.ClearDescriptionElements();
-                E.BeforeEvent.AddGeneralElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(BeforeApplyPartAdjustmentEvent E)
-        {
-            if (E.NaturalEquipmentMod == nameof(ModClosedGiganticNaturalWeapon) && E.Adjustment.Target == RENDER && E.Adjustment.Field == "Tile" && E.Subject is GameObject equipment)
-            {
-                Debug.Entry(4, $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {E.Adjustment.Field} PartAdjustment", 
-                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
-                Debug.LastIndent--;
-
-                foreach (PartAdjustment adjustment in PartAdjustments)
-                {
-                    if (adjustment.HasSameTargetAs(E.Adjustment))
-                    {
-                        if (adjustment.Check(equipment))
-                        {
-                            E.Adjustment.SetValue(adjustment.Value);
-                        }
-                    }
-                }
+                E.BeforeEvent.AddSecondaryElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
             }
             return base.HandleEvent(E);
         }

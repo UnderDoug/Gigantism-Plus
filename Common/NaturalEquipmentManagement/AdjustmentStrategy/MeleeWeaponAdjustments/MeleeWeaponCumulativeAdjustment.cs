@@ -56,7 +56,7 @@ namespace HNPS_GigantismPlus
             Verb = "have";
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject = null)
         {
             if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
@@ -65,7 +65,7 @@ namespace HNPS_GigantismPlus
                 Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
                 return new(Verb, Effect);
             }
-            return base.GetWeaponDescriptionElement(Subject);
+            return base.GetPrimaryDescriptionElement(Subject);
         }
     }
 }

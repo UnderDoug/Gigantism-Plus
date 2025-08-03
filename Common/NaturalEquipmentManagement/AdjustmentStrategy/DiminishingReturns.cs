@@ -77,24 +77,17 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return !Affected.IsNullOrEmpty() && base.Check(Subject);
-        }
-        public override bool Apply(GameObject Subject)
-        {
-            if (base.Apply(Subject))
-            {
-                Effect = $"suffering diminishing returns on {Affected}";
-                GeneralDescription = new(DescriptionElement.ORDER_ADJUST_VERY_LATE, null, Effect);
-            }
-            return IsApplied();
+            return base.Check(Subject) && !GetSecondaryDescriptionElement(Subject).IsEmpty();
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
+        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject)
         {
             if (!Affected.IsNullOrEmpty())
             {
+                Effect = $"suffering diminishing returns on {Affected}";
+                SecondaryDescription = new(DescriptionElement.ORDER_ADJUST_VERY_LATE, null, Effect);
             }
-            return base.GetGeneralDescriptionElement(Subject);
+            return base.GetSecondaryDescriptionElement(Subject);
         }
     }
 }

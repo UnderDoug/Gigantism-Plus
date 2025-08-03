@@ -66,9 +66,8 @@ namespace XRL.World.Parts.Mutation
 
         public static ModCrystallineNaturalWeapon NewCrystallinePointMod(NaturalEquipmentManager NewManager)
         {
-            ModCrystallineNaturalWeapon crystalinePointMod = new()
+            ModCrystallineNaturalWeapon crystalinePointMod = new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = 100,
@@ -80,61 +79,22 @@ namespace XRL.World.Parts.Mutation
                 Adjective = "crystalline",
                 AdjectiveColor = "crystallized",
                 AdjectiveColorFallback = "M",
-
-                PartAdjustments = new(),
-
-                AddedParts = new(),
-
-                AddedStringProps = new()
-                {
-                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
-                },
             };
 
-            if (!EnablePrereleaseContent)
-            {
-                crystalinePointMod.AddedParts.Add(nameof(Inorganic));
-            }
-            else
-            {
-                crystalinePointMod.AddAdjustment(new AddPartAdjustment<Inorganic>(), false);
-            }
-
-            crystalinePointMod.AddSkillAdjustment("ShortBlades", true);
-
-            crystalinePointMod.AddNounAdjustment(true);
-
-            crystalinePointMod.AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true);
-            crystalinePointMod.AddColorStringAdjustment("&b", true);
-            crystalinePointMod.AddTileColorAdjustment("&b", true);
-            crystalinePointMod.AddDetailColorAdjustment("B", true);
+            crystalinePointMod.AddAdjustment(new AddPartInorganic(), false)
+                
+                .AddSkillAdjustment("ShortBlades", true)
+                
+                .AddNounAdjustment(true)
+                
+                .AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true)
+                .AddColorStringAdjustment("&b", true)
+                .AddTileColorAdjustment("&b", true)
+                .AddDetailColorAdjustment("B", true)
+            
+                .AddAdjustment(new SetSwingSound("Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing"), true)
+                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked"), true);
             return crystalinePointMod;
-        }
-
-        public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Parts)
-        {
-            if (Parts == null) return false;
-            NaturalEquipmentMod.AddedParts ??= new();
-            if (Parts.Contains(","))
-            {
-                string[] parts = Parts.Split(',');
-                foreach (string part in parts)
-                {
-                    NaturalEquipmentMod.AddedParts.TryAdd(part);
-                }
-            }
-            else
-            {
-                NaturalEquipmentMod.AddedParts.TryAdd(Parts);
-            }
-            return !NaturalEquipmentMod.AddedParts.IsNullOrEmpty();
-        }
-        public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod, string Props)
-        {
-            if (Props == null) return false;
-            Props.ParseProps(out NaturalEquipmentMod.AddedStringProps, out NaturalEquipmentMod.AddedIntProps);
-            return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod = null, int Level = 1)
@@ -164,27 +124,14 @@ namespace XRL.World.Parts.Mutation
             return 0;
         }
 
-        public virtual List<string> GetNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedParts;
-        }
-        public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedStringProps;
-        }
-        public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedIntProps;
-        }
-
         public List<ModNaturalEquipment<UD_ManagedCrystallinity>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedCrystallinity>> Filter = null, NaturalEquipmentManager NewManager = null)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"* {nameof(UD_ManagedBurrowingClaws)}."
+                $"* {nameof(UD_ManagedCrystallinity)}."
                 + $"{nameof(GetNaturalEquipmentMods)}("
                 + $"{nameof(Filter)}, "
-                + $"{nameof(NewManager)}: {NewManager?.Name})",
+                + $"{nameof(NewManager)})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
             NewManager ??= NaturalEquipmentManager;
@@ -261,19 +208,13 @@ namespace XRL.World.Parts.Mutation
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
-
-            NaturalEquipmentMod.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level));
-            NaturalEquipmentMod.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level));
-
-            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+            NaturalEquipmentMod?.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level))
+                ?.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level))
+                ?.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
+                ?.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
+                ?.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
+                
+                ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,
                 $"x {nameof(UD_ManagedCrystallinity)}."

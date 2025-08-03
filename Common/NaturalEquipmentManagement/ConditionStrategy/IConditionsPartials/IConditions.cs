@@ -314,8 +314,9 @@ namespace HNPS_GigantismPlus
                     Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
                     if (condition != null)
                     {
+                        bool result = condition.Check(Subject);
                         Debug.LastIndent = indent;
-                        yield return condition.Check(Subject);
+                        yield return result;
                     }
                 }
             }

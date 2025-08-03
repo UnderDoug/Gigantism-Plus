@@ -80,35 +80,50 @@ namespace XRL.World.Parts
                 AdjectiveColor = chromeHandBones.BonesAdjectiveColor,
                 AdjectiveColorFallback = chromeHandBones.BonesAdjectiveColor,
                 ExludeFromDynamicTile = true,
-
-                PartAdjustments = new(),
-
-                AddedParts = new(),
-
-                AddedIntProps = new(),
-                AddedStringProps = new(),
             };
             chromeBonedNaturalWeapon.AddTileAdjustment(chromeHandBones.BonesTile, Condition: IsOrganicFist);
             chromeBonedNaturalWeapon.AddColorStringAdjustment(chromeHandBones.BonesTileColorString);
             chromeBonedNaturalWeapon.AddTileColorAdjustment(chromeHandBones.BonesTileColorString);
             chromeBonedNaturalWeapon.AddDetailColorAdjustment(chromeHandBones.BonesTileDetailColor, true);
 
-            chromeHandBones.ProcessNaturalEquipmentAddedParts(chromeBonedNaturalWeapon, chromeHandBones.BonesAddParts);
-            chromeHandBones.ProcessNaturalEquipmentAddedProps(chromeBonedNaturalWeapon, chromeHandBones.BonesAddProps);
-
             if (!chromeHandBones.BonesSwingSound.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddedStringProps["SwingSound"] = chromeHandBones.BonesSwingSound;
+                chromeBonedNaturalWeapon.AddAdjustment(new SetSwingSound(chromeHandBones.BonesSwingSound));
             }
             if (!chromeHandBones.BonesBlockedSound.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddedStringProps["BlockedSound"] = chromeHandBones.BonesBlockedSound;
+                chromeBonedNaturalWeapon.AddAdjustment(new SetBlockedSound(chromeHandBones.BonesBlockedSound));
             }
             if (!chromeHandBones.BonesEquipmentFrameColors.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddedStringProps["EquipmentFrameColors"] = chromeHandBones.BonesEquipmentFrameColors;
+                chromeBonedNaturalWeapon.AddAdjustment(new SetEquipmentFrameColors(chromeHandBones.BonesEquipmentFrameColors, false));
             }
-
+            if (!chromeHandBones.BonesAddParts.IsNullOrEmpty())
+            {
+                foreach (string addedPart in chromeHandBones.BonesAddParts.CachedCommaExpansion())
+                {
+                    chromeBonedNaturalWeapon.AddAdjustment(new AddPart(addedPart));
+                }
+            }
+            if (!chromeHandBones.BonesAddProps.IsNullOrEmpty()
+                && chromeHandBones.BonesAddProps.ParseProps(out Dictionary<string, string> stringProps, out Dictionary<string, int> intProps))
+            {
+                if (!stringProps.IsNullOrEmpty())
+                {
+                    foreach ((string label, string prop) in stringProps)
+                    {
+                        chromeBonedNaturalWeapon.AddAdjustment(new SetStringProperty(label, prop));
+                    }
+                }
+                if (!intProps.IsNullOrEmpty())
+                {
+                    foreach ((string label, int prop) in intProps)
+                    {
+                        chromeBonedNaturalWeapon.AddAdjustment(new SetIntProperty(label, prop));
+                    }
+                }
+            }
+            chromeBonedNaturalWeapon.AddAdjustment(new DiminishingReturns("increases to damage die count"), true, IsGigantic );
             return chromeBonedNaturalWeapon;
         }
 

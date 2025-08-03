@@ -55,14 +55,14 @@ namespace HNPS_GigantismPlus
             return IsApplied();
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject = null)
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject = null)
         {
             if (!Value.IsNullOrEmpty())
             {
                 Effect = $"bonus penetration from {Value}";
                 return new(Verb, Effect);
             }
-            return GetWeaponDescriptionElement(Subject);
+            return GetPrimaryDescriptionElement(Subject);
         }
     }
 }

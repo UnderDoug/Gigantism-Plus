@@ -12,48 +12,48 @@ namespace HNPS_GigantismPlus
     {
         public int DescriptionOrder;
 
-        public DescriptionElement WeaponDescription;
-        public DescriptionElement GeneralDescription;
+        public DescriptionElement PrimaryDescription;
+        public DescriptionElement SecondaryDescription;
 
         public ArbitraryDescription()
             : base()
         {
             Prioritize = false;
             DescriptionOrder = 0;
-            WeaponDescription = DescriptionElement.Empty;
-            GeneralDescription = DescriptionElement.Empty;
+            PrimaryDescription = DescriptionElement.Empty;
+            SecondaryDescription = DescriptionElement.Empty;
         }
-        public ArbitraryDescription(DescriptionElement WeaponDescription, DescriptionElement GeneralDescription)
+        public ArbitraryDescription(DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription)
             : this()
         {
-            this.WeaponDescription = WeaponDescription;
-            this.GeneralDescription = GeneralDescription;
+            this.PrimaryDescription = PrimaryDescription;
+            this.SecondaryDescription = SecondaryDescription;
         }
-        public ArbitraryDescription(int DescriptionOrder, DescriptionElement WeaponDescription, DescriptionElement GeneralDescription)
-            : this(WeaponDescription, GeneralDescription)
+        public ArbitraryDescription(int DescriptionOrder, DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription)
+            : this(PrimaryDescription, SecondaryDescription)
         {
             this.DescriptionOrder = DescriptionOrder;
-            if (WeaponDescription != DescriptionElement.Empty)
+            if (PrimaryDescription != DescriptionElement.Empty)
             {
-                WeaponDescription.Priority = DescriptionOrder;
+                PrimaryDescription.Priority = DescriptionOrder;
             }
-            if (GeneralDescription != DescriptionElement.Empty)
+            if (SecondaryDescription != DescriptionElement.Empty)
             {
-                GeneralDescription.Priority = DescriptionOrder;
+                SecondaryDescription.Priority = DescriptionOrder;
             }
         }
-        public ArbitraryDescription(Type Source, DescriptionElement WeaponDescription, DescriptionElement GeneralDescription)
-            : this(WeaponDescription, GeneralDescription)
+        public ArbitraryDescription(Type Source, DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription)
+            : this(PrimaryDescription, SecondaryDescription)
         {
             this.Source = Source;
         }
-        public ArbitraryDescription(Type Source, int Priority, DescriptionElement WeaponDescription, DescriptionElement GeneralDescription)
-            : this(Source, WeaponDescription, GeneralDescription)
+        public ArbitraryDescription(Type Source, int Priority, DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription)
+            : this(Source, PrimaryDescription, SecondaryDescription)
         {
             this.Priority = Priority;
         }
-        public ArbitraryDescription(Type Source, int Priority, int DescriptionOrder, DescriptionElement WeaponDescription, DescriptionElement GeneralDescription)
-            : this(Source, Priority, WeaponDescription, GeneralDescription)
+        public ArbitraryDescription(Type Source, int Priority, int DescriptionOrder, DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription)
+            : this(Source, Priority, PrimaryDescription, SecondaryDescription)
         {
             this.DescriptionOrder = DescriptionOrder;
         }
@@ -61,24 +61,24 @@ namespace HNPS_GigantismPlus
             : base(SourceAdjustment)
         {
             DescriptionOrder = SourceAdjustment.DescriptionOrder;
-            WeaponDescription = SourceAdjustment.WeaponDescription;
-            GeneralDescription = SourceAdjustment.GeneralDescription;
+            PrimaryDescription = SourceAdjustment.PrimaryDescription;
+            SecondaryDescription = SourceAdjustment.SecondaryDescription;
         }
-        public ArbitraryDescription(DescriptionElement WeaponDescription, DescriptionElement GeneralDescription, ArbitraryDescription SourceAdjustment)
+        public ArbitraryDescription(DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription, ArbitraryDescription SourceAdjustment)
             : base(SourceAdjustment)
         {
             DescriptionOrder = SourceAdjustment.DescriptionOrder;
-            this.WeaponDescription = SourceAdjustment.WeaponDescription;
-            this.GeneralDescription = SourceAdjustment.GeneralDescription;
+            this.PrimaryDescription = PrimaryDescription;
+            this.SecondaryDescription = SecondaryDescription;
         }
-        public ArbitraryDescription(Type Source, DescriptionElement WeaponDescription, DescriptionElement GeneralDescription, ArbitraryDescription SourceAdjustment)
-            : this(WeaponDescription, GeneralDescription, SourceAdjustment)
+        public ArbitraryDescription(Type Source, DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription, ArbitraryDescription SourceAdjustment)
+            : this(PrimaryDescription, SecondaryDescription, SourceAdjustment)
         {
             this.Source = Source;
             DescriptionOrder = SourceAdjustment.DescriptionOrder;
         }
-        public ArbitraryDescription(Type Source, int Priority, DescriptionElement WeaponDescription, DescriptionElement GeneralDescription, ArbitraryDescription SourceAdjustment)
-            : this(Source, WeaponDescription, GeneralDescription, SourceAdjustment)
+        public ArbitraryDescription(Type Source, int Priority, DescriptionElement PrimaryDescription, DescriptionElement SecondaryDescription, ArbitraryDescription SourceAdjustment)
+            : this(Source, PrimaryDescription, SecondaryDescription, SourceAdjustment)
         {
             this.Priority = Priority;
         }
@@ -87,47 +87,48 @@ namespace HNPS_GigantismPlus
         {
             List<string> output = new(base.AddToString());
             string weapon = null;
-            if (WeaponDescription != DescriptionElement.Empty)
+            if (PrimaryDescription != DescriptionElement.Empty)
             {
-                weapon = WeaponDescription;
+                weapon = PrimaryDescription;
             }
             string general = null;
-            if (GeneralDescription != DescriptionElement.Empty)
+            if (SecondaryDescription != DescriptionElement.Empty)
             {
-                general = GeneralDescription;
+                general = SecondaryDescription;
             }
             if (!weapon.IsNullOrEmpty())
             {
-                output.Add(general != null ? $"{nameof(WeaponDescription)} {weapon}" : weapon);
+                output.Add(general != null ? $"{nameof(PrimaryDescription)} {weapon}" : weapon);
             }
             if (!general.IsNullOrEmpty())
             {
-                output.Add(weapon != null ? $"{nameof(GeneralDescription)} {general}" : general);
+                output.Add(weapon != null ? $"{nameof(SecondaryDescription)} {general}" : general);
             }
             return output;
         }
 
         public override bool Check(GameObject Subject)
         {
-            return (WeaponDescription != DescriptionElement.Empty || GeneralDescription != DescriptionElement.Empty) && base.Check(Subject);
+            return base.Check(Subject)
+                && (PrimaryDescription != DescriptionElement.Empty || SecondaryDescription != DescriptionElement.Empty);
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject)
         {
-            if (WeaponDescription != DescriptionElement.Empty)
+            if (PrimaryDescription != DescriptionElement.Empty)
             {
-                return WeaponDescription;
+                return PrimaryDescription;
             }
-            return base.GetGeneralDescriptionElement(Subject);
+            return base.GetSecondaryDescriptionElement(Subject);
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
+        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject)
         {
-            if (GeneralDescription != DescriptionElement.Empty)
+            if (SecondaryDescription != DescriptionElement.Empty)
             {
-                return GeneralDescription;
+                return SecondaryDescription;
             }
-            return base.GetGeneralDescriptionElement(Subject);
+            return base.GetSecondaryDescriptionElement(Subject);
         }
     }
 }

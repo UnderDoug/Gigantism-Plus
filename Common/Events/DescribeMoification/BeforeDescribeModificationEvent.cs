@@ -41,8 +41,8 @@ namespace HNPS_GigantismPlus
                 E.Object = Object;
                 E.Adjective = Adjective;
                 E.ObjectNoun = ObjectNoun;
-                E.WeaponDescriptions = WeaponDescriptions ?? new();
-                E.GeneralDescriptions = GeneralDescriptions ?? new();
+                E.PrimaryDescriptions = WeaponDescriptions ?? new();
+                E.SecondaryDescriptions = GeneralDescriptions ?? new();
                 E.Context = Context;
             }
             return E;

@@ -1,14 +1,18 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using XRL.Language;
 using XRL.Rules;
 using XRL.World.Anatomy;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
 namespace XRL.World.Parts.Mutation
 {
@@ -65,91 +69,34 @@ namespace XRL.World.Parts.Mutation
 
         public static ModBurrowingNaturalWeapon NewBurrowingWeaponMod(NaturalEquipmentManager NewManager)
         {
-            ModBurrowingNaturalWeapon burrowingClawsMod = new()
+            ModBurrowingNaturalWeapon burrowingClawsMod = new(NewManager);
+            
+            burrowingClawsMod.AddNounAdjustment(true)
+                
+                .AddSkillAdjustment("ShortBlades", true)
+
+                .AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true)
+                .AddColorStringAdjustment("&w", true)
+                .AddTileColorAdjustment("&w", true)
+                .AddDetailColorAdjustment("W", true);
+
+            DiminishingReturns diminishingReturns = new("increases to damage die size")
             {
-                Manager = NewManager,
-                BodyPartType = "Hand",
-
-                ModPriority = 80,
-                DescriptionPriority = 80,
-
-                ForceNoun = true,
-                Noun = "claw",
-
-                Adjective = "burrowing",
-                AdjectiveColor = "W",
-                AdjectiveColorFallback = "y",
-
-                PartAdjustments = new(),
-
-                AddedParts = new(),
-
-                AddedStringProps = new()
+                Condition = new AllConditions<GameObject>()
                 {
-                    { "SwingSound", "Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked" },
-                },
-            };
-            if (!EnablePrereleaseContent)
-            {
-                burrowingClawsMod.AddedParts.Add(nameof(DiggingTool));
-            }
-            else
-            {
-                burrowingClawsMod.AddAdjustment(new AddPartAdjustment<DiggingTool>(), false);
-            }
-
-            burrowingClawsMod.AddSkillAdjustment("ShortBlades", true);
-
-            burrowingClawsMod.AddNounAdjustment(true);
-
-            burrowingClawsMod.AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true);
-            burrowingClawsMod.AddColorStringAdjustment("&w", true);
-            burrowingClawsMod.AddTileColorAdjustment("&w", true);
-            burrowingClawsMod.AddDetailColorAdjustment("W", true);
-
-            if (EnablePrereleaseContent)
-            {
-                DiminishingReturns diminishingReturns = new("increases to damage die size")
-                {
-                    Condition = new AllConditions<GameObject>()
+                    WielderHasGigantismPlus,
+                    new NotAnyConditions<GameObject>()
                     {
-                        new GameObjectWielderHasPart<GigantismPlus>(),
-                        new NotAnyConditions<GameObject>()
-                        {
-                            new GameObjectWielderHasPart<ElongatedPaws>(),
-                            new GameObjectWielderHasPart<UD_ManagedCrystallinity>(),
-                        },
-                    }
-                };
-                burrowingClawsMod.AddAdjustment(diminishingReturns, true);
-            }
-            return burrowingClawsMod;
-        }
-
-        public virtual bool ProcessNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, string Parts)
-        {
-            if (Parts == null) return false;
-            NaturalEquipmentMod.AddedParts ??= new();
-            if (Parts.Contains(","))
-            {
-                string[] parts = Parts.Split(',');
-                foreach (string part in parts)
-                {
-                    NaturalEquipmentMod.AddedParts.TryAdd(part);
+                        WielderHasElongatedPaws,
+                        WielderHasCrystallinity,
+                    },
                 }
-            }
-            else
-            {
-                NaturalEquipmentMod.AddedParts.TryAdd(Parts);
-            }
-            return !NaturalEquipmentMod.AddedParts.IsNullOrEmpty();
-        }
-        public virtual bool ProcessNaturalEquipmentAddedProps(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod, string Props)
-        {
-            if (Props == null) return false;
-            Props.ParseProps(out NaturalEquipmentMod.AddedStringProps, out NaturalEquipmentMod.AddedIntProps);
-            return !NaturalEquipmentMod.AddedStringProps.IsNullOrEmpty() || !NaturalEquipmentMod.AddedIntProps.IsNullOrEmpty();
+            };
+            burrowingClawsMod.AddAdjustment(new AddPart<DiggingTool>(), false)
+                .AddAdjustment(diminishingReturns, true)
+                .AddAdjustment(new SetSwingSound("Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing"), true)
+                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked"), true);
+            return burrowingClawsMod;
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)
@@ -186,19 +133,6 @@ namespace XRL.World.Parts.Mutation
             return 0;
         }
 
-        public virtual List<string> GetNaturalEquipmentAddedParts(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedParts;
-        }
-        public virtual Dictionary<string, string> GetNaturalEquipmentAddedStringProps(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedStringProps;
-        }
-        public virtual Dictionary<string, int> GetNaturalEquipmentAddedIntProps(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod)
-        {
-            return NaturalEquipmentMod.AddedIntProps;
-        }
-
         public List<ModNaturalEquipment<UD_ManagedBurrowingClaws>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<UD_ManagedBurrowingClaws>> Filter = null, NaturalEquipmentManager NewManager = null)
         {
             int indent = Debug.LastIndent;
@@ -206,7 +140,7 @@ namespace XRL.World.Parts.Mutation
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(GetNaturalEquipmentMods)}("
                 + $"{nameof(Filter)}, "
-                + $"{nameof(NewManager)}: {NewManager?.Name})",
+                + $"{nameof(NewManager)})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
             NewManager ??= NaturalEquipmentManager;
@@ -283,24 +217,15 @@ namespace XRL.World.Parts.Mutation
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NaturalEquipmentMod.DamageDieCount = GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.DamageDieSize = GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.DamageBonus = GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.HitBonus = GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level);
-            NaturalEquipmentMod.PenBonus = GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level);
-
-            if (EnablePrereleaseContent)
-            {
-                NaturalEquipmentMod.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level));
-                NaturalEquipmentMod.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level));
-
-                NaturalEquipmentMod.AddAdjustment(new AddBurrowingClawsProperties(GetWallBonusPenetration(), GetWallBonusPercentage()), true);
-            }
-
-            NaturalEquipmentMod.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
+            NaturalEquipmentMod?.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level))
+                ?.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level))
+                ?.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
+                ?.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
+                ?.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
+                
+                ?.AddAdjustment(new AddBurrowingClawsProperties(GetWallBonusPenetration(), GetWallBonusPercentage()), true)
+                
+                ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,
                 $"x {nameof(UD_ManagedBurrowingClaws)}."

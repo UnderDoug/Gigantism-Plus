@@ -33,7 +33,8 @@ namespace XRL.World.Parts.Mutation
             List<object> doList = new()
             {
                 'V',    // Vomit
-                "CL",    // Change Level
+                "CL",   // Change Level
+                "RA",   // Rapid Advance
             };
             List<object> dontList = new()
             {
@@ -160,17 +161,14 @@ namespace XRL.World.Parts.Mutation
                 BodyPartType = "Hand",
 
                 Noun = "fist",
-
-                AddedStringProps = new()
-                {
-                    { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
-                },
             };
-            giganticFistMod.AddSkillAdjustment("Cudgel", true);
-
-            giganticFistMod.AddNounAdjustment(true, Condition: IsOrganicFist);
-            giganticFistMod.AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: IsOrganicFist);
+            giganticFistMod.AddSkillAdjustment("Cudgel", true)
+                
+                .AddNounAdjustment(true, Condition: IsOrganicFist)
+                .AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: IsOrganicFist)
+                
+                .AddAdjustment(new SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing"), true)
+                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block"), true);
 
             return giganticFistMod;
         }
@@ -192,9 +190,8 @@ namespace XRL.World.Parts.Mutation
         }
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(NaturalEquipmentManager NewManager)
         {
-            ModNaturalEquipment<GigantismPlus> giganticBodMod = new()
+            ModNaturalEquipment<GigantismPlus> giganticBodMod = new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Body",
 
                 ModPriority = 40,
@@ -203,30 +200,23 @@ namespace XRL.World.Parts.Mutation
                 Adjective = "gigantic",
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
-
-                PartAdjustments = new(),
-
-                AddedIntProps = new()
-                {
-                    { "ModGiganticNoShortDescription", 1 },
-                    { "ModGiganticNoDisplayName", 1 }
-                },
             };
-            giganticBodMod.AddMeleeStatAdjustment("Strength", -100);
+            giganticBodMod.AddMeleeStatAdjustment("Strength", -100)
 
-            if (EnablePrereleaseContent)
-            {
-                giganticBodMod.AddArmorAVAdjustment(10);
-                giganticBodMod.AddArmorDVAdjustment(-10);
-                giganticBodMod.AddArmorStatisticAdjustment("Toughness", 30);
+                .AddColorStringAdjustment("&Z", true)
+                .AddTileColorAdjustment("&Z", true)
+                .AddDetailColorAdjustment("z", true)
 
-                // giganticBodMod.AddAdjustment(new AdjustArbitraryPart<Render>(nameof(Parts.Render.DisplayName), "test", "have", "a test Display Name"), -999);
+                .AddArmorAVAdjustment(2)
+                .AddArmorDVAdjustment(-2)
 
-            }
+                .AddAdjustment(new AdjustArmorHeatResist(5), Condition: new GameObjectBlueprintIs("Quills"))
+                .AddAdjustment(new AdjustArmorColdResist(5), Condition: new GameObjectBlueprintIs("Quills"))
+                .AddAdjustment(new AdjustArmorElecResist(-10), Condition: new GameObjectBlueprintIs("Quills"))
 
-            giganticBodMod.AddColorStringAdjustment("&Z", true);
-            giganticBodMod.AddTileColorAdjustment("&Z", true);
-            giganticBodMod.AddDetailColorAdjustment("z", true);
+                .AddAdjustment(new DisableModGiganticShortDescription())
+                .AddAdjustment(new DisableModGiganticDisplayName());
+
             return giganticBodMod;
         }
         public static ModClosedGiganticNaturalWeapon NewClosedFistMod(NaturalEquipmentManager NewManager)
@@ -251,18 +241,15 @@ namespace XRL.World.Parts.Mutation
                 Adjective = "closed",
                 AdjectiveColor = "Y",
                 AdjectiveColorFallback = "y",
-
-                AddedStringProps = new()
-                {
-                    { "SwingSound", "Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing" },
-                    { "BlockedSound", "Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block" }
-                },
             };
-            closedGiganticFist.AddSkillAdjustment("Cudgel", false);
+            closedGiganticFist.AddSkillAdjustment("Cudgel", false)
+                
+                .AddNounAdjustment()
+                .AddTileAdjustment("NaturalWeapons/GiganticFist.png", false)
+                
+                .AddAdjustment(new SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing"), true)
+                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block"), true);
 
-            closedGiganticFist.AddNounAdjustment();
-
-            closedGiganticFist.AddTileAdjustment("NaturalWeapons/GiganticFist.png", false);
             return closedGiganticFist;
         }
 
@@ -998,7 +985,7 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(BeforeRapidAdvancementEvent E)
         {
-            if (!E.Amount.Is(0))
+            if (E.Amount != 0)
             {
                 SwapMutationCategory(nameof(GigantismPlus), "PhysicalDefects", "Physical");
             }
@@ -1006,7 +993,7 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(AfterRapidAdvancementEvent E)
         {
-            if (!E.Amount.Is(0))
+            if (E.Amount != 0)
             {
                 SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
             }

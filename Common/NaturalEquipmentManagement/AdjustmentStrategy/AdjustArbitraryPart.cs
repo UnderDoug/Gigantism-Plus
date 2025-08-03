@@ -67,11 +67,11 @@ namespace HNPS_GigantismPlus
             return PartParameter != null;
         }
 
-        public override bool SameAs(IAdjustment OtherAdjustment)
+        public override bool SameAs(IAdjustment OtherAdjustment, bool ConsiderSource = true)
         {
             return OtherAdjustment is AdjustArbitraryPart<T> aAP 
                 && aAP.Parameter == Parameter
-                && base.SameAs(OtherAdjustment);
+                && base.SameAs(OtherAdjustment, ConsiderSource);
         }
 
         public override bool Check(GameObject Subject)
@@ -89,7 +89,7 @@ namespace HNPS_GigantismPlus
             return IsApplied();
         }
 
-        public override DescriptionElement GetWeaponDescriptionElement(GameObject Subject)
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject)
         {
             DescriptionElement element = DescriptionElement.Empty;
             T samplePart = new();
@@ -100,7 +100,7 @@ namespace HNPS_GigantismPlus
             return element;
         }
 
-        public override DescriptionElement GetGeneralDescriptionElement(GameObject Subject)
+        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject)
         {
             DescriptionElement element = DescriptionElement.Empty;
             T samplePart = new();

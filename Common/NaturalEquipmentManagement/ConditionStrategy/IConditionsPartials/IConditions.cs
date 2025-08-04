@@ -8,6 +8,8 @@ using XRL.Collections;
 using XRL.World;
 
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -15,6 +17,27 @@ namespace HNPS_GigantismPlus
     public abstract partial class IConditions<T> : ICondition<T>
         where T : class, new()
     {
+        private static bool doDebug => getClassDoDebug("IConditions");
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                nameof(Check),
+                nameof(NotCheck),
+                nameof(Results),
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
         protected ICondition<T>[] Items = Array.Empty<ICondition<T>>();
 
         protected int Size;
@@ -306,15 +329,19 @@ namespace HNPS_GigantismPlus
         public IEnumerable<bool> Results(T Subject)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, $"> {nameof(IConditions<T>)}.{nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+            Debug.Entry(4, $"> {GetType().Name}.{nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
                 foreach (ICondition<T> condition in this)
                 {
-                    Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
                     if (condition != null)
                     {
+                        Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
+                        Debug.Divider(4, HONLY, 25, null, BANDL, Indent: indent + 2, Toggle: doDebug);
+
                         bool result = condition.Check(Subject);
+
+                        Debug.Divider(4, HONLY, 25, TANDR, Indent: indent + 2, Toggle: doDebug);
                         Debug.LastIndent = indent;
                         yield return result;
                     }
@@ -330,16 +357,21 @@ namespace HNPS_GigantismPlus
         public IEnumerable<bool> NotResults(T Subject)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, $"> {nameof(IConditions<T>)}.{nameof(NotResults)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+            Debug.Entry(4, $"> {GetType().Name}.{nameof(NotResults)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
                 foreach (ICondition<T> condition in this)
                 {
-                    Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
                     if (condition != null)
                     {
+                        Debug.Entry(4, $"{condition.ToString(ShowResult: true, Subject)}", Indent: indent + 2, Toggle: true);
+                        Debug.Divider(4, HONLY, 25, null, BANDL, Indent: indent + 2, Toggle: doDebug);
+
+                        bool notResult = condition.NotCheck(Subject);
+
+                        Debug.Divider(4, HONLY, 25, TANDR, Indent: indent + 2, Toggle: doDebug);
                         Debug.LastIndent = indent;
-                        yield return condition.NotCheck(Subject);
+                        yield return notResult;
                     }
                 }
             }

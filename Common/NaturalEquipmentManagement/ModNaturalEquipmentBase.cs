@@ -23,6 +23,25 @@ namespace XRL.World.Parts
         , IModEventHandler<BeforeApplyAdjustmentEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(ModNaturalEquipmentBase));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                
+            };
+            List<object> dontList = new()
+            {
+                nameof(AddAdjustment),
+            };
+
+            if (what != null && doList.Contains(what))
+                return true;
+
+            if (what != null && dontList.Contains(what))
+                return false;
+
+            return doDebug;
+        }
 
         private GameObject _wielder = null;
         public GameObject Wielder
@@ -142,7 +161,7 @@ namespace XRL.World.Parts
             Adjustment.Source ??= GetType();
             Adjustment.Condition ??= Condition;
             Adjustment.Priority = modPriority;
-            Debug.LoopItem(4, $"Adding: {Adjustment}", Indent: indent + 1, Toggle: true);
+            Debug.LoopItem(4, $"Adding: {Adjustment}", Indent: indent + 1, Toggle: getDoDebug(nameof(AddAdjustment)));
             Adjustments.Add(Adjustment);
             Debug.LastIndent = indent;
             return this;

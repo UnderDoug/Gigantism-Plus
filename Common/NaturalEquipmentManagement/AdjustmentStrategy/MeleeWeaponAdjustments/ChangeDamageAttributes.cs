@@ -62,7 +62,7 @@ namespace HNPS_GigantismPlus
                 }
                 attributes ??= AttributeName;
                 Effect = $"{attributes} type damage";
-                return new(Verb, Effect);
+                return new(DescriptionElement.ORDER_ADJUST_SLIGHTLY_LATE, Verb, Effect);
             }
             return base.GetPrimaryDescriptionElement(Subject);
         }

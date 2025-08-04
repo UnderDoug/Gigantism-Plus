@@ -56,6 +56,17 @@ namespace HNPS_GigantismPlus
             { nameof(GiantAbodePopulator), true },
             { nameof(WeaponElongator), true },
 
+            //Conditions
+            { "ICondition", true && doConditionsDebug },
+            { "IConditions", true && doConditionsDebug },
+            { "NotCondition", true && doConditionsDebug },
+            { "AnyConditions", true && doConditionsDebug },
+            { "AllConditions", true && doConditionsDebug },
+            { "OnlyOneCondition", true && doConditionsDebug },
+            { "NotAnyConditions", true && doConditionsDebug },
+            { "NotAllConditions", true && doConditionsDebug },
+
+            // Adjustments
             { nameof(IAdjustment), true },
             { nameof(Adjustments), true },
 
@@ -144,6 +155,26 @@ namespace HNPS_GigantismPlus
             { nameof(WrassleGear), true },
             { nameof(ModWrassleVibrant), true },
         };
+
+        public static bool doConditionsDebug = true;
+
+        public static bool getDoDebug(object what = null, List<object> DoList = null, List<object> DontList = null, bool? DoDebug = null)
+        {
+            DoList = new();
+            DontList = new();
+
+            if (what != null && !DoList.IsNullOrEmpty() && DoList.Contains(what))
+            {
+                return true;
+            }
+
+            if (what != null && !DontList.IsNullOrEmpty() && DontList.Contains(what))
+            {
+                return false;
+            }
+
+            return DoDebug ?? doDebug;
+        }
 
         public static bool getClassDoDebug(string Class)
         {

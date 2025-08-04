@@ -22,16 +22,15 @@ namespace HNPS_GigantismPlus
         {
             List<object> doList = new()
             {
-                'V',    // Vomit
-                "OC",   // ObjectCreation
+                nameof(Apply),
+                nameof(Check),
+                nameof(Checks),
+                nameof(GetApplied),
+                nameof(GetUnapplied),
             };
             List<object> dontList = new()
             {
-                'R',    // Removal
-                "S",    // Serialisation
-                nameof(BodyPartsUpdatedEvent),
-                nameof(AfterBodyPartsUpdatedEvent),
-                nameof(BeforeUpdateBodyPartsEvent),
+                nameof(Add),
             };
 
             if (what != null && doList.Contains(what))
@@ -97,6 +96,9 @@ namespace HNPS_GigantismPlus
 
         public virtual void Add(IAdjustment Adjustment, GameObject Subject)
         {
+            bool doConditionsDebug = Options.doConditionsDebug;
+            Options.doConditionsDebug = getDoDebug(nameof(Add));
+
             IAdjustment higherPriorityAdjustment = null;
             if (!Items.IsNullOrEmpty())
             {
@@ -122,6 +124,7 @@ namespace HNPS_GigantismPlus
                 Items[Length++] = Adjustment;
                 Variant++;
             }
+            Options.doConditionsDebug = doConditionsDebug;
         }
 
         public void EnsureCapacity(int Capacity)
@@ -343,10 +346,14 @@ namespace HNPS_GigantismPlus
         /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="IAdjustment.Check(GameObject)" /> on each of the elements contained in the Adjustments <see cref="List{IAdjustment}" />.</returns>
         public IEnumerable<bool> Checks(GameObject Subject)
         {
-            if (!Items.IsNullOrEmpty())
+            if (!this.IsNullOrEmpty())
             {
-                foreach (IAdjustment adjustment in Items)
+                foreach (IAdjustment adjustment in this)
                 {
+                    if (adjustment == null)
+                    {
+                        continue;
+                    }
                     yield return adjustment.Check(Subject);
                 }
             }
@@ -362,6 +369,10 @@ namespace HNPS_GigantismPlus
             {
                 foreach (IAdjustment adjustment in this)
                 {
+                    if (adjustment == null)
+                    {
+                        continue;
+                    }
                     if (adjustment.IsApplied())
                     {
                         yield return adjustment;
@@ -380,6 +391,10 @@ namespace HNPS_GigantismPlus
             {
                 foreach (IAdjustment adjustment in this)
                 {
+                    if (adjustment == null)
+                    {
+                        continue;
+                    }
                     if (!adjustment.IsApplied())
                     {
                         yield return adjustment;
@@ -413,6 +428,10 @@ namespace HNPS_GigantismPlus
             {
                 foreach (IAdjustment adjustment in this)
                 {
+                    if (adjustment == null)
+                    {
+                        continue;
+                    }
                     if (!adjustment.IsApplied())
                     {
                         adjustment.Apply(Subject);

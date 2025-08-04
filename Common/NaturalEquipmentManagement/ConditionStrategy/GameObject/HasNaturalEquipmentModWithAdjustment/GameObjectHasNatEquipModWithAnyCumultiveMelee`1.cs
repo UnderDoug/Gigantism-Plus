@@ -7,21 +7,24 @@ using XRL.World.Parts.Mutation;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasNatEquipModWithAnyCumultiveMelee<T> : AnyConditions<GameObject>
-        where T : ModNaturalEquipmentBase, new()
+    public class GameObjectHasNatEquipModWithAnyCumultiveMelee<T> : GameObjectHasNaturalEquipmentMod<T>
+        where T
+        : IPart
+        , IManagedDefaultNaturalEquipment<T>
+        , new()
     {
-        public static new bool IsReadOnly => true;
-
-        public GameObjectHasNatEquipModWithAnyCumultiveMelee()
-            : base()
+        public override bool Check(GameObject GameObject)
         {
-            Clear();
-            EnsureCapacity(5);
-            Add(new GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, AdjustDamageDieCount>());
-            Add(new GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, AdjustDamageDieSize>());
-            Add(new GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, AdjustDamageBonus>());
-            Add(new GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, AdjustHitBonus>());
-            Add(new GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, AdjustPenBonus>());
+            return base.Check(GameObject, out ModNaturalEquipment<T> naturalEquipmentMod) 
+                && (new AnyConditions<IPart>()
+                { 
+                    new PartHasAdjustment<T, AdjustDamageDieCount>(),
+                    new PartHasAdjustment<T, AdjustDamageDieSize>(),
+                    new PartHasAdjustment<T, AdjustDamageBonus>(),
+                    new PartHasAdjustment<T, AdjustHitBonus>(),
+                    new PartHasAdjustment<T, AdjustPenBonus>(),
+                })
+                .Check(naturalEquipmentMod);
         }
     }
 }

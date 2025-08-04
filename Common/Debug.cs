@@ -234,7 +234,7 @@ namespace HNPS_GigantismPlus
         public static ModNaturalEquipmentBase Vomit(this ModNaturalEquipmentBase NaturalEquipmentMod, int Verbosity, string Title = null, bool DamageOnly = false, int Indent = 0, bool Toggle = true)
         {
             int indent = Indent;
-            Vomit(Verbosity, $"{nameof(NaturalEquipmentMod)}[{NaturalEquipmentMod.GetSource()}]", Title, Indent: Indent, Toggle: Toggle);
+            Vomit(Verbosity, $"{nameof(NaturalEquipmentMod)}<{NaturalEquipmentMod.GetSource()}>", Title, Indent: Indent, Toggle: Toggle);
             
             if (!DamageOnly)
             {

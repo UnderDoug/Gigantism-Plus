@@ -63,7 +63,7 @@ namespace HNPS_GigantismPlus
                 return false;
 
             if (MethodName == nameof(InheritsFrom))
-                return true;
+                return false;
 
             return doDebug;
         }
@@ -2381,17 +2381,17 @@ namespace HNPS_GigantismPlus
 
         public static bool IsAssignableFrom(this IPart @this, IPart Part)
         {
-            return @this.GetType().IsAssignableFrom(Part.GetType());
+            return @this.GetType().InheritsFrom(Part.GetType());
         }
 
         public static bool InheritsFrom(this IPart @this, Type Type)
         {
-            return Type.IsAssignableFrom(@this.GetType());
+            return Type.InheritsFrom(@this.GetType());
         }
         public static bool InheritsFrom<T>(this IPart @this)
             where T : IModification
         {
-            return typeof(T).IsAssignableFrom(@this.GetType());
+            return typeof(T).InheritsFrom(@this.GetType());
         }
 
         public static string GetShaderFromSequence(this IEnumerable<string> Sequence)

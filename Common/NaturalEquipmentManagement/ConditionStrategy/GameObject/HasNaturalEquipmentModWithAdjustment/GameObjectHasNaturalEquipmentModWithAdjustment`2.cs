@@ -8,8 +8,10 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public class GameObjectHasNaturalEquipmentModWithAdjustment<T, TAdjustment> 
         : GameObjectHasNaturalEquipmentMod<T>
-        where T 
-        : ModNaturalEquipmentBase, new()
+        where T
+        : IPart
+        , IManagedDefaultNaturalEquipment<T>
+        , new()
         where TAdjustment
         : IAdjustment
     {

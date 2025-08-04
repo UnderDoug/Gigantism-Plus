@@ -57,7 +57,7 @@ namespace HNPS_GigantismPlus
             {
                 string skillName = Skills.GetGenericSkill(Value)?.DisplayName;
                 Effect ??= $"as a {skillName}";
-                return new(Verb, Effect);
+                return new(DescriptionElement.ORDER_ADJUST_SLIGHTLY_LATE, Verb, Effect);
             }
             return GetPrimaryDescriptionElement(Subject);
         }

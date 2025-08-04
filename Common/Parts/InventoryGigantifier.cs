@@ -1,10 +1,13 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
 using XRL.Rules;
 using XRL.Wish;
 using XRL.World.Parts.Mutation;
 using XRL.World.Tinkering;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -27,13 +30,7 @@ namespace XRL.World.Parts
             {
             };
 
-            if (what != null && doList.Contains(what))
-                return true;
-
-            if (what != null && dontList.Contains(what))
-                return false;
-
-            return doDebug;
+            return Options.getDoDebug(what, doList, dontList, doDebug);
         }
         public bool IsMerchant => ParentObject != null && ParentObject.HasPart<GenericInventoryRestocker>();
         public bool IsSecretGiant => ParentObject != null && ParentObject.HasPropertyOrTag("SecretGiantVillager");
@@ -168,8 +165,10 @@ namespace XRL.World.Parts
                         : $" ({nameof(inventoryGigantifierAlwaysStockGiant)})"
                         ;
 
-                    Debug.DiveIn(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
+                    Debug.LoopItem(3, $"{nameof(ItemName)}", ItemName, Indent: 1, Toggle: doDebug);
+
                     int NoThanks = 0;
+                    Debug.DiveIn(3, $"{ItemDebug}", Indent: 2, Toggle: doDebug);
                     // Can the item have the gigantic modifier applied?
                     if (ItemModding.ModificationApplicable("ModGigantic", item)
                         || (creatureIsSecretGiantGutsmonger && itemIsCybernetic)
@@ -418,7 +417,7 @@ namespace XRL.World.Parts
                                 Indent: 2, Toggle: doDebug);
                         }
 
-                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
+                        Debug.DiveOut(3, $"/ Completed {ItemDebug} //", Indent: 2, Toggle: doDebug);
                     }
                     else
                     {
@@ -430,9 +429,7 @@ namespace XRL.World.Parts
                             @operator.Manager = manager;
                             wantstoUpdateBody = true;
                         }
-
-                        Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: doDebug);
-                        Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
+                        Debug.DiveOut(3, $"/x Skipping {ItemDebug} //", Indent: 2, Toggle: doDebug);
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);

@@ -143,7 +143,7 @@ namespace HNPS_GigantismPlus
         public string ToString(bool ShowApplied, bool Short = false)
         {
             string appliedString = ShowApplied ? $"[{(Applied ? SQR : MTY)}]" : null;
-            string priorityString = $"@({Priority.ToString().PadLeft(7)})";
+            string priorityString = $"@({Priority})";
             string addToString = !Short ? AddToString().Join("; ") : null;
             if (!addToString.IsNullOrEmpty())
             {
@@ -201,6 +201,8 @@ namespace HNPS_GigantismPlus
 
             bool otherCondition = true;
             bool condition = true;
+            bool doConditionsDebug = Options.doConditionsDebug;
+            Options.doConditionsDebug = doDebug;
             try
             {
                 condition = Check(Subject);
@@ -221,6 +223,7 @@ namespace HNPS_GigantismPlus
                 Debug.CheckNah(4, $"{nameof(otherCondition)} Checked", $"{nameof(Exception)}", Indent: indent + 2, Toggle: doDebug);
                 MetricsManager.LogModError(ThisMod, e);
             }
+            Options.doConditionsDebug = doConditionsDebug;
 
             Debug.LastIndent = indent;
             return condition || !otherCondition || condition == otherCondition;
@@ -268,10 +271,9 @@ namespace HNPS_GigantismPlus
                 return true;
             }
             bool sameType = GetType() == OtherAdjustment.GetType();
-            bool sameSource = Source == OtherAdjustment.Source;
             if (!Prioritize && sameType)
             {
-                 return sameSource && ConsiderSource;
+                 return ConsiderSource && Source == OtherAdjustment.Source;
             }
             return sameType;
         }

@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using XRL.World;
+using XRL.World.Parts;
 
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasPart<T> : ICondition<GameObject>
-        where T : IPart
+    public class PartIsModification<T> : ICondition<IPart>
+        where T : IModification
     {
-        public GameObjectHasPart()
+        public PartIsModification()
             : base()
         {
         }
-        public GameObjectHasPart(GameObjectHasPart<T> Source)
+        public PartIsModification(PartIsModification<T> Source)
             : base(Source)
         {
         }
@@ -25,10 +26,10 @@ namespace HNPS_GigantismPlus
             };
         }
 
-        public override bool Check(GameObject GameObject)
+        public override bool Check(IPart IPart)
         {
-            return base.Check(GameObject)
-                && GameObject.HasPart<T>();
+            return base.Check(IPart)
+                && IPart.InheritsFrom<T>();
         }
     }
 }

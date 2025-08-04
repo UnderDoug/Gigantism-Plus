@@ -40,27 +40,25 @@ namespace XRL.World.Parts
             AddTileColorAdjustment("&Z", true);
             AddDetailColorAdjustment("z", true);
 
-            AnyConditions<GameObject> arbitraryAnyConditions = ThisModAdjustsMeleeCumulatively<ModElongatedNaturalWeapon>();
+            DescriptionElement itScales = new(
+                Priority: DescriptionElement.ORDER_ADJUST_EXTREMELY_LATE,
+                Verb: "have",
+                Effect: $"=subject.possessive= bonus damage scale by half =subject.possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier");
+            AddAdjustment(
+                Adjustment: new ArbitraryDescription(DescriptionElement.Empty, itScales), 
+                FlipPriority: true,
+                Condition: ThisModAdjustsMeleeCumulatively<ElongatedPaws>());
 
-            string arbitraryEffect = $"=subject.possessive= bonus damage scale by half =subject.possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier";
-            DescriptionElement emptyElement = DescriptionElement.Empty;
-            ArbitraryDescription arbitraryCumulativeMeleeDescription = new(emptyElement, new("", arbitraryEffect))
-            {
-                Condition = arbitraryAnyConditions,
-            };
-            AddAdjustment(arbitraryCumulativeMeleeDescription, true);
+            DescriptionElement hasItScale = new(
+                Priority: DescriptionElement.ORDER_ADJUST_EXTREMELY_LATE, 
+                Verb: "have", 
+                Effect: $"=subject.possessive= bonus damage scale by half =subject.possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier");
+            AddAdjustment(
+                Adjustment: new ArbitraryDescription(DescriptionElement.Empty, hasItScale), 
+                FlipPriority: true, 
+                Condition: new NotCondition<GameObject>(ThisModAdjustsMeleeCumulatively<ElongatedPaws>()));
 
-            ArbitraryDescription arbitraryNoCumulativeMeleeDescription = new(emptyElement, new("have", arbitraryEffect))
-            {
-                Condition = new NotAnyConditions<GameObject>(arbitraryAnyConditions),
-            };
-            AddAdjustment(arbitraryNoCumulativeMeleeDescription, true);
-
-            DiminishingReturns diminishingReturns = new("increases to damage die size")
-            {
-                Condition = new AnyConditions<GameObject>() { IsGigantic, IsBurrowing },
-            };
-            AddAdjustment(diminishingReturns, true);
+            AddAdjustment(new DiminishingReturns("increases to damage die size"), true, new AnyConditions<GameObject>() { IsGigantic, IsBurrowing });
             AddAdjustment(new SetSwingSound("Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing"), true, IsOrganicFist);
             AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"), true, IsOrganicFist);
         }

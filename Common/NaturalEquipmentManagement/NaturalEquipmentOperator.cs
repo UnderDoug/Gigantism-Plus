@@ -75,13 +75,6 @@ namespace XRL.World.Parts
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
         
-        public DieRoll DamageDie;
-
-        [NonSerialized]
-        public (int Count, int Size, int Bonus) AccumulatedDamageDie = (0, 0, 0);
-        public int AccumulatedHitBonus = 0;
-        public int AccumulatedPenBonus = 0;
-
         public bool DoDynamicTile = true;
 
         private BodyPart _parentLimb = null;
@@ -109,9 +102,6 @@ namespace XRL.World.Parts
         {
             Manager = null;
             OperatorID = Guid.NewGuid();
-            AccumulatedDamageDie = (0, 0, 0);
-            AccumulatedHitBonus = 0;
-            AccumulatedPenBonus = 0;
             AppliedAdjustments = new();
         }
 
@@ -211,51 +201,54 @@ namespace XRL.World.Parts
                     }
 
                     Debug.Entry(4, $"Collecting Adjustments...", Indent: 1, Toggle: doDebug);
-                    Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
                     Adjustments ??= new();
                     foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                     {
-                        Debug.LoopItem(4, 
+                        Debug.Divider(4, HONLY, 60, Indent: 2, Toggle: doDebug);
+                        Debug.Entry(4, 
                             $"[{naturalEquipmentMod.ModPriority}]" +
                             $"{naturalEquipmentMod.GetType().Name}" +
                             $"<{naturalEquipmentMod.Adjective}>]", 
                             Indent: 2, Toggle: doDebug);
                         foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
+                            Debug.Divider(4, HONLY, 40, Indent: 3, Toggle: doDebug);
                             Debug.Entry(4, $"{adjustment}", Indent: 3, Toggle: doDebug);
                             Adjustments.Add(adjustment, ParentObject);
                             bool wasAdded = Adjustments.Contains(adjustment);
                             Debug.LoopItem(4, $"Added", $"{wasAdded}", Good: wasAdded, Indent: 3, Toggle: doDebug);
                         }
+                        Debug.Divider(4, HONLY, 40, Indent: 3, Toggle: doDebug);
                     }
-                    Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                    Debug.Divider(4, HONLY, 60, Indent: 2, Toggle: doDebug);
 
                     if (!Adjustments.IsNullOrEmpty())
                     {
                         Debug.Entry(4, $"Applying Adjustments...", Indent: 1, Toggle: doDebug);
                         foreach (IAdjustment adjustment in Adjustments)
                         {
+                            Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
                             Debug.LoopItem(4, $"{adjustment}", Indent: 2, Toggle: doDebug);
                             if (adjustment.Apply(ParentObject))
                             {
-                                Debug.CheckYeh(4, $"Applied", Indent: 3, Toggle: doDebug);
+                                Debug.CheckYeh(4, $"Applied", Indent: 2, Toggle: doDebug);
                                 AppliedAdjustments.Add($"{adjustment.ToString(ShowApplied: true)}");
                             }
                             else
                             {
-                                Debug.CheckNah(4, $"Not Applied", Indent: 3, Toggle: doDebug);
+                                Debug.CheckNah(4, $"Not Applied", Indent: 2, Toggle: doDebug);
                             }
                         }
+                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
 
                         Debug.Entry(4, $"Showing Applied Adjustments...", Indent: 1, Toggle: doDebug);
-                        Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
-                        Adjustments ??= new();
                         foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                         {
-                            Debug.LoopItem(4, 
+                            Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                            Debug.Entry(4,
                                 $"[{naturalEquipmentMod.ModPriority}]" +
                                 $"{naturalEquipmentMod.GetType().Name}" +
-                                $"<{naturalEquipmentMod.Adjective}>]", 
+                                $"<{naturalEquipmentMod.Adjective}>]",
                                 Indent: 2, Toggle: doDebug);
 
                             foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
@@ -264,6 +257,10 @@ namespace XRL.World.Parts
                             }
                         }
                         Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
+                    }
+                    else
+                    {
+                        Debug.Entry(4, $"{nameof(Adjustments)} Empty", Indent: 2, Toggle: doDebug);
                     }
 
                     if (DoDynamicTile && ParentObject.IsDefaultEquipmentOf(ParentLimb))
@@ -593,9 +590,6 @@ namespace XRL.World.Parts
             base.Write(Basis, Writer);
 
             Writer.WriteObject(Manager);
-            Writer.Write(AccumulatedDamageDie.Count);
-            Writer.Write(AccumulatedDamageDie.Size);
-            Writer.Write(AccumulatedDamageDie.Bonus);
             Writer.Write(AppliedAdjustments);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
@@ -603,12 +597,6 @@ namespace XRL.World.Parts
             base.Read(Basis, Reader);
 
             Manager = Reader.ReadObject() as NaturalEquipmentManager;
-            AccumulatedDamageDie = new()
-            {
-                Count = Reader.ReadInt32(),
-                Size = Reader.ReadInt32(),
-                Bonus = Reader.ReadInt32(),
-            };
             AppliedAdjustments = Reader.ReadList<string>();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

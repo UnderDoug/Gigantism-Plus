@@ -60,7 +60,7 @@ namespace HNPS_GigantismPlus
             if (!Value.IsNullOrEmpty())
             {
                 Effect = $"bonus penetration from {Value}";
-                return new(Verb, Effect);
+                return new(DescriptionElement.ORDER_ADJUST_SLIGHTLY_LATE, Verb, Effect);
             }
             return GetPrimaryDescriptionElement(Subject);
         }

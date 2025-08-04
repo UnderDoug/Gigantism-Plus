@@ -67,7 +67,7 @@ namespace HNPS_GigantismPlus
             if (Value != null)
             {
                 Effect = $"{AttributeName} to {Subject.poss("damage")} types";
-                return new(Verb, Effect);
+                return new(DescriptionElement.ORDER_ADJUST_SLIGHTLY_LATE, Verb, Effect);
             }
             return base.GetPrimaryDescriptionElement(Subject);
         }

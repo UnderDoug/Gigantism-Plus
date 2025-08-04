@@ -15,9 +15,7 @@ namespace HNPS_GigantismPlus
         public DiminishingReturns()
             : base()
         {
-            Prioritize = false;
             Affected = null;
-            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE;
         }
         public DiminishingReturns(string Affected)
             : this()
@@ -48,8 +46,7 @@ namespace HNPS_GigantismPlus
         public DiminishingReturns(DiminishingReturns SourceAdjustment)
             : base(SourceAdjustment)
         {
-            Prioritize = false;
-            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE;
+            DescriptionOrder = SourceAdjustment.DescriptionOrder;
         }
         public DiminishingReturns(string Affected, DiminishingReturns SourceAdjustment)
             : this(SourceAdjustment)
@@ -67,6 +64,24 @@ namespace HNPS_GigantismPlus
             this.Priority = Priority;
         }
 
+        public override void Configure()
+        {
+            base.Configure();
+            Effect = $"suffering diminishing returns on ";
+            Prioritize = false;
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE;
+        }
+
+        public bool SetSecondaryDescription()
+        {
+            if (!Affected.IsNullOrEmpty())
+            {
+                Effect += Affected;
+                SecondaryDescription = new(DescriptionElement.ORDER_ADJUST_VERY_LATE, null, Effect);
+            }
+            return !SecondaryDescription.IsEmpty();
+        }
+
         public override List<string> AddToString()
         {
             return new(base.AddToString())
@@ -77,17 +92,12 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return base.Check(Subject) && !GetSecondaryDescriptionElement(Subject).IsEmpty();
+            return base.Check(Subject) && SetSecondaryDescription();
         }
 
-        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject)
+        public override bool Apply(GameObject Subject)
         {
-            if (!Affected.IsNullOrEmpty())
-            {
-                Effect = $"suffering diminishing returns on {Affected}";
-                SecondaryDescription = new(DescriptionElement.ORDER_ADJUST_VERY_LATE, null, Effect);
-            }
-            return base.GetSecondaryDescriptionElement(Subject);
+            return base.Apply(Subject) && SetSecondaryDescription();
         }
     }
 }

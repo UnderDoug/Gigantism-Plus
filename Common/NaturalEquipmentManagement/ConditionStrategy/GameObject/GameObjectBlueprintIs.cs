@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using XRL.World;
 
 namespace HNPS_GigantismPlus
@@ -23,9 +24,17 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override List<string> AddToString()
+        {
+            return new(base.AddToString())
+            {
+                Blueprint.Quote(),
+            };
+        }
+
         public override bool Check(GameObject GameObject)
         {
-            return (GameObject == null && !FalseIfSubjectNull)
+            return base.Check(GameObject)
                 || Blueprint.IsNullOrEmpty()
                 || GameObject?.Blueprint == Blueprint;
         }

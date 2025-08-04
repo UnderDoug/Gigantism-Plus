@@ -7,7 +7,10 @@ namespace HNPS_GigantismPlus
 {
     [Serializable]
     public class GameObjectHasNaturalEquipmentModWithAdjustDamageDieCount<T> : GameObjectHasNaturalEquipmentModWithAdjustment<T, AdjustDamageDieCount>
-        where T : ModNaturalEquipmentBase, new()
+        where T
+        : IPart
+        , IManagedDefaultNaturalEquipment<T>
+        , new()
     {
         public GameObjectHasNaturalEquipmentModWithAdjustDamageDieCount()
             : base()

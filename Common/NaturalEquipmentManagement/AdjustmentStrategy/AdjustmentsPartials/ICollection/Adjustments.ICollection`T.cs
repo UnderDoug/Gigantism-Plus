@@ -14,6 +14,9 @@ namespace HNPS_GigantismPlus
 
         public virtual void Add(IAdjustment Adjustment)
         {
+            bool doConditionsDebug = Options.doConditionsDebug;
+            Options.doConditionsDebug = getDoDebug(nameof(Add));
+
             IAdjustment higherPriorityAdjustment = null;
             if (!Items.IsNullOrEmpty())
             {
@@ -39,6 +42,7 @@ namespace HNPS_GigantismPlus
                 Items[Length++] = Adjustment;
                 Variant++;
             }
+            Options.doConditionsDebug = doConditionsDebug;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

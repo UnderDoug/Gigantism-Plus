@@ -9,7 +9,8 @@ namespace HNPS_GigantismPlus
     public class GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, TAdjustment> 
         : GameObjectHasNaturalEquipmentModWithAdjustment<T, TAdjustment>
         where T 
-        : ModNaturalEquipmentBase
+        : IPart
+        , IManagedDefaultNaturalEquipment<T>
         , new()
         where TAdjustment 
         : MeleeWeaponCumulativeAdjustment

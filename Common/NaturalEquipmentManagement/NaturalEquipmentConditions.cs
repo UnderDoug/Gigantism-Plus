@@ -20,10 +20,10 @@ namespace HNPS_GigantismPlus
             new NotCondition<GameObject>(new GameObjectHasAnyParts(new Type[] { typeof(Inorganic), typeof(Metal) })),
         };
 
-        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<GigantismPlus>> IsGigantic => new();
-        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<ElongatedPaws>> IsElongated => new();
-        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<UD_ManagedBurrowingClaws>> IsBurrowing => new();
-        public static GameObjectHasNaturalEquipmentMod<ModNaturalEquipment<UD_ManagedCrystallinity>> IsCrystalline => new();
+        public static GameObjectHasNaturalEquipmentMod<GigantismPlus> IsGigantic => new();
+        public static GameObjectHasNaturalEquipmentMod<ElongatedPaws> IsElongated => new();
+        public static GameObjectHasNaturalEquipmentMod<UD_ManagedBurrowingClaws> IsBurrowing => new();
+        public static GameObjectHasNaturalEquipmentMod<UD_ManagedCrystallinity> IsCrystalline => new();
 
         public static GameObjectWielderHasPart<GigantismPlus> WielderHasGigantismPlus => new();
         public static GameObjectWielderHasPart<ElongatedPaws> WielderHasElongatedPaws => new();
@@ -31,6 +31,6 @@ namespace HNPS_GigantismPlus
         public static GameObjectWielderHasPart<UD_ManagedCrystallinity> WielderHasCrystallinity => new();
 
         public static GameObjectHasNatEquipModWithAnyCumultiveMelee<T> ThisModAdjustsMeleeCumulatively<T>()
-            where T : ModNaturalEquipmentBase, new() => new();
+            where T : IPart , IManagedDefaultNaturalEquipment<T> , new() => new();
     }
 }

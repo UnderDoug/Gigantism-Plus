@@ -6,6 +6,8 @@ using XRL.World;
 using XRL.World.Parts;
 
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
+using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
@@ -35,6 +37,20 @@ namespace HNPS_GigantismPlus
     public abstract class ICondition<T> : IComposite, IConditional<T>
         where T : class, new()
     {
+        private static bool doDebug => getClassDoDebug(nameof(InventoryGigantifier));
+        private static bool getDoDebug(object what = null)
+        {
+            List<object> doList = new()
+            {
+                nameof(ToString),
+            };
+            List<object> dontList = new()
+            {
+            };
+
+            return Options.getDoDebug(what, doList, dontList, doDebug);
+        }
+
         public bool FalseIfSubjectNull;
 
         public ICondition()
@@ -57,6 +73,9 @@ namespace HNPS_GigantismPlus
 
         public string ToString(bool ShowResult = false, T Subject = null, bool Short = false)
         {
+            bool doConditionsDebug = Options.doConditionsDebug;
+            Options.doConditionsDebug = getDoDebug(nameof(ToString));
+
             string resultString = null;
             if (ShowResult)
             {
@@ -67,6 +86,8 @@ namespace HNPS_GigantismPlus
             {
                 addToString = ": " + addToString;
             }
+
+            Options.doConditionsDebug = doConditionsDebug;
             return $"{resultString}{GetType().Name}{addToString}";
         }
 

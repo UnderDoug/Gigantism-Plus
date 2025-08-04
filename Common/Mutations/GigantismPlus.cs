@@ -162,13 +162,13 @@ namespace XRL.World.Parts.Mutation
 
                 Noun = "fist",
             };
-            giganticFistMod.AddSkillAdjustment("Cudgel", true)
+            giganticFistMod.AdjustMeleeSkill("Cudgel", true)
                 
-                .AddNounAdjustment(true, Condition: IsOrganicFist)
-                .AddTileAdjustment("NaturalWeapons/GiganticFist.png", true, Condition: IsOrganicFist)
+                .AdjustNoun(true, Condition: IsOrganicFist)
+                .AdjustTile("NaturalWeapons/GiganticFist.png", true, Condition: IsOrganicFist)
                 
-                .AddAdjustment(new SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing"), true)
-                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block"), true);
+                .SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing", true)
+                .SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block", true);
 
             return giganticFistMod;
         }
@@ -201,18 +201,18 @@ namespace XRL.World.Parts.Mutation
                 AdjectiveColor = "gigantic",
                 AdjectiveColorFallback = "w",
             };
-            giganticBodMod.AddMeleeStatAdjustment("Strength", -100)
+            giganticBodMod.AdjustMeleeStat("Strength", -100)
 
-                .AddColorStringAdjustment("&Z", true)
-                .AddTileColorAdjustment("&Z", true)
-                .AddDetailColorAdjustment("z", true)
+                .AdjustColorString("&Z", true)
+                .AdjustTileColor("&Z", true)
+                .AdjustDetailColor("z", true)
 
-                .AddArmorAVAdjustment(2)
-                .AddArmorDVAdjustment(-2)
+                .AdjustArmorAV(2)
+                .AdjustArmorDV(-2)
 
-                .AddAdjustment(new AdjustArmorHeatResist(5), Condition: new GameObjectBlueprintIs("Quills"))
-                .AddAdjustment(new AdjustArmorColdResist(5), Condition: new GameObjectBlueprintIs("Quills"))
-                .AddAdjustment(new AdjustArmorElecResist(-10), Condition: new GameObjectBlueprintIs("Quills"))
+                .AdjustArmorResistance("HeatResist", 5, Condition: new GameObjectBlueprintIs("Quills"))
+                .AdjustArmorResistance("ColdResist", 5, Condition: new GameObjectBlueprintIs("Quills"))
+                .AdjustArmorResistance("ElecResist", -10, Condition: new GameObjectBlueprintIs("Quills"))
 
                 .AddAdjustment(new DisableModGiganticShortDescription())
                 .AddAdjustment(new DisableModGiganticDisplayName());
@@ -242,13 +242,14 @@ namespace XRL.World.Parts.Mutation
                 AdjectiveColor = "Y",
                 AdjectiveColorFallback = "y",
             };
-            closedGiganticFist.AddSkillAdjustment("Cudgel", false)
+            closedGiganticFist.AdjustMeleeStat("Strength", false)
+                .AdjustMeleeSkill("Cudgel", false)
+
+                .AdjustNoun()
+                .AdjustTile("NaturalWeapons/GiganticFist.png", false, new NotCondition<GameObject>(IsAugmented))
                 
-                .AddNounAdjustment()
-                .AddTileAdjustment("NaturalWeapons/GiganticFist.png", false)
-                
-                .AddAdjustment(new SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing"), true)
-                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block"), true);
+                .SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing", false)
+                .SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block", false);
 
             return closedGiganticFist;
         }
@@ -701,7 +702,6 @@ namespace XRL.World.Parts.Mutation
                         Name: HunchOverAbilityHunched,
                         Command: COMMAND_NAME_HUNCH_OVER,
                         Class: "Physical Manoeuvres",
-                        Description: null,
                         Icon: "&#214",
                         Toggleable: true,
                         ActiveToggle: true
@@ -727,19 +727,14 @@ namespace XRL.World.Parts.Mutation
         {
             if ((GO.HasSkill(nameof(Acrobatics_Jump)) && GroundPoundActivatedAbilityID == Guid.Empty) || Force)
             {
-                GroundPoundActivatedAbilityID = AddMyActivatedAbility(
+                GroundPoundActivatedAbilityID = 
+                    AddMyActivatedAbility(
                         Name: "Ground Pound",
                         Command: COMMAND_NAME_GROUND_POUND,
                         Class: "Physical Mutations",
-                        Description: null,
                         Icon: "&#214",
-                        DisabledMessage: null,
                         Toggleable: true,
-                        DefaultToggleState: false,
-                        ActiveToggle: false,
-                        IsAttack: false,
-                        IsRealityDistortionBased: false,
-                        IsWorldMapUsable: false,
+                        IsWorldMapUsable: true,
                         Silent: Silent
                         );
             }
@@ -768,14 +763,9 @@ namespace XRL.World.Parts.Mutation
                         Name: "Close Fist",
                         Command: COMMAND_NAME_CLOSE_FIST,
                         Class: "Physical Mutations",
-                        Description: null,
                         Icon: "&#214",
-                        DisabledMessage: null,
                         Toggleable: true,
-                        DefaultToggleState: false,
-                        ActiveToggle: false,
-                        IsAttack: false,
-                        IsRealityDistortionBased: false,
+                        ActiveToggle: true,
                         IsWorldMapUsable: true,
                         Silent: Silent
                         );
@@ -1372,20 +1362,21 @@ namespace XRL.World.Parts.Mutation
             bool OriginalToggledOn = ToggledOn;
             if (ToggledOn)
             {
-                Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(AbilityToggledCloseFist)} {nameof(ToggledOn)}", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
 
                 ToggledOn = true;
             }
             else
             {
-                Debug.Entry(4, "AbilityToggledCloseFist ToggledOn", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(AbilityToggledCloseFist)} {nameof(ToggledOn)}", $"{ToggledOn}", Indent: 1, Toggle: doDebug);
                 ToggledOn = false;
             }
 
             if (OriginalToggledOn == ToggledOn)
             {
-                Debug.Entry(4, "Sending Bodyparts Update", Indent: 1, Toggle: doDebug);
+                Debug.Entry(4, $"Sending {nameof(Body.UpdateBodyParts)}", Indent: 1, Toggle: doDebug);
                 GO.Body.UpdateBodyParts();
+                GO.UseEnergy(100, $"Physical Mutation {nameof(GigantismPlus)}");
             }
 
             return ToggledOn;

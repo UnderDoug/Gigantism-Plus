@@ -10,6 +10,8 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public class DiminishingReturns : ArbitraryDescription
     {
+        public bool Constructed;
+
         public string Affected;
 
         public DiminishingReturns()
@@ -46,6 +48,7 @@ namespace HNPS_GigantismPlus
         public DiminishingReturns(DiminishingReturns SourceAdjustment)
             : base(SourceAdjustment)
         {
+            Constructed = SourceAdjustment.Constructed;
             DescriptionOrder = SourceAdjustment.DescriptionOrder;
         }
         public DiminishingReturns(string Affected, DiminishingReturns SourceAdjustment)
@@ -69,17 +72,19 @@ namespace HNPS_GigantismPlus
             base.Configure();
             Effect = $"suffering diminishing returns on ";
             Prioritize = false;
-            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE;
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE*2;
+            Constructed = false;
         }
 
         public bool SetSecondaryDescription()
         {
-            if (!Affected.IsNullOrEmpty())
+            if (!Constructed && !Affected.IsNullOrEmpty() && !Effect.IsNullOrEmpty())
             {
                 Effect += Affected;
-                SecondaryDescription = new(DescriptionElement.ORDER_ADJUST_VERY_LATE, null, Effect);
+                SecondaryDescription = new(DescriptionOrder, null, Effect);
+                Constructed = !SecondaryDescription.IsEmpty();
             }
-            return !SecondaryDescription.IsEmpty();
+            return Constructed;
         }
 
         public override List<string> AddToString()
@@ -92,12 +97,7 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return base.Check(Subject) && SetSecondaryDescription();
-        }
-
-        public override bool Apply(GameObject Subject)
-        {
-            return base.Apply(Subject) && SetSecondaryDescription();
+            return SetSecondaryDescription() && base.Check(Subject);
         }
     }
 }

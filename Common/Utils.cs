@@ -545,13 +545,13 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(SwapMutationCategory));
             Debug.Entry(3,
-                $"* {MutationName}." 
+                $"* {MutationName}" 
                 + $"{nameof(SwapMutationCategory)}({nameof(MutationName)}, "
                 + $"{nameof(OutOfCategory)}: {OutOfCategory.Quote()}, "
                 + $"{nameof(IntoCategory)}: {IntoCategory.Quote()})", 
                 Indent: indent + 1, Toggle: doDebug);
 
-            MutationEntry MutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
+            MutationEntry mutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
 
             Debug.Entry(4, 
                 $"Looping {nameof(MutationCategory)}s...", 
@@ -561,16 +561,16 @@ namespace HNPS_GigantismPlus
                 Debug.LoopItem(4, category.Name, Indent: indent + 3, Toggle: doDebug);
                 if (category.Name == IntoCategory)
                 {
-                    Debug.Divider(4, HONLY, Count: 38, Starter: TANDR, Finisher: BANDL, Indent: indent + 3, Toggle: doDebug);
+                    Debug.Divider(4, HONLY, Count: 58, Starter: TANDR, Finisher: BANDL, Indent: indent + 3, Toggle: doDebug);
                     Debug.CheckYeh(4, $"Found {nameof(IntoCategory)}", 
                         Indent: indent + 4, Toggle: doDebug);
 
                     Debug.Entry(3, 
-                        $"Adding {MutationEntry.Name.Quote()} {nameof(MutationEntry)} " +
+                        $"Adding {mutationEntry.Name.Quote()} {nameof(mutationEntry)} " +
                         $"to {IntoCategory.Quote()} {nameof(MutationCategory)}", 
                         Indent: indent + 4, Toggle: doDebug);
 
-                    category.Add(MutationEntry);
+                    category.Add(mutationEntry);
                     category.Entries.Sort((x, y) => x.Name.CompareTo(y.Name));
 
                     Debug.Entry(4, $"Displaying all entries in {IntoCategory.Quote()} {nameof(MutationCategory)}...", 
@@ -582,6 +582,7 @@ namespace HNPS_GigantismPlus
                         {
                             entry.Defect = true;
                         }
+                        mutationEntry.Mutation.SetDisplayName(null);
                         Debug.LoopItem(4, entry.Name, entry.GetDisplayName(true), Indent: indent + 5, Toggle: doDebug);
                     }
 
@@ -593,29 +594,26 @@ namespace HNPS_GigantismPlus
                     Debug.Divider(4, HONLY, Count: 38, Starter: TANDR, Finisher: BANDL, Indent: indent + 3, Toggle: doDebug);
                     Debug.CheckYeh(3, $"Found Category: {OutOfCategory.Quote()}", 
                         Indent: indent + 4, Toggle: doDebug);
-                    Debug.Entry(3, $"Removing {MutationEntry.Name.Quote()} {nameof(MutationEntry)} " +
+                    Debug.Entry(3, $"Removing {mutationEntry.Name.Quote()} {nameof(mutationEntry)} " +
                         $"from {OutOfCategory.Quote()} {nameof(MutationCategory)}", 
                         Indent: indent + 4, Toggle: doDebug);
 
-                    category.Entries.RemoveAll(r => r == MutationEntry);
+                    category.Entries.RemoveAll(r => r == mutationEntry);
 
                     Debug.Entry(3, $"x {nameof(OutOfCategory)}: {OutOfCategory.Quote()} //", Indent: indent + 4, Toggle: doDebug);
 
-                    Debug.Divider(4, HONLY, Count: 38, Starter: BANDR, Finisher: TANDL, Indent: indent + 3, Toggle: doDebug);
+                    Debug.Divider(4, HONLY, Count: 58, Starter: BANDR, Finisher: TANDL, Indent: indent + 3, Toggle: doDebug);
                 }
             }
-            Debug.Entry(4,
-                $"x foreach ({nameof(MutationCategory)} category " +
-                $"in {nameof(MutationFactory)}.{nameof(MutationFactory.GetCategories)}()) " +
-                $"*//",
-                Indent: indent + 2, Toggle: doDebug);
 
-            Debug.Footer(3, 
-                $"{MutationName}.", 
-                $"{nameof(SwapMutationCategory)}({nameof(MutationName)}, " +
-                $"{nameof(OutOfCategory)}: {OutOfCategory.Quote()}, " +
-                $"{nameof(IntoCategory)}: {IntoCategory.Quote()})", 
-                Toggle: doDebug);
+            Debug.Entry(3,
+                $"x {MutationName}."
+                + $"{nameof(SwapMutationCategory)}({nameof(MutationName)}, "
+                + $"{nameof(OutOfCategory)}: {OutOfCategory.Quote()}, "
+                + $"{nameof(IntoCategory)}: {IntoCategory.Quote()}) "
+                + $"*//",
+                Indent: indent + 1, Toggle: doDebug);
+            Debug.LastIndent = indent;
         } //!-- private void SwapMutationCategory(bool Before = true)
 
         public static GameObjectBlueprint GetGameObjectBlueprint(string Blueprint)
@@ -628,7 +626,7 @@ namespace HNPS_GigantismPlus
             GameObjectBlueprint = GetGameObjectBlueprint(Blueprint);
             return !GameObjectBlueprint.Is(null);
         }
-        public static string MakeAndList(IReadOnlyList<string> Words, bool Serial = true, bool IgnoreCommas = false)
+        public static string MakeAndList(IReadOnlyList<string> Words, bool Serial = true, bool IgnoreCommas = false, bool Oxford = true)
         {
             List<string> replacedList = new();
             string entry;
@@ -649,6 +647,10 @@ namespace HNPS_GigantismPlus
             if (IgnoreCommas)
             {
                 andList.Replace(";;", ",");
+            }
+            if (Oxford)
+            {
+                andList.Replace(" and", ", and");
             }
             return andList;
         }

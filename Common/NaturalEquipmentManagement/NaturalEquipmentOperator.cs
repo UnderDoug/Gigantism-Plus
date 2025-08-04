@@ -208,7 +208,7 @@ namespace XRL.World.Parts
                         Debug.Entry(4, 
                             $"[{naturalEquipmentMod.ModPriority}]" +
                             $"{naturalEquipmentMod.GetType().Name}" +
-                            $"<{naturalEquipmentMod.Adjective}>]", 
+                            $"<{naturalEquipmentMod.Adjective}>", 
                             Indent: 2, Toggle: doDebug);
                         foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
@@ -218,7 +218,6 @@ namespace XRL.World.Parts
                             bool wasAdded = Adjustments.Contains(adjustment);
                             Debug.LoopItem(4, $"Added", $"{wasAdded}", Good: wasAdded, Indent: 3, Toggle: doDebug);
                         }
-                        Debug.Divider(4, HONLY, 40, Indent: 3, Toggle: doDebug);
                     }
                     Debug.Divider(4, HONLY, 60, Indent: 2, Toggle: doDebug);
 
@@ -248,7 +247,7 @@ namespace XRL.World.Parts
                             Debug.Entry(4,
                                 $"[{naturalEquipmentMod.ModPriority}]" +
                                 $"{naturalEquipmentMod.GetType().Name}" +
-                                $"<{naturalEquipmentMod.Adjective}>]",
+                                $"<{naturalEquipmentMod.Adjective}>",
                                 Indent: 2, Toggle: doDebug);
 
                             foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)

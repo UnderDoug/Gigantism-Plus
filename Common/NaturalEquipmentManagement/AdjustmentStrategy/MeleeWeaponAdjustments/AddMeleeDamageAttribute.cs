@@ -8,27 +8,27 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class AddDamageAttribute : MeleeWeaponAdjustment
+    public class AddMeleeDamageAttribute : MeleeWeaponAdjustment
     {
         public string AttributeName;
 
-        public AddDamageAttribute()
+        public AddMeleeDamageAttribute()
             : base()
         {
             AttributeName = null;
         }
 
-        public AddDamageAttribute(string Attributes, string AttributeName = null)
+        public AddMeleeDamageAttribute(string Attributes, string AttributeName = null)
             : this()
         {
             Value = Attributes;
             this.AttributeName = AttributeName;
         }
-        public AddDamageAttribute(AddDamageAttribute SourceAdjustment)
+        public AddMeleeDamageAttribute(AddMeleeDamageAttribute SourceAdjustment)
             : base(SourceAdjustment)
         {
         }
-        public AddDamageAttribute(MeleeWeapon Source, string AttributeName = null)
+        public AddMeleeDamageAttribute(MeleeWeapon Source, string AttributeName = null)
             : this(Source.Attributes, AttributeName)
         {
         }

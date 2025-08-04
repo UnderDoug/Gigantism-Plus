@@ -30,6 +30,9 @@ namespace XRL.World.Parts
 
             Adjective = "augmented";
             AdjectiveColorFallback = "c";
+
+            string cyberneticsObject = AssigningPart?.ImplantObject?.GetDisplayName(Short: true, AsIfKnown: true);
+            AddSecondaryDescription(new("have", $"some of =subject.possessive= bonuses applied by an implanted {cyberneticsObject}"));
         }
         public ModAugmentedNaturalWeapon(NaturalEquipmentManager NewManager)
             : this()
@@ -55,32 +58,28 @@ namespace XRL.World.Parts
             return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1).Strip() ?? base.GetAdjective();
         }
 
-        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsGiganticExoframe>> E)
-        {
-            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
-            {
-                string cyberneticsObject = AssigningPart?.ImplantObject?.GetDisplayName(Short:true, AsIfKnown: true);
-
-                E.BeforeEvent.ClearDescriptionElements();
-                E.BeforeEvent.AddSecondaryElement("have", $"some of {E.Object.its} bonuses applied by an implanted {cyberneticsObject}");
-            }
-            return base.HandleEvent(E);
-        }
         public override bool HandleEvent(BeforeApplyAdjustmentEvent E)
         {
-            if (E.Adjustment.Source == typeof(ModClosedGiganticNaturalWeapon) && E.Adjustment.GetType() == typeof(ChangeTile) && E.Subject is GameObject equipment)
+            if (E.Adjustment.Source == typeof(ModClosedGiganticNaturalWeapon) 
+                && E.Adjustment.GetType() == typeof(ChangeTile) 
+                && E.Subject is GameObject equipment)
             {
-                Debug.Entry(4, $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {nameof(ChangeTile)} {nameof(E.Adjustment)}",
-                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
-                Debug.LastIndent--;
+                int indent = Debug.LastIndent;
+                Debug.Entry(4, 
+                    $"{nameof(ModAugmentedNaturalWeapon)}: " +
+                    $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {nameof(ChangeTile)} {nameof(E.Adjustment)}",
+                    Indent: indent + 1, Toggle: doDebug);
 
                 foreach (IAdjustment adjustment in Adjustments)
                 {
-                    if (adjustment.Check(equipment))
+                    if (adjustment.GetType() == typeof(ChangeTile) && adjustment.Check(equipment))
                     {
-                        E.Adjustment.Value = adjustment.Value;
+                        Debug.Entry(4, "Appropriate Adjustment found, code execution skipped...", Indent:  indent + 2, Toggle: doDebug);
+                        // E.Adjustment.Value = adjustment.Value;
+                        break;
                     }
                 }
+                Debug.LastIndent = indent;
             }
             return base.HandleEvent(E);
         }

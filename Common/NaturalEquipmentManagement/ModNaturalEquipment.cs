@@ -29,11 +29,13 @@ namespace XRL.World.Parts
             List<object> doList = new()
             {
                 'V',    // Vomit
+                nameof(DescriptionElement) + ":Final",
             };
             List<object> dontList = new()
             {
                 "AM",    // Apply Mod
                 "APP",   // Apply Part & Prop
+                nameof(DescriptionElement) + ":Collection",
             };
 
             if (what != null && doList.Contains(what))
@@ -136,37 +138,70 @@ namespace XRL.World.Parts
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
                 int indent = Debug.LastIndent;
+                bool doDebugDuringCollection = getDoDebug(nameof(DescriptionElement) + ":Collection");
+                bool doDebugFinal = getDoDebug(nameof(DescriptionElement) + ":Final");
                 Debug.LoopItem(4, 
-                    $"{GetType().Name}.{nameof(HandleEvent)}({nameof(BeforeDescribeModificationEvent<ModNaturalEquipment<T>>)} E)", 
+                    $"{GetType().Name}." +
+                    $"{nameof(HandleEvent)}(" +
+                    $"{nameof(BeforeDescribeModificationEvent<ModNaturalEquipment<T>>)} E)", 
                     Indent: indent + 1, Toggle: true);
 
                 if (!Adjustments.IsNullOrEmpty() && !Adjustments.GetApplied().IsNullOrEmpty())
                 {
-                    Debug.CheckYeh(4, $"Have Adjustments", Indent: indent + 2, Toggle: true);
+                    List<DescriptionElement> combinedPrimaryElements = new();
+                    List<DescriptionElement> combinedSecondaryElements = new();
+                    Debug.CheckYeh(4, $"Have Adjustments", Indent: indent + 2, Toggle: getDoDebug());
                     foreach (IAdjustment adjustment in Adjustments.GetApplied())
                     {
-                        Debug.Entry(4, $"{adjustment.ToString(true)}", Indent: indent + 3, Toggle: true);
-                        if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> weaponElements, out List<DescriptionElement> generalElements))
+                        Debug.Entry(4, $"{adjustment.ToString(true)}", Indent: indent + 3, Toggle: getDoDebug());
+                        if (adjustment.TryGetDescriptionElements(ParentObject, out List<DescriptionElement> primaryElements, out List<DescriptionElement> secondaryElements))
                         {
-                            if (!weaponElements.IsNullOrEmpty())
+                            if (!primaryElements.IsNullOrEmpty())
                             {
-                                Debug.LoopItem(4, $"{nameof(weaponElements)}", Indent: indent + 4, Toggle: true);
-                                foreach (DescriptionElement element in weaponElements)
+                                Debug.LoopItem(4, $"{nameof(primaryElements)}", Indent: indent + 4, Toggle: doDebugDuringCollection);
+                                foreach (DescriptionElement element in primaryElements)
                                 {
-                                    Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: true);
+                                    Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: doDebugDuringCollection);
                                 }
-                                E.PrimaryDescriptions.AddRange(weaponElements);
+                                combinedPrimaryElements.AddRange(primaryElements);
+                                E.PrimaryDescriptions.AddRange(primaryElements);
                             }
-                            if (!generalElements.IsNullOrEmpty())
+                            if (!secondaryElements.IsNullOrEmpty())
                             {
-                                Debug.LoopItem(4, $"{nameof(generalElements)}", Indent: indent + 4, Toggle: true);
-                                foreach (DescriptionElement element in generalElements)
+                                Debug.LoopItem(4, $"{nameof(secondaryElements)}", Indent: indent + 4, Toggle: doDebugDuringCollection);
+                                foreach (DescriptionElement element in secondaryElements)
                                 {
-                                    Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: true);
+                                    Debug.LoopItem(4, $"{element}", Indent: indent + 5, Toggle: doDebugDuringCollection);
                                 }
-                                E.SecondaryDescriptions.AddRange(generalElements);
+                                combinedSecondaryElements.AddRange(primaryElements);
+                                E.SecondaryDescriptions.AddRange(secondaryElements);
                             }
                         }
+                    }
+                    Debug.LoopItem(4, $"{GetType().Name} {nameof(E.PrimaryDescriptions)}", Indent: indent + 2, Toggle: doDebugFinal);
+                    if (!combinedPrimaryElements.IsNullOrEmpty())
+                    {
+                        foreach (DescriptionElement element in combinedPrimaryElements)
+                        {
+                            Debug.LoopItem(4, $"{element.ToString(ParentObject)}", Indent: indent + 3, Toggle: doDebugFinal);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, $"Empty", Indent: indent + 3, Toggle: doDebugFinal);
+                    }
+
+                    Debug.LoopItem(4, $"{GetType().Name} {nameof(E.SecondaryDescriptions)}", Indent: indent + 2, Toggle: doDebugFinal);
+                    if (!combinedPrimaryElements.IsNullOrEmpty())
+                    {
+                        foreach (DescriptionElement element in combinedPrimaryElements)
+                        {
+                            Debug.LoopItem(4, $"{element.ToString(ParentObject)}", Indent: indent + 3, Toggle: doDebugFinal);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LoopItem(4, $"Empty", Indent: indent + 3, Toggle: doDebugFinal);
                     }
                 }
 

@@ -28,11 +28,11 @@ namespace XRL.World.Parts
             AdjectiveColor = "gigantic";
             AdjectiveColorFallback = "w";
 
-            AddMeleeStatAdjustment("Strength", -100, new GameObjectHasPart<MeleeWeapon>());
+            AdjustMeleeStat("Strength", -100, new GameObjectHasPart<MeleeWeapon>());
 
-            AddColorStringAdjustment("&Z", true);
-            AddTileColorAdjustment("&Z", true);
-            AddDetailColorAdjustment("z", true);
+            AdjustColorString("&Z", true);
+            AdjustTileColor("&Z", true);
+            AdjustDetailColor("z", true);
 
             AddAdjustment(new DisableModGiganticShortDescription());
             AddAdjustment(new DisableModGiganticDisplayName());
@@ -71,26 +71,12 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
-                int dieCount = GetDamageDieCount();
                 int damageBonus = GetDamageBonus();
-                int hitBonus = GetHitBonus();
                 int cleaveBonus = -(damageBonus - 2);
 
-                if (!EnablePrereleaseContent && dieCount > 0)
-                {
-                    E.AddPrimaryElement("gain", $"{dieCount} additional damage die");
-                }
-                if (!EnablePrereleaseContent && damageBonus != 0)
-                {
-                    E.AddPrimaryElement("have", $"a {damageBonus.Signed()} {damageBonus.Signed().BonusOrPenalty()} to damage");
-                }
                 if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
                 {
                     E.AddPrimaryElement("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
-                }
-                if (!EnablePrereleaseContent && hitBonus != 0)
-                {
-                    E.AddPrimaryElement("have", $"a {hitBonus.Signed()} hit {hitBonus.Signed().BonusOrPenalty()}");
                 }
             }
             return base.HandleEvent(E);
@@ -112,31 +98,20 @@ namespace XRL.World.Parts
                 return base.GetInstanceDescription(Object);
             }
 
-            if (EnablePrereleaseContent)
-            {
-                DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>.Send(
-                    Object: Object,
-                    Adjective: GetColoredAdjective(),
-                    WeaponDescriptions: out List<DescriptionElement> weaponDescriptions,
-                    GeneralDescriptions: out List<DescriptionElement> generalDescriptions,
-                    Context: NATURAL_EQUIPMENT);
+            DescribeModificationEvent<ModNaturalEquipment<GigantismPlus>>.Send(
+                Object: Object,
+                Adjective: GetColoredAdjective(),
+                WeaponDescriptions: out List<DescriptionElement> weaponDescriptions,
+                GeneralDescriptions: out List<DescriptionElement> generalDescriptions,
+                Context: NATURAL_EQUIPMENT);
 
-                return DescribeModificationEvent<ModGigantic>.Send(
-                    Object: Object,
-                    Adjective: GetColoredAdjective(),
-                    WeaponDescriptions: weaponDescriptions,
-                    GeneralDescriptions: generalDescriptions,
-                    Context: NATURAL_EQUIPMENT)
-                    .Process(PluralizeObject: true);
-            }
-            else
-            {
-                return DescribeModificationEvent<ModGigantic>.Send(
-                    Object: Object,
-                    Adjective: GetColoredAdjective(),
-                    Context: NATURAL_EQUIPMENT)
-                    .Process(PluralizeObject: true);
-            }
+            return DescribeModificationEvent<ModGigantic>.Send(
+                Object: Object,
+                Adjective: GetColoredAdjective(),
+                WeaponDescriptions: weaponDescriptions,
+                GeneralDescriptions: generalDescriptions,
+                Context: NATURAL_EQUIPMENT)
+                .Process(PluralizeObject: true);
         }
     }
 }

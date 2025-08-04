@@ -1,12 +1,15 @@
-﻿using HNPS_GigantismPlus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+
 using XRL.Language;
 using XRL.Rules;
 using XRL.World.Anatomy;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -66,35 +69,7 @@ namespace XRL.World.Parts.Mutation
 
         public static ModCrystallineNaturalWeapon NewCrystallinePointMod(NaturalEquipmentManager NewManager)
         {
-            ModCrystallineNaturalWeapon crystalinePointMod = new(NewManager)
-            {
-                BodyPartType = "Hand",
-
-                ModPriority = 100,
-                DescriptionPriority = 100,
-
-                ForceNoun = true,
-                Noun = "point",
-
-                Adjective = "crystalline",
-                AdjectiveColor = "crystallized",
-                AdjectiveColorFallback = "M",
-            };
-
-            crystalinePointMod.AddAdjustment(new AddPartInorganic(), false)
-                
-                .AddSkillAdjustment("ShortBlades", true)
-                
-                .AddNounAdjustment(true)
-                
-                .AddTileAdjustment("Creatures/natural-weapon-claw.bmp", true)
-                .AddColorStringAdjustment("&b", true)
-                .AddTileColorAdjustment("&b", true)
-                .AddDetailColorAdjustment("B", true)
-            
-                .AddAdjustment(new SetSwingSound("Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing"), true)
-                .AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_metal_blocked"), true);
-            return crystalinePointMod;
+            return new(NewManager);
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod = null, int Level = 1)
@@ -208,11 +183,11 @@ namespace XRL.World.Parts.Mutation
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            NaturalEquipmentMod?.AddDamageDieCountAdjustment(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level))
-                ?.AddDamageDieSizeAdjustment(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level))
-                ?.AddDamageBonusAdjustment(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
-                ?.AddHitBonusAdjustment(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
-                ?.AddPenBonusAdjustment(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
+            NaturalEquipmentMod?.AdjustMeleeDamageDieCount(GetNaturalWeaponDamageDieCount(NaturalEquipmentMod, Level))
+                ?.AdjustMeleeDamageDieSize(GetNaturalWeaponDamageDieSize(NaturalEquipmentMod, Level))
+                ?.AdjustMeleeDamageBonus(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
+                ?.AdjustMeleeHitBonus(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
+                ?.AdjustPenBonus(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
                 
                 ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 

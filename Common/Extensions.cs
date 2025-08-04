@@ -2640,7 +2640,7 @@ namespace HNPS_GigantismPlus
         public static bool InheritsFrom(this Type T, Type Type, bool IncludeSelf = true, bool Silent = true)
         {
             int indent = Debug.LastIndent;
-            bool doDebug = !Silent && getClassDoDebug(nameof(InheritsFrom));
+            bool doDebug = !Silent && getDoDebug(nameof(InheritsFrom));
             Debug.Entry(4,
                 $"* {nameof(Extensions)}."
                 + $"{nameof(InheritsFrom)}("

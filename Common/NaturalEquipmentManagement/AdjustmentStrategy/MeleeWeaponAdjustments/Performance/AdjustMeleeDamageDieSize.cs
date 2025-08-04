@@ -8,57 +8,51 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class AdjustDamageDieCount : MeleeWeaponCumulativeAdjustment
+    public class AdjustMeleeDamageDieSize : MeleeWeaponPerformanceAdjustment
     {
-        public AdjustDamageDieCount()
-            : base("damage die")
+        public AdjustMeleeDamageDieSize()
+            : base("damage die size")
         {
             Verb = "gain";
         }
-        public AdjustDamageDieCount(int Amount)
+        public AdjustMeleeDamageDieSize(int Amount)
             : this()
         {
             this.Amount = Amount;
         }
-        public AdjustDamageDieCount(Type Source, int Amount)
+        public AdjustMeleeDamageDieSize(Type Source, int Amount)
             : this(Amount)
         {
             this.Source = Source;
         }
-        public AdjustDamageDieCount(MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public AdjustMeleeDamageDieSize(MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
-            AffectedParameter = "damage die";
+            AffectedParameter = "damage die size";
             Verb = "gain";
         }
-        public AdjustDamageDieCount(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
+        public AdjustMeleeDamageDieSize(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
-        }
-
-        public override bool Check(GameObject Subject)
-        {
-            return Amount > 0 
-                && base.Check(Subject);
         }
 
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().AdjustDamageDieCount((int)Amount);
+                Subject.GetPart<MeleeWeapon>().AdjustDamageDieSize((int)Amount);
             }
             return IsApplied();
         }
 
         public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject = null)
         {
-            if (AffectedParameter != null && Amount > 0)
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
                 string amount = ((int)Amount).Signed();
-                Effect = $"{amount} additional {AffectedParameter}";
-                return new(DescriptionElement.ORDER_ADJUST_EXTREMELY_EARLY + 1, Verb, Effect);
+                Effect = $"{amount} {AffectedParameter}";
+                return new(DescriptionElement.ORDER_ADJUST_EXTREMELY_EARLY + 2, Verb, Effect);
             }
             return base.GetPrimaryDescriptionElement(Subject);
         }

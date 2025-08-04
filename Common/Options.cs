@@ -60,9 +60,9 @@ namespace HNPS_GigantismPlus
             { "ICondition", true && doConditionsDebug },
             { "IConditions", true && doConditionsDebug },
             { "NotCondition", true && doConditionsDebug },
+            { "OnlyOneCondition", true && doConditionsDebug },
             { "AnyConditions", true && doConditionsDebug },
             { "AllConditions", true && doConditionsDebug },
-            { "OnlyOneCondition", true && doConditionsDebug },
             { "NotAnyConditions", true && doConditionsDebug },
             { "NotAllConditions", true && doConditionsDebug },
 

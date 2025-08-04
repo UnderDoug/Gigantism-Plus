@@ -38,33 +38,5 @@ namespace XRL.World.Parts
             bool metalic = ParentObject != null && ParentObject.HasPart<Metal>() || Operator.ParentLimb.Category.HasBit(BodyPartCategory.METAL);
             return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1, Inorganic: inorganic, Metalic: metalic).Strip() ?? base.GetAdjective();
         }
-
-        public override bool HandleEvent(DescribeModificationEvent<ModNaturalEquipment<CyberneticsManagedHandBones>> E)
-        {
-            if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT && (Wielder != null && Wielder.HasPart<GigantismPlus>()))
-            {
-                E.AddSecondaryElement(null, "suffering diminishing returns on increases to damage die count");
-            }
-            return base.HandleEvent(E);
-        }
-
-        public override bool HandleEvent(BeforeApplyAdjustmentEvent E)
-        {
-            if (E.Adjustment.Source == typeof(ModGiganticNaturalWeapon) && E.Adjustment.GetType() == typeof(ChangeDetailColor))
-            {
-                Debug.Entry(4, $"Replaced {nameof(ModGiganticNaturalWeapon)} {nameof(ChangeDetailColor)} {nameof(E.Adjustment)}",
-                    Indent: Debug.LastIndent + 1, Toggle: doDebug);
-                Debug.LastIndent--;
-
-                foreach (IAdjustment adjustment in Adjustments)
-                {
-                    if (adjustment.SameAs(E.Adjustment, false))
-                    {
-                        // E.Adjustment.Value = adjustment.Value;
-                    }
-                }
-            }
-            return base.HandleEvent(E);
-        }
     }
 }

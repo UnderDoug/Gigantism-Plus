@@ -17,8 +17,8 @@ namespace HNPS_GigantismPlus
         {
             List<object> doList = new()
             {
-                nameof(Check),
-                nameof(NotCheck),
+                // nameof(Check),
+                // nameof(NotCheck),
             };
             List<object> dontList = new()
             {
@@ -46,7 +46,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(Check));
-            Debug.Entry(4, $"[?] {GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(OnlyOneCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
@@ -67,15 +67,13 @@ namespace HNPS_GigantismPlus
                         }
                     }
                 }
-                Debug.LoopItem(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {oneCondition}",
-                    Good: oneCondition, Indent: indent + 2, Toggle: doDebug);
-                Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {oneCondition}",
+                    Good: oneCondition, Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return oneCondition;
             }
-            Debug.LoopItem(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 2, Toggle: doDebug);
-            Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
+                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return !FalseIfSubjectNull;
         }
@@ -84,7 +82,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(NotCheck));
-            Debug.Entry(4, $"[?] {GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(OnlyOneCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
@@ -105,15 +103,13 @@ namespace HNPS_GigantismPlus
                         }
                     }
                 }
-                Debug.LoopItem(4, $"{GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!oneCondition}",
-                    Good: !oneCondition, Indent: indent + 2, Toggle: doDebug);
-                Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+                Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!oneCondition}",
+                    Good: !oneCondition, Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return !oneCondition;
             }
-            Debug.LoopItem(4, $"{GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 2, Toggle: doDebug);
-            Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
+                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return !FalseIfSubjectNull;
         }

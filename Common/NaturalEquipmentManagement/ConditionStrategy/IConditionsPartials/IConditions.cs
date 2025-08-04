@@ -22,9 +22,10 @@ namespace HNPS_GigantismPlus
         {
             List<object> doList = new()
             {
-                nameof(Check),
-                nameof(NotCheck),
-                nameof(Results),
+                // nameof(Check),
+                // nameof(NotCheck),
+                // nameof(Results),
+                // nameof(NotResults),
             };
             List<object> dontList = new()
             {
@@ -329,7 +330,7 @@ namespace HNPS_GigantismPlus
         public IEnumerable<bool> Results(T Subject)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, $"> {GetType().Name}.{nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+            Debug.Entry(4, $"> {nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
                 foreach (ICondition<T> condition in this)
@@ -357,7 +358,7 @@ namespace HNPS_GigantismPlus
         public IEnumerable<bool> NotResults(T Subject)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, $"> {GetType().Name}.{nameof(NotResults)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
+            Debug.Entry(4, $"> {nameof(NotResults)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
                 foreach (ICondition<T> condition in this)

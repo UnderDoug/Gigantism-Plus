@@ -17,8 +17,8 @@ namespace HNPS_GigantismPlus
         {
             List<object> doList = new()
             {
-                nameof(Check),
-                nameof(NotCheck),
+                // nameof(Check),
+                // nameof(NotCheck),
             };
             List<object> dontList = new()
             {
@@ -46,7 +46,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(Check));
-            Debug.Entry(4, $"[?] {GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
@@ -55,20 +55,19 @@ namespace HNPS_GigantismPlus
                 {
                     if (!result)
                     {
-                        Debug.CheckNah(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {false}", Indent: indent + 2, Toggle: doDebug);
-                        Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+                        Debug.CheckNah(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}", 
+                            Indent: indent + 1, Toggle: doDebug);
                         Debug.LastIndent = indent;
                         return false;
                     }
                 }
-                Debug.CheckYeh(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {true}", Indent: indent + 2, Toggle: doDebug);
-                Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+                Debug.CheckYeh(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}", 
+                    Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return true;
             }
-            Debug.LoopItem(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 2, Toggle: doDebug);
-            Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
+                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return !FalseIfSubjectNull;
         }
@@ -77,7 +76,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(NotCheck));
-            Debug.Entry(4, $"[?] {GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(AllConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
@@ -86,20 +85,19 @@ namespace HNPS_GigantismPlus
                 {
                     if (!result)
                     {
-                        Debug.CheckYeh(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {true}", Indent: indent + 2, Toggle: doDebug);
-                        Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+                        Debug.CheckYeh(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}", 
+                            Indent: indent + 1, Toggle: doDebug);
                         Debug.LastIndent = indent;
                         return true;
                     }
                 }
-                Debug.CheckNah(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {false}", Indent: indent + 2, Toggle: doDebug);
-                Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+                Debug.CheckNah(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}", 
+                    Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return false;
             }
-            Debug.LoopItem(4, $"{GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 2, Toggle: doDebug);
-            Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(AllConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
+                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return !FalseIfSubjectNull;
         }

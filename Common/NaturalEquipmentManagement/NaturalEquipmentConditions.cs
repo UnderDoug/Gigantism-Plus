@@ -20,10 +20,18 @@ namespace HNPS_GigantismPlus
             new NotCondition<GameObject>(new GameObjectHasAnyParts(new Type[] { typeof(Inorganic), typeof(Metal) })),
         };
 
+        public static AnyConditions<GameObject> IsCybernetic => new()
+        {
+            IsAugmented,
+            IsChromeBoned,
+        };
+
         public static GameObjectHasNaturalEquipmentMod<GigantismPlus> IsGigantic => new();
         public static GameObjectHasNaturalEquipmentMod<ElongatedPaws> IsElongated => new();
         public static GameObjectHasNaturalEquipmentMod<UD_ManagedBurrowingClaws> IsBurrowing => new();
         public static GameObjectHasNaturalEquipmentMod<UD_ManagedCrystallinity> IsCrystalline => new();
+        public static GameObjectHasNaturalEquipmentMod<CyberneticsGiganticExoframe> IsAugmented => new();
+        public static GameObjectHasNaturalEquipmentMod<CyberneticsManagedHandBones> IsChromeBoned => new();
 
         public static GameObjectWielderHasPart<GigantismPlus> WielderHasGigantismPlus => new();
         public static GameObjectWielderHasPart<ElongatedPaws> WielderHasElongatedPaws => new();

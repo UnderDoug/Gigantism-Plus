@@ -69,30 +69,31 @@ namespace XRL.World.Parts
             {
                 AdjectiveColor = giganticExoframe.AugmentAdjectiveColor,
             };
-            augmentedManipulator.AddNounAdjustment();
+            augmentedManipulator.AdjustNoun()
+                
+                .AdjustTile(giganticExoframe.AugmentTile)
 
-            augmentedManipulator.AddTileAdjustment(giganticExoframe.AugmentTile);
-            augmentedManipulator.AddColorStringAdjustment(giganticExoframe.AugmentTileColorString, true);
-            augmentedManipulator.AddTileColorAdjustment(giganticExoframe.AugmentTileColorString, true);
-            augmentedManipulator.AddDetailColorAdjustment(giganticExoframe.AugmentTileDetailColor);
+                .AdjustColorString(giganticExoframe.AugmentTileColorString, true)
+                .AdjustTileColor(giganticExoframe.AugmentTileColorString, true)
+                .AdjustDetailColor(giganticExoframe.AugmentTileDetailColor);
 
             if (!giganticExoframe.AugmentSwingSound.IsNullOrEmpty())
             {
-                augmentedManipulator.AddAdjustment(new SetSwingSound(giganticExoframe.AugmentSwingSound));
+                augmentedManipulator.SetSwingSound(giganticExoframe.AugmentSwingSound, true);
             }
             if (!giganticExoframe.AugmentBlockedSound.IsNullOrEmpty())
             {
-                augmentedManipulator.AddAdjustment(new SetBlockedSound(giganticExoframe.AugmentBlockedSound));
+                augmentedManipulator.SetBlockedSound(giganticExoframe.AugmentBlockedSound, true);
             }
             if (!giganticExoframe.AugmentEquipmentFrameColors.IsNullOrEmpty())
             {
-                augmentedManipulator.AddAdjustment(new SetEquipmentFrameColors(giganticExoframe.AugmentEquipmentFrameColors, true));
+                augmentedManipulator.SetEquipmentFrameColors(giganticExoframe.AugmentEquipmentFrameColors, true);
             }
             if (!giganticExoframe.AugmentAddParts.IsNullOrEmpty())
             {
                 foreach (string addedPart in giganticExoframe.AugmentAddParts.CachedCommaExpansion())
                 {
-                    augmentedManipulator.AddAdjustment(new AddPart(addedPart));
+                    augmentedManipulator.AddPart(addedPart);
                 }
             }
             if (!giganticExoframe.AugmentAddProps.IsNullOrEmpty()
@@ -102,14 +103,14 @@ namespace XRL.World.Parts
                 {
                     foreach ((string label, string prop) in stringProps)
                     {
-                        augmentedManipulator.AddAdjustment(new SetStringProperty(label, prop));
+                        augmentedManipulator.SetStringProperty(label, prop, true);
                     }
                 }
                 if (!intProps.IsNullOrEmpty())
                 {
                     foreach ((string label, int prop) in intProps)
                     {
-                        augmentedManipulator.AddAdjustment(new SetIntProperty(label, prop));
+                        augmentedManipulator.SetIntProperty(label, prop, true);
                     }
                 }
             }

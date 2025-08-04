@@ -109,7 +109,7 @@ namespace HNPS_GigantismPlus
         {
             WeaponDescriptions = new();
             GeneralDescriptions = new();
-            return Send( // return DescribeModificationEvent <T> E = Send(
+            return Send(
                 BeforeDescribeModificationEvent<T>.Send(
                     Object: Object,
                     Adjective: Adjective,
@@ -118,38 +118,30 @@ namespace HNPS_GigantismPlus
                     GeneralDescriptions: GeneralDescriptions,
                     Context: Context)
                 );
-            /*
-            if (E != null)
-            {
-                WeaponDescriptions = E.WeaponDescriptions;
-                GeneralDescriptions = E.GeneralDescriptions;
-            }
-            return E; 
-            */
         }
         public string Process(bool PluralizeObject = true)
         {
-            List<DescriptionElement> weaponDescriptions = new();
-            List<DescriptionElement> generalDescriptions = new();
+            List<DescriptionElement> primaryDescriptions = new();
+            List<DescriptionElement> secondaryDescriptions = new();
             ObjectNoun ??= Object.GetObjectNoun();
 
             if (BeforeEvent != null)
             {
                 if (!BeforeEvent.PrimaryDescriptions.IsNullOrEmpty())
                 {
-                    weaponDescriptions = AddElements(weaponDescriptions, BeforeEvent.PrimaryDescriptions);
+                    primaryDescriptions = AddElements(primaryDescriptions, BeforeEvent.PrimaryDescriptions);
                 }
                 if (!BeforeEvent.SecondaryDescriptions.IsNullOrEmpty())
                 {
-                    generalDescriptions = AddElements(generalDescriptions, BeforeEvent.SecondaryDescriptions);
+                    secondaryDescriptions = AddElements(secondaryDescriptions, BeforeEvent.SecondaryDescriptions);
                 }
             }
 
-            weaponDescriptions ??= AddElements(weaponDescriptions, PrimaryDescriptions);
-            generalDescriptions ??= AddElements(generalDescriptions, SecondaryDescriptions);
+            primaryDescriptions ??= AddElements(primaryDescriptions, PrimaryDescriptions);
+            secondaryDescriptions ??= AddElements(secondaryDescriptions, SecondaryDescriptions);
 
-            weaponDescriptions.Sort();
-            generalDescriptions.Sort();
+            primaryDescriptions.Sort();
+            secondaryDescriptions.Sort();
 
             StringBuilder SB = Event.NewStringBuilder();
 
@@ -162,58 +154,32 @@ namespace HNPS_GigantismPlus
             SB.Append(objectNoun).Append(" "); // "fist "
             // "Gigantic: This fist "
 
-            if (weaponDescriptions.IsNullOrEmpty() && generalDescriptions.IsNullOrEmpty())
+            if (primaryDescriptions.IsNullOrEmpty() && secondaryDescriptions.IsNullOrEmpty())
             {
-                generalDescriptions ??= new();
+                secondaryDescriptions ??= new();
                 if (typeof(T).InheritsFrom(typeof(ModGigantic)))
                 {
-                    generalDescriptions.Add(new(null, "really big. Like, massive! Yuge"));
-                    // SB.Append($"{Object.Are()} really big. Like, massive! Yuge!");
+                    secondaryDescriptions.Add(new(null, "really big. Like, massive! Yuge"));
                 }
                 else if (typeof(T).InheritsFrom(typeof(ModNaturalEquipmentBase)))
                 {
-                    generalDescriptions.Add(new("gain", "some manner of adjustments"));
-                    // SB.Append($"{Object.Does("gain")} some manner of adjustments");
+                    secondaryDescriptions.Add(new("gain", "some manner of adjustments"));
                 }
                 else
                 {
-                    generalDescriptions.Add(new(null, "mysterious. Like, strange! Indescribable"));
-                    // SB.Append($"{Object.Are()} mysterious. Like, strange! Indescribable!");
+                    secondaryDescriptions.Add(new(null, "mysterious. Like, strange! Indescribable"));
                 }
             }
 
             bool isFirstList = true;
-            if (!weaponDescriptions.IsNullOrEmpty())
+            if (!primaryDescriptions.IsNullOrEmpty())
             {
-                SB.AppendDescription(Object, weaponDescriptions, isFirstList);
+                SB.AppendDescription(Object, primaryDescriptions, isFirstList);
                 isFirstList = false;
-                /*
-                List<string> processedWeaponDescription = new();
-                foreach (DescriptionElement weaponEnrty in weaponDescriptions)
-                {
-                    processedWeaponDescription.Add(weaponEnrty.GetProcessedItem(IsFirstSentence: isFirstList, weaponDescriptions, Object));
-                }
-                if (!processedWeaponDescription.IsNullOrEmpty())
-                {
-                    SB.Append(Utils.MakeAndList(processedWeaponDescription, IgnoreCommas: true) + ". ");
-                    isFirstList = false;
-                }
-                */
             }
-            if (!generalDescriptions.IsNullOrEmpty())
+            if (!secondaryDescriptions.IsNullOrEmpty())
             {
-                SB.AppendDescription(Object, generalDescriptions, isFirstList);
-                /*
-                List<string> processedGeneralDescription = new();
-                foreach (DescriptionElement entry in generalDescriptions)
-                {
-                    processedGeneralDescription.Add(entry.GetProcessedItem(IsFirstSentence: isFirstList, generalDescriptions, Object));
-                }
-                if (!processedGeneralDescription.IsNullOrEmpty())
-                {
-                    SB.Append(Utils.MakeAndList(processedGeneralDescription, IgnoreCommas: true) + ".");
-                }
-                */
+                SB.AppendDescription(Object, secondaryDescriptions, isFirstList);
             }
 
             Reset();

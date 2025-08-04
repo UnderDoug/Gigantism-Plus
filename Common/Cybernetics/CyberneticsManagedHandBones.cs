@@ -68,9 +68,8 @@ namespace XRL.World.Parts
             {
                 return null;
             }
-            ModChromeBonedNaturalWeapon chromeBonedNaturalWeapon = new()
+            ModChromeBonedNaturalWeapon chromeBonedNaturalWeapon = new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = 490,
@@ -81,28 +80,29 @@ namespace XRL.World.Parts
                 AdjectiveColorFallback = chromeHandBones.BonesAdjectiveColor,
                 ExludeFromDynamicTile = true,
             };
-            chromeBonedNaturalWeapon.AddTileAdjustment(chromeHandBones.BonesTile, Condition: IsOrganicFist);
-            chromeBonedNaturalWeapon.AddColorStringAdjustment(chromeHandBones.BonesTileColorString);
-            chromeBonedNaturalWeapon.AddTileColorAdjustment(chromeHandBones.BonesTileColorString);
-            chromeBonedNaturalWeapon.AddDetailColorAdjustment(chromeHandBones.BonesTileDetailColor, true);
+            chromeBonedNaturalWeapon.AdjustTile(chromeHandBones.BonesTile, Condition: IsOrganicFist)
+                
+                .AdjustColorString(chromeHandBones.BonesTileColorString)
+                .AdjustTileColor(chromeHandBones.BonesTileColorString)
+                .AdjustDetailColor(chromeHandBones.BonesTileDetailColor, true);
 
             if (!chromeHandBones.BonesSwingSound.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddAdjustment(new SetSwingSound(chromeHandBones.BonesSwingSound));
+                chromeBonedNaturalWeapon.SetSwingSound(chromeHandBones.BonesSwingSound, true);
             }
             if (!chromeHandBones.BonesBlockedSound.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddAdjustment(new SetBlockedSound(chromeHandBones.BonesBlockedSound));
+                chromeBonedNaturalWeapon.SetBlockedSound(chromeHandBones.BonesBlockedSound, true);
             }
             if (!chromeHandBones.BonesEquipmentFrameColors.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.AddAdjustment(new SetEquipmentFrameColors(chromeHandBones.BonesEquipmentFrameColors, false));
+                chromeBonedNaturalWeapon.SetEquipmentFrameColors(chromeHandBones.BonesEquipmentFrameColors, Override: false);
             }
             if (!chromeHandBones.BonesAddParts.IsNullOrEmpty())
             {
                 foreach (string addedPart in chromeHandBones.BonesAddParts.CachedCommaExpansion())
                 {
-                    chromeBonedNaturalWeapon.AddAdjustment(new AddPart(addedPart));
+                    chromeBonedNaturalWeapon.AddPart(addedPart);
                 }
             }
             if (!chromeHandBones.BonesAddProps.IsNullOrEmpty()
@@ -112,18 +112,18 @@ namespace XRL.World.Parts
                 {
                     foreach ((string label, string prop) in stringProps)
                     {
-                        chromeBonedNaturalWeapon.AddAdjustment(new SetStringProperty(label, prop));
+                        chromeBonedNaturalWeapon.SetStringProperty(label, prop, true);
                     }
                 }
                 if (!intProps.IsNullOrEmpty())
                 {
                     foreach ((string label, int prop) in intProps)
                     {
-                        chromeBonedNaturalWeapon.AddAdjustment(new SetIntProperty(label, prop));
+                        chromeBonedNaturalWeapon.SetIntProperty(label, prop, true);
                     }
                 }
             }
-            chromeBonedNaturalWeapon.AddAdjustment(new DiminishingReturns("increases to damage die count"), true, IsGigantic );
+            chromeBonedNaturalWeapon.AddDiminishingReturnsDescription("increases to damage die count", IsGigantic );
             return chromeBonedNaturalWeapon;
         }
 

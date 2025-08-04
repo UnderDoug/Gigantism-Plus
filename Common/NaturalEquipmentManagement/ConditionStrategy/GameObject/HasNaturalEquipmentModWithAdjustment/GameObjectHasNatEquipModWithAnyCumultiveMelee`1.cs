@@ -18,11 +18,11 @@ namespace HNPS_GigantismPlus
             return base.Check(GameObject, out ModNaturalEquipment<T> naturalEquipmentMod) 
                 && (new AnyConditions<IPart>()
                 { 
-                    new PartHasAdjustment<T, AdjustDamageDieCount>(),
-                    new PartHasAdjustment<T, AdjustDamageDieSize>(),
-                    new PartHasAdjustment<T, AdjustDamageBonus>(),
-                    new PartHasAdjustment<T, AdjustHitBonus>(),
-                    new PartHasAdjustment<T, AdjustPenBonus>(),
+                    new PartHasAdjustment<T, AdjustMeleeDamageDieCount>(),
+                    new PartHasAdjustment<T, AdjustMeleeDamageDieSize>(),
+                    new PartHasAdjustment<T, AdjustMeleeDamageBonus>(),
+                    new PartHasAdjustment<T, AdjustMeleeHitBonus>(),
+                    new PartHasAdjustment<T, AdjustMeleePenBonus>(),
                 })
                 .Check(naturalEquipmentMod);
         }

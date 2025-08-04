@@ -8,30 +8,28 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class AdjustDamageDieSize : MeleeWeaponPerformanceAdjustment
+    public class AdjustMeleeDamageBonus : MeleeWeaponCumulativeAdjustment
     {
-        public AdjustDamageDieSize()
-            : base("damage die size")
+        public AdjustMeleeDamageBonus()
+            : base("damage")
         {
-            Verb = "gain";
         }
-        public AdjustDamageDieSize(int Amount)
+        public AdjustMeleeDamageBonus(int Amount)
             : this()
         {
             this.Amount = Amount;
         }
-        public AdjustDamageDieSize(Type Source, int Amount)
+        public AdjustMeleeDamageBonus(Type Source, int Amount)
             : this(Amount)
         {
             this.Source = Source;
         }
-        public AdjustDamageDieSize(MeleeWeaponPerformanceAdjustment SourceAdjustment)
+        public AdjustMeleeDamageBonus(MeleeWeaponCumulativeAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
-            AffectedParameter = "damage die size";
-            Verb = "gain";
+            AffectedParameter = "damage";
         }
-        public AdjustDamageDieSize(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
+        public AdjustMeleeDamageBonus(int Amount, MeleeWeaponCumulativeAdjustment SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
@@ -41,7 +39,7 @@ namespace HNPS_GigantismPlus
         {
             if (base.Apply(Subject))
             {
-                Subject.GetPart<MeleeWeapon>().AdjustDamageDieSize((int)Amount);
+                Subject.GetPart<MeleeWeapon>().AdjustDamage((int)Amount);
             }
             return IsApplied();
         }
@@ -51,8 +49,9 @@ namespace HNPS_GigantismPlus
             if (AffectedParameter != null && !Amount.IsNullOrZero())
             {
                 string amount = ((int)Amount).Signed();
-                Effect = $"{amount} {AffectedParameter}";
-                return new(DescriptionElement.ORDER_ADJUST_EXTREMELY_EARLY + 2, Verb, Effect);
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
+                return new(DescriptionElement.ORDER_ADJUST_EXTREMELY_EARLY + 3, Verb, Effect);
             }
             return base.GetPrimaryDescriptionElement(Subject);
         }

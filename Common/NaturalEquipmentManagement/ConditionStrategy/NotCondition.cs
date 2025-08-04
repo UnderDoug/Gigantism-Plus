@@ -18,8 +18,8 @@ namespace HNPS_GigantismPlus
         {
             List<object> doList = new()
             {
-                nameof(Check),
-                nameof(NotCheck),
+                // nameof(Check),
+                // nameof(NotCheck),
             };
             List<object> dontList = new()
             {
@@ -49,15 +49,14 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(Check));
-            Debug.Entry(4, $"[?] {GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(NotCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             bool check = base.Check(Subject)
                 && (Condition == null || !FalseIfSubjectNull)
                 && Condition.NotCheck(Subject);
 
-            Debug.LoopItem(4, $"{GetType().Name}.{nameof(Check)}({typeof(T).Name} Subject): {check}",
-                Good: check, Indent: indent + 2, Toggle: doDebug);
-            Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(NotCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {check}",
+                Good: check, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return check;
         }
@@ -66,15 +65,14 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(NotCheck));
-            Debug.Entry(4, $"[?] {GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(NotCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             bool notCheck = base.NotCheck(Subject)
                 && (Condition == null || !FalseIfSubjectNull)
                 && Condition.Check(Subject);
 
-            Debug.LoopItem(4, $"{GetType().Name}.{nameof(NotCheck)}({typeof(T).Name} Subject): {notCheck}",
-                Good: notCheck, Indent: indent + 2, Toggle: doDebug);
-            Debug.Divider(4, HONLY, 40, TANDR, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(NotCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {notCheck}",
+                Good: notCheck, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return notCheck;
         }

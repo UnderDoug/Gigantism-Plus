@@ -9,7 +9,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class ChangeDamageAttributes : AddDamageAttribute
+    public class ChangeDamageAttributes : AddMeleeDamageAttribute
     {
         public ChangeDamageAttributes()
             : base()

@@ -8,33 +8,33 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class AdjustPenBonus : MeleeWeaponPerformanceAdjustment
+    public class AdjustMeleePenBonus : MeleeWeaponPerformanceAdjustment
     {
-        public AdjustPenBonus()
+        public AdjustMeleePenBonus()
             : base("penetration")
         {
         }
-        public AdjustPenBonus(int Amount)
+        public AdjustMeleePenBonus(int Amount)
             : this()
         {
             this.Amount = Amount;
         }
-        public AdjustPenBonus(Type Source, int Amount)
+        public AdjustMeleePenBonus(Type Source, int Amount)
             : this(Amount)
         {
             this.Source = Source;
         }
-        public AdjustPenBonus(MeleeWeaponPerformanceAdjustment SourceAdjustment)
+        public AdjustMeleePenBonus(MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : base(SourceAdjustment)
         {
             AffectedParameter = "penetration";
         }
-        public AdjustPenBonus(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
+        public AdjustMeleePenBonus(int Amount, MeleeWeaponPerformanceAdjustment SourceAdjustment)
             : this(SourceAdjustment)
         {
             this.Amount = Amount;
         }
-        public AdjustPenBonus(MeleeWeapon Source)
+        public AdjustMeleePenBonus(MeleeWeapon Source)
             : this(Source.PenBonus)
         {
         }

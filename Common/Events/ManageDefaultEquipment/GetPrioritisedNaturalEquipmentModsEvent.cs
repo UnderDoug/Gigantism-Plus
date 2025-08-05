@@ -44,11 +44,14 @@ namespace HNPS_GigantismPlus
 
         public SortedDictionary<int, ModNaturalEquipmentBase> AddNaturalEquipmentMods(List<ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
-            foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                AddNaturalEquipmentMod(naturalEquipmentMod);
+                foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
+                {
+                    AddNaturalEquipmentMod(naturalEquipmentMod);
+                }
             }
-            return this.NaturalEquipmentMods;
+            return this.NaturalEquipmentMods ?? new();
         }
         public SortedDictionary<int, ModNaturalEquipmentBase> AddNaturalEquipmentMod(ModNaturalEquipmentBase NaturalEquipmentMod)
         {
@@ -62,22 +65,41 @@ namespace HNPS_GigantismPlus
                 Indent: indent, Toggle: doDebug);
 
             NaturalEquipmentMods ??= new();
-            if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
+            if (NaturalEquipmentMod != null)
+            {
+                if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
+                {
+                    Debug.Warn(2,
+                        $"{nameof(NaturalEquipmentOperator)}",
+                        $"{nameof(AddNaturalEquipmentMod)}()",
+                        $"[{NaturalEquipmentMod.ModPriority}]" +
+                        $"{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " +
+                        $"in {nameof(NaturalEquipmentMods)} overwritten: Same ModPriority",
+                        Indent: indent + 1);
+                }
+                ModNaturalEquipmentBase naturalEquipmentModCopy = NaturalEquipmentMod.DeepCopy(Equipment) as ModNaturalEquipmentBase;
+                NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = naturalEquipmentModCopy;
+            }
+            else
             {
                 Debug.Warn(2,
                     $"{nameof(NaturalEquipmentOperator)}",
                     $"{nameof(AddNaturalEquipmentMod)}()",
-                    $"[{NaturalEquipmentMod.ModPriority}]" +
-                    $"{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " +
-                    $"in {nameof(NaturalEquipmentMods)} overwritten: Same ModPriority",
+                    $"Supplied {nameof(NaturalEquipmentMod)} was empty",
                     Indent: indent + 1);
             }
-            ModNaturalEquipmentBase naturalEquipmentModCopy = NaturalEquipmentMod.DeepCopy(Equipment) as ModNaturalEquipmentBase;
-            NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = naturalEquipmentModCopy;
-            Debug.Entry(4, $"NaturalEquipmentMods:", Indent: indent + 1, Toggle: doDebug);
-            foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+            Debug.Entry(4, $"{nameof(NaturalEquipmentMods)}:", Indent: indent + 1, Toggle: doDebug);
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}", Indent: indent + 2, Toggle: doDebug);
+                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                {
+                    Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}",
+                        Indent: indent + 2, Toggle: doDebug);
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"Empty List", Indent: indent + 2, Toggle: doDebug);
             }
             Debug.Entry(4,
                 $"x {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."

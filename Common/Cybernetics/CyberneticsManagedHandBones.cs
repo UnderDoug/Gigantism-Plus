@@ -96,7 +96,7 @@ namespace XRL.World.Parts
             }
             if (!chromeHandBones.BonesEquipmentFrameColors.IsNullOrEmpty())
             {
-                chromeBonedNaturalWeapon.SetEquipmentFrameColors(chromeHandBones.BonesEquipmentFrameColors, Override: false);
+                chromeBonedNaturalWeapon.SetEquipmentFrameColors(chromeHandBones.BonesEquipmentFrameColors, Override: false, true);
             }
             if (!chromeHandBones.BonesAddParts.IsNullOrEmpty())
             {

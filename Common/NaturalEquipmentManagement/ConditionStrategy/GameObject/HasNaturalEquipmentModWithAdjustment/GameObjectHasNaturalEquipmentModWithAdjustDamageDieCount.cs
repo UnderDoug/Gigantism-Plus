@@ -6,7 +6,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasNaturalEquipmentModWithAdjustDamageDieCount<T> : GameObjectHasNaturalEquipmentModWithAdjustment<T, AdjustDamageDieCount>
+    public class GameObjectHasNaturalEquipmentModWithAdjustDamageDieCount<T> : GameObjectHasNaturalEquipmentModWithAdjustment<T, AdjustMeleeDamageDieCount>
         where T
         : IPart
         , IManagedDefaultNaturalEquipment<T>

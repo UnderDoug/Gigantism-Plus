@@ -267,62 +267,69 @@ namespace XRL.World.Parts.Mutation
             return 8 * level;
         }
 
-        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
+        public override int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
-            if (NaturalEquipmentMod.Adjective == "closed")
+            if (NaturalEquipmentMod != null)
             {
-                return 0;
-            }
+                if (NaturalEquipmentMod.Adjective == "closed")
+                {
+                    return 0;
+                }
 
-            if (NaturalEquipmentMod.BodyPartType == "Head")
-            {
-                return 2;
-            }
+                if (NaturalEquipmentMod.BodyPartType == "Head")
+                {
+                    return 2;
+                }
 
-            if (NaturalEquipmentMod.BodyPartType == "Hand")
-            {
-                return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
-            }
-
-            return 0;
-        }
-        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
-        {
-            if (NaturalEquipmentMod.Adjective == "closed")
-            {
-                return 0;
-            }
-
-            if (NaturalEquipmentMod.BodyPartType == "Head")
-            {
-                return 5;
-            }
-
-            if (NaturalEquipmentMod.BodyPartType == "Hand")
-            {
-                double perLevel = 3.0;
-                int levelOffset = MinDamageBonusIncrease * (int)perLevel;
-                return (int)Math.Max(MinDamageBonusIncrease, Math.Floor((Level - levelOffset) / perLevel));
+                if (NaturalEquipmentMod.BodyPartType == "Hand")
+                {
+                    return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
+                }
             }
             return 0;
         }
-        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod = null, int Level = 1)
+        public override int GetNaturalWeaponDamageBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
-            if (NaturalEquipmentMod.Adjective == "closed")
+            if (NaturalEquipmentMod != null)
             {
-                return 0;
-            }
+                if (NaturalEquipmentMod.Adjective == "closed")
+                {
+                    return 0;
+                }
 
-            if (NaturalEquipmentMod.BodyPartType == "Head")
+                if (NaturalEquipmentMod.BodyPartType == "Head")
+                {
+                    return 5;
+                }
+
+                if (NaturalEquipmentMod.BodyPartType == "Hand")
+                {
+                    double perLevel = 3.0;
+                    int levelOffset = MinDamageBonusIncrease * (int)perLevel;
+                    return (int)Math.Max(MinDamageBonusIncrease, Math.Floor((Level - levelOffset) / perLevel));
+                }
+            }
+            return 0;
+        }
+        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
+        {
+            if (NaturalEquipmentMod != null)
             {
-                return 3;
-            }
+                if (NaturalEquipmentMod.Adjective == "closed")
+                {
+                    return 0;
+                }
 
-            if (NaturalEquipmentMod.BodyPartType == "Hand")
-            {
-                return -3 + (int)Math.Floor(Level / 2.0);
-            }
+                if (NaturalEquipmentMod.BodyPartType == "Head")
+                {
+                    return 3;
+                }
 
+                if (NaturalEquipmentMod.BodyPartType == "Hand")
+                {
+                    return -3 + (int)Math.Floor(Level / 2.0);
+                }
+            }
             return 0;
         }
 

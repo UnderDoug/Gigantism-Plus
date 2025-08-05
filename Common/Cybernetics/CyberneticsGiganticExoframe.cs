@@ -87,7 +87,7 @@ namespace XRL.World.Parts
             }
             if (!giganticExoframe.AugmentEquipmentFrameColors.IsNullOrEmpty())
             {
-                augmentedManipulator.SetEquipmentFrameColors(giganticExoframe.AugmentEquipmentFrameColors, true);
+                augmentedManipulator.SetEquipmentFrameColors(giganticExoframe.AugmentEquipmentFrameColors, true, true);
             }
             if (!giganticExoframe.AugmentAddParts.IsNullOrEmpty())
             {

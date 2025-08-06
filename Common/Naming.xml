@@ -454,7 +454,7 @@
           <value Name="Tinker" />
           <value Name="Crafter" />
           <value Name="Maker" />
-          <value Name="Dissassembler" />
+          <value Name="Disassembler" />
           <value Name="Repairer" />
           <value Name="Modifier" />
         </templatevar>
@@ -462,7 +462,7 @@
           <value Name="Tinker" />
           <value Name="Crafter" />
           <value Name="Maker" />
-          <value Name="Dissassembler" />
+          <value Name="Disassembler" />
           <value Name="Repairer" />
           <value Name="Fixer" />
           <value Name="Drafter" />
@@ -497,7 +497,7 @@
           <value Name="Tinkers" />
           <value Name="Crafts" />
           <value Name="Makes" />
-          <value Name="Dissassembles" />
+          <value Name="Disassembles" />
           <value Name="Repairs" />
           <value Name="Fixes" />
           <value Name="Drafts" />

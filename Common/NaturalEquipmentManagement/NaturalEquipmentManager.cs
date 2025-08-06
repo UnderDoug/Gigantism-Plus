@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using XRL.Language;
 using XRL.Rules;
@@ -33,6 +34,7 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
+                $"{nameof(PrioritiseNaturalEquipmentMods)}:{true}",
             };
             List<object> dontList = new()
             {
@@ -41,6 +43,7 @@ namespace XRL.World.Parts
                 nameof(BodyPartsUpdatedEvent),
                 nameof(AfterBodyPartsUpdatedEvent),
                 nameof(BeforeUpdateBodyPartsEvent),
+                $"{nameof(PrioritiseNaturalEquipmentMods)}:{false}",
             };
 
             if (what != null && doList.Contains(what))
@@ -51,6 +54,12 @@ namespace XRL.World.Parts
 
             return doDebug;
         }
+
+        [NonSerialized]
+        public static List<List<ModNaturalEquipmentBase>> NaturalEquipmentModListPool = new();
+
+        [NonSerialized]
+        public static int nNaturalEquipmentModListPoolCounter = 0;
 
         public List<NaturalEquipmentOperator> NaturalEquipmentOperators => GetNaturalEquipmentOperators(ParentObject, this);
 
@@ -71,6 +80,61 @@ namespace XRL.World.Parts
         public override void Remove()
         {
             base.Remove();
+        }
+
+        public static void ResetNaturalEquipmentModListPool()
+        {
+            for (int i = 0; i < nNaturalEquipmentModListPoolCounter; i++)
+            {
+                if (NaturalEquipmentModListPool[i].Count > 0)
+                {
+                    NaturalEquipmentModListPool[i].Clear();
+                }
+            }
+            nNaturalEquipmentModListPoolCounter = 0;
+        }
+
+        public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList()
+        {
+            while (NaturalEquipmentModListPool.Count <= nNaturalEquipmentModListPoolCounter)
+            {
+                NaturalEquipmentModListPool.Add(new List<ModNaturalEquipmentBase>(12));
+            }
+            List<ModNaturalEquipmentBase> list = NaturalEquipmentModListPool[nNaturalEquipmentModListPoolCounter];
+            nNaturalEquipmentModListPoolCounter++;
+            if (list.Count > 0)
+            {
+                list.Clear();
+            }
+            return list;
+        }
+        public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList(List<ModNaturalEquipmentBase> List)
+        {
+            List<ModNaturalEquipmentBase> list = NewNaturalEquipmentModList();
+            list.AddRange(List);
+            return list;
+        }
+        public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList(List<ModNaturalEquipmentBase> List, Predicate<ModNaturalEquipmentBase> Filter)
+        {
+            if (Filter == null)
+            {
+                return NewNaturalEquipmentModList(List);
+            }
+            List<ModNaturalEquipmentBase> list = NewNaturalEquipmentModList();
+            foreach (ModNaturalEquipmentBase item in List)
+            {
+                if (Filter(item))
+                {
+                    list.Add(item);
+                }
+            }
+            return list;
+        }
+        public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList(IEnumerable<ModNaturalEquipmentBase> List)
+        {
+            List<ModNaturalEquipmentBase> list = NewNaturalEquipmentModList();
+            list.AddRange(List);
+            return list;
         }
 
         public void SyncOperators()
@@ -158,6 +222,163 @@ namespace XRL.World.Parts
                 }
             }
             return null;
+        }
+
+        public static List<ModNaturalEquipment<T>> GetNaturalEquipmentMods<T>(NaturalEquipmentManager Manager, Predicate<ModNaturalEquipment<T>> Filter = null)
+            where T
+            : IPart
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"* {nameof(NaturalEquipmentManager)}."
+                + $"{nameof(GetNaturalEquipmentMods)}<"
+                + $"{typeof(T).Name}>("
+                + $"{nameof(Manager)}, "
+                + $"{nameof(Filter)})",
+                Indent: indent + 1, Toggle: getDoDebug());
+
+            List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
+
+            List<MethodInfo> managedBaseMethods = new(typeof(T).GetMethods());
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                managedBaseMethods.RemoveAll(m => !m.IsStatic || !m.IsPublic || !m.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>)));
+            }
+            if (!managedBaseMethods.IsNullOrEmpty())
+            {
+                Debug.CheckYeh(4, $"Have Methods", Indent: indent + 2, Toggle: getDoDebug());
+                foreach (MethodInfo managedMethod in managedBaseMethods)
+                {
+                    if (!managedMethod.IsStatic || !managedMethod.IsPublic)
+                    {
+                        continue;
+                    }
+
+                    Debug.Divider(4, HONLY, Indent: indent + 3, Toggle: getDoDebug());
+
+                    Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
+
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.IsStatic)}: {managedMethod.IsStatic}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+                    Debug.LoopItem(4, $"{nameof(managedMethod.ReturnType)}: {managedMethod.ReturnType.Name}",
+                        Indent: indent + 4, Toggle: getDoDebug());
+
+                    if (managedMethod.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>), Silent: false)
+                        && managedMethod.IsStatic
+                        && managedMethod.IsPublic)
+                    {
+                        ParameterInfo[] parameters = managedMethod.GetParameters();
+                        if (parameters.Length == 1
+                            && parameters[0].ParameterType.InheritsFrom(typeof(NaturalEquipmentManager), Silent: false))
+                        {
+                            Debug.CheckYeh(4,
+                                $"public static {managedMethod.ReturnType.Name} " +
+                                $"{managedMethod.Name}(" +
+                                $"{parameters[0].ParameterType.Name} {parameters[0].Name})",
+                                Indent: indent + 5, Toggle: getDoDebug());
+
+                            if (managedMethod.Invoke(null, new object[1] { Manager }) is ModNaturalEquipment<T> naturalEquipmentMod)
+                            {
+                                Debug.CheckYeh(4, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                                if (naturalEquipmentMod != null && Filter(naturalEquipmentMod))
+                                {
+                                    Debug.CheckYeh(4, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: getDoDebug());
+                                    naturalEquipmentModsList.Add(naturalEquipmentMod);
+                                }
+                                else
+                                {
+                                    Debug.CheckNah(4, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: getDoDebug());
+                                }
+                            }
+                            else
+                            {
+                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)} (May be that the mod is conditionally produced)", Indent: indent + 3, Toggle: getDoDebug());
+                            }
+                        }
+                    }
+                }
+                Debug.Divider(4, HONLY, Indent: indent + 3, Toggle: getDoDebug());
+            }
+            Debug.LastIndent = indent;
+            return naturalEquipmentModsList;
+        }
+        public List<ModNaturalEquipment<T>> GetNaturalEquipmentMods<T>(Predicate<ModNaturalEquipment<T>> Filter = null)
+            where T
+            : IPart
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
+        {
+            return GetNaturalEquipmentMods(this, Filter);
+        }
+
+        public static SortedDictionary<int, ModNaturalEquipmentBase> PrioritiseNaturalEquipmentMods(List<ModNaturalEquipmentBase> NaturalEquipmentModList, bool ForDescriptions = false)
+        {
+            int indent = Debug.LastIndent;
+            bool doDebug = getDoDebug($"{nameof(PrioritiseNaturalEquipmentMods)}:{ForDescriptions}");
+
+            Debug.Entry(4,
+                $"* {nameof(PrioritiseNaturalEquipmentMods)}"
+                + $"(ForDescriptions: {ForDescriptions})",
+                Indent: indent + 1, Toggle: doDebug);
+
+            string label = ForDescriptions
+                ? "Descriptions"
+                : "EquipmentMods"
+                ;
+
+            Debug.Entry(4, $"{label}:", Indent: indent + 1, Toggle: doDebug);
+
+            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = new();
+            if (!NaturalEquipmentModList.IsNullOrEmpty())
+            {
+                foreach (ModNaturalEquipmentBase attachedNaturalEquipmentMod in NaturalEquipmentModList)
+                {
+                    int priority = ForDescriptions
+                        ? attachedNaturalEquipmentMod.DescriptionPriority
+                        : attachedNaturalEquipmentMod.ModPriority
+                        ;
+                    string priorityString = ForDescriptions
+                        ? nameof(attachedNaturalEquipmentMod.DescriptionPriority)
+                        : nameof(attachedNaturalEquipmentMod.ModPriority)
+                        ;
+
+                    if (naturalEquipmentMods.ContainsKey(priority))
+                    {
+                        Debug.Warn(2,
+                            $"{nameof(Extensions)}",
+                            $"{nameof(PrioritiseNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                            $"[{priority}]" +
+                            $"{naturalEquipmentMods[priority]} " +
+                            $"in {nameof(naturalEquipmentMods)} overwritten: Same {priorityString}",
+                            Indent: indent + 2);
+                    }
+
+                    naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
+
+                    Debug.LoopItem(4,
+                        $"{attachedNaturalEquipmentMod.Name}" +
+                        $"[{attachedNaturalEquipmentMod.GetAdjective()}]",
+                        Good: naturalEquipmentMods[priority] != null, Indent: indent + 2, Toggle: doDebug);
+                }
+            }
+
+            if (!naturalEquipmentMods.IsNullOrEmpty())
+            {
+                Debug.Entry(4, $"{nameof(naturalEquipmentMods)}:", Indent: indent + 1, Toggle: doDebug);
+                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in naturalEquipmentMods)
+                {
+                    Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}",
+                        Indent: indent + 2, Toggle: doDebug);
+                }
+            }
+
+            Debug.LastIndent = indent;
+
+            return naturalEquipmentMods;
         }
 
         public static List<string> WantStringEvents = new()

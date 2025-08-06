@@ -135,6 +135,27 @@ namespace HNPS_GigantismPlus
             return Applied;
         }
 
+        public virtual string GetSourceName()
+        {
+            if (Source == null)
+            {
+                return null;
+            }
+            List<Type> sourceTypeGenerics = new(Source.GetGenericArguments());
+            string sourceString = Source.Name;
+            string genericsString = null;
+            if (!sourceTypeGenerics.IsNullOrEmpty())
+            {
+                genericsString = sourceTypeGenerics.Join(", ");
+            }
+            if (!genericsString.IsNullOrEmpty())
+            {
+                sourceString = sourceString[..^2];
+                genericsString = $"<{genericsString}>";
+            }
+            return $"{sourceString}{genericsString}";
+        }
+
         public override string ToString()
         {
             return ToString(ShowApplied: false, Short: false);
@@ -149,7 +170,7 @@ namespace HNPS_GigantismPlus
             {
                 addToString = ": " + addToString;
             }
-            return $"{appliedString}{Source.Name}.{priorityString}{GetType().Name}{addToString}";
+            return $"{appliedString}{GetSourceName()}.{priorityString}{GetType().Name}{addToString}";
         }
 
         public virtual List<string> AddToString()

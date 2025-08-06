@@ -1,13 +1,16 @@
-﻿using HNPS_GigantismPlus;
-using Sheeter;
-using System;
+﻿using System;
 using System.Collections.Generic;
+
 using XRL.Language;
 using XRL.World.Anatomy;
 using XRL.World.Parts.Mutation;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
+
 using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
@@ -239,6 +242,5 @@ namespace XRL.World.Parts
         {
             return NaturalEquipmentMod;
         }
-
     }
 }

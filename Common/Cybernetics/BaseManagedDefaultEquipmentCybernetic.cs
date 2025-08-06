@@ -49,8 +49,6 @@ namespace XRL.World.Parts
 
         public NaturalEquipmentManager NaturalEquipmentManager => Implantee?.RequirePart<NaturalEquipmentManager>();
 
-        public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-
         public int Level { get; set; }
 
         private GameObject _implantee = null;
@@ -93,79 +91,9 @@ namespace XRL.World.Parts
             return 0;
         }
 
-        public List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, NaturalEquipmentManager NewManager = null)
+        public List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null)
         {
-            int indent = Debug.LastIndent;
-            Debug.Entry(4,
-                $"* {typeof(T).Name}."
-                + $"{nameof(GetNaturalEquipmentMods)}("
-                + $"{nameof(Filter)}, "
-                + $"{nameof(NewManager)})",
-                Indent: indent + 1, Toggle: getDoDebug());
-
-            NewManager ??= NaturalEquipmentManager;
-            List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
-
-            List<MethodInfo> managedBaseMethods = new(typeof(T).GetMethods());
-            if (!managedBaseMethods.IsNullOrEmpty())
-            {
-                managedBaseMethods.RemoveAll(m => !m.IsStatic || !m.IsPublic || !m.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>)));
-            }
-            if (!managedBaseMethods.IsNullOrEmpty())
-            {
-                Debug.CheckYeh(4, $"Have Methods", Indent: indent + 2, Toggle: getDoDebug());
-                foreach (MethodInfo managedMethod in managedBaseMethods)
-                {
-                    if (!managedMethod.IsStatic || !managedMethod.IsPublic)
-                    {
-                        continue;
-                    }
-                    Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
-
-                    Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}",
-                        Indent: indent + 4, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $"{nameof(managedMethod.IsStatic)}: {managedMethod.IsStatic}",
-                        Indent: indent + 4, Toggle: getDoDebug());
-                    Debug.LoopItem(4, $"{nameof(managedMethod.ReturnType)}: {managedMethod.ReturnType.Name}",
-                        Indent: indent + 4, Toggle: getDoDebug());
-
-                    if (managedMethod.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>))
-                        && managedMethod.IsStatic
-                        && managedMethod.IsPublic)
-                    {
-                        ParameterInfo[] parameters = managedMethod.GetParameters();
-                        if (parameters.Length == 1
-                            && parameters[0].ParameterType.InheritsFrom(typeof(NaturalEquipmentManager)))
-                        {
-                            Debug.CheckYeh(4,
-                                $"public static {managedMethod.ReturnType.Name} " +
-                                $"{managedMethod.Name}(" +
-                                $"{parameters[0].ParameterType.Name} {parameters[0].Name})",
-                                Indent: indent + 5, Toggle: getDoDebug());
-
-                            if (managedMethod.Invoke(null, new object[1] { NewManager }) is ModNaturalEquipment<T> naturalEquipmentMod)
-                            {
-                                Debug.CheckYeh(4, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
-                                if (Filter(naturalEquipmentMod))
-                                {
-                                    Debug.CheckYeh(4, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: getDoDebug());
-                                    naturalEquipmentModsList.Add(naturalEquipmentMod);
-                                }
-                                else
-                                {
-                                    Debug.CheckNah(4, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: getDoDebug());
-                                }
-                            }
-                            else
-                            {
-                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
-                            }
-                        }
-                    }
-                }
-            }
-            Debug.LastIndent = indent;
-            return naturalEquipmentModsList;
+            return NaturalEquipmentManager.GetNaturalEquipmentMods(Filter);
         }
 
         public virtual ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level)
@@ -264,7 +192,7 @@ namespace XRL.World.Parts
         {
             return new()
             {
-                GetPrioritisedNaturalEquipmentModsEvent.ID,
+                GetNaturalEquipmentModsEvent.ID,
                 BeforeManageDefaultNaturalEquipmentEvent.ID,
             };
         }
@@ -370,23 +298,18 @@ namespace XRL.World.Parts
         {
             return base.HandleEvent(E);
         }
-        public virtual bool HandleEvent(GetPrioritisedNaturalEquipmentModsEvent E)
+        public virtual bool HandleEvent(GetNaturalEquipmentModsEvent E)
         {
             Debug.Entry(4,
                 $"@ {typeof(T).Name}."
                 + $"{nameof(HandleEvent)}("
-                + $"{nameof(GetPrioritisedNaturalEquipmentModsEvent)} E)",
+                + $"{nameof(GetNaturalEquipmentModsEvent)} E)",
                 Indent: 0, Toggle: getDoDebug("getMods"));
 
-            List<ModNaturalEquipment<T>> naturalEquipmentMods = 
-                UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
-                    mod => mod.BodyPartType == E.TargetBodyPart.Type), 
-                    Level);
+            E.AddNaturalEquipmentMods(UpdateNaturalEquipmentMods(GetNaturalEquipmentMods(
+                m => m.BodyPartType == E.TargetBodyPart.Type),
+                Level));
 
-            foreach (ModNaturalEquipment<T> naturalEquipmentMod in naturalEquipmentMods)
-            {
-                E.AddNaturalEquipmentMod(naturalEquipmentMod);
-            }
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BeforeManageDefaultNaturalEquipmentEvent E)

@@ -310,18 +310,18 @@ namespace XRL.World.Parts
         {
             AdjustArmorResistance adjustment = Resistance switch
             {
-                "Acid" => new AdjustArmorElecResist(Amount),
-                "AcidResist" => new AdjustArmorElecResist(Amount),
-                "AcidResistance" => new AdjustArmorElecResist(Amount),
-                "Acidic" => new AdjustArmorElecResist(Amount),
-                "AcidicResist" => new AdjustArmorElecResist(Amount),
-                "AcidicResistance" => new AdjustArmorElecResist(Amount),
-                "AR" => new AdjustArmorElecResist(Amount),
+                "Acid" => new AdjustArmorAcidResist(Amount),
+                "AcidResist" => new AdjustArmorAcidResist(Amount),
+                "AcidResistance" => new AdjustArmorAcidResist(Amount),
+                "Acidic" => new AdjustArmorAcidResist(Amount),
+                "AcidicResist" => new AdjustArmorAcidResist(Amount),
+                "AcidicResistance" => new AdjustArmorAcidResist(Amount),
+                "AR" => new AdjustArmorAcidResist(Amount),
 
-                "Cold" => new AdjustArmorElecResist(Amount),
-                "ColdResist" => new AdjustArmorElecResist(Amount),
-                "ColdResistance" => new AdjustArmorElecResist(Amount),
-                "CR" => new AdjustArmorElecResist(Amount),
+                "Cold" => new AdjustArmorColdResist(Amount),
+                "ColdResist" => new AdjustArmorColdResist(Amount),
+                "ColdResistance" => new AdjustArmorColdResist(Amount),
+                "CR" => new AdjustArmorColdResist(Amount),
 
                 "Elec" => new AdjustArmorElecResist(Amount),
                 "ElecResist" => new AdjustArmorElecResist(Amount),
@@ -334,10 +334,10 @@ namespace XRL.World.Parts
                 "ElectrialcResistance" => new AdjustArmorElecResist(Amount),
                 "ER" => new AdjustArmorElecResist(Amount),
 
-                "Heat" => new AdjustArmorElecResist(Amount),
-                "HeatResist" => new AdjustArmorElecResist(Amount),
+                "Heat" => new AdjustArmorHeatResist(Amount),
+                "HeatResist" => new AdjustArmorHeatResist(Amount),
                 "HeatResistance" => new AdjustArmorElecResist(Amount),
-                "HR" => new AdjustArmorElecResist(Amount),
+                "HR" => new AdjustArmorHeatResist(Amount),
 
                 _ => null,
             };

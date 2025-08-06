@@ -9,6 +9,8 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public abstract class AdjustArmorResistance : ArmorCumulativeAdjustment
     {
+        public int DescriptionOrder;
+
         public AdjustArmorResistance()
             : base()
         {
@@ -30,6 +32,12 @@ namespace HNPS_GigantismPlus
             Verb = "give";
         }
 
+        public override void Configure()
+        {
+            base.Configure();
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_EARLY;
+        }
+
         public override bool Check(GameObject Subject)
         {
             return !Amount.IsNullOrZero() 
@@ -43,7 +51,7 @@ namespace HNPS_GigantismPlus
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
                 Effect = $"{amount} {AffectedParameter}";
-                return new(Verb, Effect);
+                return new(DescriptionOrder, Verb, Effect);
             }
             return base.GetSecondaryDescriptionElement(Subject);
         }

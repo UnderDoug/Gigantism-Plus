@@ -21,8 +21,6 @@ namespace XRL.World
     {
         public abstract NaturalEquipmentManager NaturalEquipmentManager { get; }
 
-        public virtual List<ModNaturalEquipment<T>> NaturalEquipmentMods => GetNaturalEquipmentMods();
-
         public abstract int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<T> NaturalEquipmentMod = null, int Level = 1);
 
         public abstract int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<T> NaturalEquipmentMod = null, int Level = 1);
@@ -33,7 +31,7 @@ namespace XRL.World
 
         public abstract int GetNaturalWeaponPenBonus(ModNaturalEquipment<T> NaturalEquipmentMod = null, int Level = 1);
 
-        public abstract List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null, NaturalEquipmentManager NewManager = null);
+        public abstract List<ModNaturalEquipment<T>> GetNaturalEquipmentMods(Predicate<ModNaturalEquipment<T>> Filter = null);
 
         public abstract ModNaturalEquipment<T> UpdateNaturalEquipmentMod(ModNaturalEquipment<T> NaturalEquipmentMod, int Level = 1);
 
@@ -45,7 +43,7 @@ namespace XRL.World
         , IModEventHandler<BeforeUpdateBodyPartsEvent>
         , IModEventHandler<BodyPartsUpdatedEvent>
         , IModEventHandler<AfterBodyPartsUpdatedEvent>
-        , IModEventHandler<GetPrioritisedNaturalEquipmentModsEvent>
+        , IModEventHandler<GetNaturalEquipmentModsEvent>
         , IModEventHandler<BeforeManageDefaultNaturalEquipmentEvent>
         , IModEventHandler<ManageDefaultNaturalEquipmentEvent>
         , IModEventHandler<AfterManageDefaultNaturalEquipmentEvent>

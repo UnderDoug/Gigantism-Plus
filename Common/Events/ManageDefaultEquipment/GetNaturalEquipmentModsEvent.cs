@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using XRL;
 using XRL.World;
@@ -12,13 +13,13 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-    public class GetPrioritisedNaturalEquipmentModsEvent : ModPooledEvent<GetPrioritisedNaturalEquipmentModsEvent>
+    public class GetNaturalEquipmentModsEvent : ModPooledEvent<GetNaturalEquipmentModsEvent>
     {
-        private static bool doDebug => getClassDoDebug(nameof(GetPrioritisedNaturalEquipmentModsEvent));
+        private static bool doDebug => getClassDoDebug(nameof(GetNaturalEquipmentModsEvent));
 
         public new static readonly int CascadeLevel = CASCADE_ALL; // CASCADE_EQUIPMENT | CASCADE_SLOTS;
 
-        public static readonly string RegisteredEventID = nameof(GetPrioritisedNaturalEquipmentModsEvent);
+        public static readonly string RegisteredEventID = nameof(GetNaturalEquipmentModsEvent);
 
         public GameObject Creature;
 
@@ -26,7 +27,7 @@ namespace HNPS_GigantismPlus
 
         public BodyPart TargetBodyPart;
 
-        public SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods;
+        public List<ModNaturalEquipmentBase> NaturalEquipmentMods;
 
         public virtual string GetRegisteredEventID()
         {
@@ -42,22 +43,11 @@ namespace HNPS_GigantismPlus
             NaturalEquipmentMods = null;
         }
 
-        public SortedDictionary<int, ModNaturalEquipmentBase> AddNaturalEquipmentMods(List<ModNaturalEquipmentBase> NaturalEquipmentMods)
-        {
-            if (!NaturalEquipmentMods.IsNullOrEmpty())
-            {
-                foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
-                {
-                    AddNaturalEquipmentMod(naturalEquipmentMod);
-                }
-            }
-            return this.NaturalEquipmentMods ?? new();
-        }
-        public SortedDictionary<int, ModNaturalEquipmentBase> AddNaturalEquipmentMod(ModNaturalEquipmentBase NaturalEquipmentMod)
+        public List<ModNaturalEquipmentBase> AddNaturalEquipmentMod(ModNaturalEquipmentBase NaturalEquipmentMod)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4,
-                $"@ {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
+                $"@ {nameof(GetNaturalEquipmentModsEvent)}."
                 + $"{nameof(AddNaturalEquipmentMod)}"
                 + $"(NaturalEquipmentMod: {NaturalEquipmentMod.Name}[{NaturalEquipmentMod.Adjective}])"
                 + $" Creature: {Creature?.DebugName ?? NULL},"
@@ -67,33 +57,23 @@ namespace HNPS_GigantismPlus
             NaturalEquipmentMods ??= new();
             if (NaturalEquipmentMod != null)
             {
-                if (NaturalEquipmentMods.ContainsKey(NaturalEquipmentMod.ModPriority))
-                {
-                    Debug.Warn(2,
-                        $"{nameof(NaturalEquipmentOperator)}",
-                        $"{nameof(AddNaturalEquipmentMod)}()",
-                        $"[{NaturalEquipmentMod.ModPriority}]" +
-                        $"{NaturalEquipmentMods[NaturalEquipmentMod.ModPriority]} " +
-                        $"in {nameof(NaturalEquipmentMods)} overwritten: Same ModPriority",
-                        Indent: indent + 1);
-                }
                 ModNaturalEquipmentBase naturalEquipmentModCopy = NaturalEquipmentMod.DeepCopy(Equipment) as ModNaturalEquipmentBase;
-                NaturalEquipmentMods[NaturalEquipmentMod.ModPriority] = naturalEquipmentModCopy;
+                NaturalEquipmentMods.Add(naturalEquipmentModCopy);
             }
             else
             {
                 Debug.Warn(2,
                     $"{nameof(NaturalEquipmentOperator)}",
                     $"{nameof(AddNaturalEquipmentMod)}()",
-                    $"Supplied {nameof(NaturalEquipmentMod)} was empty",
+                    $"Supplied {nameof(NaturalEquipmentMod)} was null",
                     Indent: indent + 1);
             }
             Debug.Entry(4, $"{nameof(NaturalEquipmentMods)}:", Indent: indent + 1, Toggle: doDebug);
             if (!NaturalEquipmentMods.IsNullOrEmpty())
             {
-                foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
+                foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
                 {
-                    Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}",
+                    Debug.CheckYeh(4, $"{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}",
                         Indent: indent + 2, Toggle: doDebug);
                 }
             }
@@ -102,28 +82,77 @@ namespace HNPS_GigantismPlus
                 Debug.CheckNah(4, $"Empty List", Indent: indent + 2, Toggle: doDebug);
             }
             Debug.Entry(4,
-                $"x {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
+                $"x {nameof(GetNaturalEquipmentModsEvent)}."
                 + $"{nameof(AddNaturalEquipmentMod)}"
                 + $"(NaturalEquipmentMod: {NaturalEquipmentMod.Name}) @//",
                 Indent: indent, Toggle: doDebug);
 
             Debug.LastIndent = indent;
-
             return NaturalEquipmentMods;
         }
-        public static SortedDictionary<int, ModNaturalEquipmentBase> GetFor(GameObject Creature, GameObject Equipment, BodyPart TargetBodyPart)
+        public List<ModNaturalEquipmentBase> AddNaturalEquipmentMod<T>(ModNaturalEquipment<T> NaturalEquipmentMod)
+            where T
+            : IPart
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
+        {
+            return AddNaturalEquipmentMod((ModNaturalEquipmentBase)NaturalEquipmentMod);
+        }
+
+        public List<ModNaturalEquipmentBase> AddNaturalEquipmentMods(List<ModNaturalEquipmentBase> NaturalEquipmentMods)
+        {
+            int indent = Debug.LastIndent;
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach (ModNaturalEquipmentBase naturalEquipmentMod in NaturalEquipmentMods)
+                {
+                    AddNaturalEquipmentMod(naturalEquipmentMod);
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"Empty List", Indent: indent + 2, Toggle: doDebug);
+            }
+
+            Debug.LastIndent = indent;
+            return this.NaturalEquipmentMods ?? new();
+        }
+        public List<ModNaturalEquipmentBase> AddNaturalEquipmentMods<T>(List<ModNaturalEquipment<T>> NaturalEquipmentMods)
+            where T
+            : IPart
+            , IManagedDefaultNaturalEquipment<T>
+            , new()
+        {
+            int indent = Debug.LastIndent;
+            if (!NaturalEquipmentMods.IsNullOrEmpty())
+            {
+                foreach (ModNaturalEquipment<T> naturalEquipmentMod in NaturalEquipmentMods)
+                {
+                    AddNaturalEquipmentMod(naturalEquipmentMod);
+                }
+            }
+            else
+            {
+                Debug.CheckNah(4, $"Empty List", Indent: indent + 2, Toggle: doDebug);
+            }
+
+            Debug.LastIndent = indent;
+            return this.NaturalEquipmentMods ?? new();
+        }
+
+        public static List<ModNaturalEquipmentBase> GetFor(GameObject Creature, GameObject Equipment, BodyPart TargetBodyPart)
         {
             Debug.Entry(4,
-            $"! {nameof(GetPrioritisedNaturalEquipmentModsEvent)}."
+            $"! {nameof(GetNaturalEquipmentModsEvent)}."
             + $"{nameof(GetFor)}"
             + $"(Creature: {Creature?.DebugName ?? NULL},"
             + $" Equipment: {Equipment?.DebugName ?? NULL}"
             + $" TargetLimb: {TargetBodyPart?.DebugName() ?? NULL})",
             Indent: 0, Toggle: doDebug);
 
-            GetPrioritisedNaturalEquipmentModsEvent E = FromPool();
+            GetNaturalEquipmentModsEvent E = FromPool();
 
-            E.NaturalEquipmentMods = new();
+            E.NaturalEquipmentMods = NaturalEquipmentManager.NewNaturalEquipmentModList();
             E.Creature = Creature;
             E.Equipment = Equipment;
             E.TargetBodyPart = TargetBodyPart;
@@ -150,10 +179,10 @@ namespace HNPS_GigantismPlus
                     @event.SetParameter(nameof(E.TargetBodyPart), E.TargetBodyPart);
                     @event.SetParameter(nameof(NaturalEquipmentMods), E.NaturalEquipmentMods);
                     proceed = Creature.FireEvent(@event);
-                    E.NaturalEquipmentMods = @event.GetParameter(nameof(NaturalEquipmentMods)) as SortedDictionary<int, ModNaturalEquipmentBase>;
+                    E.NaturalEquipmentMods = @event.GetParameter(nameof(NaturalEquipmentMods)) as List<ModNaturalEquipmentBase>;
                 }
             }
-            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = new(E.NaturalEquipmentMods);
+            List<ModNaturalEquipmentBase> naturalEquipmentMods = E.NaturalEquipmentMods;
             E.Reset();
             return naturalEquipmentMods;
         }

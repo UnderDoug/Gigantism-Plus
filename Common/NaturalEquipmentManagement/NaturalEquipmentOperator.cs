@@ -125,7 +125,7 @@ namespace XRL.World.Parts
 
         public SortedDictionary<int, ModNaturalEquipmentBase> GetShortDescriptionEntries()
         {
-            return ParentObject.GetPrioritisedNaturalEquipmentMods(ForDescriptions: true);
+            return ParentObject.GetPrioritisedAppliedNaturalEquipmentMods(ForDescriptions: true);
         }
         public string ProcessShortDescription(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions = null)
         {
@@ -163,9 +163,9 @@ namespace XRL.World.Parts
             _shortDescriptionCache = null;
         }
 
-        public SortedDictionary<int, ModNaturalEquipmentBase> GetNaturalEquipmentMods()
+        public List<ModNaturalEquipmentBase> GetNaturalEquipmentMods()
         {
-            return GetPrioritisedNaturalEquipmentModsEvent.GetFor(Wielder, ParentObject, ParentLimb);
+            return GetNaturalEquipmentModsEvent.GetFor(Wielder, ParentObject, ParentLimb);
         }
         
         public virtual void ManageNaturalEquipment(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
@@ -193,7 +193,9 @@ namespace XRL.World.Parts
                 {
                     Debug.Entry(4, $"Applying {NaturalEquipmentMods}...", Indent: 1, Toggle: doDebug);
                     ApplyNaturalEquipmentMods(NaturalEquipmentMods);
-                    NaturalEquipmentMods = ParentObject.GetPrioritisedNaturalEquipmentMods();
+
+                    Debug.Entry(4, $"Updating list of {NaturalEquipmentMods} to only include applied modifications...", Indent: 1, Toggle: doDebug);
+                    NaturalEquipmentMods = ParentObject.GetPrioritisedAppliedNaturalEquipmentMods();
 
                     if (ParentObject.TryGetPart(out MakersMark makersMark))
                     {
@@ -549,7 +551,7 @@ namespace XRL.World.Parts
                     $"{ParentObject?.DebugName} Can Be Disassembled", $"{TinkeringHelpers.CanBeDisassembled(ParentObject)}",
                     Good: !TinkeringHelpers.CanBeDisassembled(ParentObject), Indent: indent + 2, Toggle: doDebug);
 
-                ManageNaturalEquipment(GetNaturalEquipmentMods());
+                ManageNaturalEquipment(NaturalEquipmentManager.PrioritiseNaturalEquipmentMods(GetNaturalEquipmentMods()));
             }
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentOperator)}."

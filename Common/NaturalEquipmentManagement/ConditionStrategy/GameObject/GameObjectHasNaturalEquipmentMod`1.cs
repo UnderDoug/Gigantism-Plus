@@ -67,9 +67,9 @@ namespace HNPS_GigantismPlus
                 return targetMod;
             }
 
-            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = GameObject.GetPrioritisedNaturalEquipmentMods();
+            SortedDictionary<int, ModNaturalEquipmentBase> naturalEquipmentMods = GameObject.GetPrioritisedAppliedNaturalEquipmentMods();
 
-            Debug.Entry(3, $"Looping {nameof(Extensions.GetPrioritisedNaturalEquipmentMods)}...", 
+            Debug.Entry(3, $"Looping {nameof(Extensions.GetPrioritisedAppliedNaturalEquipmentMods)}...", 
                 Indent: indent + 2, Toggle: doDebug);
             foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in naturalEquipmentMods)
             {

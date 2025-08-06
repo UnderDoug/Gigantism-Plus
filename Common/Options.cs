@@ -76,7 +76,7 @@ namespace HNPS_GigantismPlus
             { nameof(BodyPartsUpdatedEvent), false },
             { nameof(AfterBodyPartsUpdatedEvent), false },
 
-            { nameof(GetPrioritisedNaturalEquipmentModsEvent), false },
+            { nameof(GetNaturalEquipmentModsEvent), false },
 
             { "IManageDefaultNaturalEquipmentEvent", false },
             { nameof(GetNaturalEquipmentOperatorsEvent), false },

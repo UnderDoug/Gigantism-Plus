@@ -53,5 +53,22 @@ namespace HNPS_GigantismPlus
             }
             return IsApplied();
         }
+
+        public override DescriptionElement GetPrimaryDescriptionElement(GameObject Subject = null)
+        {
+            if (AffectedParameter != null && !Amount.IsNullOrZero())
+            {
+                string amount = ((int)Amount).Signed();
+                string bonusPenalty = amount.BonusOrPenalty();
+                Effect = $"a {amount} {bonusPenalty} to {AffectedParameter}";
+                return new(DescriptionElement.ORDER_ADJUST_SLIGHTLY_LATE + 1, Verb, Effect);
+            }
+            return base.GetSecondaryDescriptionElement(Subject);
+        }
+
+        public override DescriptionElement GetSecondaryDescriptionElement(GameObject Subject = null)
+        {
+            return default;
+        }
     }
 }

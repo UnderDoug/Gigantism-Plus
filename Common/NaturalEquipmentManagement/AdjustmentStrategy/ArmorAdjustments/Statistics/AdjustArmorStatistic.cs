@@ -9,6 +9,8 @@ namespace HNPS_GigantismPlus
     [Serializable]
     public abstract class AdjustArmorStatistic : ArmorCumulativeAdjustment
     {
+        public int DescriptionOrder;
+
         public AdjustArmorStatistic()
             : base()
         {
@@ -32,6 +34,7 @@ namespace HNPS_GigantismPlus
         {
             base.Configure();
             Verb = "confer";
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_EARLY;
         }
 
         public override bool Check(GameObject Subject)
@@ -47,7 +50,7 @@ namespace HNPS_GigantismPlus
                 string amount = ((int)Amount).Signed();
                 string bonusPenalty = amount.BonusOrPenalty();
                 Effect = $"a {bonusPenalty} of {amount} {AffectedParameter}";
-                return new(Verb, Effect);
+                return new(DescriptionOrder, Verb, Effect);
             }
             return base.GetSecondaryDescriptionElement(Subject);
         }

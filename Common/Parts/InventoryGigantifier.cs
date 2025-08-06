@@ -168,7 +168,7 @@ namespace XRL.World.Parts
                     Debug.LoopItem(3, $"{nameof(ItemName)}", ItemName, Indent: 1, Toggle: doDebug);
 
                     int NoThanks = 0;
-                    Debug.DiveIn(3, $"{ItemDebug}", Indent: 2, Toggle: doDebug);
+                    Debug.DiveIn(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
                     // Can the item have the gigantic modifier applied?
                     if (ItemModding.ModificationApplicable("ModGigantic", item)
                         || (creatureIsSecretGiantGutsmonger && itemIsCybernetic)
@@ -417,7 +417,7 @@ namespace XRL.World.Parts
                                 Indent: 2, Toggle: doDebug);
                         }
 
-                        Debug.DiveOut(3, $"/ Completed {ItemDebug} //", Indent: 2, Toggle: doDebug);
+                        Debug.DiveOut(3, $"/ Completed {ItemDebug} //", Indent: 1, Toggle: doDebug);
                     }
                     else
                     {
@@ -429,7 +429,7 @@ namespace XRL.World.Parts
                             @operator.Manager = manager;
                             wantstoUpdateBody = true;
                         }
-                        Debug.DiveOut(3, $"/x Skipping {ItemDebug} //", Indent: 2, Toggle: doDebug);
+                        Debug.DiveOut(3, $"/x Skipping {ItemDebug} //", Indent: 1, Toggle: doDebug);
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);

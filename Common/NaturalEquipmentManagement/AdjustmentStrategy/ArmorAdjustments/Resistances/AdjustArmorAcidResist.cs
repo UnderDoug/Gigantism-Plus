@@ -39,6 +39,12 @@ namespace HNPS_GigantismPlus
         {
         }
 
+        public override void Configure()
+        {
+            base.Configure();
+            DescriptionOrder += 1;
+        }
+
         public override bool Apply(GameObject Subject)
         {
             if (base.Apply(Subject))

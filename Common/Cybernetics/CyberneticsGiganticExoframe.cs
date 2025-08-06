@@ -14,6 +14,8 @@ using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.SecretGiganticExoframe;
 using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
+using static XRL.World.Parts.ModAugmentedNaturalWeapon;
+
 namespace XRL.World.Parts
 {
     [Serializable]
@@ -40,29 +42,49 @@ namespace XRL.World.Parts
         }
 
         // XML Set Fields.
-        public string Model = "Alpha";
-        public string Material = "carbide";
-        public string AugmentAdjectiveColor = "b";
-        public string AugmentTile = "NaturalWeapons/EF-AugmentedGiganticManipulator.png";
-        public string AugmentTileColorString = "&c";
-        public string AugmentTileDetailColor = "b";
-        public string AugmentSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
-        public string AugmentBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+        public string Model;
+        public string Material;
+        public string AugmentAdjectiveColor;
+        public string AugmentTile;
+        public string AugmentTileColorString;
+        public string AugmentTileDetailColor;
+        public string AugmentSwingSound;
+        public string AugmentBlockedSound;
         public string AugmentAddParts;
         public string AugmentAddProps;
         public string AugmentEquipmentFrameColors;
 
-        public int JumpDistanceBonus = 0;
-        public double StunningForceLevelFactor = 0.5;
+        public int JumpDistanceBonus;
+        public double StunningForceLevelFactor;
 
         public CyberneticsGiganticExoframe()
         {
+            Model = "Alpha";
+            Material = "carbide";
+            AugmentAdjectiveColor = "b";
+            AugmentTile = "NaturalWeapons/EF-AugmentedGiganticManipulator.png";
+            AugmentTileColorString = "&c";
+            AugmentTileDetailColor = "b";
+            AugmentSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
+            AugmentBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+            AugmentAddParts = null;
+            AugmentAddProps = null;
+            AugmentEquipmentFrameColors = null;
+            
+            JumpDistanceBonus = 0;
+            StunningForceLevelFactor = 0.5;
         }
         public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(NaturalEquipmentManager NewManager)
         {
             CyberneticsGiganticExoframe giganticExoframe = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsGiganticExoframe>();
             if (giganticExoframe == null)
             {
+                Debug.Warn(2, 
+                    nameof(CyberneticsGiganticExoframe),
+                    nameof(NewAugmentedManipulatorMod),
+                    $"Couldn't get instance of {nameof(giganticExoframe)} from " +
+                    $"{nameof(NaturalEquipmentManager.GetManagedNaturalEquipmentCompatiblePart)}",
+                    Indent: 0);
                 return null;
             }
             ModAugmentedNaturalWeapon augmentedManipulator = new(NewManager)
@@ -114,21 +136,20 @@ namespace XRL.World.Parts
                     }
                 }
             }
-            
             return augmentedManipulator;
         }
 
         public string GetAugmentAdjective(int Colorfulness = 0)
         {
             ModAugmentedNaturalWeapon naturalEquipmentMod = NewAugmentedManipulatorMod(NaturalEquipmentManager);
-            string augmentedColor = naturalEquipmentMod.AdjectiveColor;
-            string augmentedColorFallback = naturalEquipmentMod.AdjectiveColorFallback;
-            string adjective = naturalEquipmentMod.Adjective;
+            string augmentedColor = naturalEquipmentMod?.AdjectiveColor ?? AugmentAdjectiveColor;
+            string augmentedColorFallback = naturalEquipmentMod?.AdjectiveColorFallback ?? ADJ_COL_FALLBACK;
+            string adjective = naturalEquipmentMod?.Adjective ?? ADJ;
             return adjective.OptionalColor(augmentedColor, augmentedColorFallback, Colorfulness);
         }
         public string GetAugmentPrefix(int Colorfulness = 0)
         {
-            string prefixColor = "c";
+            string prefixColor = ADJ_COL_FALLBACK;
             string prefix = "E" + "F".OptionalColor(prefixColor, prefixColor, Colorfulness);
             return prefix;
         }

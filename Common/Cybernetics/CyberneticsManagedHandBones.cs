@@ -13,6 +13,8 @@ using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
+using static XRL.World.Parts.ModChromeBonedNaturalWeapon;
+
 namespace XRL.World.Parts
 {
     [Serializable]
@@ -39,43 +41,55 @@ namespace XRL.World.Parts
         }
 
         // XML Set Fields.
-        public string Material = "carbide";
-        public string BonesAdjectiveColor = "b";
-        public string BonesTile = "Items/sw_carbidehand.bmp";
-        public string BonesTileColorString = "&K";
-        public string BonesTileDetailColor = "b";
-        public string BonesSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
-        public string BonesBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+        public string Material;
+        public string BonesAdjectiveColor;
+        public string BonesTile;
+        public string BonesTileColorString;
+        public string BonesTileDetailColor;
+        public string BonesSwingSound;
+        public string BonesBlockedSound;
         public string BonesAddParts;
         public string BonesAddProps;
         public string BonesEquipmentFrameColors;
-        public int BonesDamageDieCount = 1;
-        public int BonesDamageDieSize = 1;
-        public int BonesDamageBonus = 0;
-        public int BonesHitBonus = 0;
-        public int BonesPenBonus = 0;
-
-        public int JumpDistanceBonus = 0;
-        public double StunningForceLevelFactor = 0.5;
+        public int BonesDamageDieCount;
+        public int BonesDamageDieSize;
+        public int BonesDamageBonus;
+        public int BonesHitBonus;
+        public int BonesPenBonus;
 
         public CyberneticsManagedHandBones()
         {
+            Material = "carbide";
+            BonesAdjectiveColor = "b";
+            BonesTile = "Items/sw_carbidehand.bmp";
+            BonesTileColorString = "&K";
+            BonesTileDetailColor = "b";
+            BonesSwingSound = "Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing";
+            BonesBlockedSound = "Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked";
+            BonesAddParts = null;
+            BonesAddProps = null;
+            BonesEquipmentFrameColors = null;
+            BonesDamageDieCount = 1;
+            BonesDamageDieSize = 1;
+            BonesDamageBonus = 0;
+            BonesHitBonus = 0;
+            BonesPenBonus = 0;
         }
         public static ModChromeBonedNaturalWeapon NewChromeBonedNaturalWeaponMod(NaturalEquipmentManager NewManager)
         {
             CyberneticsManagedHandBones chromeHandBones = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsManagedHandBones>();
             if (chromeHandBones == null)
             {
+                Debug.Warn(2,
+                    nameof(CyberneticsManagedHandBones),
+                    nameof(NewChromeBonedNaturalWeaponMod),
+                    $"Couldn't get instance of {nameof(chromeHandBones)} from " +
+                    $"{nameof(NaturalEquipmentManager.GetManagedNaturalEquipmentCompatiblePart)}",
+                    Indent: 0);
                 return null;
             }
             ModChromeBonedNaturalWeapon chromeBonedNaturalWeapon = new(NewManager)
             {
-                BodyPartType = "Hand",
-
-                ModPriority = 490,
-                DescriptionPriority = 490,
-
-                Adjective = "boned",
                 AdjectiveColor = chromeHandBones.BonesAdjectiveColor,
                 AdjectiveColorFallback = chromeHandBones.BonesAdjectiveColor,
                 ExludeFromDynamicTile = true,
@@ -123,7 +137,6 @@ namespace XRL.World.Parts
                     }
                 }
             }
-            chromeBonedNaturalWeapon.AddDiminishingReturnsDescription("increases to damage die count", IsGigantic );
             return chromeBonedNaturalWeapon;
         }
 
@@ -138,17 +151,17 @@ namespace XRL.World.Parts
         {
             ModChromeBonedNaturalWeapon naturalEquipmentMod = NewChromeBonedNaturalWeaponMod(NaturalEquipmentManager);
             Inorganic = Metalic ? Metalic : Inorganic;
-            string bonesColor = "r";
-            string adjective = naturalEquipmentMod.Adjective;
+            string bonesColor = ALT_COLOR;
+            string adjective = naturalEquipmentMod?.Adjective ?? ADJ;
             if (Inorganic)
             {
-                bonesColor = "K";
-                adjective = "reinforced";
+                bonesColor = ALT_COLOR_INORGANIC;
+                adjective = ADJ_INORGANIC;
             }
             if (Metalic)
             {
-                bonesColor = "c";
-                adjective = "infused";
+                bonesColor = ALT_COLOR_METAL;
+                adjective = ADJ_METAL;
             }
             return $"{adjective.OptionalColor(bonesColor, bonesColor, Colorfulness)}";
         }

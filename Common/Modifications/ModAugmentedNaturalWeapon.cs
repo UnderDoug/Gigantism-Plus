@@ -17,6 +17,10 @@ namespace XRL.World.Parts
     {
         private static bool doDebug => getClassDoDebug(nameof(ModAugmentedNaturalWeapon));
 
+        public const string NOUN = "manipulator";
+        public const string ADJ = "augmented";
+        public const string ADJ_COL_FALLBACK = "c";
+
         public ModAugmentedNaturalWeapon()
             : base()
         {
@@ -26,10 +30,10 @@ namespace XRL.World.Parts
             DescriptionPriority = -500;
 
             ForceNoun = true;
-            Noun = "manipulator";
+            Noun = NOUN;
 
-            Adjective = "augmented";
-            AdjectiveColorFallback = "c";
+            Adjective = ADJ;
+            AdjectiveColorFallback = ADJ_COL_FALLBACK;
 
             string cyberneticsObject = AssigningPart?.ImplantObject?.GetDisplayName(Short: true, AsIfKnown: true);
             AddSecondaryDescription(new("have", $"some of =subject.possessive= bonuses applied by an implanted {cyberneticsObject}"));

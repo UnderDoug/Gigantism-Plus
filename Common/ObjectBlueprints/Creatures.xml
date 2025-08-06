@@ -212,8 +212,8 @@
   <!-- 
       Putus Templar: Giant-Slayers
     -->
-  <object Name="Giant Gutsmonger" Inherits="NPC">
-    <part Name="Render" DisplayName="gigantic gutsmonger" 
+  <object Name="Bophades" Inherits="NPC">
+    <part Name="Render" DisplayName="Bophades" 
           RenderString="8" ColorString="&amp;B" 
           Tile="Creatures/Class_Errant_GiantHunter_Inverted.png"
           TileColor="&amp;B" DetailColor="Y" />
@@ -239,6 +239,7 @@
     <tag Name="staticFaction3" Value="Wardens,friend,reasons they won't talk about" />
     <tag Name="NoHateFactions" Value="WrassleGiants,Giants,Wardens,Dromad" />
     <xtagGrammar Proper="true" />
+    <tag Name="Gender" Value="male" />
     <tag Name="ExcludeFromDynamicEncounters" />
     <skill Name="Endurance" />
     <skill Name="Endurance_ShakeItOff" />

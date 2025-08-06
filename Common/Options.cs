@@ -57,14 +57,14 @@ namespace HNPS_GigantismPlus
             { nameof(WeaponElongator), true },
 
             //Conditions
-            { "ICondition", true && doConditionsDebug },
-            { "IConditions", true && doConditionsDebug },
-            { "NotCondition", true && doConditionsDebug },
-            { "OnlyOneCondition", true && doConditionsDebug },
-            { "AnyConditions", true && doConditionsDebug },
-            { "AllConditions", true && doConditionsDebug },
-            { "NotAnyConditions", true && doConditionsDebug },
-            { "NotAllConditions", true && doConditionsDebug },
+            { "ICondition", false && doConditionsDebug },
+            { "IConditions", false && doConditionsDebug },
+            { "NotCondition", false && doConditionsDebug },
+            { "OnlyOneCondition", false && doConditionsDebug },
+            { "AnyConditions", false && doConditionsDebug },
+            { "AllConditions", false && doConditionsDebug },
+            { "NotAnyConditions", false && doConditionsDebug },
+            { "NotAllConditions", false && doConditionsDebug },
 
             // Adjustments
             { nameof(IAdjustment), true },

@@ -170,21 +170,21 @@ namespace XRL.World.Parts
         
         public virtual void ManageNaturalEquipment(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
-            Debug.Header(4, 
+            Debug.Header(4,
                 $"{nameof(NaturalEquipmentOperator)}",
                 $"{nameof(ManageNaturalEquipment)}(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods) " +
                 $"{nameof(HasManaged)}: {HasManaged}", Toggle: doDebug);
 
-            string parentLimbString = 
-                ParentLimb != null 
-                ? $"[{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description}" 
+            string parentLimbString =
+                ParentLimb != null
+                ? $"[{ParentLimb?.ID}:{ParentLimb?.Type}] {ParentLimb?.Description}"
                 : $"[null]";
 
-            Debug.LoopItem(4, 
-                $" Wielder: {Wielder?.DebugName ?? NULL}", 
+            Debug.LoopItem(4,
+                $" Wielder: {Wielder?.DebugName ?? NULL}",
                 Indent: 0, Toggle: doDebug);
-            Debug.LoopItem(4, 
-                $" ParentLimb: {parentLimbString}", 
+            Debug.LoopItem(4,
+                $" ParentLimb: {parentLimbString}",
                 Indent: 0, Toggle: doDebug);
 
             if (!HasManaged)

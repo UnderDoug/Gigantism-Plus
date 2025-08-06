@@ -1,30 +1,26 @@
-﻿using System;
+﻿using Genkit;
+using HistoryKit;
+using HNPS_GigantismPlus;
+using Qud.API;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using Genkit;
-using HistoryKit;
-using Qud.API;
-
 using XRL;
 using XRL.Language;
 using XRL.Names;
 using XRL.Rules;
 using XRL.UI;
 using XRL.Wish;
+using XRL.World.AI.GoalHandlers;
 using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 using XRL.World.Parts.Mutation;
 using XRL.World.ZoneBuilders;
-
-using HNPS_GigantismPlus;
-
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
-
 using static XRL.World.ObjectBuilders.WrassleGiantHero;
 
 namespace XRL.World.WorldBuilders
@@ -394,7 +390,7 @@ namespace XRL.World.WorldBuilders
             string tinkerBlueprint = $"HumanTinker{ApproxZoneTier}";
             string apothecaryBlueprint = $"HumanApothecary{ApproxZoneTier}";
             string dromadBlueprint = $"DromadTrader{ApproxZoneTier}";
-            string gutsmongerBlueprint = $"Giant Gutsmonger";
+            string gutsmongerBlueprint = $"Bophades";
             string petBlueprint = PopulationManager.RollOneFrom($"DynamicInheritsTable:BaseAnimal:Tier{ApproxZoneTier}").Blueprint;
 
             If.d100(10, () => tinkerBlueprint = GetOldGiantEligibleBlueprint());
@@ -443,7 +439,7 @@ namespace XRL.World.WorldBuilders
                 MetricsManager.LogException(xContext + "Merchant", x);
             }
 
-            Debug.Entry(4, $"Finding {nameof(GutsmongerGiant)}...", Indent: 1, Toggle: getDoDebug());
+            Debug.Entry(4, $"Smuggling {nameof(GutsmongerGiant)}...", Indent: 1, Toggle: getDoDebug());
             try
             {
                 void gigantifyGutsmonger(GameObject Gutsmonger)
@@ -733,10 +729,33 @@ namespace XRL.World.WorldBuilders
                 Villager.SetStringProperty("HeroTileColor", "&B");
 
                 conversationScriptID = "gutsmonger";
+
+                string conversationText =
+                    "Oi, =player.species=... Guts??~" +
+
+                    "Go' anuver... \"shipmen\" 'rivin soon. " +
+                    "\n\nDon' ask... Heh.~" +
+
+                    "Der's two fins Oim good a', en Oim notoriously skint on d'means for wun-uv 'em! " +
+                    "\n\n Har har har! Oim a funnee wun!~" +
+
+                    "{{emote|*cracks knuckles obnoxously*}}~" +
+
+                    "'s a family name, 'roight? " +
+                    "\n\nOid change et, bu' folk 'round 'er' know me by it.~" +
+
+                    "Oiv go' a speshol se' o' skiows det make me a noightmer fo' a certain kin'na folk wot fink we 'er're danjrus... " +
+                    "\n\n'an maybe Oi em... Ta dem.~" +
+
+                    "Dey'w tell yah 's cus Oi took fings wot we'ren moine an' sold 'em wivow permitch.. " +
+                    "\n\nwivow persismz... " +
+                    "\n\n...wen Oi wa'n' opposed to! " +
+                    "\n\nBu' Oi say if'n dey we'ren moine... how'd Oi take 'em??";
+
                 ConversationsAPI.addSimpleConversationToObject(
                         Object: Villager,
-                        Text: "Oi, =player.species=... Guts??",
-                        Goodbye: "Live and drink.",
+                        Text: conversationText,
+                        Goodbye: "Live and, uh... Drink?",
                         ClearLost: true);
 
                 string gutsmongerTitle = NameMaker.MakeTitle(For: Villager, Special: Context);
@@ -806,6 +825,8 @@ namespace XRL.World.WorldBuilders
             {
                 Villager = HeroMaker.MakeHero(Villager, $"SpecialVillagerHeroTemplate_{heroTemplate}", -1, Context);
 
+                string epithetContext = !isGutsmonger ? Context : "Warden";
+
                 string villagerEpithet = NameMaker.MakeEpithet(
                     For: null,
                     Genotype: null,
@@ -817,7 +838,7 @@ namespace XRL.World.WorldBuilders
                     Gender: null,
                     Mutations: null,
                     Tag: null,
-                    Special: Context,
+                    Special: epithetContext,
                     NamingContext: null,
                     SpecialFaildown: true,
                     HasHonorific: null,
@@ -825,26 +846,31 @@ namespace XRL.World.WorldBuilders
 
                 Debug.LoopItem(4, $"{nameof(villagerEpithet)}", villagerEpithet ?? NULL, Good: villagerEpithet != null, Indent: indent + 2, Toggle: getDoDebug());
 
-                string villagerName = NameMaker.MakeName(
-                    For: null,
-                    Genotype: null,
-                    Subtype: null,
-                    Species: null,
-                    Culture: null,
-                    Faction: "WrassleGiants",
-                    Region: null,
-                    Gender: null,
-                    Mutations: null,
-                    Tag: null,
-                    Special: Context,
-                    NamingContext: null,
-                    SpecialFaildown: true,
-                    HasHonorific: null,
-                    HasEpithet: null);
+                string villagerName = null;
+
+                if (!isGutsmonger)
+                {
+                    villagerName = NameMaker.MakeName(
+                        For: null,
+                        Genotype: null,
+                        Subtype: null,
+                        Species: null,
+                        Culture: null,
+                        Faction: "WrassleGiants",
+                        Region: null,
+                        Gender: null,
+                        Mutations: null,
+                        Tag: null,
+                        Special: Context,
+                        NamingContext: null,
+                        SpecialFaildown: true,
+                        HasHonorific: null,
+                        HasEpithet: null);
+                }
 
                 Debug.LoopItem(4, $"{nameof(villagerName)}", villagerName ?? NULL, Good: villagerName != null, Indent: indent + 2, Toggle: getDoDebug());
 
-                if (villagerName.Contains("NameGenFail"))
+                if (!villagerName.IsNullOrEmpty() && villagerName.Contains("NameGenFail"))
                 {
                     villagerName = null;
                 }
@@ -853,14 +879,17 @@ namespace XRL.World.WorldBuilders
                     villagerName = villagerName.OptionalColorYuge();
                 }
 
-                Villager.GiveProperName(
-                    Name: villagerName,
-                    Force: true,
-                    Special: "Hero",
-                    SpecialFaildown: true,
-                    HasHonorific: null,
-                    HasEpithet: null,
-                    NamingContext: null);
+                if (!villagerName.IsNullOrEmpty() && !isGutsmonger)
+                {
+                    Villager.GiveProperName(
+                        Name: villagerName,
+                        Force: true,
+                        Special: "Hero",
+                        SpecialFaildown: true,
+                        HasHonorific: null,
+                        HasEpithet: null,
+                        NamingContext: null);
+                }
 
                 if (!villagerEpithet.IsNullOrEmpty())
                 {

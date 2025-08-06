@@ -120,8 +120,8 @@ namespace HNPS_GigantismPlus
         }
         public static void DiveOut(int Verbosity, string Text, int Indent = 0, bool Toggle = true)
         {
-            Entry(Verbosity, Text, Indent, Toggle: Toggle);
-            Divider(Verbosity, HONLY, 37, Starter: SPACE + BANDR, Finisher: TANDL, Indent + 1, Toggle: Toggle); // <
+            Entry(Verbosity, Text, Indent + 1, Toggle: Toggle);
+            Divider(Verbosity, HONLY, 37, Starter: SPACE + BANDR, Finisher: TANDL, Indent, Toggle: Toggle); // <
         }
 
         public static void Warn(int Verbosity, string ClassName, string MethodName, string Issue = null, int Indent = 0)

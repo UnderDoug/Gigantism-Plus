@@ -76,6 +76,54 @@
       </templates>
     </namestyle>
 
+<!--
+    
+    Epithet Examples
+    
+    the Thicc Disciple
+    <template Name="the *Adjective* *Role*" />
+
+    the Swole
+    <template Name="the *Adjective*" />
+
+    who Kicks
+    <template Name="who *Verbs*" />
+
+    the Enormous Champion, who Slams
+    <template Name="the *Adjective* *Role*, who *Verbs*" />
+
+    the Hefty, who Slaps
+    <template Name="the *Adjective*, who *Verbs*" />
+
+    of the Closed Fist
+    <template Name="of the *Noun*" />
+
+    the Heavyweight, of the Ground Pound
+    <template Name="the *Adjective*, of the *Noun*" />
+
+    the Enormous, of the Roundhouse Kick, who Throws Down
+    <template Name="the *Adjective*, of the *Noun*, who *Verbs*" />
+
+    the Gains Seeker, of the Mountain
+    <template Name="the *Role*, of the *Noun*" />
+
+    the Seeker of the Stone
+    <template Name="the *Actioner* of the *Subject*" />
+
+    the Contender, of the Nanoweave Mask, who Doesn't Back Down
+    <template Name="the *Role* of the *Noun*, who *Verbs*" />
+
+    the Conker of the Noggins, who Bellows
+    <template Name="the *Actioner* of the *Subject*, who *Verbs*" />
+
+    the Huge Suplexer, of the Ring Jump
+    <template Name="the *Adjective* *Role*, of the *Noun*" />
+
+    the Gentle Hurler of the Folding Chairs
+    <template Name="the *Adjective* *Actioner* of the *Subject*" />
+    
+-->
+    
     <namestyle Name="Giants Hero Epithet">
       <scopes>
         <scope Name="Main" Type="Epithet" Special="Hero" Faction="Giants" Priority="200" Combine="false" />

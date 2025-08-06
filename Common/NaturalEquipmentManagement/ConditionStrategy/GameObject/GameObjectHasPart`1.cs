@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus
         {
             return new(base.AddToString())
             {
-                typeof(T).Name
+                typeof(T).ToStringWithGenerics()
             };
         }
 

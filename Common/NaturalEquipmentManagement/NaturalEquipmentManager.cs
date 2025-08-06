@@ -34,12 +34,14 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
+                nameof(GetNaturalEquipmentMods),
                 $"{nameof(PrioritiseNaturalEquipmentMods)}:{true}",
             };
             List<object> dontList = new()
             {
                 'R',    // Removal
                 "S",    // Serialisation
+                nameof(EquipperEquippedEvent),
                 nameof(BodyPartsUpdatedEvent),
                 nameof(AfterBodyPartsUpdatedEvent),
                 nameof(BeforeUpdateBodyPartsEvent),
@@ -231,13 +233,14 @@ namespace XRL.World.Parts
             , new()
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4,
+            bool doDebug = getDoDebug(nameof(GetNaturalEquipmentMods));
+            Debug.Entry(2,
                 $"* {nameof(NaturalEquipmentManager)}."
                 + $"{nameof(GetNaturalEquipmentMods)}<"
                 + $"{typeof(T).Name}>("
                 + $"{nameof(Manager)}, "
                 + $"{nameof(Filter)})",
-                Indent: indent + 1, Toggle: getDoDebug());
+                Indent: indent + 1, Toggle: doDebug);
 
             List<ModNaturalEquipment<T>> naturalEquipmentModsList = new();
 
@@ -248,7 +251,7 @@ namespace XRL.World.Parts
             }
             if (!managedBaseMethods.IsNullOrEmpty())
             {
-                Debug.CheckYeh(4, $"Have Methods", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.CheckYeh(3, $"Have Methods", Indent: indent + 2, Toggle: doDebug);
                 foreach (MethodInfo managedMethod in managedBaseMethods)
                 {
                     if (!managedMethod.IsStatic || !managedMethod.IsPublic)
@@ -256,16 +259,16 @@ namespace XRL.World.Parts
                         continue;
                     }
 
-                    Debug.Divider(4, HONLY, Indent: indent + 3, Toggle: getDoDebug());
+                    Debug.Divider(3, HONLY, Indent: indent + 3, Toggle: doDebug);
 
-                    Debug.LoopItem(4, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: getDoDebug());
+                    Debug.LoopItem(3, $"{nameof(managedMethod)}: {managedMethod.Name}", Indent: indent + 3, Toggle: doDebug);
 
                     Debug.LoopItem(4, $"{nameof(managedMethod.IsPublic)}: {managedMethod.IsPublic}",
-                        Indent: indent + 4, Toggle: getDoDebug());
+                        Indent: indent + 4, Toggle: doDebug);
                     Debug.LoopItem(4, $"{nameof(managedMethod.IsStatic)}: {managedMethod.IsStatic}",
-                        Indent: indent + 4, Toggle: getDoDebug());
+                        Indent: indent + 4, Toggle: doDebug);
                     Debug.LoopItem(4, $"{nameof(managedMethod.ReturnType)}: {managedMethod.ReturnType.Name}",
-                        Indent: indent + 4, Toggle: getDoDebug());
+                        Indent: indent + 4, Toggle: doDebug);
 
                     if (managedMethod.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>), Silent: false)
                         && managedMethod.IsStatic
@@ -275,33 +278,33 @@ namespace XRL.World.Parts
                         if (parameters.Length == 1
                             && parameters[0].ParameterType.InheritsFrom(typeof(NaturalEquipmentManager), Silent: false))
                         {
-                            Debug.CheckYeh(4,
+                            Debug.CheckYeh(3,
                                 $"public static {managedMethod.ReturnType.Name} " +
                                 $"{managedMethod.Name}(" +
                                 $"{parameters[0].ParameterType.Name} {parameters[0].Name})",
-                                Indent: indent + 5, Toggle: getDoDebug());
+                                Indent: indent + 4, Toggle: doDebug);
 
                             if (managedMethod.Invoke(null, new object[1] { Manager }) is ModNaturalEquipment<T> naturalEquipmentMod)
                             {
-                                Debug.CheckYeh(4, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: getDoDebug());
+                                Debug.CheckYeh(3, $"Successful {nameof(managedMethod.Invoke)}", Indent: indent + 3, Toggle: doDebug);
                                 if (naturalEquipmentMod != null && Filter(naturalEquipmentMod))
                                 {
-                                    Debug.CheckYeh(4, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: getDoDebug());
+                                    Debug.CheckYeh(3, $"Passed {nameof(Filter)}, added to List", Indent: indent + 3, Toggle: doDebug);
                                     naturalEquipmentModsList.Add(naturalEquipmentMod);
                                 }
                                 else
                                 {
-                                    Debug.CheckNah(4, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: getDoDebug());
+                                    Debug.CheckNah(3, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: doDebug);
                                 }
                             }
                             else
                             {
-                                Debug.CheckNah(4, $"Failed {nameof(managedMethod.Invoke)} (May be that the mod is conditionally produced)", Indent: indent + 3, Toggle: getDoDebug());
+                                Debug.CheckNah(3, $"Failed {nameof(managedMethod.Invoke)} (May be that the mod is conditionally produced)", Indent: indent + 3, Toggle: doDebug);
                             }
                         }
                     }
                 }
-                Debug.Divider(4, HONLY, Indent: indent + 3, Toggle: getDoDebug());
+                Debug.Divider(3, HONLY, Indent: indent + 3, Toggle: doDebug);
             }
             Debug.LastIndent = indent;
             return naturalEquipmentModsList;
@@ -408,31 +411,35 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(EquipperEquippedEvent E)
         {
-            Debug.Entry(4,
-                $"@ {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}("
-                + $"{nameof(EquipperEquippedEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
-
             if (E.Actor == ParentObject)
             {
-                Debug.Entry(4,
-                    $"{nameof(E.Actor)}: {E?.Actor?.DebugName ?? NULL}",
-                    Indent: 1, Toggle: getDoDebug());
-
                 if (E.Item.IsNaturalEquipment() && E.Item.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator))
                 {
+                    int indent = Debug.LastIndent;
+                    bool doDebug = getDoDebug(nameof(EquipperEquippedEvent));
+
+                    Debug.Entry(4,
+                    $"@ {nameof(NaturalEquipmentManager)}."
+                    + $"{nameof(HandleEvent)}("
+                    + $"{nameof(EquipperEquippedEvent)} E)",
+                    Indent: indent + 1, Toggle: doDebug);
+
+                    Debug.Entry(4,
+                        $"{nameof(E.Actor)}: {E?.Actor?.DebugName ?? NULL}",
+                        Indent: indent + 2, Toggle: doDebug);
+
                     naturalEquipmentOperator.Manager = this;
+
+                    Debug.Entry(4,
+                        $"x {nameof(NaturalEquipmentManager)}."
+                        + $"{nameof(HandleEvent)}("
+                        + $"{nameof(EquippedEvent)}"
+                        + $" E.Creature: {E.Actor?.DebugName ?? NULL}) @//",
+                        Indent: indent + 1, Toggle: doDebug);
+
+                    Debug.LastIndent = indent;
                 }
             }
-
-            Debug.Entry(4,
-                $"x {nameof(NaturalEquipmentManager)}."
-                + $"{nameof(HandleEvent)}("
-                + $"{nameof(EquippedEvent)}"
-                + $" E.Creature: {E.Actor?.DebugName ?? NULL}) @//",
-                Indent: 0, Toggle: getDoDebug());
-
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BeforeUpdateBodyPartsEvent E)

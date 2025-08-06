@@ -115,7 +115,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}("
-                + $"{NaturalEquipmentMod.GetType().Name}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{NaturalEquipmentMod.GetType().Name}<{nameof(UD_ManagedBurrowingClaws)}>, "
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
@@ -132,7 +132,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"x {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}("
-                + $"{NaturalEquipmentMod.GetType().Name}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{NaturalEquipmentMod.GetType().Name}<{nameof(UD_ManagedBurrowingClaws)}>, "
                 + $"{nameof(Level)}: {Level})"
                 + $" *//",
                 Indent: indent + 1, Toggle: getDoDebug());
@@ -146,7 +146,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(UpdateNaturalEquipmentMods)}("
-                + $"{nameof(NaturalEquipmentMods)}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{nameof(NaturalEquipmentMods)}<{nameof(UD_ManagedBurrowingClaws)}>, "
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
@@ -161,7 +161,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"x {nameof(UD_ManagedBurrowingClaws)}."
                 + $"{nameof(UpdateNaturalEquipmentMods)}("
-                + $"{nameof(NaturalEquipmentMods)}[{nameof(UD_ManagedBurrowingClaws)}], "
+                + $"{nameof(NaturalEquipmentMods)}<{nameof(UD_ManagedBurrowingClaws)}>, "
                 + $"{nameof(Level)}: {Level})"
                 + $" *//",
                 Indent: indent + 1, Toggle: getDoDebug());

@@ -50,7 +50,7 @@ namespace HNPS_GigantismPlus
         {
             return new(base.AddToString())
             {
-                typeof(TAdjustment).Name,
+                typeof(TAdjustment).ToStringWithGenerics(),
             };
         }
 

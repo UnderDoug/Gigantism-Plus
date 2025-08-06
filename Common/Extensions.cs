@@ -2668,5 +2668,31 @@ namespace HNPS_GigantismPlus
         {
             return NaturalEquipment?.NaturalEquipmentOperator()?.Wielder();
         }
+
+        public static string ToStringWithGenerics(this Type Type)
+        {
+            if (Type == null)
+            {
+                return null;
+            }
+            List<Type> typeGenerics = new(Type.GetGenericArguments());
+            string typeString = Type.Name;
+            string genericsString = null;
+            if (!typeGenerics.IsNullOrEmpty())
+            {
+                List<string> genericsStringList = new();
+                foreach (Type genericType in typeGenerics)
+                {
+                    genericsStringList.Add(genericType.ToStringWithGenerics());
+                }
+                genericsString = genericsStringList.Join(", ");
+            }
+            if (!genericsString.IsNullOrEmpty())
+            {
+                typeString = typeString.Split('`')[0];
+                genericsString = $"<{genericsString}>";
+            }
+            return $"{typeString}{genericsString}";
+        }
     }
 }

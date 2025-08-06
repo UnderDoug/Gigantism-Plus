@@ -21,14 +21,6 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public override List<string> AddToString()
-        {
-            return new(base.AddToString())
-            {
-                typeof(T).Name
-            };
-        }
-
         public override bool Check(IPart IPart)
         {
             return base.Check(IPart);

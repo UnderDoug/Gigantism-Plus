@@ -86,7 +86,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}("
-                + $"{NaturalEquipmentMod?.GetType()?.Name}[{typeof(T).Name}], "
+                + $"{NaturalEquipmentMod?.GetType()?.ToStringWithGenerics()}, "
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
@@ -101,7 +101,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMod)}("
-                + $"{NaturalEquipmentMod?.GetType()?.Name}[{typeof(T).Name}], "
+                + $"{NaturalEquipmentMod?.GetType()?.ToStringWithGenerics()}, "
                 + $"{nameof(Level)}: {Level})"
                 + $" *//",
                 Indent: indent + 1, Toggle: getDoDebug());
@@ -116,7 +116,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMods)}("
-                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(NaturalEquipmentMods)}<{typeof(T).Name}>, "
                 + $"{nameof(Level)}: {Level})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
@@ -131,7 +131,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4,
                 $"x {typeof(T).Name}."
                 + $"{nameof(UpdateNaturalEquipmentMods)}("
-                + $"{nameof(NaturalEquipmentMods)}[{typeof(T).Name}], "
+                + $"{nameof(NaturalEquipmentMods)}<{typeof(T).Name}>, "
                 + $"{nameof(Level)}: {Level})"
                 + $" *//",
                 Indent: indent + 1, Toggle: getDoDebug());

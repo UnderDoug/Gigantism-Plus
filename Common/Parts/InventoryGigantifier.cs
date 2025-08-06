@@ -381,7 +381,7 @@ namespace XRL.World.Parts
                                 Indent: 3, Toggle: doDebug);
                             if (NoThanks > 0 && !Wish && !(creatureIsSecretGiantVillager && item.HasPart<CyberneticsBaseItem>() && 7.in10()))
                             {
-                                Debug.Entry(3, "/x Skipping", Indent: 2, Toggle: doDebug);
+                                Debug.Entry(3, $"Skipped {ItemDebug} //", Indent: 2, Toggle: doDebug);
                                 Debug.DiveOut(3, $"{ItemDebug}", Indent: 1, Toggle: doDebug);
                                 continue;
                             }
@@ -417,7 +417,7 @@ namespace XRL.World.Parts
                                 Indent: 2, Toggle: doDebug);
                         }
 
-                        Debug.DiveOut(3, $"/ Completed {ItemDebug} //", Indent: 1, Toggle: doDebug);
+                        Debug.DiveOut(3, $"Completed {ItemDebug} //", Indent: 1, Toggle: doDebug);
                     }
                     else
                     {
@@ -429,7 +429,7 @@ namespace XRL.World.Parts
                             @operator.Manager = manager;
                             wantstoUpdateBody = true;
                         }
-                        Debug.DiveOut(3, $"/x Skipping {ItemDebug} //", Indent: 1, Toggle: doDebug);
+                        Debug.DiveOut(3, $"Skipped {ItemDebug} //", Indent: 1, Toggle: doDebug);
                     }
                 }
                 Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);

@@ -191,10 +191,10 @@ namespace XRL.World.Parts
             {
                 if (!NaturalEquipmentMods.IsNullOrEmpty())
                 {
-                    Debug.Entry(4, $"Applying {NaturalEquipmentMods}...", Indent: 1, Toggle: doDebug);
+                    Debug.Entry(4, $"Applying {nameof(NaturalEquipmentMods)}...", Indent: 1, Toggle: doDebug);
                     ApplyNaturalEquipmentMods(NaturalEquipmentMods);
 
-                    Debug.Entry(4, $"Updating list of {NaturalEquipmentMods} to only include applied modifications...", Indent: 1, Toggle: doDebug);
+                    Debug.Entry(4, $"Updating list of {nameof(NaturalEquipmentMods)} to only include applied modifications...", Indent: 1, Toggle: doDebug);
                     NaturalEquipmentMods = ParentObject.GetPrioritisedAppliedNaturalEquipmentMods();
 
                     if (ParentObject.TryGetPart(out MakersMark makersMark))
@@ -380,14 +380,16 @@ namespace XRL.World.Parts
 
         public virtual void ApplyNaturalEquipmentMods(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
-            Debug.Entry(4, $"* {nameof(ApplyNaturalEquipmentMods)}()", Indent: 1, Toggle: doDebug);
+            int indent = Debug.LastIndent;
+            Debug.Entry(4, $"* {nameof(ApplyNaturalEquipmentMods)}()", Indent: indent + 1, Toggle: doDebug);
             foreach ((_, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
             {
-                Debug.Entry(4, $"Applying {naturalEquipmentMod.Name} to {ParentObject?.ShortDisplayNameStripped}", Indent: 2, Toggle: doDebug);
+                Debug.Entry(4, $"Applying {naturalEquipmentMod.GetType().ToStringWithGenerics()} to {ParentObject?.DebugName}", Indent: indent + 2, Toggle: doDebug);
                 ParentObject.ApplyNaturalEquipmentModification(naturalEquipmentMod, Wielder);
                 naturalEquipmentMod.ParentObject = ParentObject;
             }
-            Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, $"x {nameof(ApplyNaturalEquipmentMods)}() *//", Indent: indent + 1, Toggle: doDebug);
+            Debug.LastIndent = indent;
         }
 
         public static bool RemoveThisIfNotNatural(GameObject Equipment, NaturalEquipmentOperator Manager)

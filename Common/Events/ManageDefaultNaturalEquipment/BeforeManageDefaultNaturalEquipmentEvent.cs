@@ -13,7 +13,7 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    [GameEvent(Cascade = CASCADE_EQUIPMENT | CASCADE_SLOTS, Cache = Cache.Pool)]
+    [GameEvent(Cascade = CASCADE_NONE, Cache = Cache.Pool)]
     public class BeforeManageDefaultNaturalEquipmentEvent : IManageDefaultNaturalEquipmentEvent<BeforeManageDefaultNaturalEquipmentEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeManageDefaultNaturalEquipmentEvent));

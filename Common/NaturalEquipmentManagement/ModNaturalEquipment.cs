@@ -195,9 +195,9 @@ namespace XRL.World.Parts
                     }
 
                     Debug.LoopItem(4, $"{GetType().Name} {nameof(E.SecondaryDescriptions)}", Indent: indent + 2, Toggle: doDebugFinal);
-                    if (!combinedPrimaryElements.IsNullOrEmpty())
+                    if (!combinedSecondaryElements.IsNullOrEmpty())
                     {
-                        foreach (DescriptionElement element in combinedPrimaryElements)
+                        foreach (DescriptionElement element in combinedSecondaryElements)
                         {
                             Debug.LoopItem(4, $"{element.ToString(ParentObject)}", Indent: indent + 3, Toggle: doDebugFinal);
                         }

@@ -27,9 +27,9 @@ namespace XRL.World.WorldBuilders
 {
     [HasWishCommand]
     [JoppaWorldBuilderExtension]
-    public class SecretGiantWhoCooksBuilderExtension : IJoppaWorldBuilderExtension
+    public class HNPS_SecretGiantWhoCooksBuilderExtension : IJoppaWorldBuilderExtension
     {
-        private static bool doDebug => getClassDoDebug(nameof(SecretGiantWhoCooksBuilderExtension));
+        private static bool doDebug => getClassDoDebug(nameof(HNPS_SecretGiantWhoCooksBuilderExtension));
         private static bool getDoDebug(object what = null)
         {
             List<object> doList = new()
@@ -73,7 +73,7 @@ namespace XRL.World.WorldBuilders
             WorldCreationProgress.StepProgress("Gigantifying wrasslers...");
 
             Debug.Entry(4,
-                $"\u2666 {nameof(SecretGiantWhoCooksBuilderExtension)}." +
+                $"\u2666 {nameof(HNPS_SecretGiantWhoCooksBuilderExtension)}." +
                 $"{nameof(GigantifyWrasslers)}(WorldID: {WorldID})",
                 Indent: 0, Toggle: getDoDebug());
 
@@ -83,7 +83,7 @@ namespace XRL.World.WorldBuilders
             if (UniqueGiant == null)
             {
                 Debug.Warn(2,
-                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                    $"{nameof(HNPS_SecretGiantWhoCooksBuilderExtension)}",
                     $"{nameof(GigantifyWrasslers)}(JoppaWorldBuilder builder) ",
                     $"failed to instantiate {nameof(UniqueGiant)}. Placement aborted.",
                     Indent: 0);
@@ -178,7 +178,7 @@ namespace XRL.World.WorldBuilders
             if (wrassleID == null)
             {
                 Debug.Warn(2,
-                    $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                    $"{nameof(HNPS_SecretGiantWhoCooksBuilderExtension)}",
                     $"{nameof(GigantifyWrasslers)}(JoppaWorldBuilder builder) ",
                     $"failed to instantiate {nameof(wrassleID)}. Ring sync aborted.",
                     Indent: 0);
@@ -239,7 +239,7 @@ namespace XRL.World.WorldBuilders
                 else
                 {
                     Debug.Warn(2,
-                        $"{nameof(SecretGiantWhoCooksBuilderExtension)}",
+                        $"{nameof(HNPS_SecretGiantWhoCooksBuilderExtension)}",
                         $"{nameof(GigantifyWrasslers)}",
                         $"Failed to instantiate one or more of the Giant Villagers, " +
                         $"allowing {nameof(GiantAbodePopulator)} to attempt Villager generation",
@@ -401,7 +401,7 @@ namespace XRL.World.WorldBuilders
             DromadGiant = null;
             PetGiant = null;
 
-            string xContext = $"{nameof(SecretGiantWhoCooksBuilderExtension)}.{nameof(TryGenerateGiantVillagers)}() ";
+            string xContext = $"{nameof(HNPS_SecretGiantWhoCooksBuilderExtension)}.{nameof(TryGenerateGiantVillagers)}() ";
 
             Debug.Entry(4, $"Crafting up {nameof(TinkerGiant)}...", Indent: 1, Toggle: getDoDebug());
             try

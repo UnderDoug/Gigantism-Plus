@@ -419,7 +419,7 @@ namespace XRL.World.ZoneBuilders
                         $"in zone {zone?.ZoneID}",
                         Indent: 1);
 
-                    UniqueGiant = SecretGiantWhoCooksBuilderExtension.GetTheGiant();
+                    UniqueGiant = HNPS_SecretGiantWhoCooksBuilderExtension.GetTheGiant();
                 }
                 bool failedToGetTinker = false;
                 bool failedToGetApothecary = false;
@@ -540,7 +540,7 @@ namespace XRL.World.ZoneBuilders
 
                     failedToGetResidents = true;
                 }
-                if (SecretGiantWhoCooksBuilderExtension.TryGenerateGiantVillagers(zone.wX / 10,
+                if (HNPS_SecretGiantWhoCooksBuilderExtension.TryGenerateGiantVillagers(zone.wX / 10,
                     HeroDetailColor: UniqueGiant.WrassleID()?.SecondaryColor,
                     out GameObject altTinkerGiant,
                     out GameObject altApothecaryGiant,

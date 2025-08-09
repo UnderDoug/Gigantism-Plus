@@ -52,7 +52,7 @@ namespace HNPS_GigantismPlus
             { nameof(Vaultable), true },
             { nameof(Gigantified), true },
             { nameof(InventoryGigantifier), true },
-            { nameof(SecretGiantWhoCooksBuilderExtension), true },
+            { nameof(HNPS_SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
             { nameof(WeaponElongator), true },
 

@@ -640,8 +640,6 @@ namespace XRL.World.ZoneBuilders
                         {
                             UniqueGiant.Brain.StartingCell = new();
                             UniqueGiant.Brain.StartingCell.SetCell(uniqueGiantLocation);
-                            UniqueGiant.Brain.Wanders = true;
-                            UniqueGiant.Brain.WandersRandomly = true;
                         }
                         if (UniqueGiant.TryGetPart(out StewBelly stewBelly))
                         {

@@ -59,45 +59,45 @@ namespace XRL.World.ObjectBuilders
         // These are the skills the highest tier GiantSlayer has
         public static List<string> HeroSkills => new()
         {
-            "Acrobatics",
-            "Acrobatics_Jump",
-            "Endurance",
-            "Endurance_ShakeItOff",
-            "Tactics",
-            "Tactics_Charge",
-            "Cudgel",
-            "Cudgel_Expertise",
-            "Cudgel_Bludgeon",
-            "Cudgel_Slam",
-            "Cudgel_ChargingStrike",
-            "SingleWeaponFighting",
-            "SingleWeaponFighting_OpportuneAttacks",
+            nameof(Acrobatics),
+            nameof(Acrobatics_Jump),
+            nameof(Endurance),
+            nameof(Endurance_ShakeItOff),
+            nameof(Tactics),
+            nameof(Tactics_Charge),
+            nameof(Cudgel),
+            nameof(Cudgel_Expertise),
+            nameof(Cudgel_Bludgeon),
+            nameof(Cudgel_Slam),
+            nameof(Cudgel_ChargingStrike),
+            nameof(SingleWeaponFighting),
+            nameof(SingleWeaponFighting_OpportuneAttacks),
         };
         public static List<string> UniqueHeroSkills => new()
         {
             /* 
              * Commented skills are the ones that appear in the above list 
              */
-            // "Acrobatics",
-            // "Acrobatics_Jump",
-            // "Endurance",
-            // "Endurance_ShakeItOff",
-            "Endurance_Weathered",
-            "Endurance_Calloused",
-            // "Tactics",
-            // "Tactics_Charge",
-            // "Cudgel",
-            // "Cudgel_Expertise",
-            // "Cudgel_Bludgeon",
-            // "Cudgel_Slam",
-            // "Cudgel_ChargingStrike",
-            "Cudgel_Backswing",
-            "Cudgel_Conk",
-            "Cudgel_SmashUp",
-            // "SingleWeaponFighting",
-            // "SingleWeaponFighting_OpportuneAttacks",
-            "SingleWeaponFighting_WeaponExpertise",
-            "SingleWeaponFighting_PenetratingStrikes",
+            // nameof(Acrobatics),
+            // nameof(Acrobatics_Jump),
+            // nameof(Endurance),
+            // nameof(Endurance_ShakeItOff),
+            nameof(Endurance_Weathered),
+            nameof(Endurance_Calloused),
+            // nameof(Tactics),
+            // nameof(Tactics_Charge),
+            // nameof(Cudgel),
+            // nameof(Cudgel_Expertise),
+            // nameof(Cudgel_Bludgeon),
+            // nameof(Cudgel_Slam),
+            // nameof(Cudgel_ChargingStrike),
+            nameof(Cudgel_Backswing),
+            nameof(Cudgel_Conk),
+            nameof(Cudgel_SmashUp),
+            // nameof(SingleWeaponFighting),
+            // nameof(SingleWeaponFighting_OpportuneAttacks),
+            nameof(SingleWeaponFighting_WeaponExpertise),
+            nameof(SingleWeaponFighting_PenetratingStrikes),
         };
         public static string[] SecretAttributes = new[] { "giant", "humanoid", "settlement", "mountains", "recipe", "oddity" };
 
@@ -135,8 +135,6 @@ namespace XRL.World.ObjectBuilders
             }
 
             Debug.LoopItem(4, $"Unique?", Good: Unique, Indent: indent + 1, Toggle: getDoDebug());
-
-            
 
             Creature.SetStringProperty("Role", Unique ? "Leader" : "Hero");
 
@@ -319,20 +317,22 @@ namespace XRL.World.ObjectBuilders
                 Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Wanders = true;
-            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Wanders)}", $"{Creature.Brain.Wanders}",
                 Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.WandersRandomly = true;
-            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.WandersRandomly)}", $"{Creature.Brain.WandersRandomly}",
                 Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Factions = "";
-            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
-                Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
+            Debug.Entry(4, $"Brain.{nameof(Brain.Factions)} cleared...", Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Allegiance.Clear();
             Creature.Brain.Allegiance.Add("WrassleGiants", 800);
             Creature.Brain.Allegiance.Add("Giants", 600);
+
+            Creature.Brain.Allegiance.Hostile = false;
+            Creature.Brain.Allegiance.Calm = true;
 
             Debug.LoopItem(4, $"Brain.{nameof(Brain.Allegiance)}", Indent: indent + 2, Toggle: getDoDebug());
             foreach ((string creatureFaction, int creatureRep) in Creature.Brain.Allegiance)

@@ -1098,6 +1098,9 @@ namespace HNPS_GigantismPlus
             where T : class
         {
             if (Bag.IsNullOrEmpty()) return null;
+
+            bool doDebug = getDoDebug(nameof(DrawSeededToken));
+
             List<T> drawBag = new();
             drawBag.AddRange(Bag);
             ExceptForTokens ??= new();
@@ -1130,21 +1133,22 @@ namespace HNPS_GigantismPlus
                     stepper = $"-{Stepper}";
                 }
                 string seed = $"{Seed}{context}{stepper}";
+                int cap = (drawBag.Count - 1);
                 int low = 0;
-                int high = (drawBag.Count - 1) * 7;
-                int roll = Stat.SeededRandom(seed, low, high) % (drawBag.Count - 1);
+                int high = cap * 700;
+                int roll = Stat.SeededRandom(seed, low, high) % cap;
 
                 int indent = Debug.LastIndent;
-                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(Seed)}: {Seed}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(Stepper)}: {Stepper}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(Context)}: {Context}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(seed)}: {seed}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(low)}: {low}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(drawBag.Count)} - 1: {drawBag.Count - 1}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(high)}: {high}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Entry(4, $"{nameof(roll)}: {roll}", Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
-                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 1, Toggle: getDoDebug(nameof(DrawSeededToken)));
+                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(Seed)}: {Seed}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(Stepper)}: {Stepper}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(Context)}: {Context}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(seed)}: {seed}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(low)}: {low}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(cap)}: {cap}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(high)}: {high}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Entry(4, $"{nameof(roll)}: {roll}", Indent: indent + 1, Toggle: doDebug);
+                Debug.Divider(4, HONLY, Count: 25, Indent: indent + 1, Toggle: doDebug);
 
                 Debug.LastIndent = indent;
                 token = drawBag.ElementAt(roll);

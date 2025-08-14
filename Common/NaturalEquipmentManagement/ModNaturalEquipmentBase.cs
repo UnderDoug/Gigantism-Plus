@@ -586,6 +586,7 @@ namespace XRL.World.Parts
 
             if (!Adjustments.IsNullOrEmpty())
             {
+                naturalEquipmentMod.Adjustments = new();
                 foreach (IAdjustment adjustment in Adjustments)
                 {
                     naturalEquipmentMod.Adjustments.Add(adjustment.DeepCopy());

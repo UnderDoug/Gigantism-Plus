@@ -579,7 +579,6 @@ namespace XRL.World.Parts
             NaturalEquipmentManager naturalEquipmentManager = base.DeepCopy(Parent, MapInv) as NaturalEquipmentManager;
             return naturalEquipmentManager;
         }
-
         public override void FinalizeCopyEarly(GameObject Source, bool CopyEffects, bool CopyID, Func<GameObject, GameObject> MapInv)
         {
             base.FinalizeCopyEarly(Source, CopyEffects, CopyID, MapInv);

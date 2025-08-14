@@ -592,7 +592,7 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
-            Writer.WriteObject(Manager);
+            Manager.Write(Basis, Writer);
             Writer.Write(AppliedAdjustments);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
@@ -605,13 +605,10 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             NaturalEquipmentOperator naturalEquipmentOperator = base.DeepCopy(Parent, MapInv) as NaturalEquipmentOperator;
+            naturalEquipmentOperator.Manager = null;
             naturalEquipmentOperator.OperatorID = Guid.NewGuid();
             naturalEquipmentOperator._shortDescriptionCache = null;
             return naturalEquipmentOperator;
         }
-
-    } //!-- public class NaturalEquipmentOperator 
-      //: IScribedPart
-      //, IModEventHandler<BeforeBodyPartsUpdatedEvent>
-      //, IModEventHandler<AfterBodyPartsUpdatedEvent>
+    }
 }

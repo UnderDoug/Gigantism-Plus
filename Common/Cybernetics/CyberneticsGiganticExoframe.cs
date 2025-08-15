@@ -169,7 +169,7 @@ namespace XRL.World.Parts
                 + $" {nameof(Implant)}: {Implant?.DebugName ?? NULL})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            Become(Implantee, Model, Implant);
+            Becoome(Implantee, Model, Implant);
 
             base.OnImplanted(Implantee, Implant);
 
@@ -196,7 +196,7 @@ namespace XRL.World.Parts
 
             // Implantee.CheckEquipmentSlots();
 
-            Unbecome(Implantee, Model, ImplantObject);
+            Unbecoome(Implantee, Model, ImplantObject);
 
             base.OnUnimplanted(Implantee, Implant);
 

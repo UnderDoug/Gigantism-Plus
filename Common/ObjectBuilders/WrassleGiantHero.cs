@@ -218,7 +218,7 @@ namespace XRL.World.ObjectBuilders
             }
             Dictionary<int, string> factionAdmirationList = new()
             {
-                { 1, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 1, Context: nameof(factionAdmirationBag)) },
+                { 1, $"=subject.possessive= =subject.wrassleShader:vibrant= nanoweave suit" /*factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 1, Context: nameof(factionAdmirationBag))*/ },
                 { 2, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 2, Context: nameof(factionAdmirationBag)) },
                 { 3, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 3, Context: nameof(factionAdmirationBag)) },
             };

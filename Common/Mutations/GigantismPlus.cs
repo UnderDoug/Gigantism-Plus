@@ -638,19 +638,6 @@ namespace XRL.World.Parts.Mutation
             
 
             return Event.FinalizeString(SB);
-            
-            /* Old mutation description kept for posterity.
-             * 
-               + "You are " + GigantismSource + " large, will {{rules|struggle to enter small spaces}} without {{g|hunching over}},"
-               + "and can typically {{rules|only}} use {{gigantic|gigantic}} equipment.\n"
-               + "You are {{rules|heavy}}, can carry {{rules|twice}} as much weight,"
-               + "and all your natural weapons are {{gigantic|gigantic}}.\n\n"
-               + "Your " + WeaponNoun + "s gain:\n"
-               + "{{rules|+1}} To-Hit every {{rules|2 mutation levels}}\n"
-               + "{{B|d1}} damage every {{B|3 mutation levels}}\n"
-               + "{{W|1d}} damage every {{W|5 mutation levels}}\n"
-               + "They have {{rules|uncapped penetration}}, but are harder {{rules|to hit}} with due to their size."
-            */
         }
 
         public override string GetLevelText(int Level)

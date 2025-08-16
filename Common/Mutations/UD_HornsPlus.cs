@@ -138,7 +138,7 @@ namespace XRL.World.Parts.Mutation
             body ??= ParentObject?.Body;
             if (Variant.IsNullOrEmpty())
             {
-                Variant = "Horns";
+                Variant = nameof(UD_HornsPlus);
                 SetVariant(Variant);
             }
             if (body != null && !Variant.IsNullOrEmpty())

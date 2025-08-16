@@ -14,7 +14,8 @@
       10: Wrassle Gear
       11: Helper Parts
       12: Sundry
-      13: Testing
+      13: Fixes
+      14: Testing
       
   -->
   <!-- 
@@ -524,6 +525,22 @@ You cannot wear equipment on your body." />
   <object Name="Sandals" Load="Merge">
     <!-- this object is both a plural and has DisplayName="antlers" resulting in "antlerses" -->
     <tag Name="DisplayNameSingular" Value="sandle" />
+  </object>
+
+  <object Name="UD_HornsPlus" Inherits="Horns">
+    <tag Name="MutationEquipment" Value="UD_HornsPlus" />
+  </object>
+  <object Name="UD_HornsPlus Single" Inherits="Horns Single">
+    <tag Name="MutationEquipment" Value="UD_HornsPlus" />
+  </object>
+  <object Name="UD_HornsPlus Casque" Inherits="Horns Casque">
+    <tag Name="MutationEquipment" Value="UD_HornsPlus" />
+  </object>
+  <object Name="UD_HornsPlus Antlers" Inherits="Horns Antlers">
+    <tag Name="MutationEquipment" Value="UD_HornsPlus" />
+  </object>
+  <object Name="UD_HornsPlus Spiral" Inherits="Horns Spiral">
+    <tag Name="MutationEquipment" Value="UD_HornsPlus" />
   </object>
 
   <!-- 

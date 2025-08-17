@@ -22,7 +22,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class UD_QuillsPlus : BaseDefaultEquipmentMutation
+    public class UD_QuillsPlus : BaseDefaultEquipmentMutation, IModEventHandler<AfterRapidAdvancementEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(UD_QuillsPlus));
         private static bool getDoDebug(object what = null)
@@ -349,17 +349,31 @@ namespace XRL.World.Parts.Mutation
             return quillsObject;
         }
 
-        public override bool ChangeLevel(int NewLevel)
+        public virtual bool RecalculateQuills(int NewLevel)
         {
+            bool recalculated = false;
             if (NewLevel != oldLevel)
             {
                 int additionalQuills = (NewLevel - oldLevel) * Stat.Random(80, 120);
                 nMaxQuills = Math.Max(300, nMaxQuills + additionalQuills);
                 oldLevel = NewLevel;
+                recalculated = true;
             }
-
             nQuills = nMaxQuills;
+            return recalculated;
+        }
 
+        public override bool ChangeLevel(int NewLevel)
+        {
+            if (RecalculateQuills(NewLevel))
+            {
+                Debug.Entry(4,
+                    $"{nameof(UD_QuillsPlus)}." +
+                    $"{nameof(ChangeLevel)}({nameof(NewLevel)}) ran " +
+                    $"{nameof(RecalculateQuills)}({nameof(NewLevel)}: {NewLevel})",
+                    Indent: Debug.LastIndent + 1, Toggle: getDoDebug());
+                Debug.LastIndent--;
+            }
             return base.ChangeLevel(NewLevel);
         }
 
@@ -404,6 +418,7 @@ namespace XRL.World.Parts.Mutation
                 || ID == SingletonEvent<BeginTakeActionEvent>.ID
                 || ID == BeforeApplyDamageEvent.ID
                 || ID == TookDamageEvent.ID
+                || ID == AfterRapidAdvancementEvent.ID
                 || ID == PooledEvent<CommandEvent>.ID
                 || ID == AIGetOffensiveAbilityListEvent.ID;
         }
@@ -498,6 +513,20 @@ namespace XRL.World.Parts.Mutation
                         ParentObject.FireEvent("ReflectedDamage");
                     }
                 }
+            }
+            return base.HandleEvent(E);
+        }
+        public virtual bool HandleEvent(AfterRapidAdvancementEvent E)
+        {
+            if (E.Amount > 0 && RecalculateQuills(Level))
+            {
+                Debug.Entry(4, 
+                    $"{nameof(UD_QuillsPlus)}." +
+                    $"{nameof(HandleEvent)}(" +
+                    $"{nameof(AfterRapidAdvancementEvent)} E) ran " +
+                    $"{nameof(RecalculateQuills)}(NewLevel: {Level})",
+                    Indent: Debug.LastIndent + 1, Toggle: getDoDebug());
+                Debug.LastIndent--;
             }
             return base.HandleEvent(E);
         }

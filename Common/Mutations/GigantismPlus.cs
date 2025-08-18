@@ -55,9 +55,11 @@ namespace XRL.World.Parts.Mutation
 
         private bool MutationColor => UI.Options.MutationColor;
 
-        public float WeightFactor = 5.0f;
+        public bool NaturallyGigantic;
+
+        public float WeightFactor;
         public float CarryCapFactor => 2.0f;
-        public int CarryCapBonus = 8;
+        public int CarryCapBonus;
 
         private static int MaxDamageDieIncrease => 7;
         private static int MinDamageBonusIncrease => 3;
@@ -111,10 +113,10 @@ namespace XRL.World.Parts.Mutation
 
         public static readonly string FLIP_GROUND_POUND = "GigantismPlus_Flip_Ground_Pound";
 
-        public int HunchedOverAVModifier = 4;
-        public int HunchedOverDVModifier = -6;
-        public int HunchedOverQNModifier = -60;
-        public int HunchedOverMSModifier = -60;
+        public int HunchedOverAVModifier;
+        public int HunchedOverDVModifier;
+        public int HunchedOverQNModifier;
+        public int HunchedOverMSModifier;
         
         private string HunchOverAbilityHunched => !IsCyberGiant ? "Hunched Over" : "Compact Mode";
         // private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
@@ -145,12 +147,24 @@ namespace XRL.World.Parts.Mutation
         [SerializeField]
         private int AppliedJumpRangeBonus = 0;
 
-        private double _stunningForceLevelFactor = 0.5;
+        private double _stunningForceLevelFactor;
 
-        public int StunningForceDistance = 3;
+        public int StunningForceDistance;
 
         public GigantismPlus()
         {
+            NaturallyGigantic = false;
+            WeightFactor = NaturallyGigantic ? 1f : 5f;
+
+            CarryCapBonus = 8;
+
+            HunchedOverAVModifier = 4;
+            HunchedOverDVModifier = -6;
+            HunchedOverQNModifier = -60;
+            HunchedOverMSModifier = -60;
+
+            _stunningForceLevelFactor = 0.5;
+            StunningForceDistance = 3;
         }
 
         public static ModGiganticNaturalWeapon NewGiganticFistMod(NaturalEquipmentManager NewManager)
@@ -258,9 +272,9 @@ namespace XRL.World.Parts.Mutation
 
         public override bool GeneratesEquipment() { return true; }
 
-        public static float GetWeightFactor(int level)
+        public static float GetWeightFactor(int level, bool NaturallyGigantic)
         {
-            return 4.75f + (0.25f * level);
+            return (NaturallyGigantic ? 0.75f : 4.75f) + (0.25f * level);
         }
         public static int GetCarryCapBonus(int level)
         {
@@ -520,7 +534,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: getDoDebug("CH"));
             Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: getDoDebug("CH"));
             Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: getDoDebug("CH"));
-            WeightFactor = GetWeightFactor(NewLevel);
+            WeightFactor = GetWeightFactor(NewLevel, NaturallyGigantic);
             CarryCapBonus = GetCarryCapBonus(NewLevel);
             Debug.Entry(4, $"Values After", Indent: 2, Toggle: getDoDebug("CH"));
             Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: getDoDebug("CH"));

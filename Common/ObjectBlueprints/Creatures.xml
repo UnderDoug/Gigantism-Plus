@@ -22,74 +22,71 @@
   </object>
   
   <object Name="Great Saltback" Load="Merge">
-    <mutation Name="GigantismPlus" Level="5" />
+    <mutation Name="GigantismPlus" Level="5" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="2d3" />
     <property Name="NoWrassleGear" Value="NonePlease!" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Chrome Pyramid" Load="Merge">
-    <part Name="Physics" Weight="5000" />
-    <mutation Name="GigantismPlus" Level="7" />
+    <mutation Name="GigantismPlus" Level="7" NaturallyGigantic="true" />
     <removetag Name="Gigantic" />
     <property Name="NoWrassleGear" Value="NonePlease!" />
     <tag Name="GigantismPlusColorChange" Value="false" />
 	</object>
 	<object Name="Great Magma Crab" Load="Merge">
-		<mutation Name="GigantismPlus" Level="5" />
+		<mutation Name="GigantismPlus" Level="5" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="2d3" />
     <property Name="NoWrassleGear" Value="NonePlease!" />
 		<removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Saltwurm" Load="Merge">
-    <part Name="Physics" Weight="8000" />
-    <mutation Name="GigantismPlus" Level="8" />
+    <mutation Name="GigantismPlus" Level="8" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="2d3" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Star Kraken" Load="Merge">
-    <part Name="Physics" Weight="8000" />
-    <mutation Name="GigantismPlus" Level="8" />
+    <mutation Name="GigantismPlus" Level="8" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="3d4" />
     <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="VehicleTemplarMech" Load="Merge">
-    <mutation Name="GigantismPlus" Level="8" />
+    <mutation Name="GigantismPlus" Level="8" NaturallyGigantic="true" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="BaseNephal" Load="Merge">
-    <mutation Name="GigantismPlus" Level="10" />
+    <mutation Name="GigantismPlus" Level="10" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="3d3" />
     <intproperty Name="RapidLevel_GigantismPlus" Value="6" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="BaseVehicleGolem" Load="Merge">
-    <mutation Name="GigantismPlus" Level="5" />
+    <mutation Name="GigantismPlus" Level="5" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="2d3" />
     <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Rodanis Y" Load="Merge">
-    <mutation Name="GigantismPlus" Level="8" />
+    <mutation Name="GigantismPlus" Level="8" NaturallyGigantic="true" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Oboroqoru" Load="Merge">
-    <mutation Name="GigantismPlus" Level="10" />
+    <mutation Name="GigantismPlus" Level="10" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="3d3" />
     <intproperty Name="RapidLevel_GigantismPlus" Value="6" />
     <removetag Name="Gigantic" />
     <tag Name="GigantismPlusColorChange" Value="false" />
   </object>
   <object Name="Troll" Load="Merge">
-    <mutation Name="GigantismPlus" Level="6" />
+    <mutation Name="GigantismPlus" Level="6" NaturallyGigantic="true" />
     <property Name="GenerateWithStews" Value="3d3" />
     <intproperty Name="RapidLevel_GigantismPlus" Value="3" />
     <removetag Name="Gigantic" />

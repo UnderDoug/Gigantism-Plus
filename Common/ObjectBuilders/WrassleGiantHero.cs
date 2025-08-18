@@ -214,11 +214,11 @@ namespace XRL.World.ObjectBuilders
             Debug.LoopItem(4, $"{nameof(factionAdmirationBag)} contents:", Indent: indent + 1, Toggle: getDoDebug());
             foreach (string reason in factionAdmirationBag)
             {
-                Debug.LoopItem(4, $"{reason}", Indent: indent + 2, Toggle: getDoDebug());
+                Debug.LoopItem(4, $"{nameof(reason)}: {reason}", Indent: indent + 2, Toggle: getDoDebug());
             }
             Dictionary<int, string> factionAdmirationList = new()
             {
-                { 1, $"=subject.possessive= =subject.wrassleShader:vibrant= nanoweave suit" /*factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 1, Context: nameof(factionAdmirationBag))*/ },
+                { 1, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 1, Context: nameof(factionAdmirationBag)) },
                 { 2, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 2, Context: nameof(factionAdmirationBag)) },
                 { 3, factionAdmirationBag.DrawSeededToken(wrassleID, Stepper: 3, Context: nameof(factionAdmirationBag)) },
             };
@@ -228,7 +228,7 @@ namespace XRL.World.ObjectBuilders
             {
                 string faction = "";
                 string feeling = "friend";
-                string reason = GameText.VariableReplace(factionAdmirationBag[i], Creature);
+                string reason = GameText.VariableReplace(factionAdmirationList[i], Creature);
 
                 if (i == ThiccBoisIndex)
                 {
@@ -309,6 +309,9 @@ namespace XRL.World.ObjectBuilders
             }
 
             Debug.LoopItem(4, $"Configuring Brain", Indent: indent + 1, Toggle: getDoDebug());
+
+            Creature.SetStringProperty("AllowIdleBehavior", "Ugh, Bored!");
+            Creature.SetStringProperty("SleepOnBed", "*yawn*");
 
             Creature.Brain ??= Creature.RequirePart<Brain>();
 

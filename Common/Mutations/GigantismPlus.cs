@@ -994,6 +994,7 @@ namespace XRL.World.Parts.Mutation
             if (E.Amount != 0)
             {
                 SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
+                ResetDisplayName();
             }
             return base.HandleEvent(E);
         }

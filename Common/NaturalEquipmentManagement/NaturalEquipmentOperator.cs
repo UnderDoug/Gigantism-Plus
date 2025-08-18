@@ -57,9 +57,6 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-
-        private bool HaveManagerToSerialize = false;
-
         [NonSerialized]
         public NaturalEquipmentManager Manager;
 
@@ -595,22 +592,12 @@ namespace XRL.World.Parts
         {
             base.Write(Basis, Writer);
 
-            HaveManagerToSerialize = Manager != null;
-            Writer.Write(HaveManagerToSerialize);
-            if (HaveManagerToSerialize)
-            {
-                Manager.Write(Basis, Writer);
-            }
             Writer.Write(AppliedAdjustments);
         }
         public override void Read(GameObject Basis, SerializationReader Reader)
         {
             base.Read(Basis, Reader);
-            HaveManagerToSerialize = Reader.ReadBoolean();
-            if (HaveManagerToSerialize)
-            {
-                Manager = Reader.ReadObject() as NaturalEquipmentManager;
-            }
+
             AppliedAdjustments = Reader.ReadList<string>();
         }
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)

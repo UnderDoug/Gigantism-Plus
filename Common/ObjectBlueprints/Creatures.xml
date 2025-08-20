@@ -145,28 +145,28 @@
     -->
   <object Name="Horned Chameleon" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="1" Variant="Horns Single" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="1" Variant="UD_Horns Single" />
   </object>
   <object Name="BaseHindren" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="3" Variant="Horns Antlers" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="3" Variant="UD_Horns Antlers" />
   </object>
   <object Name="Fork-Horned Gnu" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="5" Variant="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="5" Variant="UD_Horns" />
   </object>
   <object Name="Unimax" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="10" Variant="Horns Spiral" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="10" Variant="UD_Horns Spiral" />
     <intproperty Name="RapidLevel_UD_HornsPlus" Value="6" />
   </object>
   <object Name="Goat Golem" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="UD_Horns" />
   </object>
   <object Name="Warden Yrame" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="Horns" />
+    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="UD_Horns" />
   </object>
   
   <!-- 

@@ -143,6 +143,7 @@ namespace XRL.World.Parts.Mutation
             }
             if (body != null && !Variant.IsNullOrEmpty())
             {
+                Debug.Entry(4, nameof(Variant), Variant, Indent: 0, Toggle: !Variant.Contains(nameof(UD_HornsPlus)));
                 string bodyPartType = GameObjectFactory.Factory.GetBlueprint(Variant).GetPartParameter("MeleeWeapon", "Slot", "Head");
 
                 BodyPart bodyPart = RequireRegisteredSlot(body, bodyPartType);

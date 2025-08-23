@@ -21,11 +21,7 @@ namespace XRL.World.Parts
     [Serializable]
     public class WrassleID 
         : IScribedPart
-        , IModEventHandler<GetWrassleIDEvent>
-        , IModEventHandler<AddWrassleIDEvent>
-        , IModEventHandler<UpdateWrassleIDEvent>
-        , IModEventHandler<WrassleIDUpdatedEvent>
-        , IModEventHandler<SyncWrassleIDEvent>
+        , IWrassleIDEventHandler
     {
         private static bool doDebug => getClassDoDebug(nameof(WrassleID));
         private static bool getDoDebug(object what = null)

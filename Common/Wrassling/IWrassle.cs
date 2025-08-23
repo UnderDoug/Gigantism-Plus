@@ -17,10 +17,7 @@ using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World
 {
-    public interface IWrassle
-        : IModEventHandler<AddWrassleIDEvent>
-        , IModEventHandler<UpdateWrassleIDEvent>
-        , IModEventHandler<WrassleIDUpdatedEvent>
+    public interface IWrassle : IWrassleIDEventHandler
     {
         public virtual WrassleID WrassleID => GetWrassleID();
 

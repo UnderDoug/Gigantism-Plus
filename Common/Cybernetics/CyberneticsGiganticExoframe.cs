@@ -44,6 +44,8 @@ namespace XRL.World.Parts
         // XML Set Fields.
         public string Model;
         public string Material;
+        public int AV;
+        public int DV;
         public string AugmentAdjectiveColor;
         public string AugmentTile;
         public string AugmentTileColorString;
@@ -61,6 +63,8 @@ namespace XRL.World.Parts
         {
             Model = "Alpha";
             Material = "carbide";
+            AV = 2;
+            DV = -5;
             AugmentAdjectiveColor = "b";
             AugmentTile = "NaturalWeapons/EF-AugmentedGiganticManipulator.png";
             AugmentTileColorString = "&c";
@@ -171,6 +175,14 @@ namespace XRL.World.Parts
 
             Becoome(Implantee, Model, Implant);
 
+            Armor armor = ParentObject.RequirePart<Armor>();
+            if (armor != null)
+            {
+                armor.WornOn = "Body";
+                armor.AV = AV;
+                armor.DV = DV;
+            }
+
             base.OnImplanted(Implantee, Implant);
 
             Debug.Entry(2,
@@ -197,6 +209,8 @@ namespace XRL.World.Parts
             // Implantee.CheckEquipmentSlots();
 
             Unbecoome(Implantee, Model, ImplantObject);
+
+            ParentObject.RemovePart<Armor>();
 
             base.OnUnimplanted(Implantee, Implant);
 
@@ -248,8 +262,7 @@ namespace XRL.World.Parts
             {
                 if (E.Object.TryGetPart(out Description description))
                 {
-                    string material = Material.Color(AugmentAdjectiveColor);
-                    description._Short = description._Short.Replace("*material*", material);
+                    description._Short = description._Short.Replace("*material*", Material);
                 }
             }
             return base.HandleEvent(E);

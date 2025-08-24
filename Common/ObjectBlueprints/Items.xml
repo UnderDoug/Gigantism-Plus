@@ -41,7 +41,7 @@
   <object Name="BaseGiganticExoframe" Inherits="BaseCyberneticsEquipment">
     <part Name="Description"
           Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and *material* plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|massive exoframe}}"
+    <part Name="Render" DisplayName="[{{c|exoframe}} {{y|base}}]"
           RenderString="M" Tile="Items/sw_exoskeleton.bmp"
           ColorString="&amp;c" DetailColor="r" />
     <part Name="CyberneticsBaseItem"
@@ -55,16 +55,10 @@ You cannot wear equipment on your body." />
     <tag Name="CyberneticsUsesEqSlot" />
     <tag Name="CyberneticsOneOnly" />
     <part Name="CyberneticsGiganticExoframe"
-          Model="Alpha"
-          Material="carbide"
-          AugmentAdjectiveColor="b"
+          Model="Base"
           AugmentTile="NaturalWeapons/EF-AugmentedGiganticManipulator.png"
-          AugmentTileColorString="&amp;c"
-          AugmentTileDetailColor="b"
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
-          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
-          JumpDistanceBonus="0"
-          StunningForceLevelFactor="0.5"/>
+          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" />
     <part Name="ModGigantic" />
     <part Name="ModImprovedGigantismPlus" Tier="1" />
     <tag Name="BaseObject" Value="*noinherit" />
@@ -78,19 +72,15 @@ You cannot wear equipment on your body." />
   <object Name="Gigantic Exoframe Alpha" Inherits="BaseGiganticExoframe"
           PreviousName="GiganticExoframeAlpha">
     <part Name="Physics" Weight="15" />
-    <part Name="Render" DisplayName="{{c|exoframe {{b|alpha}}}}" DetailColor="b" />
-    <part Name="Armor" 
-          AV="2" 
-          DV="-5" />
+    <part Name="Render" DisplayName="{{c|exoframe}} {{b|alpha}}" DetailColor="b" />
     <part Name="CyberneticsBaseItem" Cost="2" />
     <part Name="Commerce" Value="120" />
     <part Name="CyberneticsGiganticExoframe" 
           Model="Alpha"
-          Material="carbide"
+          Material="{{b|carbide}}"
+          AV="2" DV="-5"
           AugmentAdjectiveColor="b" 
           AugmentTileDetailColor="b" 
-          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing" 
-          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked" 
           JumpDistanceBonus="0" 
           StunningForceLevelFactor="0.5" />
     <part Name="ModImprovedGigantismPlus" Tier="2" />
@@ -101,19 +91,15 @@ You cannot wear equipment on your body." />
   <object Name="Gigantic Exoframe Delta" Inherits="BaseGiganticExoframe"
           PreviousName="GiganticExoframeDelta">
     <part Name="Physics" Weight="18" />
-    <part Name="Render" DisplayName="{{c|exoframe {{K|delta}}}}" DetailColor="K" />
-    <part Name="Armor" 
-          AV="5" 
-          DV="-4" />
+    <part Name="Render" DisplayName="{{c|exoframe}} {{K|delta}}" DetailColor="K" />
     <part Name="CyberneticsBaseItem" Cost="4" />
     <part Name="Commerce" Value="240" />
     <part Name="CyberneticsGiganticExoframe"
           Model="Delta"
-          Material="fullerite"
+          Material="{{K|fullerite}}"
+          AV="5" DV="-4"
           AugmentAdjectiveColor="K"
           AugmentTileDetailColor="K"
-          AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_fullerite_swing"
-          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           JumpDistanceBonus="1"
           StunningForceLevelFactor="0.67" />
     <part Name="ModImprovedGigantismPlus" Tier="5" />
@@ -123,16 +109,14 @@ You cannot wear equipment on your body." />
   <object Name="Gigantic Exoframe Sigma" Inherits="BaseGiganticExoframe"
           PreviousName="GiganticExoframeSigma">
     <part Name="Physics" Weight="9" />
-    <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{K|flawless}} {{crysteel|crysteel}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{G|sigma}}}}" DetailColor="G" />
-    <part Name="Armor" 
-          AV="6" 
-          DV="-3" />
+    <part Name="Springy" Factor="0.5" />
+    <part Name="Render" DisplayName="{{c|exoframe}} {{G|sigma}}" DetailColor="G" />
     <part Name="CyberneticsBaseItem" Cost="8" />
     <part Name="Commerce" Value="600" />
-    <part Name="CyberneticsGiganticExoframe" 
+    <part Name="CyberneticsGiganticExoframe"
           Model="Sigma"
+          Material="{{K|flawless}} {{crysteel|crysteel}}"
+          AV="6" DV="-3"
           AugmentAdjectiveColor="crysteel"
           AugmentTileDetailColor="G"
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_crysteel_swing"
@@ -143,6 +127,7 @@ You cannot wear equipment on your body." />
           JumpDistanceBonus="2"
           StunningForceLevelFactor="0.75" />
     <part Name="ModImprovedGigantismPlus" Tier="10" />
+    <removepart Name="Metal" />
     <part Name="Crysteel" />
     <tag Name="Flawless" />
     <tag Name="Tier" Value="6" />
@@ -151,20 +136,16 @@ You cannot wear equipment on your body." />
   <object Name="Gigantic Exoframe Omega" Inherits="BaseGiganticExoframe"
           PreviousName="GiganticExoframeOmega">
     <part Name="Physics" Weight="6" />
-    <part Name="Description"
-          Short="A long un-wittnessed bulk of mechanical marvel competes for your peripheral even as your attention is drawn across its many valves, pistons, and {{zetachrome|zetachrome}} plates. Dust and debris break loose from the shelf of its {{giant|immense}} bredth and tumble, home-sick, as rocks might cascade down a mountain face. Several {{implanted|invasive interfaces}} hang like spilled innards, ready to bring the behemoth to life with the acquiescence of a willing tribute." />
-    <part Name="Render" DisplayName="{{c|exoframe {{zetachrome|omega}}}}" DetailColor="m" />
-    <part Name="Armor" 
-          AV="8" 
-          DV="-2" />
+    <part Name="Render" DisplayName="{{c|exoframe}} {{zetachrome|omega}}" DetailColor="m" />
     <part Name="CyberneticsBaseItem" Cost="16" />
     <part Name="Commerce" Value="2200" />
-    <part Name="CyberneticsGiganticExoframe" 
+    <part Name="CyberneticsGiganticExoframe"
           Model="Omega"
+          Material="{{zetachrome|zetachrome}}"
+          AV="8" DV="-2"
           AugmentAdjectiveColor="zetachrome"
           AugmentTileDetailColor="m"
           AugmentSwingSound="Sounds/Melee/cudgels/sfx_melee_cudgel_onehanded_zetachrome_swing"
-          AugmentBlockedSound="Sounds/Melee/multiUseBlock/sfx_melee_fullerite_blocked"
           AugmentAddParts="Zetachrome"
           AugmentEquipmentFrameColors="mCmC"
           JumpDistanceBonus="3"
@@ -172,6 +153,8 @@ You cannot wear equipment on your body." />
     <part Name="ModImprovedGigantismPlus" Tier="16" />
     <part Name="Zetachrome" />
     <tag Name="Tier" Value="8" />
+    <tag Name="Role" Value="Rare" />
+    <stag Name="Historical" />
   </object>
 
   <!-- 
@@ -194,7 +177,7 @@ You cannot wear equipment on your body." />
           BonesDamageDieSize="1" />
   </object>
   <object Name="FulleriteHandBones" Load="Merge">
-    <part Name="Description" Short="Black *material* merely dents where weak collagen would be smashed to bits." />
+    <part Name="Description" Short="Black *material* merely creaks where weak bone and cartilage would be smashed to bits." />
     <part Name="Render" DisplayName="{{K|fullerite}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" TileColor="&amp;K" DetailColor="r" />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 1 additional damage die, +2 damage die size and +1 bonus damage." />
     <removepart Name="CyberneticsFistReplacement" />
@@ -209,7 +192,7 @@ You cannot wear equipment on your body." />
           BonesDamageBonus="1" />
   </object>
   <object Name="CrysteelHandBones" Load="Merge">
-    <part Name="Description" Short="Dappled *material* merely dents where weak collagen would be smashed to bits." />
+    <part Name="Description" Short="Dappled *material* merely deflects where weak bone and cartilage would be smashed to bits." />
     <part Name="Render" DisplayName="{{crysteel|crysteel}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" TileColor="&amp;G" DetailColor="r" />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 2 additional damage die and +2 damage die size." />
     <removepart Name="CyberneticsFistReplacement" />
@@ -228,6 +211,7 @@ You cannot wear equipment on your body." />
     <tag Name="Flawless" />
   </object>
   <object Name="RealHomosapien_ZetachromeHandBones" Load="Merge">
+    <part Name="Description" Short="Vibrant *material* persists where weak bone and cartilage would be smashed to bits." />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 3 additional damage die, +3 damage die size and +1 bonus damage." />
     <removepart Name="CyberneticsFistReplacement" />
     <part Name="CyberneticsManagedHandBones"

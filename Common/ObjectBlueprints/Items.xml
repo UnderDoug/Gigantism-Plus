@@ -507,8 +507,12 @@ You cannot wear equipment on your body." />
       
   -->
   <object Name="Sandals" Load="Merge">
-    <!-- this object is both a plural and has DisplayName="antlers" resulting in "antlerses" -->
-    <tag Name="DisplayNameSingular" Value="sandle" />
+    <!-- this object is both a plural and has DisplayName="antlers" resulting in "sandalses" -->
+    <tag Name="DisplayNameSingular" Value="sandal" />
+  </object>
+  <object Name="Rocket Skates" Load="Merge">
+    <!-- this object is both a plural and has DisplayName="antlers" resulting in "{{rocket|rocket}} {{K|skateses}}" -->
+    <tag Name="DisplayNameSingular" Value="{{rocket|rocket}} {{K|skate}}" />
   </object>
 
   <object Name="UD_HornsPlus" Inherits="Horns">

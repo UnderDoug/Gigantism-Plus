@@ -47,13 +47,13 @@ namespace HNPS_GigantismPlus
 
         public override void Reset()
         {
+            base.Reset();
             Object = null;
             Adjective = null;
             ObjectNoun = null;
             PrimaryDescriptions = null;
             SecondaryDescriptions = null;
             Context = null;
-            base.Reset();
         }
         public T Send()
         {

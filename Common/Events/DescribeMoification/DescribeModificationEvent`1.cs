@@ -32,12 +32,12 @@ namespace HNPS_GigantismPlus
 
         public override void Reset()
         {
+            base.Reset();
             if (BeforeEvent != null)
             {
                 BeforeEvent.Reset();
                 BeforeEvent = null;
             }
-            base.Reset();
         }
 
         public static DescribeModificationEvent<T> FromPool(BeforeDescribeModificationEvent<T> BeforeEvent)

@@ -113,7 +113,19 @@
     <tag Name="GigantismPlusColorChange" Value="false" />
     <tag Name="WrasslerColorChange" Value="false" />
   </object>
-
+  
+  <object Name="Leering Stalker" Load="Merge">
+    <mutation Name="GigantismPlus" Level="7" NaturallyGigantic="true" />
+    <property Name="NoWrassleGear" Value="NonePlease!" />
+    <tag Name="GigantismPlusColorChange" Value="false" />
+  </object>
+  <object Name="LeeringStalker_PneumaticPiston" Load="Merge">
+    <part Name="ModGigantic" />
+  </object>
+  <object Name="Giant Heap of Chrome Scrap" Load="Merge">
+    <part Name="Render" DisplayName="heap of {{c|chrome}} scrap" />
+  </object>
+  
   <!-- End make creatures Gigantic -->
   
   <!-- 

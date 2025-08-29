@@ -946,7 +946,7 @@ namespace XRL.World.Parts.Mutation
                 || ID == AfterLevelGainedEvent.ID
                 || ID == CanEnterInteriorEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == GetSlotsRequiredEvent.ID
                 || ID == BodyPartsUpdatedEvent.ID
                 || (wantAddGroundPound && ID == AfterAddSkillEvent.ID)
                 || (wantRemoveGroundPound && ID == AfterRemoveSkillEvent.ID)
@@ -1050,7 +1050,7 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(GetExtraPhysicalFeaturesEvent E)
         {
-            E.Features.Add("gigantic".OptionalColor("gianter", "w", Colorfulness) + " stature");
+            E.Features.Add("gigantic".OptionalColor("gigantic", "w", Colorfulness) + " stature");
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetSlotsRequiredEvent E)
@@ -1078,6 +1078,16 @@ namespace XRL.World.Parts.Mutation
                     E.CanBeTooSmall = true;
                 }
             }
+
+            // should let you equip pretty literally anything in the thrown weapon slot 
+            // if you could equip it in that slot otherwise. Lugging an object shouldn't
+            // be affected by it's size if it's smaller than the lugger.
+            if (actorGiant && !equipment.IsGiganticEquipment 
+                && ((!E.SlotType.IsNullOrEmpty() && E.SlotType == "Thrown Weapon") || E.Object.IsEntirelyFloating()))
+            {
+                E.CanBeTooSmall = false;
+            }
+
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(BodyPartsUpdatedEvent E)

@@ -196,11 +196,16 @@ namespace XRL.World.Parts.Mutation
         }
         public static ModGiganticNaturalWeapon NewGiganticMugMod(NaturalEquipmentManager NewManager)
         {
-            return new()
+            ModGiganticNaturalWeapon giganticMugMod = new()
             {
                 Manager = NewManager,
                 BodyPartType = "Face",
             };
+
+            int bonusDamage = NewManager?.ParentObject?.GetPart<GigantismPlus>() is GigantismPlus gigantism ? Math.Max(3, gigantism.Level / 2) : 3;
+            giganticMugMod.AdjustMeleeDamageBonus(bonusDamage, MeleeWeaponSkillIsAxe);
+            return giganticMugMod;
+
         }
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(NaturalEquipmentManager NewManager)
         {

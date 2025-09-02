@@ -816,7 +816,7 @@ namespace XRL.World.WorldBuilders
             }
 
             Villager.SetStringProperty("Culture", isResident ? "Giant" : "WrassleGiant");
-            if (!isGutsmonger)
+            if (!isGutsmonger && !isDromad)
             {
                 Villager.SetStringProperty("Species", "Giant");
             }
@@ -908,6 +908,10 @@ namespace XRL.World.WorldBuilders
             else
             {
                 Villager.SetIntProperty("Villager", 1);
+            }
+            if (isDromad)
+            {
+                Villager.SetStringProperty("Species", "Giant");
             }
 
             int xPThisLevel = Leveler.GetXPForLevel(level.BaseValue);

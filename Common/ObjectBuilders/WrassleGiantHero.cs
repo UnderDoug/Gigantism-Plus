@@ -1118,7 +1118,11 @@ namespace XRL.World.ObjectBuilders
             {
                 alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero");
             }
-
+            else 
+            if (1.in10000())
+            {
+                alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprintsInheritingFrom("Snapjaw").GetRandomElement();
+            }
             return alternateCreatureObjectBlueprint ?? creatureObjectBlueprint;
         }
         public static GameObjectBlueprint GetAnOldGiantBlueprintModel(Predicate<GameObjectBlueprint> filter = null)
@@ -1155,10 +1159,8 @@ namespace XRL.World.ObjectBuilders
             if (false && !EncountersAPI.IsLegendaryEligible(Blueprint))
                 return false;
 
-            if (!Blueprint.HasPart(nameof(Body)) && !Blueprint.HasTagOrProperty("BodySubstitute"))
-                return false;
-
-            if (!Blueprint.HasPart(nameof(Combat)) && !Blueprint.HasTagOrProperty("BodySubstitute"))
+            if ((!Blueprint.HasPart(nameof(Body)) || !Blueprint.HasPart(nameof(Combat))) 
+                && !Blueprint.HasTagOrProperty("BodySubstitute"))
                 return false;
 
             List<string> oldFactions =
@@ -1174,9 +1176,6 @@ namespace XRL.World.ObjectBuilders
                 return false;
 
             if (Blueprint.Name.StartsWith("Base"))
-                return false;
-
-            if (false && Blueprint.HasTag("NoLibrarian"))
                 return false;
 
             if (Blueprint.InheritsFrom("BaseTrueKin"))
@@ -1221,22 +1220,22 @@ namespace XRL.World.ObjectBuilders
             if (Blueprint.InheritsFrom("Gyre Wight Apotheote"))
                 return false;
 
-            if (Blueprint.TryGetTag("Species", out string species) && species.Is("mecha"))
+            if (Blueprint.TryGetTag("Species", out string species) && species is "mecha")
                 return false;
 
-            if (Blueprint.TryGetTag("Role", out string roll) && roll.Is("Minion"))
+            if (Blueprint.TryGetTag("Role", out string role) && role is "Minion")
                 return false;
 
             if (Blueprint.HasTagOrProperty("StartInLiquid"))
                 return false;
 
-            if (Blueprint.Parts.ContainsKey(typeof(SpawnWithLiquid).Name))
+            if (Blueprint.Parts.ContainsKey(nameof(SpawnWithLiquid)))
                 return false;
 
-            if (Blueprint.Parts.ContainsKey(typeof(AISitting).Name))
+            if (Blueprint.Parts.ContainsKey(nameof(AISitting)))
                 return false;
 
-            if (Blueprint.Parts.ContainsKey(typeof(CherubimSpawner).Name))
+            if (Blueprint.Parts.ContainsKey(nameof(CherubimSpawner)))
                 return false;
 
             if (Blueprint.Mutations.ContainsKey(nameof(Burrowing)))
@@ -1252,23 +1251,27 @@ namespace XRL.World.ObjectBuilders
                 return false;
 
             // from the playable snapjaws mod, kept popping up.
-            if (Blueprint.Name.Is("PlayableSnapjaw") || Blueprint.InheritsFrom("PlayableSnapjaw"))
+            if (Blueprint.Name is "PlayableSnapjaw" || Blueprint.InheritsFrom("PlayableSnapjaw"))
                 return false;
 
             // from the RogueRobots mod, kept popping up.
-            if (Blueprint.Name.Is("PlayerBaseRobot") || Blueprint.InheritsFrom("PlayerBaseRobot"))
+            if (Blueprint.Name is "PlayerBaseRobot" || Blueprint.InheritsFrom("PlayerBaseRobot"))
                 return false;
 
             // from the RogueRobots mod, kept popping up.
-            if (Blueprint.Name.Is("TinkerBot") || Blueprint.InheritsFrom("TinkerBot"))
+            if (Blueprint.Name is "TinkerBot" || Blueprint.InheritsFrom("TinkerBot"))
                 return false;
 
             // from the RogueRobots mod, just in case.
-            if (Blueprint.Name.Is("Agooga") || Blueprint.InheritsFrom("Agooga"))
+            if (Blueprint.Name is "Agooga" || Blueprint.InheritsFrom("Agooga"))
                 return false;
 
             // from the Gyre White Subtype mod, kept popping up.
-            if (Blueprint.Name.Is("Andrea_GyreWight_WightBody") || Blueprint.InheritsFrom("Andrea_GyreWight_WightBody"))
+            if (Blueprint.Name is "Andrea_GyreWight_WightBody" || Blueprint.InheritsFrom("Andrea_GyreWight_WightBody"))
+                return false;
+
+            // from the VariedPopulations mod, spawns hostile to the player.
+            if (Blueprint.Name is "Aleksh_PrimeShape" || Blueprint.InheritsFrom("Aleksh_PrimeShape"))
                 return false;
 
             return true;

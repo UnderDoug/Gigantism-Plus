@@ -479,10 +479,14 @@ namespace XRL.World.Parts
                 + $"{nameof(E.Item)}: {E.Item?.DebugName ?? NULL})",
                 Indent: indent + 1, Toggle: doDebug);
 
-            if (ParentObject == E.Item && E.Item != null && Manager != null)
+            if (E.Item != null && ParentObject == E.Item)
             {
                 Manager = E.Actor.RequirePart<NaturalEquipmentManager>();
                 Debug.CheckYeh(4, $"Added {Manager.Name} to {Name}", Indent: indent + 2, Toggle: doDebug);
+                if (E.Item.EquipAsDefaultBehavior())
+                {
+                    // E.Actor?.Body?.UpdateBodyParts();
+                }
             }
             else
             {

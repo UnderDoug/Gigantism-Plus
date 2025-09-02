@@ -40,5 +40,10 @@ namespace HNPS_GigantismPlus
 
         public static GameObjectHasNatEquipModWithAnyCumultiveMelee<T> ThisModAdjustsMeleeCumulatively<T>()
             where T : IPart , IManagedDefaultNaturalEquipment<T> , new() => new();
+
+        public static GameObjectMeleeWeaponSkillIs MeleeWeaponSkillIsAxe = new("Axe");
+        public static GameObjectMeleeWeaponSkillIs MeleeWeaponSkillIsShortBlades = new("ShortBlades");
+        public static GameObjectMeleeWeaponSkillIs MeleeWeaponSkillIsCudgel = new("Cudgel");
+        public static GameObjectMeleeWeaponSkillIs MeleeWeaponSkillIsLongBlades = new("LongBlades");
     }
 }

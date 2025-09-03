@@ -36,9 +36,9 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject GameObject)
         {
             return base.Check(GameObject)
-                || Skill.IsNullOrEmpty()
-                || GameObject == null 
-                || GameObject.TryGetPart(out MeleeWeapon mw)
+                && !Skill.IsNullOrEmpty()
+                && GameObject == null 
+                && GameObject.TryGetPart(out MeleeWeapon mw)
                 && mw.Skill == Skill;
         }
     }

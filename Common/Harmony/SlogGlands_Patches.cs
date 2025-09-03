@@ -26,12 +26,6 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void AddSphincterTo_SetDefaultBehaviorBlueprint_Postfix(ref SlogGlands __instance, ref BodyPart Part)
         {
-            if (Part != null 
-                && Part.DefaultBehavior != null
-                && Part.DefaultBehaviorBlueprint != SlogGlands.EQUIPMENT_BLUEPRINT)
-            {
-                Part.DefaultBehaviorBlueprint = SlogGlands.EQUIPMENT_BLUEPRINT;
-            }
         }
     }
 }

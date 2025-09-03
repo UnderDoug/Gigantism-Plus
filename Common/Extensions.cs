@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -1092,6 +1093,32 @@ namespace HNPS_GigantismPlus
         public static string GetEquipmentSlot(this GameObject @object)
         {
             return @object.GetPart<Armor>()?.WornOn ?? @object.GetPart<MeleeWeapon>()?.Slot;
+        }
+        public static string ToLiteral(this string String, bool Quotes = false)
+        {
+            if (String.IsNullOrEmpty())
+            {
+                return null;
+            }
+            string output = Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(String, false);
+            if (Quotes)
+            {
+                output = output.Quote();
+            }
+            return output;
+        }
+        public static bool IsEndOfSection(this OpCode OpCode)
+        {
+            string ciOpcode = OpCode.ToString();
+            return ciOpcode.StartsWith("pop")
+                || ciOpcode.StartsWith("br")
+                || ciOpcode.StartsWith("be")
+                || ciOpcode.StartsWith("bg")
+                || ciOpcode.StartsWith("bl")
+                || ciOpcode.StartsWith("leave")
+                || ciOpcode.StartsWith("ret")
+                || ciOpcode.StartsWith("st")
+                || ciOpcode.StartsWith("throw");
         }
 
         public static T DrawRandomToken<T>(this List<T> Bag, T ExceptForToken = null, List<T> ExceptForTokens = null)

@@ -352,7 +352,7 @@ namespace XRL.World.Parts
                     if (naturalEquipmentMods.ContainsKey(priority))
                     {
                         Debug.Warn(2,
-                            $"{nameof(Extensions)}",
+                            $"{nameof(NaturalEquipmentManager)}",
                             $"{nameof(PrioritiseNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
                             $"[{priority}]" +
                             $"{naturalEquipmentMods[priority]} " +
@@ -508,7 +508,7 @@ namespace XRL.World.Parts
                             Indent: 2, Toggle: doDebug);
 
                         naturalEquipmentOperator.ClearShortDescriptionCache();
-                        naturalEquipmentOperator.HasManaged = false;
+                        naturalEquipmentOperator.HasOperated = false;
                     }
                 }
             }

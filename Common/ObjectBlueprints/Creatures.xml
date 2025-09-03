@@ -211,6 +211,14 @@
   </object>
   
   <!-- 
+      Swap SlogGlands mutation class for creatures that come with it.
+    -->
+  <object Name="GolgothaSlog" Load="Merge">
+    <removemutation Name="SlogGlands" />
+    <mutation Name="UD_SlogGlands" DisplayName="Bilge Sphincter" Level="1" />
+  </object>
+  
+  <!-- 
       Make creatures Elongated: 
       - give mutation "ElongatedPaws" 
     -->

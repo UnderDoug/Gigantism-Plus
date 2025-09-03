@@ -28,7 +28,7 @@ namespace HNPS_GigantismPlus.Harmony
         {
             if (Limb != null && ___StingerObject != null)
             {
-                ___StingerObject.Obliterate();
+                ___StingerObject?.Release();
                 ___StingerObject = null;
             }
             return true;

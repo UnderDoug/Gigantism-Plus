@@ -4,16 +4,19 @@
     <category Name="Physical">
 
       <mutation Name="Crystallinity" Class="UD_ManagedCrystallinity" DisplayName="Crystallinity" />
+
+      <mutation Name="Bilge Sphincter" Class="UD_SlogGlands" DisplayName="Bilge Sphincter" />
       
     <!-- NaturalWeapon Managed vanilla mutations -->
 
-      <mutation Name="Base Burrowing Claws" Class="BurrowingClaws" DisplayName="Burrowing Claws (B)" />
-      <mutation Name="Base Crystallinity" Class="Crystallinity" DisplayName="Crystallinity (B)" />
+      <mutation Name="Base Burrowing Claws" Class="BurrowingClaws" DisplayName="Burrowing Claws ({{B|B}})" />
+      <mutation Name="Base Crystallinity" Class="Crystallinity" DisplayName="Crystallinity ({{B|B}})" />
       
     <!-- "Fixed" vanilla mutations -->
       
-      <mutation Name="Base Horns" Class="Horns" DisplayName="Horns (B)" />
-      <mutation Name="Base Quills" Class="Quills" DisplayName="Quills (B)" />
+      <mutation Name="Base Horns" Class="Horns" DisplayName="Horns ({{B|B}})" />
+      <mutation Name="Base Quills" Class="Quills" DisplayName="Quills ({{B|B}})" />
+      <mutation Name="Base Bilge Sphincter" Class="SlogGlands" DisplayName="Bilge Sphincter ({{B|B}})" />
     </category>
   
 </mutations>

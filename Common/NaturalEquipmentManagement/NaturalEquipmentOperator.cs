@@ -70,7 +70,7 @@ namespace XRL.World.Parts
          && ParentLimb != null
          && !ParentLimb.Extrinsic;
 
-        public bool HasManaged = false;
+        public bool HasOperated = false;
 
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
@@ -173,7 +173,7 @@ namespace XRL.World.Parts
             Debug.Header(4,
                 $"{nameof(NaturalEquipmentOperator)}",
                 $"{nameof(ManageNaturalEquipment)}(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods) " +
-                $"{nameof(HasManaged)}: {HasManaged}", Toggle: doDebug);
+                $"{nameof(HasOperated)}: {HasOperated}", Toggle: doDebug);
 
             string parentLimbString =
                 ParentLimb != null
@@ -187,7 +187,7 @@ namespace XRL.World.Parts
                 $" ParentLimb: {parentLimbString}",
                 Indent: 0, Toggle: doDebug);
 
-            if (!HasManaged)
+            if (!HasOperated)
             {
                 if (!NaturalEquipmentMods.IsNullOrEmpty())
                 {
@@ -370,12 +370,12 @@ namespace XRL.World.Parts
                     Indent: 1, Toggle: doDebug);
             }
 
-            HasManaged = true;
+            HasOperated = true;
 
             Debug.Footer(4,
                 $"{nameof(NaturalEquipmentOperator)}",
                 $"{nameof(ManageNaturalEquipment)}(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods) " +
-                $"{nameof(HasManaged)}: {HasManaged}", Toggle: doDebug);
+                $"{nameof(HasOperated)}: {HasOperated}", Toggle: doDebug);
         }
 
         public virtual void ApplyNaturalEquipmentMods(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)

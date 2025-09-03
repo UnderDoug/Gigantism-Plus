@@ -1,24 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿using HarmonyLib;
+using HNPS_GigantismPlus;
 using Qud.API;
-
+using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
 using XRL;
-using XRL.UI;
 using XRL.Core;
 using XRL.Rules;
-using XRL.World;
-using XRL.World.Parts;
-using XRL.World.Parts.Skill;
-using XRL.World.Parts.Mutation;
-using XRL.World.ObjectBuilders;
+using XRL.UI;
 using XRL.Wish;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
+using XRL.World;
+using XRL.World.ObjectBuilders;
+using XRL.World.Parts;
+using XRL.World.Parts.Mutation;
+using XRL.World.Parts.Skill;
 using static HNPS_GigantismPlus.Const;
-
+using static HNPS_GigantismPlus.Utils;
+using static XRL.World.Parts.ModNaturalEquipmentBase;
 using Debug = HNPS_GigantismPlus.Debug;
 using Options = HNPS_GigantismPlus.Options;
 
@@ -181,6 +179,83 @@ namespace HNPS_GigantismPlus
         {
             string context = Context == null ? "" : $"{Context}:";
             Entry(Verbosity, $"% Vomit: {Source} {context}", Indent, Toggle: Toggle);
+        }
+        public static CodeMatcher Vomit(this CodeMatcher CodeMatcher, bool Do = false)
+        {
+            if (Do)
+            {
+                Dictionary<Label, int> labelInstructions = new();
+                int originalPos = CodeMatcher.Pos;
+                CodeMatcher.Start();
+                while (CodeMatcher.Advance(1).IsValid)
+                {
+                    CodeInstruction ci = CodeMatcher.Instruction;
+                    if (ci.labels.IsNullOrEmpty())
+                    {
+                        continue;
+                    }
+                    foreach (Label label in ci.labels)
+                    {
+                        if (!labelInstructions.ContainsKey(label))
+                        {
+                            labelInstructions.Add(label, CodeMatcher.Pos);
+                        }
+                        else
+                        {
+                            labelInstructions[label] = CodeMatcher.Pos;
+                        }
+                    }
+                }
+                CodeMatcher.Start().Advance(originalPos);
+
+                int counter = 0;
+                int counterPadding = Math.Max(4, (CodeMatcher.Instructions().Count + 1).ToString().Length);
+
+                foreach (CodeInstruction ci in CodeMatcher.InstructionEnumeration())
+                {
+                    string ciOperand = ci?.operand?.ToString();
+                    if (ci?.operand?.GetType() == typeof(string))
+                    {
+                        ciOperand = ci.operand?.ToString()?.ToLiteral(Quotes: true);
+                    }
+                    else
+                    if (ci.operand is Label ciLabel)
+                    {
+                        string ciLabelString = "????";
+                        if (labelInstructions.ContainsKey(ciLabel))
+                        {
+                            ciLabelString = labelInstructions[ciLabel].ToString().PadLeft(counterPadding, '0');
+                        }
+                        ciOperand = $"[{ciLabelString}]";
+                    }
+                    UnityEngine.Debug.Log($"[{counter.ToString().PadLeft(counterPadding, '0')}] {ci.opcode,-10} {ciOperand}");
+                    counter++;
+
+                    if (ci.opcode.IsEndOfSection())
+                    {
+                        UnityEngine.Debug.Log("");
+                    }
+                }
+            }
+            return CodeMatcher;
+        }
+        public static IEnumerable<CodeInstruction> Vomit(this IEnumerable<CodeInstruction> Instructions, bool Do = false)
+        {
+            return new CodeMatcher(Instructions).Vomit(Do).InstructionEnumeration();
+        }
+        public static CodeMatcher VomitInstruction(this CodeMatcher CodeMatcher, string Context = null)
+        {
+            int counter = CodeMatcher.Pos;
+            int counterPadding = Math.Max(4, (CodeMatcher.Length + 1).ToString().Length);
+
+            CodeInstruction ci = CodeMatcher.Instruction;
+            string ciOperand = ci?.operand?.ToString();
+            if (ci?.operand?.GetType() == typeof(string))
+            {
+                ciOperand = ci.operand?.ToString()?.ToLiteral(Quotes: true);
+            }
+            UnityEngine.Debug.Log($"[{counter.ToString().PadLeft(counterPadding, '0')}] {ci.opcode,-10} {ciOperand} {Context}");
+            return CodeMatcher;
         }
 
         public static MeleeWeapon Vomit(this MeleeWeapon MeleeWeapon, int Verbosity, string Title = null, List<string> Categories = null, int Indent = 0, bool Toggle = true)

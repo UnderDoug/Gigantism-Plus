@@ -35,8 +35,8 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject GameObject)
         {
             return base.Check(GameObject)
-                || Blueprint.IsNullOrEmpty()
-                || GameObject?.Blueprint == Blueprint;
+                && !Blueprint.IsNullOrEmpty()
+                && GameObject?.Blueprint == Blueprint;
         }
     }
 }

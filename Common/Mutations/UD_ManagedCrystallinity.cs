@@ -70,6 +70,15 @@ namespace XRL.World.Parts.Mutation
             return new(NewManager);
         }
 
+        public static ModCrystallineNaturalWeapon NewCrystallineArmMod(NaturalEquipmentManager NewManager)
+        {
+            // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.
+            return new(NewManager)
+            {
+                BodyPartType = "Arm",
+            };
+        }
+
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedCrystallinity> NaturalEquipmentMod = null, int Level = 1)
         {
             return 0;

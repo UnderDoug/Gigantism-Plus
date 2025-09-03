@@ -32,7 +32,7 @@ namespace XRL.World.Parts
 
             AdjustColorString("&Z", true);
             AdjustTileColor("&Z", true);
-            AdjustDetailColor("z", true);
+            AdjustDetailColor("z", true, new GameObjectIsForSlot("Hand"));
 
             AddAdjustment(new DisableModGiganticShortDescription());
             AddAdjustment(new DisableModGiganticDisplayName());
@@ -63,7 +63,19 @@ namespace XRL.World.Parts
         {
             if (IsObjectActivePartSubject(E.Object))
             {
-                E.Amount += GetDamageBonus() - 2;
+                int damageBonus = 0;
+                if (!Adjustments.IsNullOrEmpty())
+                {
+                    foreach (IAdjustment adjustment in Adjustments)
+                    {
+                        if (adjustment is AdjustMeleeDamageBonus meleeWeaponDamageBonus)
+                        {
+                            damageBonus = (int)meleeWeaponDamageBonus.Amount;
+                            break;
+                        }
+                    }
+                }
+                E.Amount += Math.Max(0, damageBonus - 2);
             }
             return base.HandleEvent(E);
         }
@@ -71,12 +83,11 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && E.Context == NATURAL_EQUIPMENT)
             {
-                int damageBonus = GetDamageBonus();
-                int cleaveBonus = -(damageBonus - 2);
+                int cleaveBonus = -GetCleaveAmountEvent.GetFor(ParentObject, Wielder, null);
 
-                if (damageBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
+                if (cleaveBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
                 {
-                    E.AddPrimaryElement("has", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
+                    E.AddPrimaryElement("have", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
                 }
             }
             return base.HandleEvent(E);

@@ -26,9 +26,9 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void ApplyTo_CallUpdateBodyParts_Postfix(GameObject Object)
+        public static void ApplyTo_CallUpdateBodyParts_Postfix(GameObject Object)
         {
             Object?.Body?.UpdateBodyParts();
         }
-    } //!-- public static class CookingDomainSpecial_UnitCrystalTransform_Patches
+    }
  }

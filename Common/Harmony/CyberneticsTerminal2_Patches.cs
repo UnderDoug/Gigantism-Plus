@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus.Harmony
         // goal force gigantic creatures who are eligible for cybernetics to hunch over when using becomming nooks.
         // failure to do so really freaks out the cybernetic in question due to being "too small".
         // you end up with it installed, but the equipment copy ends up in your inventory.
-        static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = true)
+        public static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = true)
         {
             Debug.Entry(3, 
                 $"* {nameof(CyberneticsTerminal2_ToggleHunched)}(" + 
@@ -72,7 +72,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(InventoryActionEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool InventoryActionEvent_HunchOver_Prefix(InventoryActionEvent E)
+        public static bool InventoryActionEvent_HunchOver_Prefix(InventoryActionEvent E)
         {
             if (E.Command.Is("InterfaceWithBecomingNook"))
             {
@@ -94,7 +94,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(InventoryActionEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void InventoryActionEvent_HunchOver_Postfix(InventoryActionEvent E)
+        public static void InventoryActionEvent_HunchOver_Postfix(InventoryActionEvent E)
         {
             if (E.Command == "InterfaceWithBecomingNook")
             {
@@ -115,7 +115,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(CommandSmartUseEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool CommandSmartUseEvent_HunchOver_Prefix(CommandSmartUseEvent E)
+        public static bool CommandSmartUseEvent_HunchOver_Prefix(CommandSmartUseEvent E)
         {
             Debug.Entry(3,
                 $"# {typeof(CyberneticsTerminal2).Name}."
@@ -134,7 +134,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(CommandSmartUseEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void CommandSmartUseEvent_HunchOver_Postfix(CommandSmartUseEvent E)
+        public static void CommandSmartUseEvent_HunchOver_Postfix(CommandSmartUseEvent E)
         {
             Debug.Entry(3, "Patched method run", Indent: 1, Toggle: doDebug);
 

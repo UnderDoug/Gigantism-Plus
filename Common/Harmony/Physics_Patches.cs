@@ -23,7 +23,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(EquippedEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, Physics __instance)
+        public static bool HandleEvent_EquippedEvent_Prefix(EquippedEvent E, Physics __instance)
         {
             // goal: reduce the amount of thrown warnings when the FinalizeCopy patch sends an EquippedEvent
 

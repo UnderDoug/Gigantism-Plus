@@ -32,7 +32,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GetDisplayNameEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void HandleEvent_GetDisplayName_Postfix(GetDisplayNameEvent E)
+        public static void HandleEvent_GetDisplayName_Postfix(GetDisplayNameEvent E)
         {
             string adjective = "gigantic";
             int priority = 30;
@@ -63,7 +63,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool ModificationApplied_AdditionalEffects_Prefix(ref ModGigantic __instance, GameObject Object)
+        public static bool ModificationApplied_AdditionalEffects_Prefix(ref ModGigantic __instance, GameObject Object)
         {
             BeforeModGiganticAppliedEvent.Send(Object, __instance);
             return true;
@@ -80,7 +80,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void ModificationApplied_AdditionalEffects_Postfix(ref ModGigantic __instance, GameObject Object)
+        public static void ModificationApplied_AdditionalEffects_Postfix(ref ModGigantic __instance, GameObject Object)
         {
             AfterModGiganticAppliedEvent.Send(Object, __instance);
         }

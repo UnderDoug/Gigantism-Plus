@@ -28,11 +28,27 @@ namespace HNPS_GigantismPlus.Harmony
         {
             BodyPart @this = __instance;
 
-            Debug.Entry(4, $"{typeof(Body_Patches).Name}.{nameof(Implant_UpdateBodyParts_Postfix)}(ref Actor __instance)", Indent: 0, Toggle: doDebug);
+            Debug.Entry(4, $"{nameof(Body_Patches)}.{nameof(BodyPart.Implant)}(BodyPart __instance)", Indent: 0, Toggle: doDebug);
 
-            Debug.Entry(4, $"Object is {@this.ParentBody?.ParentObject?.DebugName ?? NULL}", Indent: 1, Toggle: doDebug);
+            Debug.Entry(4, $"Implantee is {@this.ParentBody?.ParentObject?.DebugName ?? NULL}", Indent: 1, Toggle: doDebug);
 
             @this?.ParentBody?.UpdateBodyParts();
+        }
+
+        [HarmonyPatch(
+            declaringType: typeof(BodyPart),
+            methodName: nameof(BodyPart.DefaultBehavior),
+            methodType: MethodType.Setter)]
+        [HarmonyPostfix]
+        public static void set_DefaultBehavior_UpdateDefaultBehaviorBlueprint_Postfix(ref BodyPart __instance)
+        {
+            BodyPart @this = __instance;
+
+            Debug.Entry(4, $"{nameof(Body_Patches)}.{nameof(BodyPart.DefaultBehavior)}(ref BodyPart __instance)", Indent: 0, Toggle: doDebug);
+
+            Debug.Entry(4, $"Wielder is {@this.ParentBody?.ParentObject?.DebugName ?? NULL}", Indent: 1, Toggle: doDebug);
+
+            __instance.DefaultBehaviorBlueprint = __instance.DefaultBehavior?.Blueprint;
         }
     }
 }

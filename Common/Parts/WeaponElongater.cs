@@ -40,7 +40,7 @@ namespace XRL.World.Parts
         public ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod
         {
             get => _naturalEquipmentMod ??= ElongatedPaws?.UpdateNaturalEquipmentMod(
-                ElongatedPaws.NewElongatedWeaponMod(ElongatedPaws.NaturalEquipmentManager),
+                ElongatedPaws.NewElongatedArmMod(ElongatedPaws.NaturalEquipmentManager),
                     (int) ElongatedPaws?.Level);
             set => _naturalEquipmentMod = value;
         }

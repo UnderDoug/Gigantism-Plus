@@ -468,7 +468,7 @@ namespace XRL.World.Parts
                             Indent: 2, Toggle: doDebug);
 
                         naturalEquipmentOperator.ClearShortDescriptionCache();
-                        naturalEquipmentOperator.HasManaged = false;
+                        // naturalEquipmentOperator.HasManaged = false;
                     }
                 }
             }
@@ -559,6 +559,21 @@ namespace XRL.World.Parts
                                 Creature: ParentObject, 
                                 BodyPart: equipmentLimb, 
                                 Operator: naturalEquipmentOperator).Reset();
+                        }
+                    }
+                }
+                List<GameObject> naturalEquipmentInInventory = Event.NewGameObjectList(E.Creature.GetInventory(GO => GO.InheritsFrom("NaturalEquipment")) ?? new());
+                if (!naturalEquipmentInInventory.IsNullOrEmpty())
+                {
+                    foreach (GameObject naturalEquipment in naturalEquipmentInInventory)
+                    {
+                        string bodyPartType = naturalEquipment.GetPart<MeleeWeapon>()?.Slot ?? naturalEquipment.GetPart<Armor>()?.WornOn;
+                        // E.Creature.EquipObject(naturalEquipment, E.Creature.GetFirstBodyPart(BP => BP.Type == bodyPartType && BP.DefaultBehavior == null), true, 0)
+                        
+                        if (!E.Creature.AutoEquip(naturalEquipment, Silent: true)
+                            && GameObject.Validate(naturalEquipment))
+                        {
+                            naturalEquipment.Obliterate();
                         }
                     }
                 }

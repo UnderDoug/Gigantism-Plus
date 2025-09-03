@@ -1089,6 +1089,11 @@ namespace HNPS_GigantismPlus
                 || @object.InheritsFrom("NaturalWeapon");
         }
 
+        public static string GetEquipmentSlot(this GameObject @object)
+        {
+            return @object.GetPart<Armor>()?.WornOn ?? @object.GetPart<MeleeWeapon>()?.Slot;
+        }
+
         public static T DrawRandomToken<T>(this List<T> Bag, T ExceptForToken = null, List<T> ExceptForTokens = null)
             where T : class
         {

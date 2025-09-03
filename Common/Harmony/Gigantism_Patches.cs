@@ -22,7 +22,7 @@ namespace HNPS_GigantismPlus.Harmony
             declaringType: typeof(GameObject),
             methodName: nameof(GameObject.GetBodyWeight))]
         [HarmonyPrefix]
-        static void GetBodyWeight_GigantismPlus_Prefix(ref GameObject __state, ref GameObject __instance)
+        public static void GetBodyWeight_GigantismPlus_Prefix(ref GameObject __state, ref GameObject __instance)
         {
             __state = __instance;
             
@@ -46,7 +46,7 @@ namespace HNPS_GigantismPlus.Harmony
             declaringType: typeof(GameObject), 
             methodName: nameof(GameObject.GetBodyWeight))]
         [HarmonyPostfix]
-        static void GetBodyWeight_GigantismPlus_Postfix(ref GameObject __state)
+        public static void GetBodyWeight_GigantismPlus_Postfix(ref GameObject __state)
         {
             if (!__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
             {
@@ -77,7 +77,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject), typeof(double) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPrefix]
-        static void GetFor_GigantismPlus_Prefix(ref GameObject __state, GameObject Object)
+        public static void GetFor_GigantismPlus_Prefix(ref GameObject __state, GameObject Object)
         {
             __state = Object;
             
@@ -106,7 +106,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject), typeof(double) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void GetFor_GigantismPlus_Postfix(ref GameObject __state)
+        public static void GetFor_GigantismPlus_Postfix(ref GameObject __state)
         {
             if (!__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
             {

@@ -483,9 +483,13 @@ namespace XRL.World.Parts
             {
                 Manager = E.Actor.RequirePart<NaturalEquipmentManager>();
                 Debug.CheckYeh(4, $"Added {Manager.Name} to {Name}", Indent: indent + 2, Toggle: doDebug);
-                if (E.Item.EquipAsDefaultBehavior())
+                if (E.Item.EquipAsDefaultBehavior() && WantsToOperate)
                 {
-                    // E.Actor?.Body?.UpdateBodyParts();
+                    if (ParentLimb != null)
+                    {
+                        ParentLimb.DefaultBehaviorBlueprint = E.Item.Blueprint;
+                    }
+                    ManageNaturalEquipment(NaturalEquipmentManager.PrioritiseNaturalEquipmentMods(GetNaturalEquipmentMods()));
                 }
             }
             else
@@ -549,7 +553,7 @@ namespace XRL.World.Parts
                 {
                     tinkerItem = ParentObject.RequirePart<TinkerItem>();
                 }
-                tinkerItem.Bits = "";
+                tinkerItem.Bits = "0";
                 tinkerItem.CanDisassemble = false;
                 tinkerItem.CanBuild = false;
 

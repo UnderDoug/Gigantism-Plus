@@ -24,7 +24,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(BodyPart) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
-        static bool AddCarapaceTo_NewCarapaceEveryTime_Prefix(ref Carapace __instance, ref BodyPart body, ref GameObject ___CarapaceObject)
+        public static bool AddCarapaceTo_NewCarapaceEveryTime_Prefix(ref Carapace __instance, ref BodyPart body, ref GameObject ___CarapaceObject)
         {
             if (body != null && ___CarapaceObject != null)
             {

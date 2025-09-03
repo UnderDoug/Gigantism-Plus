@@ -169,9 +169,8 @@ namespace XRL.World.Parts.Mutation
 
         public static ModGiganticNaturalWeapon NewGiganticFistMod(NaturalEquipmentManager NewManager)
         {
-            ModGiganticNaturalWeapon giganticFistMod = new()
+            ModGiganticNaturalWeapon giganticFistMod = new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 Noun = "fist",
@@ -188,24 +187,33 @@ namespace XRL.World.Parts.Mutation
         }
         public static ModGiganticNaturalWeapon NewGiganticNogginMod(NaturalEquipmentManager NewManager)
         {
-            return new()
+            return new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Head",
             };
         }
         public static ModGiganticNaturalWeapon NewGiganticMugMod(NaturalEquipmentManager NewManager)
         {
-            ModGiganticNaturalWeapon giganticMugMod = new()
+            return new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Face",
             };
+        }
+        public static ModGiganticNaturalWeapon NewGiganticArmMod(NaturalEquipmentManager NewManager)
+        {
+            // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.
 
-            int bonusDamage = NewManager?.ParentObject?.GetPart<GigantismPlus>() is GigantismPlus gigantism ? Math.Max(3, gigantism.Level / 2) : 3;
-            giganticMugMod.AdjustMeleeDamageBonus(bonusDamage, MeleeWeaponSkillIsAxe);
-            return giganticMugMod;
-
+            return new(NewManager)
+            {
+                BodyPartType = "Arm",
+            };
+        }
+        public static ModGiganticNaturalWeapon NewGiganticTailMod(NaturalEquipmentManager NewManager)
+        {
+            return new(NewManager)
+            {
+                BodyPartType = "Tail",
+            };
         }
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(NaturalEquipmentManager NewManager)
         {
@@ -240,15 +248,13 @@ namespace XRL.World.Parts.Mutation
         }
         public static ModClosedGiganticNaturalWeapon NewClosedFistMod(NaturalEquipmentManager NewManager)
         {
-            GigantismPlus gigantismPlus = NewManager?.ParentObject?.GetPart<GigantismPlus>();
-            if (gigantismPlus == null 
+            if (NewManager?.ParentObject?.GetPart<GigantismPlus>() is not GigantismPlus gigantismPlus
                 || !gigantismPlus.IsMyActivatedAbilityToggledOn(gigantismPlus.CloseFistActivatedAbilityID))
             {
                 return null;
             }
-            ModClosedGiganticNaturalWeapon closedGiganticFist = new()
+            ModClosedGiganticNaturalWeapon closedGiganticFist = new(NewManager)
             {
-                Manager = NewManager,
                 BodyPartType = "Hand",
 
                 ModPriority = -999999, // -999,999
@@ -300,7 +306,10 @@ namespace XRL.World.Parts.Mutation
                     return 2;
                 }
 
-                if (NaturalEquipmentMod.BodyPartType == "Hand")
+                if (NaturalEquipmentMod.BodyPartType == "Hand" 
+                    || NaturalEquipmentMod.BodyPartType == "Arm"
+                    || NaturalEquipmentMod.BodyPartType == "Face"
+                    || NaturalEquipmentMod.BodyPartType == "Tail")
                 {
                     return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
                 }
@@ -321,7 +330,10 @@ namespace XRL.World.Parts.Mutation
                     return 5;
                 }
 
-                if (NaturalEquipmentMod.BodyPartType == "Hand")
+                if (NaturalEquipmentMod.BodyPartType == "Hand"
+                    || NaturalEquipmentMod.BodyPartType == "Arm"
+                    || NaturalEquipmentMod.BodyPartType == "Face"
+                    || NaturalEquipmentMod.BodyPartType == "Tail")
                 {
                     double perLevel = 3.0;
                     int levelOffset = MinDamageBonusIncrease * (int)perLevel;
@@ -330,7 +342,7 @@ namespace XRL.World.Parts.Mutation
             }
             return 0;
         }
-        public override int  GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
+        public override int GetNaturalWeaponHitBonus(ModNaturalEquipment<GigantismPlus> NaturalEquipmentMod, int Level = 1)
         {
             if (NaturalEquipmentMod != null)
             {
@@ -344,7 +356,10 @@ namespace XRL.World.Parts.Mutation
                     return 3;
                 }
 
-                if (NaturalEquipmentMod.BodyPartType == "Hand")
+                if (NaturalEquipmentMod.BodyPartType == "Hand"
+                    || NaturalEquipmentMod.BodyPartType == "Arm"
+                    || NaturalEquipmentMod.BodyPartType == "Face"
+                    || NaturalEquipmentMod.BodyPartType == "Tail")
                 {
                     return -3 + (int)Math.Floor(Level / 2.0);
                 }

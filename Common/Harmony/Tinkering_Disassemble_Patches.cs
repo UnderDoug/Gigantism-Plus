@@ -25,7 +25,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void CanBeConsideredScrap_PreventCyberAndNatural_Postfix(ref GameObject obj, ref bool __result)
+        public static void CanBeConsideredScrap_PreventCyberAndNatural_Postfix(ref GameObject obj, ref bool __result)
         {
             if (obj != null && (obj.HasPart<CyberneticsBaseItem>() || obj.HasPart<NaturalEquipment>() || obj.IsNaturalEquipment()))
             {

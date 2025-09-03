@@ -37,18 +37,18 @@ namespace HNPS_GigantismPlus.Harmony
                 + $"(ref Body __instance, Event E, ref Event ___eBodypartsUpdated)", 
                 Indent: 0, Toggle: doDebug);
 
-            string objectDesc = @this.ParentObject != null 
+            string objectDesc = @this.ParentObject is not null 
                 ? $"{@this.ParentObject?.ID}:{@this.ParentObject?.ShortDisplayNameStripped}" 
                 : "[null]";
 
             Debug.Entry(4, $"Object is {objectDesc}", Indent: 1, Toggle: doDebug);
 
-            if (ParentObject != null)
+            if (ParentObject is not null)
             {
                 RegenerateNonDefaultNaturalEquipment(ParentObject);
             }
 
-            if (E.Is(___eBodypartsUpdated) && @this.ParentObject != null)
+            if (E == ___eBodypartsUpdated && @this.ParentObject is not null)
             {
                 // Tells each NaturalEquipmentOperator to reset itself in prep for managing its attached equipment
                 BodyPartsUpdatedEvent.Send(@this.ParentObject);
@@ -71,7 +71,7 @@ namespace HNPS_GigantismPlus.Harmony
                 Indent: indent, Toggle: doDebug);
 
             Debug.Entry(4, $"? if (!Creature.Is(null) and Creature.HasPart<Inventory>())", Indent: indent + 1, Toggle: doDebug);
-            if (!Creature.Is(null) && Creature.HasPart<Inventory>())
+            if (Creature != null && Creature.HasPart<Inventory>())
             {
                 Debug.Entry(4, $"? if (Creature.TryGetGameObjectBlueprint(out GameObjectBlueprint Blueprint) and Blueprint.Inventory != null)", Indent: indent + 2, Toggle: doDebug);
                 bool doReequip = false;
@@ -112,7 +112,7 @@ namespace HNPS_GigantismPlus.Harmony
                     Debug.Entry(4, $"Getting list of currentItemBlueprints that are Natural", Indent: indent + 3, Toggle: doDebug);
                     Dictionary<string, int> currentItemBlueprints = new();
                     Debug.Entry(4, $"> foreach (GameObject item in ParentObject.GetEquippedObjects())", Indent: indent + 3, Toggle: doDebug);
-                    foreach (GameObject item in Creature.GetEquippedObjects())
+                    foreach (GameObject item in Creature.GetInventoryAndEquipmentAndDefaultEquipment())
                     {
                         Debug.Divider(4, HONLY, Count: 25, Indent: indent + 4, Toggle: doDebug);
                         Debug.LoopItem(4, $"item.Blueprint", $"{item.Blueprint}", Indent: indent + 4, Toggle: doDebug);
@@ -160,6 +160,8 @@ namespace HNPS_GigantismPlus.Harmony
                     Debug.Entry(4, $"? if ({nameof(doReequip)})", Indent: indent + 3, Toggle: doDebug);
                     Debug.LoopItem(4, $"{nameof(doReequip)}", $"{doReequip}",
                         Good: doReequip, Indent: indent + 4, Toggle: doDebug);
+
+                    List<BodyPart> alreadyEquippedToBodyParts = new();
                     if (doReequip)
                     {
                         Debug.Entry(4, $"> foreach ((string blueprint, int number) in blueprintItemBlueprints)", Indent: indent + 4, Toggle: doDebug);
@@ -168,8 +170,23 @@ namespace HNPS_GigantismPlus.Harmony
                             Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: doDebug);
                             for (int i = 0; i < blueprintItemBlueprints.Count; i++)
                             {
+                                GameObject naturalEquipmentObject = GameObjectFactory.Factory.CreateObject(blueprint);
+                                if (naturalEquipmentObject is not null
+                                    && Creature.GetFirstBodyPart(
+                                        BP => !alreadyEquippedToBodyParts.Contains(BP) 
+                                        && BP.Type == naturalEquipmentObject.GetEquipmentSlot() 
+                                        && BP.DefaultBehavior == null) is BodyPart partToEquipTo
+                                    && partToEquipTo.DoEquip(naturalEquipmentObject))
+                                {
+                                    alreadyEquippedToBodyParts.TryAdd(partToEquipTo);
+                                }
+                                else
+                                if (naturalEquipmentObject is not null)
+                                {
+                                    naturalEquipmentObject?.Obliterate();
+                                }
                                 Debug.CheckYeh(4, $"{blueprint} added to inventory", Indent: indent + 5, Toggle: doDebug);
-                                Creature.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(blueprint));
+                                // Creature.Inventory.AddObjectToInventory(GameObjectFactory.Factory.CreateObject(blueprint));
                             }
                         }
                         Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: doDebug);
@@ -187,7 +204,7 @@ namespace HNPS_GigantismPlus.Harmony
                     Good: doReequip, Indent: indent + 2, Toggle: doDebug);
                 if (doReequip)
                 {
-                    Creature.Brain.WantToReequip();
+                    // Creature.Brain.WantToReequip();
                 }
             }
             else

@@ -65,9 +65,18 @@ namespace XRL.World.Parts.Mutation
             EnableActivatedAbilityID = BurrowingClaws.EnableActivatedAbilityID;
         }
 
-        public static ModBurrowingNaturalWeapon NewBurrowingWeaponMod(NaturalEquipmentManager NewManager)
+        public static ModBurrowingNaturalWeapon NewBurrowingHandMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager);
+        }
+
+        public static ModBurrowingNaturalWeapon NewBurrowingArmMod(NaturalEquipmentManager NewManager)
+        {
+            // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.
+            return new(NewManager)
+            {
+                BodyPartType = "Arm",
+            };
         }
 
         public virtual int GetNaturalWeaponDamageDieCount(ModNaturalEquipment<UD_ManagedBurrowingClaws> NaturalEquipmentMod = null, int Level = 1)

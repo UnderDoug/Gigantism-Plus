@@ -25,7 +25,7 @@ namespace HNPS_GigantismPlus.Harmony
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        static void Apply_UseMutationEntry_Postfix(ref bool __result, ref Skulk_Tonic __instance, GameObject Object)
+        public static void Apply_UseMutationEntry_Postfix(ref bool __result, ref Skulk_Tonic __instance, GameObject Object)
         {
             // Intercept the application of Burrowing Claws via Skulk_Tonic to apply the Mutations.xml version instead for compatibility.
 

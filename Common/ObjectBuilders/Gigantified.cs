@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using XRL.Core;
 using XRL.Rules;
+using XRL.UI;
 using XRL.Wish;
 using XRL.World.AI.GoalHandlers;
 using XRL.World.Parts;
@@ -468,27 +469,57 @@ namespace XRL.World.ObjectBuilders
             return Gigantify(Creature, Level, Stews, Tier, NamePrefix, Context);
         }
 
-        [WishCommand("gigantic", null)]
+        [WishCommand("gigantify", null)]
         public static void Wish(string Blueprint)
         {
-            GameObject @object = The.Player;
+            GameObject @object = null;
+            string blueprint = null;
+            if (!Blueprint.IsNullOrEmpty())
+            {
+                if (GameObjectFactory.Factory.GetBlueprintIfExists(Blueprint) is GameObjectBlueprint gameObjectBlueprint)
+                {
+                    blueprint = gameObjectBlueprint.Name;
+                }
+                else
+                {
+                    blueprint = WishSearcher.SearchForBlueprint(Blueprint)?.Result;
+                }
+                if (!blueprint.IsNullOrEmpty())
+                {
+                    @object = GameObjectFactory.Factory.CreateObject(blueprint, Context: "Wish");
 
-            if (Blueprint == null)
-            {
-                WishResult wishResult = WishSearcher.SearchForBlueprint(Blueprint);
-                @object = GameObjectFactory.Factory.CreateObject(wishResult.Result, 0, 0, null, null, null, "Wish");
+                    if (@object != null)
+                    {
+                        int Level = ExplodingDie(1, "1d2", Step: 1, Limit: 16, Indent: 2);
+                        int Stews = ExplodingDie(0, "1d2", Step: 1, Indent: 2);
+                        int objectTier = (int)Math.Floor(@object.GetBlueprint().Stat("Level") / 5.0);
+                        int Tier = ExplodingDie(objectTier, "1d3", Step: 1, Limit: 8, Indent: 2);
+
+                        Gigantify(@object, Level, Stews, Tier, "gigantic".MaybeColor("gigantic"));
+
+                        @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
+
+                        The.PlayerCell.getClosestEmptyCell().AddObject(@object);
+                        return;
+                    }
+                }
+                Popup.Show($"Couldn't resolve {nameof(blueprint)}: {Blueprint} ({blueprint ?? "[null]"}), double check it's correct.");
             }
-            if (@object != null)
+            else
             {
+                @object = The.Player;
+
                 int Level = ExplodingDie(1, "1d2", Step: 1, Limit: 16, Indent: 2);
                 int Stews = ExplodingDie(0, "1d2", Step: 1, Indent: 2);
                 int objectTier = (int)Math.Floor(@object.GetBlueprint().Stat("Level") / 5.0);
                 int Tier = ExplodingDie(objectTier, "1d3", Step: 1, Limit: 8, Indent: 2);
-                Gigantify(@object, Level, Stews, Tier, "gigantic".MaybeColor("gigantic"));
-                @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
-            }
 
-            The.PlayerCell.getClosestEmptyCell().AddObject(@object);
+                Gigantify(@object, Level, Stews, Tier, "gigantic".MaybeColor("gigantic"), "Wish", true);
+
+                @object.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
+
+                Popup.Show($"Lookin' thicc, {The.Player.DisplayName}.");
+            }
         }
     }
 }

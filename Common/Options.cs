@@ -136,6 +136,7 @@ namespace HNPS_GigantismPlus
             { nameof(MutationBGoneWishHandler_Patches), true },
             { nameof(Physics_Patches), false },
             { nameof(Skulk_Tonic_Patches), true },
+            { nameof(Stinger_Patches), true },
             { nameof(Tinkering_Disassemble_Patches), false },
 
             // Widgets

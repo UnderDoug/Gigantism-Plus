@@ -177,13 +177,13 @@ namespace XRL.World.Parts
                     if (E.Equipment != null && E.Equipment.IsNaturalEquipment())
                     {
                         E.GetForEquipment();
-                        break;
+                        continue;
                     }
                     E.Equipment = bodyPart.Equipped;
                     if (E.Equipment != null && E.Equipment.IsNaturalEquipment())
                     {
                         E.GetForEquipment();
-                        break;
+                        continue;
                     }
                 }
             }

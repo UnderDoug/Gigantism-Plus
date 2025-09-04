@@ -28,6 +28,10 @@ namespace HNPS_GigantismPlus.Harmony
         {
             if (Limb != null && ___StingerObject != null)
             {
+                if (___StingerObject.EquipAsDefaultBehavior())
+                {
+                    Limb.DefaultBehavior = null;
+                }
                 ___StingerObject?.Obliterate();
                 ___StingerObject = null;
             }

@@ -196,7 +196,7 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Warn(2,
                     $"{nameof(Extensions)}",
-                    $"{nameof(GetPrioritisedAppliedNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                    $"{nameof(GetPrioritisedAppliedNaturalEquipmentMods)}({nameof(GameObject)} {typeof(bool).Name})",
                     $"{nameof(Equipment)} {Equipment?.DebugName ?? NULL} has no {nameof(naturalEquipmentMods)} " +
                     $"when it was expected {Equipment?.it ?? "it"} would",
                     Indent: indent + 2);

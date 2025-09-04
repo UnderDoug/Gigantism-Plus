@@ -62,8 +62,8 @@ namespace HNPS_GigantismPlus
             }
         }
 
-        public Adjustments(IEnumerable<IAdjustment> Conditions)
-            : this(Conditions as IReadOnlyList<IAdjustment>)
+        public Adjustments(IEnumerable<IAdjustment> Adjustments)
+            : this(Adjustments as IReadOnlyList<IAdjustment>)
         {
         }
 
@@ -77,9 +77,9 @@ namespace HNPS_GigantismPlus
             return new Enumerator(this);
         }
 
-        public static implicit operator ReadOnlySpan<IAdjustment>(Adjustments Conditions)
+        public static implicit operator ReadOnlySpan<IAdjustment>(Adjustments Adjustments)
         {
-            return Conditions.AsSpan();
+            return Adjustments.AsSpan();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

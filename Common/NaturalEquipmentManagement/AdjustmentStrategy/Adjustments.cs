@@ -93,7 +93,6 @@ namespace HNPS_GigantismPlus
             }
         }
 
-
         public virtual void Add(IAdjustment Adjustment, GameObject Subject)
         {
             bool doConditionsDebug = Options.doConditionsDebug;
@@ -111,16 +110,14 @@ namespace HNPS_GigantismPlus
                     if (Adjustment.TryGetHigherPriorityAdjustment(Subject, Items[i], out higherPriorityAdjustment))
                     {
                         Items[i] = higherPriorityAdjustment;
+                        Variant++;
                         break;
                     }
                 }
             }
             if (higherPriorityAdjustment == null)
             {
-                if (Length == Size)
-                {
-                    Resize(Length * 2);
-                }
+                EnsureCapacity(Length + 1);
                 Items[Length++] = Adjustment;
                 Variant++;
             }
@@ -142,7 +139,7 @@ namespace HNPS_GigantismPlus
                 Capacity = DefaultCapacity;
             }
             IAdjustment[] array = new IAdjustment[Capacity];
-            Array.Copy(Items, 0, array, 0, Length);
+            Array.Copy(Items, array, Length);
             Items = array;
             Size = Capacity;
         }
@@ -186,7 +183,10 @@ namespace HNPS_GigantismPlus
             EnsureCapacity(Length + Adjustments.Count());
             foreach (IAdjustment Item in Adjustments)
             {
-                Add(Item);
+                if (Item != null)
+                {
+                    Add(Item);
+                }
             }
         }
 

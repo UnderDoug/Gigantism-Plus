@@ -86,11 +86,14 @@ namespace XRL.World.Parts
 
         public static void ResetNaturalEquipmentModListPool()
         {
-            for (int i = 0; i < nNaturalEquipmentModListPoolCounter; i++)
+            if (!NaturalEquipmentModListPool.IsNullOrEmpty())
             {
-                if (NaturalEquipmentModListPool[i].Count > 0)
+                for (int i = 0; i < nNaturalEquipmentModListPoolCounter; i++)
                 {
-                    NaturalEquipmentModListPool[i].Clear();
+                    if (!NaturalEquipmentModListPool[i].IsNullOrEmpty())
+                    {
+                        NaturalEquipmentModListPool[i].Clear();
+                    }
                 }
             }
             nNaturalEquipmentModListPoolCounter = 0;
@@ -98,26 +101,30 @@ namespace XRL.World.Parts
 
         public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList()
         {
+            NaturalEquipmentModListPool ??= new();
             while (NaturalEquipmentModListPool.Count <= nNaturalEquipmentModListPoolCounter)
             {
                 NaturalEquipmentModListPool.Add(new List<ModNaturalEquipmentBase>(12));
             }
-            List<ModNaturalEquipmentBase> list = NaturalEquipmentModListPool[nNaturalEquipmentModListPoolCounter];
-            nNaturalEquipmentModListPoolCounter++;
-            if (list.Count > 0)
-            {
-                list.Clear();
-            }
+            List<ModNaturalEquipmentBase> list = NaturalEquipmentModListPool[nNaturalEquipmentModListPoolCounter++];
+            list.Clear();
             return list;
         }
         public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList(List<ModNaturalEquipmentBase> List)
         {
             List<ModNaturalEquipmentBase> list = NewNaturalEquipmentModList();
-            list.AddRange(List);
+            if (!List.IsNullOrEmpty())
+            {
+                list.AddRange(List);
+            }
             return list;
         }
         public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList(List<ModNaturalEquipmentBase> List, Predicate<ModNaturalEquipmentBase> Filter)
         {
+            if (List.IsNullOrEmpty())
+            {
+                return NewNaturalEquipmentModList();
+            }
             if (Filter == null)
             {
                 return NewNaturalEquipmentModList(List);
@@ -135,7 +142,10 @@ namespace XRL.World.Parts
         public static List<ModNaturalEquipmentBase> NewNaturalEquipmentModList(IEnumerable<ModNaturalEquipmentBase> List)
         {
             List<ModNaturalEquipmentBase> list = NewNaturalEquipmentModList();
-            list.AddRange(List);
+            if (!List.IsNullOrEmpty())
+            {
+                list.AddRange(List);
+            }
             return list;
         }
 
@@ -149,12 +159,12 @@ namespace XRL.World.Parts
 
         public static List<NaturalEquipmentOperator> GetNaturalEquipmentOperators(GameObject Creature, NaturalEquipmentManager Manager)
         {
-            GetNaturalEquipmentOperatorsEvent getNaturalEquipmentOperatorsEvent = GetNaturalEquipmentOperatorsEvent.FromPool();
-            getNaturalEquipmentOperatorsEvent.Manager = Manager;
-            getNaturalEquipmentOperatorsEvent.Creature = Creature;
-            getNaturalEquipmentOperatorsEvent.Operators = new();
+            GetNaturalEquipmentOperatorsEvent E = GetNaturalEquipmentOperatorsEvent.FromPool();
+            E.Manager = Manager;
+            E.Creature = Creature;
+            E.Operators = new();
 
-            getNaturalEquipmentOperatorsEvent.GetForCreature();
+            E.GetForCreature();
 
             // List<NaturalEquipmentOperator> naturalEquipmentOperators = GetNaturalEquipmentOperatorsEvent.GetForCreature(Creature, Manager);
 
@@ -163,20 +173,22 @@ namespace XRL.World.Parts
             {
                 foreach (BodyPart bodyPart in bodyParts)
                 {
-                    getNaturalEquipmentOperatorsEvent.Equipment = bodyPart.DefaultBehavior;
-                    if (getNaturalEquipmentOperatorsEvent.Equipment != null && getNaturalEquipmentOperatorsEvent.Equipment.IsNaturalEquipment())
+                    E.Equipment = bodyPart.DefaultBehavior;
+                    if (E.Equipment != null && E.Equipment.IsNaturalEquipment())
                     {
-                        getNaturalEquipmentOperatorsEvent.GetForEquipment();
+                        E.GetForEquipment();
+                        break;
                     }
-                    getNaturalEquipmentOperatorsEvent.Equipment = bodyPart.Equipped;
-                    if (getNaturalEquipmentOperatorsEvent.Equipment != null && getNaturalEquipmentOperatorsEvent.Equipment.IsNaturalEquipment())
+                    E.Equipment = bodyPart.Equipped;
+                    if (E.Equipment != null && E.Equipment.IsNaturalEquipment())
                     {
-                        getNaturalEquipmentOperatorsEvent.GetForEquipment();
+                        E.GetForEquipment();
+                        break;
                     }
                 }
             }
-            List<NaturalEquipmentOperator> naturalEquipmentOperators = getNaturalEquipmentOperatorsEvent.Operators;
-            getNaturalEquipmentOperatorsEvent.Reset();
+            List<NaturalEquipmentOperator> naturalEquipmentOperators = E.Operators;
+            E.Reset();
 
             return naturalEquipmentOperators;
         }
@@ -227,10 +239,7 @@ namespace XRL.World.Parts
         }
 
         public static List<ModNaturalEquipment<T>> GetNaturalEquipmentMods<T>(NaturalEquipmentManager Manager, Predicate<ModNaturalEquipment<T>> Filter = null)
-            where T
-            : IPart
-            , IManagedDefaultNaturalEquipment<T>
-            , new()
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(GetNaturalEquipmentMods));
@@ -310,10 +319,7 @@ namespace XRL.World.Parts
             return naturalEquipmentModsList;
         }
         public List<ModNaturalEquipment<T>> GetNaturalEquipmentMods<T>(Predicate<ModNaturalEquipment<T>> Filter = null)
-            where T
-            : IPart
-            , IManagedDefaultNaturalEquipment<T>
-            , new()
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             return GetNaturalEquipmentMods(this, Filter);
         }
@@ -349,23 +355,46 @@ namespace XRL.World.Parts
                         : nameof(attachedNaturalEquipmentMod.ModPriority)
                         ;
 
-                    if (naturalEquipmentMods.ContainsKey(priority))
+                    bool doOverwrite = true;
+                    if (!naturalEquipmentMods.IsNullOrEmpty())
+                    {
+                        foreach ((int prioritisedPriority, ModNaturalEquipmentBase prioritisedNaturalEquipmentMod) in naturalEquipmentMods)
+                        {
+                            if (prioritisedNaturalEquipmentMod.GetType() == attachedNaturalEquipmentMod.GetType())
+                            {
+                                doOverwrite = false;
+                                string whichPriority = priority == prioritisedPriority ? "the current priority" : "priority";
+                                Debug.Warn(2,
+                                    $"{nameof(NaturalEquipmentManager)}",
+                                    $"{nameof(PrioritiseNaturalEquipmentMods)}({nameof(List<ModNaturalEquipmentBase>)}, {typeof(bool).Name})",
+                                    $"[{priority}]" +
+                                    $"{naturalEquipmentMods[priority]} " +
+                                    $"in {nameof(naturalEquipmentMods)} excluded: {prioritisedNaturalEquipmentMod} " +
+                                    $"already exists in list at {whichPriority} [{prioritisedPriority}]",
+                                    Indent: indent + 2);
+                                break;
+                            }
+                        }
+                    }
+                    if (naturalEquipmentMods.ContainsKey(priority) && doOverwrite)
                     {
                         Debug.Warn(2,
                             $"{nameof(NaturalEquipmentManager)}",
-                            $"{nameof(PrioritiseNaturalEquipmentMods)}(bool {nameof(ForDescriptions)})",
+                            $"{nameof(PrioritiseNaturalEquipmentMods)}({nameof(List<ModNaturalEquipmentBase>)}, {typeof(bool).Name})",
                             $"[{priority}]" +
                             $"{naturalEquipmentMods[priority]} " +
                             $"in {nameof(naturalEquipmentMods)} overwritten: Same {priorityString}",
                             Indent: indent + 2);
                     }
-
-                    naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
+                    if (doOverwrite)
+                    {
+                        naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
+                    }
 
                     Debug.LoopItem(4,
                         $"{attachedNaturalEquipmentMod.Name}" +
                         $"[{attachedNaturalEquipmentMod.GetAdjective()}]",
-                        Good: naturalEquipmentMods[priority] != null, Indent: indent + 2, Toggle: doDebug);
+                        Good: naturalEquipmentMods[priority] == attachedNaturalEquipmentMod, Indent: indent + 2, Toggle: doDebug);
                 }
             }
 
@@ -468,7 +497,7 @@ namespace XRL.World.Parts
                             Indent: 2, Toggle: doDebug);
 
                         naturalEquipmentOperator.ClearShortDescriptionCache();
-                        // naturalEquipmentOperator.HasManaged = false;
+                        naturalEquipmentOperator.HasOperated = false;
                     }
                 }
             }
@@ -507,8 +536,8 @@ namespace XRL.World.Parts
                             $"Limb: [{parentLimb?.ID}:{parentLimb?.Type}] {parentLimb?.Description ?? NULL}",
                             Indent: 2, Toggle: doDebug);
 
-                        naturalEquipmentOperator.ClearShortDescriptionCache();
-                        naturalEquipmentOperator.HasOperated = false;
+                        // naturalEquipmentOperator.ClearShortDescriptionCache();
+                        // naturalEquipmentOperator.HasOperated = false;
                     }
                 }
             }

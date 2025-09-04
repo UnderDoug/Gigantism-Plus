@@ -40,6 +40,7 @@ namespace HNPS_GigantismPlus
             Creature = null;
             Equipment = null;
             TargetBodyPart = null;
+            NaturalEquipmentMods?.Clear();
             NaturalEquipmentMods = null;
         }
 
@@ -54,7 +55,7 @@ namespace HNPS_GigantismPlus
                 + $" Equipment: {Equipment?.DebugName ?? NULL}",
                 Indent: indent, Toggle: doDebug);
 
-            NaturalEquipmentMods ??= new();
+            NaturalEquipmentMods ??= NaturalEquipmentManager.NewNaturalEquipmentModList();
             if (NaturalEquipmentMod != null)
             {
                 ModNaturalEquipmentBase naturalEquipmentModCopy = NaturalEquipmentMod.DeepCopy(Equipment) as ModNaturalEquipmentBase;
@@ -91,10 +92,7 @@ namespace HNPS_GigantismPlus
             return NaturalEquipmentMods;
         }
         public List<ModNaturalEquipmentBase> AddNaturalEquipmentMod<T>(ModNaturalEquipment<T> NaturalEquipmentMod)
-            where T
-            : IPart
-            , IManagedDefaultNaturalEquipment<T>
-            , new()
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             return AddNaturalEquipmentMod((ModNaturalEquipmentBase)NaturalEquipmentMod);
         }
@@ -118,10 +116,7 @@ namespace HNPS_GigantismPlus
             return this.NaturalEquipmentMods ?? new();
         }
         public List<ModNaturalEquipmentBase> AddNaturalEquipmentMods<T>(List<ModNaturalEquipment<T>> NaturalEquipmentMods)
-            where T
-            : IPart
-            , IManagedDefaultNaturalEquipment<T>
-            , new()
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
         {
             int indent = Debug.LastIndent;
             if (!NaturalEquipmentMods.IsNullOrEmpty())
@@ -182,9 +177,7 @@ namespace HNPS_GigantismPlus
                     E.NaturalEquipmentMods = @event.GetParameter(nameof(NaturalEquipmentMods)) as List<ModNaturalEquipmentBase>;
                 }
             }
-            List<ModNaturalEquipmentBase> naturalEquipmentMods = E.NaturalEquipmentMods;
-            E.Reset();
-            return naturalEquipmentMods;
+            return E.NaturalEquipmentMods;
         }
     }
 }

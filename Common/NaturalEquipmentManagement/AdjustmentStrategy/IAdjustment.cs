@@ -273,7 +273,7 @@ namespace HNPS_GigantismPlus
             bool sameType = GetType() == OtherAdjustment.GetType();
             if (!Prioritize && sameType)
             {
-                 return ConsiderSource && Source == OtherAdjustment.Source;
+                return ConsiderSource && Source == OtherAdjustment.Source;
             }
             return sameType;
         }

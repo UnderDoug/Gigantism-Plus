@@ -38,6 +38,7 @@ namespace XRL.World.Parts
             {
                 'V',    // Vomit
                 "OC",   // ObjectCreation
+                nameof(EquippedEvent),
             };
             List<object> dontList = new()
             {
@@ -45,7 +46,6 @@ namespace XRL.World.Parts
                 "S",    // Serialisation
                 nameof(GetNaturalEquipmentOperatorsEvent),
                 nameof(ManageDefaultNaturalEquipmentEvent),
-                nameof(EquippedEvent),
             };
 
             if (what != null && doList.Contains(what))
@@ -203,14 +203,21 @@ namespace XRL.World.Parts
                     }
 
                     Debug.Entry(4, $"Collecting Adjustments...", Indent: 1, Toggle: doDebug);
-                    Adjustments ??= new();
+                    if (Adjustments.IsNullOrEmpty())
+                    {
+                        Adjustments = new();
+                    }
+                    else
+                    {
+                        Adjustments.Clear();
+                    }
                     foreach ((int _, ModNaturalEquipmentBase naturalEquipmentMod) in NaturalEquipmentMods)
                     {
                         Debug.Divider(4, HONLY, 60, Indent: 2, Toggle: doDebug);
-                        Debug.Entry(4, 
+                        Debug.Entry(4,
                             $"[{naturalEquipmentMod.ModPriority}]" +
                             $"{naturalEquipmentMod.GetType().Name}" +
-                            $"<{naturalEquipmentMod.Adjective}>", 
+                            $"<{naturalEquipmentMod.Adjective}>",
                             Indent: 2, Toggle: doDebug);
                         foreach (IAdjustment adjustment in naturalEquipmentMod.Adjustments)
                         {
@@ -226,10 +233,20 @@ namespace XRL.World.Parts
                     if (!Adjustments.IsNullOrEmpty())
                     {
                         Debug.Entry(4, $"Applying Adjustments...", Indent: 1, Toggle: doDebug);
+                        int counter = 0;
                         foreach (IAdjustment adjustment in Adjustments)
                         {
                             Debug.Divider(4, HONLY, 40, Indent: 2, Toggle: doDebug);
-                            Debug.LoopItem(4, $"{adjustment}", Indent: 2, Toggle: doDebug);
+                            Debug.LoopItem(4, $"{counter++}] {adjustment?.ToString() ?? NULL}", Indent: 2, Toggle: doDebug);
+                            if (adjustment == null)
+                            {
+                                Debug.Warn(2,
+                                    $"{nameof(NaturalEquipmentOperator)}",
+                                    $"{nameof(ManageNaturalEquipment)}({nameof(SortedDictionary<int, ModNaturalEquipmentBase>)})",
+                                    $"{nameof(adjustment)} is null",
+                                    Indent: 2);
+                                continue;
+                            }
                             if (adjustment.Apply(ParentObject))
                             {
                                 Debug.CheckYeh(4, $"Applied", Indent: 2, Toggle: doDebug);

@@ -230,8 +230,8 @@ namespace XRL.World.Parts.Mutation
             };
             giganticBodMod.AdjustMeleeStat("Strength", -100)
 
-                .AdjustColorString("&Z", true)
-                .AdjustTileColor("&Z", true)
+                //.AdjustColorString("&Z", true)
+                //.AdjustTileColor("&Z", true)
                 .AdjustDetailColor("z", true)
 
                 .AdjustArmorAV(2)
@@ -308,10 +308,13 @@ namespace XRL.World.Parts.Mutation
 
                 if (NaturalEquipmentMod.BodyPartType == "Hand" 
                     || NaturalEquipmentMod.BodyPartType == "Arm"
-                    || NaturalEquipmentMod.BodyPartType == "Face"
-                    || NaturalEquipmentMod.BodyPartType == "Tail")
+                    || NaturalEquipmentMod.BodyPartType == "Face")
                 {
                     return (int)Math.Min(1 + Math.Floor(Level / 3.0), MaxDamageDieIncrease);
+                }
+                if (NaturalEquipmentMod.BodyPartType == "Tail")
+                {
+                    return (int)Math.Min(1 + Math.Floor(Level / 5.0), MaxDamageDieIncrease / 2);
                 }
             }
             return 0;
@@ -1087,25 +1090,19 @@ namespace XRL.World.Parts.Mutation
              && !equipment.IsGiganticEquipment
              && equipment.HasTagOrProperty("GiganticEquippable");
 
+
             // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable"
             // with half the slots it would normally take, provided it's not now too small.
             // exceptions are Floating Nearby, Thrown Weapon, and Cybernetics.
-            if (actorGiant && equipmentNotGiantButIsEquippable && !E.SlotType.IsNullOrEmpty())
+            if (actorGiant 
+                && equipmentNotGiantButIsEquippable 
+                && !E.SlotType.IsNullOrEmpty())
             {
                 E.Decreases++;
                 if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
                 {
                     E.CanBeTooSmall = true;
                 }
-            }
-
-            // should let you equip pretty literally anything in the thrown weapon slot 
-            // if you could equip it in that slot otherwise. Lugging an object shouldn't
-            // be affected by it's size if it's smaller than the lugger.
-            if (actorGiant && !equipment.IsGiganticEquipment 
-                && ((!E.SlotType.IsNullOrEmpty() && E.SlotType == "Thrown Weapon") || E.Object.IsEntirelyFloating()))
-            {
-                E.CanBeTooSmall = false;
             }
 
             return base.HandleEvent(E);

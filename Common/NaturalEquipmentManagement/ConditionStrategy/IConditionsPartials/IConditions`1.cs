@@ -105,7 +105,7 @@ namespace HNPS_GigantismPlus
                 Capacity = DefaultCapacity;
             }
             ICondition<T>[] array = new ICondition<T>[Capacity];
-            Array.Copy(Items, 0, array, 0, Length);
+            Array.Copy(Items, array, Length);
             Items = array;
             Size = Capacity;
         }

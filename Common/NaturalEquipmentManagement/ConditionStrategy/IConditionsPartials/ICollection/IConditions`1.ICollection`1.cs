@@ -11,10 +11,7 @@ namespace HNPS_GigantismPlus
 
         public virtual void Add(ICondition<T> Condition)
         {
-            if (Length == Size)
-            {
-                Resize(Length * 2);
-            }
+            EnsureCapacity(Length + 1);
             Items[Length++] = Condition;
             Variant++;
         }
@@ -23,18 +20,12 @@ namespace HNPS_GigantismPlus
         public void Clear()
         {
             Variant++;
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<ICondition<T>>())
+            if (Length > 0)
             {
-                int size = Size;
+                Array.Clear(Items, 0, Length);
                 Size = 0;
-                if (size > 0)
-                {
-                    Array.Clear(Items, 0, size);
-                }
-            }
-            else
-            {
-                Size = 0;
+                Length = 0;
+                Variant = 0;
             }
         }
 

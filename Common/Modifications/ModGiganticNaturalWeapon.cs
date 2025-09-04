@@ -87,7 +87,7 @@ namespace XRL.World.Parts
 
                 if (cleaveBonus != 0 && ParentObject.TryGetPart(out MeleeWeapon weapon) && weapon.Skill == "Axe")
                 {
-                    E.AddPrimaryElement("have", $"a {cleaveBonus.Signed()} {(-cleaveBonus).Signed().BonusOrPenalty()} when cleaving AV");
+                    E.AddPrimaryElement("cleave", $"for an additional {cleaveBonus.Signed()} AV");
                 }
             }
             return base.HandleEvent(E);

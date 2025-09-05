@@ -27,7 +27,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> ApplyTo_MutationEntryInstead_Transpile(IEnumerable<CodeInstruction> Instructions, ILGenerator Generator)
         {
-            bool doVomit = true;
+            bool doVomit = false;
             string patchMethodName = 
                 $"{nameof(CookingDomainSpecial_UnitSlogTransform)}." +
                 $"{nameof(CookingDomainSpecial_UnitSlogTransform.ApplyTo)}(" +

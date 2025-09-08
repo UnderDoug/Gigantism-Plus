@@ -189,6 +189,7 @@ namespace HNPS_GigantismPlus
         // Debug Settings
         [OptionFlag] public static int DebugVerbosity;
         [OptionFlag] public static bool DebugIncludeInMessage;
+        [OptionFlag] public static bool GigantismDebugDescriptions;
         [OptionFlag] public static bool StewBellyDebugDescriptions;
         [OptionFlag] public static bool WrassleIDDebugDescriptions;
         [OptionFlag] public static bool DebugVaultDescriptions;

@@ -34,7 +34,15 @@ namespace HNPS_GigantismPlus.Harmony
                 Indent: 0, Toggle: doDebug);
 
             Mutations mutations = MutationBGoneWishHandler.GetMutations();
-            BaseMutation baseMutation = mutations.GetMutationByName(argument);
+            BaseMutation baseMutation = null;
+            foreach (BaseMutation mutation in mutations.MutationList)
+            {
+                if (mutation?.GetMutationEntry()?.Name == argument)
+                {
+                    baseMutation = mutation;
+                    break;
+                }
+            }
             if (baseMutation != null)
             {
                 MutationBGoneWishHandler.RemoveMutation(mutations, baseMutation);

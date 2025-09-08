@@ -939,7 +939,7 @@ namespace XRL.World.Parts.Mutation
             if (ParentObject.GetPropertyOrTag(GIGANTISMPLUS_COLORCHANGE_PROP, "true").Is("true"))
             {
                 bool flag = true;
-                if (ParentObject.IsPlayerControlled() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
+                if (ParentObject.IsPlayer() && (XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
                 {
                     flag = MutationColor;
                 }
@@ -964,8 +964,10 @@ namespace XRL.World.Parts.Mutation
             bool wantJumped = true || ParentObject.HasPart<StunningForceOnJump>();
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
+                || (GigantismDebugDescriptions && ID == GetShortDescriptionEvent.ID)
                 || ID == BeforeRapidAdvancementEvent.ID
                 || ID == AfterRapidAdvancementEvent.ID
+                || ID == AfterManageDefaultNaturalEquipmentEvent.ID
                 || ID == AfterLevelGainedEvent.ID
                 || ID == CanEnterInteriorEvent.ID
                 || ID == GetExtraPhysicalFeaturesEvent.ID
@@ -1004,6 +1006,52 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"E.Weight: {E.Weight})", Indent: 1, Toggle: doDebug);
             return base.HandleEvent(E);
         }
+        public override bool HandleEvent(GetShortDescriptionEvent E)
+        {
+            if (The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
+            {
+                StringBuilder SB = Event.NewStringBuilder();
+
+                SB.AppendColored("M", $"{nameof(GigantismPlus)}").Append(": ");
+                SB.AppendLine();
+
+                SB.AppendColored("W", $"Physical");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("G", $"{CarryCapFactor}").Append($"){HONLY}{nameof(CarryCapFactor)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("G", $"{CarryCapBonus}").Append($"){HONLY}{nameof(CarryCapBonus)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("G", $"{ParentObject.GetMaxCarriedWeight()}").Append($"){HONLY}{nameof(ParentObject.GetMaxCarriedWeight)}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("G", $"{WeightFactor}").Append($"){HONLY}{nameof(WeightFactor)}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append("(").AppendColored("G", $"{ParentObject.Weight}").Append($"){HONLY}{nameof(ParentObject.GetWeight)}");
+                SB.AppendLine();
+
+                SB.AppendColored("W", $"Force on Jump");
+                SB.AppendLine();
+                SB.Append(VANDR).Append("(").AppendColored("G", $"{AppliedJumpRangeBonus}").Append($"){HONLY}{nameof(AppliedJumpRangeBonus)}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append("(").AppendColored("G", $"{StunningForceDistance}").Append($"){HONLY}{nameof(StunningForceDistance)}");
+                SB.AppendLine();
+
+                SB.AppendColored("W", $"State");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{NaturallyGigantic.YehNah()}]{HONLY}{nameof(NaturallyGigantic)}: ").AppendColored("B", $"{NaturallyGigantic}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{IsVehicleCreature.YehNah()}]{HONLY}{nameof(IsVehicleCreature)}: ").AppendColored("B", $"{IsVehicleCreature}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{IsCyberGiant.YehNah()}]{HONLY}{nameof(IsCyberGiant)}: ").AppendColored("B", $"{IsCyberGiant}");
+                SB.AppendLine();
+                SB.Append(VANDR).Append($"[{IsHunchFree.YehNah()}]{HONLY}{nameof(IsHunchFree)}: ").AppendColored("B", $"{IsHunchFree}");
+                SB.AppendLine();
+                SB.Append(TANDR).Append("(").AppendColored("C", $"{HunchOverEnergyCost}").Append($"){HONLY}{nameof(HunchOverEnergyCost)}");
+                SB.AppendLine();
+
+                E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
+            }
+            return base.HandleEvent(E);
+        }
         public override bool HandleEvent(BeforeRapidAdvancementEvent E)
         {
             if (E.Amount != 0)
@@ -1017,6 +1065,14 @@ namespace XRL.World.Parts.Mutation
             if (E.Amount != 0)
             {
                 SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
+                ResetDisplayName();
+            }
+            return base.HandleEvent(E);
+        }
+        public override bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)
+        {
+            if (!GetDisplayName().Strip().Contains("(D)"))
+            {
                 ResetDisplayName();
             }
             return base.HandleEvent(E);
@@ -1272,7 +1328,7 @@ namespace XRL.World.Parts.Mutation
                 if (Message)
                 {
                     string message = GameText.VariableReplace("=subject.T= =verb:hunch= over, allowing =subject.objective= access to smaller spaces.", actor);
-                    if (ParentObject.IsPlayerControlled())
+                    if (ParentObject.IsPlayer())
                     {
                         Popup.Show(message);
                     }
@@ -1323,7 +1379,7 @@ namespace XRL.World.Parts.Mutation
                 if (Message)
                 {
                     string message = GameText.VariableReplace("=subject.T= =verb:stand= tall, relaxing into =subject.possessive= immense stature.", actor);
-                    if (ParentObject.IsPlayerControlled())
+                    if (ParentObject.IsPlayer())
                     {
                         Popup.Show(message);
                     }
@@ -1348,7 +1404,6 @@ namespace XRL.World.Parts.Mutation
 
         public bool AbilityToggledHunchOver(GameObject GO = null, bool ToggledOn = false)
         {
-
             GO ??= ParentObject;
             if (GO == null)
             {
@@ -1449,6 +1504,14 @@ namespace XRL.World.Parts.Mutation
             gigantism.GiganticExoframe = null;
 
             return gigantism;
+        }
+
+        public override void FinalizeCopyLate(GameObject Source, bool CopyEffects, bool CopyID, Func<GameObject, GameObject> MapInv)
+        {
+            base.FinalizeCopyLate(Source, CopyEffects, CopyID, MapInv);
+            ParentObject.FlushWeightCaches();
+            _ = ParentObject.GetMaxCarriedWeight();
+            _ = ParentObject.GetWeight();
         }
 
     } //!-- public class GigantismPlus : BaseDefaultEquipmentMutation

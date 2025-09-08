@@ -18,7 +18,7 @@ namespace XRL.World.Parts
 {
     [Serializable]
     public abstract class BaseManagedDefaultEquipmentCybernetic<T> 
-        : IPart
+        : IScribedPart
         , IManagedDefaultNaturalEquipment<T>
         where T 
         : BaseManagedDefaultEquipmentCybernetic<T>

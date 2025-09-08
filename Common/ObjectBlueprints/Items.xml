@@ -48,7 +48,7 @@
           Slots="Body" Cost="2"
           BehaviorDescription="You are considered a gigantic creature while this exoframe is installed.
 You cannot wear equipment on your body." />
-    <removepart Name="TinkerItem" />
+    <part Name="TinkerItem" CanDisassemble="false" />
     <part Name="Metal" />
     <part Name="NoDamage" />
     <part Name="NoRust" />
@@ -166,6 +166,7 @@ You cannot wear equipment on your body." />
     <part Name="Description" Short="Blue *material* merely dents where weak collagen would be smashed to bits." />
     <part Name="Render" DisplayName="{{b|carbide}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 1 additional damage die and +1 damage die size." />
+    <part Name="TinkerItem" CanDisassemble="false" />
     <removepart Name="CyberneticsFistReplacement" />
     <part Name="CyberneticsManagedHandBones"
           Material="carbide"
@@ -180,6 +181,7 @@ You cannot wear equipment on your body." />
     <part Name="Description" Short="Black *material* merely creaks where weak bone and cartilage would be smashed to bits." />
     <part Name="Render" DisplayName="{{K|fullerite}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" TileColor="&amp;K" DetailColor="r" />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 1 additional damage die, +2 damage die size and +1 bonus damage." />
+    <part Name="TinkerItem" CanDisassemble="false" />
     <removepart Name="CyberneticsFistReplacement" />
     <part Name="CyberneticsManagedHandBones"
           Material="fullerite"
@@ -195,6 +197,7 @@ You cannot wear equipment on your body." />
     <part Name="Description" Short="Dappled *material* merely deflects where weak bone and cartilage would be smashed to bits." />
     <part Name="Render" DisplayName="{{crysteel|crysteel}} {{r|hand bones}}" Tile="Items/sw_carbidehand.bmp" TileColor="&amp;G" DetailColor="r" />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 2 additional damage die and +2 damage die size." />
+    <part Name="TinkerItem" CanDisassemble="false" />
     <removepart Name="CyberneticsFistReplacement" />
     <part Name="CyberneticsManagedHandBones"
           Material="crysteel"
@@ -213,6 +216,7 @@ You cannot wear equipment on your body." />
   <object Name="RealHomosapien_ZetachromeHandBones" Load="Merge">
     <part Name="Description" Short="Vibrant *material* persists where weak bone and cartilage would be smashed to bits." />
     <part Name="CyberneticsBaseItem" BehaviorDescription="Your fists gain 3 additional damage die, +3 damage die size and +1 bonus damage." />
+    <part Name="TinkerItem" CanDisassemble="false" />
     <removepart Name="CyberneticsFistReplacement" />
     <part Name="CyberneticsManagedHandBones"
           Material="zetachrome"

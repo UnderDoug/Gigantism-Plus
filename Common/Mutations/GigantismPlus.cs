@@ -953,8 +953,9 @@ namespace XRL.World.Parts.Mutation
         }
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            Registrar.Register(GetIntrinsicWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
-            Registrar.Register(GetMaxCarriedWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+            // These two don't seem to work after being DeepCopied.
+            // Registrar.Register(GetIntrinsicWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
+            // Registrar.Register(GetMaxCarriedWeightEvent.ID, EventOrder.EXTREMELY_EARLY + EventOrder.EXTREMELY_EARLY);
             base.Register(Object, Registrar);
         }
         public override bool WantEvent(int ID, int cascade)
@@ -964,6 +965,8 @@ namespace XRL.World.Parts.Mutation
             bool wantJumped = true || ParentObject.HasPart<StunningForceOnJump>();
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
+                || ID == GetIntrinsicWeightEvent.ID
+                || ID == GetMaxCarriedWeightEvent.ID
                 || (GigantismDebugDescriptions && ID == GetShortDescriptionEvent.ID)
                 || ID == BeforeRapidAdvancementEvent.ID
                 || ID == AfterRapidAdvancementEvent.ID

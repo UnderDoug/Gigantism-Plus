@@ -138,7 +138,7 @@ namespace HNPS_GigantismPlus.Harmony
                     if (doEquippedEvent)
                     {
                         EquippedEvent.Send(Object, equipment, part);
-                        EffectAppliedEvent.Send(equipment, null, null, Object);
+                        EffectAppliedEvent.Send(equipment, "", new(), Object);
                         Debug.CheckYeh(4, $"{nameof(EquippedEvent)}", "Sent", Indent: 4, Toggle: doDebug);
                     }
                     else

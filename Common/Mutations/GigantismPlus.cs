@@ -559,6 +559,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Entry(4, $"CarryCapBonus: {CarryCapBonus}", Indent: 3, Toggle: getDoDebug("CH"));
             WeightFactor = GetWeightFactor(NewLevel, NaturallyGigantic);
             CarryCapBonus = GetCarryCapBonus(NewLevel);
+            CarryingCapacityChangedEvent.Send(ParentObject);
             Debug.Entry(4, $"Values After", Indent: 2, Toggle: getDoDebug("CH"));
             Debug.Entry(4, $"WeightFactor: {WeightFactor}", Indent: 3, Toggle: getDoDebug("CH"));
             Debug.Entry(4, $"GetWeight(): {ParentObject.GetWeight()}", Indent: 4, Toggle: getDoDebug("CH"));

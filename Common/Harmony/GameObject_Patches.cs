@@ -11,6 +11,7 @@ using XRL.World.Parts.Mutation;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Utils;
+using XRL;
 
 namespace HNPS_GigantismPlus.Harmony
 {
@@ -20,8 +21,100 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(GameObject_Patches));
 
         [HarmonyPatch(
+            declaringType: typeof(GameObject),
+            methodName: nameof(GameObject.IsGiganticCreature),
+            methodType: MethodType.Getter)]
+        [HarmonyPrefix]
+        public static bool IsGiganticCreature_getter_CheckEvent_Prefix(ref GameObject __instance, ref bool __result)
+        {
+            __result = false;
+            if (GetGiganticCreatureEvent.CheckFor(__instance, out bool Strict))
+            {
+                __result = true;
+                if (Strict)
+                {
+                    return false;
+                }
+            }
+
+            if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry 
+                && __instance.HasPart(gigantismEntry.Class))
+            {
+                __result = true;
+            }
+            return !__result;
+        }
+        [HarmonyPatch(
+            declaringType: typeof(GameObject),
+            methodName: nameof(GameObject.IsGiganticCreature),
+            methodType: MethodType.Setter)]
+        [HarmonyPrefix]
+        public static bool IsGiganticCreature_setter_CheckEvent_Prefix(ref GameObject __instance, ref bool value)
+        {
+            bool @override = false;
+            bool isGigantic = __instance.IsGiganticCreature;
+            if (value != isGigantic)
+            {
+                bool setValue = !SetGiganticCreatureEvent.CheckFor(__instance, out @override, isGigantic);
+                value = @override ? setValue : value;
+                if (value)
+                {
+                    if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry)
+                    {
+                        __instance.RequirePart<Mutations>().AddMutation(gigantismEntry.Mutation);
+                    }
+                }
+                else
+                if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry
+                    && __instance.GetPart(gigantismEntry.Class) is BaseMutation gigantismMutation)
+                {
+                    __instance.RequirePart<Mutations>().RemoveMutation(gigantismMutation);
+                }
+                __instance.SetIntProperty("Gigantic", value ? 1 : (-1));
+            }
+            return !@override;
+        }
+
+        [HarmonyPatch(
+            declaringType: typeof(GameObject),
+            methodName: nameof(GameObject.IsGiganticEquipment),
+            methodType: MethodType.Getter)]
+        [HarmonyPrefix]
+        public static bool IsGiganticEquipment_getter_CheckEvent_Prefix(ref GameObject __instance, ref bool __result)
+        {
+            __result = false;
+            if (GetGiganticEquipmentEvent.CheckFor(__instance, out bool Override))
+            {
+                __result = true;
+                if (Override)
+                {
+                    return false;
+                }
+            }
+            return !__result;
+        }
+        [HarmonyPatch(
+            declaringType: typeof(GameObject),
+            methodName: nameof(GameObject.IsGiganticEquipment),
+            methodType: MethodType.Setter)]
+        [HarmonyPrefix]
+        public static bool IsGiganticEquipment_setter_CheckEvent_Prefix(ref GameObject __instance, ref bool value)
+        {
+            bool @override = false;
+            bool isGigantic = __instance.IsGiganticEquipment;
+            if (value != isGigantic)
+            {
+                bool setValue = !SetGiganticEquipmentEvent.CheckFor(__instance, out @override, isGigantic);
+                value = @override ? setValue : value;
+            }
+            return !@override;
+        }
+
+        [HarmonyPatch(
             declaringType: typeof(GameObject), 
-            methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness))]
+            methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness),
+            argumentTypes: new Type[] { typeof(GameObject) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]
         public static bool CheckDefaultBehaviorGiganticness_ForceEquipped_BlockHideAdjective_Prefix(GameObject __instance, GameObject Equipper)
         {
@@ -67,12 +160,17 @@ namespace HNPS_GigantismPlus.Harmony
 
         [HarmonyPatch(
             declaringType: typeof(GameObject), 
-            methodName: nameof(GameObject.FinalizeCopy))]
+            methodName: nameof(GameObject.FinalizeCopy),
+            argumentTypes: new Type[] { typeof(GameObject), typeof(bool), typeof(bool), typeof(Func<GameObject, GameObject>) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
         [HarmonyPostfix]
         public static void FinalizeCopy_ReequipImprovedMutationMod_Postfix(GameObject __instance)
         {
             GameObject Object = __instance;
-            if (Object?.Body == null) return;
+            if (Object?.Body == null)
+            {
+                return;
+            }
 
             Debug.Divider(4, HONLY, Count: 40, Indent: 0, Toggle: doDebug);
             Debug.Entry(4, 

@@ -26,6 +26,7 @@ namespace XRL.World.Parts.Mutation
         : BaseManagedDefaultEquipmentMutation<GigantismPlus>
         , IModEventHandler<BeforeVaultEvent>
         , IModEventHandler<VaultedEvent>
+        , IModEventHandler<GetGiganticCreatureEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(GigantismPlus));
         private static bool getDoDebug(object what = null)
@@ -66,15 +67,17 @@ namespace XRL.World.Parts.Mutation
 
         public bool IsVehicleCreature => ParentObject.HasPart(typeof(Vehicle));
 
+        [SerializeField]
+        private bool _BlockIsGiganticCreature = false;
         public bool IsGiganticCreature // basically a wrapper but forces you to not be PseudoGigantic at the same time 
         {
             get
             {
-                return (ParentObject?.IsGiganticCreature) != null && ParentObject.IsGiganticCreature;
+                return ParentObject != null && ParentObject.IsGiganticCreature;
             }
             private set
             {
-                if (ParentObject != null) ParentObject.IsGiganticCreature = value;
+                if (ParentObject != null) _BlockIsGiganticCreature = !value;
                 if (IsPseudoGiganticCreature == value) IsPseudoGiganticCreature = !value;
             }
         }
@@ -835,8 +838,8 @@ namespace XRL.World.Parts.Mutation
                 GO.RemovePart<Gigantism>();
                 Debug.LoopItem(4, "RemovePart<Gigantism>()", Indent: 2, Toggle: doDebug);
                
-                IsGiganticCreature = true; // Enable the Gigantic flag
-                Debug.LoopItem(4, "IsGiganticCreature = true", Indent: 2, Toggle: doDebug);
+                // IsGiganticCreature = true; // Enable the Gigantic flag
+                // Debug.LoopItem(4, "IsGiganticCreature = true", Indent: 2, Toggle: doDebug);
                 
                 GO.RequirePart<StunningForceOnJump>();
                 Debug.LoopItem(4, "RequirePart<StunningForceOnJump>()", Indent: 2, Toggle: doDebug);
@@ -890,8 +893,8 @@ namespace XRL.World.Parts.Mutation
                 StraightenUp();
                 GO.RemovePart<PseudoGigantism>();
                 Debug.Entry(4, "RemovePart<PseudoGigantism>()", Indent: 2, Toggle: doDebug);
-                GO.IsGiganticCreature = false; // Revert the Gigantic flag
-                Debug.Entry(4, "IsGiganticCreature = false", Indent: 2, Toggle: doDebug);
+                // GO.IsGiganticCreature = false; // Revert the Gigantic flag
+                // Debug.Entry(4, "IsGiganticCreature = false", Indent: 2, Toggle: doDebug);
 
                 Debug.Entry(4, "? if (HunchOverActivatedAbilityID != Guid.Empty)", Indent: 2, Toggle: doDebug);
                 if (HunchOverActivatedAbilityID != Guid.Empty)
@@ -966,6 +969,7 @@ namespace XRL.World.Parts.Mutation
             bool wantJumped = true || ParentObject.HasPart<StunningForceOnJump>();
             // Add once Hunch Over Stat-Shift is implemented: SingletonEvent<BeforeAbilityManagerOpenEvent>.
             return base.WantEvent(ID, cascade)
+                || (_BlockIsGiganticCreature && ID == GetGiganticCreatureEvent.ID)
                 || ID == GetIntrinsicWeightEvent.ID
                 || ID == GetMaxCarriedWeightEvent.ID
                 || (GigantismDebugDescriptions && ID == GetShortDescriptionEvent.ID)
@@ -983,6 +987,23 @@ namespace XRL.World.Parts.Mutation
                 || ID == BeforeVaultEvent.ID
                 || ID == VaultedEvent.ID
                 || ID == CommandEvent.ID;
+        }
+        public virtual bool HandleEvent(GetGiganticCreatureEvent E)
+        {
+            int indent = Debug.LastIndent;
+            Debug.Entry(4,
+                $"{nameof(GigantismPlus)}." +
+                $"{nameof(HandleEvent)}({nameof(GetGiganticCreatureEvent)} E)",
+                Indent: indent + 1, Toggle: doDebug);
+            if (_BlockIsGiganticCreature)
+            {
+                E.IsGigantic = false;
+                E.Override = true;
+            }
+            Debug.LoopItem(4, $"{nameof(_BlockIsGiganticCreature)}", $"{_BlockIsGiganticCreature}",
+                Good: _BlockIsGiganticCreature, Indent: indent + 2, Toggle: doDebug);
+            Debug.LastIndent = indent;
+            return base.HandleEvent(E);
         }
         public override bool HandleEvent(GetIntrinsicWeightEvent E)
         {
@@ -1012,7 +1033,7 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            if (The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
+            if (ParentObject != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
             {
                 StringBuilder SB = Event.NewStringBuilder();
 
@@ -1029,7 +1050,7 @@ namespace XRL.World.Parts.Mutation
                 SB.AppendLine();
                 SB.Append(VANDR).Append("(").AppendColored("G", $"{WeightFactor}").Append($"){HONLY}{nameof(WeightFactor)}");
                 SB.AppendLine();
-                SB.Append(TANDR).Append("(").AppendColored("G", $"{ParentObject.Weight}").Append($"){HONLY}{nameof(ParentObject.GetWeight)}");
+                SB.Append(TANDR).Append("(").AppendColored("G", $"{ParentObject?.Weight}").Append($"){HONLY}{nameof(ParentObject.GetWeight)}");
                 SB.AppendLine();
 
                 SB.AppendColored("W", $"Force on Jump");
@@ -1060,7 +1081,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (E.Amount != 0)
             {
-                SwapMutationCategory(nameof(GigantismPlus), "PhysicalDefects", "Physical");
+                SwapMutationCategory(nameof(Gigantism), "PhysicalDefects", "Physical");
             }
             return base.HandleEvent(E);
         }
@@ -1068,7 +1089,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (E.Amount != 0)
             {
-                SwapMutationCategory(nameof(GigantismPlus), "Physical", "PhysicalDefects");
+                SwapMutationCategory(nameof(Gigantism), "Physical", "PhysicalDefects");
                 ResetDisplayName();
             }
             return base.HandleEvent(E);
@@ -1138,33 +1159,32 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
-            GameObject actor = E.Actor;
-            GameObject equipment = E.Object;
-
-            bool actorGiant = 
-                actor != null
-             && actor.IsGiganticCreature;
-
-            bool equipmentNotGiantButIsEquippable = 
-                equipment != null
-             && !equipment.IsGiganticEquipment
-             && equipment.HasTagOrProperty("GiganticEquippable");
-
-
-            // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable"
-            // with half the slots it would normally take, provided it's not now too small.
-            // exceptions are Floating Nearby, Thrown Weapon, and Cybernetics.
-            if (actorGiant 
-                && equipmentNotGiantButIsEquippable 
-                && !E.SlotType.IsNullOrEmpty())
+            if (E.Actor is GameObject actor && E.Object is GameObject equipment)
             {
-                E.Decreases++;
-                if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
+                bool actorGiant =
+                    actor != null
+                 && actor.IsGiganticCreature;
+
+                bool equipmentNotGiantButIsEquippable =
+                    equipment != null
+                 && !equipment.IsGiganticEquipment
+                 && equipment.HasTagOrProperty("GiganticEquippable");
+
+
+                // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable"
+                // with half the slots it would normally take, provided it's not now too small.
+                // exceptions are Floating Nearby, Thrown Weapon, and Cybernetics.
+                if (actorGiant
+                    && equipmentNotGiantButIsEquippable
+                    && !E.SlotType.IsNullOrEmpty())
                 {
-                    E.CanBeTooSmall = true;
+                    E.Decreases++;
+                    if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
+                    {
+                        E.CanBeTooSmall = true;
+                    }
                 }
             }
-
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(BodyPartsUpdatedEvent E)

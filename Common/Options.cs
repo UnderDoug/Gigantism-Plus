@@ -113,6 +113,10 @@ namespace HNPS_GigantismPlus
             { nameof(AfterModGiganticAppliedHandler), false },
             { nameof(BeforeDescribeModGiganticHandler), false },
             { nameof(DescribeModGiganticHandler), false },
+            { nameof(GetGiganticCreatureHandler), false },
+            { nameof(SetGiganticCreatureHandler), false },
+            { nameof(GetGiganticEquipmentHandler), false },
+            { nameof(SetGiganticEquipmentHandler), false },
 
             // Harmony Patches
             { nameof(Body_Patches), false },
@@ -161,8 +165,8 @@ namespace HNPS_GigantismPlus
 
         public static bool getDoDebug(object what = null, List<object> DoList = null, List<object> DontList = null, bool? DoDebug = null)
         {
-            DoList = new();
-            DontList = new();
+            DoList ??= new();
+            DontList ??= new();
 
             if (what != null && !DoList.IsNullOrEmpty() && DoList.Contains(what))
             {
@@ -177,14 +181,7 @@ namespace HNPS_GigantismPlus
             return DoDebug ?? doDebug;
         }
 
-        public static bool getClassDoDebug(string Class)
-        {
-            if (classDoDebug.ContainsKey(Class))
-            {
-                return classDoDebug[Class];
-            }
-            return doDebug;
-        }
+        public static bool getClassDoDebug(string Class) => classDoDebug.ContainsKey(Class) ? classDoDebug[Class] : doDebug;
 
         // Debug Settings
         [OptionFlag] public static int DebugVerbosity;

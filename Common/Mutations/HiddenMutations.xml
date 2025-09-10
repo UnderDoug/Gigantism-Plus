@@ -19,4 +19,8 @@
       <mutation Name="Base Bilge Sphincter" Class="SlogGlands" DisplayName="Bilge Sphincter ({{B|B}})" />
     </category>
   
+    <category Name="PhysicalDefects">
+      <!-- mutation Name="GigantismPlus" Class="GigantismPlus" Variant="Legacy" DisplayName="Gigantism" Exclusions="Gigantism" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" /-->
+    </category>
+  
 </mutations>

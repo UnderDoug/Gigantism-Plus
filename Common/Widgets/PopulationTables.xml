@@ -559,52 +559,52 @@
   <population Name="Gigantic Exoframe Stock 2">
     <group Name="Items" Style="PickOne">
       <table Weight="10" Name="Gigantic Exoframe Stock 1" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Alpha" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Alpha" />
       <table Weight="15" Name="Gigantic Exoframe Stock 3" />
     </group>
   </population>
   <population Name="Gigantic Exoframe Stock 3">
     <group Name="Items" Style="PickOne">
       <table Weight="5" Name="Gigantic Exoframe Stock 2" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Alpha" />
-      <Object Weight="15" Blueprint="Gigantic Exoframe Delta" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Alpha" />
+      <object Weight="15" Blueprint="Gigantic Exoframe Delta" />
       <table Weight="5" Name="Gigantic Exoframe Stock 4" />
     </group>
   </population>
   <population Name="Gigantic Exoframe Stock 4">
     <group Name="Items" Style="PickOne">
       <table Weight="10" Name="Gigantic Exoframe Stock 3" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Delta" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Delta" />
       <table Weight="15" Name="Gigantic Exoframe Stock 5" />
     </group>
   </population>
   <population Name="Gigantic Exoframe Stock 5">
     <group Name="Items" Style="PickOne">
       <table Weight="5" Name="Gigantic Exoframe Stock 4" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Delta" />
-      <Object Weight="15" Blueprint="Gigantic Exoframe Sigma" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Delta" />
+      <object Weight="15" Blueprint="Gigantic Exoframe Sigma" />
       <table Weight="5" Name="Gigantic Exoframe Stock 6" />
     </group>
   </population>
   <population Name="Gigantic Exoframe Stock 6">
     <group Name="Items" Style="PickOne">
       <table Weight="10" Name="Gigantic Exoframe Stock 5" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Sigma" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Sigma" />
       <table Weight="15" Name="Gigantic Exoframe Stock 7" />
     </group>
   </population>
   <population Name="Gigantic Exoframe Stock 7">
     <group Name="Items" Style="PickOne">
       <table Weight="5" Name="Gigantic Exoframe Stock 6" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Sigma" />
-      <Object Weight="15" Blueprint="Gigantic Exoframe Omega" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Sigma" />
+      <object Weight="15" Blueprint="Gigantic Exoframe Omega" />
       <table Weight="5" Name="Gigantic Exoframe Stock 8" />
     </group>
   </population>
   <population Name="Gigantic Exoframe Stock 8">
     <group Name="Items" Style="PickOne">
       <table Weight="25" Name="Gigantic Exoframe Stock 7" />
-      <Object Weight="75" Blueprint="Gigantic Exoframe Omega" />
+      <object Weight="75" Blueprint="Gigantic Exoframe Omega" />
     </group>
   </population>
 

@@ -26,7 +26,7 @@ namespace HNPS_GigantismPlus.Harmony
         {
             __state = __instance;
             
-            if (__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
+            if (__state.IsGiganticCreature && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // GigantismPlus wants to control weight based on the creature being Gigantic
                 
@@ -34,7 +34,7 @@ namespace HNPS_GigantismPlus.Harmony
                 $"# {nameof(GigantismPlus_ControlledWeight_GameObject_Patches)}."
                 + $"{nameof(GetBodyWeight_GigantismPlus_Prefix)}(ref GameObject __state, ref GameObject __instance)",
                 Indent: 0, Toggle: doDebug);
-                __state.IsGiganticCreature = false; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
+                gigantismPlus.IsPseudoGiganticCreature = true; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
 
                 Debug.Entry(4,
                 $"Was gigantic, not now",
@@ -48,11 +48,11 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void GetBodyWeight_GigantismPlus_Postfix(ref GameObject __state)
         {
-            if (!__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
+            if (!__state.IsGiganticCreature && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // GigantismPlus wants to control weight based on the creature being Gigantic
 
-                __state.IsGiganticCreature = true; // make the GameObject Gigantic
+                gigantismPlus.IsPseudoGiganticCreature = false; // make the GameObject Gigantic
 
                 Debug.Entry(4,
                 $"Wasn't gigantic, are now",
@@ -63,7 +63,7 @@ namespace HNPS_GigantismPlus.Harmony
                 Indent: 0, Toggle: doDebug);
             }
         }
-    } //!-- public static class GigantismPlus_ControlledWeight_GameObject_Patches
+    }
 
     // Goal is to block the default CarryCap-increasing behaviour if the GameObject in question is Gigantic(Plus)
     [HarmonyPatch]
@@ -81,7 +81,7 @@ namespace HNPS_GigantismPlus.Harmony
         {
             __state = Object;
             
-            if (__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
+            if (__state.IsGiganticCreature && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // GigantismPlus wants to control carry cap based on the creature being Gigantic
                 
@@ -92,7 +92,7 @@ namespace HNPS_GigantismPlus.Harmony
                 + $" {nameof(GameObject)} {nameof(Object)})",
                 Indent: 0, Toggle: doDebug);
 
-                __state.IsGiganticCreature = false; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
+                gigantismPlus.IsPseudoGiganticCreature = true; // make the GameObject not Gigantic (we revert this as soon as the origianl method completes)
 
                 Debug.Entry(4,
                 $"Was gigantic, not now",
@@ -108,11 +108,11 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void GetFor_GigantismPlus_Postfix(ref GameObject __state)
         {
-            if (!__state.IsGiganticCreature && __state.HasPart<GigantismPlus>())
+            if (!__state.IsGiganticCreature && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // GigantismPlus wants to control weight based on the creature being Gigantic
 
-                __state.IsGiganticCreature = true; // make the GameObject Gigantic
+                gigantismPlus.IsPseudoGiganticCreature = false; // make the GameObject Gigantic
 
                 Debug.Entry(4,
                 $"Wasn't gigantic, are now",
@@ -124,7 +124,7 @@ namespace HNPS_GigantismPlus.Harmony
                 Indent: 0, Toggle: doDebug);
             }
         }
-    } //!-- public static class GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches
+    }
 
     // Goal is to ensure that NaturalEquipment generated while having Gigantism actually get the gigantic modifier
     // including when the creature is PsuedoGigantic
@@ -141,7 +141,8 @@ namespace HNPS_GigantismPlus.Harmony
         {
             __state = __instance.ParentObject;
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
-            if (IsPretendBig && !__state.IsGiganticCreature)
+            if (IsPretendBig && !__state.IsGiganticCreature 
+                && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // is the GameObject PseudoGigantic but not Gigantic
                 Debug.Entry(3, 
@@ -150,7 +151,7 @@ namespace HNPS_GigantismPlus.Harmony
                     $"-> PseudoGigantic not Gigantic",
                     Indent: 0, Toggle: doDebug);
 
-                __state.IsGiganticCreature = true; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
+                gigantismPlus.IsPseudoGiganticCreature = false; // make the GameObject Gigantic (we revert this as soon as the origianl method completes)
 
                 Debug.Entry(2, $"Trying to generate gigantic natural equipment while PseudoGigantic", Indent: 1, Toggle: doDebug);
             }
@@ -164,7 +165,8 @@ namespace HNPS_GigantismPlus.Harmony
         public static void RegenerateDefaultEquipmentPostfix(ref GameObject __state)
         {
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
-            if (IsPretendBig && __state.IsGiganticCreature)
+            if (IsPretendBig && __state.IsGiganticCreature
+                && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // is the GameObject both PseudoGigantic and Gigantic (only supposed to be possible here)
                 Debug.Entry(3,
@@ -173,11 +175,11 @@ namespace HNPS_GigantismPlus.Harmony
                     $"-> PseudoGigantic not Gigantic",
                     Indent: 0, Toggle: doDebug);
 
-                __state.IsGiganticCreature = false; // make the GameObject not Gigantic 
+                gigantismPlus.IsPseudoGiganticCreature = true; // make the GameObject not Gigantic 
 
                 Debug.Entry(3, "Should have generated gigantic natural equipment while PseudoGigantic", Indent: 1, Toggle: doDebug);
             }
         }
 
-    } //!-- public static class PseudoGiganticCreature_RegenerateDefaultEquipment_Patches
+    }
 }

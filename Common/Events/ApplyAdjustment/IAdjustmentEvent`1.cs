@@ -114,7 +114,7 @@ namespace HNPS_GigantismPlus
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
                 + $"{nameof(ProcessEvent)}("
-                + $"{nameof(Subject)}: {Subject?.GetType()?.Name ?? NULL})",
+                + $"{nameof(Subject)}: {Subject?.DebugName ?? NULL})",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
             bool anyWants = WantToProceed(out bool SubjectWantsMin, out bool SubjectWantsStr);
@@ -166,8 +166,9 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(Send)}()"
-                + $" for {nameof(Subject)}: {Subject?.GetType()?.Name ?? NULL}",
+                + $"{nameof(Send)}() for "
+                + $"{nameof(Source)}: {Source?.GetType().Name ?? NULL}, and "
+                + $"{nameof(Subject)}: {Subject?.DebugName ?? NULL}",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
             ProcessEvent();
@@ -193,8 +194,9 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"* {typeof(T).Name}."
-                + $"{nameof(CheckFor)}()"
-                + $" for {nameof(Subject)}: {Subject?.GetType()?.Name ?? NULL}",
+                + $"{nameof(CheckFor)}() for "
+                + $"{nameof(Source)}: {Source?.GetType().Name ?? NULL}, and "
+                + $"{nameof(Subject)}: {Subject?.DebugName ?? NULL}",
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
             bool result = ProcessEvent();
@@ -207,7 +209,7 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             Debug.Entry(4,
                 $"! {typeof(T).Name}."
-                + $"{nameof(Send)}("
+                + $"{nameof(CheckFor)}("
                 + $"{nameof(Subject)}, "
                 + $"{nameof(Source)}, "
                 + $"{nameof(Adjustment)})",

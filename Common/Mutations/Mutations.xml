@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <mutations>
     <category Name="PhysicalDefects">
-        <mutation Name="GigantismPlus" Cost="-3" MaxSelected="1" Class="GigantismPlus" DisplayName="Gigantism" Exclusions="" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" />
+        <mutation Name="Gigantism" Cost="-3" MaxSelected="1" Class="GigantismPlus" DisplayName="Gigantism" Exclusions="GigantismPlus" BearerDescription="those who are gigantic" Tile="Mutations/GigantismPlus.png" Defect="true" />
     </category>
   
     <category Name="Physical">

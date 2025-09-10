@@ -157,17 +157,23 @@ namespace HNPS_GigantismPlus
             Debug.Entry(1, $"Registering XRLGame Event Handlers...", Indent: 1);
             if (The.Game != null)
             {
-                bool crayonsGetColor = CrayonsGetColorHandler.Register();
-                bool beforeModGiganticApplied = BeforeModGiganticAppliedHandler.Register();
-                bool afterModGiganticApplied = AfterModGiganticAppliedHandler.Register();
-                bool beforeDescribeModGigantic = BeforeDescribeModGiganticHandler.Register();
-                bool describeModGigantic = DescribeModGiganticHandler.Register();
+                List<bool> registrations = new()
+                {
+                    CrayonsGetColorHandler.Register(),
 
-                bool allRegistered = crayonsGetColor
-                    && beforeModGiganticApplied
-                    && afterModGiganticApplied
-                    && beforeDescribeModGigantic
-                    && describeModGigantic;
+                    BeforeModGiganticAppliedHandler.Register(),
+                    AfterModGiganticAppliedHandler.Register(),
+
+                    BeforeDescribeModGiganticHandler.Register(),
+                    DescribeModGiganticHandler.Register(),
+
+                    GetGiganticCreatureHandler.Register(),
+                    SetGiganticCreatureHandler.Register(),
+                    GetGiganticEquipmentHandler.Register(),
+                    SetGiganticEquipmentHandler.Register(),
+                };
+
+                bool allRegistered = !registrations.Any(r => !r);
 
                 Debug.LoopItem(1, $"Event Handler Registration Finished", Indent: 1, Good: allRegistered);
 
@@ -582,7 +588,7 @@ namespace HNPS_GigantismPlus
                         {
                             entry.Defect = true;
                         }
-                        mutationEntry.Mutation.SetDisplayName(null);
+                        mutationEntry.Mutation.ResetDisplayName();
                         Debug.LoopItem(4, entry.Name, entry.GetDisplayName(true), Indent: indent + 5, Toggle: doDebug);
                     }
 

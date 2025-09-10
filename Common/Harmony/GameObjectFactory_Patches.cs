@@ -1,15 +1,14 @@
 using HarmonyLib;
-
 using System;
 using System.Collections.Generic;
-
+using System.Reflection.Emit;
 using XRL;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Loaders;
-
-using static HNPS_GigantismPlus.Options;
+using XRL.World.Parts;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus.Harmony
@@ -20,6 +19,47 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(GameObjectFactory_Patches));
 
         private static readonly string TargetAttribute = "DisplayName";
+        [HarmonyPatch(
+            declaringType: typeof(GameObjectFactory),
+            methodName: nameof(GameObjectFactory.LoadBakedXML),
+            argumentTypes: new Type[] { typeof(ObjectBlueprintLoader.ObjectBlueprintXMLData) },
+            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> LoadBakedXML_AddMutationEntryNode_Transpiler(IEnumerable<CodeInstruction> Instructions, ILGenerator Generator)
+        {
+            bool doVomit = true;
+            string patchMethodName = $"{nameof(GameObjectFactory_Patches)}.{nameof(GameObjectFactory.LoadBakedXML)}";
+            int metricsCheckSteps = 0;
+
+            CodeMatcher codeMatcher = new(Instructions, Generator);
+            
+            // return base.HandleEvent(E);
+            CodeMatch[] match_Return_BaseHandleEvent_E = new CodeMatch[]
+            {
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Ldarg_1),
+                new(ins => ins.Calls(AccessTools.Method(typeof(IComponent<GameObject>), nameof(IComponent<GameObject>.HandleEvent), new Type[] { typeof(GetShortDescriptionEvent) }))),
+                new(OpCodes.Ret),
+            };
+            /*
+            // find start of:
+            // return base.HandleEvent(E);
+            // from the start
+            if (codeMatcher.Start().MatchStartForward(match_Return_BaseHandleEvent_E).IsInvalid)
+            {
+                MetricsManager.LogModError(ModManager.GetMod("UD_Tinkering_Bytes"), $"{patchMethodName}: ({metricsCheckSteps}) {nameof(CodeMatcher.MatchStartForward)} failed to find instructions {nameof(match_Return_BaseHandleEvent_E)}");
+                foreach (CodeMatch match in match_Return_BaseHandleEvent_E)
+                {
+                    MetricsManager.LogModError(ModManager.GetMod("UD_Tinkering_Bytes"), $"{patchMethodName}:     {match.opcode} {match.operand}");
+                }
+                codeMatcher.Vomit(doVomit);
+                return Instructions;
+            }
+            metricsCheckSteps++;
+            */
+            MetricsManager.LogModInfo(ModManager.GetMod("UD_Tinkering_Bytes"), $"Successfully transpiled {patchMethodName}");
+            return codeMatcher.Vomit(doVomit).InstructionEnumeration();
+        }
 
         [HarmonyPatch(
             declaringType: typeof(GameObjectFactory),
@@ -145,5 +185,6 @@ namespace HNPS_GigantismPlus.Harmony
                 }
             }
         }
+
     }
 }

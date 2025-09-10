@@ -1110,7 +1110,8 @@ namespace HNPS_GigantismPlus
         public static bool IsEndOfSection(this OpCode OpCode)
         {
             string ciOpcode = OpCode.ToString();
-            return ciOpcode.StartsWith("pop")
+            return ciOpcode.StartsWith("endfinally")
+                || ciOpcode.StartsWith("pop")
                 || ciOpcode.StartsWith("br")
                 || ciOpcode.StartsWith("be")
                 || ciOpcode.StartsWith("bg")

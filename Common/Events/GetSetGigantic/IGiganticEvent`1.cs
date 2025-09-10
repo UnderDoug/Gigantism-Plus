@@ -57,7 +57,7 @@ namespace HNPS_GigantismPlus
         public static T FromPool(GameObject Object, bool IsGigantic = false, string Context = null)
         {
             T E = FromPool();
-            if (GameObject.Validate(Object))
+            if (Object != null)
             {
                 E.Object = Object;
                 E.IsGigantic = IsGigantic;
@@ -183,7 +183,12 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(Context)})",
                 Indent: 0, Toggle: getDoDebug('X'));
 
-            return FromPool(Object, IsGigantic, Context).CheckFor(out Override);
+            Override = false;
+            if (FromPool(Object, IsGigantic, Context) is T E)
+            {
+                return E.CheckFor(out Override);
+            }
+            return false;
         }
         public static bool CheckFor(GameObject Object, bool IsGigantic = false, string Context = null)
         {
@@ -195,7 +200,7 @@ namespace HNPS_GigantismPlus
                 + $"{nameof(Context)})",
                 Indent: 0, Toggle: getDoDebug('X'));
 
-            return FromPool(Object, IsGigantic, Context).CheckFor(out _);
+            return CheckFor(Object, out _, IsGigantic, Context);
         }
     }
 }

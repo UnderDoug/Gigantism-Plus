@@ -30,7 +30,7 @@ namespace HNPS_GigantismPlus
             return true;
         }
     }
-    public class SetGiganticCreatureHandler : IEventHandler, IModEventHandler<GetGiganticCreatureEvent>
+    public class SetGiganticCreatureHandler : IEventHandler, IModEventHandler<SetGiganticCreatureEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(SetGiganticCreatureHandler));
 
@@ -40,7 +40,7 @@ namespace HNPS_GigantismPlus
         {
             The.Game?.RegisterEvent(Handler, GetGiganticCreatureEvent.ID);
             
-            return (bool)The.Game?.WasModEventHandlerRegistered<SetGiganticCreatureHandler, GetGiganticCreatureEvent>();
+            return (bool)The.Game?.WasModEventHandlerRegistered<SetGiganticCreatureHandler, SetGiganticCreatureEvent>();
         }
 
         public bool HandleEvent(GetGiganticCreatureEvent E)
@@ -67,7 +67,7 @@ namespace HNPS_GigantismPlus
             return true;
         }
     }
-    public class SetGiganticEquipmentHandler : IEventHandler, IModEventHandler<GetGiganticEquipmentEvent>
+    public class SetGiganticEquipmentHandler : IEventHandler, IModEventHandler<SetGiganticEquipmentEvent>
     {
         private static bool doDebug => getClassDoDebug(nameof(SetGiganticEquipmentHandler));
 
@@ -77,7 +77,7 @@ namespace HNPS_GigantismPlus
         {
             The.Game?.RegisterEvent(Handler, GetGiganticEquipmentEvent.ID);
             
-            return (bool)The.Game?.WasModEventHandlerRegistered<SetGiganticEquipmentHandler, GetGiganticEquipmentEvent>();
+            return (bool)The.Game?.WasModEventHandlerRegistered<SetGiganticEquipmentHandler, SetGiganticEquipmentEvent>();
         }
 
         public bool HandleEvent(GetGiganticEquipmentEvent E)

@@ -259,7 +259,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            if (E.Object == ImplantObject)
+            if (E.Object == ParentObject)
             {
                 if (E.Object.TryGetPart(out Description description))
                 {

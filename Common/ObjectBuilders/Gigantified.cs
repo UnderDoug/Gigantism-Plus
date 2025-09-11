@@ -276,9 +276,9 @@ namespace XRL.World.ObjectBuilders
                 CyberneticsGiganticExoframe exoframeCybernetic = Creature?.Body?.GetBody().Cybernetics?.GetPart<CyberneticsGiganticExoframe>();
                 bool alreadyInstalled = false;
 
-                if (exoframeCybernetic != null && !(exoframeCybernetic.ImplantObject.GetTier() < exoframeObject.GetTier()))
+                if (exoframeCybernetic != null && !(exoframeCybernetic.ParentObject.GetTier() < exoframeObject.GetTier()))
                 {
-                    exoframeObject = exoframeCybernetic.ImplantObject;
+                    exoframeObject = exoframeCybernetic.ParentObject;
                     alreadyInstalled = true;
                 }
 

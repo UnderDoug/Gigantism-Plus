@@ -36,7 +36,7 @@ namespace HNPS_GigantismPlus.Harmony
             if (Actor != null && Actor.IsTrueKin() && Actor.TryGetPart(out GigantismPlus gigantism))
             {
                 Debug.CheckYeh(3, "Actor exists, is a True Kin, and has GigantismPlus", Indent: 4, Toggle: doDebug);
-                if (!gigantism.Is(null) && (gigantism.UnHunchImmediately || IsStart))
+                if (gigantism == null && (gigantism.UnHunchImmediately || IsStart))
                 {
                     Debug.Entry(3, "Making Hunch Over free, Sending Command to Hunch Over", Indent: 5, Toggle: doDebug);
 
@@ -74,7 +74,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPrefix]
         public static bool InventoryActionEvent_HunchOver_Prefix(InventoryActionEvent E)
         {
-            if (E.Command.Is("InterfaceWithBecomingNook"))
+            if (E.Command == "InterfaceWithBecomingNook")
             {
                 Debug.Entry(3,
                     $"# {typeof(CyberneticsTerminal2).Name}."

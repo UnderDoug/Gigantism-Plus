@@ -35,7 +35,7 @@ namespace XRL.World.Parts
             Adjective = ADJ;
             AdjectiveColorFallback = ADJ_COL_FALLBACK;
 
-            string cyberneticsObject = AssigningPart?.ImplantObject?.GetDisplayName(Short: true, AsIfKnown: true);
+            string cyberneticsObject = AssigningPart?.ParentObject?.GetDisplayName(Short: true, AsIfKnown: true);
             AddSecondaryDescription(new("have", $"some of =subject.possessive= bonuses applied by an implanted {cyberneticsObject}"));
         }
         public ModAugmentedNaturalWeapon(NaturalEquipmentManager NewManager)

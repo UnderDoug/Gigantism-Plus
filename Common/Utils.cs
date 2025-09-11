@@ -398,7 +398,7 @@ namespace HNPS_GigantismPlus
                         Part.DefaultBehavior.DisplayName = exoframe.GetAugmentAdjective() + " " + Part.DefaultBehavior.ShortDisplayName;
 
                         Description desc = Part.DefaultBehavior.GetPart<Description>();
-                        desc._Short += $" This appendage is being {exoframe.GetAugmentAdjective()} by a {exoframe.ImplantObject.DisplayName}.";
+                        desc._Short += $" This appendage is being {exoframe.GetAugmentAdjective()} by a {exoframe.ParentObject.DisplayName}.";
 
                         Render render = Part.DefaultBehavior.GetPart<Render>();
                         render.ColorString = exoframe.AugmentTileColorString;

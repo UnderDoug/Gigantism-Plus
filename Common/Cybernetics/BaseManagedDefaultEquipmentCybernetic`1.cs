@@ -51,19 +51,7 @@ namespace XRL.World.Parts
 
         public int Level { get; set; }
 
-        private GameObject _implantee = null;
-        public GameObject Implantee
-        {
-            get => _implantee ??= ImplantObject?.Implantee;
-            set => _implantee = value == null ? null : _implantee;
-        }
-
-        private GameObject _implantObject = null;
-        public GameObject ImplantObject
-        {
-            get =>_implantObject ??= ParentObject;
-            set => _implantObject = value == null ? null : _implantObject;
-        }
+        public GameObject Implantee => ParentObject?.Implantee;
 
         public BaseManagedDefaultEquipmentCybernetic()
         {
@@ -159,12 +147,12 @@ namespace XRL.World.Parts
         {
             Implantee?.MakeUnderstood();
             Implantee?.Body?.UpdateBodyParts();
-        } //!-- public override void OnImplanted(GameObject Object)
+        }
 
         public virtual void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
             Implantee?.Body?.UpdateBodyParts();
-        } //!-- public override void OnUnimplanted(GameObject Object)
+        }
 
         public virtual void OnBeforeManageDefaultNaturalEquipment(NaturalEquipmentOperator Manager, BodyPart TargetBodyPart)
         {
@@ -357,42 +345,19 @@ namespace XRL.World.Parts
             {
                 return false; // This prevents the cybernetic from being disassembled.
             }
-
-            if (E.ID == "BeforeMutationAdded")
+            else
+            if (E.ID == "CookedAt")
             {
-                GameObject Actor = E.GetParameter("Object") as GameObject;
-                string Mutation = E.GetParameter("Mutation") as string;
-                if (Actor == Implantee)
-                {
-                    /*
-                    Debug.Entry(4, $"> foreach (ModNaturalEquipment<E> naturalEquipmentMod in NaturalEquipmentMods)", Indent: 1, Toggle: getDoDebug());
-                    foreach (ModNaturalEquipment<T> NaturalEquipmentMod in NaturalEquipmentMods)
-                    {
-                        // UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-                    }
-                    if (NaturalEquipmentMod != null) // UpdateNaturalEquipmentMod(NaturalEquipmentMod, Level);
-                    Debug.Entry(4, $"x foreach (ModNaturalEquipment<E> naturalEquipmentMod in NaturalEquipmentMods) >//", Indent: 1, Toggle: getDoDebug());
-                    */
-                }
-            }
-            else if (E.ID == "MutationAdded")
-            {
-                GameObject Actor = E.GetParameter("Object") as GameObject;
-                string Mutation = E.GetParameter("Mutation") as string;
-                if (Actor == Implantee)
-                {
-                    // do code?
-                }
-            }
-            else if (E.ID == "CookedAt")
-            {
-                if (E.GetParameter("Actor") is GameObject Actor && Actor == ParentObject && Actor.Body != null)
+                if (E.GetParameter("Actor") is GameObject Actor 
+                    && Actor == ParentObject 
+                    && Actor.Body != null)
                 {
                     Actor.Body.UpdateBodyParts();
                 }
             }
             return base.FireEvent(E);
         }
+
         // This prevents the cybernetic from being disassembled.
         public virtual void CanBeDisassembled()
         {
@@ -403,10 +368,6 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             BaseManagedDefaultEquipmentCybernetic<T> cybernetic = base.DeepCopy(Parent, MapInv) as BaseManagedDefaultEquipmentCybernetic<T>;
-
-            cybernetic.Implantee = null;
-            cybernetic.ImplantObject = null;
-
             return cybernetic;
         }
     }

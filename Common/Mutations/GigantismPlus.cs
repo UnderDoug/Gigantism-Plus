@@ -648,7 +648,7 @@ namespace XRL.World.Parts.Mutation
 
             string gigantismSource = (!IsCyberGiant) ? "unusually" : "cybernetically".Color("c");
             string exoframeName = string.Empty;
-            if (IsCyberGiant) exoframeName = GiganticExoframe.ImplantObject.ShortDisplayName;
+            if (IsCyberGiant) exoframeName = GiganticExoframe.ParentObject.ShortDisplayName;
 
             string MaxDamageDie = $" (Max: {MaxDamageDieIncrease.Signed()})";
             string MinDamageBonus = $" (Min: {MinDamageBonusIncrease.Signed()})";

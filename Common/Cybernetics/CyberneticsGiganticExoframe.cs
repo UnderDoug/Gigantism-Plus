@@ -194,7 +194,7 @@ namespace XRL.World.Parts
                 Indent: indent + 1, Toggle: getDoDebug());
 
             Debug.LastIndent = indent;
-        } //!--- public override void OnImplanted(GameObject Object)
+        }
 
         public override void OnUnimplanted(GameObject Implantee, GameObject Implant)
         {
@@ -208,7 +208,7 @@ namespace XRL.World.Parts
 
             // Implantee.CheckEquipmentSlots();
 
-            Unbecoome(Implantee, Model, ImplantObject);
+            Unbecoome(Implantee, Model, ParentObject);
 
             ParentObject.RemovePart<Armor>();
 
@@ -223,7 +223,7 @@ namespace XRL.World.Parts
                 Indent: indent + 1, Toggle: getDoDebug());
 
             Debug.LastIndent = indent;
-        } //!--- public override void OnUnimplanted(GameObject Object)
+        }
 
         public override bool AllowStaticRegistration()
         {
@@ -236,19 +236,20 @@ namespace XRL.World.Parts
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
-                || ID == PooledEvent<GetSlotsRequiredEvent>.ID
+                || ID == GetSlotsRequiredEvent.ID
                 || ID == AfterObjectCreatedEvent.ID;
         }
         public override bool HandleEvent(GetSlotsRequiredEvent E)
         {
             // Lets you install this cybernetic despite being a disparate size to you.
-            if (E.Object == ImplantObject && E.Object.HasPart<CyberneticsBaseItem>())
+            if (E.Object == ParentObject && E.Object.HasPart<CyberneticsBaseItem>())
             {
                 if (!E.Actor.IsGiganticCreature && E.Object.IsGiganticEquipment)
                 {
                     E.Decreases++;
                 }
-                else if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
+                else
+                if (E.Actor.IsGiganticCreature && !E.Object.IsGiganticEquipment)
                 {
                     E.Increases++;
                 }
@@ -258,7 +259,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(AfterObjectCreatedEvent E)
         {
-            if (E.Object == ImplantObject)
+            if (E.Object == ParentObject)
             {
                 if (E.Object.TryGetPart(out Description description))
                 {

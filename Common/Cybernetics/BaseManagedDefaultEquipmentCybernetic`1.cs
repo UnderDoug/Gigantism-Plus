@@ -334,8 +334,6 @@ namespace XRL.World.Parts
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
             Registrar.Register("CanBeDisassembled"); // This prevents the cybernetic from being disassembled.
-            Registrar.Register("BeforeMutationAdded");
-            Registrar.Register("MutationAdded");
             Registrar.Register("CookedAt");
             base.Register(Object, Registrar);
         }

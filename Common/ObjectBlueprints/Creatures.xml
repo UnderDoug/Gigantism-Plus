@@ -251,8 +251,8 @@
     <stat Name="Hitpoints" Value="300" sValue="5,2d4,(t-1)d10,(v)" />
     <part Name="GivesRep" />
     <xtagWaterRitual NoJoin="true" SellSkill="SingleWeaponFighting_OpportuneAttacks" SellBlueprints="true" numRecipes="1"></xtagWaterRitual>
-    <tag Name="staticFaction1" Value="GiantTemplar,hate,grand larsony and the illegal sale of cybernetics" />
-    <tag Name="staticFaction2" Value="WrassleGiants,love,grand larsony and the illegal sale of cybernetics" />
+    <tag Name="staticFaction1" Value="GiantTemplar,hate,grand larceny and the illegal sale of cybernetics" />
+    <tag Name="staticFaction2" Value="WrassleGiants,love,grand larceny and the illegal sale of cybernetics" />
     <tag Name="staticFaction3" Value="Wardens,friend,reasons they won't talk about" />
     <tag Name="NoHateFactions" Value="WrassleGiants,Giants,Wardens,Dromad" />
     <xtagGrammar Proper="true" />

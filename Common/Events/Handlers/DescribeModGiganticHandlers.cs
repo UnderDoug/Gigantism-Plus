@@ -188,7 +188,9 @@ namespace HNPS_GigantismPlus
             MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
             bool isDefaultBehavior = Object.EquipAsDefaultBehavior();
             bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
-            if (meleeWeapon != null && Object.HasTagOrProperty("ShowMeleeWeaponStats"))
+            if (meleeWeapon != null 
+                && Object.HasTagOrProperty("ShowMeleeWeaponStats")
+                && !Object.InheritsFrom("Tonic"))
             {
                 E.AddPrimaryElement("have", "+3 damage");
                 if (meleeWeapon.Skill == "Cudgel")
@@ -200,11 +202,13 @@ namespace HNPS_GigantismPlus
                     E.AddPrimaryElement(priority++, "cleave", "for -3 AV");
                 }
             }
-            else if (Object.HasPart<MissileWeapon>())
+            else 
+            if (Object.HasPart<MissileWeapon>())
             {
                 E.AddPrimaryElement(priority++, "have", "+3 damage");
             }
-            else if (Object.HasPart<ThrownWeapon>())
+            else 
+            if (Object.HasPart<ThrownWeapon>())
             {
                 if (!Object.HasPartDescendedFrom<IGrenade>())
                 {

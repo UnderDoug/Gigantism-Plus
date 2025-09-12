@@ -4,6 +4,7 @@ using HNPS_GigantismPlus;
 using Qud.API;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using XRL;
@@ -53,8 +54,19 @@ namespace XRL.World.WorldBuilders
 
         public JoppaWorldBuilder Builder = null;
 
-        public static string SecretZoneID = string.Empty;
-        public static JournalMapNote SecretMapNote = null;
+        private static string _SecretZoneID;
+        public static string SecretZoneID
+        {
+            get => _SecretZoneID ??= SecretMapNote?.ZoneID;
+            set => _SecretZoneID = value;
+        }
+
+        private static JournalMapNote _SecretMapNote;
+        public static JournalMapNote SecretMapNote
+        {
+            get => _SecretMapNote ??= JournalAPI.GetMapNote(SCRT_GNT_SCRT_ID);
+            set => _SecretMapNote = value;
+        }
 
         public Zone SecretZone => The.ZoneManager.GetZone(SecretZoneID);
 
@@ -926,10 +938,17 @@ namespace XRL.World.WorldBuilders
         public static void GoToGiantWish()
         {
             Zone Z = The.ZoneManager.GetZone(SecretZoneID);
-            The.Player.Physics.CurrentCell.RemoveObject(The.Player.Physics.ParentObject);
-            Z.GetEmptyCells().GetRandomElement().AddObject(The.Player);
-            The.ZoneManager.SetActiveZone(Z);
-            The.ZoneManager.ProcessGoToPartyLeader();
+            if (Z != null)
+            {
+                The.Player.Physics.CurrentCell.RemoveObject(The.Player.Physics.ParentObject);
+                Z.GetEmptyCells().GetRandomElement()?.AddObject(The.Player);
+                The.ZoneManager.SetActiveZone(Z);
+                The.ZoneManager.ProcessGoToPartyLeader();
+            }
+            else
+            {
+                Popup.Show("Can't find the Giant Zone. This is a bug.");
+            }
         }
 
         [WishCommand(Command = "GetAGiant")]

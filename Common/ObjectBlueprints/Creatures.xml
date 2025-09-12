@@ -236,7 +236,7 @@
           TileColor="&amp;B" DetailColor="Y" />
     <part Name="Honorifics" Primary="&quot;Warden&quot;" />
     <part Name="ConversationScript" ConversationID="gutsmonger" />
-    <part Name="Description" Short="Boulders of {{K|flawless}} {{crysteel|crysteel}} are arranged into a human-like gestalt and move as though possessed by an all-too energetic poltergeist who knows, mostly, how this kind of body is supposed to behave. Immense silicate sheets coaxed by the heat of its earthen hearth, sit bulging and atop =pronouns.possessive= brow, threatening an insectoid appearance were it not for =pronouns.possessive= sheer size. Visceral grime, of man and machine alike, is splayed across a leather tent fastened 'bout =pronouns.possessive= nape, and hangs from the few nooks that exist nestled amongst the subtle edges of where the machine stops, and =pronouns.subjective= =verb:begin:afterpronoun=." />
+    <part Name="Description" Short="Boulders of {{K|flawless}} {{crysteel|crysteel}} are arranged into a human-like gestalt and move as though possessed by an all-too energetic poltergeist who knows, mostly, how this kind of body is supposed to behave. Immense silicate sheets, coaxed by the heat of its earthen hearth, sit bulging and atop =pronouns.possessive= brow, threatening an insectoid appearance were it not for =pronouns.possessive= sheer size. Visceral grime, of man and machine alike, is splayed across a leather tent fastened 'bout =pronouns.possessive= nape, and hangs from the few nooks that exist nestled amongst the subtle edges of where the machine stops, and =pronouns.subjective= =verb:begin:afterpronoun=." />
     <skill Name="Tinkering" />
     <skill Name="Tinkering_Tinker1" />
     <tag Name="Role" Value="Tank" />

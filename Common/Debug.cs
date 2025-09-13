@@ -184,7 +184,7 @@ namespace HNPS_GigantismPlus
         {
             if (Do)
             {
-                bool haveILGen = Generator != null;
+                bool haveILGen = false && Generator != null;
                 Dictionary<Label, int> labelInstructions = new();
                 int originalPos = CodeMatcher.Pos;
                 CodeMatcher.Start();
@@ -226,13 +226,13 @@ namespace HNPS_GigantismPlus
                         string ciLabelString = "????";
                         if (labelInstructions.ContainsKey(ciLabel))
                         {
-                            ciLabelString = labelInstructions[ciLabel].ToString().PadLeft(counterPadding, '0');
+                            ciLabelString = $"[{labelInstructions[ciLabel].ToString().PadLeft(counterPadding, '0')}]";
                             if (haveILGen)
                             {
                                 ciLabelString = $"IL_{labelInstructions[ciLabel]:X4}";
                             }
                         }
-                        ciOperand = $"[{ciLabelString}]";
+                        ciOperand = $"{ciLabelString}";
                     }
                     string codePos = $"[{counter.ToString().PadLeft(counterPadding, '0')}]";
                     if (haveILGen)

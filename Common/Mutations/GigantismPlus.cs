@@ -823,7 +823,7 @@ namespace XRL.World.Parts.Mutation
         public override bool Mutate(GameObject GO, int Level)
         {
             Debug.Header(4, $"GigantismPlus", $"Mutate (GO: {GO.DebugName}, Level: {Level})", Toggle: doDebug);
-            Body body = GO.Body;
+            Body body = GO?.Body;
 
             if (EnablePrereleaseContent)
             {
@@ -854,6 +854,8 @@ namespace XRL.World.Parts.Mutation
                     Debug.LoopItem(4, "stewBelly.StartingHankering = 1", Indent: 2, Toggle: doDebug);
                 }
                 Debug.LoopItem(4, "StewBelly already processed Stews", Indent: 2, Toggle: doDebug);
+
+                GO?.CheckEquipmentSlots();
             }
             else
             {
@@ -1096,18 +1098,14 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)
         {
-            if (!GetDisplayName().Strip().Contains("(D)"))
-            {
-                ResetDisplayName();
-            }
+            ResetDisplayName();
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(AfterLevelGainedEvent E)
         {
-            if (IsCyberGiant)
+            if (IsCyberGiant && E.Actor.Body is Body body)
             {
-                Body body = E.Actor.Body;
-                body?.UpdateBodyParts();
+                body.UpdateBodyParts();
             }
             return base.HandleEvent(E);
         }
@@ -1161,28 +1159,38 @@ namespace XRL.World.Parts.Mutation
         {
             if (E.Actor is GameObject actor && E.Object is GameObject equipment)
             {
-                bool actorGiant =
-                    actor != null
-                 && actor.IsGiganticCreature;
-
-                bool equipmentNotGiantButIsEquippable =
-                    equipment != null
-                 && !equipment.IsGiganticEquipment
-                 && equipment.HasTagOrProperty("GiganticEquippable");
-
-
-                // Lets you equip non-gigantic equipment that is flagged as "GiganticEquippable"
+                // Allow equipping non-gigantic equipment that is flagged as "GiganticEquippable"
                 // with half the slots it would normally take, provided it's not now too small.
                 // exceptions are Floating Nearby, Thrown Weapon, and Cybernetics.
-                if (actorGiant
-                    && equipmentNotGiantButIsEquippable
+                if (actor.IsGiganticCreature
+                    && !equipment.IsGiganticEquipment
+                    && equipment.HasTagOrProperty("GiganticEquippable")
                     && !E.SlotType.IsNullOrEmpty())
                 {
                     E.Decreases++;
-                    if (E.SlotType != "Floating Nearby" && E.SlotType != "Thrown Weapon" && !E.Object.HasPart<CyberneticsBaseItem>())
+                    if (E.SlotType != "Floating Nearby" 
+                        && E.SlotType != "Thrown Weapon"
+                        && equipment.IsEntirelyFloating()
+                        && !equipment.HasPart<CyberneticsBaseItem>())
                     {
                         E.CanBeTooSmall = true;
                     }
+                }
+
+                // Allow equipping thrown and floating items irrespective of size disparity.
+                bool isFloating = !E.SlotType.IsNullOrEmpty()
+                    && (E.SlotType == "Floating Nearby" || equipment.IsEntirelyFloating());
+                bool isThrown = !E.SlotType.IsNullOrEmpty()
+                    && E.SlotType == "Thrown Weapon";
+                bool isEquipmentTwoSlotNonGigantic = equipment.UsesTwoSlots
+                    && actor.IsGiganticCreature
+                    && !equipment.IsGiganticEquipment
+                    && !equipment.HasTagOrProperty("GiganticEquippable");
+                bool isEquipmentThrownOrFloating = equipment.UsesSlots.IsNullOrEmpty()
+                    && (isFloating || isThrown);
+                if (isEquipmentTwoSlotNonGigantic || isEquipmentThrownOrFloating)
+                {
+                    E.CanBeTooSmall = false;
                 }
             }
             return base.HandleEvent(E);

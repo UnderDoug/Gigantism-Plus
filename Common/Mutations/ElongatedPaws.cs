@@ -154,7 +154,7 @@ namespace XRL.World.Parts.Mutation
 
         public override bool Mutate(GameObject GO, int Level)
         {
-            GO.CheckEquipmentSlots();
+            GO?.CheckEquipmentSlots();
             
             return base.Mutate(GO, Level);
         }
@@ -187,8 +187,9 @@ namespace XRL.World.Parts.Mutation
                     }
                 }
 
-                GO.CheckEquipmentSlots();
             }
+
+            GO?.CheckEquipmentSlots();
 
             return base.Unmutate(GO);
         }

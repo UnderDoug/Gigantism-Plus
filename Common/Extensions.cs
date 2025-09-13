@@ -457,40 +457,36 @@ namespace HNPS_GigantismPlus
             Object.SetStringProperty("EquipmentFrameColors", TopLeft_Left_Right_BottomRight, true);
         }
 
-        public static void CheckEquipmentSlots(this GameObject Actor)
+        public static void CheckEquipmentSlots(this GameObject Actor, IEnumerable<string> AffectedSlotTypes = null)
         {
-            Debug.Entry(3, $"* {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName})", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
             Body Body = Actor?.Body;
-            if (Body != null)
+            if (Actor == null || Body == null)
             {
-                List<GameObject> list = Event.NewGameObjectList();
-                Debug.Entry(3, "> foreach (BodyPart bodyPart in Actor.LoopParts())", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
-                foreach (BodyPart bodyPart in Body.LoopParts())
+                return;
+            }
+            List<GameObject> equippedObjectsList = Event.NewGameObjectList();
+            foreach (BodyPart bodyPart in Body.LoopParts())
+            {
+                if (!AffectedSlotTypes.IsNullOrEmpty() && AffectedSlotTypes.Contains(bodyPart.Type))
                 {
-                    Debug.Entry(3, "bodyPart", $"{bodyPart.Description} [{bodyPart.ID}:{bodyPart.Name}]", Indent: 1, Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
-                    GameObject equipped = bodyPart.Equipped;
-                    if (equipped != null && !list.Contains(equipped))
+                    continue;
+                }
+                
+                if (bodyPart.Equipped is GameObject equippedObject 
+                    && !equippedObjectsList.Contains(equippedObject))
+                {
+                    equippedObjectsList.Add(equippedObject);
+                    int slotsUsed = Body.GetPartCountEquippedOn(equippedObject);
+                    int slotsRequired = equippedObject.GetSlotsRequiredFor(Actor, bodyPart.Type);
+                    if (slotsUsed != slotsRequired 
+                        && bodyPart.TryUnequip(Silent: true, SemiForced: true) 
+                        && slotsUsed > slotsRequired)
                     {
-                        Debug.LoopItem(3, "equipped", $"[{equipped.ID}:{equipped.ShortDisplayName}]", Indent: 2, Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
-                        list.Add(equipped);
-                        int partCountEquippedOn = Body.GetPartCountEquippedOn(equipped);
-                        int slotsRequiredFor = equipped.GetSlotsRequiredFor(Actor, bodyPart.Type, true);
-                        if (!partCountEquippedOn.Is(slotsRequiredFor) 
-                            && bodyPart.TryUnequip(true, true, false, false) 
-                            && partCountEquippedOn > slotsRequiredFor)
-                        {
-                            equipped.SplitFromStack();
-                            bodyPart.Equip(equipped, new int?(0), true, false, false, true);
-                        }
+                        equippedObject.SplitFromStack();
+                        bodyPart.Equip(Item: equippedObject, EnergyCost: 0, Silent: true, SemiForced: true);
                     }
                 }
-                Debug.Entry(3, "x foreach (BodyPart bodyPart in Actor.LoopParts()) >//", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
             }
-            else
-            {
-                Debug.Entry(4, $"no body on which to perform check, aborting ", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
-            }
-            Debug.Entry(3, $"x {nameof(CheckEquipmentSlots)}(this GameObject Actor: {Actor.DebugName}) *//", Toggle: getDoDebug(nameof(CheckEquipmentSlots)));
         }
 
         public static IPart RequirePart(this GameObject Object, IPart Part, bool DoRegistration = true, bool Creation = false)

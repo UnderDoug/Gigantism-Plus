@@ -58,7 +58,7 @@ namespace HNPS_GigantismPlus.Harmony
             metricsCheckSteps++;
             */
             MetricsManager.LogModInfo(ModManager.GetMod("UD_Tinkering_Bytes"), $"Successfully transpiled {patchMethodName}");
-            return codeMatcher.Vomit(doVomit).InstructionEnumeration();
+            return codeMatcher.Vomit(Generator, doVomit).InstructionEnumeration();
         }
 
         [HarmonyPatch(

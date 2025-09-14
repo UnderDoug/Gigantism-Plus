@@ -96,13 +96,6 @@ namespace XRL.World.Parts.Skill
             private set;
         }
 
-        public bool IsBurrowerWantsToVault =>
-                ParentObject != null
-             && WantToVault
-             && !MidVault
-             && !Vaulted
-             && ParentObject.HasPart<Digging>();
-
         public Tactics_Vault ()
         {
 
@@ -952,8 +945,6 @@ namespace XRL.World.Parts.Skill
                 || ID == GetMovementCapabilitiesEvent.ID
                 || ID == CommandEvent.ID
                 || ID == GetItemElementsEvent.ID
-                || ID == PooledEvent<ShouldAttackToReachTargetEvent>.ID
-                || ID == PooledEvent<PathAsBurrowerEvent>.ID
                 || ID == AfterVaultedEvent.ID;
         }
         public override void TurnTick(long TimeTick, int Amount)
@@ -990,8 +981,7 @@ namespace XRL.World.Parts.Skill
                     .AppendColored("W", $"AutoAct State").AppendLine()
                     .Append(VANDR).Append($"[{WantToVault.YehNah()}]{HONLY}WantToVault: ").AppendColored("B", $"{WantToVault}").AppendLine()
                     .Append(VANDR).Append($"[{WasAutoActing.YehNah(WantToVault)}]{HONLY}WasAutoActing: ").AppendColored("B", $"{WasAutoActing}").AppendLine()
-                    .Append(VANDR).Append($"[{haveAutoActSetting.YehNah(WantToVault)}]{HONLY}AutoActSetting: ").AppendColored("o", $"{AutoActSetting?.Quote() ?? "null".Color("B")}").AppendLine()
-                    .Append(TANDR).Append($"[{IsBurrowerWantsToVault.YehNah(!WantToVault)}]{HONLY}IsBurrowerWantsToVault: ").AppendColored("B", $"{IsBurrowerWantsToVault}").AppendLine();
+                    .Append(VANDR).Append($"[{haveAutoActSetting.YehNah(WantToVault)}]{HONLY}AutoActSetting: ").AppendColored("o", $"{AutoActSetting?.Quote() ?? "null".Color("B")}").AppendLine();
                     
                 E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
             }
@@ -1132,8 +1122,7 @@ namespace XRL.World.Parts.Skill
                 } // if (Vaultee != null)
             } // if (E.Actor == ParentObject && ParentObject != null && WantToVault)
             if (false 
-                && E.Cell.InActiveZone 
-                && IsBurrowerWantsToVault)
+                && E.Cell.InActiveZone)
             {
                 GameObject Vaulter = ParentObject;
 
@@ -1143,9 +1132,6 @@ namespace XRL.World.Parts.Skill
                 + $" E.Cell: [{E.Cell?.Location}],"
                 + $" E.Actor: {Vaulter?.DebugName ?? NULL}",
                 Indent: 0, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(IsBurrowerWantsToVault)}", $"{IsBurrowerWantsToVault}",
-                    Good: IsBurrowerWantsToVault, Indent: 1, Toggle: getDoDebug());
 
                 Debug.LoopItem(4, $"Checking adjacent cells for wasDiggable vaultables...", Indent: 1, Toggle: getDoDebug());
                 foreach (Cell cell in E.Cell.GetAdjacentCells())
@@ -1208,8 +1194,7 @@ namespace XRL.World.Parts.Skill
         {
             if (false 
                 && E.Cell.InActiveZone 
-                && E.Actor == ParentObject 
-                && IsBurrowerWantsToVault 
+                && E.Actor == ParentObject
                 && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
             {
                 GameObject Vaulter = E.Actor;
@@ -1220,9 +1205,6 @@ namespace XRL.World.Parts.Skill
                 + $" E.Cell: [{E.Cell?.Location}],"
                 + $" E.Actor: {Vaulter?.DebugName ?? NULL}",
                 Indent: 0, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(IsBurrowerWantsToVault)}", $"{IsBurrowerWantsToVault}",
-                    Good: IsBurrowerWantsToVault, Indent: 1, Toggle: getDoDebug());
 
                 Debug.LoopItem(4, $"NotPlayer", $"{!ParentObject.IsPlayer()}",
                     Good: !ParentObject.IsPlayer(), Indent: 1, Toggle: getDoDebug());
@@ -1279,226 +1261,6 @@ namespace XRL.World.Parts.Skill
                         Debug.CheckNah(4, $"Cell [{cell.Location}] contains no diggable vaultables", Indent: 1, Toggle: getDoDebug());
                     }
                 }
-            }
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(PathAsBurrowerEvent E)
-        {
-            if (VaultingEnabled 
-                && E.Object != null 
-                && E.Object == ParentObject 
-                && IsBurrowerWantsToVault 
-                && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
-            {
-                GameObject Vaulter = E.Object;
-                Cell vaulterCell = Vaulter.CurrentCell;
-
-                Debug.Entry(4,
-                $"@ {nameof(Tactics_Vault)}."
-                + $"{nameof(HandleEvent)}({nameof(PathAsBurrowerEvent)} E)"
-                + $" E.Actor: {Vaulter?.DebugName ?? NULL}",
-                Indent: 0, Toggle: getDoDebug());
-
-                bool vaulterNotNull = Vaulter != null;
-
-                bool vaulterNotPlayer =
-                    vaulterNotNull
-                    && !Vaulter.IsPlayerControlled();
-
-                bool autoActActive = AutoAct.IsActive();
-
-                bool actingAutomatically = vaulterNotPlayer || autoActActive;
-
-                GameObject Vaultee = null;
-
-                foreach (Cell cell in Vaulter.CurrentCell.GetAdjacentCells())
-                {
-                    if (cell != null && cell.HasDiggableVaultableObject())
-                    {
-                        foreach (GameObject vaultee in cell.GetObjectsWithPart(nameof(Vaultable)))
-                        {
-                            if (vaultee.HasPropertyOrTag(DIGGABLE))
-                            {
-                                Vaultee = vaultee;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                bool vaulteeNotNull = Vaultee != null;
-
-                Vaultable vaultable = null;
-
-                bool vaulteeHasVaultable = vaulteeNotNull && Vaultee.TryGetPart(out vaultable);
-
-                Dictionary<Cell, Cell> originDestinationPairs = vaultable?.GetVaultableCellPairs(Vaulter);
-
-                bool vaulteeHasValidCellPair = !originDestinationPairs.IsNullOrEmpty();
-
-                bool vaultableCellPairsContainsVaulter =
-                    vaulteeHasValidCellPair
-                    && vaulterNotNull
-                    && originDestinationPairs.ContainsKey(Vaulter.CurrentCell);
-
-                bool vaulterCanVaultVaultee = CanVault(Vaultee, Silent: true);
-
-                bool shouldNotPathAsBurrower =
-                    vaulterNotNull
-                 && IsBurrowerWantsToVault
-                 && actingAutomatically
-                 && vaulteeNotNull
-                 && vaultableCellPairsContainsVaulter
-                 && vaulterCanVaultVaultee;
-
-                Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}",
-                    Good: vaulterNotNull, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(IsBurrowerWantsToVault)}", $"{IsBurrowerWantsToVault}",
-                    Good: IsBurrowerWantsToVault, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(actingAutomatically)}", $"{actingAutomatically}",
-                    Good: actingAutomatically, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(vaulterNotPlayer)}", $"{vaulterNotPlayer}",
-                    Good: vaulterNotPlayer, Indent: 2, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(autoActActive)}", $"{autoActActive}",
-                    Good: autoActActive, Indent: 2, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(vaulteeNotNull)}", $"{vaulteeNotNull}",
-                    Good: vaulteeNotNull, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(vaulteeHasVaultable)}", $"{vaulteeHasVaultable}",
-                    Good: vaulteeHasVaultable, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(vaulteeHasValidCellPair)}", $"{vaulteeHasValidCellPair}",
-                    Good: vaulteeHasValidCellPair, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(vaultableCellPairsContainsVaulter)}", $"{vaultableCellPairsContainsVaulter}",
-                    Good: vaultableCellPairsContainsVaulter, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(vaulterCanVaultVaultee)}", $"{vaulterCanVaultVaultee}",
-                    Good: vaulterCanVaultVaultee, Indent: 1, Toggle: getDoDebug());
-
-                Debug.LoopItem(4, $"{nameof(shouldNotPathAsBurrower)}", $"{shouldNotPathAsBurrower}",
-                    Good: shouldNotPathAsBurrower, Indent: 1, Toggle: getDoDebug());
-
-                if (shouldNotPathAsBurrower)
-                {
-                    Debug.Entry(4, $"Stopping {Vaulter?.DebugName ?? NULL} from pathing as burrower",
-                        Indent: 1, Toggle: getDoDebug());
-
-                    return true; // this is a return !flag one so true gives a !true result.
-                }
-            }
-
-            return base.HandleEvent(E);
-        }
-        public override bool HandleEvent(ShouldAttackToReachTargetEvent E)
-        {
-            GameObject Vaulter = E.Actor;
-            GameObject Vaultee = E.Object;
-
-            Debug.Entry(4,
-                $"@ {nameof(Tactics_Vault)}."
-                + $"{nameof(HandleEvent)}("
-                + $"{nameof(ShouldAttackToReachTargetEvent)} E)",
-                Indent: 0, Toggle: getDoDebug());
-
-            Debug.Entry(4, $"E.Actor", $"{E.Actor?.DebugName ?? NULL}",
-                Indent: 1, Toggle: getDoDebug());
-
-            Debug.Entry(4, $"E.Object", $"{E.Object?.DebugName ?? NULL}",
-                Indent: 1, Toggle: getDoDebug());
-
-            Debug.Entry(4, $"E.Target", $"{E.Target?.DebugName ?? NULL}",
-                Indent: 1, Toggle: getDoDebug());
-
-            bool vaulterNotNull = Vaulter != null && ParentObject == E.Actor;
-
-            bool vaulteeNotNull = Vaultee != null;
-
-            bool vaulterMovingAutomatically = (!Vaulter.IsPlayerControlled() || AutoAct.IsAnyMovement());
-
-            bool targetNotVaultee = vaulteeNotNull && E.Target != Vaultee;
-
-            Vaultable vaultable = null;
-            bool vaulteeIsVautable = vaulteeNotNull && Vaultee.TryGetPart(out vaultable);
-
-            Dictionary<Cell, Cell> vaultableCellPairs = new();
-
-            if (vaulteeNotNull)
-            {
-                vaultableCellPairs = vaultable?.GetVaultableCellPairs();
-            }
-
-            bool vaulteeHasValidVaultLocations = vaulteeNotNull && !vaultableCellPairs.IsNullOrEmpty();
-
-            bool vaulterIsInValidVaultLocation =
-                vaulteeHasValidVaultLocations
-             && (vaultableCellPairs.ContainsKey(Vaulter.CurrentCell)
-                || vaultableCellPairs.ContainsValue(Vaulter.CurrentCell)
-                || GetValidDestinationCell(Vaulter, Vaultee.CurrentCell) != null);
-
-            bool vaulterCanVaultVaultee =
-                vaulterNotNull
-             && CanVault(Vaultee, Silent: true);
-
-            bool shouldNotAttack =
-                vaulterNotNull
-             && vaulterMovingAutomatically
-             && targetNotVaultee
-             && vaulteeIsVautable
-             && vaulteeHasValidVaultLocations
-             && vaulterIsInValidVaultLocation
-             && vaulterCanVaultVaultee
-             && IsBurrowerWantsToVault;
-
-            Debug.LoopItem(4, $"Determining whether should not attack...",
-                Indent: 1, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}",
-                Good: vaulterNotNull, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(vaulterMovingAutomatically)}", $"{vaulterMovingAutomatically}",
-                Good: vaulterMovingAutomatically, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(targetNotVaultee)}", $"{targetNotVaultee}",
-                Good: targetNotVaultee, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(vaulteeIsVautable)}", $"{vaulteeIsVautable}",
-                Good: vaulteeIsVautable, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(vaulteeHasValidVaultLocations)}", $"{vaulteeHasValidVaultLocations}",
-                Good: vaulteeHasValidVaultLocations, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(vaulterIsInValidVaultLocation)}", $"{vaulterIsInValidVaultLocation}",
-                Good: vaulterIsInValidVaultLocation, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(vaulterCanVaultVaultee)}", $"{vaulterCanVaultVaultee}",
-                Good: vaulterCanVaultVaultee, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(IsBurrowerWantsToVault)}", $"{IsBurrowerWantsToVault}",
-                Good: IsBurrowerWantsToVault, Indent: 2, Toggle: getDoDebug());
-
-            Debug.LoopItem(4, $"{nameof(shouldNotAttack)}", $"{shouldNotAttack}",
-                Good: shouldNotAttack, Indent: 1, Toggle: getDoDebug());
-
-            if (VaultingEnabled && shouldNotAttack)
-            {
-                E.ShouldAttack = false;
-
-                Debug.LoopItem(4, $"E.ShouldAttack", $"{E.ShouldAttack}",
-                    Good: !E.ShouldAttack, Indent: 1, Toggle: getDoDebug());
-
-                Debug.Entry(4,
-                    $"x {nameof(Tactics_Vault)}."
-                    + $"{nameof(HandleEvent)}("
-                    + $"{nameof(ShouldAttackToReachTargetEvent)} E) @//",
-                    Indent: 0, Toggle: getDoDebug());
-
-                return false;
             }
             return base.HandleEvent(E);
         }

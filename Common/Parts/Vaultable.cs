@@ -563,10 +563,6 @@ namespace XRL.World.Parts
                     vaulterHasSkill
                     && vaultSkill.CanVault(Vaultee, Silent: true);
 
-                bool vaulterIsBurrowerWantsToVault =
-                    vaulterHasSkill
-                    && vaultSkill.IsBurrowerWantsToVault;
-
                 bool vaulterNotPlayer =
                     vaulterNotNull
                     && !Vaulter.IsPlayerControlled();
@@ -578,7 +574,6 @@ namespace XRL.World.Parts
                 bool notOkayToDamage =
                     vaultableCellPairsContainsVaulter
                  && vaulterCanVaultVaultee
-                 && vaulterIsBurrowerWantsToVault
                  && actingAutomatically;
 
                 Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
@@ -596,9 +591,6 @@ namespace XRL.World.Parts
 
                 Debug.LoopItem(4, $"{nameof(vaulterCanVaultVaultee)}", $"{vaulterCanVaultVaultee}",
                     Good: vaulterCanVaultVaultee, Indent: 1, Toggle: doDebug);
-
-                Debug.LoopItem(4, $"{nameof(vaulterIsBurrowerWantsToVault)}", $"{vaulterIsBurrowerWantsToVault}",
-                    Good: vaulterIsBurrowerWantsToVault, Indent: 1, Toggle: doDebug);
 
                 Debug.LoopItem(4, $"{nameof(actingAutomatically)}", $"{actingAutomatically}",
                     Good: actingAutomatically, Indent: 1, Toggle: doDebug);

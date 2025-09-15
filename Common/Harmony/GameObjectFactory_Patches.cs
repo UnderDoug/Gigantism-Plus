@@ -47,17 +47,17 @@ namespace HNPS_GigantismPlus.Harmony
             // from the start
             if (codeMatcher.Start().MatchStartForward(match_Return_BaseHandleEvent_E).IsInvalid)
             {
-                MetricsManager.LogModError(ModManager.GetMod("UD_Tinkering_Bytes"), $"{patchMethodName}: ({metricsCheckSteps}) {nameof(CodeMatcher.MatchStartForward)} failed to find instructions {nameof(match_Return_BaseHandleEvent_E)}");
+                MetricsManager.LogModError(ThisMod, $"{patchMethodName}: ({metricsCheckSteps}) {nameof(CodeMatcher.MatchStartForward)} failed to find instructions {nameof(match_Return_BaseHandleEvent_E)}");
                 foreach (CodeMatch match in match_Return_BaseHandleEvent_E)
                 {
-                    MetricsManager.LogModError(ModManager.GetMod("UD_Tinkering_Bytes"), $"{patchMethodName}:     {match.opcode} {match.operand}");
+                    MetricsManager.LogModError(ThisMod, $"{patchMethodName}:     {match.opcode} {match.operand}");
                 }
                 codeMatcher.Vomit(doVomit);
                 return Instructions;
             }
             metricsCheckSteps++;
             */
-            MetricsManager.LogModInfo(ModManager.GetMod("UD_Tinkering_Bytes"), $"Successfully transpiled {patchMethodName}");
+            MetricsManager.LogModInfo(ThisMod, $"Successfully transpiled {patchMethodName}");
             return codeMatcher.Vomit(Generator, doVomit).InstructionEnumeration();
         }
 

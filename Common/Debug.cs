@@ -188,7 +188,7 @@ namespace HNPS_GigantismPlus
                 Dictionary<Label, int> labelInstructions = new();
                 int originalPos = CodeMatcher.Pos;
                 CodeMatcher.Start();
-                while (CodeMatcher.Advance(1).IsValid)
+                do
                 {
                     CodeInstruction ci = CodeMatcher.Instruction;
                     int labelPos = haveILGen ? Generator.ILOffset : CodeMatcher.Pos;
@@ -208,10 +208,11 @@ namespace HNPS_GigantismPlus
                         }
                     }
                 }
+                while (CodeMatcher.Advance(1).IsValid);
                 CodeMatcher.Start();
 
                 int counterPadding = Math.Max(4, (CodeMatcher.Instructions().Count + 1).ToString().Length);
-                while (CodeMatcher.Advance(1).IsValid)
+                do
                 {
                     CodeInstruction ci = CodeMatcher.Instruction;
                     int counter = haveILGen ? Generator.ILOffset : CodeMatcher.Pos;
@@ -245,7 +246,8 @@ namespace HNPS_GigantismPlus
                     {
                         UnityEngine.Debug.Log("");
                     }
-                }
+                } 
+                while (CodeMatcher.Advance(1).IsValid);
                 CodeMatcher.Start().Advance(originalPos);
             }
             return CodeMatcher;

@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<AssemblyName>GigantismPus</AssemblyName>
 		<PackageId>GigantismPus</PackageId>
 		<Authors>hyd-n-plyn-syt, UnderDoug</Authors>
 		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <BaseIntermediateOutputPath>.dotnet\obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>.dotnet\bin\</BaseOutputPath>
 	</PropertyGroup>
   <Import Project="../Mods.csproj" />
 </Project>

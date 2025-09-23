@@ -19,7 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(SlogGlands_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(SlogGlands), 
+            declaringType: typeof(SlogGlands),
             methodName: nameof(SlogGlands.AddSphincterTo),
             argumentTypes: new Type[] { typeof(BodyPart) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]

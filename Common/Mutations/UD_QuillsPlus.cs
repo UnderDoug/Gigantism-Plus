@@ -102,7 +102,7 @@ namespace XRL.World.Parts.Mutation
                     nPenalty = GetAVPenalty(Level);
                     StatShifter.SetStatShift(ParentObject, "AV", -nPenalty);
                 }
-                
+
 
                 SetMyActivatedAbilityDisplayName(QuillFlingActivatedAbilityID, GetAbilityDisplayName(ObjectNameSingular));
             }
@@ -270,10 +270,10 @@ namespace XRL.World.Parts.Mutation
             {
                 QuillFlingActivatedAbilityID =
                     AddMyActivatedAbility(
-                        Name: AbilityName, 
-                        Command: COMMAND_NAME, 
-                        Class: "Physical Mutations", 
-                        Description: null, 
+                        Name: AbilityName,
+                        Command: COMMAND_NAME,
+                        Class: "Physical Mutations",
+                        Description: null,
                         Icon: "*",
                         Silent: Silent);
             }
@@ -339,7 +339,7 @@ namespace XRL.World.Parts.Mutation
 
         public static GameObject GenerateQuillsObject(string Variant, BodyPart BodyPart, int Level = 0)
         {
-            if (Variant.IsNullOrEmpty() || BodyPart == null || Level < 1) 
+            if (Variant.IsNullOrEmpty() || BodyPart == null || Level < 1)
                 return null;
 
             GameObject quillsObject = GameObject.Create(Variant);
@@ -520,7 +520,7 @@ namespace XRL.World.Parts.Mutation
         {
             if (E.Amount > 0 && RecalculateQuills(Level))
             {
-                Debug.Entry(4, 
+                Debug.Entry(4,
                     $"{nameof(UD_QuillsPlus)}." +
                     $"{nameof(HandleEvent)}(" +
                     $"{nameof(AfterRapidAdvancementEvent)} E) ran " +
@@ -575,7 +575,7 @@ namespace XRL.World.Parts.Mutation
                     {
                         return false;
                     }
-                    DidX("fling", $"{ParentObject.its} {objectName} everywhere", "!", ColorAsGoodFor:ParentObject);
+                    DidX("fling", $"{ParentObject.its} {objectName} everywhere", "!", ColorAsGoodFor: ParentObject);
                     foreach (Cell cell in adjacentCells)
                     {
                         QuillFling(cell, quillsPerCell);
@@ -587,11 +587,11 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(AIGetOffensiveAbilityListEvent E)
         {
-            bool enoughQuills = 
+            bool enoughQuills =
                 nQuills >= MINIMUM_QUILLS_TO_FLING
              && nQuills > nMaxQuills * 0.65;
 
-            bool closeEnough = 
+            bool closeEnough =
                 E.Distance <= 1
              || ParentObject.HasEffect<Engulfed>();
 
@@ -730,7 +730,7 @@ namespace XRL.World.Parts.Mutation
         {
             base.Write(Basis, Writer);
 
-            Writer.WriteGameObject(QuillsObject); 
+            Writer.WriteGameObject(QuillsObject);
             Writer.Write(QuillFlingActivatedAbilityID);
         }
 

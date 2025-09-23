@@ -18,7 +18,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(Horns_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(Horns), 
+            declaringType: typeof(Horns),
             methodName: nameof(Horns.RegrowHorns),
             argumentTypes: new Type[] { typeof(bool) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]

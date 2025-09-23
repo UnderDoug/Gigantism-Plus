@@ -29,7 +29,7 @@ namespace HNPS_GigantismPlus
     public static class Utils
     {
         private static bool doDebug => true;
-        public static bool getDoDebug (string MethodName)
+        public static bool getDoDebug(string MethodName)
         {
             if (MethodName == nameof(TryGetTilePath))
                 return false;
@@ -275,11 +275,11 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Entry(3, $"_TilePathCache contains {TileName}", TilePath ?? "null", Indent: 3, Toggle: getDoDebug(nameof(TryGetTilePath)));
             }
-            string foundLocation = 
-                inCache 
-                ? "_TilePathCache" 
-                : IsWholePath 
-                    ? "files" 
+            string foundLocation =
+                inCache
+                ? "_TilePathCache"
+                : IsWholePath
+                    ? "files"
                     : "supplied subfolders";
 
             Debug.Entry(3, $"Tile \"{TileName}\" {(TilePath == null ? "not" : "was")} found in {foundLocation}", Indent: 2, Toggle: getDoDebug(nameof(TryGetTilePath)));
@@ -485,7 +485,7 @@ namespace HNPS_GigantismPlus
             int oldIndent = Indent;
 
             Debug.Entry(4, $"Explodes on High Roll: {High}", Indent: Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
-            Begin:
+        Begin:
             if (Limit != 0 && High >= Limit)
             {
                 Debug.Entry(4, "Limit 0 or DieRoll.Max() >= Limit", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
@@ -511,7 +511,7 @@ namespace HNPS_GigantismPlus
                 Debug.Entry(4, $"continue: {Result}, Failure!", Indent: ++Indent, Toggle: getDoDebug(nameof(ExplodingDie)));
             }
 
-            Exit:
+        Exit:
             Debug.Entry(4, $"Final Number: {Number}", Indent: oldIndent, Toggle: getDoDebug(nameof(ExplodingDie)));
             return Number;
         }
@@ -524,7 +524,7 @@ namespace HNPS_GigantismPlus
 
         public static void SwapMutationEnrtyClass(MutationEntry Entry, string Class, int Indent = 0)
         {
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"@ {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0)",
                 Indent: Indent, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
             Debug.Entry(4,
@@ -540,7 +540,7 @@ namespace HNPS_GigantismPlus
             {
                 Debug.Entry(4, $"Classes already match, no action necessary", Indent: Indent + 1, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
             }
-                
+
             Debug.Entry(4,
                 $"x {nameof(Utils)}.{nameof(SwapMutationEnrtyClass)}(MutationEntry Entry, string Class, int Indent = 0) @//",
                 Indent: Indent, Toggle: getDoDebug(nameof(SwapMutationEnrtyClass)));
@@ -551,16 +551,16 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(SwapMutationCategory));
             Debug.Entry(3,
-                $"* {MutationName}" 
+                $"* {MutationName}"
                 + $"{nameof(SwapMutationCategory)}({nameof(MutationName)}, "
                 + $"{nameof(OutOfCategory)}: {OutOfCategory.Quote()}, "
-                + $"{nameof(IntoCategory)}: {IntoCategory.Quote()})", 
+                + $"{nameof(IntoCategory)}: {IntoCategory.Quote()})",
                 Indent: indent + 1, Toggle: doDebug);
 
             MutationEntry mutationEntry = MutationFactory.GetMutationEntryByName(MutationName);
 
-            Debug.Entry(4, 
-                $"Looping {nameof(MutationCategory)}s...", 
+            Debug.Entry(4,
+                $"Looping {nameof(MutationCategory)}s...",
                 Indent: indent + 2, Toggle: doDebug);
             foreach (MutationCategory category in MutationFactory.GetCategories())
             {
@@ -568,18 +568,18 @@ namespace HNPS_GigantismPlus
                 if (category.Name == IntoCategory)
                 {
                     Debug.Divider(4, HONLY, Count: 58, Starter: TANDR, Finisher: BANDL, Indent: indent + 3, Toggle: doDebug);
-                    Debug.CheckYeh(4, $"Found {nameof(IntoCategory)}", 
+                    Debug.CheckYeh(4, $"Found {nameof(IntoCategory)}",
                         Indent: indent + 4, Toggle: doDebug);
 
-                    Debug.Entry(3, 
+                    Debug.Entry(3,
                         $"Adding {mutationEntry.Name.Quote()} {nameof(mutationEntry)} " +
-                        $"to {IntoCategory.Quote()} {nameof(MutationCategory)}", 
+                        $"to {IntoCategory.Quote()} {nameof(MutationCategory)}",
                         Indent: indent + 4, Toggle: doDebug);
 
                     category.Add(mutationEntry);
                     category.Entries.Sort((x, y) => x.Name.CompareTo(y.Name));
 
-                    Debug.Entry(4, $"Displaying all entries in {IntoCategory.Quote()} {nameof(MutationCategory)}...", 
+                    Debug.Entry(4, $"Displaying all entries in {IntoCategory.Quote()} {nameof(MutationCategory)}...",
                         Indent: indent + 4, Toggle: doDebug);
 
                     foreach (MutationEntry entry in category.Entries)
@@ -598,10 +598,10 @@ namespace HNPS_GigantismPlus
                 if (category.Name == OutOfCategory)
                 {
                     Debug.Divider(4, HONLY, Count: 38, Starter: TANDR, Finisher: BANDL, Indent: indent + 3, Toggle: doDebug);
-                    Debug.CheckYeh(3, $"Found Category: {OutOfCategory.Quote()}", 
+                    Debug.CheckYeh(3, $"Found Category: {OutOfCategory.Quote()}",
                         Indent: indent + 4, Toggle: doDebug);
                     Debug.Entry(3, $"Removing {mutationEntry.Name.Quote()} {nameof(mutationEntry)} " +
-                        $"from {OutOfCategory.Quote()} {nameof(MutationCategory)}", 
+                        $"from {OutOfCategory.Quote()} {nameof(MutationCategory)}",
                         Indent: indent + 4, Toggle: doDebug);
 
                     category.Entries.RemoveAll(r => r == mutationEntry);
@@ -675,12 +675,12 @@ namespace HNPS_GigantismPlus
         {
             float duration = Math.Min(DurationMax, Cause * DurationFactor);
             CombatJuice.cameraShake(duration, Async: Async);
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(Rumble)}:"
                 + $" Duration ({duration}),"
                 + $" Cause ({Cause}),"
                 + $" DurationFactor ({DurationFactor}), "
-                + $"DurationMax({DurationMax})", 
+                + $"DurationMax({DurationMax})",
                 Toggle: getDoDebug(nameof(Rumble)));
             return duration;
         }

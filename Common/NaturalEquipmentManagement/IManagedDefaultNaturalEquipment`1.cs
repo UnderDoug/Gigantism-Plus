@@ -12,9 +12,9 @@ using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalEquipment<T> 
+    public interface IManagedDefaultNaturalEquipment<T>
         : IManagedDefaultNaturalEquipment
-        where T 
+        where T
         : IPart
         , IManagedDefaultNaturalEquipment<T>
         , new()

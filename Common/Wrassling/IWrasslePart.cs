@@ -18,7 +18,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class IWrasslePart 
+    public abstract class IWrasslePart
         : IScribedPart
         , IWrassle
     {
@@ -166,7 +166,7 @@ namespace XRL.World.Parts
 
         public override bool AllowStaticRegistration()
         {
-            return base.AllowStaticRegistration() 
+            return base.AllowStaticRegistration()
                 || true;
         }
         public override bool WantEvent(int ID, int Cascade)

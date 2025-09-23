@@ -112,10 +112,10 @@ namespace XRL.World.ObjectBuilders
         {
             int indent = Debug.LastIndent;
 
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"{nameof(WrassleGiantHero)}." +
                 $"{nameof(Apply)}(" +
-                $"GameObject Creature: {Creature?.DebugName ?? NULL}, " + 
+                $"GameObject Creature: {Creature?.DebugName ?? NULL}, " +
                 $"string Context: {Context.Quote()})",
                 Indent: indent + 0, Toggle: getDoDebug());
 
@@ -124,10 +124,10 @@ namespace XRL.World.ObjectBuilders
             bool Unique = Context == "Unique";
             if (Unique && The.Game.HasStringGameState(SCRT_GNT_UNQ_STATE) && false)
             {
-                Debug.Warn(4, 
-                    $"{nameof(WrassleGiantHero)}", 
-                    $"{nameof(Apply)}", 
-                    $"Attempted to create Unique {nameof(WrassleGiantHero)} while one already exists", 
+                Debug.Warn(4,
+                    $"{nameof(WrassleGiantHero)}",
+                    $"{nameof(Apply)}",
+                    $"Attempted to create Unique {nameof(WrassleGiantHero)} while one already exists",
                     Indent: 0);
 
                 Context = "Hero";
@@ -192,18 +192,18 @@ namespace XRL.World.ObjectBuilders
                 }
             }
             Creature.SetStringProperty("NoHateFactions", noHateFactionsList.Join(","));
-            Debug.LoopItem(4, 
-                $"NoHateFactions", $"{Creature.GetStringProperty("NoHateFactions")}", 
-                Good: !Creature.GetStringProperty("NoHateFactions").IsNullOrEmpty(), 
+            Debug.LoopItem(4,
+                $"NoHateFactions", $"{Creature.GetStringProperty("NoHateFactions")}",
+                Good: !Creature.GetStringProperty("NoHateFactions").IsNullOrEmpty(),
                 Indent: indent + 1, Toggle: getDoDebug());
 
             int StaticFactionAdmirations = Unique || wrassler.WrassleID.SeededRandomBool(Context: nameof(StaticFactionAdmirations)) ? 3 : 2;
             bool ThiccBoisAdmire = Unique || wrassler.WrassleID.SeededRandomBool(Context: nameof(ThiccBoisAdmire), ChanceIn: 3);
             string ThiccBois = ThiccBoisBag.GetRandomElement();
-            int ThiccBoisIndex = 
-                Unique 
-                ? StaticFactionAdmirations - 1 
-                : ThiccBoisAdmire 
+            int ThiccBoisIndex =
+                Unique
+                ? StaticFactionAdmirations - 1
+                : ThiccBoisAdmire
                     ? StaticFactionAdmirations
                     : 0
                 ;
@@ -248,7 +248,7 @@ namespace XRL.World.ObjectBuilders
                 }
                 Creature.SetStringProperty($"staticFaction{i}", factionAdmiration, RemoveIfNull: true);
 
-                Debug.LoopItem(4, $"staticFaction{i}", Creature.GetStringProperty($"staticFaction{i}") ?? NULL, 
+                Debug.LoopItem(4, $"staticFaction{i}", Creature.GetStringProperty($"staticFaction{i}") ?? NULL,
                     Good: Creature.HasStringProperty($"staticFaction{i}"), Indent: indent + 2, Toggle: getDoDebug());
             }
 
@@ -256,15 +256,15 @@ namespace XRL.World.ObjectBuilders
             {
                 Creature.SetStringProperty("SharesRecipe", SCRT_GNT_RECIPE);
                 Creature.SetStringProperty("SharesRecipeWithTrueKin", "false");
-                Debug.LoopItem(4, 
+                Debug.LoopItem(4,
                     $"SharesRecipe",
                     Creature.GetStringProperty("SharesRecipe"),
-                    Good: Creature.HasStringProperty("SharesRecipe"), 
+                    Good: Creature.HasStringProperty("SharesRecipe"),
                     Indent: indent + 1, Toggle: getDoDebug());
-                Debug.LoopItem(4, 
+                Debug.LoopItem(4,
                     $"SharesRecipeWithTrueKin",
                     Creature.GetStringProperty("SharesRecipeWithTrueKin"),
-                    Good: Creature.HasStringProperty("SharesRecipeWithTrueKin"), 
+                    Good: Creature.HasStringProperty("SharesRecipeWithTrueKin"),
                     Indent: indent + 1, Toggle: getDoDebug());
 
                 SecretRevealer secretRevealer = Creature.RequirePart<SecretRevealer>();
@@ -316,7 +316,7 @@ namespace XRL.World.ObjectBuilders
             Creature.Brain ??= Creature.RequirePart<Brain>();
 
             Creature.Brain.Mobile = true;
-            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}", 
+            Debug.LoopItem(4, $"Brain.{nameof(Brain.Mobile)}", $"{Creature.Brain.Mobile}",
                 Good: Creature.Brain.Mobile, Indent: indent + 2, Toggle: getDoDebug());
 
             Creature.Brain.Wanders = true;
@@ -438,7 +438,7 @@ namespace XRL.World.ObjectBuilders
                     Stews -= fewerStews;
                     Debug.CheckYeh(4, $"Epithet.IsGivingStewless() {"1d4".Quote()} fewerStews", $"{fewerStews}", Indent: indent + 2, Toggle: getDoDebug());
                 }
-                    
+
                 if (Epithet.IsGivingThoughtful())
                 {
                     Debug.CheckYeh(4, $"Epithet.IsGivingThoughtful()", Indent: indent + 2, Toggle: getDoDebug());
@@ -498,7 +498,7 @@ namespace XRL.World.ObjectBuilders
                 if (Epithet.IsGivingTrulyImmense())
                 {
                     Debug.CheckYeh(4, $"Epithet.IsGivingTrulyImmense() Hitpoints", $"x2", Indent: indent + 2, Toggle: getDoDebug());
-                    
+
                     Creature.MultiplyStat("Hitpoints", 2);
                     Debug.LoopItem(4, $"Hitpoints", $"x2", Indent: indent + 3, Toggle: getDoDebug());
                     Debug.LoopItem(4, $"Hitpoints new Total", $"{Creature.GetStat("Hitpoints").BaseValue}", Indent: indent + 3, Toggle: getDoDebug());
@@ -625,12 +625,12 @@ namespace XRL.World.ObjectBuilders
                 };
 
                 Debug.CheckYeh(4, $"Extra Stats", Indent: indent + 2, Toggle: getDoDebug());
-                Creature.AddBaseStat("Strength",     statRolls["extraStr"].roll);
-                Creature.AddBaseStat("Agility",      statRolls["extraAgi"].roll);
-                Creature.AddBaseStat("Toughness",    statRolls["extraTou"].roll);
+                Creature.AddBaseStat("Strength", statRolls["extraStr"].roll);
+                Creature.AddBaseStat("Agility", statRolls["extraAgi"].roll);
+                Creature.AddBaseStat("Toughness", statRolls["extraTou"].roll);
                 Creature.AddBaseStat("Intelligence", statRolls["extraInt"].roll);
-                Creature.AddBaseStat("Willpower",    statRolls["extraWil"].roll);
-                Creature.AddBaseStat("Ego",          statRolls["extraEgo"].roll);
+                Creature.AddBaseStat("Willpower", statRolls["extraWil"].roll);
+                Creature.AddBaseStat("Ego", statRolls["extraEgo"].roll);
 
                 Debug.LoopItem(4, $"{statRolls["extraStr"].die.Quote()} extraStr", $"{statRolls["extraStr"].roll}", Indent: indent + 3, Toggle: getDoDebug());
                 Debug.LoopItem(4, $"{statRolls["extraAgi"].die.Quote()} extraAgi", $"{statRolls["extraAgi"].roll}", Indent: indent + 3, Toggle: getDoDebug());
@@ -769,13 +769,13 @@ namespace XRL.World.ObjectBuilders
                 if (Chimera != null)
                 {
                     mutations.AddMutation(Chimera);
-                    Debug.LoopItem(4, 
-                        $"Chimera Mutation added", 
+                    Debug.LoopItem(4,
+                        $"Chimera Mutation added",
                         Good: mutations.ActiveMutationList.Contains(Chimera),
                         Indent: indent + 3, Toggle: getDoDebug());
                     // mutations.MutationList = mutations.MutationList.OrderByDescending(x => x.Name == Chimera.Name).ToList();
-                    Debug.LoopItem(4, 
-                        $"Mutations list sorted to have Chimera at the top", 
+                    Debug.LoopItem(4,
+                        $"Mutations list sorted to have Chimera at the top",
                         Good: mutations.MutationList.ElementAt(0) == Chimera,
                         Indent: indent + 3, Toggle: getDoDebug());
 
@@ -783,9 +783,9 @@ namespace XRL.World.ObjectBuilders
                     int MentalToPhysicalMutations = Math.Max(0, (int)Math.Floor(MentalMutations / 2.0));
                     PhysicalMutations += MentalToPhysicalMutations;
                     MentalMutations = 0;
-                    Debug.LoopItem(4, 
-                        $"Max(0, (int)Math.Floor(MentalMutations / 2.0)) extraPhysicalMutations", 
-                        $"{MentalToPhysicalMutations}", 
+                    Debug.LoopItem(4,
+                        $"Max(0, (int)Math.Floor(MentalMutations / 2.0)) extraPhysicalMutations",
+                        $"{MentalToPhysicalMutations}",
                         Indent: indent + 4, Toggle: getDoDebug());
                     Debug.LoopItem(4, $"MentalMutations", $"{MentalMutations}", Indent: indent + 4, Toggle: getDoDebug());
                 }
@@ -821,9 +821,9 @@ namespace XRL.World.ObjectBuilders
                 {
                     Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
                     randomMentalMutation = MutationFactory.GetRandomMutation("Mental");
-                    Debug.LoopItem(4, 
-                        $"{randomMentalMutation.Name}", 
-                        Good: !mutations.HasMutation(randomMentalMutation), 
+                    Debug.LoopItem(4,
+                        $"{randomMentalMutation.Name}",
+                        Good: !mutations.HasMutation(randomMentalMutation),
                         Indent: indent + 5, Toggle: getDoDebug());
                 }
                 while (randomMentalMutation != null && mutations.HasMutation(randomMentalMutation));
@@ -855,9 +855,9 @@ namespace XRL.World.ObjectBuilders
                 {
                     Debug.Divider(4, HONLY, Count: 25, Indent: indent + 5, Toggle: getDoDebug());
                     randomPhysicalMutation = MutationFactory.GetRandomMutation("Physical");
-                    Debug.LoopItem(4, 
-                        $"{randomPhysicalMutation.Name}", 
-                        Good: !mutations.HasMutation(randomPhysicalMutation), 
+                    Debug.LoopItem(4,
+                        $"{randomPhysicalMutation.Name}",
+                        Good: !mutations.HasMutation(randomPhysicalMutation),
                         Indent: indent + 5, Toggle: getDoDebug());
                 }
                 while (randomPhysicalMutation != null && mutations.HasMutation(randomPhysicalMutation));
@@ -872,8 +872,8 @@ namespace XRL.World.ObjectBuilders
                         int chimeraLimbRoll = "1d7".RollCached();
                         bool giveChimeraLimb = chimeraLimbRoll > 4;
                         Debug.LoopItem(4,
-                            $"{"1d7".Quote()} chimeraLimbRoll {chimeraLimbRoll} > 4", 
-                            Good: giveChimeraLimb, 
+                            $"{"1d7".Quote()} chimeraLimbRoll {chimeraLimbRoll} > 4",
+                            Good: giveChimeraLimb,
                             Indent: indent + 7, Toggle: getDoDebug());
                         if (giveChimeraLimb)
                         {
@@ -897,10 +897,10 @@ namespace XRL.World.ObjectBuilders
                 givesRep.ResetRelatedFactions();
             }
             givesRep.repValue = Unique ? 400 : 200;
-            Debug.LoopItem(4, 
-                $"<GivesRep>?", 
+            Debug.LoopItem(4,
+                $"<GivesRep>?",
                 $"{(givesRep?.repValue != null ? givesRep.repValue : "")}",
-                Good: Creature.HasPart<GivesRep>(), 
+                Good: Creature.HasPart<GivesRep>(),
                 Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.CheckYeh(4, $"Remove Problem Parts", Indent: indent + 2, Toggle: getDoDebug());
@@ -951,7 +951,7 @@ namespace XRL.World.ObjectBuilders
             }
 
             Creature.FireEvent("VillageInit");
-                
+
             if (Creature.TryGetPart(out DisplayNameAdjectives displayNameAdjectives))
             {
                 if (displayNameAdjectives.AdjectiveList.Contains(Gigantified.GetNamePrefix()))
@@ -969,9 +969,9 @@ namespace XRL.World.ObjectBuilders
                 }
                 conversationScript.ConversationID = SCRT_GNT_UNQ_CONVSCRPT_ID;
 
-                Debug.LoopItem(4, 
-                    $"<ConversationScript>?", 
-                    $"{conversationScript?.ConversationID ?? "" }",
+                Debug.LoopItem(4,
+                    $"<ConversationScript>?",
+                    $"{conversationScript?.ConversationID ?? ""}",
                     Good: Creature.HasPart<ConversationScript>(),
                     Indent: indent + 2, Toggle: getDoDebug());
             }
@@ -1040,9 +1040,9 @@ namespace XRL.World.ObjectBuilders
                 {
                     int iLevel = i + 1;
                     int rapidAdvancement = ((iLevel + 5) % 10 == 0) ? 3 : 0;
-                    Debug.LoopItem(4, 
+                    Debug.LoopItem(4,
                         $"iLevel: {iLevel}" +
-                        $"{(rapidAdvancement != 0 ? $" | Rapid Advance: {rapidAdvancement != 0}" : "")}", 
+                        $"{(rapidAdvancement != 0 ? $" | Rapid Advance: {rapidAdvancement != 0}" : "")}",
                         Indent: indent + 3, Toggle: getDoDebug());
                     Leveler.RapidAdvancement(rapidAdvancement, Creature);
                 }
@@ -1068,7 +1068,7 @@ namespace XRL.World.ObjectBuilders
             creatureArticle = Unique ? creatureArticle.Capitalize() : creatureArticle;
 
             string aCreature = creatureNoun != null ? $"{creatureArticle} {creatureNoun}" : "";
-            
+
             string preDesc = Unique ? SCRT_GNT_UNQ_PREDESC : GNT_PREDESC;
 
             // aCreature = Unique ? Creature.An(Stripped: true, BaseOnly: true) : Creature.an(Stripped: true, BaseOnly: true);
@@ -1079,9 +1079,9 @@ namespace XRL.World.ObjectBuilders
 
             Creature.SetStringProperty(WRASSLER_COLORCHANGE_PROP, "true");
 
-            Debug.LoopItem(4, 
-                $"<Description>?", 
-                Good: description.Short.Contains($"{preDesc}"), 
+            Debug.LoopItem(4,
+                $"<Description>?",
+                Good: description.Short.Contains($"{preDesc}"),
                 Indent: indent + 2, Toggle: getDoDebug());
 
             if (Creature.TryGetPart(out GigantismPlus gigantism))
@@ -1094,7 +1094,7 @@ namespace XRL.World.ObjectBuilders
                         capOverride += levelCalculation.bonus;
                     }
                 }
-                gigantism.CapOverride = capOverride > gigantism.Level ? capOverride : - 1;
+                gigantism.CapOverride = capOverride > gigantism.Level ? capOverride : -1;
             }
             string wrassleColor = $"{wrassleID?.SecondaryColor ?? UD_QWE.WrassleRingColors.GetRandomElement()}";
             Creature.SetStringProperty("WrassleColor", wrassleColor);
@@ -1118,7 +1118,7 @@ namespace XRL.World.ObjectBuilders
             {
                 alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero");
             }
-            else 
+            else
             if (1.in10000())
             {
                 alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprintsInheritingFrom("Snapjaw").GetRandomElement();
@@ -1159,7 +1159,7 @@ namespace XRL.World.ObjectBuilders
             if (false && !EncountersAPI.IsLegendaryEligible(Blueprint))
                 return false;
 
-            if ((!Blueprint.HasPart(nameof(Body)) || !Blueprint.HasPart(nameof(Combat))) 
+            if ((!Blueprint.HasPart(nameof(Body)) || !Blueprint.HasPart(nameof(Combat)))
                 && !Blueprint.HasTagOrProperty("BodySubstitute"))
                 return false;
 

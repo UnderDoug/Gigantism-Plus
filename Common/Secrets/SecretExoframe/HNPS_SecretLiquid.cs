@@ -25,7 +25,7 @@ namespace XRL.Liquids
     [IsLiquid]
     public class HNPS_SecretLiquid : BaseLiquid
     {
-        public HNPS_SecretLiquid() 
+        public HNPS_SecretLiquid()
             : base("secretliquid")
         {
             DefaultColors = new(3) { "Y", "W", "O" };

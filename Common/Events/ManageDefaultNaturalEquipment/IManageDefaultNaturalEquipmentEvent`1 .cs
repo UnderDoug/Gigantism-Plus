@@ -202,7 +202,7 @@ namespace HNPS_GigantismPlus
                     Good: EquipmentWantsStr, Indent: indent + 3, Toggle: doDebug);
             }
             Debug.LastIndent = indent;
-            return  CreatureWantsMin || EquipmentWantsMin || CreatureWantsStr || EquipmentWantsStr;
+            return CreatureWantsMin || EquipmentWantsMin || CreatureWantsStr || EquipmentWantsStr;
         }
         public bool ProcessEvent()
         {

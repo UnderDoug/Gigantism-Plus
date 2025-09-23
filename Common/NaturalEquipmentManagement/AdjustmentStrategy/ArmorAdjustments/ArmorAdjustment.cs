@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return base.Check(Subject) 
+            return base.Check(Subject)
                 && Subject.HasPart<Armor>();
         }
     }

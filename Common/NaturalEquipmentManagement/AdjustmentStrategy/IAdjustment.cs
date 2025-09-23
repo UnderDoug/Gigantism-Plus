@@ -55,7 +55,7 @@ namespace HNPS_GigantismPlus
 
         [NonSerialized]
         public int Priority; // Priority of adjustment, lower number = higher priority
-       
+
         [NonSerialized]
         public ICondition<GameObject> Condition;
 
@@ -255,8 +255,8 @@ namespace HNPS_GigantismPlus
         public virtual bool TryGetHigherPriorityAdjustment(GameObject Subject, IAdjustment OtherAdjustment, out IAdjustment HigherProrityAdjustment)
         {
             HigherProrityAdjustment = null;
-            return IsTruerThan(Subject, OtherAdjustment) 
-                && TryGetHigherPriorityAdjustment(OtherAdjustment, out HigherProrityAdjustment) 
+            return IsTruerThan(Subject, OtherAdjustment)
+                && TryGetHigherPriorityAdjustment(OtherAdjustment, out HigherProrityAdjustment)
                 && HigherProrityAdjustment != null;
         }
 
@@ -285,7 +285,7 @@ namespace HNPS_GigantismPlus
 
             if (!Applying && Subject != null && Check(Subject) && BeforeApplyAdjustmentEvent.CheckFor(Subject, Source, this))
             {
-                Debug.LoopItem(4, $"1] !{nameof(Applying)} and {nameof(Check)}({nameof(Subject)}) and {nameof(BeforeApplyAdjustmentEvent)}", 
+                Debug.LoopItem(4, $"1] !{nameof(Applying)} and {nameof(Check)}({nameof(Subject)}) and {nameof(BeforeApplyAdjustmentEvent)}",
                     Indent: indent + 2, Toggle: doDebug);
 
                 Applying = true;
@@ -305,7 +305,7 @@ namespace HNPS_GigantismPlus
             }
             Applying = false;
 
-            Debug.LoopItem(4, $"2] {nameof(Applying)} or !{nameof(Check)}({nameof(Subject)}) or !{nameof(BeforeApplyAdjustmentEvent)}", 
+            Debug.LoopItem(4, $"2] {nameof(Applying)} or !{nameof(Check)}({nameof(Subject)}) or !{nameof(BeforeApplyAdjustmentEvent)}",
                 Indent: indent + 2, Toggle: doDebug);
 
             Debug.Entry(4, $"x {GetType().Name}.{nameof(Apply)}() *//", Indent: indent + 1, Toggle: doDebug);

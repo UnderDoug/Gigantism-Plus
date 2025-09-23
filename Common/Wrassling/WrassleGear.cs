@@ -62,14 +62,14 @@ namespace XRL.World.Parts
 
         private string _DetailColor;
         public string DetailColor => _DetailColor ??= SecondaryColor;
-        
+
         public string RandomTiles;
         public bool RandomizeTile;
 
         public bool ColorEquipmentFrame;
 
         public bool IsVibrant;
-        
+
         public WrassleGear()
         {
             BondedLimbID = 0;
@@ -207,7 +207,7 @@ namespace XRL.World.Parts
                 ParentObject.InheritsFrom(BASE_WRASSLE_GEAR)
              || (ParentObject.HasPart<Armor>() && ParentObject.HasPart<MeleeWeapon>());
             bool wantLateBeforeApplyDamage =
-                EnablePrereleaseContent 
+                EnablePrereleaseContent
              && ParentObject.InheritsFrom(WRASSLE_RING_ROPES)
              || ParentObject.InheritsFrom(FOLDING_CHAIR);
             bool wantInventoryActions =
@@ -384,7 +384,7 @@ namespace XRL.World.Parts
                         $"{nameof(Item)} has {nameof(Armor)} part and {nameof(MeleeWeapon)} part",
                         Indent: indent + 2, Toggle: getDoDebug('X'));
 
-                    Debug.LoopItem(4, $"{nameof(IsMeleeWeaponNormally)}", $"{ IsMeleeWeaponNormally}",
+                    Debug.LoopItem(4, $"{nameof(IsMeleeWeaponNormally)}", $"{IsMeleeWeaponNormally}",
                         Good: IsMeleeWeaponNormally, Indent: indent + 2, Toggle: getDoDebug('X'));
                     if (!IsMeleeWeaponNormally)
                     {
@@ -448,9 +448,9 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject && (E.Object.InheritsFrom(WRASSLE_RING_ROPES) || E.Object.InheritsFrom(FOLDING_CHAIR)))
             {
-                Debug.Entry(4, 
-                    $"{typeof(WrassleGear).Name}." + 
-                    $"{nameof(HandleEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}", 
+                Debug.Entry(4,
+                    $"{typeof(WrassleGear).Name}." +
+                    $"{nameof(HandleEvent)}({typeof(LateBeforeApplyDamageEvent).Name} E) ParentObject: {ParentObject?.DebugName}",
                     Indent: 0, Toggle: getDoDebug());
                 Damage damage = E.Damage;
                 GameObject attacker = E.Source;
@@ -472,7 +472,7 @@ namespace XRL.World.Parts
 
                 bool chairSpecialCase =
                     isChair
-                 && (damage.Attributes.Contains("Concussion") || E.Indirect) 
+                 && (damage.Attributes.Contains("Concussion") || E.Indirect)
                  && sourceIsWrassler;
 
                 bool notJostled =

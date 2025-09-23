@@ -31,14 +31,14 @@ namespace HNPS_GigantismPlus.Harmony
             Body @this = __instance;
             GameObject ParentObject = @this?.ParentObject;
             Debug.Divider(4, HONLY, Count: 60, Indent: 0, Toggle: doDebug);
-            Debug.Entry(4, 
-                $"# [Prefix] {nameof(Body)}." 
+            Debug.Entry(4,
+                $"# [Prefix] {nameof(Body)}."
                 + $"{nameof(Body.FireEventOnBodyparts)}"
-                + $"(ref Body __instance, Event E, ref Event ___eBodypartsUpdated)", 
+                + $"(ref Body __instance, Event E, ref Event ___eBodypartsUpdated)",
                 Indent: 0, Toggle: doDebug);
 
-            string objectDesc = @this.ParentObject is not null 
-                ? $"{@this.ParentObject?.ID}:{@this.ParentObject?.ShortDisplayNameStripped}" 
+            string objectDesc = @this.ParentObject is not null
+                ? $"{@this.ParentObject?.ID}:{@this.ParentObject?.ShortDisplayNameStripped}"
                 : "[null]";
 
             Debug.Entry(4, $"Object is {objectDesc}", Indent: 1, Toggle: doDebug);
@@ -65,9 +65,9 @@ namespace HNPS_GigantismPlus.Harmony
         public static void RegenerateNonDefaultNaturalEquipment(GameObject Creature)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(RegenerateNonDefaultNaturalEquipment)}("
-                + $"{nameof(Creature)}: {Creature?.DebugName ?? NULL})", 
+                + $"{nameof(Creature)}: {Creature?.DebugName ?? NULL})",
                 Indent: indent, Toggle: doDebug);
 
             Debug.Entry(4, $"? if (!Creature.Is(null) and Creature.HasPart<Inventory>())", Indent: indent + 1, Toggle: doDebug);
@@ -83,7 +83,7 @@ namespace HNPS_GigantismPlus.Harmony
                     foreach (InventoryObject inventoryObject in Blueprint.Inventory)
                     {
                         Debug.Divider(4, HONLY, Count: 25, Indent: indent + 4, Toggle: doDebug);
-                        Debug.LoopItem(4, $"inventoryObject.Blueprint", $"{inventoryObject.Blueprint}", Indent: indent +4, Toggle: doDebug);
+                        Debug.LoopItem(4, $"inventoryObject.Blueprint", $"{inventoryObject.Blueprint}", Indent: indent + 4, Toggle: doDebug);
                         if (TryGetGameObjectBlueprint(inventoryObject.Blueprint, out GameObjectBlueprint itemBlueprint))
                         {
                             if (itemBlueprint.IsNatural())
@@ -135,10 +135,10 @@ namespace HNPS_GigantismPlus.Harmony
                         }
                     }
                     Debug.Divider(4, HONLY, Count: 25, Indent: indent + 4, Toggle: doDebug);
-                    Debug.Entry(4, $"x foreach (GameObject item in ParentObject.GetEquippedObjects()) >//", 
+                    Debug.Entry(4, $"x foreach (GameObject item in ParentObject.GetEquippedObjects()) >//",
                         Indent: indent + 3, Toggle: doDebug);
 
-                    Debug.Entry(4, $"Reducing blueprintItemBlueprint counts by number of equivalent currentItemBlueprints", 
+                    Debug.Entry(4, $"Reducing blueprintItemBlueprint counts by number of equivalent currentItemBlueprints",
                         Indent: indent + 3, Toggle: doDebug);
                     Debug.Entry(4, $"> foreach ((string blueprint, int number) in currentItemBlueprints)", Indent: indent + 3, Toggle: doDebug);
                     foreach ((string blueprint, int number) in currentItemBlueprints)
@@ -173,8 +173,8 @@ namespace HNPS_GigantismPlus.Harmony
                                 GameObject naturalEquipmentObject = GameObjectFactory.Factory.CreateObject(blueprint);
                                 if (naturalEquipmentObject is not null
                                     && Creature.GetFirstBodyPart(
-                                        BP => !alreadyEquippedToBodyParts.Contains(BP) 
-                                        && BP.Type == naturalEquipmentObject.GetEquipmentSlot() 
+                                        BP => !alreadyEquippedToBodyParts.Contains(BP)
+                                        && BP.Type == naturalEquipmentObject.GetEquipmentSlot()
                                         && BP.DefaultBehavior == null) is BodyPart partToEquipTo
                                     && partToEquipTo.DoEquip(naturalEquipmentObject))
                                 {

@@ -48,26 +48,26 @@ namespace XRL.World.Parts
 
         public override string GetColoredAdjective()
         {
-            bool inorganic = ParentObject != null 
-                && !ParentObject.IsOrganic;
-
-            bool metalic = ParentObject != null 
-                && ParentObject.HasPart<Metal>() 
-                || (Operator != null && Operator.ParentLimb.Category.HasBit(BodyPartCategory.METAL));
-
-            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Inorganic: inorganic, Metalic: metalic) 
-                ?? base.GetColoredAdjective();
-        }
-        public override string GetAdjective()
-        {
-            bool inorganic = ParentObject != null 
+            bool inorganic = ParentObject != null
                 && !ParentObject.IsOrganic;
 
             bool metalic = ParentObject != null
                 && ParentObject.HasPart<Metal>()
                 || (Operator != null && Operator.ParentLimb.Category.HasBit(BodyPartCategory.METAL));
 
-            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1, Inorganic: inorganic, Metalic: metalic).Strip() 
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Inorganic: inorganic, Metalic: metalic)
+                ?? base.GetColoredAdjective();
+        }
+        public override string GetAdjective()
+        {
+            bool inorganic = ParentObject != null
+                && !ParentObject.IsOrganic;
+
+            bool metalic = ParentObject != null
+                && ParentObject.HasPart<Metal>()
+                || (Operator != null && Operator.ParentLimb.Category.HasBit(BodyPartCategory.METAL));
+
+            return AssigningPart?.GetNaturalEquipmentColoredAdjective(Colorfulness: 1, Inorganic: inorganic, Metalic: metalic).Strip()
                 ?? base.GetAdjective();
         }
     }

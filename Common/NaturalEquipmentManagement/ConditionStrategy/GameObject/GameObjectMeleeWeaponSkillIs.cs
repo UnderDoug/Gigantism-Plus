@@ -37,7 +37,7 @@ namespace HNPS_GigantismPlus
         {
             return base.Check(GameObject)
                 && !Skill.IsNullOrEmpty()
-                && GameObject == null 
+                && GameObject == null
                 && GameObject.TryGetPart(out MeleeWeapon mw)
                 && mw.Skill == Skill;
         }

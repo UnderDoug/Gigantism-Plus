@@ -46,8 +46,8 @@ namespace XRL.World.Effects
         };
 
         public static string JournalGospelInfix =
-            $"<spice.instancesOf.inYear.!random.capitalize> =year=, " + 
-            $"<spice.instancesOf.afterTumultuousYears.!random>, =player.possessive= counselors suggested " + 
+            $"<spice.instancesOf.inYear.!random.capitalize> =year=, " +
+            $"<spice.instancesOf.afterTumultuousYears.!random>, =player.possessive= counselors suggested " +
             $"=player.subjective= <spice.instancesOf.abdicate.!random> as sultan. " +
             $"Instead, =player.subjective= ate a meal and ";
         public static List<string> JournalGospelSuffixs = new()
@@ -96,14 +96,14 @@ namespace XRL.World.Effects
                 Popup.Show("The world rushes away from you as your anatomy realizes its new stature.");
                 Popup.Show($"You gained the mutation {gigantism.GetDisplayName()}!");
                 JournalAPI.AddAccomplishment(
-                    text: JournalTexts.GetRandomElement(), 
+                    text: JournalTexts.GetRandomElement(),
                     muralText: $"{JournalMuralPrefixs.GetRandomElement()}{JournalMuralInfix}{JournalMuralSuffixs.GetRandomElement()}",
                     gospelText: $"{JournalGospelInfix}{JournalGospelSuffixs.GetRandomElement()}",
-                    aggregateWith: null, 
-                    category: "general", 
-                    muralCategory: MuralCategory.BodyExperienceNeutral, 
-                    muralWeight: MuralWeight.VeryHigh, 
-                    secretId: null, 
+                    aggregateWith: null,
+                    category: "general",
+                    muralCategory: MuralCategory.BodyExperienceNeutral,
+                    muralWeight: MuralWeight.VeryHigh,
+                    secretId: null,
                     time: -1L);
             }
 

@@ -1,8 +1,8 @@
 ﻿namespace XRL.World.ZoneBuilders
 {
-	public class ReachabilityNorthEdge
-	{
-		public bool ClearFirst = true;
+    public class ReachabilityNorthEdge
+    {
+        public bool ClearFirst = true;
 
 
         public bool BuildZone(Zone Z)
@@ -17,5 +17,5 @@
             }
             return true;
         }
-	}
+    }
 }

@@ -6,13 +6,13 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, TAdjustment> 
+    public class GameObjectHasNaturalEquipmentModWithCumulativeDamage<T, TAdjustment>
         : GameObjectHasNaturalEquipmentModWithAdjustment<T, TAdjustment>
-        where T 
+        where T
         : IPart
         , IManagedDefaultNaturalEquipment<T>
         , new()
-        where TAdjustment 
+        where TAdjustment
         : MeleeWeaponCumulativeAdjustment
         , new()
     {

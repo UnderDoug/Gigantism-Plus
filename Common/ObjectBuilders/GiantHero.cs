@@ -90,7 +90,7 @@ namespace XRL.World.ObjectBuilders
 
                 if (Epithet.IsGivingStewful())
                     Stews += Stat.Roll("2d4");
-                
+
                 if (Epithet.IsGivingStewless())
                     Stews -= Stat.Roll("1d4");
 
@@ -118,7 +118,7 @@ namespace XRL.World.ObjectBuilders
                     Creature.AddBaseStat("Willpower", Stat.Roll("1d4"));
                     MentalMutations += Stat.Roll("1d2");
                 }
-                    
+
                 if (Epithet.IsGivingTrulyImmense())
                 {
                     Creature.MultiplyStat("Hitpoints", 2);
@@ -132,7 +132,7 @@ namespace XRL.World.ObjectBuilders
 
                 if (Epithet.IsGivingWrassler())
                     Creature.ReceiveObject("Gigantic FoldingChair");
-                
+
                 if (!Epithet.IsGivingPopular())
                 {
                     if (Creature.TryGetPart(out Leader leader)) Creature.RemovePart(leader);

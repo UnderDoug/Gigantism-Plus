@@ -39,7 +39,7 @@ public class AfterRapidAdvancementEvent : ModPooledEvent<AfterRapidAdvancementEv
 
     public static void Send(int Amount, GameObject Actor)
     {
-        Debug.Entry(4, 
+        Debug.Entry(4,
             $"{nameof(AfterRapidAdvancementEvent)}." +
             $"{nameof(Send)}(int Amount: {Amount}, GameObject Actor: {Actor?.DebugName})",
             Indent: 0, Toggle: doDebug);

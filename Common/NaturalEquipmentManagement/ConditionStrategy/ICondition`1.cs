@@ -62,7 +62,7 @@ namespace HNPS_GigantismPlus
             this.FalseIfSubjectNull = FalseIfSubjectNull;
         }
         public ICondition(ICondition<T> Source)
-            : this (Source.FalseIfSubjectNull)
+            : this(Source.FalseIfSubjectNull)
         {
         }
 

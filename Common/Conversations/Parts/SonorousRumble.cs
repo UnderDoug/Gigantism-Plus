@@ -25,7 +25,7 @@ namespace XRL.World.Conversations.Parts
 
         public float MaxTotalDuration;
 
-        public SonorousRumble() 
+        public SonorousRumble()
         {
             Delay = 0f;
             Times = 1;
@@ -45,7 +45,7 @@ namespace XRL.World.Conversations.Parts
             {
                 Debug.Entry(4,
                     $"@ {nameof(SonorousRumble)}."
-                    + $"{nameof(HandleEvent)}({nameof(EnteredElementEvent)} E) " 
+                    + $"{nameof(HandleEvent)}({nameof(EnteredElementEvent)} E) "
                     + $"Speaker: {The.Speaker.DebugName}",
                     Indent: 0);
 

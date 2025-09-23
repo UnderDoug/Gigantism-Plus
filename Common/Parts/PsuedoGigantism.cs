@@ -32,11 +32,11 @@ namespace XRL.World.Parts
             if (!E.Actor.IsGiganticCreature)
             {
                 E.Decreases++;
-                
-                E.CanBeTooSmall = 
-                    !E.Object.IsGiganticEquipment 
+
+                E.CanBeTooSmall =
+                    !E.Object.IsGiganticEquipment
                  && !E.SlotType.Is("Floating Nearby")
-                 && !E.Object.HasPart<CyberneticsBaseItem>() 
+                 && !E.Object.HasPart<CyberneticsBaseItem>()
                  && !E.Object.HasTagOrProperty("GiganticEquippable");
             }
 

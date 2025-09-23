@@ -6,7 +6,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasNaturalEquipmentModWithAdjustment<T, TAdjustment> 
+    public class GameObjectHasNaturalEquipmentModWithAdjustment<T, TAdjustment>
         : GameObjectHasNaturalEquipmentMod<T>
         where T
         : IPart

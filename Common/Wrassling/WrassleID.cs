@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;using System.CodeDom.Compiler;
+using System.Text;
+using System.CodeDom.Compiler;
 
 using XRL.World;
 using XRL.World.Capabilities;
@@ -19,7 +20,7 @@ namespace XRL.World.Parts
 {
     [HasWishCommand]
     [Serializable]
-    public class WrassleID 
+    public class WrassleID
         : IScribedPart
         , IWrassleIDEventHandler
     {
@@ -53,8 +54,8 @@ namespace XRL.World.Parts
 
         [NonSerialized]
         private Guid _ID;
-        public virtual Guid ID 
-        { 
+        public virtual Guid ID
+        {
             get => GetID();
             set => SetID(value);
         }
@@ -81,7 +82,7 @@ namespace XRL.World.Parts
             PreloadedWrassleID = ID;
         }
         public WrassleID(WrassleID Source)
-            : this (Source.ID)
+            : this(Source.ID)
         {
         }
         public WrassleID(IWrassle Source)
@@ -195,7 +196,7 @@ namespace XRL.World.Parts
         public virtual bool PushWrassleID(WrassleID ToWrassleID)
         {
             Guid oldWrassleID = ToWrassleID.ID;
-            
+
             if (ToWrassleID.SetID(this) != oldWrassleID)
             {
                 return true;
@@ -205,7 +206,7 @@ namespace XRL.World.Parts
         public virtual bool PullWrassleID(WrassleID FromWrassleID)
         {
             Guid oldWrassleID = GetID(Silent: true);
-            
+
             if (SetID(FromWrassleID.GetID(Silent: true)) != oldWrassleID)
             {
                 return true;
@@ -221,7 +222,7 @@ namespace XRL.World.Parts
             }
             return UD_QWE.GetWrassleShaderForWord(GetID(Silent: true), Word);
         }
-        
+
         public virtual void OnUpdatedID()
         {
             int indent = Debug.LastIndent;
@@ -281,7 +282,7 @@ namespace XRL.World.Parts
             {
                 Debug.CheckYeh(4, $"{nameof(PreloadedWrassleID)} has Value",
                     Indent: indent + 2, Toggle: getDoDebug('X'));
-                
+
                 if (PreloadedWrassleID == WrassleID.GetID(Silent: true) || PreloadedWrassleID == WrassleID.SetID(PreloadedWrassleID))
                 {
                     Debug.CheckYeh(4, $"{nameof(WrassleID)} set to {nameof(PreloadedWrassleID)}",

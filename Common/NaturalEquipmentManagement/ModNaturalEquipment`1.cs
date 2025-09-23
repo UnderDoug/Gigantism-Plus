@@ -16,12 +16,12 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModNaturalEquipment<T> 
+    public class ModNaturalEquipment<T>
         : ModNaturalEquipmentBase
         , IDescribeModificationHandler<ModNaturalEquipment<T>>
         // , IModEventHandler<BeforeDescribeModificationEvent<ModNaturalEquipment<T>>>
         // , IModEventHandler<DescribeModificationEvent<ModNaturalEquipment<T>>>
-        where T 
+        where T
         : IPart
         , IManagedDefaultNaturalEquipment<T>
         , new()
@@ -50,8 +50,8 @@ namespace XRL.World.Parts
             return doDebug;
         }
 
-        public T AssigningPart => 
-            Manager?.GetManagedNaturalEquipmentCompatiblePart<T>() 
+        public T AssigningPart =>
+            Manager?.GetManagedNaturalEquipmentCompatiblePart<T>()
          ?? Operator?.Manager?.GetManagedNaturalEquipmentCompatiblePart<T>();
 
         public ModNaturalEquipment()
@@ -97,19 +97,19 @@ namespace XRL.World.Parts
         }
         public override void ApplyModification(GameObject Object)
         {
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"@ {Name}[{GetSource()}]."
                 + $"{nameof(ApplyModification)}"
-                + $"(Object: \"{Object.BaseDisplayName}\")", 
+                + $"(Object: \"{Object.BaseDisplayName}\")",
                 Indent: 3, Toggle: getDoDebug("AM"));
-            
+
             // Do Code?
 
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"x {Name}[{GetSource()}]."
                 + $"{nameof(ApplyModification)}"
                 + $"(Object: \"{Object.BaseDisplayName}\")"
-                + $" @//", 
+                + $" @//",
                 Indent: 3, Toggle: getDoDebug("AM"));
             base.ApplyModification(Object);
         }
@@ -143,10 +143,10 @@ namespace XRL.World.Parts
                 int indent = Debug.LastIndent;
                 bool doDebugDuringCollection = getDoDebug(nameof(DescriptionElement) + ":Collection");
                 bool doDebugFinal = getDoDebug(nameof(DescriptionElement) + ":Final");
-                Debug.LoopItem(4, 
+                Debug.LoopItem(4,
                     $"{GetType().Name}." +
                     $"{nameof(HandleEvent)}(" +
-                    $"{nameof(BeforeDescribeModificationEvent<ModNaturalEquipment<T>>)} E)", 
+                    $"{nameof(BeforeDescribeModificationEvent<ModNaturalEquipment<T>>)} E)",
                     Indent: indent + 1, Toggle: true);
 
                 if (!Adjustments.IsNullOrEmpty() && !Adjustments.GetApplied().IsNullOrEmpty())
@@ -227,7 +227,7 @@ namespace XRL.World.Parts
                 .Send(Object, GetColoredAdjective(), Context: NATURAL_EQUIPMENT)
                 .Process();
         }
-        
+
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             ModNaturalEquipment<T> modNaturalEquipment = base.DeepCopy(Parent, MapInv) as ModNaturalEquipment<T>;

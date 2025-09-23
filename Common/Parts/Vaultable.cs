@@ -38,7 +38,7 @@ namespace XRL.World.Parts
         public string OverridingParts;
         public List<string> OverridingPartsList;
 
-        public Vaultable() 
+        public Vaultable()
         {
             SizeMatters = false;
             RequiresJumpSkill = false;
@@ -153,7 +153,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(GetShortDescriptionEvent E)
         {
-            if(VaultingEnabled && The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
+            if (VaultingEnabled && The.Player != null && ParentObject.CurrentZone == The.ZoneManager.ActiveZone)
             {
                 int navWeight = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, false);
                 int navWeightAuto = ParentObject.CurrentCell.GetNavigationWeightFor(The.Player, true);
@@ -343,7 +343,7 @@ namespace XRL.World.Parts
              && !E.Item.IsCreature
              && !E.Item.HasPart<Container>()
              && !E.Item.HasPart<Pettable>()
-             && E.Actor.TryGetPart(out Tactics_Vault vaultSkill) 
+             && E.Actor.TryGetPart(out Tactics_Vault vaultSkill)
              && vaultSkill.CanNormallyVault(E.Item);
 
             if (canSmartUse)
@@ -608,7 +608,7 @@ namespace XRL.World.Parts
 
                 if (notOkayToDamage)
                 {
-                    Debug.Entry(4, $"Dissallowing {Vaulter?.DebugName ?? NULL} from digging {Vaultee?.DebugName ?? NULL}", 
+                    Debug.Entry(4, $"Dissallowing {Vaulter?.DebugName ?? NULL} from digging {Vaultee?.DebugName ?? NULL}",
                         Indent: 1, Toggle: doDebug);
 
                     return false;
@@ -618,9 +618,9 @@ namespace XRL.World.Parts
         }
         public override bool FireEvent(Event E)
         {
-            if (E.ID == "BeforePhysicsRejectObjectEntringCell" 
-                && E.HasFlag("Actual") 
-                && E.GetGameObjectParameter("Object") is GameObject Vaulter 
+            if (E.ID == "BeforePhysicsRejectObjectEntringCell"
+                && E.HasFlag("Actual")
+                && E.GetGameObjectParameter("Object") is GameObject Vaulter
                 && Vaulter != null && !Vaulter.IsFlying)
             {
                 Debug.Entry(4,
@@ -649,30 +649,30 @@ namespace XRL.World.Parts
                  && actingAutomatically;
 
                 Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
-                Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}", 
+                Debug.LoopItem(4, $"{nameof(vaulterNotNull)}", $"{vaulterNotNull}",
                     Good: vaulterNotNull, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(haveSkill)}", $"{haveSkill}", 
+                Debug.LoopItem(4, $"{nameof(haveSkill)}", $"{haveSkill}",
                     Good: haveSkill, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(notMidVault)}", $"{notMidVault}", 
+                Debug.LoopItem(4, $"{nameof(notMidVault)}", $"{notMidVault}",
                     Good: notMidVault, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(vaulted)}", $"{vaulted}", 
+                Debug.LoopItem(4, $"{nameof(vaulted)}", $"{vaulted}",
                     Good: vaulted, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(wantToVault)}", $"{wantToVault}", 
+                Debug.LoopItem(4, $"{nameof(wantToVault)}", $"{wantToVault}",
                     Good: wantToVault, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(isPlayer)}", $"{isPlayer}", 
+                Debug.LoopItem(4, $"{nameof(isPlayer)}", $"{isPlayer}",
                     Good: isPlayer, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(autoActActive)}", $"{autoActActive}", 
+                Debug.LoopItem(4, $"{nameof(autoActActive)}", $"{autoActActive}",
                     Good: autoActActive, Indent: 1, Toggle: doDebug);
 
                 Debug.Divider(4, HONLY, Count: 30, Indent: 1, Toggle: doDebug);
 
-                Debug.LoopItem(4, $"{nameof(shouldResumeAfterVault)}", $"{shouldResumeAfterVault}", 
+                Debug.LoopItem(4, $"{nameof(shouldResumeAfterVault)}", $"{shouldResumeAfterVault}",
                     Good: shouldResumeAfterVault, Indent: 1, Toggle: doDebug);
 
                 if (shouldResumeAfterVault)

@@ -22,7 +22,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class GigantismPlus 
+    public class GigantismPlus
         : BaseManagedDefaultEquipmentMutation<GigantismPlus>
         , IModEventHandler<BeforeVaultEvent>
         , IModEventHandler<VaultedEvent>
@@ -120,7 +120,7 @@ namespace XRL.World.Parts.Mutation
         public int HunchedOverDVModifier;
         public int HunchedOverQNModifier;
         public int HunchedOverMSModifier;
-        
+
         private string HunchOverAbilityHunched => !IsCyberGiant ? "Hunched Over" : "Compact Mode";
         // private string HunchedOverAbilityHunched => !IsCyberGiant ? "Hunched" : "Compact";
         // private string HunchedOverAbilityUpright => !IsCyberGiant ? "Upright" : "Regular";
@@ -179,10 +179,10 @@ namespace XRL.World.Parts.Mutation
                 Noun = "fist",
             };
             giganticFistMod.AdjustMeleeSkill("Cudgel", true)
-                
+
                 .AdjustNoun(true, Condition: IsOrganicFist)
                 .AdjustTile("NaturalWeapons/GiganticFist.png", true, Condition: IsOrganicFist)
-                
+
                 .SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing", true)
                 .SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block", true);
 
@@ -275,7 +275,7 @@ namespace XRL.World.Parts.Mutation
 
                 .AdjustNoun()
                 .AdjustTile("NaturalWeapons/GiganticFist.png", false, new NotCondition<GameObject>(IsAugmented))
-                
+
                 .SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing", false)
                 .SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block", false);
 
@@ -309,7 +309,7 @@ namespace XRL.World.Parts.Mutation
                     return 2;
                 }
 
-                if (NaturalEquipmentMod.BodyPartType == "Hand" 
+                if (NaturalEquipmentMod.BodyPartType == "Hand"
                     || NaturalEquipmentMod.BodyPartType == "Arm"
                     || NaturalEquipmentMod.BodyPartType == "Face")
                 {
@@ -392,8 +392,8 @@ namespace XRL.World.Parts.Mutation
 
         public int GetJumpRangeBonus(int Level)
         {
-            return 1 + 
-                GiganticExoframe?.JumpDistanceBonus != null 
+            return 1 +
+                GiganticExoframe?.JumpDistanceBonus != null
                 ? GiganticExoframe.JumpDistanceBonus
                 : 0
                 ;
@@ -454,7 +454,7 @@ namespace XRL.World.Parts.Mutation
         {
             GO ??= ParentObject;
 
-            if (GO == null) 
+            if (GO == null)
                 return false;
 
             Debug.LoopItem(4, "Removing StunningForceOnJump", Indent: 2, Toggle: getDoDebug("CH"));
@@ -478,7 +478,7 @@ namespace XRL.World.Parts.Mutation
 
         public virtual bool ApplyJumpRangeBonus(GameObject GO = null, int Level = 0)
         {
-            if (Level < 1) 
+            if (Level < 1)
                 return false;
 
             GO ??= ParentObject;
@@ -519,7 +519,7 @@ namespace XRL.World.Parts.Mutation
                 return false;
 
             Debug.CheckYeh(4, $"AppliedJumpRangeBonus: {AppliedJumpRangeBonus}", Indent: 2, Toggle: getDoDebug("CH"));
-            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2, Toggle: getDoDebug("CH")); 
+            Debug.Entry(4, $"JumpRangeModifier: {GO.GetIntProperty(JUMP_RANGE_MODIFIER)}", Indent: 2, Toggle: getDoDebug("CH"));
             GO.ModIntProperty("JumpRangeModifier", -AppliedJumpRangeBonus, RemoveIfZero: true);
             AppliedJumpRangeBonus += -AppliedJumpRangeBonus;
             Acrobatics_Jump.SyncAbility(GO);
@@ -654,7 +654,7 @@ namespace XRL.World.Parts.Mutation
             string MinDamageBonus = $" (Min: {MinDamageBonusIncrease.Signed()})";
 
             StringBuilder SB = Event.NewStringBuilder();
-            
+
             SB.Append($"You are {gigantismSource} large, ").Append("will ").AppendRule("struggle to enter small spaces")
                 .Append(" without ").AppendColored("g", "hunching over").Append(", ").Append("and can typically ")
                 .AppendRule("only").Append(" use ").AppendGigantic("gigantic").Append(" equipment.").AppendLine();
@@ -668,7 +668,7 @@ namespace XRL.World.Parts.Mutation
                 .Append("after jumping at least ").AppendRule($"{stunningForceDistance}").Append(" tiles.").AppendLine()
                 .Append("Your shockwave's ").AppendRule("damage").Append(" and ").AppendRule("force")
                 .Append(" increases every ").AppendRule($"{(int)(1 / stunningForceLevelFactor)} levels");
-            if (IsCyberGiant) 
+            if (IsCyberGiant)
                 SB.AppendLine().Append("This amount is being boosted by your ").Append(exoframeName);
             SB.AppendLine().AppendLine();
 
@@ -676,7 +676,7 @@ namespace XRL.World.Parts.Mutation
                 .AppendRule("1d").Append(" damage every ").AppendRule($"{3} levels").Append(MaxDamageDie).AppendLine()
                 .AppendRule("+1").Append(" damage every ").AppendRule($"{3} levels").Append(MinDamageBonus).AppendLine()
                 .AppendRule("+1").Append(" to hit every ").AppendRule($"{2} levels");
-            
+
 
             return Event.FinalizeString(SB);
         }
@@ -719,7 +719,7 @@ namespace XRL.World.Parts.Mutation
                 .AppendRule($"{FistHitBonus.Signed()}").Append($" hit {FistHitBonus.BonusOrPenalty()}.");
 
             return Event.FinalizeString(SB);
-            
+
             /* Hunch Over penalties.
              * 
                "When {{g|Hunched Over}}:\n"
@@ -762,7 +762,7 @@ namespace XRL.World.Parts.Mutation
         {
             if ((GO.HasSkill(nameof(Acrobatics_Jump)) && GroundPoundActivatedAbilityID == Guid.Empty) || Force)
             {
-                GroundPoundActivatedAbilityID = 
+                GroundPoundActivatedAbilityID =
                     AddMyActivatedAbility(
                         Name: "Ground Pound",
                         Command: COMMAND_NAME_GROUND_POUND,
@@ -834,16 +834,16 @@ namespace XRL.World.Parts.Mutation
             if (body != null)
             {
                 Debug.CheckYeh(4, "Have Body", Indent: 2, Toggle: doDebug);
-               
+
                 GO.RemovePart<Gigantism>();
                 Debug.LoopItem(4, "RemovePart<Gigantism>()", Indent: 2, Toggle: doDebug);
-               
+
                 // IsGiganticCreature = true; // Enable the Gigantic flag
                 // Debug.LoopItem(4, "IsGiganticCreature = true", Indent: 2, Toggle: doDebug);
-                
+
                 GO.RequirePart<StunningForceOnJump>();
                 Debug.LoopItem(4, "RequirePart<StunningForceOnJump>()", Indent: 2, Toggle: doDebug);
-                
+
                 if (!GO.TryGetPart(out StewBelly stewBelly))
                 {
                     stewBelly = GO.RequirePart<StewBelly>();
@@ -885,7 +885,7 @@ namespace XRL.World.Parts.Mutation
         public override bool Unmutate(GameObject GO)
         {
             Debug.Header(4, $"GigantismPlus", $"Unmutate (GO: {GO.DebugName}, Level: {Level})", Toggle: doDebug);
-            
+
             Debug.Entry(4, "? if (GO != null)", Indent: 1, Toggle: doDebug);
             if (GO != null)
             {
@@ -918,7 +918,7 @@ namespace XRL.World.Parts.Mutation
                 ToggleMyActivatedAbility(GroundPoundActivatedAbilityID, null, Silent: true, false);
                 AbilityToggledGroundPound(GO, ToggledOn: false);
                 RemoveActivatedAbilityGroundPound(GO, true);
-                
+
                 // Remove jumping properties
                 UnapplyJumpRangeBonus(GO);
 
@@ -1168,7 +1168,7 @@ namespace XRL.World.Parts.Mutation
                     && !E.SlotType.IsNullOrEmpty())
                 {
                     E.Decreases++;
-                    if (E.SlotType != "Floating Nearby" 
+                    if (E.SlotType != "Floating Nearby"
                         && E.SlotType != "Thrown Weapon"
                         && equipment.IsEntirelyFloating()
                         && !equipment.HasPart<CyberneticsBaseItem>())
@@ -1278,7 +1278,7 @@ namespace XRL.World.Parts.Mutation
             if (E.Command == COMMAND_NAME_HUNCH_OVER)
             {
                 GameObject actor = ParentObject;
-                
+
                 // Things that might stop you from taking this action
                 if (actor.CurrentZone.ZoneWorld == "Interior" && !IsGiganticCreature)
                 {
@@ -1402,7 +1402,7 @@ namespace XRL.World.Parts.Mutation
             {
                 // Action happened 
                 UseEnergy(HunchOverEnergyCost, "Physical Defect Mutation Gigantism Hunch Over");
-                
+
                 //
                 // Add the stat shifting code here.
                 //

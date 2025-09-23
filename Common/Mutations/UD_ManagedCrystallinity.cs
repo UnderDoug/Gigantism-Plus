@@ -17,7 +17,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class UD_ManagedCrystallinity 
+    public class UD_ManagedCrystallinity
         : Crystallinity
         , IManagedDefaultNaturalEquipment<UD_ManagedCrystallinity>
     {
@@ -126,7 +126,7 @@ namespace XRL.World.Parts.Mutation
                 ?.AdjustMeleeDamageBonus(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
                 ?.AdjustMeleeHitBonus(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
                 ?.AdjustPenBonus(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
-                
+
                 ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,
@@ -242,7 +242,7 @@ namespace XRL.World.Parts.Mutation
 
         public override void OnRegenerateDefaultEquipment(Body body)
         {
-            if(body != null && ParentObject.Body == body)
+            if (body != null && ParentObject.Body == body)
             {
                 if (!ParentObject.TryGetPart(out RefractLight refractLight))
                 {
@@ -275,11 +275,11 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject?.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, 
+            Debug.Header(4,
                 $"{nameof(UD_ManagedCrystallinity)}",
-                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}(body)", 
+                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}(body)",
                 Toggle: getDoDebug('M'));
-            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}", 
+            Debug.Entry(4, $"TARGET {ParentObject?.DebugName} in zone {InstanceObjectZoneID}",
                 Indent: 0, Toggle: getDoDebug('M'));
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
@@ -289,7 +289,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Footer(4,
                 $"{nameof(UD_ManagedCrystallinity)}",
                 $"{nameof(OnBeforeManageDefaultNaturalEquipment)}" +
-                $"(body of: {ParentObject?.Blueprint})", 
+                $"(body of: {ParentObject?.Blueprint})",
                 Toggle: getDoDebug('M'));
         }
 

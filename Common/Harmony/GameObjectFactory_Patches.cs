@@ -32,7 +32,7 @@ namespace HNPS_GigantismPlus.Harmony
             int metricsCheckSteps = 0;
 
             CodeMatcher codeMatcher = new(Instructions, Generator);
-            
+
             // return base.HandleEvent(E);
             CodeMatch[] match_Return_BaseHandleEvent_E = new CodeMatch[]
             {

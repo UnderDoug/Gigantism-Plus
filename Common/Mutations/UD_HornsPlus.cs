@@ -170,7 +170,7 @@ namespace XRL.World.Parts.Mutation
 
         public static GameObject GenerateHornsObject(string Variant, BodyPart BodyPart, int Level = 0)
         {
-            if (Variant.IsNullOrEmpty() || BodyPart == null || Level < 1) 
+            if (Variant.IsNullOrEmpty() || BodyPart == null || Level < 1)
                 return null;
 
             GameObject hornsObject = GameObject.Create(Variant);

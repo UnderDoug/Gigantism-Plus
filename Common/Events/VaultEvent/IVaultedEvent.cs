@@ -62,13 +62,13 @@ public abstract class IVaultedEvent<T> : ModPooledEvent<T>
     }
     public static void Send(GameObject Vaulter, Cell OriginCell, Cell OverCell, Cell DestinationCell)
     {
-        Debug.Entry(4, 
-            $"{typeof(T).Name}." + 
-            $"{nameof(Send)}" + 
-            $"({nameof(Vaulter)}: {Vaulter?.DebugName}," + 
-            $" {nameof(OriginCell)}: [{OriginCell?.Location}]," + 
-            $" {nameof(OverCell)}: [{OverCell?.Location}]," + 
-            $" {nameof(DestinationCell)}: [{DestinationCell?.Location}])", 
+        Debug.Entry(4,
+            $"{typeof(T).Name}." +
+            $"{nameof(Send)}" +
+            $"({nameof(Vaulter)}: {Vaulter?.DebugName}," +
+            $" {nameof(OriginCell)}: [{OriginCell?.Location}]," +
+            $" {nameof(OverCell)}: [{OverCell?.Location}]," +
+            $" {nameof(DestinationCell)}: [{DestinationCell?.Location}])",
             Indent: 0, Toggle: doDebug);
 
         T E = FromPool(Vaulter, OriginCell, OverCell, DestinationCell);

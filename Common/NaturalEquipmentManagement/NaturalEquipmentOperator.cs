@@ -23,7 +23,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class NaturalEquipmentOperator 
+    public class NaturalEquipmentOperator
         : IScribedPart
         , IModEventHandler<GetNaturalEquipmentOperatorsEvent>
         , IModEventHandler<BeforeUpdateBodyPartsEvent>
@@ -64,8 +64,8 @@ namespace XRL.World.Parts
 
         public Guid OperatorID = Guid.Empty;
 
-        public bool WantsToOperate => 
-            ParentObject != null 
+        public bool WantsToOperate =>
+            ParentObject != null
          && ParentObject.IsNaturalEquipment()
          && ParentLimb != null
          && !ParentLimb.Extrinsic;
@@ -74,7 +74,7 @@ namespace XRL.World.Parts
 
         public GameObjectBlueprint OriginalNaturalEquipmentBlueprint => GameObjectFactory.Factory.GetBlueprint(ParentObject.Blueprint);
         public GameObjectBlueprint DefaultFistBlueprint => GameObjectFactory.Factory.GetBlueprint("DefaultFist");
-        
+
         public bool DoDynamicTile = true;
 
         private BodyPart _parentLimb = null;
@@ -148,7 +148,7 @@ namespace XRL.World.Parts
                     Debug.LastIndent--;
                 }
             }
-            
+
             Debug.Entry(4,
                 $"x {nameof(NaturalEquipmentOperator)}."
                 + $"{nameof(ProcessShortDescription)}(SortedDictionary<int, ModNaturalEquipmentBase> ShortDescriptions) *//",
@@ -167,7 +167,7 @@ namespace XRL.World.Parts
         {
             return GetNaturalEquipmentModsEvent.GetFor(Wielder, ParentObject, ParentLimb);
         }
-        
+
         public virtual void ManageNaturalEquipment(SortedDictionary<int, ModNaturalEquipmentBase> NaturalEquipmentMods)
         {
             Debug.Header(4,
@@ -426,7 +426,7 @@ namespace XRL.World.Parts
                 Debug.CheckYeh(4,
                     $"Kept {nameof(NaturalEquipmentOperator)} on {Equipment?.DebugName}",
                     Indent: 1, Toggle: getDoDebug("OC"));
-                
+
                 return false;
             }
         }

@@ -14,7 +14,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Base = true, Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-    public abstract class IDescribeModificationEvent<T, M> : ModPooledEvent<T> 
+    public abstract class IDescribeModificationEvent<T, M> : ModPooledEvent<T>
         where T : IDescribeModificationEvent<T, M>, new()
         where M : IModification
     {
@@ -328,7 +328,7 @@ namespace HNPS_GigantismPlus
                         Descriptions = RemoveElement(Descriptions, descriptionElement, IgnorePriority);
                     }
                 }
-                
+
             }
             return Descriptions;
         }

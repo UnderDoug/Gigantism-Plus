@@ -20,7 +20,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(Tinkering_Disassemble_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(Tinkering_Disassemble), 
+            declaringType: typeof(Tinkering_Disassemble),
             methodName: nameof(Tinkering_Disassemble.CanBeConsideredScrap),
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]

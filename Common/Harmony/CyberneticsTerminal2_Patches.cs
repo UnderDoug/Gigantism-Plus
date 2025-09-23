@@ -23,15 +23,15 @@ namespace HNPS_GigantismPlus.Harmony
         // you end up with it installed, but the equipment copy ends up in your inventory.
         public static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = true)
         {
-            Debug.Entry(3, 
-                $"* {nameof(CyberneticsTerminal2_ToggleHunched)}(" + 
-                $"GameObject Actor: {Actor.ShortDisplayName}, " + 
-                $"bool IsStart: {IsStart})", 
+            Debug.Entry(3,
+                $"* {nameof(CyberneticsTerminal2_ToggleHunched)}(" +
+                $"GameObject Actor: {Actor.ShortDisplayName}, " +
+                $"bool IsStart: {IsStart})",
                 Indent: 2, Toggle: doDebug);
 
             Debug.Entry(3, "Checking the Actor exists, is a True Kin, and has GigantismPlus", Indent: 3, Toggle: doDebug);
-            Debug.Entry(4, 
-                "? if (Actor != null and actor.IsTrueKin && Actor.TryGetPart<GigantismPlus>(out var gigantism)", 
+            Debug.Entry(4,
+                "? if (Actor != null and actor.IsTrueKin && Actor.TryGetPart<GigantismPlus>(out var gigantism)",
                 Indent: 3, Toggle: doDebug);
             if (Actor != null && Actor.IsTrueKin() && Actor.TryGetPart(out GigantismPlus gigantism))
             {
@@ -50,12 +50,12 @@ namespace HNPS_GigantismPlus.Harmony
                     }
                 }
             }
-            else 
-            { 
+            else
+            {
                 Debug.CheckNah(3, "one or more of: actor doesn't exist, isn't a True Kin, or lacks GigantismPlus", Indent: 4, Toggle: doDebug);
             }
-            Debug.Entry(4, 
-                "x if (Actor != null and actor.IsTrueKin && Actor.TryGetPart<GigantismPlus>(out var gigantism) ?//", 
+            Debug.Entry(4,
+                "x if (Actor != null and actor.IsTrueKin && Actor.TryGetPart<GigantismPlus>(out var gigantism) ?//",
                 Indent: 3, Toggle: doDebug);
 
             Debug.Entry(3,
@@ -67,8 +67,8 @@ namespace HNPS_GigantismPlus.Harmony
         } //!-- static void CyberneticsTerminal2_ToggleHunched(GameObject Actor, bool IsStart = true)
 
         [HarmonyPatch(
-            declaringType: typeof(CyberneticsTerminal2), 
-            methodName: nameof(CyberneticsTerminal2.HandleEvent), 
+            declaringType: typeof(CyberneticsTerminal2),
+            methodName: nameof(CyberneticsTerminal2.HandleEvent),
             argumentTypes: new Type[] { typeof(InventoryActionEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPrefix]

@@ -4,11 +4,11 @@
     {
         public string Material;
 
-        public SolidMaterial() 
+        public SolidMaterial()
         {
             Material = "Shale";
         }
-        public SolidMaterial(string Material) 
+        public SolidMaterial(string Material)
             : this()
         {
             this.Material = Material;

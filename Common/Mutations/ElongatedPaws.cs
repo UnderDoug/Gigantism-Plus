@@ -12,7 +12,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public class ElongatedPaws 
+    public class ElongatedPaws
         : BaseManagedDefaultEquipmentMutation<ElongatedPaws>
     {
         private static bool doDebug => getClassDoDebug(nameof(ElongatedPaws));
@@ -70,7 +70,7 @@ namespace XRL.World.Parts.Mutation
         public override int GetNaturalWeaponDamageDieSize(ModNaturalEquipment<ElongatedPaws> NaturalEquipmentMod = null, int Level = 1)
         {
             int dieSize = 0;
-            
+
             if (!HasGigantism) dieSize++;
             if (!HasBurrowing) dieSize++;
 
@@ -155,7 +155,7 @@ namespace XRL.World.Parts.Mutation
         public override bool Mutate(GameObject GO, int Level)
         {
             GO?.CheckEquipmentSlots();
-            
+
             return base.Mutate(GO, Level);
         }
 

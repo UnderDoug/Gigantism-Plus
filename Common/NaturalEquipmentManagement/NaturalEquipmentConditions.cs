@@ -39,7 +39,7 @@ namespace HNPS_GigantismPlus
         public static GameObjectWielderHasPart<UD_ManagedCrystallinity> WielderHasCrystallinity => new();
 
         public static GameObjectHasNatEquipModWithAnyCumultiveMelee<T> ThisModAdjustsMeleeCumulatively<T>()
-            where T : IPart , IManagedDefaultNaturalEquipment<T> , new() => new();
+            where T : IPart, IManagedDefaultNaturalEquipment<T>, new() => new();
 
         public static GameObjectMeleeWeaponSkillIs MeleeWeaponSkillIsAxe = new("Axe");
         public static GameObjectMeleeWeaponSkillIs MeleeWeaponSkillIsShortBlades = new("ShortBlades");

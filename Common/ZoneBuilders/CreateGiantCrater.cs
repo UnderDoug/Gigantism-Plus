@@ -13,7 +13,7 @@ using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World.ZoneBuilders
 {
-	public class CreateGiantCrater
+    public class CreateGiantCrater
         : ZoneBuilderSandbox
     {
         public string CraterWallMaterial;
@@ -189,12 +189,12 @@ namespace XRL.World.ZoneBuilders
                     if (dieRoll.Resolve() == 1)
                     {
                         cell.Clear();
-                        if (!region.Contains((cell.Location, cell))) 
+                        if (!region.Contains((cell.Location, cell)))
                             region.Add((cell.Location, cell));
                     }
                     else
                     {
-                        if (region.Contains((cell.Location, cell))) 
+                        if (region.Contains((cell.Location, cell)))
                             region.Remove((cell.Location, cell));
                         cell.Clear();
                         cell.AddObject(MapWallMaterial);
@@ -212,12 +212,12 @@ namespace XRL.World.ZoneBuilders
                         if (dieRoll.Resolve() == 1)
                         {
                             adjacentCell.Clear();
-                            if (!region.Contains((adjacentCell.Location, adjacentCell))) 
+                            if (!region.Contains((adjacentCell.Location, adjacentCell)))
                                 region.Add((adjacentCell.Location, adjacentCell));
                         }
                         else
                         {
-                            if (region.Contains((adjacentCell.Location, adjacentCell))) 
+                            if (region.Contains((adjacentCell.Location, adjacentCell)))
                                 region.Remove((adjacentCell.Location, adjacentCell));
                             cell.Clear();
                             cell.AddObject(MapWallMaterial);
@@ -226,7 +226,7 @@ namespace XRL.World.ZoneBuilders
                     continue;
                 }
                 cell.Clear();
-                if (!region.Contains((cell.Location, cell))) 
+                if (!region.Contains((cell.Location, cell)))
                     region.Add((cell.Location, cell));
             }
             return region;

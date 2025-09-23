@@ -116,39 +116,39 @@ namespace HNPS_GigantismPlus
         // DescriptionElement with double
         public static bool operator >(DescriptionElement operand1, double operand2) => operand1.Priority > operand2;
         public static bool operator <(DescriptionElement operand1, double operand2) => operand1.Priority < operand2;
-        
+
         public static bool operator >=(DescriptionElement operand1, double operand2) => operand1.Priority >= operand2;
         public static bool operator <=(DescriptionElement operand1, double operand2) => operand1.Priority <= operand2;
-        
+
         public static bool operator >(double operand1, DescriptionElement operand2) => operand1 > operand2.Priority;
         public static bool operator <(double operand1, DescriptionElement operand2) => operand1 < operand2.Priority;
-        
+
         public static bool operator >=(double operand1, DescriptionElement operand2) => operand1 >= operand2.Priority;
         public static bool operator <=(double operand1, DescriptionElement operand2) => operand1 <= operand2.Priority;
 
         // DescriptionElement with float
         public static bool operator >(DescriptionElement operand1, float operand2) => operand1.Priority > operand2;
         public static bool operator <(DescriptionElement operand1, float operand2) => operand1.Priority < operand2;
-        
+
         public static bool operator >=(DescriptionElement operand1, float operand2) => operand1.Priority >= operand2;
         public static bool operator <=(DescriptionElement operand1, float operand2) => operand1.Priority <= operand2;
-        
+
         public static bool operator >(float operand1, DescriptionElement operand2) => operand1 > operand2.Priority;
         public static bool operator <(float operand1, DescriptionElement operand2) => operand1 < operand2.Priority;
-        
+
         public static bool operator >=(float operand1, DescriptionElement operand2) => operand1 >= operand2.Priority;
         public static bool operator <=(float operand1, DescriptionElement operand2) => operand1 <= operand2.Priority;
 
         // DescriptionElement with long
         public static bool operator >(DescriptionElement operand1, long operand2) => operand1.Priority > operand2;
         public static bool operator <(DescriptionElement operand1, long operand2) => operand1.Priority < operand2;
-        
+
         public static bool operator >=(DescriptionElement operand1, long operand2) => operand1.Priority >= operand2;
         public static bool operator <=(DescriptionElement operand1, long operand2) => operand1.Priority <= operand2;
-        
+
         public static bool operator >(long operand1, DescriptionElement operand2) => operand1 > operand2.Priority;
         public static bool operator <(long operand1, DescriptionElement operand2) => operand1 < operand2.Priority;
-        
+
         public static bool operator >=(long operand1, DescriptionElement operand2) => operand1 >= operand2.Priority;
         public static bool operator <=(long operand1, DescriptionElement operand2) => operand1 <= operand2.Priority;
     }

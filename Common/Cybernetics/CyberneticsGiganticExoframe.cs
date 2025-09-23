@@ -74,7 +74,7 @@ namespace XRL.World.Parts
             AugmentAddParts = null;
             AugmentAddProps = null;
             AugmentEquipmentFrameColors = null;
-            
+
             JumpDistanceBonus = 0;
             StunningForceLevelFactor = 0.5;
         }
@@ -83,7 +83,7 @@ namespace XRL.World.Parts
             CyberneticsGiganticExoframe giganticExoframe = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsGiganticExoframe>();
             if (giganticExoframe == null)
             {
-                Debug.Warn(2, 
+                Debug.Warn(2,
                     nameof(CyberneticsGiganticExoframe),
                     nameof(NewAugmentedManipulatorMod),
                     $"Couldn't get instance of {nameof(giganticExoframe)} from " +
@@ -96,7 +96,7 @@ namespace XRL.World.Parts
                 AdjectiveColor = giganticExoframe.AugmentAdjectiveColor,
             };
             augmentedManipulator.AdjustNoun()
-                
+
                 .AdjustTile(giganticExoframe.AugmentTile)
 
                 .AdjustColorString(giganticExoframe.AugmentTileColorString, true)
@@ -276,7 +276,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsGiganticExoframe exoframe = base.DeepCopy(Parent, MapInv) as CyberneticsGiganticExoframe;
-            
+
             return exoframe;
         }
     }

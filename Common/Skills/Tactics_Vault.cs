@@ -13,7 +13,7 @@ using XRL.World.Capabilities;
 using XRL.World.AI.Pathfinding;
 using XRL.Wish;
 
-using Mathf =  UnityEngine.Mathf;
+using Mathf = UnityEngine.Mathf;
 
 using HNPS_GigantismPlus;
 using Debug = HNPS_GigantismPlus.Debug;
@@ -24,7 +24,7 @@ using static HNPS_GigantismPlus.Options;
 namespace XRL.World.Parts.Skill
 {
     [Serializable]
-    public class Tactics_Vault 
+    public class Tactics_Vault
         : BaseSkill
         , IModEventHandler<AfterVaultedEvent>
     {
@@ -96,7 +96,7 @@ namespace XRL.World.Parts.Skill
             private set;
         }
 
-        public Tactics_Vault ()
+        public Tactics_Vault()
         {
 
         }
@@ -254,7 +254,7 @@ namespace XRL.World.Parts.Skill
                 OverridingPartsList ??= vaultable.OverridingPartsList;
             }
 
-            if (!OverridingPartsList.IsNullOrEmpty() 
+            if (!OverridingPartsList.IsNullOrEmpty()
              && OverridingPartsList.OverlapsWith((from p in Vaulter.GetPartsDescendedFrom<IPart>() select p.Name).ToList()))
                 return true;
 
@@ -264,7 +264,7 @@ namespace XRL.World.Parts.Skill
             if ((bool)RequiresJumpSkill && !Vaulter.HasSkill(nameof(Acrobatics_Jump)))
                 return false;
 
-            if (!EnablingLimbsList.IsNullOrEmpty() 
+            if (!EnablingLimbsList.IsNullOrEmpty()
              && !EnablingLimbsList.OverlapsWith((from bp in Vaulter.Body.GetParts(EvenIfDismembered: false) select bp.Type).ToList()))
                 return false;
 
@@ -277,7 +277,7 @@ namespace XRL.World.Parts.Skill
 
         public static bool CanVault(GameObject Vaulter, GameObject Vaultee, out Tactics_Vault VaultSkill, bool? SizeMatters = false, bool? RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null, bool Silent = false)
         {
-            return CanTryVault(Vaulter, Vaultee, out VaultSkill, Silent) 
+            return CanTryVault(Vaulter, Vaultee, out VaultSkill, Silent)
                 && CanNormallyVault(Vaulter, Vaultee, SizeMatters, RequiresSkill, EnablingLimbsList, OverridingPartsList);
         }
         public static bool CanVault(GameObject Vaulter, GameObject Vaultee, bool? SizeMatters = false, bool? RequiresSkill = false, List<string> EnablingLimbsList = null, List<string> OverridingPartsList = null, bool Silent = false)
@@ -434,27 +434,27 @@ namespace XRL.World.Parts.Skill
         {
             if (Vaulter == null)
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Vaulter == null", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Vaulter == null",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
 
             if (Target == null)
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Target == null", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Target == null",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
 
             if (!Target.IsEmptyOfSolidFor(Vaulter, IncludeCombatObjects: true))
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Target is empty of solid for Vaulter ({Vaulter?.DebugName ?? NULL})", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Target is empty of solid for Vaulter ({Vaulter?.DebugName ?? NULL})",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
@@ -462,36 +462,36 @@ namespace XRL.World.Parts.Skill
             string noAutoWalk = "NoAutowalk";
             if (!Target.GetObjectsWithTagOrProperty(noAutoWalk).IsNullOrEmpty())
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Target contains objects tagged {noAutoWalk.Quote()}", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Target contains objects tagged {noAutoWalk.Quote()}",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
 
             if (Target.GetDangerousOpenLiquidVolume() != null)
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Target contains dangerous open liquid volume", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Target contains dangerous open liquid volume",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
 
             if (Target.HasCombatObject())
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Target contains combat object", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Target contains combat object",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
 
             if (Target.HasSwimmingDepthLiquid())
             {
-                Debug.CheckNah(4, 
-                    $"{nameof(IsTargetCellValidDestination)}", 
-                    $"Target contains swimming depth liquid volume", 
+                Debug.CheckNah(4,
+                    $"{nameof(IsTargetCellValidDestination)}",
+                    $"Target contains swimming depth liquid volume",
                     Indent: 3, Toggle: doDebug);
                 return false;
             }
@@ -525,10 +525,10 @@ namespace XRL.World.Parts.Skill
 
         public static bool Vault(GameObject Vaulter, Cell OriginCell, GameObject Vaultee, Cell DestinationCell, out Cell Origin, out Cell Over, out Cell Destination, bool Silent = false)
         {
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(Tactics_Vault)}."
                 + $"{nameof(Vault)}"
-                + $"(Vaulter: {Vaulter?.DebugName ?? NULL})", 
+                + $"(Vaulter: {Vaulter?.DebugName ?? NULL})",
                 Indent: 1, Toggle: getDoDebug());
 
             Origin = OriginCell ?? Vaulter.CurrentCell;
@@ -647,8 +647,8 @@ namespace XRL.World.Parts.Skill
                     Indent: 2, Toggle: getDoDebug());
                 if (vaultSkill.MidVault)
                 {
-                    Debug.Warn(4, 
-                        $"{nameof(Tactics_Vault)}", 
+                    Debug.Warn(4,
+                        $"{nameof(Tactics_Vault)}",
                         $"{nameof(Vault)}",
                         $"MidVault is still \"true\" following DirectMove",
                         Indent: 0);
@@ -692,7 +692,7 @@ namespace XRL.World.Parts.Skill
                 Debug.LoopItem(4, $"Gravitating Vaulter...", Indent: 2, Toggle: getDoDebug());
                 Vaulter.Gravitate();
 
-                Debug.LoopItem(4, $"Landing Vaulter from Origin [{Origin?.Location}] to Destination [{Destination?.Location}]...", 
+                Debug.LoopItem(4, $"Landing Vaulter from Origin [{Origin?.Location}] to Destination [{Destination?.Location}]...",
                     Indent: 2, Toggle: getDoDebug());
                 Land(Origin, Destination);
             }
@@ -881,7 +881,7 @@ namespace XRL.World.Parts.Skill
                 AutoAct.Resume();
                 Debug.CheckYeh(4, $"AutoAct.Setting", AutoAct.Setting, Indent: 1, Toggle: getDoDebug());
                 The.ActionManager.SkipPlayerTurn = true;
-                Debug.LoopItem(4, $"The.ActionManager.SkipPlayerTurn", $"{The.ActionManager.SkipPlayerTurn}", 
+                Debug.LoopItem(4, $"The.ActionManager.SkipPlayerTurn", $"{The.ActionManager.SkipPlayerTurn}",
                     Good: The.ActionManager.SkipPlayerTurn, Indent: 1, Toggle: getDoDebug());
                 try
                 {
@@ -893,7 +893,7 @@ namespace XRL.World.Parts.Skill
                     Debug.Warn(4,
                         $"{nameof(Tactics_Vault)}",
                         $"{nameof(ResumeAfterVault)}()",
-                        $"Call to The.ActionManager.RunSegment() failed with {nameof(NullReferenceException)}", 
+                        $"Call to The.ActionManager.RunSegment() failed with {nameof(NullReferenceException)}",
                         Indent: 0);
                 }
                 vaultSkill.Clear().Vomit(4, nameof(ResumeAfterVault), $"End of Method (Success)", Indent: 1, Toggle: getDoDebug());
@@ -982,7 +982,7 @@ namespace XRL.World.Parts.Skill
                     .Append(VANDR).Append($"[{WantToVault.YehNah()}]{HONLY}WantToVault: ").AppendColored("B", $"{WantToVault}").AppendLine()
                     .Append(VANDR).Append($"[{WasAutoActing.YehNah(WantToVault)}]{HONLY}WasAutoActing: ").AppendColored("B", $"{WasAutoActing}").AppendLine()
                     .Append(VANDR).Append($"[{haveAutoActSetting.YehNah(WantToVault)}]{HONLY}AutoActSetting: ").AppendColored("o", $"{AutoActSetting?.Quote() ?? "null".Color("B")}").AppendLine();
-                    
+
                 E.Infix.AppendLine().AppendRules(Event.FinalizeString(SB));
             }
             return base.HandleEvent(E);
@@ -1082,10 +1082,10 @@ namespace XRL.World.Parts.Skill
 
                     if (shouldVault && CanVault(Vaultee, Silent: false))
                     {
-                        Debug.Entry(4, $"Attempted to enter cell [{Over?.Location}] with vaultee {Vaultee?.DebugName ?? NULL}", 
+                        Debug.Entry(4, $"Attempted to enter cell [{Over?.Location}] with vaultee {Vaultee?.DebugName ?? NULL}",
                             Indent: 1, Toggle: getDoDebug());
 
-                        Debug.Entry(4, $"Attempting Vault into Destination cell [{Destination?.Location}]", 
+                        Debug.Entry(4, $"Attempting Vault into Destination cell [{Destination?.Location}]",
                             Indent: 1, Toggle: getDoDebug());
 
                         Debug.LoopItem(4, $"Vaulter", $"{Vaulter?.DebugName ?? NULL}", Good: Vaulter != null,
@@ -1121,7 +1121,7 @@ namespace XRL.World.Parts.Skill
 
                 } // if (Vaultee != null)
             } // if (E.Actor == ParentObject && ParentObject != null && WantToVault)
-            if (false 
+            if (false
                 && E.Cell.InActiveZone)
             {
                 GameObject Vaulter = ParentObject;
@@ -1185,15 +1185,15 @@ namespace XRL.World.Parts.Skill
             }
             if (VaultingEnabled && E.Blocking != null)
             {
-                Debug.Entry(4, $"BLOCKED: E.Cell: [{E.Cell.Location}], E.Blocking in [{E.Blocking.CurrentCell.Location}]", 
+                Debug.Entry(4, $"BLOCKED: E.Cell: [{E.Cell.Location}], E.Blocking in [{E.Blocking.CurrentCell.Location}]",
                     Indent: 1, Toggle: getDoDebug());
             }
             return base.HandleEvent(E);
         }
         public override bool HandleEvent(EnteredCellEvent E)
         {
-            if (false 
-                && E.Cell.InActiveZone 
+            if (false
+                && E.Cell.InActiveZone
                 && E.Actor == ParentObject
                 && (!ParentObject.IsPlayer() || AutoAct.IsAnyMovement()))
             {
@@ -1286,16 +1286,16 @@ namespace XRL.World.Parts.Skill
             if (VaultingEnabled && E.ID == COMMAND_TOGGLE)
             {
                 ToggleMyActivatedAbility(ActivatedAbilityID, null, Silent: true, null);
-                Debug.CheckYeh(3, 
-                    $"{nameof(Tactics_Vault)} Toggled", 
-                    $"{WantToVault}", 
+                Debug.CheckYeh(3,
+                    $"{nameof(Tactics_Vault)} Toggled",
+                    $"{WantToVault}",
                     Indent: 0, Toggle: getDoDebug());
             }
-            if (false 
-                && E.ID == BEGIN_ATTACK_EVENT 
-                && WantToVault 
-                && ParentObject != null 
-                && ParentObject.IsPlayer() 
+            if (false
+                && E.ID == BEGIN_ATTACK_EVENT
+                && WantToVault
+                && ParentObject != null
+                && ParentObject.IsPlayer()
                 && AutoAct.IsAnyMovement())
             {
                 Debug.Entry(4,

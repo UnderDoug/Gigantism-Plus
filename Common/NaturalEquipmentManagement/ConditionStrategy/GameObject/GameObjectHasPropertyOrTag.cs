@@ -41,7 +41,7 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject GameObject)
         {
             return base.Check(GameObject)
-                && !PropertyOrTag.IsNullOrEmpty() 
+                && !PropertyOrTag.IsNullOrEmpty()
                 && GameObject.HasPropertyOrTag(PropertyOrTag);
         }
     }

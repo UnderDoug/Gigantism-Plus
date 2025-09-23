@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus
         public static bool Register()
         {
             The.Game?.RegisterEvent(Handler, CrayonsGetColorsEvent.ID);
-            
+
             return (bool)The.Game?.WasModEventHandlerRegistered<CrayonsGetColorHandler, CrayonsGetColorsEvent>();
         }
 

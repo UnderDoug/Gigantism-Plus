@@ -246,7 +246,7 @@ namespace HNPS_GigantismPlus
                     {
                         UnityEngine.Debug.Log("");
                     }
-                } 
+                }
                 while (CodeMatcher.Advance(1).IsValid);
                 CodeMatcher.Start().Advance(originalPos);
             }
@@ -327,7 +327,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Indent;
             Vomit(Verbosity, $"{nameof(NaturalEquipmentMod)}<{NaturalEquipmentMod.GetSource()}>", Title, Indent: Indent, Toggle: Toggle);
-            
+
             if (!DamageOnly)
             {
                 LoopItem(Verbosity, $"{nameof(NaturalEquipmentMod.BodyPartType)}", $"{NaturalEquipmentMod.BodyPartType}", Indent: indent + 1, Toggle: Toggle);
@@ -376,8 +376,8 @@ namespace HNPS_GigantismPlus
                     isKey = true;
                 }
                 if (!output.IsNullOrEmpty())
-                {  
-                    output += !isKey ? ", " : "; "; 
+                {
+                    output += !isKey ? ", " : "; ";
                 }
                 output += !isKey ? token : token[1..];
             }
@@ -498,7 +498,7 @@ namespace HNPS_GigantismPlus
             else Entry(Verbosity, Output, Indent: Indent, Toggle: Toggle);
             foreach (T item in List)
             {
-                if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent+1, Toggle: Toggle);
+                if (LoopItem) Debug.LoopItem(Verbosity, item.ToString(), Good: Good, Indent: Indent + 1, Toggle: Toggle);
                 else Entry(Verbosity, item.ToString(), Indent: Indent + 1, Toggle: Toggle);
             }
             if (DivAfter != "") Divider(4, DivAfter, 25, Indent: Indent + 1, Toggle: Toggle);
@@ -625,7 +625,7 @@ namespace HNPS_GigantismPlus
                  || !furniture.HasTag("Tier")
                  || furniture.HasTag("Creature")
                  || furniture.InheritsFrom("Creature")
-                 || furniture.IsExcludedFromDynamicEncounters()) 
+                 || furniture.IsExcludedFromDynamicEncounters())
                     continue;
 
                 string PrimaryWidgetCategory = string.Empty;
@@ -648,12 +648,12 @@ namespace HNPS_GigantismPlus
                 string Quality = Quote($"{furniture.GetTag("Quality")}");
                 string Utility = Quote($"{furniture.GetTag("Utility")}");
                 UnityEngine.Debug.LogError(
-                    $"{PrimaryWidgetCategory}," + 
-                    $"{SecondaryWidgetCategory}," + 
-                    $"{TertiaryWidgetCategory}," + 
-                    $"{Blueprint}," + 
-                    $"{Tier}," + 
-                    $"{Quality}," + 
+                    $"{PrimaryWidgetCategory}," +
+                    $"{SecondaryWidgetCategory}," +
+                    $"{TertiaryWidgetCategory}," +
+                    $"{Blueprint}," +
+                    $"{Tier}," +
+                    $"{Quality}," +
                     $"{Utility}");
             }
         }
@@ -796,7 +796,7 @@ namespace XRL.World.Parts
         public CellHighlighter()
         {
             BackgroundColor = "k";
-            DoHighlight = 
+            DoHighlight =
                 Options.DebugVerbosity > 3
              && The.Game.GetBooleanGameState(DEBUG_HIGHLIGHT_CELLS);
             HighlightPriority = 0;
@@ -807,7 +807,7 @@ namespace XRL.World.Parts
             if ((XRLCore.FrameTimer.ElapsedMilliseconds & 0x7F) == 0L)
             {
                 DoHighlight =
-                    Options.DebugVerbosity > 3 
+                    Options.DebugVerbosity > 3
                  && The.Game.GetBooleanGameState(DEBUG_HIGHLIGHT_CELLS);
             }
             if (DoHighlight)
@@ -816,11 +816,11 @@ namespace XRL.World.Parts
                     ParentObject.Render.Visible = true;
 
                 E.ApplyColors(
-                    Foreground: TileColor ?? E.DetailColor, 
-                    Background: BackgroundColor, 
+                    Foreground: TileColor ?? E.DetailColor,
+                    Background: BackgroundColor,
                     Detail: DetailColor ?? E.DetailColor,
-                    ICON_COLOR_PRIORITY, 
-                    ICON_COLOR_PRIORITY, 
+                    ICON_COLOR_PRIORITY,
+                    ICON_COLOR_PRIORITY,
                     ICON_COLOR_PRIORITY);
             }
             else

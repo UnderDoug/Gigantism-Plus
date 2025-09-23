@@ -47,7 +47,7 @@ namespace XRL.World.Parts
         public int Stews // total number of times SeriouslyThickStew has been consumed.
         {
             get => _Stews;
-            set 
+            set
             {
                 _Stews = value;
                 CalculateGainsAndHankering(value, out int Gains, out int Hankering);
@@ -77,7 +77,7 @@ namespace XRL.World.Parts
         public int StartingHankering
         {
             get => _StartingHankering != 0 ? _StartingHankering : 2;
-            set 
+            set
             {
                 _StartingHankering = value;
                 Hankering += _StartingHankering;
@@ -122,9 +122,9 @@ namespace XRL.World.Parts
         }
 
         public void OnGained()
-        {   
+        {
             RemoveMutationMod(ParentObject, ref mutationMod);
-            Mutations mutations = ParentObject.RequirePart<Mutations>(); 
+            Mutations mutations = ParentObject.RequirePart<Mutations>();
             if (Gains > 0)
             {
                 mutationMod = mutations.AddMutationMod(
@@ -199,8 +199,9 @@ namespace XRL.World.Parts
                 int leftOvers = Stews - Hankering;
                 Hankering -= Stews;
                 if (Hankering <= 0) Hankering = ++Gains;
-                Stews = Math.Max(0,leftOvers);
-            };
+                Stews = Math.Max(0, leftOvers);
+            }
+            ;
         }
         public int CalculateGains()
         {
@@ -248,7 +249,7 @@ namespace XRL.World.Parts
             DieRoll startingStewsDie = new(StartingStewsProperty);
             if (startingStewsDie != null)
             {
-                StartingStews = Math.Max(0,startingStewsDie.Resolve());
+                StartingStews = Math.Max(0, startingStewsDie.Resolve());
             }
             if (StartingStews > 0)
             {
@@ -302,8 +303,8 @@ namespace XRL.World.Parts
             if (StewBellyDebugDescriptions && Stews > 0)
             {
                 Debug.Entry(4,
-                    $"{nameof(StewBelly)}." + 
-                    $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)", 
+                    $"{nameof(StewBelly)}." +
+                    $"{nameof(HandleEvent)}({nameof(GetShortDescriptionEvent)} E)",
                     Indent: 0, Toggle: getDoDebug());
 
                 Debug.Entry(4, $"Stews", $"{Stews}", Indent: 1, Toggle: getDoDebug());

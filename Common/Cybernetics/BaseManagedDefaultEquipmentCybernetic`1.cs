@@ -17,10 +17,10 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentCybernetic<T> 
+    public abstract class BaseManagedDefaultEquipmentCybernetic<T>
         : IScribedPart
         , IManagedDefaultNaturalEquipment<T>
-        where T 
+        where T
         : BaseManagedDefaultEquipmentCybernetic<T>
         , IManagedDefaultNaturalEquipment<T>
         , new()
@@ -99,7 +99,7 @@ namespace XRL.World.Parts
                 ?.AdjustMeleeDamageBonus(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
                 ?.AdjustMeleeHitBonus(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
                 ?.AdjustPenBonus(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
-                
+
                 ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,
@@ -159,11 +159,11 @@ namespace XRL.World.Parts
             Zone InstanceObjectZone = Implantee.GetCurrentZone();
             string InstanceObjectZoneID = InstanceObjectZone?.ZoneID ?? "[Pre-build]";
 
-            Debug.Header(4, 
-                $"{typeof(T).Name}", 
+            Debug.Header(4,
+                $"{typeof(T).Name}",
                 $"{nameof(OnBeforeManageDefaultNaturalEquipment)}" +
                 $"(body)", Toggle: getDoDebug('M'));
-            Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}", 
+            Debug.Entry(4, $"TARGET {Implantee?.DebugName ?? NULL} in zone {InstanceObjectZoneID}",
                 Indent: 0, Toggle: getDoDebug('M'));
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
@@ -346,8 +346,8 @@ namespace XRL.World.Parts
             else
             if (E.ID == "CookedAt")
             {
-                if (E.GetParameter("Actor") is GameObject Actor 
-                    && Actor == ParentObject 
+                if (E.GetParameter("Actor") is GameObject Actor
+                    && Actor == ParentObject
                     && Actor.Body != null)
                 {
                     Actor.Body.UpdateBodyParts();

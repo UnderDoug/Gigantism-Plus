@@ -58,7 +58,7 @@ namespace XRL.World.Parts
                 List<Cell> cells = cell.GetAdjacentCells();
                 cells.Add(cell);
                 int count = Count;
-                while(count > 0 && !cells.IsNullOrEmpty())
+                while (count > 0 && !cells.IsNullOrEmpty())
                 {
                     bool ByChance = Stat.Roll(1, 100) <= ChancePer;
                     cell = cells.DrawRandomToken();

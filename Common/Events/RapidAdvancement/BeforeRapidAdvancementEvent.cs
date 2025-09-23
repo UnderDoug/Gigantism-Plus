@@ -39,9 +39,9 @@ public class BeforeRapidAdvancementEvent : ModPooledEvent<BeforeRapidAdvancement
 
     public static void Send(int Amount, GameObject Actor)
     {
-        Debug.Entry(4, 
-            $"{nameof(BeforeRapidAdvancementEvent)}." + 
-            $"{nameof(Send)}(int Amount: {Amount}, GameObject Actor: {Actor?.DebugName})", 
+        Debug.Entry(4,
+            $"{nameof(BeforeRapidAdvancementEvent)}." +
+            $"{nameof(Send)}(int Amount: {Amount}, GameObject Actor: {Actor?.DebugName})",
             Indent: 0, Toggle: doDebug);
 
         BeforeRapidAdvancementEvent E = FromPool();

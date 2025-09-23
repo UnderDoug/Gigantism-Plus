@@ -19,7 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(Carapace_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(Carapace), 
+            declaringType: typeof(Carapace),
             methodName: nameof(Carapace.AddCarapaceTo),
             argumentTypes: new Type[] { typeof(BodyPart) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]

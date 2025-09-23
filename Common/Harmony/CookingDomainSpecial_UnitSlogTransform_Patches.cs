@@ -20,7 +20,7 @@ namespace HNPS_GigantismPlus.Harmony
 
         // Calls UpdateBodyParts on recently transformed slog-bods to ensure they get any natural equipment adjustments they might be due!
         [HarmonyPatch(
-            declaringType: typeof(CookingDomainSpecial_UnitSlogTransform), 
+            declaringType: typeof(CookingDomainSpecial_UnitSlogTransform),
             methodName: nameof(CookingDomainSpecial_UnitSlogTransform.ApplyTo),
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
@@ -28,7 +28,7 @@ namespace HNPS_GigantismPlus.Harmony
         public static IEnumerable<CodeInstruction> ApplyTo_MutationEntryInstead_Transpile(IEnumerable<CodeInstruction> Instructions, ILGenerator Generator)
         {
             bool doVomit = false;
-            string patchMethodName = 
+            string patchMethodName =
                 $"{nameof(CookingDomainSpecial_UnitSlogTransform)}." +
                 $"{nameof(CookingDomainSpecial_UnitSlogTransform.ApplyTo)}(" +
                 $"{nameof(GameObject)})";
@@ -82,4 +82,4 @@ namespace HNPS_GigantismPlus.Harmony
             return codeMatcher.Vomit(doVomit).InstructionEnumeration();
         }
     }
- }
+}

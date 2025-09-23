@@ -18,7 +18,7 @@ using SerializeField = UnityEngine.SerializeField;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public abstract class ModNaturalEquipmentBase 
+    public abstract class ModNaturalEquipmentBase
         : IModification
         , IModEventHandler<BeforeApplyAdjustmentEvent>
     {
@@ -27,7 +27,7 @@ namespace XRL.World.Parts
         {
             List<object> doList = new()
             {
-                
+
             };
             List<object> dontList = new()
             {
@@ -139,7 +139,7 @@ namespace XRL.World.Parts
 
         public override bool ModificationApplicable(GameObject Object)
         {
-            return Object.HasPart<Physics>() 
+            return Object.HasPart<Physics>()
                 && Object.IsNaturalEquipment();
         }
 
@@ -524,7 +524,7 @@ namespace XRL.World.Parts
 
         public override void ApplyModification(GameObject Object)
         {
-            if (Object.HasPartDescendedFrom<ModNaturalEquipmentBase>() 
+            if (Object.HasPartDescendedFrom<ModNaturalEquipmentBase>()
                 && !Object.GetPartsDescendedFrom<ModNaturalEquipmentBase>(p => SameModification(p, false)).IsNullOrEmpty())
             {
                 return;

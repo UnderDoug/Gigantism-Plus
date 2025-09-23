@@ -11,7 +11,7 @@ using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
 
 namespace HNPS_GigantismPlus.Harmony
-{   
+{
     // Goal is to block the default weight-increasing behaviour if the GameObject in question is Gigantic(Plus)
     [HarmonyPatch]
     public static class GigantismPlus_ControlledWeight_GameObject_Patches
@@ -25,11 +25,11 @@ namespace HNPS_GigantismPlus.Harmony
         public static void GetBodyWeight_GigantismPlus_Prefix(ref GameObject __state, ref GameObject __instance)
         {
             __state = __instance;
-            
+
             if (__state.IsGiganticCreature && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // GigantismPlus wants to control weight based on the creature being Gigantic
-                
+
                 Debug.Entry(4,
                 $"# {nameof(GigantismPlus_ControlledWeight_GameObject_Patches)}."
                 + $"{nameof(GetBodyWeight_GigantismPlus_Prefix)}(ref GameObject __state, ref GameObject __instance)",
@@ -43,7 +43,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPatch(
-            declaringType: typeof(GameObject), 
+            declaringType: typeof(GameObject),
             methodName: nameof(GameObject.GetBodyWeight))]
         [HarmonyPostfix]
         public static void GetBodyWeight_GigantismPlus_Postfix(ref GameObject __state)
@@ -80,14 +80,14 @@ namespace HNPS_GigantismPlus.Harmony
         public static void GetFor_GigantismPlus_Prefix(ref GameObject __state, GameObject Object)
         {
             __state = Object;
-            
+
             if (__state.IsGiganticCreature && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // GigantismPlus wants to control carry cap based on the creature being Gigantic
-                
+
                 Debug.Entry(4,
                 $"# {nameof(GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches)}."
-                + $"{nameof(GetFor_GigantismPlus_Prefix)}" 
+                + $"{nameof(GetFor_GigantismPlus_Prefix)}"
                 + $"(ref {nameof(GameObject)} {nameof(__state)},"
                 + $" {nameof(GameObject)} {nameof(Object)})",
                 Indent: 0, Toggle: doDebug);
@@ -119,7 +119,7 @@ namespace HNPS_GigantismPlus.Harmony
                 Indent: 1, Toggle: doDebug);
                 Debug.Entry(4,
                 $"x {nameof(GigantismPlus_ControlledCarryCap_GetMaxCarriedWeightEvent_Patches)}."
-                + $"{nameof(GetFor_GigantismPlus_Prefix)}" 
+                + $"{nameof(GetFor_GigantismPlus_Prefix)}"
                 + $"(ref {nameof(GameObject)} {nameof(__state)}) #//",
                 Indent: 0, Toggle: doDebug);
             }
@@ -141,13 +141,13 @@ namespace HNPS_GigantismPlus.Harmony
         {
             __state = __instance.ParentObject;
             bool IsPretendBig = __state.HasPart<PseudoGigantism>();
-            if (IsPretendBig && !__state.IsGiganticCreature 
+            if (IsPretendBig && !__state.IsGiganticCreature
                 && __state.TryGetPart(out GigantismPlus gigantismPlus))
             {
                 // is the GameObject PseudoGigantic but not Gigantic
-                Debug.Entry(3, 
-                    $"{nameof(Body)}." + 
-                    $"{nameof(Body.RegenerateDefaultEquipment)}() " + 
+                Debug.Entry(3,
+                    $"{nameof(Body)}." +
+                    $"{nameof(Body.RegenerateDefaultEquipment)}() " +
                     $"-> PseudoGigantic not Gigantic",
                     Indent: 0, Toggle: doDebug);
 

@@ -304,8 +304,8 @@ namespace XRL.World.ZoneBuilders
                             Indent: 2, Toggle: getDoDebug());
                     }
                     Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
-                    Debug.Entry(4, 
-                        $"x foreach ({nameof(PopulationResult)} item in {nameof(ContentsTable)}: {ContentsTable.Quote()}) >//", 
+                    Debug.Entry(4,
+                        $"x foreach ({nameof(PopulationResult)} item in {nameof(ContentsTable)}: {ContentsTable.Quote()}) >//",
                         Indent: 1, Toggle: getDoDebug());
 
                     string abodeRegionString = string.Empty;
@@ -670,11 +670,11 @@ namespace XRL.World.ZoneBuilders
 
                 if (PlaceGiantVillagerInCell(tinkerGiant, tinkerGiantLocation, zone, "Tinker")
                     && PlaceGiantVillagerInCell(apothecaryGiant, apothecaryGiantLocation, zone, "Apothecary")
-                    && PlaceGiantVillagerInCell(dromadGiant, dromadGiantLocation, zone, "Dromad") 
+                    && PlaceGiantVillagerInCell(dromadGiant, dromadGiantLocation, zone, "Dromad")
                     && PlaceGiantVillagerInCell(gutsmongerGiant, gutsmongerGiantLocation, zone, "Gutsmonger")
                     && PlaceGiantVillagerInCell(petGiant, petGiantLocation, zone, "Pet"))
                 {
-                    Debug.CheckYeh(4, $"all five Giant Villager Merchants (and Pet) successfully placed", 
+                    Debug.CheckYeh(4, $"all five Giant Villager Merchants (and Pet) successfully placed",
                         Indent: 1, Toggle: getDoDebug());
                 }
                 else

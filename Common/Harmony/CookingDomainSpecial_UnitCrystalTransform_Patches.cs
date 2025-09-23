@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus.Harmony
 
         // Calls UpdateBodyParts on recently transformed crytalline beings to ensure they get their funky new manipulators.
         [HarmonyPatch(
-            declaringType: typeof(CookingDomainSpecial_UnitCrystalTransform), 
+            declaringType: typeof(CookingDomainSpecial_UnitCrystalTransform),
             methodName: nameof(CookingDomainSpecial_UnitCrystalTransform.ApplyTo),
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
@@ -31,4 +31,4 @@ namespace HNPS_GigantismPlus.Harmony
             Object?.Body?.UpdateBodyParts();
         }
     }
- }
+}

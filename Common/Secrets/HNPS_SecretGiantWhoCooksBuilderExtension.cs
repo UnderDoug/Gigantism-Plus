@@ -161,7 +161,7 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"Setting ZoneTierOverride to {nameof(approxZoneTier)} ({approxZoneTier})...", Indent: 1, Toggle: getDoDebug());
             zoneManager.SetZoneProperty(SecretZoneID, "ZoneTierOverride", approxZoneTier.ToString());
 
-            TerrainTravel pTravel = Builder.terrainComponents[Location2D.Get(location.X/3, location.Y/3)];
+            TerrainTravel pTravel = Builder.terrainComponents[Location2D.Get(location.X / 3, location.Y / 3)];
             if (UI.Options.ShowOverlandEncounters && pTravel != null)
             {
                 Debug.Entry(4, $"Setting up OverLandEncounters option...", Indent: 1, Toggle: getDoDebug());
@@ -200,8 +200,8 @@ namespace XRL.World.WorldBuilders
             Debug.Entry(4, $"{nameof(wrassleID)}.{nameof(wrassleID.ID)}", $"{wrassleID.GetID(Silent: true)}", Indent: 1, Toggle: getDoDebug());
 
             wrasslerColor = wrassleID?.SecondaryColor;
-            wrassleRingColor = wrasslerColor 
-                ?? UniqueGiant.GetStringProperty("WrassleColor", null) 
+            wrassleRingColor = wrasslerColor
+                ?? UniqueGiant.GetStringProperty("WrassleColor", null)
                 ?? UD_QWE.WrassleRingColors.GetRandomElement();
             Debug.Entry(4, $"{nameof(wrassleRingColor)} is {wrassleRingColor}", Indent: 1, Toggle: getDoDebug());
 
@@ -289,7 +289,7 @@ namespace XRL.World.WorldBuilders
                         Debug.Entry(4, $"Attempting to sync WrassleIDs...", Indent: 3, Toggle: getDoDebug());
                         if (UD_QWE.TrySyncWrassleID(UniqueGiant, rope))
                         {
-                            Debug.CheckYeh(4, $"Wrassle ID's synched", $"{UniqueGiant.WrassleIDString()}", 
+                            Debug.CheckYeh(4, $"Wrassle ID's synched", $"{UniqueGiant.WrassleIDString()}",
                                 Indent: 3, Toggle: getDoDebug());
                             // wrassleGear.SetDetailColor(Force: true); // Might not need this now.
                         }
@@ -302,7 +302,7 @@ namespace XRL.World.WorldBuilders
                     else
                     {
                         Debug.CheckNah(4, $"{nameof(rope)} lacks {nameof(WrassleGear)}", Indent: 3, Toggle: getDoDebug());
-                        Debug.Entry(4, $"Setting color to preselected {wrassleRingColor.Quote()} via {nameof(Render)}...", 
+                        Debug.Entry(4, $"Setting color to preselected {wrassleRingColor.Quote()} via {nameof(Render)}...",
                             Indent: 3, Toggle: getDoDebug());
 
                         rope.Render.DetailColor = wrassleRingColor;
@@ -335,7 +335,7 @@ namespace XRL.World.WorldBuilders
                         Debug.Entry(4, $"Attempting to sync WrassleIDs...", Indent: 3, Toggle: getDoDebug());
                         if (UD_QWE.TrySyncWrassleID(UniqueGiant, chair))
                         {
-                            Debug.CheckYeh(4, $"Wrassle ID's synched", $"{UniqueGiant.WrassleIDString()}", 
+                            Debug.CheckYeh(4, $"Wrassle ID's synched", $"{UniqueGiant.WrassleIDString()}",
                                 Indent: 3, Toggle: getDoDebug());
                         }
                         else
@@ -363,14 +363,14 @@ namespace XRL.World.WorldBuilders
         public static GameObject GetAGiant(bool Unique = false)
         {
             GameObject creature;
-            GameObjectBlueprint creatureBlueprint = Unique 
+            GameObjectBlueprint creatureBlueprint = Unique
                 ? GetAUniqueGiantHeroBlueprintModel()
                 : GetAGiantHeroBlueprintModel()
                 ;
 
-            void ApplyBuilder(GameObject Creature) 
+            void ApplyBuilder(GameObject Creature)
             {
-                UD_QWE.WrassleGiantHeroBuilder.Apply(Creature, Context: Unique ? "Unique" : "Hero"); 
+                UD_QWE.WrassleGiantHeroBuilder.Apply(Creature, Context: Unique ? "Unique" : "Hero");
             }
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,
@@ -397,7 +397,7 @@ namespace XRL.World.WorldBuilders
             SetGiantVillagerStews(Resident);
             Gigantifier.Apply(Resident, "GiantVillageResident");
         }
-        public static bool TryGenerateGiantVillagers(int ApproxZoneTier, string HeroDetailColor, out GameObject TinkerGiant, out  GameObject ApothecaryGiant, out GameObject DromadGiant, out GameObject GutsmongerGiant, out GameObject PetGiant, out List<GameObject> Residents)
+        public static bool TryGenerateGiantVillagers(int ApproxZoneTier, string HeroDetailColor, out GameObject TinkerGiant, out GameObject ApothecaryGiant, out GameObject DromadGiant, out GameObject GutsmongerGiant, out GameObject PetGiant, out List<GameObject> Residents)
         {
             string tinkerBlueprint = $"HumanTinker{ApproxZoneTier}";
             string apothecaryBlueprint = $"HumanApothecary{ApproxZoneTier}";
@@ -620,10 +620,10 @@ namespace XRL.World.WorldBuilders
                 {
                     baseVillagerBlueprintName = "HumanTinker";
                     ConversationsAPI.addSimpleConversationToObject(
-                        Object: Villager, 
+                        Object: Villager,
                         Text: "Need a gadget repaired or identified, =player.formalAddressTerm=? " +
-                        "Or if you're a tinker =player.reflexive=, perhaps you'd like to peruse my schematics?", 
-                        Goodbye: "Live and drink, tinker.", 
+                        "Or if you're a tinker =player.reflexive=, perhaps you'd like to peruse my schematics?",
+                        Goodbye: "Live and drink, tinker.",
                         ClearLost: true);
                 }
             }
@@ -632,15 +632,15 @@ namespace XRL.World.WorldBuilders
                 baseVillagerBlueprintName = "HumanApothecary";
                 conversationScriptID = "herbalist";
                 ConversationsAPI.addSimpleConversationToObject(
-                    Object: Villager, 
+                    Object: Villager,
                     Text: "I've the cure for what ails you.~You don't look so good. You need more yuckwheat and honey in your diet.~" +
                     "Cook your meals with yuckwheat if you feel sick. Catch a disease early enough and you can kill it.~" +
                     "\"Ease the pain, addle the brain.\" Be careful when you chew witchwood bark.~" +
                     "In the market for a tonic, =player.formalAddressTerm=? Spend water now or blood later, your choice.~" +
                     "Prickly-boons and yuckwheat for trade.~" +
                     "If you came for the humble pie, you had best not have led any mind-hunters here.~" +
-                    "Have you got enough tonics?", 
-                    Goodbye: "Live and drink.", 
+                    "Have you got enough tonics?",
+                    Goodbye: "Live and drink.",
                     ClearLost: true);
             }
 
@@ -670,7 +670,7 @@ namespace XRL.World.WorldBuilders
 
                     Villager.GetStat("Intelligence").BaseValue = Math.Max(baseMerchantBlueprint.Stats["Intelligence"].BaseValue, 16);
                 }
-                if(isApothecary)
+                if (isApothecary)
                 {
                     Villager.SetStringProperty("Role", "Skirmisher");
                     Villager.GetStat("Intelligence").BaseValue = Math.Max(baseMerchantBlueprint.Stats["Intelligence"].BaseValue, 15);
@@ -806,8 +806,8 @@ namespace XRL.World.WorldBuilders
                 Villager.RequirePart<Interesting>().Key = "VillagePet";
 
                 ConversationsAPI.addSimpleConversationToObject(
-                    Object: Villager, 
-                    Text: Villager.GetTag("SimpleConversation", "*does not react*"), 
+                    Object: Villager,
+                    Text: Villager.GetTag("SimpleConversation", "*does not react*"),
                     Goodbye: "Live and drink.");
             }
             if (isResident)
@@ -971,7 +971,7 @@ namespace XRL.World.WorldBuilders
             foreach (GameObject Object in Z.GetObjectsWithPart(typeof(GigantismPlus).Name))
             {
                 if (Object.IsPlayer()) continue;
-                Object.Die(null ,null, "insufficient stew", "insufficient stew", true, DeathVerb: "hanker");
+                Object.Die(null, null, "insufficient stew", "insufficient stew", true, DeathVerb: "hanker");
             }
         }
     } //!-- public class SecretGiantWhoCooksBuilderExtension : IJoppaWorldBuilderExtension

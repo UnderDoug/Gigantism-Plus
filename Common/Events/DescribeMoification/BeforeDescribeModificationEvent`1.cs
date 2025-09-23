@@ -13,7 +13,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [GameEvent(Cascade = CASCADE_ALL, Cache = Cache.Pool)]
-    public class BeforeDescribeModificationEvent<T> : IDescribeModificationEvent<BeforeDescribeModificationEvent<T>, T> 
+    public class BeforeDescribeModificationEvent<T> : IDescribeModificationEvent<BeforeDescribeModificationEvent<T>, T>
         where T : IModification
     {
         private static bool doDebug => getClassDoDebug(nameof(BeforeDescribeModificationEvent<T>));
@@ -36,7 +36,7 @@ namespace HNPS_GigantismPlus
             string Context = null)
         {
             BeforeDescribeModificationEvent<T> E = FromPool();
-            if (E !=null)
+            if (E != null)
             {
                 E.Object = Object;
                 E.Adjective = Adjective;
@@ -57,10 +57,10 @@ namespace HNPS_GigantismPlus
         {
             return FromPool(
                 Object: Object,
-                Adjective: Adjective, 
-                ObjectNoun: ObjectNoun, 
-                WeaponDescriptions: WeaponDescriptions, 
-                GeneralDescriptions: GeneralDescriptions, 
+                Adjective: Adjective,
+                ObjectNoun: ObjectNoun,
+                WeaponDescriptions: WeaponDescriptions,
+                GeneralDescriptions: GeneralDescriptions,
                 Context: Context
                 )?.Send();
         }
@@ -73,7 +73,7 @@ namespace HNPS_GigantismPlus
         {
             return E as BeforeDescribeModificationEvent<T>;
         }
-        
+
         public static implicit operator BeforeDescribeModificationEvent<T>(DescribeModificationEvent<T> E)
         {
             return E as BeforeDescribeModificationEvent<T>;

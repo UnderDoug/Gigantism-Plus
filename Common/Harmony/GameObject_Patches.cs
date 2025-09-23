@@ -37,7 +37,7 @@ namespace HNPS_GigantismPlus.Harmony
                 }
             }
 
-            if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry 
+            if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry
                 && __instance.HasPart(gigantismEntry.Class))
             {
                 __result = true;
@@ -111,7 +111,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPatch(
-            declaringType: typeof(GameObject), 
+            declaringType: typeof(GameObject),
             methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness),
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
@@ -123,16 +123,16 @@ namespace HNPS_GigantismPlus.Harmony
             {
                 int indent = Debug.LastIndent;
                 GameObject physicsEquipped = @this?.Physics?.Equipped;
-                Debug.Entry(4, 
+                Debug.Entry(4,
                     $"# {nameof(GameObject)}."
                     + $"{nameof(GameObject.CheckDefaultBehaviorGiganticness)}("
                     + $"{nameof(@this)}: {@this?.DebugName ?? NULL}, "
                     + $"{nameof(Equipper)}: {Equipper?.DebugName ?? NULL}, "
-                    + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})", 
+                    + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})",
                     Indent: indent, Toggle: doDebug);
 
                 bool didTheThing = false;
-                if (false && Equipper != null && Equipper.TryGetPart(out NaturalEquipmentManager naturalEquipmentManager) 
+                if (false && Equipper != null && Equipper.TryGetPart(out NaturalEquipmentManager naturalEquipmentManager)
                     && @this != null && @this.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator))
                 {
                     // didTheThing = naturalEquipmentManager.AddOperator(naturalEquipmentOperator);
@@ -142,8 +142,8 @@ namespace HNPS_GigantismPlus.Harmony
                     // this used to be an extremely important line of code that guarantees that default equipment is considered equipped.
                     // removing it completely breaks the NaturalEquipmentOperator.
                     physicsEquipped = @this.Physics.Equipped = Equipper;
-                    Debug.Entry(4, 
-                        $"{@this?.DebugName ?? NULL} is equipped by {@this?.Physics?.Equipped?.DebugName ?? NULL}", 
+                    Debug.Entry(4,
+                        $"{@this?.DebugName ?? NULL} is equipped by {@this?.Physics?.Equipped?.DebugName ?? NULL}",
                         Indent: indent + 1, Toggle: doDebug);
                 }
                 Debug.Entry(4,
@@ -159,7 +159,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPatch(
-            declaringType: typeof(GameObject), 
+            declaringType: typeof(GameObject),
             methodName: nameof(GameObject.FinalizeCopy),
             argumentTypes: new Type[] { typeof(GameObject), typeof(bool), typeof(bool), typeof(Func<GameObject, GameObject>) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
@@ -173,9 +173,9 @@ namespace HNPS_GigantismPlus.Harmony
             }
 
             Debug.Divider(4, HONLY, Count: 40, Indent: 0, Toggle: doDebug);
-            Debug.Entry(4, 
-                $"# {nameof(GameObject_Patches)}." + 
-                $"{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}(GameObject __instance: {Object.DebugName})", 
+            Debug.Entry(4,
+                $"# {nameof(GameObject_Patches)}." +
+                $"{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}(GameObject __instance: {Object.DebugName})",
                 Indent: 0, Toggle: doDebug);
 
             Debug.Entry(4, $"> foreach (BodyPart part in Object.Actor.LoopParts())", Indent: 1, Toggle: doDebug);
@@ -207,7 +207,7 @@ namespace HNPS_GigantismPlus.Harmony
                             Debug.CheckYeh(4, $"{nameof(EffectAppliedEvent)}", "Sent", Indent: 4, Toggle: doDebug);
                             continue;
                         }
-                        
+
                     }
                     else
                     {
@@ -255,10 +255,10 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, $"Updating Body Parts: Object.Body.UpdateBodyParts()", Indent: 1, Toggle: doDebug);
             Object.Body.UpdateBodyParts();
 
-            Debug.Entry(4, 
-                $"x {nameof(GameObject_Patches)}." 
-                + $"{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}" 
-                + $"(GameObject __instance: {Object.DebugName}) #//", 
+            Debug.Entry(4,
+                $"x {nameof(GameObject_Patches)}."
+                + $"{nameof(FinalizeCopy_ReequipImprovedMutationMod_Postfix)}"
+                + $"(GameObject __instance: {Object.DebugName}) #//",
                 Indent: 0, Toggle: doDebug);
 
             Debug.Divider(4, HONLY, Count: 40, Indent: 0, Toggle: doDebug);

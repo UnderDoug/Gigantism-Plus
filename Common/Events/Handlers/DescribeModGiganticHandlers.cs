@@ -14,7 +14,7 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace HNPS_GigantismPlus
 {
-    public class BeforeDescribeModGiganticHandler 
+    public class BeforeDescribeModGiganticHandler
         : IEventHandler
         , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
 
@@ -77,7 +77,7 @@ namespace HNPS_GigantismPlus
       //        : IEventHandler
       //        , IModEventHandler<BeforeDescribeModificationEvent>
 
-    public class DescribeModGiganticHandler 
+    public class DescribeModGiganticHandler
         : IEventHandler
         , IModEventHandler<DescribeModificationEvent<ModGigantic>>
     {
@@ -188,7 +188,7 @@ namespace HNPS_GigantismPlus
             MeleeWeapon meleeWeapon = Object.GetPart<MeleeWeapon>();
             bool isDefaultBehavior = Object.EquipAsDefaultBehavior();
             bool isDefaultBehaviorOrFloating = isDefaultBehavior || Object.IsEntirelyFloating();
-            if (meleeWeapon != null 
+            if (meleeWeapon != null
                 && Object.HasTagOrProperty("ShowMeleeWeaponStats")
                 && !Object.InheritsFrom("Tonic"))
             {
@@ -202,12 +202,12 @@ namespace HNPS_GigantismPlus
                     E.AddPrimaryElement(priority++, "cleave", "for -3 AV");
                 }
             }
-            else 
+            else
             if (Object.HasPart<MissileWeapon>())
             {
                 E.AddPrimaryElement(priority++, "have", "+3 damage");
             }
-            else 
+            else
             if (Object.HasPart<ThrownWeapon>())
             {
                 if (!Object.HasPartDescendedFrom<IGrenade>())
@@ -409,7 +409,7 @@ namespace HNPS_GigantismPlus
         }
         public static void DescribeModGigantic(DescribeModificationEvent<ModGigantic> E)
         {
-            
+
         }
 
     } //!-- public class DescribeModGiganticHandler

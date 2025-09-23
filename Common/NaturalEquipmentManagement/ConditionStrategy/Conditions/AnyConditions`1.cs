@@ -55,13 +55,13 @@ namespace HNPS_GigantismPlus
                 {
                     if (result)
                     {
-                        Debug.CheckYeh(4, $"{nameof(AnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}", 
+                        Debug.CheckYeh(4, $"{nameof(AnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}",
                             Indent: indent + 1, Toggle: doDebug);
                         Debug.LastIndent = indent;
                         return true;
                     }
                 }
-                Debug.CheckNah(4, $"{nameof(AnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}", 
+                Debug.CheckNah(4, $"{nameof(AnyConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}",
                     Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return false;
@@ -85,13 +85,13 @@ namespace HNPS_GigantismPlus
                 {
                     if (result)
                     {
-                        Debug.CheckNah(4, $"{nameof(AnyConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {false}", 
+                        Debug.CheckNah(4, $"{nameof(AnyConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {false}",
                             Indent: indent + 1, Toggle: doDebug);
                         Debug.LastIndent = indent;
                         return false;
                     }
                 }
-                Debug.CheckYeh(4, $"{nameof(AnyConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {true}", 
+                Debug.CheckYeh(4, $"{nameof(AnyConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {true}",
                     Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return true;

@@ -64,12 +64,12 @@ namespace XRL.World.Parts
 
         public override bool HandleEvent(BeforeApplyAdjustmentEvent E)
         {
-            if (E.Adjustment.Source == typeof(ModClosedGiganticNaturalWeapon) 
-                && E.Adjustment.GetType() == typeof(ChangeTile) 
+            if (E.Adjustment.Source == typeof(ModClosedGiganticNaturalWeapon)
+                && E.Adjustment.GetType() == typeof(ChangeTile)
                 && E.Subject is GameObject equipment)
             {
                 int indent = Debug.LastIndent;
-                Debug.Entry(4, 
+                Debug.Entry(4,
                     $"{nameof(ModAugmentedNaturalWeapon)}: " +
                     $"Replaced {nameof(ModClosedGiganticNaturalWeapon)} {nameof(ChangeTile)} {nameof(E.Adjustment)}",
                     Indent: indent + 1, Toggle: doDebug);
@@ -78,7 +78,7 @@ namespace XRL.World.Parts
                 {
                     if (adjustment.GetType() == typeof(ChangeTile) && adjustment.Check(equipment))
                     {
-                        Debug.Entry(4, "Appropriate Adjustment found, code execution skipped...", Indent:  indent + 2, Toggle: doDebug);
+                        Debug.Entry(4, "Appropriate Adjustment found, code execution skipped...", Indent: indent + 2, Toggle: doDebug);
                         // E.Adjustment.Value = adjustment.Value;
                         break;
                     }
@@ -87,5 +87,5 @@ namespace XRL.World.Parts
             }
             return base.HandleEvent(E);
         }
-    } 
+    }
 }

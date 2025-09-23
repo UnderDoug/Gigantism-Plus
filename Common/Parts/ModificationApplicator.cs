@@ -25,21 +25,21 @@ namespace XRL.World.Parts
         public ModificationApplicator()
         {
             Mod = "";
-                // ModLacquered
-            
+            // ModLacquered
+
             IsConsumed = true;
-            
+
             ConsumedVerb = "get";
-                // get
-            
+            // get
+
             ConsumedMessage = "used up entriely.";
-                // (gets) used up entriely.
-            
+            // (gets) used up entriely.
+
             NoItemsMessage = "You have no items that this can be used on.";
-                // You have no items that can be lacquered.
-            
+            // You have no items that can be lacquered.
+
             Become = "";
-                // (Becomes) covered in a rust-proof lacquer.
+            // (Becomes) covered in a rust-proof lacquer.
         }
 
         private bool isCompletelyConfigured

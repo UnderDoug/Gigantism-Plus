@@ -572,21 +572,21 @@ namespace XRL.World.Parts
                         BodyPart equipmentLimb = naturalEquipmentOperator.ParentLimb;
 
                         if (BeforeManageDefaultNaturalEquipmentEvent.CheckFor(
-                            Equipment: naturalEquipment, 
-                            Creature: ParentObject, 
-                            BodyPart: equipmentLimb, 
+                            Equipment: naturalEquipment,
+                            Creature: ParentObject,
+                            BodyPart: equipmentLimb,
                             Operator: naturalEquipmentOperator))
                         {
                             ManageDefaultNaturalEquipmentEvent.Send(
-                                Equipment: naturalEquipment, 
-                                Creature: ParentObject, 
-                                BodyPart: equipmentLimb, 
+                                Equipment: naturalEquipment,
+                                Creature: ParentObject,
+                                BodyPart: equipmentLimb,
                                 Operator: naturalEquipmentOperator).Reset();
 
                             AfterManageDefaultNaturalEquipmentEvent.Send(
-                                Equipment: naturalEquipment, 
-                                Creature: ParentObject, 
-                                BodyPart: equipmentLimb, 
+                                Equipment: naturalEquipment,
+                                Creature: ParentObject,
+                                BodyPart: equipmentLimb,
                                 Operator: naturalEquipmentOperator).Reset();
                         }
                     }
@@ -598,7 +598,7 @@ namespace XRL.World.Parts
                     {
                         string bodyPartType = naturalEquipment.GetPart<MeleeWeapon>()?.Slot ?? naturalEquipment.GetPart<Armor>()?.WornOn;
                         // E.Creature.EquipObject(naturalEquipment, E.Creature.GetFirstBodyPart(BP => BP.Type == bodyPartType && BP.DefaultBehavior == null), true, 0)
-                        
+
                         if (!E.Creature.AutoEquip(naturalEquipment, Silent: true)
                             && GameObject.Validate(naturalEquipment))
                         {

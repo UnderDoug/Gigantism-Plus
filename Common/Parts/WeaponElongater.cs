@@ -49,7 +49,7 @@ namespace XRL.World.Parts
             }
             else
             {
-                MetricsManager.LogModWarning(ThisMod, 
+                MetricsManager.LogModWarning(ThisMod,
                     $"{nameof(WeaponElongator)}.{nameof(ApplyElongatedBonusCap)}, " +
                     $"{nameof(ElongatedPaws)} or its {nameof(NaturalEquipmentMod)} was null, no adjustments possible");
             }
@@ -147,7 +147,7 @@ namespace XRL.World.Parts
         }
         public override bool HandleEvent(UnequippedEvent E)
         {
-            
+
             if (E.Item is GameObject item && item == ParentObject && Wielder != null && ElongatedPaws != null)
             {
                 UnapplyElongatedBonusCap(MeleeWeapon);

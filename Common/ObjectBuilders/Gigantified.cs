@@ -44,11 +44,11 @@ namespace XRL.World.ObjectBuilders
 
         public string NamePrefix;
 
-        public Gigantified() 
-        { 
+        public Gigantified()
+        {
             Initialize();
         }
-        public Gigantified(string NamePrefix) 
+        public Gigantified(string NamePrefix)
         {
             Initialize();
             this.NamePrefix = NamePrefix;
@@ -156,7 +156,7 @@ namespace XRL.World.ObjectBuilders
                 Creature.SetStringProperty(GNT_START_STEWS_PROPLABEL, $"{generatesWithStews}+{startingStews}");
                 Debug.LoopItem(4, nameof(startingStews), $"{startingStews}", Indent: indent + 2, Toggle: getDoDebug());
                 Debug.LoopItem(4, nameof(generatesWithStews), $"{generatesWithStews}", Indent: indent + 2, Toggle: getDoDebug());
-                Debug.LoopItem(4, nameof(GNT_START_STEWS_PROPLABEL), Creature.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, ""), 
+                Debug.LoopItem(4, nameof(GNT_START_STEWS_PROPLABEL), Creature.GetPropertyOrTag(GNT_START_STEWS_PROPLABEL, ""),
                     Indent: indent + 2, Toggle: getDoDebug());
 
                 if (!Creature.TryGetPart(out StewBelly stewBelly))
@@ -179,7 +179,7 @@ namespace XRL.World.ObjectBuilders
 
                 success = mutations.HasMutation(gigantismPlus.GetMutationClass());
             }
-            
+
             Debug.Entry(4,
                 $"x {nameof(GigantifyMutant)}"
                 + $"(Creature: {Creature?.DebugName ?? NULL},"
@@ -400,7 +400,7 @@ namespace XRL.World.ObjectBuilders
                     Debug.Warn(4,
                         nameof(Gigantified),
                         nameof(GigantifyTrueKin),
-                        $"{nameof(exoframeObject)} is null or lacks {nameof(CyberneticsGiganticExoframe)} part", 
+                        $"{nameof(exoframeObject)} is null or lacks {nameof(CyberneticsGiganticExoframe)} part",
                         Indent: indent + 1);
                 }
             }
@@ -411,7 +411,7 @@ namespace XRL.World.ObjectBuilders
                     Debug.Warn(4,
                         nameof(Gigantified),
                         nameof(GigantifyTrueKin),
-                        $"{nameof(Creature)} is null", Indent: 
+                        $"{nameof(Creature)} is null", Indent:
                         indent + 1);
                 }
                 if (Creature != null && !Creature.IsCreature)
@@ -419,7 +419,7 @@ namespace XRL.World.ObjectBuilders
                     Debug.Warn(4,
                         nameof(Gigantified),
                         nameof(GigantifyTrueKin),
-                        $"{nameof(Creature)} is not a Creature", 
+                        $"{nameof(Creature)} is not a Creature",
                         Indent: indent + 1);
                 }
             }
@@ -438,8 +438,8 @@ namespace XRL.World.ObjectBuilders
 
         public static bool Gigantify(GameObject Creature, int Level = 1, int Stews = 0, int Tier = 1, string NamePrefix = "", string Context = "", bool AsThoughMutant = false)
         {
-            Debug.Header(4, 
-                $"{nameof(Gigantified)}", 
+            Debug.Header(4,
+                $"{nameof(Gigantified)}",
                 $"{nameof(Gigantify)}(" +
                 $"{nameof(Creature)}: {Creature?.DebugName ?? NULL}, " +
                 $"{nameof(Level)}: {Level}, " +
@@ -448,10 +448,10 @@ namespace XRL.World.ObjectBuilders
                 $"{nameof(Context)}: {Context?.Quote() ?? NULL})",
                 Toggle: doDebug);
 
-            bool gigantified = 
+            bool gigantified =
                 GigantifyMutant(Creature, Level, Stews, NamePrefix, Context, AsThoughMutant)
              || GigantifyTrueKin(Creature, Tier, NamePrefix, Context);
-            
+
             Debug.Footer(4,
                 $"{nameof(Gigantified)}",
                 $"{nameof(Gigantify)}(" +

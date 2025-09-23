@@ -83,8 +83,8 @@ namespace HNPS_GigantismPlus
                 return true;
 
             // Check for Nephal claws (Agolgot parts that don't use the manager)
-            if (!Creature.InheritsFrom("BaseNephal") 
-             && !BodyPart.DefaultBehaviorBlueprint.IsNullOrEmpty() 
+            if (!Creature.InheritsFrom("BaseNephal")
+             && !BodyPart.DefaultBehaviorBlueprint.IsNullOrEmpty()
              && BodyPart.DefaultBehaviorBlueprint.StartsWith("Nephal_Claw"))
                 return true;
 
@@ -131,7 +131,7 @@ namespace HNPS_GigantismPlus
                 return new(type, DieRoll.Left.AdjustDieCount(Amount), DieRoll.Right);
             }
         } //!-- public static DieRoll AdjustDieCount(this DieRoll DieRoll, int Amount)
-       
+
         public static string AdjustDieCount(this string DieRoll, int Amount)
         {
             DieRoll dieRoll = new(DieRoll);
@@ -173,7 +173,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(GetPrioritisedAppliedNaturalEquipmentMods));
-            
+
             Debug.Entry(4,
                 $"* {nameof(GetPrioritisedAppliedNaturalEquipmentMods)}"
                 + $"(ForDescriptions: {ForDescriptions})",
@@ -207,7 +207,7 @@ namespace HNPS_GigantismPlus
             return naturalEquipmentMods;
         }
 
-        public static string BonusOrPenalty(this int Int) 
+        public static string BonusOrPenalty(this int Int)
         {
             return Int >= 0 ? "bonus" : "penalty";
         }
@@ -441,7 +441,7 @@ namespace HNPS_GigantismPlus
         {
             InventoryGigantifier.GigantifyInventory(Creature, Option, GrenadeOption, Wish, Force, Context);
         }
-        
+
         public static void SetSwingSound(this GameObject Object, string Path)
         {
             if (Path != null && Path != "")
@@ -471,15 +471,15 @@ namespace HNPS_GigantismPlus
                 {
                     continue;
                 }
-                
-                if (bodyPart.Equipped is GameObject equippedObject 
+
+                if (bodyPart.Equipped is GameObject equippedObject
                     && !equippedObjectsList.Contains(equippedObject))
                 {
                     equippedObjectsList.Add(equippedObject);
                     int slotsUsed = Body.GetPartCountEquippedOn(equippedObject);
                     int slotsRequired = equippedObject.GetSlotsRequiredFor(Actor, bodyPart.Type);
-                    if (slotsUsed != slotsRequired 
-                        && bodyPart.TryUnequip(Silent: true, SemiForced: true) 
+                    if (slotsUsed != slotsRequired
+                        && bodyPart.TryUnequip(Silent: true, SemiForced: true)
                         && slotsUsed > slotsRequired)
                     {
                         equippedObject.SplitFromStack();
@@ -515,7 +515,7 @@ namespace HNPS_GigantismPlus
 
         public static IPart ConvertToPart(this string Part)
         {
-            GamePartBlueprint gamePartBlueprint = new (Part);
+            GamePartBlueprint gamePartBlueprint = new(Part);
             return gamePartBlueprint.Reflector?.GetInstance() ?? (Activator.CreateInstance(gamePartBlueprint.T) as IPart);
         }
 
@@ -544,8 +544,8 @@ namespace HNPS_GigantismPlus
             return ModPart;
         }
 
-        public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName) 
-            where T 
+        public static ModNaturalEquipment<T> ConvertToNaturalWeaponModification<T>(this string ModPartName)
+            where T
             : IPart
             , IModEventHandler<ManageDefaultNaturalEquipmentEvent>
             , IManagedDefaultNaturalEquipment<T>
@@ -555,8 +555,8 @@ namespace HNPS_GigantismPlus
             return (ModNaturalEquipment<T>)ModPart;
         }
 
-        public static T GetManagedNaturalEquipmentCompatiblePart<T>(this GameObject Object) 
-            where T 
+        public static T GetManagedNaturalEquipmentCompatiblePart<T>(this GameObject Object)
+            where T
             : IPart
             , IManagedDefaultNaturalEquipment<T>
             , new()
@@ -573,7 +573,7 @@ namespace HNPS_GigantismPlus
             return null;
         }
 
-        public static bool ApplyNaturalEquipmentModification(this GameObject obj, ModNaturalEquipmentBase ModPart, GameObject Actor) 
+        public static bool ApplyNaturalEquipmentModification(this GameObject obj, ModNaturalEquipmentBase ModPart, GameObject Actor)
         {
             return obj.ApplyModification(ModPart, Actor: Actor);
         }
@@ -721,7 +721,7 @@ namespace HNPS_GigantismPlus
             if (!Object.Understood())
                 return "artifact";
 
-            if (Object.InheritsFrom("FoldingChair") 
+            if (Object.InheritsFrom("FoldingChair")
                 && Object.HasPart<ModGigantic>())
                 return "folding chair";
 
@@ -781,8 +781,8 @@ namespace HNPS_GigantismPlus
 
             if (Object.TryGetPart(out MissileWeapon missileWeapon))
             {
-                if (missileWeapon.Skill.Contains("Shotgun") 
-                    || Object.InheritsFrom("BaseShotgun") 
+                if (missileWeapon.Skill.Contains("Shotgun")
+                    || Object.InheritsFrom("BaseShotgun")
                     || (Object.TryGetPart(out MagazineAmmoLoader loader) && loader.AmmoPart.Is("AmmoShotgunShell")))
                     return "shotgun";
 
@@ -895,7 +895,8 @@ namespace HNPS_GigantismPlus
                             }
                         default:
                             return "armor";
-                    };
+                    }
+                    ;
                 }
                 switch (armor.WornOn)
                 {
@@ -1045,25 +1046,25 @@ namespace HNPS_GigantismPlus
         public static bool IsImprovised(this MeleeWeapon MeleeWeapon)
         {
             bool isImprovisedButGigantic = MeleeWeapon.ParentObject.HasPart<ModGigantic>()
-             && MeleeWeapon.MaxStrengthBonus == 0 
-             && MeleeWeapon.PenBonus == 0 
-             && MeleeWeapon.HitBonus == 0 
-             && (MeleeWeapon.BaseDamage.Is("1d2") || MeleeWeapon.BaseDamage.Is("1d2+3")) 
-             && MeleeWeapon.Ego == 0 
-             && MeleeWeapon.Skill.Is("Cudgel") 
-             && MeleeWeapon.Stat.Is("Strength") 
-             && MeleeWeapon.Slot.Is("Hand") 
+             && MeleeWeapon.MaxStrengthBonus == 0
+             && MeleeWeapon.PenBonus == 0
+             && MeleeWeapon.HitBonus == 0
+             && (MeleeWeapon.BaseDamage.Is("1d2") || MeleeWeapon.BaseDamage.Is("1d2+3"))
+             && MeleeWeapon.Ego == 0
+             && MeleeWeapon.Skill.Is("Cudgel")
+             && MeleeWeapon.Stat.Is("Strength")
+             && MeleeWeapon.Slot.Is("Hand")
              && MeleeWeapon.Attributes.IsNullOrEmpty();
 
-            bool hasImprovisedProp = 
-                MeleeWeapon.ParentObject.HasTagOrStringProperty("IsImprovisedMelee") 
+            bool hasImprovisedProp =
+                MeleeWeapon.ParentObject.HasTagOrStringProperty("IsImprovisedMelee")
              && !MeleeWeapon.ParentObject.GetStringProperty("IsImprovisedMelee").Is("false");
 
             MeleeWeapon @default = new();
 
-            return MeleeWeapon.SameAs(@default) 
-                || MeleeWeapon.IsImprovisedWeapon() 
-                || isImprovisedButGigantic 
+            return MeleeWeapon.SameAs(@default)
+                || MeleeWeapon.IsImprovisedWeapon()
+                || isImprovisedButGigantic
                 || MeleeWeapon.ParentObject.GetIntProperty("IsImprovisedMelee") > 0
                 || hasImprovisedProp;
         }
@@ -1521,9 +1522,9 @@ namespace HNPS_GigantismPlus
 
         public static bool TagIsIncludedOrNotExcluded(this GameObjectBlueprint Blueprint, string TagName, Dictionary<string, bool> IncludeExclude)
         {
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* ({Blueprint.Name})."
-                + $"{nameof(TagIsIncludedOrNotExcluded)}" 
+                + $"{nameof(TagIsIncludedOrNotExcluded)}"
                 + $"(string TagName: {TagName}, Dictionary<string, bool> IncludeExclude)",
                 Indent: 0, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
 
@@ -1540,13 +1541,13 @@ namespace HNPS_GigantismPlus
                 {
                     if (entryInclude) includeTags.Add(entryValue);
                     else excludeTags.Add(entryValue);
-                    Debug.LoopItem(4, $"{(entryInclude ? "include" : "exclude")}: {entryValue}", 
+                    Debug.LoopItem(4, $"{(entryInclude ? "include" : "exclude")}: {entryValue}",
                         Indent: 2, Good: entryInclude, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                 }
 
                 bool noBlueprintTagValue = !Blueprint.TryGetTag(TagName, out string blueprintTagValue);
                 bool noBlueprintPart = true;
-                foreach ((string part,_) in Blueprint.Parts)
+                foreach ((string part, _) in Blueprint.Parts)
                 {
                     if (includeTags.Contains(part.ToLower()))
                     {
@@ -1557,14 +1558,14 @@ namespace HNPS_GigantismPlus
                 bool noBlueprintTagOrPart = noBlueprintTagValue && noBlueprintPart;
                 if (!includeTags.IsNullOrEmpty() && noBlueprintTagOrPart)
                 {
-                    Debug.CheckNah(4, $"includeTags not empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part", 
+                    Debug.CheckNah(4, $"includeTags not empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part",
                         Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
-                    return false; 
+                    return false;
                 }
                 else if (noBlueprintTagOrPart)
                 {
-                    Debug.CheckYeh(4, 
-                        $"includeTags is empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part, " + 
+                    Debug.CheckYeh(4,
+                        $"includeTags is empty and {Blueprint.Name} doesn't have \"{TagName}\" tag or equivalent Part, " +
                         $"exclusions are irrelevant",
                         Indent: 1, Toggle: getDoDebug(nameof(TagIsIncludedOrNotExcluded)));
                     return true;
@@ -1695,7 +1696,7 @@ namespace HNPS_GigantismPlus
             return @object is string @string && !@string.IsNullOrEmpty() ? Utils.Quote($"{@string}") : Utils.Quote(NULL);
         }
 
-        public static Dictionary<string,List<Cell>> GetHutRegion(this Zone Z, Rect2D R, bool Round = false)
+        public static Dictionary<string, List<Cell>> GetHutRegion(this Zone Z, Rect2D R, bool Round = false)
         {
             string Inner = $"{nameof(Inner)}";
             string Outer = $"{nameof(Outer)}";
@@ -1792,8 +1793,8 @@ namespace HNPS_GigantismPlus
                 if (doorSide != null)
                 {
                     Cell newDoor = Region[doorSide].GetRandomElement();
-                    
-                    Dictionary<string,List<Cell>> Edges = new()
+
+                    Dictionary<string, List<Cell>> Edges = new()
                     {
                         { NorthEdge, Region[NorthEdge] },
                         { SouthEdge, Region[SouthEdge] },
@@ -1837,12 +1838,12 @@ namespace HNPS_GigantismPlus
             return cellsList;
         }
 
-        public static Point2D PullInsideFromEdges(this Cell Cell, Dictionary<string,List<Cell>> Edges, string DoorSide = "")
+        public static Point2D PullInsideFromEdges(this Cell Cell, Dictionary<string, List<Cell>> Edges, string DoorSide = "")
         {
             Debug.Entry(4,
                 $"@ {typeof(Extensions).Name}."
                 + $"{nameof(PullInsideFromEdges)}"
-                + $"(Cell: {Cell}, List<Cell> Edge, " 
+                + $"(Cell: {Cell}, List<Cell> Edge, "
                 + $"string DoorSide: {(DoorSide.IsNullOrEmpty() ? $"".Quote() : DoorSide.Quote())})",
                 Indent: 0, Toggle: getDoDebug(nameof(PullInsideFromEdges)));
 
@@ -1892,13 +1893,13 @@ namespace HNPS_GigantismPlus
                 }
                 Debug.Entry(4, $"Xs: {XsString}", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                 Debug.Entry(4, $"Ys: {YsString}", Indent: 2, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
-                if (Xs.Count > 1 &&  Ys.Count > 1)
+                if (Xs.Count > 1 && Ys.Count > 1)
                 {
-                    Debug.Entry(2, 
-                        $"WARN [GigantismPlus]: " + 
-                        $"{typeof(Extensions).Name}." + 
-                        $"{nameof(PullInsideFromEdge)}() " + 
-                        $"List<Cell> Edge must be a straight line.", 
+                    Debug.Entry(2,
+                        $"WARN [GigantismPlus]: " +
+                        $"{typeof(Extensions).Name}." +
+                        $"{nameof(PullInsideFromEdge)}() " +
+                        $"List<Cell> Edge must be a straight line.",
                         Indent: 0, Toggle: getDoDebug(nameof(PullInsideFromEdge)));
                     return output;
                 }
@@ -1908,7 +1909,7 @@ namespace HNPS_GigantismPlus
                 int min = int.MaxValue;
                 if (edgeIsLat)
                 {
-                    foreach(int x in Xs)
+                    foreach (int x in Xs)
                     {
                         max = Math.Max(max, x);
                         min = Math.Min(min, x);
@@ -1960,14 +1961,14 @@ namespace HNPS_GigantismPlus
                 + $"(string Source: {Source})",
                 Indent: 0, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
             List<string> output = new();
-            
+
             string[] sourcePieces = Source.Split("~");
             string pathBefore = sourcePieces[0];
             string pathAfter = sourcePieces[2];
 
             Debug.Entry(4, $"pathBefore: {pathBefore}, pathAfter: {pathAfter}", Indent: 1, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
             Debug.Entry(4, $"sourcePieces[1] {sourcePieces[1]}", Indent: 1, Toggle: getDoDebug(nameof(GetNumberedTileVariants)));
-            
+
             string[] pathRange = sourcePieces[1].Split('-');
             int first = int.Parse(pathRange[0]);
             int last = int.Parse(pathRange[1]);
@@ -2626,7 +2627,7 @@ namespace HNPS_GigantismPlus
 
         public static bool IsTradeGood(this GameObject Item)
         {
-            return Item.HasTag("DynamicObjectsTable:TradeGoods") 
+            return Item.HasTag("DynamicObjectsTable:TradeGoods")
                 || Item.InheritsFrom("BaseCurrency")
                 || Item.HasPropertyOrTag("Currency")
                 || (Item.Physics != null && Item.Physics.Category == "Trade Goods");

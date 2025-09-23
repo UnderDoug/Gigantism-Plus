@@ -17,10 +17,10 @@ using System.Linq;
 namespace XRL.World.Parts.Mutation
 {
     [Serializable]
-    public abstract class BaseManagedDefaultEquipmentMutation<T> 
+    public abstract class BaseManagedDefaultEquipmentMutation<T>
         : BaseDefaultEquipmentMutation
-        , IManagedDefaultNaturalEquipment<T> 
-        where T 
+        , IManagedDefaultNaturalEquipment<T>
+        where T
         : BaseManagedDefaultEquipmentMutation<T>
         , IManagedDefaultNaturalEquipment<T>
         , new()
@@ -95,7 +95,7 @@ namespace XRL.World.Parts.Mutation
                 ?.AdjustMeleeDamageBonus(GetNaturalWeaponDamageBonus(NaturalEquipmentMod, Level))
                 ?.AdjustMeleeHitBonus(GetNaturalWeaponHitBonus(NaturalEquipmentMod, Level))
                 ?.AdjustPenBonus(GetNaturalWeaponPenBonus(NaturalEquipmentMod, Level))
-                    
+
                 ?.Vomit(4, DamageOnly: true, Indent: indent + 2, Toggle: getDoDebug());
 
             Debug.Entry(4,
@@ -167,11 +167,11 @@ namespace XRL.World.Parts.Mutation
             Zone InstanceObjectZone = ParentObject.GetCurrentZone();
             string InstanceObjectZoneID = "[Pre-build]";
             if (InstanceObjectZone != null) InstanceObjectZoneID = InstanceObjectZone.ZoneID;
-            Debug.Header(4, 
-                $"{typeof(T).Name}", 
-                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}(body)", 
+            Debug.Header(4,
+                $"{typeof(T).Name}",
+                $"{nameof(OnBeforeManageDefaultNaturalEquipment)}(body)",
                 Toggle: getDoDebug('M'));
-            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}", 
+            Debug.Entry(4, $"TARGET {ParentObject.DebugName} in zone {InstanceObjectZoneID}",
                 Indent: 0, Toggle: getDoDebug('M'));
 
             // Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: getDoDebug());
@@ -181,7 +181,7 @@ namespace XRL.World.Parts.Mutation
             Debug.Footer(4,
                 $"{typeof(T).Name}",
                 $"{nameof(OnBeforeManageDefaultNaturalEquipment)}" +
-                $"(body of: {ParentObject.Blueprint})", 
+                $"(body of: {ParentObject.Blueprint})",
                 Toggle: getDoDebug('M'));
         }
 

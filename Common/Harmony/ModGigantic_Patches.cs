@@ -75,8 +75,8 @@ namespace HNPS_GigantismPlus.Harmony
         /// <param name="__instance">The ModGigantic instance being applied.</param>
         /// <param name="Object">The object to which the modification is being applied.</param>
         [HarmonyPatch(
-            declaringType: typeof(ModGigantic), 
-            methodName: nameof(ModGigantic.ApplyModification), 
+            declaringType: typeof(ModGigantic),
+            methodName: nameof(ModGigantic.ApplyModification),
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
@@ -144,9 +144,9 @@ namespace HNPS_GigantismPlus.Harmony
                 int level = Gigantified.GetLevel(objectTier);
 
                 int stews = Gigantified.GetStews();
-                stews += 
-                    Object.HasPart<LiquidVolume>() 
-                    ? 6 
+                stews +=
+                    Object.HasPart<LiquidVolume>()
+                    ? 6
                     : 0
                     ;
 

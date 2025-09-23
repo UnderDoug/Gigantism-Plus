@@ -55,8 +55,8 @@ namespace HNPS_GigantismPlus
                 Traverse targetPartTraverse = new(targetPart);
                 Type ValueType = Value.GetType();
 
-                bool partParamaterExists = 
-                    (PartParameter = targetPartTraverse.Property(Parameter)).PropertyExists() 
+                bool partParamaterExists =
+                    (PartParameter = targetPartTraverse.Property(Parameter)).PropertyExists()
                  || (PartParameter = targetPartTraverse.Field(Parameter)).FieldExists();
 
                 if (!partParamaterExists || PartParameter.GetValueType() != ValueType)
@@ -69,7 +69,7 @@ namespace HNPS_GigantismPlus
 
         public override bool SameAs(IAdjustment OtherAdjustment, bool ConsiderSource = true)
         {
-            return OtherAdjustment is AdjustArbitraryPart<T> aAP 
+            return OtherAdjustment is AdjustArbitraryPart<T> aAP
                 && aAP.Parameter == Parameter
                 && base.SameAs(OtherAdjustment, ConsiderSource);
         }

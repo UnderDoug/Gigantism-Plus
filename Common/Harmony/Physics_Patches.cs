@@ -18,7 +18,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(Physics_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(Physics), 
+            declaringType: typeof(Physics),
             methodName: nameof(Physics.HandleEvent),
             argumentTypes: new Type[] { typeof(EquippedEvent) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
@@ -36,7 +36,7 @@ namespace HNPS_GigantismPlus.Harmony
 
             if (__instance?._Equipped != null)
             {
-                __instance._Equipped = null; 
+                __instance._Equipped = null;
                 Debug.Entry(4, $"__instance._Equipped", __instance._Equipped?.DebugName ?? NULL, Indent: indent + 1, Toggle: doDebug);
             }
             return true;

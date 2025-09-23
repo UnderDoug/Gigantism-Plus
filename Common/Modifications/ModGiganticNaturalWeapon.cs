@@ -11,11 +11,11 @@ using static HNPS_GigantismPlus.Utils;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class ModGiganticNaturalWeapon 
+    public class ModGiganticNaturalWeapon
         : ModNaturalEquipment<GigantismPlus>
         , IDescribeModificationHandler<ModGigantic>
-     // , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
-     // , IModEventHandler<DescribeModificationEvent<ModGigantic>>
+    // , IModEventHandler<BeforeDescribeModificationEvent<ModGigantic>>
+    // , IModEventHandler<DescribeModificationEvent<ModGigantic>>
     {
         private static bool doDebug => getClassDoDebug(nameof(ModGiganticNaturalWeapon));
 

@@ -95,7 +95,7 @@ namespace XRL.World.Parts
                 ExludeFromDynamicTile = true,
             };
             chromeBonedNaturalWeapon.AdjustTile(chromeHandBones.BonesTile, Condition: IsOrganicFist)
-                
+
                 .AdjustColorString(chromeHandBones.BonesTileColorString)
                 .AdjustTileColor(chromeHandBones.BonesTileColorString)
                 .AdjustDetailColor(chromeHandBones.BonesTileDetailColor, true);
@@ -281,7 +281,7 @@ namespace XRL.World.Parts
         public override IPart DeepCopy(GameObject Parent, Func<GameObject, GameObject> MapInv)
         {
             CyberneticsManagedHandBones handBones = base.DeepCopy(Parent, MapInv) as CyberneticsManagedHandBones;
-            
+
             return handBones;
         }
     }

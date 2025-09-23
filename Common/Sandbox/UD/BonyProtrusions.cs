@@ -29,9 +29,9 @@ namespace XRL.World.Parts.Mutation
         {
         }
 
-        public override bool CanLevel() 
-        { 
-            return false; 
+        public override bool CanLevel()
+        {
+            return false;
         }
 
         public override bool GeneratesEquipment()
@@ -63,14 +63,14 @@ namespace XRL.World.Parts.Mutation
             };
             foreach ((BodyPart BodyPart, GameObject BonyObject) in partObjectPairs)
             {
-                if (BodyPart != null 
-                    && BodyPart.Equipped != BonyObject 
-                    && (BodyPart.Equipped == null || BodyPart.ForceUnequip(Silent: true)) 
+                if (BodyPart != null
+                    && BodyPart.Equipped != BonyObject
+                    && (BodyPart.Equipped == null || BodyPart.ForceUnequip(Silent: true))
                     && !ParentObject.ForceEquipObject(BonyObject, BodyPart, Silent: true, 0))
                 {
                     MetricsManager.LogError(
-                        $"{typeof(BonyProtrusions).Name} " + 
-                        $"force equip of {BonyObject?.ShortDisplayNameStripped ?? "null"} " + 
+                        $"{typeof(BonyProtrusions).Name} " +
+                        $"force equip of {BonyObject?.ShortDisplayNameStripped ?? "null"} " +
                         $"on {BodyPart?.Name ?? "null"} failed");
                 }
             }

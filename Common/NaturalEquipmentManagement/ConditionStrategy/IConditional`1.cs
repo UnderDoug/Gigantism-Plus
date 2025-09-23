@@ -8,7 +8,7 @@ namespace HNPS_GigantismPlus
     /// Defines a check method that a type implements to provide a <seealso cref="bool"/> value based on an instance of another type passed to it. 
     /// </summary>
     /// <typeparam name="T">The type of object on which the <seealso cref="Check"/> is performed.</typeparam>
-    public interface IConditional<T> 
+    public interface IConditional<T>
     {
         /// <summary>
         /// Checks an instance of type <typeparamref name="T"/> and returns an arbitrary <seealso cref="bool"/> value.

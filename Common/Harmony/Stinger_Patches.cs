@@ -19,7 +19,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(Stinger_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(Stinger), 
+            declaringType: typeof(Stinger),
             methodName: nameof(Stinger.AddStingerTo),
             argumentTypes: new Type[] { typeof(BodyPart) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
@@ -39,16 +39,16 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPatch(
-            declaringType: typeof(Stinger), 
+            declaringType: typeof(Stinger),
             methodName: nameof(Stinger.AddStingerTo),
             argumentTypes: new Type[] { typeof(BodyPart) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
         [HarmonyPostfix]
-        public static void  AddStingerTo_NewStingerEveryTime_Postfix(ref Stinger __instance, ref BodyPart Limb, ref GameObject ___StingerObject)
+        public static void AddStingerTo_NewStingerEveryTime_Postfix(ref Stinger __instance, ref BodyPart Limb, ref GameObject ___StingerObject)
         {
-            if (Limb != null 
-                && ___StingerObject != null 
-                && ___StingerObject.EquipAsDefaultBehavior() 
+            if (Limb != null
+                && ___StingerObject != null
+                && ___StingerObject.EquipAsDefaultBehavior()
                 && Limb.DefaultBehavior == ___StingerObject
                 && Limb.DefaultBehaviorBlueprint != ___StingerObject.Blueprint)
             {

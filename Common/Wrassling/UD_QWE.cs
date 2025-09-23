@@ -126,8 +126,8 @@ namespace XRL.World.Capabilities
         public static bool TryDecodeWrassleIDContext(string WrassleIDContext, out Guid WrassleID_ID)
         {
             WrassleID_ID = default;
-            if (!WrassleIDContext.IsNullOrEmpty() 
-                && WrassleIDContext.StartsWith(WRASSLE_ID_CONTEXT) 
+            if (!WrassleIDContext.IsNullOrEmpty()
+                && WrassleIDContext.StartsWith(WRASSLE_ID_CONTEXT)
                 && Guid.TryParse(WrassleIDContext.Substring(WRASSLE_ID_CONTEXT.Length), out WrassleID_ID))
             {
                 return true;
@@ -241,7 +241,7 @@ namespace XRL.World.Capabilities
         public static WrassleID UpdateWrassleID(WrassleID WrassleID)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
                 + $"{nameof(UpdateWrassleID)}("
                 + $"{nameof(WrassleID)} {nameof(WrassleID)}",
@@ -256,7 +256,7 @@ namespace XRL.World.Capabilities
         public static WrassleID UpdateWrassleID(GameObject WrassleObject)
         {
             int indent = Debug.LastIndent;
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
                 + $"{nameof(UpdateWrassleID)}("
                 + $"{nameof(GameObject)} {nameof(WrassleObject)}",
@@ -474,9 +474,9 @@ namespace XRL.World.Capabilities
             string fromPocket = primaryIsDark != null && (bool)primaryIsDark ? "Bright" : null;
             string exceptFor = primaryIsDark != null && (bool)primaryIsDark ? PrimaryColor.ToUpper() : PrimaryColor.ToLower();
 
-            SecondaryColor = colorBag.DrawSeededToken(WrassleID_ID, 
-                Context: nameof(GetWrassleColorPair), 
-                FromPocket: fromPocket, 
+            SecondaryColor = colorBag.DrawSeededToken(WrassleID_ID,
+                Context: nameof(GetWrassleColorPair),
+                FromPocket: fromPocket,
                 ExceptForToken: exceptFor);
 
             Debug.LastIndent = indent;
@@ -733,7 +733,7 @@ namespace XRL.World.Capabilities
             int indent = Debug.LastIndent;
             Indent += indent;
 
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(UD_QWE)}."
                 + $"{nameof(GetBestowalChance)}("
                 + $"{WrassleCreature?.DebugName ?? NULL})",
@@ -904,7 +904,7 @@ namespace XRL.World.Capabilities
                 bool doFootOrFeet = wrassleID.SeededRandomBool(Stepper: footOrFeetLaterality, Context: FootOrFeet);
                 if ((bodyPart.Type == "Foot" && (justFeet || !doFootOrFeet)) || (bodyPart.Type == "Feet" && (doFootOrFeet || !justFeet)))
                 {
-                    Debug.CheckNah(4, 
+                    Debug.CheckNah(4,
                         $"{bodyPart.Type} slot " +
                         $"with {nameof(Laterality)} of {Laterality.LateralityAdjective(footOrFeetLaterality, true) ?? NULL} " +
                         $"skipped for this {nameof(WrassleID)} or because {nameof(justFeet)}",

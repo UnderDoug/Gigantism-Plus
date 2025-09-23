@@ -48,7 +48,7 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return !Amount.IsNullOrZero() 
+            return !Amount.IsNullOrZero()
                 && base.Check(Subject);
         }
         public override bool Apply(GameObject Subject)

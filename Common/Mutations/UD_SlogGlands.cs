@@ -207,11 +207,11 @@ namespace XRL.World.Parts.Mutation
         }
         public override bool HandleEvent(AIGetOffensiveAbilityListEvent E)
         {
-            if (E.Distance <= 10 
-                && FindSpitVolume() != null 
-                && IsMyActivatedAbilityAIUsable(ActivatedAbilityID) 
-                && HasBilgeSphincter() 
-                && GameObject.Validate(E.Target) 
+            if (E.Distance <= 10
+                && FindSpitVolume() != null
+                && IsMyActivatedAbilityAIUsable(ActivatedAbilityID)
+                && HasBilgeSphincter()
+                && GameObject.Validate(E.Target)
                 && E.Actor.HasLOSTo(E.Target, IncludeSolid: true, BlackoutStops: false, UseTargetability: true))
             {
                 E.Add("CommandSlog");

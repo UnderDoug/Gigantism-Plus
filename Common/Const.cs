@@ -37,7 +37,7 @@ namespace HNPS_GigantismPlus
         public const string TANDL = "\u2518"; // ┘
 
         public const string SPACE = "\u0020"; //" "
-        public const string NBSP  = "\u00A0"; //" " (NBSP)
+        public const string NBSP = "\u00A0"; //" " (NBSP)
 
         public const string ITEM = VANDR + HONLY + HONLY + SPACE; // "├── "
         public const string BRAN = VONLY + SPACE + SPACE + SPACE; // "│   "

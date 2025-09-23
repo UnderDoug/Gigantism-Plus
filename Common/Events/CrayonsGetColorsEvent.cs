@@ -41,14 +41,14 @@ public class CrayonsGetColorsEvent : ModPooledEvent<CrayonsGetColorsEvent>
     }
 
     public static Dictionary<string, List<string>> GetColors(
-        List<string> BrightColors = null, 
-        List<string> DarkColors = null, 
+        List<string> BrightColors = null,
+        List<string> DarkColors = null,
         string Context = null,
         string Flags = null)
     {
-        int BrightColorsCount = BrightColors.IsNullOrEmpty() ? 0 : BrightColors.Count; 
-        int DarkColorsCount = DarkColors.IsNullOrEmpty() ? 0 : DarkColors.Count; 
-        Debug.Entry(4, 
+        int BrightColorsCount = BrightColors.IsNullOrEmpty() ? 0 : BrightColors.Count;
+        int DarkColorsCount = DarkColors.IsNullOrEmpty() ? 0 : DarkColors.Count;
+        Debug.Entry(4,
             $"! {typeof(CrayonsGetColorsEvent).Name}." +
             $"{nameof(GetColors)}(List<string> BrightColors({BrightColorsCount}), List<string> DarkColors({DarkColorsCount}))",
             Indent: 0, Toggle: doDebug);

@@ -39,7 +39,7 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject Subject)
         {
-            return Amount > 0 
+            return Amount > 0
                 && base.Check(Subject);
         }
 

@@ -83,7 +83,7 @@ namespace HNPS_GigantismPlus
         }
         public static DescribeModificationEvent<T> Send(
             GameObject Object,
-            string Adjective, 
+            string Adjective,
             string ObjectNoun = null,
             List<DescriptionElement> WeaponDescriptions = null,
             List<DescriptionElement> GeneralDescriptions = null,
@@ -94,7 +94,7 @@ namespace HNPS_GigantismPlus
                     Object: Object,
                     Adjective: Adjective,
                     ObjectNoun: ObjectNoun,
-                    WeaponDescriptions: WeaponDescriptions, 
+                    WeaponDescriptions: WeaponDescriptions,
                     GeneralDescriptions: GeneralDescriptions,
                     Context: Context)
                 );
@@ -190,7 +190,7 @@ namespace HNPS_GigantismPlus
         {
             return E as DescribeModificationEvent<IModification>;
         }
-        public static implicit operator DescribeModificationEvent<T>(DescribeModificationEvent<IModification>  E)
+        public static implicit operator DescribeModificationEvent<T>(DescribeModificationEvent<IModification> E)
         {
             return E as DescribeModificationEvent<T>;
         }

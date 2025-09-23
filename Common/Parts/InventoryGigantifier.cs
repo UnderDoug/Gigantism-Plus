@@ -48,17 +48,17 @@ namespace XRL.World.Parts
             GameObject GO = E.Object;
             if (GO != null && GO == ParentObject && IsGigantic)
             {
-                Debug.Header(3, 
-                    nameof(InventoryGigantifier), 
+                Debug.Header(3,
+                    nameof(InventoryGigantifier),
                     $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)",
                     Toggle: doDebug);
                 Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0, Toggle: doDebug);
-            
+
                 GO.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
-                Debug.Footer(3, 
-                    nameof(InventoryGigantifier), 
-                    $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)", 
+                Debug.Footer(3,
+                    nameof(InventoryGigantifier),
+                    $"{nameof(HandleEvent)}({nameof(AfterObjectCreatedEvent)} E)",
                     Toggle: doDebug);
             }
             return base.HandleEvent(E);
@@ -70,16 +70,16 @@ namespace XRL.World.Parts
             Debug.Entry(3, "TARGET", GO.DebugName, Indent: 0, Toggle: doDebug);
             if (GO != null && GO == ParentObject && IsMerchant)
             {
-                Debug.Header(3, 
-                    nameof(InventoryGigantifier), 
-                    $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)", 
+                Debug.Header(3,
+                    nameof(InventoryGigantifier),
+                    $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)",
                     Toggle: doDebug);
 
                 GO.GigantifyInventory(EnableGiganticNPCGear, EnableGiganticNPCGear_Grenades);
 
-                Debug.Footer(3, 
-                    nameof(InventoryGigantifier), 
-                    $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)", 
+                Debug.Footer(3,
+                    nameof(InventoryGigantifier),
+                    $"{nameof(HandleEvent)}({nameof(StockedEvent)} E)",
                     Toggle: doDebug);
             }
             return base.HandleEvent(E);
@@ -125,11 +125,11 @@ namespace XRL.World.Parts
                 return; // skip creatures without inventory
             }
 
-            Debug.Entry(3, 
+            Debug.Entry(3,
                 $"* {nameof(GigantifyInventory)}("
                 + $"{nameof(Option)}: {Option}, "
                 + $"{nameof(GrenadeOption)}: {GrenadeOption}, "
-                + $"{nameof(Force)}: {Force})", 
+                + $"{nameof(Force)}: {Force})",
                 Indent: 1, Toggle: doDebug);
             Debug.Divider(3, Indent: 1, Toggle: doDebug);
 
@@ -144,11 +144,11 @@ namespace XRL.World.Parts
 
             // Create a copy of the items list to avoid modifying during enumeration
             List<GameObject> itemsToProcess = new(Creature.GetInventoryAndEquipment());
-            
+
             bool wantstoUpdateBody = false;
             if (!itemsToProcess.IsNullOrEmpty())
             {
-                Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)", 
+                Debug.Entry(3, "> foreach (GameObject item in itemsToProcess)",
                     Indent: 1, Toggle: doDebug);
                 Debug.Divider(4, HONLY, Count: 25, Indent: 1, Toggle: doDebug);
                 foreach (GameObject item in itemsToProcess)
@@ -212,7 +212,7 @@ namespace XRL.World.Parts
                                     Debug.CheckNah(4, "grenade (isMerchant)", "NoThanks++; x/", Indent: 2, Toggle: doDebug);
                                     NoThanks++;
                                 }
-                                if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high 
+                                if (creatureIsMerchant && merchantGrenades.die.Resolve() >= merchantGrenades.high
                                     || inventoryGigantifierAlwaysStockGiant)
                                 {
                                     Debug.LoopItem(4,
@@ -340,7 +340,7 @@ namespace XRL.World.Parts
                         // Is the item held by a merchant, and did their roll fail?
                         if (creatureIsMerchant)
                         {
-                            Debug.CheckNah(4, $"{nameof(creatureIsMerchant)} is {creatureIsMerchant}", "NoThanks++; x/", 
+                            Debug.CheckNah(4, $"{nameof(creatureIsMerchant)} is {creatureIsMerchant}", "NoThanks++; x/",
                                 Indent: 2, Toggle: doDebug);
                             NoThanks++;
 
@@ -349,8 +349,8 @@ namespace XRL.World.Parts
                             {
                                 Debug.LoopItem(4,
                                     $"but!] {nameof(merchantBaseChance)}" +
-                                    $"{secretGiantExtra}{alwaysStockGiantExtra} " + 
-                                    $"{merchantBaseChance.die} " + 
+                                    $"{secretGiantExtra}{alwaysStockGiantExtra} " +
+                                    $"{merchantBaseChance.die} " +
                                     $"rolled at or above {merchantBaseChance.high}",
                                     $"NoThanks--;",
                                     Indent: 2, Toggle: doDebug);
@@ -372,12 +372,12 @@ namespace XRL.World.Parts
                         }
 
                         Debug.Entry(3, $"NoThanks", $"{NoThanks}", Indent: 2, Toggle: doDebug);
-                        Debug.Entry(3, $"Checking if item is Cybernetic and in inventory of Secret Giant Gutsmonger and 7 in 10...", 
+                        Debug.Entry(3, $"Checking if item is Cybernetic and in inventory of Secret Giant Gutsmonger and 7 in 10...",
                             Indent: 2, Toggle: doDebug);
 
                         if (!(creatureIsSecretGiantGutsmonger && itemIsCybernetic && 7.in10()))
                         {
-                            Debug.CheckNah(4, "item is not Cybernetic in inventory of Secret Giant Gutsmonger and 7 in 10", 
+                            Debug.CheckNah(4, "item is not Cybernetic in inventory of Secret Giant Gutsmonger and 7 in 10",
                                 Indent: 3, Toggle: doDebug);
                             if (NoThanks > 0 && !Wish && !(creatureIsSecretGiantVillager && item.HasPart<CyberneticsBaseItem>() && 7.in10()))
                             {
@@ -388,7 +388,7 @@ namespace XRL.World.Parts
                         }
                         else
                         {
-                            Debug.CheckYeh(4, "item is Cybernetic in inventory of Secret Giant Gutsmonger and 7 in 10", 
+                            Debug.CheckYeh(4, "item is Cybernetic in inventory of Secret Giant Gutsmonger and 7 in 10",
                                 Indent: 3, Toggle: doDebug);
                         }
 
@@ -400,7 +400,7 @@ namespace XRL.World.Parts
                         item.ApplyModification("ModGigantic");
                         if (!item.HasPart<ModGigantic>())
                         {
-                            Debug.Warn(2, 
+                            Debug.Warn(2,
                                 nameof(InventoryGigantifier),
                                 nameof(GigantifyInventory),
                                 $"Gigantification of {ItemName} Failed",
@@ -425,7 +425,7 @@ namespace XRL.World.Parts
 
                         if (item.IsNaturalEquipment() && !item.TryGetPart(out NaturalEquipmentOperator @operator))
                         {
-                            NaturalEquipmentManager manager= Creature.RequirePart<NaturalEquipmentManager>();
+                            NaturalEquipmentManager manager = Creature.RequirePart<NaturalEquipmentManager>();
                             @operator.Manager = manager;
                             wantstoUpdateBody = true;
                         }

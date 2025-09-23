@@ -45,17 +45,17 @@ namespace XRL.World.Parts
                 Verb: "have",
                 Effect: $"=subject.possessive= bonus damage scale by half =subject.possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier");
             AddAdjustment(
-                Adjustment: new ArbitraryDescription(DescriptionElement.Empty, itScales), 
+                Adjustment: new ArbitraryDescription(DescriptionElement.Empty, itScales),
                 FlipPriority: true,
                 Condition: ThisModAdjustsMeleeCumulatively<ElongatedPaws>());
 
             DescriptionElement hasItScale = new(
-                Priority: DescriptionElement.ORDER_ADJUST_EXTREMELY_LATE, 
-                Verb: "have", 
+                Priority: DescriptionElement.ORDER_ADJUST_EXTREMELY_LATE,
+                Verb: "have",
                 Effect: $"=subject.possessive= bonus damage scale by half =subject.possessive= wielder's {ElongatedPaws.SCALE_STAT} Modifier");
             AddAdjustment(
-                Adjustment: new ArbitraryDescription(DescriptionElement.Empty, hasItScale), 
-                FlipPriority: true, 
+                Adjustment: new ArbitraryDescription(DescriptionElement.Empty, hasItScale),
+                FlipPriority: true,
                 Condition: new NotCondition<GameObject>(ThisModAdjustsMeleeCumulatively<ElongatedPaws>()));
 
             AddAdjustment(new DiminishingReturns("increases to damage die size"), true, new AnyConditions<GameObject>() { IsGigantic, IsBurrowing });

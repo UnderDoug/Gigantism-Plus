@@ -56,7 +56,7 @@ namespace HNPS_GigantismPlus
                 Indent: indent + 1, Toggle: getDoDebug('X'));
 
             WrassleID = new();
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"{nameof(WrassleID)} assigned new() preemptively;" +
                 $" it's {(WrassleID != null ? "not null" : "null")}",
                 Indent: indent + 2, Toggle: getDoDebug('X'));
@@ -66,11 +66,11 @@ namespace HNPS_GigantismPlus
                 Debug.Entry(4, $"{nameof(WrassleObject.Holder)}: {WrassleObject.Holder?.DebugName}",
                     Indent: indent + 1, Toggle: getDoDebug('X'));
 
-                if (WantToProceed(WrassleObject.Holder, 
-                    out bool WrassleObjectWantsMin, 
+                if (WantToProceed(WrassleObject.Holder,
+                    out bool WrassleObjectWantsMin,
                     out bool WrassleObjectWantsStr)
-                 && ProcessEvent(WrassleObject.Holder, 
-                    WrassleObjectWantsMin, 
+                 && ProcessEvent(WrassleObject.Holder,
+                    WrassleObjectWantsMin,
                     WrassleObjectWantsStr)
                  && FromWrassleID != Guid.Empty
                  && FromWrassleID != default)

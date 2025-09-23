@@ -418,7 +418,7 @@ namespace HNPS_GigantismPlus
                     }
                 }
             }
-            return anyCheckPasses 
+            return anyCheckPasses
                 && base.Check(Subject);
         }
 

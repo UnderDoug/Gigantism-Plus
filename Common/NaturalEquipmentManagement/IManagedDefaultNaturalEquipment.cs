@@ -12,7 +12,7 @@ using static HNPS_GigantismPlus.Options;
 
 namespace XRL.World
 {
-    public interface IManagedDefaultNaturalEquipment 
+    public interface IManagedDefaultNaturalEquipment
         : IModEventHandler<GetNaturalEquipmentOperatorsEvent>
         , IModEventHandler<BeforeUpdateBodyPartsEvent>
         , IModEventHandler<BodyPartsUpdatedEvent>

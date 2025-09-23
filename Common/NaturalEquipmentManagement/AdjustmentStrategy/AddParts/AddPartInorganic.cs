@@ -13,8 +13,8 @@ namespace HNPS_GigantismPlus
         public bool DoDescription;
 
         private static DescriptionElement DefaultDescription => new(
-            Priority: DescriptionElement.ORDER_ADJUST_VERY_LATE, 
-            Verb: "", 
+            Priority: DescriptionElement.ORDER_ADJUST_VERY_LATE,
+            Verb: "",
             Effect: Grammar.MakeLowerCase(nameof(Inorganic)));
 
         public AddPartInorganic()

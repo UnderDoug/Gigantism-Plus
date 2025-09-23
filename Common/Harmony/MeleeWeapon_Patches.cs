@@ -16,7 +16,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(MeleeWeapon_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(MeleeWeapon), 
+            declaringType: typeof(MeleeWeapon),
             methodName: nameof(MeleeWeapon.GetSimplifiedStats),
             argumentTypes: new Type[] { typeof(bool) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
@@ -29,7 +29,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPatch(
-            declaringType: typeof(MeleeWeapon), 
+            declaringType: typeof(MeleeWeapon),
             methodName: nameof(MeleeWeapon.GetDetailedStats))]
         [HarmonyPrefix]
         public static bool GetDetailedStats_CapMaxStrBonus_Prefix(MeleeWeapon __instance)
@@ -40,7 +40,7 @@ namespace HNPS_GigantismPlus.Harmony
         }
 
         [HarmonyPatch(
-            declaringType: typeof(MeleeWeapon), 
+            declaringType: typeof(MeleeWeapon),
             methodName: nameof(MeleeWeapon.AdjustBonusCap),
             argumentTypes: new Type[] { typeof(int) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]

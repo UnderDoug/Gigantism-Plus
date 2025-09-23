@@ -32,7 +32,7 @@ namespace HNPS_GigantismPlus
 
         public override void Reset()
         {
-            base.Reset(); 
+            base.Reset();
             Operators = null;
         }
 

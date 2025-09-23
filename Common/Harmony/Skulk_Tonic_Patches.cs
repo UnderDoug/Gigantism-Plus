@@ -20,7 +20,7 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(Skulk_Tonic_Patches));
 
         [HarmonyPatch(
-            declaringType: typeof(Skulk_Tonic), 
+            declaringType: typeof(Skulk_Tonic),
             methodName: nameof(Skulk_Tonic.Apply),
             argumentTypes: new Type[] { typeof(GameObject) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal })]

@@ -65,8 +65,8 @@ namespace XRL
 
         public IEnumerable<string> CacheWrassleColorSequence(Guid WrassleID, int Length, IEnumerable<string> Sequence)
         {
-            if (WrassleID == Guid.Empty 
-                || Length < 1 
+            if (WrassleID == Guid.Empty
+                || Length < 1
                 || Sequence.IsNullOrEmpty())
             {
                 return null;

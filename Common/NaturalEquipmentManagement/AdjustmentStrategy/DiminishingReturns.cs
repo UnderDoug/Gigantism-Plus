@@ -72,7 +72,7 @@ namespace HNPS_GigantismPlus
             base.Configure();
             Effect = $"suffering diminishing returns on ";
             Prioritize = false;
-            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE*2;
+            DescriptionOrder = DescriptionElement.ORDER_ADJUST_VERY_LATE * 2;
             Constructed = false;
         }
 

@@ -8,7 +8,7 @@ using static HNPS_GigantismPlus.Const;
 namespace XRL.World.Parts
 {
     [Serializable]
-    public class DoFunctionOnEventThenRemove<T> : IScribedPart 
+    public class DoFunctionOnEventThenRemove<T> : IScribedPart
         where T : MinEvent, new()
     {
         private static bool doDebug => true;
@@ -19,7 +19,7 @@ namespace XRL.World.Parts
 
         public Dictionary<string, int> IntArguments;
 
-        public Func<DoFunctionOnEventThenRemove<T>, GameObject, T,  bool> FunctionWithoutArgs;
+        public Func<DoFunctionOnEventThenRemove<T>, GameObject, T, bool> FunctionWithoutArgs;
 
         public Func<DoFunctionOnEventThenRemove<T>, GameObject, T, Dictionary<string, string>, bool> FunctionWithStringArgs;
 

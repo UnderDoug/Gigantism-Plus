@@ -53,8 +53,8 @@ namespace XRL.World.Parts
         {
             if (E.Object == ParentObject)
             {
-                string debugHeader = 
-                    $"[{ParentObject.ID}:{ParentObject.Blueprint}] -> " + 
+                string debugHeader =
+                    $"[{ParentObject.ID}:{ParentObject.Blueprint}] -> " +
                     $"{nameof(WallOrDebris)}." +
                     $"{nameof(HandleEvent)}({nameof(ObjectCreatedEvent)} E)";
 
@@ -70,15 +70,15 @@ namespace XRL.World.Parts
 
                     if (Blueprint.IsNullOrEmpty())
                     {
-                        Debug.Warn(4, 
+                        Debug.Warn(4,
                             $"{nameof(WallOrDebris)}",
                             $"{nameof(HandleEvent)}({nameof(ObjectCreatedEvent)})",
-                            $"Failed to get Debris from weighted list. " + 
-                            $"Blueprint set by fallback to Wall {Wall.Quote()}", 
+                            $"Failed to get Debris from weighted list. " +
+                            $"Blueprint set by fallback to Wall {Wall.Quote()}",
                             Indent: 0);
                         Blueprint = Wall;
                     }
-                    Debug.Entry(4, $"{debugHeader} resolved into {debrisBlueprint}, {Blueprint} is what we got", 
+                    Debug.Entry(4, $"{debugHeader} resolved into {debrisBlueprint}, {Blueprint} is what we got",
                         Indent: 0, Toggle: doDebug);
                 }
 
@@ -129,7 +129,7 @@ namespace XRL.World.Parts
                     $"{nameof(HandleEvent)}({nameof(ObjectCreatedEvent)})",
                     $"Failed to create {thing}",
                     Indent: 0);
-                
+
                 if (ParentObject.Obliterate())
                 {
                     return false;

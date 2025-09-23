@@ -43,7 +43,7 @@ namespace HNPS_GigantismPlus
             int indent = Debug.LastIndent;
             Debug.Entry(3,
                 $"@ {nameof(Gigantic_ModEntry_Adjustments)}."
-                + $"{nameof(AdjustGiganticModifier)}()", 
+                + $"{nameof(AdjustGiganticModifier)}()",
                 Indent: indent++);
 
             ModEntry modGigantic = ModificationFactory.ModsByPart[nameof(ModGigantic)];
@@ -103,10 +103,10 @@ namespace HNPS_GigantismPlus
             bool was = ModGiganticEntry.TinkerAllowed;
             int indent = Debug.LastIndent;
 
-            Debug.Entry(4, 
+            Debug.Entry(4,
                 $"* {nameof(AdjustTinkerability)}"
-                + $"(ModEntry: {ModGiganticEntry.Part}, " 
-                + $"{nameof(ShouldGiganticTinkerable)}: {ShouldGiganticTinkerable})", 
+                + $"(ModEntry: {ModGiganticEntry.Part}, "
+                + $"{nameof(ShouldGiganticTinkerable)}: {ShouldGiganticTinkerable})",
                 Indent: indent++);
 
             Debug.Entry(4, $"? if ({nameof(ShouldGiganticTinkerable)})", Indent: indent++);
@@ -182,8 +182,8 @@ namespace HNPS_GigantismPlus
         public static void AdditionalSetup()
         {
             // Called once when world is first generated.
-            Debug.Header(3, 
-                $"{nameof(GigantismPlusGameBasedInitialiser)}", 
+            Debug.Header(3,
+                $"{nameof(GigantismPlusGameBasedInitialiser)}",
                 $"{nameof(AdditionalSetup)}()");
 
             /*
@@ -225,8 +225,8 @@ namespace HNPS_GigantismPlus
                 MetricsManager.LogException($"[{MOD_ID}] {nameof(GigantismPlusGameBasedInitialiser)}", x);
             }
 
-            Debug.Footer(3, 
-                $"{nameof(GigantismPlusGameBasedInitialiser)}", 
+            Debug.Footer(3,
+                $"{nameof(GigantismPlusGameBasedInitialiser)}",
                 $"{nameof(AdditionalSetup)}()");
         }
     } //!-- public static class GigantismPlusGameBasedInitialiser
@@ -237,8 +237,8 @@ namespace HNPS_GigantismPlus
         public void mutate(GameObject player)
         {
             // Gets called once when the player is first generated
-            Debug.Header(3, 
-                $"{nameof(GigantismPlusOnPlayerLoad)}", 
+            Debug.Header(3,
+                $"{nameof(GigantismPlusOnPlayerLoad)}",
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
 
             /*
@@ -291,8 +291,8 @@ namespace HNPS_GigantismPlus
 
             player.SetIntProperty("IsPlayer", 1);
             player.SetIntProperty(WRASSLER_BESTOW_CHANCE_PROP, SlideWrasslePlayerStart);
-            
-            Debug.Footer(3, 
+
+            Debug.Footer(3,
                 $"{nameof(GigantismPlusOnPlayerLoad)}",
                 $"{nameof(mutate)}(GameObject player: {player.DebugName})");
         }

@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus
         public static bool Register()
         {
             The.Game?.RegisterEvent(Handler, GetGiganticCreatureEvent.ID);
-            
+
             return (bool)The.Game?.WasModEventHandlerRegistered<GetGiganticCreatureHandler, GetGiganticCreatureEvent>();
         }
 
@@ -39,7 +39,7 @@ namespace HNPS_GigantismPlus
         public static bool Register()
         {
             The.Game?.RegisterEvent(Handler, GetGiganticCreatureEvent.ID);
-            
+
             return (bool)The.Game?.WasModEventHandlerRegistered<SetGiganticCreatureHandler, SetGiganticCreatureEvent>();
         }
 
@@ -58,7 +58,7 @@ namespace HNPS_GigantismPlus
         public static bool Register()
         {
             The.Game?.RegisterEvent(Handler, GetGiganticEquipmentEvent.ID);
-            
+
             return (bool)The.Game?.WasModEventHandlerRegistered<GetGiganticEquipmentHandler, GetGiganticEquipmentEvent>();
         }
 
@@ -76,7 +76,7 @@ namespace HNPS_GigantismPlus
         public static bool Register()
         {
             The.Game?.RegisterEvent(Handler, GetGiganticEquipmentEvent.ID);
-            
+
             return (bool)The.Game?.WasModEventHandlerRegistered<SetGiganticEquipmentHandler, SetGiganticEquipmentEvent>();
         }
 

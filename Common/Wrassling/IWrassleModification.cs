@@ -214,7 +214,7 @@ namespace XRL.World.Parts
             }
             if ((WrassleShaderCache ??= new()).IsNullOrEmpty() || !WrassleShaderCache.ContainsKey(Word.Length))
             {
-                Debug.CheckYeh(4, $"{nameof(WrassleShaderCache)} is either empty or doesn't contain key {Word.Length}", 
+                Debug.CheckYeh(4, $"{nameof(WrassleShaderCache)} is either empty or doesn't contain key {Word.Length}",
                     Indent: indent + 2, Toggle: getDoDebug('X'));
                 string shader = UD_QWE.GetWrassleShaderForWord(WrassleID, Word);
                 if (shader.StartsWith(" sequence"))

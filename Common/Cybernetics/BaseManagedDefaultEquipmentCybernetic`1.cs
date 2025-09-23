@@ -16,6 +16,7 @@ using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
+    [HNPS_ManagesNaturalEquipment]
     [Serializable]
     public abstract class BaseManagedDefaultEquipmentCybernetic<T> 
         : IScribedPart

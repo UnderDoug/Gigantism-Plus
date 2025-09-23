@@ -78,6 +78,8 @@ namespace XRL.World.Parts
             JumpDistanceBonus = 0;
             StunningForceLevelFactor = 0.5;
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModAugmentedNaturalWeapon NewAugmentedManipulatorMod(NaturalEquipmentManager NewManager)
         {
             CyberneticsGiganticExoframe giganticExoframe = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsGiganticExoframe>();

@@ -16,6 +16,7 @@ using static HNPS_GigantismPlus.Utils;
 
 namespace XRL.World.Parts.Mutation
 {
+    [HNPS_ManagesNaturalEquipment]
     [Serializable]
     public class UD_ManagedCrystallinity 
         : Crystallinity
@@ -65,11 +66,13 @@ namespace XRL.World.Parts.Mutation
             RefractAdded = Crystallinity.RefractAdded;
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModCrystallineNaturalWeapon NewCrystallinePointMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager);
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModCrystallineNaturalWeapon NewCrystallineArmMod(NaturalEquipmentManager NewManager)
         {
             // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.

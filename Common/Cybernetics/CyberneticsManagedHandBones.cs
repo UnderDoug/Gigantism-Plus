@@ -75,6 +75,8 @@ namespace XRL.World.Parts
             BonesHitBonus = 0;
             BonesPenBonus = 0;
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModChromeBonedNaturalWeapon NewChromeBonedNaturalWeaponMod(NaturalEquipmentManager NewManager)
         {
             CyberneticsManagedHandBones chromeHandBones = NewManager?.GetManagedNaturalEquipmentCompatiblePart<CyberneticsManagedHandBones>();

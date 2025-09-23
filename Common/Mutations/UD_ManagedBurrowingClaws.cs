@@ -16,6 +16,7 @@ using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 
 namespace XRL.World.Parts.Mutation
 {
+    [HNPS_ManagesNaturalEquipment]
     [Serializable]
     public class UD_ManagedBurrowingClaws 
         : BurrowingClaws
@@ -65,11 +66,13 @@ namespace XRL.World.Parts.Mutation
             EnableActivatedAbilityID = BurrowingClaws.EnableActivatedAbilityID;
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModBurrowingNaturalWeapon NewBurrowingHandMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager);
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModBurrowingNaturalWeapon NewBurrowingArmMod(NaturalEquipmentManager NewManager)
         {
             // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.

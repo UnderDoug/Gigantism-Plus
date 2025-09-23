@@ -170,6 +170,7 @@ namespace XRL.World.Parts.Mutation
             StunningForceDistance = 3;
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModGiganticNaturalWeapon NewGiganticFistMod(NaturalEquipmentManager NewManager)
         {
             ModGiganticNaturalWeapon giganticFistMod = new(NewManager)
@@ -188,6 +189,8 @@ namespace XRL.World.Parts.Mutation
 
             return giganticFistMod;
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModGiganticNaturalWeapon NewGiganticNogginMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager)
@@ -195,6 +198,8 @@ namespace XRL.World.Parts.Mutation
                 BodyPartType = "Head",
             };
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModGiganticNaturalWeapon NewGiganticMugMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager)
@@ -202,6 +207,8 @@ namespace XRL.World.Parts.Mutation
                 BodyPartType = "Face",
             };
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModGiganticNaturalWeapon NewGiganticArmMod(NaturalEquipmentManager NewManager)
         {
             // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.
@@ -211,6 +218,8 @@ namespace XRL.World.Parts.Mutation
                 BodyPartType = "Arm",
             };
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModGiganticNaturalWeapon NewGiganticTailMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager)
@@ -218,6 +227,8 @@ namespace XRL.World.Parts.Mutation
                 BodyPartType = "Tail",
             };
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModNaturalEquipment<GigantismPlus> NewGiganticBodMod(NaturalEquipmentManager NewManager)
         {
             ModNaturalEquipment<GigantismPlus> giganticBodMod = new(NewManager)
@@ -249,6 +260,8 @@ namespace XRL.World.Parts.Mutation
 
             return giganticBodMod;
         }
+
+        [HNPS_NaturalEquipmentMod]
         public static ModClosedGiganticNaturalWeapon NewClosedFistMod(NaturalEquipmentManager NewManager)
         {
             if (NewManager?.ParentObject?.GetPart<GigantismPlus>() is not GigantismPlus gigantismPlus

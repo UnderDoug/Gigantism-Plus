@@ -48,11 +48,13 @@ namespace XRL.World.Parts.Mutation
         {
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModElongatedNaturalWeapon NewElongatedHandMod(NaturalEquipmentManager NewManager)
         {
             return new(NewManager);
         }
 
+        [HNPS_NaturalEquipmentMod]
         public static ModElongatedNaturalWeapon NewElongatedArmMod(NaturalEquipmentManager NewManager)
         {
             // This is for Gigantic Scorpiock, and any other creature that uses Arm-slot melee weapons.

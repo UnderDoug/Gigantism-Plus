@@ -16,6 +16,7 @@ using System.Linq;
 
 namespace XRL.World.Parts.Mutation
 {
+    [HNPS_ManagesNaturalEquipment]
     [Serializable]
     public abstract class BaseManagedDefaultEquipmentMutation<T>
         : BaseDefaultEquipmentMutation

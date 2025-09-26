@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using XRL.Core;
+using XRL.Rules;
 using XRL.World;
 
 namespace XRL.World.Effects
@@ -9,15 +11,23 @@ namespace XRL.World.Effects
     public class HNPS_RadarHighlightedEffect : Effect
     {
         public string TileColor;
+        public string DetailColor;
 
         public HNPS_RadarHighlightedEffect()
         {
             Duration = DURATION_INDEFINITE;
+            TileColor = null;
+            DetailColor = null;
         }
         public HNPS_RadarHighlightedEffect(string TileColor)
             : this()
         {
             this.TileColor = TileColor;
+        }
+        public HNPS_RadarHighlightedEffect(string TileColor, string DetailColor)
+            : this(TileColor)
+        {
+            this.DetailColor = DetailColor;
         }
 
         public override int GetEffectType()
@@ -33,20 +43,37 @@ namespace XRL.World.Effects
             return null;
         }
 
-        public bool CheckVisible()
+        public bool CheckVisible(LightLevel Lit)
         {
-            return Object.CurrentCell.GetLight() > LightLevel.Light
-                && Object.CurrentCell.GetLight() < LightLevel.Omniscient
+            return Lit > LightLevel.Light
+                && Lit < LightLevel.LitRadar
                 && !Object.HasEffect(typeof(SensePsychicEffect), fx => (fx as SensePsychicEffect).Listener == The.Player);
         }
 
         public override bool FinalRender(RenderEvent E, bool bAlt)
         {
-            if (!TileColor.IsNullOrEmpty() && !E.UI && CheckVisible())
+            if (Object.GetIntProperty(nameof(HNPS_RadarHighlightedEffect)) == 0)
             {
-                string color = TileColor[^1].ToString();
-                E.ColorString = $"&{color}";
-                E.DetailColor = $"p"; // customer color #007f7f, based on UnityEngine.Color ColorDarkCyan = new(0, 0.5f, 0.5f);
+                Object.SetIntProperty(nameof(HNPS_RadarHighlightedEffect), Object.GetSeededRandom(nameof(HNPS_RadarHighlightedEffect)).Next(0, 59));
+            }
+            int offset = Object.GetIntProperty(nameof(HNPS_RadarHighlightedEffect));
+
+            if ((!TileColor.IsNullOrEmpty() || !DetailColor.IsNullOrEmpty()) 
+                && !E.UI && CheckVisible(E.Lit)
+                && XRLCore.CurrentFrame != offset)
+            {
+                string tileColor = "P"; // custom color #00ffff, based on UnityEngine.Color ColorBrightCyan = new(0, 1f, 1f);
+                string detailColor = "p"; // custom color #007f7f, based on UnityEngine.Color ColorDarkCyan = new(0, 0.5f, 0.5f);
+                if (!TileColor.IsNullOrEmpty())
+                {
+                    tileColor = TileColor[^1].ToString();
+                }
+                if (!DetailColor.IsNullOrEmpty())
+                {
+                    detailColor = DetailColor[^1].ToString();
+                }
+                E.ColorString = $"&{tileColor}";
+                E.DetailColor = $"{detailColor}";
                 E.CustomDraw = true;
                 return false;
             }

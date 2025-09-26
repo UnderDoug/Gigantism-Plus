@@ -173,8 +173,6 @@ namespace XRL.World.Parts
                 + $" {nameof(Implant)}: {Implant?.DebugName ?? NULL})",
                 Indent: indent + 1, Toggle: getDoDebug());
 
-            Becoome(Implantee, Model, Implant);
-
             Armor armor = ParentObject.RequirePart<Armor>();
             if (armor != null)
             {
@@ -183,7 +181,12 @@ namespace XRL.World.Parts
                 armor.DV = DV;
             }
 
-            Implantee.ForceApplyEffect(new HNPS_RadarHighlightedEffect(AugmentTileDetailColor));
+            bool isPlayer = Implantee.IsPlayer();
+            string tileColor = isPlayer ? null : AugmentTileDetailColor;
+            string detailColor = isPlayer ? AugmentTileDetailColor : null;
+            Implantee.ForceApplyEffect(new HNPS_RadarHighlightedEffect(tileColor, detailColor));
+
+            Becoome(Implantee, Model, Implant);
 
             base.OnImplanted(Implantee, Implant);
 
@@ -212,9 +215,9 @@ namespace XRL.World.Parts
 
             Unbecoome(Implantee, Model, ParentObject);
 
-            ParentObject.RemovePart<Armor>();
-
             Implantee.RemoveEffect<HNPS_RadarHighlightedEffect>();
+
+            ParentObject.RemovePart<Armor>();
 
             base.OnUnimplanted(Implantee, Implant);
 

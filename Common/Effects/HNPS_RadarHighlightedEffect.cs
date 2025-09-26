@@ -52,15 +52,10 @@ namespace XRL.World.Effects
 
         public override bool FinalRender(RenderEvent E, bool bAlt)
         {
-            if (Object.GetIntProperty(nameof(HNPS_RadarHighlightedEffect)) == 0)
-            {
-                Object.SetIntProperty(nameof(HNPS_RadarHighlightedEffect), Object.GetSeededRandom(nameof(HNPS_RadarHighlightedEffect)).Next(0, 59));
-            }
-            int offset = Object.GetIntProperty(nameof(HNPS_RadarHighlightedEffect));
-
-            if ((!TileColor.IsNullOrEmpty() || !DetailColor.IsNullOrEmpty()) 
+            if (!bAlt 
+                && (!TileColor.IsNullOrEmpty() || !DetailColor.IsNullOrEmpty()) 
                 && !E.UI && CheckVisible(E.Lit)
-                && XRLCore.CurrentFrame != offset)
+                && XRLCore.CurrentFrame % 60 != Stat.RandomCosmetic(0, 59))
             {
                 string tileColor = "P"; // custom color #00ffff, based on UnityEngine.Color ColorBrightCyan = new(0, 1f, 1f);
                 string detailColor = "p"; // custom color #007f7f, based on UnityEngine.Color ColorDarkCyan = new(0, 0.5f, 0.5f);
@@ -76,6 +71,7 @@ namespace XRL.World.Effects
                 E.DetailColor = $"{detailColor}";
                 E.CustomDraw = true;
                 return false;
+
             }
             return true;
         }

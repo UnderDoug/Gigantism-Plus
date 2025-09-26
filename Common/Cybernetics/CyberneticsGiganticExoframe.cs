@@ -1,20 +1,18 @@
+using HNPS_GigantismPlus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using XRL.World.Anatomy;
+using XRL.World.Effects;
 using XRL.World.Parts.Mutation;
-using static XRL.World.Parts.NaturalEquipmentOperator;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
-
-using HNPS_GigantismPlus;
-using static HNPS_GigantismPlus.Utils;
 using static HNPS_GigantismPlus.Const;
+using static HNPS_GigantismPlus.NaturalEquipmentConditions;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.SecretGiganticExoframe;
-using static HNPS_GigantismPlus.NaturalEquipmentConditions;
-
+using static HNPS_GigantismPlus.Utils;
 using static XRL.World.Parts.ModAugmentedNaturalWeapon;
+using static XRL.World.Parts.ModNaturalEquipmentBase;
+using static XRL.World.Parts.NaturalEquipmentOperator;
 
 namespace XRL.World.Parts
 {
@@ -185,6 +183,8 @@ namespace XRL.World.Parts
                 armor.DV = DV;
             }
 
+            Implantee.ForceApplyEffect(new HNPS_RadarHighlightedEffect(AugmentTileDetailColor));
+
             base.OnImplanted(Implantee, Implant);
 
             Debug.Entry(2,
@@ -213,6 +213,8 @@ namespace XRL.World.Parts
             Unbecoome(Implantee, Model, ParentObject);
 
             ParentObject.RemovePart<Armor>();
+
+            Implantee.RemoveEffect<HNPS_RadarHighlightedEffect>();
 
             base.OnUnimplanted(Implantee, Implant);
 

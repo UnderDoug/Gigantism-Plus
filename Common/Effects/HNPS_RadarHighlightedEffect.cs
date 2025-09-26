@@ -1,4 +1,5 @@
 ﻿using ConsoleLib.Console;
+using HNPS_GigantismPlus;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -47,12 +48,13 @@ namespace XRL.World.Effects
         {
             return Lit > LightLevel.Light
                 && Lit < LightLevel.LitRadar
-                && !Object.HasEffect(typeof(SensePsychicEffect), fx => (fx as SensePsychicEffect).Listener == The.Player);
+                && (bool)!Object?.HasEffect(typeof(SensePsychicEffect), fx => (fx as SensePsychicEffect).Listener == The.Player);
         }
 
         public override bool FinalRender(RenderEvent E, bool bAlt)
         {
-            if (!bAlt 
+            if (GameObject.Validate(Object)
+                && !bAlt 
                 && (!TileColor.IsNullOrEmpty() || !DetailColor.IsNullOrEmpty()) 
                 && !E.UI && CheckVisible(E.Lit)
                 && XRLCore.CurrentFrame % 60 != Stat.RandomCosmetic(0, 59))
@@ -71,7 +73,6 @@ namespace XRL.World.Effects
                 E.DetailColor = $"{detailColor}";
                 E.CustomDraw = true;
                 return false;
-
             }
             return true;
         }

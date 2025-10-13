@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using XRL;
+using XRL.Core;
 using XRL.Rules;
 using XRL.World;
 using XRL.World.Loaders;
@@ -19,6 +20,8 @@ namespace HNPS_GigantismPlus.Harmony
         private static bool doDebug => getClassDoDebug(nameof(GameObjectFactory_Patches));
 
         private static readonly string TargetAttribute = "DisplayName";
+        private static readonly string EntryNameAttribute = "EntryName";
+
         [HarmonyPatch(
             declaringType: typeof(GameObjectFactory),
             methodName: nameof(GameObjectFactory.LoadBakedXML),
@@ -27,38 +30,93 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> LoadBakedXML_AddMutationEntryNode_Transpiler(IEnumerable<CodeInstruction> Instructions, ILGenerator Generator)
         {
-            bool doVomit = true;
+            bool doVomit = false;
             string patchMethodName = $"{nameof(GameObjectFactory_Patches)}.{nameof(GameObjectFactory.LoadBakedXML)}";
             int metricsCheckSteps = 0;
 
             CodeMatcher codeMatcher = new(Instructions, Generator);
 
-            // return base.HandleEvent(E);
-            CodeMatch[] match_Return_BaseHandleEvent_E = new CodeMatch[]
+            // foreach (KeyValuePair<string, ObjectBlueprintLoader.ObjectBlueprintXMLChildNode> item3 in node.NamedNodes("builder"))
+            CodeMatch[] match_node_NamedNodes_Builder = new CodeMatch[]
             {
-                new(OpCodes.Ldarg_0),
                 new(OpCodes.Ldarg_1),
-                new(ins => ins.Calls(AccessTools.Method(typeof(IComponent<GameObject>), nameof(IComponent<GameObject>.HandleEvent), new Type[] { typeof(GetShortDescriptionEvent) }))),
-                new(OpCodes.Ret),
+                new(OpCodes.Ldstr, "builder"),
+                new(ins => ins.Calls(
+                    AccessTools.Method(
+                        typeof(ObjectBlueprintLoader.ObjectBlueprintXMLData),
+                        nameof(ObjectBlueprintLoader.ObjectBlueprintXMLData.NamedNodes),
+                        new Type[] { typeof(string) }))),
+                new(ins => ins.Calls(
+                    AccessTools.Method(
+                        typeof(IEnumerable<KeyValuePair<string, ObjectBlueprintLoader.ObjectBlueprintXMLChildNode>>),
+                        nameof(IEnumerable<KeyValuePair<string, ObjectBlueprintLoader.ObjectBlueprintXMLChildNode>>.GetEnumerator)))),
+                new(OpCodes.Stloc_1),
             };
-            /*
+            
             // find start of:
-            // return base.HandleEvent(E);
+            // foreach (KeyValuePair<string, ObjectBlueprintLoader.ObjectBlueprintXMLChildNode> item3 in node.NamedNodes("builder"))
             // from the start
-            if (codeMatcher.Start().MatchStartForward(match_Return_BaseHandleEvent_E).IsInvalid)
+            if (codeMatcher.Start().MatchStartForward(match_node_NamedNodes_Builder).IsInvalid)
             {
-                MetricsManager.LogModError(ThisMod, $"{patchMethodName}: ({metricsCheckSteps}) {nameof(CodeMatcher.MatchStartForward)} failed to find instructions {nameof(match_Return_BaseHandleEvent_E)}");
-                foreach (CodeMatch match in match_Return_BaseHandleEvent_E)
+                MetricsManager.LogModError(ThisMod, 
+                    $"{patchMethodName}: ({metricsCheckSteps}) " +
+                    $"{nameof(CodeMatcher.MatchStartForward)} failed to find instructions " +
+                    $"{nameof(match_node_NamedNodes_Builder)}");
+
+                foreach (CodeMatch match in match_node_NamedNodes_Builder)
                 {
                     MetricsManager.LogModError(ThisMod, $"{patchMethodName}:     {match.opcode} {match.operand}");
                 }
-                codeMatcher.Vomit(doVomit);
+                codeMatcher.Vomit(Generator, doVomit);
                 return Instructions;
             }
             metricsCheckSteps++;
-            */
+
+            CodeInstruction[] instr_ProcessBakedXML_MutationEntry = new CodeInstruction[]
+            {
+                new(OpCodes.Ldarg_1),
+                new(OpCodes.Ldloc_0),
+                CodeInstruction.Call(
+                    typeof(GameObjectFactory_Patches), 
+                    nameof(ProcessBakedXML_MutationEntry), 
+                    new Type[] { typeof(ObjectBlueprintLoader.ObjectBlueprintXMLData), typeof(GameObjectBlueprint) })
+            };
+
+            codeMatcher.Insert(instr_ProcessBakedXML_MutationEntry);
+
             MetricsManager.LogModInfo(ThisMod, $"Successfully transpiled {patchMethodName}");
             return codeMatcher.Vomit(Generator, doVomit).InstructionEnumeration();
+        }
+
+        public static void ProcessBakedXML_MutationEntry(ObjectBlueprintLoader.ObjectBlueprintXMLData node, GameObjectBlueprint gameObjectBlueprint)
+        {
+            try
+            {
+                bool doDebug = true;
+                Debug.Entry(4, nameof(ProcessBakedXML_MutationEntry), Indent: 0, Toggle: doDebug);
+                foreach ((string mutationName, ObjectBlueprintLoader.ObjectBlueprintXMLChildNode mutationNode) in node.NamedNodes("mutation"))
+                {
+                    if (mutationNode.Attributes.ContainsKey(EntryNameAttribute))
+                    {
+                        var entryName = new KeyValuePair<string, string>(EntryNameAttribute, mutationNode.Attributes[EntryNameAttribute]);
+                        mutationNode.Attributes.Remove(EntryNameAttribute);
+                        if (MutationFactory.GetMutationEntryByName(entryName.Value) is MutationEntry mutationEntry)
+                        {
+                            Debug.Entry(4, node.Name, mutationName + ", " + nameof(mutationEntry) + ": " + mutationEntry?.Name, Indent: 0, Toggle: doDebug);
+                            GamePartBlueprint gamePartBlueprint = new("XRL.World.Parts.Mutation", mutationEntry.Class)
+                            {
+                                Name = mutationEntry.Class,
+                                Parameters = mutationNode.Attributes
+                            };
+                            gameObjectBlueprint.Mutations[gamePartBlueprint.Name] = gamePartBlueprint;
+                        }
+                    }
+                }
+            }
+            catch (Exception x)
+            {
+                MetricsManager.LogModError(ThisMod, x);
+            }
         }
 
         [HarmonyPatch(
@@ -69,7 +127,8 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void LoadBakedXML_MutationEntryIfSupplied_Postfix(ref GameObjectFactory __instance, ref GameObjectBlueprint __result, ObjectBlueprintLoader.ObjectBlueprintXMLData node)
         {
-            if (true || Stat.Roll("1d2") < 3)
+            bool doThisPatch = false;
+            if (doThisPatch)
             {
                 try
                 {
@@ -181,10 +240,9 @@ namespace HNPS_GigantismPlus.Harmony
                 }
                 catch (Exception x)
                 {
-                    MetricsManager.LogModError(ThisMod, $"{nameof(GameObjectFactory_Patches)}, x: {x}");
+                    MetricsManager.LogModError(ThisMod, x);
                 }
             }
         }
-
     }
 }

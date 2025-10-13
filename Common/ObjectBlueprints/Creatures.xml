@@ -133,23 +133,23 @@
     -->
   <object Name="MopangoCharioteer" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" />
+    <mutation Name="UD_ManagedBurrowingClaws" EntryName="Burrowing Claws" Level="4" />
   </object>
   <object Name="MopangoPilgrim" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
+    <mutation Name="UD_ManagedBurrowingClaws" EntryName="Burrowing Claws" Level="4" PathAsBurrower="false" />
   </object>
   <object Name="MopangoPilgrim Still" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
+    <mutation Name="UD_ManagedBurrowingClaws" EntryName="Burrowing Claws" Level="4" PathAsBurrower="false" />
   </object>
   <object Name="MopangoTombdweller" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="4" PathAsBurrower="false" />
+    <mutation Name="UD_ManagedBurrowingClaws" EntryName="Burrowing Claws" Level="4" PathAsBurrower="false" />
   </object>
   <object Name="MopangoWatcher" Load="Merge">
     <removemutation Name="BurrowingClaws" />
-    <mutation Name="UD_ManagedBurrowingClaws" DisplayName="Burrowing Claws" Level="6" />
+    <mutation Name="UD_ManagedBurrowingClaws" EntryName="Burrowing Claws" Level="6" />
   </object>
   
   <!-- 
@@ -157,28 +157,28 @@
     -->
   <object Name="Horned Chameleon" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="1" Variant="UD_HornsPlus Single" />
+    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="1" Variant="UD_HornsPlus Single" />
   </object>
   <object Name="BaseHindren" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="3" Variant="UD_HornsPlus Antlers" />
+    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="3" Variant="UD_HornsPlus Antlers" />
   </object>
   <object Name="Fork-Horned Gnu" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="5" Variant="UD_HornsPlus" />
+    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="5" Variant="UD_HornsPlus" />
   </object>
   <object Name="Unimax" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="10" Variant="UD_HornsPlus Spiral" />
+    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="10" Variant="UD_HornsPlus Spiral" />
     <intproperty Name="RapidLevel_UD_HornsPlus" Value="6" />
   </object>
   <object Name="Goat Golem" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="UD_HornsPlus" />
+    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="8" Variant="UD_HornsPlus" />
   </object>
   <object Name="Warden Yrame" Load="Merge">
     <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" DisplayName="Horns" Level="8" Variant="UD_HornsPlus" />
+    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="8" Variant="UD_HornsPlus" />
   </object>
   
   <!-- 
@@ -186,28 +186,28 @@
     -->
   <object Name="Prickler" Load="Merge">
     <removemutation Name="Quills" />
-    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="1" />
+    <mutation Name="UD_QuillsPlus" EntryName="Quills" Level="1" />
   </object>
   <object Name="Quillipede" Load="Merge">
     <removemutation Name="Quills" />
-    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="3" />
+    <mutation Name="UD_QuillsPlus" EntryName="Quills" Level="3" />
   </object>
   <object Name="Urshiib" Load="Merge">
     <removemutation Name="Quills" />
-    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="6" />
+    <mutation Name="UD_QuillsPlus" EntryName="Quills" Level="6" />
   </object>
   <object Name="Urchin Golem" Load="Merge">
     <removemutation Name="Quills" />
-    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="10" />
+    <mutation Name="UD_QuillsPlus" EntryName="Quills" Level="10" />
   </object>
   <object Name="Urshiib Golem" Load="Merge">
     <removemutation Name="Quills" />
-    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="9" />
+    <mutation Name="UD_QuillsPlus" EntryName="Quills" Level="9" />
     <intproperty Name="RapidLevel_UD_QuillsPlus" Value="3" />
   </object>
   <object Name="Dagasha" Load="Merge">
     <removemutation Name="Quills" />
-    <mutation Name="UD_QuillsPlus" DisplayName="Quills" Level="10" />
+    <mutation Name="UD_QuillsPlus" EntryName="Quills" Level="10" />
   </object>
   
   <!-- 
@@ -215,7 +215,7 @@
     -->
   <object Name="GolgothaSlog" Load="Merge">
     <removemutation Name="SlogGlands" />
-    <mutation Name="UD_SlogGlands" DisplayName="Bilge Sphincter" Level="1" />
+    <mutation Name="UD_SlogGlands" EntryName="Bilge Sphincter" Level="1" />
   </object>
   
   <!-- 
@@ -223,7 +223,7 @@
       - give mutation "ElongatedPaws" 
     -->
   <object Name="Urshiib" Load="Merge">
-    <mutation Name="ElongatedPaws" DisplayName="Elongated Paws" />
+    <mutation Name="ElongatedPaws" EntryName="Elongated Paws" />
   </object>
   
   <!-- 
@@ -279,7 +279,7 @@
     <inventoryobject Blueprint="Leather Apron" AutoMod="ModGigantic" IntProperties="AlwaysEquipAsArmor:1" Property="WontSell" />
     <inventoryobject Blueprint="Steel Butcher Knife" AutoMod="ModGigantic" IntProperties="AlwaysEquipAsWeapon:1" Property="WontSell" />
     <inventoryobject Blueprint="@Junk 1" Number="1-3" AutoMod="ModGigantic" />
-    <tag Name="WontSell" Value="Sandals,Spectacles,Leather Apron,Steel Butcher Knife" />
+    <!--tag Name="WontSell" Value="Sandals,Spectacles,Leather Apron,Steel Butcher Knife" /-->
     <skill Name="Persuasion_RebukeRobot" />
     <tag Name="Genotype" Value="True Kin" />
   </object>
@@ -290,8 +290,7 @@
   <object Name="TemplarGiantSlayerBase" Inherits="Templar">
     <part Name="Render" DisplayName="Templar Giant-Slayer"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png" 
-          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"  
-          />
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <part Name="Description" Short="An over-square jaw competes with =pronouns.possessive= broad, furrowed brow for posession of =pronouns.possessive= face. =pronouns.Possessive= posture hints at a once bent spine, and =pronouns.possessive= gait all but betrays it. =pronouns.Subjective= =verb:flex:afterpronoun= =pronouns.possessive= immense fists in subconcious anticipation of imminent glory, while =pronouns.possessive= deep-set, monochrome eyes flicker hopefully across the horizon." />
     <part Name="Brain" Factions="GiantTemplar-100,Templar-50" />
     <removeskill Name="LongBlades" />
@@ -308,8 +307,7 @@
   <object Name="Templar Squire Giant-Slayer" Inherits="TemplarGiantSlayerBase">
     <part Name="Render" DisplayName="Templar squire giant-slayer"
           RenderString="t" Tile="Creatures/GiantSlayer_Templar.png"
-          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y"
-          />
+          ColorString="&amp;Y" TileColor="&amp;r" DetailColor="Y" />
     <stat Name="Level" Value="11" />
     <stat Name="Hitpoints" Value="32" />
     <stat Name="Strength" Boost="2" />

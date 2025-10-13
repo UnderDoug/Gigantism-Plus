@@ -177,8 +177,8 @@
     <mutation Name="UD_HornsPlus" EntryName="Horns" Level="8" Variant="UD_HornsPlus" />
   </object>
   <object Name="Warden Yrame" Load="Merge">
-    <removemutation Name="Horns" />
-    <mutation Name="UD_HornsPlus" EntryName="Horns" Level="8" Variant="UD_HornsPlus" />
+    <!--removemutation Name="Horns" /-->
+    <!-- mutation Name="UD_HornsPlus" EntryName="Horns" Level="8" Variant="UD_HornsPlus" /-->
   </object>
   
   <!-- 

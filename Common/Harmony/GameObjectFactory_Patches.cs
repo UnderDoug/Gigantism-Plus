@@ -21,7 +21,7 @@ namespace HNPS_GigantismPlus.Harmony
 
         private static readonly string TargetAttribute = "DisplayName";
         private static readonly string EntryNameAttribute = "EntryName";
-
+        /*
         [HarmonyPatch(
             declaringType: typeof(GameObjectFactory),
             methodName: nameof(GameObjectFactory.LoadBakedXML),
@@ -243,6 +243,6 @@ namespace HNPS_GigantismPlus.Harmony
                     MetricsManager.LogModError(ThisMod, x);
                 }
             }
-        }
+        }*/
     }
 }

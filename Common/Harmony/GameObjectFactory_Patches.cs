@@ -88,7 +88,7 @@ namespace HNPS_GigantismPlus.Harmony
                     IncludeEnd: true,
                     Do: doVomit);
 
-                codeMatcher.Vomit(Generator, true);
+                codeMatcher.Vomit(Generator, doVomit);
                 return Instructions;
             }
             metricsCheckSteps++;

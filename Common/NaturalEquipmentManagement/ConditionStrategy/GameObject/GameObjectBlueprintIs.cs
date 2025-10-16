@@ -5,7 +5,7 @@ using XRL.World;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectBlueprintIs : ICondition<GameObject>
+    public class GameObjectBlueprintIs : Condition<GameObject>
     {
         public string Blueprint;
 

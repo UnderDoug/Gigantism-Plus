@@ -70,7 +70,7 @@ namespace XRL.World.Parts
         {
         }
 
-        public override ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, bool FlipPriority, ICondition<GameObject> Condition = null)
+        public override ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, bool FlipPriority, IConditional<GameObject> Condition = null)
         {
             int indent = Debug.LastIndent;
             Adjustments ??= new();

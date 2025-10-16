@@ -5,7 +5,7 @@ using XRL.World.Anatomy;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class BodyPartVariantIs : ICondition<BodyPart>
+    public class BodyPartVariantIs : Condition<BodyPart>
     {
         public string Variant;
 
@@ -26,8 +26,11 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(BodyPart BodyPart)
         {
-            return (BodyPart == null && !FalseIfSubjectNull)
-                || Variant.IsNullOrEmpty()
+            if (BodyPart == null)
+            {
+                return IfSubjectNull;
+            }
+            return Variant.IsNullOrEmpty()
                 || BodyPart?.VariantType == Variant;
         }
     }

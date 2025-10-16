@@ -26,7 +26,7 @@ namespace HNPS_GigantismPlus
 
         public virtual TAdjustment GetAdjustment(GameObject GameObject)
         {
-            if (!base.Check(GameObject))
+            if (GameObject == null)
             {
                 return null;
             }
@@ -55,6 +55,10 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject GameObject)
         {
+            if (GameObject == null)
+            {
+                return base.Check(GameObject);
+            }
             return GetAdjustment(GameObject) != null;
         }
     }

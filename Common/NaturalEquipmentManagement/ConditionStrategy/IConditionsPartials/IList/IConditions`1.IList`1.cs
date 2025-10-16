@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace HNPS_GigantismPlus
 {
-    public abstract partial class IConditions<T> : ICondition<T>, IList<ICondition<T>>
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>, IList<IConditional<T>>
     {
-        ICondition<T> IList<ICondition<T>>.this[int Index]
+        IConditional<T> IList<IConditional<T>>.this[int Index]
         {
             get
             {
@@ -21,18 +20,18 @@ namespace HNPS_GigantismPlus
                 if ((uint)Index < (uint)Length)
                 {
                     Variant++;
-                    Items[Index] = (ICondition<T>)value;
+                    Items[Index] = (IConditional<T>)value;
                 }
                 throw new ArgumentOutOfRangeException();
             }
         }
 
-        public int IndexOf(ICondition<T> Condition)
+        public int IndexOf(IConditional<T> Condition)
         {
             return Array.IndexOf(Items, Condition, 0, Length);
         }
 
-        public virtual void Insert(int Index, ICondition<T> Condition)
+        public virtual void Insert(int Index, IConditional<T> Condition)
         {
             if ((uint)Index > (uint)Size)
             {
@@ -65,7 +64,7 @@ namespace HNPS_GigantismPlus
             {
                 Array.Copy(Items, Index + 1, Items, Index, Length - Index);
             }
-            Items[Length] = default(ICondition<T>);
+            Items[Length] = (IConditional<T>)default;
             Variant++;
         }
     }

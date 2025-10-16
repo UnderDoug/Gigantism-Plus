@@ -9,10 +9,9 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class OnlyOneCondition<T> : IConditions<T>
-        where T : class, new()
+    public class ConditionsOnlyOne<T> : IConditions<T>
     {
-        private static bool doDebug => getClassDoDebug("OnlyOneCondition");
+        private static bool doDebug => getClassDoDebug("ConditionsOnlyOne");
         private static bool getDoDebug(object what = null)
         {
             List<object> doList = new()
@@ -33,11 +32,11 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
-        public OnlyOneCondition()
+        public ConditionsOnlyOne()
             : base()
         {
         }
-        public OnlyOneCondition(IConditions<T> Source)
+        public ConditionsOnlyOne(IConditions<T> Source)
             : base(Source)
         {
         }
@@ -46,7 +45,7 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(Check));
-            Debug.Entry(4, $"[?] {nameof(OnlyOneCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(ConditionsOnlyOne<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
@@ -67,22 +66,22 @@ namespace HNPS_GigantismPlus
                         }
                     }
                 }
-                Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {oneCondition}",
+                Debug.LoopItem(4, $"{nameof(ConditionsOnlyOne<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {oneCondition}",
                     Good: oneCondition, Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return oneCondition;
             }
-            Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(ConditionsOnlyOne<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {!IfSubjectNull}",
+                Good: !IfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return !FalseIfSubjectNull;
+            return !IfSubjectNull;
         }
 
         public override bool NotCheck(T Subject)
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(NotCheck));
-            Debug.Entry(4, $"[?] {nameof(OnlyOneCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(ConditionsOnlyOne<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
@@ -103,15 +102,15 @@ namespace HNPS_GigantismPlus
                         }
                     }
                 }
-                Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!oneCondition}",
+                Debug.LoopItem(4, $"{nameof(ConditionsOnlyOne<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!oneCondition}",
                     Good: !oneCondition, Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
                 return !oneCondition;
             }
-            Debug.LoopItem(4, $"{nameof(OnlyOneCondition<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(ConditionsOnlyOne<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!IfSubjectNull}",
+                Good: !IfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return !FalseIfSubjectNull;
+            return !IfSubjectNull;
         }
     }
 }

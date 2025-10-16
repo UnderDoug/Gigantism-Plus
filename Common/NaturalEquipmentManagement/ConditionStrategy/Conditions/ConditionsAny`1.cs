@@ -9,10 +9,9 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class AllConditions<T> : IConditions<T>
-        where T : class, new()
+    public class ConditionsAny<T> : IConditions<T>
     {
-        private static bool doDebug => getClassDoDebug("AllConditions");
+        private static bool doDebug => getClassDoDebug("ConditionsAny");
         private static bool getDoDebug(object what = null)
         {
             List<object> doList = new()
@@ -33,12 +32,12 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
-        public AllConditions()
+        public ConditionsAny()
             : base()
         {
         }
-        public AllConditions(IConditions<T> Source)
-            : base(Source)
+        public ConditionsAny(IConditions<T> Conditions)
+            : base(Conditions)
         {
         }
 
@@ -46,60 +45,60 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(Check));
-            Debug.Entry(4, $"[?] {nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(ConditionsAny<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
             {
                 foreach (bool result in results)
                 {
-                    if (!result)
+                    if (result)
                     {
-                        Debug.CheckNah(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}",
+                        Debug.CheckYeh(4, $"{nameof(ConditionsAny<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}",
                             Indent: indent + 1, Toggle: doDebug);
                         Debug.LastIndent = indent;
-                        return false;
+                        return true;
                     }
                 }
-                Debug.CheckYeh(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}",
+                Debug.CheckNah(4, $"{nameof(ConditionsAny<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}",
                     Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
-                return true;
+                return false;
             }
-            Debug.LoopItem(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(ConditionsAny<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {!IfSubjectNull}",
+                Good: !IfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return !FalseIfSubjectNull;
+            return !IfSubjectNull;
         }
 
         public override bool NotCheck(T Subject)
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(NotCheck));
-            Debug.Entry(4, $"[?] {nameof(AllConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(ConditionsAny<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             List<bool> results = new(Results(Subject));
             if (!results.IsNullOrEmpty())
             {
                 foreach (bool result in results)
                 {
-                    if (!result)
+                    if (result)
                     {
-                        Debug.CheckYeh(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {true}",
+                        Debug.CheckNah(4, $"{nameof(ConditionsAny<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {false}",
                             Indent: indent + 1, Toggle: doDebug);
                         Debug.LastIndent = indent;
-                        return true;
+                        return false;
                     }
                 }
-                Debug.CheckNah(4, $"{nameof(AllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {false}",
+                Debug.CheckYeh(4, $"{nameof(ConditionsAny<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {true}",
                     Indent: indent + 1, Toggle: doDebug);
                 Debug.LastIndent = indent;
-                return false;
+                return true;
             }
-            Debug.LoopItem(4, $"{nameof(AllConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!FalseIfSubjectNull}",
-                Good: !FalseIfSubjectNull, Indent: indent + 1, Toggle: doDebug);
+            Debug.LoopItem(4, $"{nameof(ConditionsAny<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {!IfSubjectNull}",
+                Good: !IfSubjectNull, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
-            return !FalseIfSubjectNull;
+            return !IfSubjectNull;
         }
     }
 }

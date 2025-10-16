@@ -4,15 +4,14 @@ using System.Collections.Generic;
 
 namespace HNPS_GigantismPlus
 {
-    public abstract partial class IConditions<T> : ICondition<T>, ICollection
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>, ICollection
     {
         bool ICollection.IsSynchronized => false;
 
         object ICollection.SyncRoot => this;
 
-        public IConditions(ICollection<ICondition<T>> Conditions)
-            : this(Conditions as IReadOnlyList<ICondition<T>>)
+        public IConditions(ICollection<IConditional<T>> Conditions)
+            : this(Conditions as IReadOnlyList<IConditional<T>>)
         {
         }
 
@@ -22,7 +21,6 @@ namespace HNPS_GigantismPlus
             {
                 throw new ArgumentException("Multidimensional arrays are not supported");
             }
-
             try
             {
                 Array.Copy(Items, 0, Array, Index, Size);

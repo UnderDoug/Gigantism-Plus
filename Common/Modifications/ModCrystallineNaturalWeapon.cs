@@ -19,10 +19,10 @@ namespace XRL.World.Parts
     {
         private static bool doDebug => getClassDoDebug(nameof(ModCrystallineNaturalWeapon));
 
-        public static AllConditions<GameObject> ReturnsAreDiminished => new()
+        public static ConditionsAll<GameObject> ReturnsAreDiminished => new()
         {
             WielderHasGigantismPlus,
-            new AnyConditions<GameObject>()
+            new ConditionsAny<GameObject>()
             {
                 WielderHasElongatedPaws,
                 WielderHasBurrowingClaws,

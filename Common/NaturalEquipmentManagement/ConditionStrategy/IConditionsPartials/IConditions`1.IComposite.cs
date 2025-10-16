@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-
-using XRL.Collections;
-using XRL.World;
+﻿using XRL.World;
 
 namespace HNPS_GigantismPlus
 {
-    public abstract partial class IConditions<T> : ICondition<T>, IComposite
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>, IComposite
     {
         public virtual void Write(SerializationWriter Writer)
         {
@@ -23,10 +15,10 @@ namespace HNPS_GigantismPlus
         public virtual void Read(SerializationReader Reader)
         {
             Size = (Length = Reader.ReadOptimizedInt32());
-            Items = new ICondition<T>[Size];
+            Items = new IConditional<T>[Size];
             for (int i = 0; i < Length; i++)
             {
-                Items[i] = (ICondition<T>)Reader.ReadObject();
+                Items[i] = (IConditional<T>)Reader.ReadObject();
             }
         }
     }

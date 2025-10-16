@@ -6,7 +6,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class PartHasAdjustment<T, TAdjustment> : PartIsNaturalModification<T>
+    public class IPartHasAdjustment<T, TAdjustment> : IPartIsNaturalModification<T>
         where T
         : IPart
         , IManagedDefaultNaturalEquipment<T>
@@ -14,18 +14,18 @@ namespace HNPS_GigantismPlus
         where TAdjustment
         : IAdjustment
     {
-        public PartHasAdjustment()
+        public IPartHasAdjustment()
             : base()
         {
         }
-        public PartHasAdjustment(PartIsModification<ModNaturalEquipment<T>> Source)
+        public IPartHasAdjustment(IPartIsModification<ModNaturalEquipment<T>> Source)
             : base(Source)
         {
         }
 
         public virtual TAdjustment GetAdjustment(IPart IPart)
         {
-            if (!base.Check(IPart))
+            if (IPart == null)
             {
                 return null;
             }
@@ -56,6 +56,10 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(IPart IPart)
         {
+            if (IPart == null)
+            {
+                return base.Check(IPart);
+            }
             return GetAdjustment(IPart) != null;
         }
     }

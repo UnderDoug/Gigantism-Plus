@@ -6,14 +6,14 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class PartIsModification<T> : ICondition<IPart>
+    public class IPartIsModification<T> : Condition<IPart>
         where T : IModification
     {
-        public PartIsModification()
+        public IPartIsModification()
             : base()
         {
         }
-        public PartIsModification(PartIsModification<T> Source)
+        public IPartIsModification(IPartIsModification<T> Source)
             : base(Source)
         {
         }
@@ -28,8 +28,11 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(IPart IPart)
         {
-            return base.Check(IPart)
-                && IPart.InheritsFrom<T>();
+            if (IPart == null)
+            {
+                base.Check(IPart);
+            }
+            return IPart.InheritsFrom<T>();
         }
     }
 }

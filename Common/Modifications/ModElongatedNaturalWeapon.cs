@@ -56,9 +56,9 @@ namespace XRL.World.Parts
             AddAdjustment(
                 Adjustment: new ArbitraryDescription(DescriptionElement.Empty, hasItScale),
                 FlipPriority: true,
-                Condition: new NotCondition<GameObject>(ThisModAdjustsMeleeCumulatively<ElongatedPaws>()));
+                Condition: new ConditionNot<GameObject>(ThisModAdjustsMeleeCumulatively<ElongatedPaws>()));
 
-            AddAdjustment(new DiminishingReturns("increases to damage die size"), true, new AnyConditions<GameObject>() { IsGigantic, IsBurrowing });
+            AddAdjustment(new DiminishingReturns("increases to damage die size"), true, new ConditionsAny<GameObject>() { IsGigantic, IsBurrowing });
             AddAdjustment(new SetSwingSound("Sounds/Melee/shortBlades/sfx_melee_foldedCarbide_wristblade_swing"), true, IsOrganicFist);
             AddAdjustment(new SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_longBlade_saltHopperMandible_blocked"), true, IsOrganicFist);
         }

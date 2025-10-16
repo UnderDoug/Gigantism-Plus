@@ -6,7 +6,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class NatEquipModBodyPartTypeIs<T> : ICondition<ModNaturalEquipment<T>>
+    public class NatEquipModBodyPartTypeIs<T> : Condition<ModNaturalEquipment<T>>
         where T : IPart, IManagedDefaultNaturalEquipment<T>, new()
     {
         public string BodyPartType;
@@ -37,8 +37,11 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(ModNaturalEquipment<T> NaturalEquipmentMod)
         {
-            return base.Check(NaturalEquipmentMod)
-                && !BodyPartType.IsNullOrEmpty()
+            if (NaturalEquipmentMod == null)
+            {
+                return base.Check(NaturalEquipmentMod);
+            }
+            return !BodyPartType.IsNullOrEmpty()
                 && NaturalEquipmentMod.BodyPartType == BodyPartType;
         }
     }

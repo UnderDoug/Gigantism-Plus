@@ -287,7 +287,7 @@ namespace XRL.World.Parts.Mutation
                 .AdjustMeleeSkill("Cudgel", false)
 
                 .AdjustNoun()
-                .AdjustTile("NaturalWeapons/GiganticFist.png", false, new NotCondition<GameObject>(IsAugmented))
+                .AdjustTile("NaturalWeapons/GiganticFist.png", false, new ConditionNot<GameObject>(IsAugmented))
 
                 .SetSwingSound("Sounds/Melee/cudgels/sfx_melee_cudgel_fistOfTheApeGod_swing", false)
                 .SetBlockedSound("Sounds/Melee/multiUseBlock/sfx_melee_cudgel_fistOfTheApeGod_block", false);

@@ -7,7 +7,7 @@ using static HNPS_GigantismPlus.Const;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasPropertyOrTag : ICondition<GameObject>
+    public class GameObjectHasPropertyOrTag : Condition<GameObject>
     {
         public string PropertyOrTag;
 

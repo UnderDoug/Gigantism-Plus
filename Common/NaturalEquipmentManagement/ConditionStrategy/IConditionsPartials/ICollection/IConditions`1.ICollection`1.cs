@@ -4,12 +4,11 @@ using System.Runtime.CompilerServices;
 
 namespace HNPS_GigantismPlus
 {
-    public abstract partial class IConditions<T> : ICondition<T>, ICollection<ICondition<T>>
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>, ICollection<IConditional<T>>
     {
         public bool IsReadOnly => false;
 
-        public virtual void Add(ICondition<T> Condition)
+        public virtual void Add(IConditional<T> Condition)
         {
             EnsureCapacity(Length + 1);
             Items[Length++] = Condition;
@@ -29,7 +28,7 @@ namespace HNPS_GigantismPlus
             }
         }
 
-        public bool Contains(ICondition<T> Condition)
+        public bool Contains(IConditional<T> Condition)
         {
             if (Size != 0)
             {
@@ -38,12 +37,12 @@ namespace HNPS_GigantismPlus
             return false;
         }
 
-        public void CopyTo(ICondition<T>[] Array, int ArrayIndex)
+        public void CopyTo(IConditional<T>[] Array, int ArrayIndex)
         {
             CopyTo(Array, ArrayIndex);
         }
 
-        public virtual bool Remove(ICondition<T> Condition)
+        public virtual bool Remove(IConditional<T> Condition)
         {
             int index = IndexOf(Condition);
             if (index >= 0)

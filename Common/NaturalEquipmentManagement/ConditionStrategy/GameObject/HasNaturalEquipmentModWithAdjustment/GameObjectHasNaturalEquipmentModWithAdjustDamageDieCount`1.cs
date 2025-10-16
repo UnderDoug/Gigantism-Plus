@@ -23,8 +23,11 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject GameObject)
         {
-            return base.Check(GameObject)
-                && GetAdjustment(GameObject).Check(GameObject);
+            if (GameObject == null)
+            {
+                return base.Check(GameObject);
+            }
+            return GetAdjustment(GameObject).Check(GameObject);
         }
     }
 }

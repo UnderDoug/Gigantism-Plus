@@ -32,10 +32,13 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject GameObject)
         {
-            GameObject holder = GameObject?.Holder;
-            Debug.Entry(4, $"{nameof(holder)} is {holder?.DebugName ?? Const.NULL}", Indent: Debug.LastIndent + 1, Toggle: true);
-            Debug.LastIndent--;
-            return base.Check(holder);
+            if (GameObject?.Holder is GameObject holder)
+            {
+                Debug.Entry(4, $"{nameof(holder)} is {holder?.DebugName ?? Const.NULL}", Indent: Debug.LastIndent + 1, Toggle: true);
+                Debug.LastIndent--;
+                return base.Check(holder);
+            }
+            return false;
         }
 
         public static implicit operator GameObjectHolderHasPart(GameObjectWielderHasPart Condition)

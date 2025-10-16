@@ -7,7 +7,7 @@ using static HNPS_GigantismPlus.Const;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasPart : ICondition<GameObject>
+    public class GameObjectHasPart : Condition<GameObject>
     {
         public string Part;
 
@@ -43,6 +43,7 @@ namespace HNPS_GigantismPlus
         {
             return base.Check(GameObject)
                 && !Part.IsNullOrEmpty()
+                && GameObject != null
                 && GameObject.HasPart(Part);
         }
     }

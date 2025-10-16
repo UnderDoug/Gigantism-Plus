@@ -14,13 +14,13 @@ namespace HNPS_GigantismPlus
 {
     public static class NaturalEquipmentConditions
     {
-        public static AnyConditions<GameObject> IsOrganicFist => new()
+        public static ConditionsAny<GameObject> IsOrganicFist => new()
         {
             new GameObjectBlueprintIs("DefaultFist"),
-            new NotCondition<GameObject>(new GameObjectHasAnyParts(new Type[] { typeof(Inorganic), typeof(Metal) })),
+            new ConditionNot<GameObject>(new GameObjectHasAnyParts(new Type[] { typeof(Inorganic), typeof(Metal) })),
         };
 
-        public static AnyConditions<GameObject> IsCybernetic => new()
+        public static ConditionsAny<GameObject> IsCybernetic => new()
         {
             IsAugmented,
             IsChromeBoned,

@@ -43,6 +43,18 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
+        public bool IfSubjectNull
+        {
+            get
+            {
+                if (Condition == null)
+                {
+                    return false;
+                }
+                return Condition.IfSubjectNull;
+            }
+        }
+
         private bool Applying; // Whether Apply() should send AfterApplyAdjustmentEvent.
 
         private bool Applied; // Whether the adjustment has been applied.
@@ -57,7 +69,7 @@ namespace HNPS_GigantismPlus
         public int Priority; // Priority of adjustment, lower number = higher priority
 
         [NonSerialized]
-        public ICondition<GameObject> Condition;
+        public Condition<GameObject> Condition;
 
         [NonSerialized]
         public string Value;
@@ -94,13 +106,21 @@ namespace HNPS_GigantismPlus
 
             Configure();
         }
-        public IAdjustment(Type Source, bool Prioritize, int Priority, ICondition<GameObject> Condition = null, AllConditions<GameObject> AllConditions = null, AnyConditions<GameObject> AnyConditions = null, string Value = null, int? Amount = null, bool? State = null, string Verb = null, string Effect = null)
+        public IAdjustment(
+            Type Source, bool
+            Prioritize,
+            int Priority,
+            IConditional<GameObject> Condition = null,
+            string Value = null, int? Amount = null,
+            bool? State = null,
+            string Verb = null,
+            string Effect = null)
             : this()
         {
             this.Source = Source;
             this.Prioritize = Prioritize;
             this.Priority = Priority;
-            this.Condition = Condition;
+            this.Condition = (Condition<GameObject>)Condition;
             this.Value = Value;
             this.Amount = Amount;
             this.State = State;
@@ -181,6 +201,10 @@ namespace HNPS_GigantismPlus
 
         public virtual bool CheckCondition(GameObject Subject)
         {
+            if (Subject == null)
+            {
+                return !IfSubjectNull;
+            }
             return Subject != null && (Condition == null || Condition[Subject]);
         }
 
@@ -392,7 +416,7 @@ namespace HNPS_GigantismPlus
             Source = Reader.ReadObject() as Type;
             Prioritize = Reader.ReadBoolean();
             Priority = Reader.ReadInt32();
-            Condition = Reader.ReadObject() as ICondition<GameObject>;
+            Condition = Reader.ReadObject() as Condition<GameObject>;
             Value = Reader.ReadOptimizedString();
             Amount = Reader.ReadObject() as int?;
             State = Reader.ReadObject() as bool?;

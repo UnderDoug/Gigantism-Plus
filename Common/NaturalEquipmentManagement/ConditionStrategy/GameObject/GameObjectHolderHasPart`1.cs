@@ -23,7 +23,11 @@ namespace HNPS_GigantismPlus
 
         public override bool Check(GameObject GameObject)
         {
-            return base.Check(GameObject?.Holder);
+            if (GameObject?.Holder is GameObject holder)
+            {
+                base.Check(holder);
+            }
+            return false;
         }
 
         public static implicit operator GameObjectHolderHasPart<T>(GameObjectWielderHasPart<T> Condition)

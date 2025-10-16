@@ -6,17 +6,17 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class PartIsNaturalModification<T> : PartIsModification<ModNaturalEquipment<T>>
+    public class IPartIsNaturalModification<T> : IPartIsModification<ModNaturalEquipment<T>>
         where T
         : IPart
         , IManagedDefaultNaturalEquipment<T>
         , new()
     {
-        public PartIsNaturalModification()
+        public IPartIsNaturalModification()
             : base()
         {
         }
-        public PartIsNaturalModification(PartIsModification<ModNaturalEquipment<T>> Source)
+        public IPartIsNaturalModification(IPartIsModification<ModNaturalEquipment<T>> Source)
             : base(Source)
         {
         }

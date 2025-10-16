@@ -6,7 +6,7 @@ using XRL.World;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasAllParts : AllConditions<GameObject>
+    public class GameObjectHasAllParts : ConditionsAll<GameObject>
     {
         public GameObjectHasAllParts()
             : base()
@@ -17,7 +17,7 @@ namespace HNPS_GigantismPlus
         {
         }
         public GameObjectHasAllParts(IEnumerable<GameObjectHasPart> Conditions)
-            : base(Conditions as AllConditions<GameObject>)
+            : base(Conditions as ConditionsAll<GameObject>)
         {
         }
         public GameObjectHasAllParts(IEnumerable<string> Parts)

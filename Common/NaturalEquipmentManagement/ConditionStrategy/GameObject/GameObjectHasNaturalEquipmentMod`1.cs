@@ -117,7 +117,13 @@ namespace HNPS_GigantismPlus
 
         public virtual bool Check(GameObject GameObject, out ModNaturalEquipment<T> NaturalEquipmentMod)
         {
-            return (NaturalEquipmentMod = GetNaturalEquipmentMod(GameObject)) != null || base.Check(GameObject);
+            NaturalEquipmentMod = null;
+            if (GameObject == null)
+            {
+                return base.Check(GameObject);
+            }
+            NaturalEquipmentMod = GetNaturalEquipmentMod(GameObject);
+            return NaturalEquipmentMod != null;
         }
     }
 }

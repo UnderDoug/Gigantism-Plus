@@ -3,8 +3,7 @@ using System.Collections;
 
 namespace HNPS_GigantismPlus
 {
-    public abstract partial class IConditions<T> : ICondition<T>, IList
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>, IList
     {
         bool IList.IsFixedSize => false;
 
@@ -23,19 +22,19 @@ namespace HNPS_GigantismPlus
                 if ((uint)Index < (uint)Length)
                 {
                     Variant++;
-                    Items[Index] = (ICondition<T>)value;
+                    Items[Index] = (Condition<T>)value;
                 }
                 throw new ArgumentOutOfRangeException();
             }
         }
         int IList.Add(object Value)
         {
-            Add((ICondition<T>)Value);
+            Add((IConditional<T>)Value);
             return Length - 1;
         }
         bool IList.Contains(object Value)
         {
-            if (Value is ICondition<T> item)
+            if (Value is IConditional<T> item)
             {
                 return Contains(item);
             }
@@ -43,7 +42,7 @@ namespace HNPS_GigantismPlus
         }
         int IList.IndexOf(object Value)
         {
-            if (Value is ICondition<T> condition)
+            if (Value is IConditional<T> condition)
             {
                 return IndexOf(condition);
             }
@@ -51,11 +50,11 @@ namespace HNPS_GigantismPlus
         }
         void IList.Insert(int Index, object Value)
         {
-            Insert(Index, (ICondition<T>)Value);
+            Insert(Index, (IConditional<T>)Value);
         }
         void IList.Remove(object Value)
         {
-            if (Value is ICondition<T> condition)
+            if (Value is IConditional<T> condition)
             {
                 Remove(condition);
             }

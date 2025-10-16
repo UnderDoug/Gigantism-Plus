@@ -153,13 +153,13 @@ namespace XRL.World.Parts
             return ParentObject?.NaturalEquipmentOperator();
         }
 
-        public virtual ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, bool FlipPriority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, bool FlipPriority, IConditional<GameObject> Condition = null)
         {
             int indent = Debug.LastIndent;
             Adjustments ??= new();
             int modPriority = FlipPriority ? -Priority : Priority;
             Adjustment.Source ??= GetType();
-            Adjustment.Condition ??= Condition;
+            Adjustment.Condition ??= (Condition<GameObject>)Condition;
             Adjustment.Priority = modPriority;
             Debug.LoopItem(4, $"Adding: {Adjustment}", Indent: indent + 1, Toggle: getDoDebug(nameof(AddAdjustment)));
             Adjustments.Add(Adjustment);
@@ -167,16 +167,16 @@ namespace XRL.World.Parts
             return this;
         }
 
-        public virtual ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(Adjustment, Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddAdjustment(IAdjustment Adjustment, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(Adjustment, ModPriority, FlipPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustNoun(int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustNoun(int Priority, IConditional<GameObject> Condition = null)
         {
             string noun = GetNoun();
             if (noun != null)
@@ -185,113 +185,113 @@ namespace XRL.World.Parts
             }
             return this;
         }
-        public virtual ModNaturalEquipmentBase AdjustNoun(bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustNoun(bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustNoun(modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustMeleeSkill(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeSkill(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ChangeMeleeWeaponSkill(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AdjustMeleeSkill(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeSkill(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustMeleeSkill(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustMeleeStat(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeStat(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ChangeMeleeWeaponStat(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AdjustMeleeStat(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeStat(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustMeleeStat(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustTile(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustTile(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ChangeTile(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AdjustTile(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustTile(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustTile(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustColorString(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustColorString(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ChangeColorString(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AdjustColorString(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustColorString(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustColorString(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustTileColor(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustTileColor(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ChangeTileColor(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AdjustTileColor(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustTileColor(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustTileColor(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustDetailColor(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustDetailColor(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ChangeDetailColor(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AdjustDetailColor(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustDetailColor(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AdjustDetailColor(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustMeleeDamageDieCount(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeDamageDieCount(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustMeleeDamageDieCount(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustMeleeDamageDieSize(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeDamageDieSize(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustMeleeDamageDieSize(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustMeleeDamageBonus(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeDamageBonus(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustMeleeDamageBonus(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustMeleeHitBonus(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustMeleeHitBonus(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustMeleeHitBonus(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddMeleeDamageAttributes(string Attributes, string AtrtibuteName, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddMeleeDamageAttributes(string Attributes, string AtrtibuteName, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AddMeleeDamageAttribute(Attributes, AtrtibuteName), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustPenBonus(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustPenBonus(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustMeleePenBonus(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustArmorAV(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustArmorAV(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustArmorAV(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustArmorDV(int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustArmorDV(int Amount, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AdjustArmorDV(Amount), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustArmorStatistic(string Statistic, int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustArmorStatistic(string Statistic, int Amount, IConditional<GameObject> Condition = null)
         {
             AdjustArmorStatistic adjustment = Statistic switch
             {
@@ -306,7 +306,7 @@ namespace XRL.World.Parts
             return AddAdjustment(adjustment, 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AdjustArmorResistance(string Resistance, int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AdjustArmorResistance(string Resistance, int Amount, IConditional<GameObject> Condition = null)
         {
             AdjustArmorResistance adjustment = Resistance switch
             {
@@ -344,7 +344,7 @@ namespace XRL.World.Parts
             return AddAdjustment(adjustment, 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddArmorStatisticAdjustment(string Statistic, int Amount, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddArmorStatisticAdjustment(string Statistic, int Amount, IConditional<GameObject> Condition = null)
         {
             AdjustArmorStatistic adjustment = Statistic switch
             {
@@ -359,110 +359,110 @@ namespace XRL.World.Parts
             return AddAdjustment(adjustment, 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddPart<P>(int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddPart<P>(int Priority, IConditional<GameObject> Condition = null)
             where P : IPart, new()
         {
             return AddAdjustment(new AddPart<P>(), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AddPart<P>(bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddPart<P>(bool FlipPriority = false, IConditional<GameObject> Condition = null)
             where P : IPart, new()
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddPart<P>(modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddPart(string Part, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddPart(string Part, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new AddPart(Part), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AddPart(string Part, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddPart(string Part, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return AddPart(Part, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase SetStringProperty(string Label, string Prop, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetStringProperty(string Label, string Prop, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new SetStringProperty(Label, Prop), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetStringProperty(string Label, string Prop, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetStringProperty(string Label, string Prop, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return SetStringProperty(Label, Prop, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase SetIntProperty(string Label, int Prop, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetIntProperty(string Label, int Prop, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new SetIntProperty(Label, Prop), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetIntProperty(string Label, int Prop, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetIntProperty(string Label, int Prop, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return SetIntProperty(Label, Prop, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase SetSwingSound(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetSwingSound(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new SetSwingSound(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetSwingSound(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetSwingSound(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return SetSwingSound(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase SetBlockedSound(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetBlockedSound(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new SetBlockedSound(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetBlockedSound(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetBlockedSound(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return SetBlockedSound(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, bool Override, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, bool Override, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new SetEquipmentFrameColors(Value, Override), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, bool Override, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, bool Override, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return SetEquipmentFrameColors(Value, Override, modPriority, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, int Priority, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, int Priority, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new SetEquipmentFrameColors(Value), Priority, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, bool FlipPriority = false, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase SetEquipmentFrameColors(string Value, bool FlipPriority = false, IConditional<GameObject> Condition = null)
         {
             int modPriority = FlipPriority ? -ModPriority : ModPriority;
             return SetEquipmentFrameColors(Value, modPriority, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddPrimaryDescription(DescriptionElement Value, int Order, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddPrimaryDescription(DescriptionElement Value, int Order, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ArbitraryDescription(Order, Value, default), 0, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AddPrimaryDescription(DescriptionElement Value, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddPrimaryDescription(DescriptionElement Value, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ArbitraryDescription(Value, default), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddSecondaryDescription(DescriptionElement Value, int Order, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddSecondaryDescription(DescriptionElement Value, int Order, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ArbitraryDescription(Order, default, Value), 0, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AddSecondaryDescription(DescriptionElement Value, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddSecondaryDescription(DescriptionElement Value, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new ArbitraryDescription(default, Value), 0, false, Condition);
         }
 
-        public virtual ModNaturalEquipmentBase AddDiminishingReturnsDescription(string Affected, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddDiminishingReturnsDescription(string Affected, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new DiminishingReturns(Affected), 0, false, Condition);
         }
-        public virtual ModNaturalEquipmentBase AddDiminishingReturnsDescription(string Affected, int Order, ICondition<GameObject> Condition = null)
+        public virtual ModNaturalEquipmentBase AddDiminishingReturnsDescription(string Affected, int Order, IConditional<GameObject> Condition = null)
         {
             return AddAdjustment(new DiminishingReturns(Order, Affected), 0, false, Condition);
         }

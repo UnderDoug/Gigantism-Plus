@@ -14,8 +14,7 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public abstract partial class IConditions<T> : ICondition<T>
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>
     {
         private static bool doDebug => getClassDoDebug("IConditions");
         private static bool getDoDebug(object what = null)
@@ -39,7 +38,7 @@ namespace HNPS_GigantismPlus
 
             return doDebug;
         }
-        protected ICondition<T>[] Items = Array.Empty<ICondition<T>>();
+        protected IConditional<T>[] Items = Array.Empty<IConditional<T>>();
 
         protected int Size;
 
@@ -60,16 +59,16 @@ namespace HNPS_GigantismPlus
         {
         }
 
-        public IConditions(List<ICondition<T>> Conditions)
+        public IConditions(List<IConditional<T>> Conditions)
             : this()
         {
             Items = Conditions.ToArray();
         }
         public IConditions(IConditions<T> Conditions)
-            : this(Conditions as IReadOnlyCollection<ICondition<T>>)
+            : this(Conditions as IReadOnlyCollection<IConditional<T>>)
         {
         }
-        public virtual ICondition<T> this[int Index]
+        public virtual IConditional<T> this[int Index]
         {
             get
             {
@@ -104,20 +103,20 @@ namespace HNPS_GigantismPlus
             {
                 Capacity = DefaultCapacity;
             }
-            ICondition<T>[] array = new ICondition<T>[Capacity];
+            IConditional<T>[] array = new IConditional<T>[Capacity];
             Array.Copy(Items, array, Length);
             Items = array;
             Size = Capacity;
         }
 
-        public void AddRange(ReadOnlySpan<ICondition<T>> Conditions)
+        public void AddRange(ReadOnlySpan<IConditional<T>> Conditions)
         {
             EnsureCapacity(Length + Conditions.Length);
             Conditions.CopyTo(Items.AsSpan(Length, Conditions.Length));
             Length += Conditions.Length;
             Variant++;
         }
-        public void AddRange(IReadOnlyList<ICondition<T>> Conditions)
+        public void AddRange(IReadOnlyList<IConditional<T>> Conditions)
         {
             int count = Conditions.Count;
             EnsureCapacity(Length + count);
@@ -126,34 +125,34 @@ namespace HNPS_GigantismPlus
                 Add(Conditions[i]);
             }
         }
-        public void AddRange(IReadOnlyCollection<ICondition<T>> Conditions)
+        public void AddRange(IReadOnlyCollection<IConditional<T>> Conditions)
         {
-            if (Conditions is IReadOnlyList<ICondition<T>> conditions)
+            if (Conditions is IReadOnlyList<IConditional<T>> conditions)
             {
                 AddRange(conditions);
                 return;
             }
             EnsureCapacity(Length + Conditions.Count);
-            foreach (ICondition<T> Item in Conditions)
+            foreach (IConditional<T> Item in Conditions)
             {
                 Add(Item);
             }
         }
-        public void AddRange(IEnumerable<ICondition<T>> Conditions)
+        public void AddRange(IEnumerable<IConditional<T>> Conditions)
         {
-            if (Conditions is IReadOnlyList<ICondition<T>> conditions)
+            if (Conditions is IReadOnlyList<IConditional<T>> conditions)
             {
                 AddRange(conditions);
                 return;
             }
             EnsureCapacity(Length + Conditions.Count());
-            foreach (ICondition<T> Item in Conditions)
+            foreach (IConditional<T> Item in Conditions)
             {
                 Add(Item);
             }
         }
 
-        public virtual int RemoveAll(Predicate<ICondition<T>> Match)
+        public virtual int RemoveAll(Predicate<IConditional<T>> Match)
         {
             if (Match == null)
             {
@@ -194,7 +193,7 @@ namespace HNPS_GigantismPlus
             return result;
         }
 
-        public int FindIndex(int StartIndex, int Count, Predicate<ICondition<T>> Match)
+        public int FindIndex(int StartIndex, int Count, Predicate<IConditional<T>> Match)
         {
             if ((uint)StartIndex > (uint)Size)
             {
@@ -222,21 +221,21 @@ namespace HNPS_GigantismPlus
 
             return -1;
         }
-        public int FindIndex(int StartIndex, Predicate<ICondition<T>> Match)
+        public int FindIndex(int StartIndex, Predicate<IConditional<T>> Match)
         {
             return FindIndex(StartIndex, Size - StartIndex, Match);
         }
-        public int FindIndex(Predicate<ICondition<T>> Match)
+        public int FindIndex(Predicate<IConditional<T>> Match)
         {
             return FindIndex(0, Size, Match);
         }
-        public bool Exists(Predicate<ICondition<T>> Match)
+        public bool Exists(Predicate<IConditional<T>> Match)
         {
             return FindIndex(Match) != -1;
         }
 
         /// <summary>Retrieve a value by reference.</summary>
-        public ref ICondition<T> GetReference(int Index)
+        public ref IConditional<T> GetReference(int Index)
         {
             if ((uint)Index >= (uint)Length)
             {
@@ -245,41 +244,41 @@ namespace HNPS_GigantismPlus
             return ref Items[Index];
         }
 
-        public ICondition<T>[] ToArray()
+        public IConditional<T>[] ToArray()
         {
-            ICondition<T>[] array = new ICondition<T>[Length];
+            IConditional<T>[] array = new IConditional<T>[Length];
             Array.Copy(Items, 0, array, 0, Length);
             return array;
         }
 
-        public void CopyTo(int Index, ICondition<T>[] Array, int ArrayIndex, int Count)
+        public void CopyTo(int Index, IConditional<T>[] Array, int ArrayIndex, int Count)
         {
             if (Size - Index < Count)
             {
                 throw new ArgumentException(
-                    $"The number of elements from {nameof(Index)} to the end of the source {nameof(ICondition<T>)}" +
+                    $"The number of elements from {nameof(Index)} to the end of the source {nameof(IConditional<T>)}" +
                     $" is greater than the available space from {nameof(ArrayIndex)} to the end of the destination {nameof(Array)}");
             }
             System.Array.Copy(Items, Index, Array, ArrayIndex, Count);
         }
-        public void CopyTo(ICondition<T>[] Array)
+        public void CopyTo(IConditional<T>[] Array)
         {
             CopyTo(Array, 0);
         }
 
-        /// <summary>Performs the specified action on each element of the collection allowing for the inclusion of a <paramref name="Subject"/> for each <see cref="ICondition{T}" /> to interact with.</summary>
-        /// <param name="Action">The <see cref="Action{ICondition{T},T}" /> <see langword="delegate" /> to perform on each element of the Conditions <see cref="List{ICondition{T}}" />.</param>
-        /// <param name="Subject">A <see cref="T" /> on which each <see cref="ICondition{T}" /> can interact with while performing the <paramref name="Action"/>.</param>
+        /// <summary>Performs the specified action on each element of the collection allowing for the inclusion of a <paramref name="Subject"/> for each <see cref="IConditional{T}" /> to interact with.</summary>
+        /// <param name="Action">The <see cref="Action{IConditional{T},T}" /> <see langword="delegate" /> to perform on each element of the Conditions <see cref="List{IConditional{T}}" />.</param>
+        /// <param name="Subject">A <see cref="T" /> on which each <see cref="IConditional{T}" /> can interact with while performing the <paramref name="Action"/>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="Action" /> is <see langword="null" />.</exception>
         /// <exception cref="InvalidOperationException">An element in the collection has been modified.</exception>
-        public void ForEach(Action<ICondition<T>, T> Action, T Subject = null)
+        public void ForEach(Action<IConditional<T>, T> Action, T Subject = default)
         {
             if (Action == null)
             {
                 throw new ArgumentNullException($"{nameof(Action)} is null");
             }
             int version = Version;
-            foreach (ICondition<T> condition in this)
+            foreach (IConditional<T> condition in this)
             {
                 if (version != Version)
                 {
@@ -297,17 +296,17 @@ namespace HNPS_GigantismPlus
         }
 
         /// <summary>Performs the specified action on each element of the collection.</summary>
-        /// <param name="Action">The <see cref="Action{ICondition{T}}" /> <see langword="delegate" /> to perform on each element of the collection.</param>
+        /// <param name="Action">The <see cref="Action{IConditional{T}}" /> <see langword="delegate" /> to perform on each element of the collection.</param>
         /// <exception cref="ArgumentNullException"><paramref name="Action" /> is <see langword="null" />.</exception>
         /// <exception cref="InvalidOperationException">An element in the collection has been modified.</exception>
-        public void ForEach(Action<ICondition<T>> Action)
+        public void ForEach(Action<IConditional<T>> Action)
         {
             if (Action == null)
             {
                 throw new ArgumentNullException($"{nameof(Action)} is null");
             }
             int version = Version;
-            foreach (ICondition<T> condition in this)
+            foreach (IConditional<T> condition in this)
             {
                 if (version != Version)
                 {
@@ -324,16 +323,16 @@ namespace HNPS_GigantismPlus
             }
         }
 
-        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the collection.</summary>
-        /// <param name="Subject">An instance of the <see langword="class" /> on which <see cref="ICondition{T}.Check(T)" /> is performed.</param>
-        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.Check(T)" /> on each of the elements contained in the collection.</returns>
+        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="IConditional{T}.Check(T)" /> on each of the elements contained in the collection.</summary>
+        /// <param name="Subject">An instance of the <see langword="class" /> on which <see cref="IConditional{T}.Check(T)" /> is performed.</param>
+        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="IConditional{T}.Check(T)" /> on each of the elements contained in the collection.</returns>
         public IEnumerable<bool> Results(T Subject)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"> {nameof(Results)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
-                foreach (ICondition<T> condition in this)
+                foreach (IConditional<T> condition in this)
                 {
                     if (condition != null)
                     {
@@ -352,16 +351,16 @@ namespace HNPS_GigantismPlus
             yield break;
         }
 
-        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the collection.</summary>
-        /// <param name="Subject">An instance of the <see langword="class" /> on which <see cref="ICondition{T}.NotCheck(T)" /> is performed.</param>
-        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="ICondition{T}.NotCheck(T)" /> on each of the elements contained in the collection.</returns>
+        /// <summary>Returns an <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="IConditional{T}.NotCheck(T)" /> on each of the elements contained in the collection.</summary>
+        /// <param name="Subject">An instance of the <see langword="class" /> on which <see cref="IConditional{T}.NotCheck(T)" /> is performed.</param>
+        /// <returns>An <see cref="IEnumerable{bool}" /> that contains each of the <see cref="bool" /> results of calling <see cref="IConditional{T}.NotCheck(T)" /> on each of the elements contained in the collection.</returns>
         public IEnumerable<bool> NotResults(T Subject)
         {
             int indent = Debug.LastIndent;
             Debug.Entry(4, $"> {nameof(NotResults)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: true);
             if (!this.IsNullOrEmpty())
             {
-                foreach (ICondition<T> condition in this)
+                foreach (IConditional<T> condition in this)
                 {
                     if (condition != null)
                     {

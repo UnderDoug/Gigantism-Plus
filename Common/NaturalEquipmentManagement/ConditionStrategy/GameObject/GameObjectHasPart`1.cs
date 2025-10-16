@@ -5,7 +5,7 @@ using XRL.World;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectHasPart<T> : ICondition<GameObject>
+    public class GameObjectHasPart<T> : Condition<GameObject>
         where T : IPart
     {
         public GameObjectHasPart()
@@ -28,6 +28,7 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject GameObject)
         {
             return base.Check(GameObject)
+                && GameObject != null
                 && GameObject.HasPart<T>();
         }
     }

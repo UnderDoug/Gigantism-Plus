@@ -8,7 +8,7 @@ using static HNPS_GigantismPlus.Const;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectIsForSlot : ICondition<GameObject>
+    public class GameObjectIsForSlot : Condition<GameObject>
     {
         public string Slot;
 

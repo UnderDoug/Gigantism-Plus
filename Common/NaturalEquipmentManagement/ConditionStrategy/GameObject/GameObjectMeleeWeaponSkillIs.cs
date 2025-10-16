@@ -6,7 +6,7 @@ using XRL.World.Parts;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class GameObjectMeleeWeaponSkillIs : ICondition<GameObject>
+    public class GameObjectMeleeWeaponSkillIs : Condition<GameObject>
     {
         public string Skill;
 
@@ -37,8 +37,7 @@ namespace HNPS_GigantismPlus
         {
             return base.Check(GameObject)
                 && !Skill.IsNullOrEmpty()
-                && GameObject == null
-                && GameObject.TryGetPart(out MeleeWeapon mw)
+                && GameObject?.GetPart<MeleeWeapon>() is MeleeWeapon mw
                 && mw.Skill == Skill;
         }
     }

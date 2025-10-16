@@ -2599,13 +2599,13 @@ namespace HNPS_GigantismPlus
             return Laterality.NONE;
         }
 
-        public static bool MeetsCondition<T>(this T Subject, ICondition<T> Condition)
+        public static bool MeetsCondition<T>(this T Subject, Condition<T> Condition)
             where T : class, new()
         {
             return Condition[Subject];
         }
 
-        public static bool NotMeetsCondition<T>(this T Subject, ICondition<T> Condition)
+        public static bool NotMeetsCondition<T>(this T Subject, Condition<T> Condition)
             where T : class, new()
         {
             return Condition.NotCheck(Subject);

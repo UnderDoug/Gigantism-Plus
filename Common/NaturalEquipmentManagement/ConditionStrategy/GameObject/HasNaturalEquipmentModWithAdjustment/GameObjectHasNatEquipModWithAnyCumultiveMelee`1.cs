@@ -16,14 +16,14 @@ namespace HNPS_GigantismPlus
         public override bool Check(GameObject GameObject)
         {
             return base.Check(GameObject, out ModNaturalEquipment<T> naturalEquipmentMod)
-                && (new AnyConditions<IPart>()
+                && new ConditionsAny<IPart>()
                 {
-                    new PartHasAdjustment<T, AdjustMeleeDamageDieCount>(),
-                    new PartHasAdjustment<T, AdjustMeleeDamageDieSize>(),
-                    new PartHasAdjustment<T, AdjustMeleeDamageBonus>(),
-                    new PartHasAdjustment<T, AdjustMeleeHitBonus>(),
-                    new PartHasAdjustment<T, AdjustMeleePenBonus>(),
-                })
+                    new IPartHasAdjustment<T, AdjustMeleeDamageDieCount>(),
+                    new IPartHasAdjustment<T, AdjustMeleeDamageDieSize>(),
+                    new IPartHasAdjustment<T, AdjustMeleeDamageBonus>(),
+                    new IPartHasAdjustment<T, AdjustMeleeHitBonus>(),
+                    new IPartHasAdjustment<T, AdjustMeleePenBonus>(),
+                }
                 .Check(naturalEquipmentMod);
         }
     }

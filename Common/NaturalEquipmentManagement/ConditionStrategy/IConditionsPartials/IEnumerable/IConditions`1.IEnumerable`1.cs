@@ -5,11 +5,10 @@ using System.Runtime.CompilerServices;
 
 namespace HNPS_GigantismPlus
 {
-    public abstract partial class IConditions<T> : ICondition<T>, IEnumerable<ICondition<T>>
-        where T : class, new()
+    public abstract partial class IConditions<T> : Condition<T>, IEnumerable<IConditional<T>>
     {
         [Serializable]
-        public struct Enumerator : IEnumerator<ICondition<T>>, IEnumerator, IDisposable
+        public struct Enumerator : IEnumerator<IConditional<T>>, IEnumerator, IDisposable
         {
             private IConditions<T> List;
 
@@ -17,9 +16,9 @@ namespace HNPS_GigantismPlus
 
             private int Variant;
 
-            private ICondition<T> Item;
+            private IConditional<T> Item;
 
-            public ICondition<T> Current => Item;
+            public IConditional<T> Current => Item;
 
             object IEnumerator.Current => Item;
 
@@ -28,7 +27,7 @@ namespace HNPS_GigantismPlus
                 this.List = List;
                 Index = 0;
                 Variant = List.Variant;
-                Item = default(ICondition<T>);
+                Item = (IConditional<T>)default;
             }
 
             public bool MoveNext()
@@ -39,7 +38,7 @@ namespace HNPS_GigantismPlus
                 }
                 if (Index >= List.Length)
                 {
-                    Item = default(ICondition<T>);
+                    Item = (IConditional<T>)default;
                     return false;
                 }
                 Item = List.Items[Index++];
@@ -53,7 +52,7 @@ namespace HNPS_GigantismPlus
                     throw new InvalidOperationException();
                 }
                 Index = 0;
-                Item = default(ICondition<T>);
+                Item = (IConditional<T>)default;
             }
 
             public void Dispose()
@@ -61,8 +60,8 @@ namespace HNPS_GigantismPlus
             }
         }
 
-        public IConditions(IEnumerable<ICondition<T>> Conditions)
-            : this(Conditions as IReadOnlyList<ICondition<T>>)
+        public IConditions(IEnumerable<IConditional<T>> Conditions)
+            : this(Conditions as IReadOnlyList<IConditional<T>>)
         {
         }
 
@@ -71,45 +70,45 @@ namespace HNPS_GigantismPlus
             return new Enumerator(this);
         }
 
-        IEnumerator<ICondition<T>> IEnumerable<ICondition<T>>.GetEnumerator()
+        IEnumerator<IConditional<T>> IEnumerable<IConditional<T>>.GetEnumerator()
         {
             return new Enumerator(this);
         }
 
-        public static implicit operator ReadOnlySpan<ICondition<T>>(IConditions<T> Conditions)
+        public static implicit operator ReadOnlySpan<IConditional<T>>(IConditions<T> Conditions)
         {
             return Conditions.AsSpan();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<ICondition<T>> AsSpan()
+        public ReadOnlySpan<IConditional<T>> AsSpan()
         {
-            return new ReadOnlySpan<ICondition<T>>(Items, 0, Length);
+            return new ReadOnlySpan<IConditional<T>>(Items, 0, Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<ICondition<T>> AsSpan(int Start)
+        public ReadOnlySpan<IConditional<T>> AsSpan(int Start)
         {
             if ((uint)Start > (uint)Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(Start));
             }
-            return new ReadOnlySpan<ICondition<T>>(Items, Start, Length - Start);
+            return new ReadOnlySpan<IConditional<T>>(Items, Start, Length - Start);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<ICondition<T>> AsSpan(int Start, int Length)
+        public ReadOnlySpan<IConditional<T>> AsSpan(int Start, int Length)
         {
             if ((uint)(Start + Length) > (uint)this.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(Length));
             }
-            return new ReadOnlySpan<ICondition<T>>(Items, Start, Length);
+            return new ReadOnlySpan<IConditional<T>>(Items, Start, Length);
         }
-        public Span<ICondition<T>> FillSpan(int Length)
+        public Span<IConditional<T>> FillSpan(int Length)
         {
             EnsureCapacity(this.Length + Length);
-            Span<ICondition<T>> result = new(Items, this.Length, Length);
+            Span<IConditional<T>> result = new(Items, this.Length, Length);
             this.Length += Length;
             Variant++;
             return result;

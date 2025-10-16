@@ -9,10 +9,9 @@ using static HNPS_GigantismPlus.Utils;
 namespace HNPS_GigantismPlus
 {
     [Serializable]
-    public class NotAllConditions<T> : AllConditions<T>
-        where T : class, new()
+    public class ConditionsNotAll<T> : ConditionsAll<T>
     {
-        private static bool doDebug => getClassDoDebug("NotAllConditions");
+        private static bool doDebug => getClassDoDebug("ConditionsNotAll");
         private static bool getDoDebug(object what = null)
         {
             List<object> doList = new()
@@ -33,11 +32,11 @@ namespace HNPS_GigantismPlus
             return doDebug;
         }
 
-        public NotAllConditions()
+        public ConditionsNotAll()
             : base()
         {
         }
-        public NotAllConditions(IConditions<T> Source)
+        public ConditionsNotAll(IConditions<T> Source)
             : base(Source)
         {
         }
@@ -46,11 +45,11 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(Check));
-            Debug.Entry(4, $"[?] {nameof(NotAllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(ConditionsNotAll<T>)}.{nameof(Check)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             bool check = base.NotCheck(Subject);
 
-            Debug.LoopItem(4, $"{nameof(NotAllConditions<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {check}",
+            Debug.LoopItem(4, $"{nameof(ConditionsNotAll<T>)}.{nameof(Check)}({typeof(T).Name} Subject): {check}",
                 Good: check, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return check;
@@ -60,11 +59,11 @@ namespace HNPS_GigantismPlus
         {
             int indent = Debug.LastIndent;
             bool doDebug = getDoDebug(nameof(NotCheck));
-            Debug.Entry(4, $"[?] {nameof(NotAllConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
+            Debug.Entry(4, $"[?] {nameof(ConditionsNotAll<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject)", Indent: indent + 1, Toggle: doDebug);
 
             bool notCheck = base.Check(Subject);
 
-            Debug.LoopItem(4, $"{nameof(NotAllConditions<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {notCheck}",
+            Debug.LoopItem(4, $"{nameof(ConditionsNotAll<T>)}.{nameof(NotCheck)}({typeof(T).Name} Subject): {notCheck}",
                 Good: notCheck, Indent: indent + 1, Toggle: doDebug);
             Debug.LastIndent = indent;
             return notCheck;

@@ -26,6 +26,7 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void AddSphincterTo_SetDefaultBehaviorBlueprint_Postfix(ref SlogGlands __instance, ref BodyPart Part)
         {
+            // Addressed this is MutationEntry Merge.
         }
     }
 }

@@ -55,6 +55,7 @@ namespace HNPS_GigantismPlus
             { nameof(HNPS_SecretGiantWhoCooksBuilderExtension), true },
             { nameof(GiantAbodePopulator), true },
             { nameof(WeaponElongator), true },
+            { nameof(CorpseGigantifier), false },
 
             //Conditions
             { "ICondition", false && doConditionsDebug },
@@ -178,7 +179,7 @@ namespace HNPS_GigantismPlus
                 return false;
             }
 
-            return DoDebug ?? doDebug;
+            return DoDebug ?? getClassDoDebug(what.ToString());
         }
 
         public static bool getClassDoDebug(string Class) => classDoDebug.ContainsKey(Class) ? classDoDebug[Class] : doDebug;

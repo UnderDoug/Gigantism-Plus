@@ -48,7 +48,7 @@ namespace XRL.World.Effects
         {
             return Lit > LightLevel.Light
                 && Lit < LightLevel.LitRadar
-                && (bool)!Object?.HasEffect(typeof(SensePsychicEffect), fx => (fx as SensePsychicEffect).Listener == The.Player);
+                && !(Object?.HasEffect(typeof(SensePsychicEffect), fx => (fx as SensePsychicEffect).Listener == The.Player)).GetValueOrDefault();
         }
 
         public override bool FinalRender(RenderEvent E, bool bAlt)

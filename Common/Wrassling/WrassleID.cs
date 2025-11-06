@@ -90,6 +90,11 @@ namespace XRL.World.Parts
         {
         }
 
+        public static explicit operator Guid(WrassleID wrassleID)
+        {
+            return wrassleID.ID;
+        }
+
         public Guid GetID(bool SuppressEvent = false, bool Silent = false)
         {
             int indent = Debug.LastIndent;

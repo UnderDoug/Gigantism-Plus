@@ -80,6 +80,20 @@ namespace XRL.World.Capabilities
             { "Hand", "FoldingChair" },
         };
 
+        public static WrassleID AddWrassleSpecificID(GameObject WrassleObject, Guid WrassleID, bool Creation = false, string Context = null)
+        {
+            if (WrassleObject == null)
+            {
+                Debug.Warn(2,
+                    $"{nameof(UD_QWE)}",
+                    $"{nameof(AddWrassleID)}",
+                    $"Called on null {nameof(WrassleObject)}",
+                    Indent: 0);
+                return null;
+            }
+            Guid wrassleID = (WrassleID != default && WrassleID != Guid.Empty) ? WrassleID : default;
+            return WrassleObject.AddPart(AddWrassleIDEvent.GetFor(WrassleObject, wrassleID, Context: Context), Creation: Creation);
+        }
         public static WrassleID AddWrassleID(GameObject WrassleObject, bool Creation = false, string Context = null)
         {
             if (WrassleObject == null)
@@ -91,7 +105,7 @@ namespace XRL.World.Capabilities
                     Indent: 0);
                 return null;
             }
-            return WrassleObject.AddPart(AddWrassleIDEvent.GetFor(WrassleObject, Context: Context), Creation: Creation);
+            return AddWrassleSpecificID(WrassleObject, WrassleID: default, Creation: Creation, Context: Context);
         }
         public static WrassleID GetWrassleID(GameObject WrassleObject)
         {
@@ -105,6 +119,25 @@ namespace XRL.World.Capabilities
                 return null;
             }
             return GetWrassleIDEvent.GetFor(WrassleObject);
+        }
+        public static WrassleID RequireWrassleID(GameObject WrassleObject, Guid WrassleID, bool Creation = false, string Context = null)
+        {
+            if (WrassleObject == null)
+            {
+                Debug.Warn(2,
+                    $"{nameof(UD_QWE)}",
+                    $"{nameof(RequireWrassleID)}",
+                    $"Called on null {nameof(WrassleObject)}",
+                    Indent: 0);
+                return null;
+            }
+            if (WrassleID != default
+                && WrassleID != Guid.Empty
+                && GetWrassleID(WrassleObject) is WrassleID existingWrassleID)
+            {
+                SyncWrassleIDEvent.Send(existingWrassleID, WrassleObject, WrassleID, Context);
+            }
+            return GetWrassleID(WrassleObject) ?? AddWrassleSpecificID(WrassleObject, WrassleID, Creation, Context);
         }
         public static WrassleID RequireWrassleID(GameObject WrassleObject, bool Creation = false, string Context = null)
         {

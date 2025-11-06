@@ -9,6 +9,8 @@ using XRL.World.Capabilities;
 using XRL.World.ObjectBuilders;
 using XRL.World.Parts;
 
+using SerializeField = UnityEngine.SerializeField;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Options;
 using static HNPS_GigantismPlus.Utils;
@@ -42,6 +44,28 @@ namespace XRL
 
         public static UD_QudWrasslingEntertainment System;
 
+        [SerializeField]
+        private string UniqueGiantID;
+
+        private GameObject _UniqueGiant;
+        public GameObject UniqueGiant
+        {
+            get => _UniqueGiant ??= GameObject.FindByID(UniqueGiantID);
+            set
+            {
+                UniqueGiantID = value?.ID;
+                _UniqueGiant = value;
+            }
+        }
+
+        [NonSerialized]
+        public Dictionary<Guid, Dictionary<int, IEnumerable<string>>> WrassleColorSequenceCache;
+
+        public UD_QudWrasslingEntertainment()
+        {
+            WrassleColorSequenceCache = new();
+        }
+
         [GameBasedCacheInit]
         public static void WrassleSystemInit()
         {
@@ -53,14 +77,6 @@ namespace XRL
         public static UD_QudWrasslingEntertainment InitializeSystem()
         {
             return new();
-        }
-
-        [NonSerialized]
-        public Dictionary<Guid, Dictionary<int, IEnumerable<string>>> WrassleColorSequenceCache;
-
-        public UD_QudWrasslingEntertainment()
-        {
-            WrassleColorSequenceCache = new();
         }
 
         public IEnumerable<string> CacheWrassleColorSequence(Guid WrassleID, int Length, IEnumerable<string> Sequence)

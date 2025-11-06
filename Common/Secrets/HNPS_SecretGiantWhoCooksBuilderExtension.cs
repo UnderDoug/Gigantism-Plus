@@ -363,10 +363,10 @@ namespace XRL.World.WorldBuilders
         public static GameObject GetAGiant(bool Unique = false)
         {
             GameObject creature;
-            GameObjectBlueprint creatureBlueprint = Unique
-                ? GetAUniqueGiantHeroBlueprintModel()
-                : GetAGiantHeroBlueprintModel()
-                ;
+            GameObjectBlueprint creatureBlueprint =
+                Unique
+                ? GetGiantEligibleBlueprintModel(Filter: null, Unique, Unique)
+                : GetAGiantHeroBlueprintModel();
 
             void ApplyBuilder(GameObject Creature)
             {
@@ -652,15 +652,27 @@ namespace XRL.World.WorldBuilders
 
                 // Villager.SetIntProperty("SuppressSimpleConversation", 1);
 
-                int blueprintHitpoints = baseMerchantBlueprint.Stats["Hitpoints"].BaseValue;
-                int blueprintLevel = baseMerchantBlueprint.Stats["Level"].BaseValue;
-                int blueprintXP = baseMerchantBlueprint.Stats["XP"].BaseValue;
+                int blueprintHitpoints = 0;
+                if (baseMerchantBlueprint.Stats["Hitpoints"] is Statistic baseHitpoints)
+                {
+                    blueprintHitpoints = baseHitpoints.BaseValue;
+                }
+                int blueprintLevel = 0;
+                if (baseMerchantBlueprint.Stats["Level"] is Statistic baseLevel)
+                {
+                    blueprintLevel = baseLevel.BaseValue;
+                }
+                int blueprintXP = 0;
+                if (baseMerchantBlueprint.Stats["XP"] is Statistic baseXP)
+                {
+                    blueprintXP = baseXP.BaseValue;
+                }
 
-                if (hitpoints.BaseValue < blueprintHitpoints)
+                if (hitpoints != null && hitpoints.BaseValue < blueprintHitpoints)
                 {
                     hitpoints.BaseValue = blueprintHitpoints;
                 }
-                if (level.BaseValue < blueprintLevel)
+                if (level != null && level.BaseValue < blueprintLevel)
                 {
                     level.BaseValue = blueprintLevel;
                 }
@@ -926,11 +938,14 @@ namespace XRL.World.WorldBuilders
                 Villager.SetStringProperty("Species", "Giant");
             }
 
-            int xPThisLevel = Leveler.GetXPForLevel(level.BaseValue);
-            int xPNextLevel = Leveler.GetXPForLevel(level.BaseValue + 1);
-            xP.BaseValue = Stat.RandomCosmetic(xPThisLevel, xPNextLevel);
+            if (xP != null && level != null)
+            {
+                xP.BaseValue = Stat.RandomCosmetic(
+                    Low: Leveler.GetXPForLevel(level.BaseValue),
+                    High: Leveler.GetXPForLevel(level.BaseValue + 1));
+            }
 
-            Villager.FireEvent("VillageInit");
+            Villager?.FireEvent("VillageInit");
             return Villager;
         }
 

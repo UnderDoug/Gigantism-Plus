@@ -419,7 +419,7 @@ namespace XRL.World.ZoneBuilders
                         $"in zone {zone?.ZoneID}",
                         Indent: 1);
 
-                    UniqueGiant = HNPS_SecretGiantWhoCooksBuilderExtension.GetTheGiant();
+                    UniqueGiant = GetTheGiant();
                 }
                 bool failedToGetTinker = false;
                 bool failedToGetApothecary = false;
@@ -759,6 +759,8 @@ namespace XRL.World.ZoneBuilders
                 return false;
             }
         }
+
+        public static GameObject GetTheGiant() => HNPS_SecretGiantWhoCooksBuilderExtension.GetTheGiant();
 
         public static void PaintCell(Cell C, string Floor = null, bool Overwrite = true)
         {

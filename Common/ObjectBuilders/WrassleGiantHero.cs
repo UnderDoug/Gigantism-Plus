@@ -51,6 +51,27 @@ namespace XRL.World.ObjectBuilders
             return doDebug;
         }
 
+        private static Guid _UniqueGiantWrassleID = Guid.Empty;
+        public static Guid UniqueGiantWrassleID
+        {
+            get
+            {
+                if (_UniqueGiantWrassleID == Guid.Empty)
+                {
+                    if (UD_QudWrasslingEntertainment.System?.UniqueGiant is GameObject uniqueGiant
+                        && uniqueGiant.TryGetPart(out WrassleID wrassleID))
+                    {
+                        _UniqueGiantWrassleID = (Guid)wrassleID;
+                    }
+                    else
+                    {
+                        _UniqueGiantWrassleID = Guid.NewGuid();
+                    }
+                }
+                return _UniqueGiantWrassleID;
+            }
+        }
+
         public static List<string> FactionAdmirationBag => GNT_ADMIREREASON_BOOK.BookPagesAsList();
         public static List<string> AdditionalFactionAdmirationBag => SCRT_GNT_GNT_ADMIREREASON_BOOK.BookPagesAsList();
 
@@ -156,6 +177,7 @@ namespace XRL.World.ObjectBuilders
             {
                 Creature.RemovePart(gameUnique);
             }
+            /*
             if (Unique)
             {
                 gameUnique = new()
@@ -164,6 +186,7 @@ namespace XRL.World.ObjectBuilders
                 };
                 Creature.AddPart(gameUnique, Creation: true);
             }
+            */
 
             if (!Creature.TryGetPart(out Wrassler wrassler))
             {
@@ -172,7 +195,7 @@ namespace XRL.World.ObjectBuilders
             }
             Debug.LoopItem(4, $"Have <Wrassler>?", Good: wrassler != null, Indent: indent + 1, Toggle: getDoDebug());
 
-            WrassleID wrassleID = Creature.WrassleID();
+            WrassleID wrassleID = UD_QWE.RequireWrassleID(Creature, UniqueGiantWrassleID, true, Context);
 
             List<string> noHateFactionsList = new(NoHateFactionsList);
             if (Creature.TryGetStringProperty("NoHateFactions", out string existingNoHateFactions))
@@ -1106,73 +1129,124 @@ namespace XRL.World.ObjectBuilders
             Debug.LastIndent = indent;
         }
 
-        public static GameObjectBlueprint GetGiantEligibleBlueprintModel(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
+        public static IEnumerable<GameObjectBlueprint> GetGiantEligibleBlueprintModels(Predicate<GameObjectBlueprint> Filter = null, bool Old = false, bool Unique = false)
         {
-            GameObjectBlueprint creatureObjectBlueprint =
-                EncountersAPI.GetACreatureBlueprintModel((GameObjectBlueprint blueprint)
-                => IsWrassleGiantEligible(blueprint, filter, Old, Unique));
+            return from blueprint in GameObjectFactory.Factory.BlueprintList
+                   where IsWrassleGiantEligible(blueprint, Filter, Old, Unique)
+                   select blueprint;
+        }
+        public static GameObjectBlueprint GetGiantEligibleBlueprintModel(Predicate<GameObjectBlueprint> Filter = null, bool Old = false, bool Unique = false)
+        {
+            static string GetConstructedSeed(int Extra = 0, int Extra2 = 0)
+            {
+                return UniqueGiantWrassleID.ToString() + "-" 
+                     + nameof(GetGiantEligibleBlueprintModel) + "-" 
+                     + Extra.ToString() + "-" 
+                     + Extra2.ToString();
+            }
+            List<GameObjectBlueprint> creatureBlueprints = new(GetGiantEligibleBlueprintModels(Filter, Old, Unique));
+            int seededIndex = Stat.RandomCosmetic(0, creatureBlueprints.Count - 1);
+            if (Unique)
+            {
+                seededIndex = Stat.SeededRandom(GetConstructedSeed(), 0, creatureBlueprints.Count - 1);
+            }
+            GameObjectBlueprint creatureObjectBlueprint = 
+                GetGiantEligibleBlueprintModels(Filter, Old, Unique)?.ElementAt(seededIndex)
+                ?? GameObjectFactory.Factory.GetBlueprint("Snapjaw");
             GameObjectBlueprint alternateCreatureObjectBlueprint = null;
 
             int chance = Unique || Old ? 10 : 5;
-            if (chance.in1000())
+            int doAlternate = 0;
+            if (Unique)
             {
-                alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero");
+                int seededAlternate = Stat.SeededRandom(GetConstructedSeed(seededIndex), 1, 1000);
+                int seededAlternate2 = Stat.SeededRandom(GetConstructedSeed(seededIndex, seededAlternate), 1, 1000);
+                if (seededAlternate < chance + 1)
+                {
+                    doAlternate = 1;
+                }
+                else
+                if (seededAlternate2 < 1)
+                {
+                    doAlternate = 2;
+                }
             }
             else
-            if (1.in10000())
             {
-                alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprintsInheritingFrom("Snapjaw").GetRandomElement();
+                if (chance.in1000())
+                {
+                    doAlternate = 1;
+                }
+                else
+                if (1.in10000())
+                {
+                    doAlternate = 2;
+                }
             }
+            alternateCreatureObjectBlueprint = doAlternate switch
+            {
+                2 => alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprintsInheritingFrom("Snapjaw").GetRandomElement(),
+                1 => alternateCreatureObjectBlueprint = GameObjectFactory.Factory.GetBlueprint("Aleksh_TrollHero"),
+                0 => null,
+                _ => null,
+            };
             return alternateCreatureObjectBlueprint ?? creatureObjectBlueprint;
         }
-        public static GameObjectBlueprint GetAnOldGiantBlueprintModel(Predicate<GameObjectBlueprint> filter = null)
+        public static GameObjectBlueprint GetAnOldGiantBlueprintModel(Predicate<GameObjectBlueprint> Filter = null)
         {
-            return GetGiantEligibleBlueprintModel(filter, Old: true);
+            return GetGiantEligibleBlueprintModel(Filter, Old: true);
         }
-        public static GameObjectBlueprint GetAGiantHeroBlueprintModel(Predicate<GameObjectBlueprint> filter = null, bool Old = true)
+        public static GameObjectBlueprint GetAGiantHeroBlueprintModel(Predicate<GameObjectBlueprint> Filter = null, bool Old = true)
         {
-            return GetGiantEligibleBlueprintModel(filter, Old);
+            return GetGiantEligibleBlueprintModel(Filter, Old);
         }
         public static GameObjectBlueprint GetAUniqueGiantHeroBlueprintModel(Predicate<GameObjectBlueprint> filter = null)
         {
             return GetGiantEligibleBlueprintModel(filter, Unique: true);
         }
-        public static string GetGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
+        public static string GetGiantEligibleBlueprint(Predicate<GameObjectBlueprint> Filter = null, bool Old = false, bool Unique = false)
         {
-            return GetGiantEligibleBlueprintModel(filter, Old, Unique).Name;
+            return GetGiantEligibleBlueprintModel(Filter, Old, Unique).Name;
         }
-        public static string GetOldGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
+        public static string GetOldGiantEligibleBlueprint(Predicate<GameObjectBlueprint> Filter = null)
         {
-            return GetAnOldGiantBlueprintModel(filter).Name;
+            return GetAnOldGiantBlueprintModel(Filter).Name;
         }
-        public static string GetGiantHeroEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null, bool Old = true)
+        public static string GetGiantHeroEligibleBlueprint(Predicate<GameObjectBlueprint> Filter = null, bool Old = true)
         {
-            return GetAGiantHeroBlueprintModel(filter, Old).Name;
+            return GetAGiantHeroBlueprintModel(Filter, Old).Name;
         }
-        public static string GetUniqueGiantEligibleBlueprint(Predicate<GameObjectBlueprint> filter = null)
+        public static string GetUniqueGiantEligibleBlueprint(Predicate<GameObjectBlueprint> Filter = null)
         {
-            return GetAUniqueGiantHeroBlueprintModel(filter).Name;
+            return GetAUniqueGiantHeroBlueprintModel(Filter).Name;
         }
 
-        public static bool IsWrassleGiantEligible(GameObjectBlueprint Blueprint, Predicate<GameObjectBlueprint> filter = null, bool Old = false, bool Unique = false)
+        public static bool IsWrassleGiantEligible(GameObjectBlueprint Blueprint, Predicate<GameObjectBlueprint> Filter = null, bool Old = false, bool Unique = false)
         {
-            if (false && !EncountersAPI.IsLegendaryEligible(Blueprint))
-                return false;
-
             if ((!Blueprint.HasPart(nameof(Body)) || !Blueprint.HasPart(nameof(Combat)))
                 && !Blueprint.HasTagOrProperty("BodySubstitute"))
+            {
                 return false;
+            }
 
-            List<string> oldFactions =
-                (from faction in Factions.Loop()
-                 where faction.Old
-                 select faction.Name).ToList();
+            if (Filter != null && !Filter(Blueprint))
+            {
+                return false;
+            }
+
+            IEnumerable<string> oldFactions =
+                from faction in Factions.Loop()
+                where faction.Old
+                select faction.Name;
 
             bool mustBeOld = Unique || Old;
             if (mustBeOld && !oldFactions.Contains(Blueprint.GetPrimaryFaction()))
                 return false;
 
             if (Blueprint.HasTag("BaseObject"))
+                return false;
+
+            if (Blueprint.HasTag("ExcludeFromDynamicEncounters"))
                 return false;
 
             if (Blueprint.Name.StartsWith("Base"))
@@ -1211,7 +1285,9 @@ namespace XRL.World.ObjectBuilders
                     "Aleksh_MetalBird",
                 };
                 if (!acceptableRobots.Contains(Blueprint.Name))
+                {
                     return false;
+                }
             }
 
             if (Blueprint.InheritsFrom("BaseGyreWight"))
@@ -1224,7 +1300,9 @@ namespace XRL.World.ObjectBuilders
                 return false;
 
             if (Blueprint.TryGetTag("Role", out string role) && role is "Minion")
-                return false;
+            {
+                // return false;
+            }
 
             if (Blueprint.HasTagOrProperty("StartInLiquid"))
                 return false;
@@ -1245,9 +1323,6 @@ namespace XRL.World.ObjectBuilders
                 return false;
 
             if (Blueprint.HasProperName())
-                return false;
-
-            if (filter != null && !filter(Blueprint))
                 return false;
 
             // from the playable snapjaws mod, kept popping up.

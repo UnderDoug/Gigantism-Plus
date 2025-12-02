@@ -374,7 +374,7 @@ namespace XRL.World.WorldBuilders
             }
             creature = GameObjectFactory.Factory.CreateObject(
                     Blueprint: creatureBlueprint,
-                    BeforeObjectCreated: ApplyBuilder,
+                    AfterObjectCreated: ApplyBuilder,
                     Context: Unique ? "Unique" : "Hero",
                     ProvideInventory: null);
 
@@ -925,7 +925,7 @@ namespace XRL.World.WorldBuilders
                     epithets.Primary = GameText.VariableReplace(villagerEpithet).Color("y");
                 }
                 Villager.SetIntProperty($"Village{Context}", 1);
-                Villager.SetIntProperty("NamedVillager", 1);
+                // Villager.SetIntProperty("NamedVillager", 1);
                 TakeOnRoleEvent.Send(Villager, Context);
                 inventoryRestocker?.PerformRestock(Silent: true);
             }

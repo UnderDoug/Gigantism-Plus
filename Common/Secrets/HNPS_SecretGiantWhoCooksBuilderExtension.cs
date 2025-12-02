@@ -566,7 +566,7 @@ namespace XRL.World.WorldBuilders
             Interesting interesting = null;
 
             Villager.SetIntProperty("SuppressSimpleConversation", 1);
-            Villager.SetIntProperty("ParticipantVillager", 1);
+            // Villager.SetIntProperty("ParticipantVillager", 1);
 
             if (!isResident)
             {

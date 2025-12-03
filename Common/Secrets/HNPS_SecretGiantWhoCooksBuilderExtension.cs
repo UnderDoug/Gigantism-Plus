@@ -734,14 +734,17 @@ namespace XRL.World.WorldBuilders
                 string dromadTitle = NameMaker.MakeTitle(For: Villager, Special: Context);
                 if (!dromadTitle.IsNullOrEmpty())
                 {
-                    Villager.RequirePart<Titles>().AddTitle(dromadTitle, -5);
+                    Titles villagerTitles = Villager.RequirePart<Titles>();
+                    villagerTitles.TitleList = "";
+                    villagerTitles.AddTitle(dromadTitle, -5);
                 }
                 if (Villager.Brain.Allegiance.IsNullOrEmpty())
                 {
                     Villager.Brain.Factions = $"Giants-100";
                     Villager.Brain.Factions = $"{SCRT_GNT_VLG_FCT}-50";
                 }
-                else if (!Villager.Brain.Allegiance.ContainsKey(SCRT_GNT_VLG_FCT))
+                else
+                if (!Villager.Brain.Allegiance.ContainsKey(SCRT_GNT_VLG_FCT))
                 {
                     Villager.Brain.Allegiance["Giants"] = 75;
                     Villager.Brain.Allegiance[SCRT_GNT_VLG_FCT] = 25;

@@ -91,6 +91,7 @@ namespace XRL.World.WorldBuilders
 
             Debug.Entry(4, $"Waking up Unique Giant...", Indent: 1, Toggle: getDoDebug());
             GameObject UniqueGiant = GetTheGiant();
+            
 
             if (UniqueGiant == null)
             {
@@ -397,7 +398,15 @@ namespace XRL.World.WorldBuilders
             SetGiantVillagerStews(Resident);
             Gigantifier.Apply(Resident, "GiantVillageResident");
         }
-        public static bool TryGenerateGiantVillagers(int ApproxZoneTier, string HeroDetailColor, out GameObject TinkerGiant, out GameObject ApothecaryGiant, out GameObject DromadGiant, out GameObject GutsmongerGiant, out GameObject PetGiant, out List<GameObject> Residents)
+        public static bool TryGenerateGiantVillagers(
+            int ApproxZoneTier,
+            string HeroDetailColor,
+            out GameObject TinkerGiant,
+            out GameObject ApothecaryGiant,
+            out GameObject DromadGiant,
+            out GameObject GutsmongerGiant,
+            out GameObject PetGiant,
+            out List<GameObject> Residents)
         {
             string tinkerBlueprint = $"HumanTinker{ApproxZoneTier}";
             string apothecaryBlueprint = $"HumanApothecary{ApproxZoneTier}";
@@ -566,7 +575,7 @@ namespace XRL.World.WorldBuilders
             Interesting interesting = null;
 
             Villager.SetIntProperty("SuppressSimpleConversation", 1);
-            // Villager.SetIntProperty("ParticipantVillager", 1);
+            Villager.SetIntProperty("ParticipantVillager", 1);
 
             if (!isResident)
             {
@@ -916,6 +925,7 @@ namespace XRL.World.WorldBuilders
                         HasHonorific: null,
                         HasEpithet: null,
                         NamingContext: null);
+                    Villager.SetIntProperty("ProperNoun", 1);
                 }
 
                 if (!villagerEpithet.IsNullOrEmpty())
@@ -928,7 +938,7 @@ namespace XRL.World.WorldBuilders
                     epithets.Primary = GameText.VariableReplace(villagerEpithet).Color("y");
                 }
                 Villager.SetIntProperty($"Village{Context}", 1);
-                // Villager.SetIntProperty("NamedVillager", 1);
+                Villager.SetIntProperty("NamedVillager", 1);
                 TakeOnRoleEvent.Send(Villager, Context);
                 inventoryRestocker?.PerformRestock(Silent: true);
             }

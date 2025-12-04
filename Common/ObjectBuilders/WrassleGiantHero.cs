@@ -371,6 +371,7 @@ namespace XRL.World.ObjectBuilders
 
             Creature.SetStringProperty("Culture", "WrassleGiant");
             Creature.SetIntProperty("ParticipantVillager", 1);
+            Creature.SetIntProperty("NamedVillager", 1);
             Creature.SetIntProperty("SecretGiantVillager", 1);
 
             int MentalMutations = 0;

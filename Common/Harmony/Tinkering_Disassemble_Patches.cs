@@ -27,10 +27,11 @@ namespace HNPS_GigantismPlus.Harmony
         [HarmonyPostfix]
         public static void CanBeConsideredScrap_PreventCyberAndNatural_Postfix(ref GameObject obj, ref bool __result)
         {
-            if (obj != null && (obj.HasPart<CyberneticsBaseItem>() || obj.HasPart<NaturalEquipment>() || obj.IsNaturalEquipment()))
-            {
+            if (obj != null
+                && (obj.HasPart<CyberneticsBaseItem>()
+                    || obj.HasPart<NaturalEquipment>()
+                    || obj.IsNaturalEquipment()))
                 __result = false;
-            }
         }
     }
 }

@@ -44,15 +44,10 @@ namespace HNPS_GigantismPlus.Harmony
             Debug.Entry(4, $"Object is {objectDesc}", Indent: 1, Toggle: doDebug);
 
             if (ParentObject is not null)
-            {
                 RegenerateNonDefaultNaturalEquipment(ParentObject);
-            }
 
             if (E == ___eBodypartsUpdated && @this.ParentObject is not null)
-            {
-                // Tells each NaturalEquipmentOperator to reset itself in prep for managing its attached equipment
                 BodyPartsUpdatedEvent.Send(@this.ParentObject);
-            }
 
             Debug.Entry(4,
                 $"x [Prefix] {nameof(Body)}."

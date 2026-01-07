@@ -280,13 +280,11 @@ namespace XRL.World.Parts
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(BodyPartsUpdatedEvent E)
-        {
-            return base.HandleEvent(E);
-        }
+            => base.HandleEvent(E);
+
         public virtual bool HandleEvent(AfterBodyPartsUpdatedEvent E)
-        {
-            return base.HandleEvent(E);
-        }
+            => base.HandleEvent(E);
+
         public virtual bool HandleEvent(GetNaturalEquipmentModsEvent E)
         {
             Debug.Entry(4,
@@ -309,28 +307,23 @@ namespace XRL.World.Parts
                 + $"{nameof(BeforeManageDefaultNaturalEquipmentEvent)} E)",
                 Indent: 0, Toggle: getDoDebug('M'));
 
-            if (E.Creature == Implantee && E.Equipment.HasPart<NaturalEquipmentOperator>())
-            {
+            if (E.Creature == Implantee
+                && E.Equipment.HasPart<NaturalEquipmentOperator>())
                 OnBeforeManageDefaultNaturalEquipment(E.Operator, E.BodyPart);
-            }
+
             return base.HandleEvent(E);
         }
         public virtual bool HandleEvent(ManageDefaultNaturalEquipmentEvent E)
-        {
-            return base.HandleEvent(E);
-        }
+            => base.HandleEvent(E);
+
         public virtual bool HandleEvent(AfterManageDefaultNaturalEquipmentEvent E)
-        {
-            return base.HandleEvent(E);
-        }
+            => base.HandleEvent(E);
+
         public virtual bool HandleEvent(BeforeRapidAdvancementEvent E)
-        {
-            return base.HandleEvent(E);
-        }
+            => base.HandleEvent(E);
+
         public virtual bool HandleEvent(AfterRapidAdvancementEvent E)
-        {
-            return base.HandleEvent(E);
-        }
+            => base.HandleEvent(E);
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
@@ -341,18 +334,14 @@ namespace XRL.World.Parts
         public override bool FireEvent(Event E)
         {
             if (E.ID == "CanBeDisassembled")
-            {
                 return false; // This prevents the cybernetic from being disassembled.
-            }
             else
             if (E.ID == "CookedAt")
             {
                 if (E.GetParameter("Actor") is GameObject Actor
                     && Actor == ParentObject
                     && Actor.Body != null)
-                {
                     Actor.Body.UpdateBodyParts();
-                }
             }
             return base.FireEvent(E);
         }

@@ -1,21 +1,14 @@
-﻿using HNPS_GigantismPlus;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using XRL.Language;
-using XRL.Rules;
+
 using XRL.World.Anatomy;
-using XRL.World.Parts.Mutation;
-using XRL.World.Tinkering;
+
+using HNPS_GigantismPlus;
+
 using static HNPS_GigantismPlus.Const;
 using static HNPS_GigantismPlus.Extensions;
 using static HNPS_GigantismPlus.Options;
-using static HNPS_GigantismPlus.Utils;
-using static XRL.World.Parts.ModNaturalEquipmentBase;
-using SerializeField = UnityEngine.SerializeField;
 
 namespace XRL.World.Parts
 {
@@ -174,13 +167,15 @@ namespace XRL.World.Parts
                 foreach (BodyPart bodyPart in bodyParts)
                 {
                     E.Equipment = bodyPart.DefaultBehavior;
-                    if (E.Equipment != null && E.Equipment.IsNaturalEquipment())
+                    if (E.Equipment != null
+                        && E.Equipment.IsNaturalEquipment())
                     {
                         E.GetForEquipment();
                         continue;
                     }
                     E.Equipment = bodyPart.Equipped;
-                    if (E.Equipment != null && E.Equipment.IsNaturalEquipment())
+                    if (E.Equipment != null
+                        && E.Equipment.IsNaturalEquipment())
                     {
                         E.GetForEquipment();
                         continue;
@@ -197,27 +192,19 @@ namespace XRL.World.Parts
         {
             List<IManagedDefaultNaturalEquipment> managedDefaultNaturalEquipmentParts = ParentObject?.GetPartsDescendedFrom<IManagedDefaultNaturalEquipment>();
             if (!managedDefaultNaturalEquipmentParts.IsNullOrEmpty())
-            {
                 foreach (IManagedDefaultNaturalEquipment managedDefaultNaturalEquipmentPart in ParentObject.GetPartsDescendedFrom<IManagedDefaultNaturalEquipment>())
-                {
                     yield return managedDefaultNaturalEquipmentPart;
-                }
-            }
+
             List<GameObject> installedCyberneticsList = Event.NewGameObjectList(ParentObject?.Body?.GetInstalledCybernetics());
             if (!installedCyberneticsList.IsNullOrEmpty())
-            {
                 foreach (GameObject installedCybernetic in installedCyberneticsList)
                 {
                     managedDefaultNaturalEquipmentParts = installedCybernetic.GetPartsDescendedFrom<IManagedDefaultNaturalEquipment>();
                     if (!managedDefaultNaturalEquipmentParts.IsNullOrEmpty())
-                    {
                         foreach (IManagedDefaultNaturalEquipment managedDefaultNaturalEquipmentCybernetic in managedDefaultNaturalEquipmentParts)
-                        {
                             yield return managedDefaultNaturalEquipmentCybernetic;
-                        }
-                    }
                 }
-            }
+
             yield break;
         }
 
@@ -226,15 +213,10 @@ namespace XRL.World.Parts
         {
             List<IManagedDefaultNaturalEquipment> managedDefaultNaturalEquipmentParts = new(GetManagedNaturalEquipmentCompatibleParts());
             if (!managedDefaultNaturalEquipmentParts.IsNullOrEmpty())
-            {
                 foreach (IManagedDefaultNaturalEquipment managedDefaultNaturalEquipmentPart in managedDefaultNaturalEquipmentParts)
-                {
                     if (managedDefaultNaturalEquipmentPart is T managedNaturalEquipmentCompatiblePart)
-                    {
                         return managedNaturalEquipmentCompatiblePart;
-                    }
-                }
-            }
+
             return null;
         }
 
@@ -255,18 +237,16 @@ namespace XRL.World.Parts
 
             List<MethodInfo> managedBaseMethods = new(typeof(T).GetMethods());
             if (!managedBaseMethods.IsNullOrEmpty())
-            {
                 managedBaseMethods.RemoveAll(m => !m.IsStatic || !m.IsPublic || !m.ReturnType.InheritsFrom(typeof(ModNaturalEquipment<T>)));
-            }
+
             if (!managedBaseMethods.IsNullOrEmpty())
             {
                 Debug.CheckYeh(3, $"Have Methods", Indent: indent + 2, Toggle: doDebug);
                 foreach (MethodInfo managedMethod in managedBaseMethods)
                 {
-                    if (!managedMethod.IsStatic || !managedMethod.IsPublic)
-                    {
+                    if (!managedMethod.IsStatic
+                        || !managedMethod.IsPublic)
                         continue;
-                    }
 
                     Debug.Divider(3, HONLY, Indent: indent + 3, Toggle: doDebug);
 
@@ -302,14 +282,10 @@ namespace XRL.World.Parts
                                     naturalEquipmentModsList.Add(naturalEquipmentMod);
                                 }
                                 else
-                                {
                                     Debug.CheckNah(3, $"Failed {nameof(Filter)}", Indent: indent + 3, Toggle: doDebug);
-                                }
                             }
                             else
-                            {
                                 Debug.CheckNah(3, $"Failed {nameof(managedMethod.Invoke)} (May be that the mod is conditionally produced)", Indent: indent + 3, Toggle: doDebug);
-                            }
                         }
                     }
                 }
@@ -336,8 +312,7 @@ namespace XRL.World.Parts
 
             string label = ForDescriptions
                 ? "Descriptions"
-                : "EquipmentMods"
-                ;
+                : "EquipmentMods";
 
             Debug.Entry(4, $"{label}:", Indent: indent + 1, Toggle: doDebug);
 
@@ -357,9 +332,7 @@ namespace XRL.World.Parts
 
                     bool doOverwrite = true;
                     if (!naturalEquipmentMods.IsNullOrEmpty())
-                    {
                         foreach ((int prioritisedPriority, ModNaturalEquipmentBase prioritisedNaturalEquipmentMod) in naturalEquipmentMods)
-                        {
                             if (prioritisedNaturalEquipmentMod.GetType() == attachedNaturalEquipmentMod.GetType())
                             {
                                 doOverwrite = false;
@@ -374,10 +347,9 @@ namespace XRL.World.Parts
                                     Indent: indent + 2);
                                 break;
                             }
-                        }
-                    }
-                    if (naturalEquipmentMods.ContainsKey(priority) && doOverwrite)
-                    {
+
+                    if (naturalEquipmentMods.ContainsKey(priority)
+                        && doOverwrite)
                         Debug.Warn(2,
                             $"{nameof(NaturalEquipmentManager)}",
                             $"{nameof(PrioritiseNaturalEquipmentMods)}({nameof(List<ModNaturalEquipmentBase>)}, {typeof(bool).Name})",
@@ -385,11 +357,9 @@ namespace XRL.World.Parts
                             $"{naturalEquipmentMods[priority]} " +
                             $"in {nameof(naturalEquipmentMods)} overwritten: Same {priorityString}",
                             Indent: indent + 2);
-                    }
+
                     if (doOverwrite)
-                    {
                         naturalEquipmentMods[priority] = attachedNaturalEquipmentMod;
-                    }
 
                     Debug.LoopItem(4,
                         $"{attachedNaturalEquipmentMod.Name}" +
@@ -402,10 +372,8 @@ namespace XRL.World.Parts
             {
                 Debug.Entry(4, $"{nameof(naturalEquipmentMods)}:", Indent: indent + 1, Toggle: doDebug);
                 foreach ((int priority, ModNaturalEquipmentBase naturalEquipmentMod) in naturalEquipmentMods)
-                {
                     Debug.CheckYeh(4, $"{priority}::{naturalEquipmentMod.Name}:{naturalEquipmentMod.GetColoredAdjective()}",
                         Indent: indent + 2, Toggle: doDebug);
-                }
             }
 
             Debug.LastIndent = indent;
@@ -419,12 +387,9 @@ namespace XRL.World.Parts
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
             if (!WantStringEvents.IsNullOrEmpty())
-            {
                 foreach (string EventID in WantStringEvents)
-                {
                     Registrar.Register(EventID);
-                }
-            }
+
             base.Register(Object, Registrar);
         }
         public static List<int> WantEvents = new()
@@ -434,10 +399,10 @@ namespace XRL.World.Parts
             AfterBodyPartsUpdatedEvent.ID,
         };
         public override bool WantEvent(int ID, int cascade)
-        {
-            return base.WantEvent(ID, cascade)
-                || (WantsToManage && WantEvents.Contains(ID));
-        }
+            => base.WantEvent(ID, cascade)
+            || (WantsToManage && WantEvents.Contains(ID))
+            ;
+
         public override bool HandleEvent(EquipperEquippedEvent E)
         {
             if (E.Actor == ParentObject)
@@ -488,7 +453,6 @@ namespace XRL.World.Parts
 
                 List<NaturalEquipmentOperator> naturalEquipmentOperators = NaturalEquipmentOperators;
                 if (!naturalEquipmentOperators.IsNullOrEmpty())
-                {
                     foreach (NaturalEquipmentOperator naturalEquipmentOperator in naturalEquipmentOperators)
                     {
                         BodyPart parentLimb = naturalEquipmentOperator.ParentLimb;
@@ -499,7 +463,6 @@ namespace XRL.World.Parts
                         naturalEquipmentOperator.ClearShortDescriptionCache();
                         naturalEquipmentOperator.HasOperated = false;
                     }
-                }
             }
 
             Debug.Entry(4,
@@ -526,19 +489,15 @@ namespace XRL.World.Parts
                     $"Creature: {E?.Creature?.DebugName ?? NULL}",
                     Indent: 1, Toggle: doDebug);
 
-                List<NaturalEquipmentOperator> naturalEquipmentOperators = NaturalEquipmentOperators;
-                if (!naturalEquipmentOperators.IsNullOrEmpty())
+                foreach (NaturalEquipmentOperator naturalEquipmentOperator in NaturalEquipmentOperators ?? new())
                 {
-                    foreach (NaturalEquipmentOperator naturalEquipmentOperator in naturalEquipmentOperators)
-                    {
-                        BodyPart parentLimb = naturalEquipmentOperator?.ParentLimb;
-                        Debug.LoopItem(4,
-                            $"Limb: [{parentLimb?.ID}:{parentLimb?.Type}] {parentLimb?.Description ?? NULL}",
-                            Indent: 2, Toggle: doDebug);
+                    BodyPart parentLimb = naturalEquipmentOperator?.ParentLimb;
+                    Debug.LoopItem(4,
+                        $"Limb: [{parentLimb?.ID}:{parentLimb?.Type}] {parentLimb?.Description ?? NULL}",
+                        Indent: 2, Toggle: doDebug);
 
-                        // naturalEquipmentOperator.ClearShortDescriptionCache();
-                        // naturalEquipmentOperator.HasOperated = false;
-                    }
+                    // naturalEquipmentOperator.ClearShortDescriptionCache();
+                    // naturalEquipmentOperator.HasOperated = false;
                 }
             }
 
@@ -592,20 +551,10 @@ namespace XRL.World.Parts
                     }
                 }
                 List<GameObject> naturalEquipmentInInventory = Event.NewGameObjectList(E.Creature.GetInventory(GO => GO.InheritsFrom("NaturalEquipment")) ?? new());
-                if (!naturalEquipmentInInventory.IsNullOrEmpty())
-                {
-                    foreach (GameObject naturalEquipment in naturalEquipmentInInventory)
-                    {
-                        string bodyPartType = naturalEquipment.GetPart<MeleeWeapon>()?.Slot ?? naturalEquipment.GetPart<Armor>()?.WornOn;
-                        // E.Creature.EquipObject(naturalEquipment, E.Creature.GetFirstBodyPart(BP => BP.Type == bodyPartType && BP.DefaultBehavior == null), true, 0)
-
-                        if (!E.Creature.AutoEquip(naturalEquipment, Silent: true)
-                            && GameObject.Validate(naturalEquipment))
-                        {
-                            naturalEquipment.Obliterate();
-                        }
-                    }
-                }
+                foreach (GameObject naturalEquipment in naturalEquipmentInInventory)
+                    if (!E.Creature.AutoEquip(naturalEquipment, Silent: true)
+                        && GameObject.Validate(naturalEquipment))
+                        naturalEquipment.Obliterate();
             }
 
             Debug.Entry(4,

@@ -564,13 +564,12 @@ namespace XRL.World.Parts
                 + $" E.Creature: {E.Creature?.DebugName ?? NULL})",
                 Indent: indent + 1, Toggle: doDebug);
 
-            if (E.Creature != null && E.Creature == Wielder)
+            if (E.Creature != null
+                && E.Creature == Wielder)
             {
-                if (!ParentObject.TryGetPart(out TinkerItem tinkerItem))
-                {
-                    tinkerItem = ParentObject.RequirePart<TinkerItem>();
-                }
-                tinkerItem.Bits = "0";
+                TinkerItem tinkerItem = ParentObject.RequirePart<TinkerItem>();
+
+                tinkerItem.Bits = "R";
                 tinkerItem.CanDisassemble = false;
                 tinkerItem.CanBuild = false;
 

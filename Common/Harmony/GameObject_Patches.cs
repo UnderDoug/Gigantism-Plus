@@ -32,18 +32,16 @@ namespace HNPS_GigantismPlus.Harmony
             {
                 __result = true;
                 if (Strict)
-                {
                     return false;
-                }
             }
 
             if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry
                 && __instance.HasPart(gigantismEntry.Class))
-            {
                 __result = true;
-            }
+
             return !__result;
         }
+
         [HarmonyPatch(
             declaringType: typeof(GameObject),
             methodName: nameof(GameObject.IsGiganticCreature),
@@ -60,16 +58,13 @@ namespace HNPS_GigantismPlus.Harmony
                 if (value)
                 {
                     if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry)
-                    {
                         __instance.RequirePart<Mutations>().AddMutation(gigantismEntry.Mutation);
-                    }
                 }
                 else
                 if (MutationFactory.GetMutationEntryByName("Gigantism") is MutationEntry gigantismEntry
                     && __instance.GetPart(gigantismEntry.Class) is BaseMutation gigantismMutation)
-                {
                     __instance.RequirePart<Mutations>().RemoveMutation(gigantismMutation);
-                }
+
                 __instance.SetIntProperty("Gigantic", value ? 1 : (-1));
             }
             return !@override;
@@ -87,12 +82,11 @@ namespace HNPS_GigantismPlus.Harmony
             {
                 __result = true;
                 if (Override)
-                {
                     return false;
-                }
             }
             return !__result;
         }
+
         [HarmonyPatch(
             declaringType: typeof(GameObject),
             methodName: nameof(GameObject.IsGiganticEquipment),
@@ -112,54 +106,6 @@ namespace HNPS_GigantismPlus.Harmony
 
         [HarmonyPatch(
             declaringType: typeof(GameObject),
-            methodName: nameof(GameObject.CheckDefaultBehaviorGiganticness),
-            argumentTypes: new Type[] { typeof(GameObject) },
-            argumentVariations: new ArgumentType[] { ArgumentType.Normal })]
-        [HarmonyPrefix]
-        public static bool CheckDefaultBehaviorGiganticness_ForceEquipped_BlockHideAdjective_Prefix(GameObject __instance, GameObject Equipper)
-        {
-            GameObject @this = __instance;
-            if (GameObject.Validate(ref Equipper))
-            {
-                int indent = Debug.LastIndent;
-                GameObject physicsEquipped = @this?.Physics?.Equipped;
-                Debug.Entry(4,
-                    $"# {nameof(GameObject)}."
-                    + $"{nameof(GameObject.CheckDefaultBehaviorGiganticness)}("
-                    + $"{nameof(@this)}: {@this?.DebugName ?? NULL}, "
-                    + $"{nameof(Equipper)}: {Equipper?.DebugName ?? NULL}, "
-                    + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})",
-                    Indent: indent, Toggle: doDebug);
-
-                bool didTheThing = false;
-                if (false && Equipper != null && Equipper.TryGetPart(out NaturalEquipmentManager naturalEquipmentManager)
-                    && @this != null && @this.TryGetPart(out NaturalEquipmentOperator naturalEquipmentOperator))
-                {
-                    // didTheThing = naturalEquipmentManager.AddOperator(naturalEquipmentOperator);
-                }
-                if (false && !didTheThing && @this?.Physics != null && @this.Physics.Equipped != Equipper)
-                {
-                    // this used to be an extremely important line of code that guarantees that default equipment is considered equipped.
-                    // removing it completely breaks the NaturalEquipmentOperator.
-                    physicsEquipped = @this.Physics.Equipped = Equipper;
-                    Debug.Entry(4,
-                        $"{@this?.DebugName ?? NULL} is equipped by {@this?.Physics?.Equipped?.DebugName ?? NULL}",
-                        Indent: indent + 1, Toggle: doDebug);
-                }
-                Debug.Entry(4,
-                    $"x {nameof(GameObject)}."
-                    + $"{nameof(GameObject.CheckDefaultBehaviorGiganticness)}("
-                    + $"{nameof(@this)}: {@this?.DebugName ?? NULL}, "
-                    + $"{nameof(Equipper)}: {Equipper?.DebugName ?? NULL}, "
-                    + $"{nameof(physicsEquipped)}: {physicsEquipped?.DebugName ?? NULL})"
-                    + $" #//",
-                    Indent: indent, Toggle: doDebug);
-            }
-            return false;
-        }
-
-        [HarmonyPatch(
-            declaringType: typeof(GameObject),
             methodName: nameof(GameObject.FinalizeCopy),
             argumentTypes: new Type[] { typeof(GameObject), typeof(bool), typeof(bool), typeof(Func<GameObject, GameObject>) },
             argumentVariations: new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
@@ -168,9 +114,7 @@ namespace HNPS_GigantismPlus.Harmony
         {
             GameObject Object = __instance;
             if (Object?.Body == null)
-            {
                 return;
-            }
 
             Debug.Divider(4, HONLY, Count: 40, Indent: 0, Toggle: doDebug);
             Debug.Entry(4,
@@ -185,19 +129,21 @@ namespace HNPS_GigantismPlus.Harmony
                 Debug.Entry(4, $"part", $"[{part.ID}:{part.Type}] {part.Description}", Indent: 2, Toggle: doDebug);
 
                 GameObject cybernetics = part.Cybernetics;
-                if (cybernetics != null) Debug.LoopItem(4, $" cybernetics", $"{cybernetics.ShortDisplayName}", Indent: 3, Toggle: doDebug);
-                if (cybernetics != null && cybernetics.HasPartDescendedFrom<IModification>())
+                if (cybernetics != null)
+                    Debug.LoopItem(4, $" cybernetics", $"{cybernetics.ShortDisplayName}", Indent: 3, Toggle: doDebug);
+
+                if (cybernetics != null
+                    && cybernetics.HasPartDescendedFrom<IModification>())
                 {
                     List<IModification> modifications = cybernetics.GetPartsDescendedFrom<IModification>();
                     bool doImplantedEvent = false;
                     foreach (IModification modification in modifications)
-                    {
                         if ($"{modification.GetType().BaseType}".Contains("ModImprovedMutationBase"))
                         {
                             doImplantedEvent = true;
                             break;
                         }
-                    }
+
                     if (doImplantedEvent)
                     {
                         if (cybernetics != null && Object != null)
@@ -207,32 +153,31 @@ namespace HNPS_GigantismPlus.Harmony
                             Debug.CheckYeh(4, $"{nameof(EffectAppliedEvent)}", "Sent", Indent: 4, Toggle: doDebug);
                             continue;
                         }
-
                     }
                     else
-                    {
                         Debug.CheckNah(4, $"No ModImprovedMutation", Indent: 4, Toggle: doDebug);
-                    }
                 }
-                else if (cybernetics != null)
-                {
+                else
+                if (cybernetics != null)
                     Debug.CheckNah(4, $"No ModPart", Indent: 4, Toggle: doDebug);
-                }
 
                 GameObject equipment = part.Equipped;
-                if (equipment != null) Debug.LoopItem(4, $" equipment", $"{equipment.ShortDisplayName}", Indent: 3, Toggle: doDebug);
-                if (equipment != null && equipment.HasPartDescendedFrom<IModification>() && !equipment.HasPartDescendedFrom<CyberneticsBaseItem>())
+                if (equipment != null)
+                    Debug.LoopItem(4, $" equipment", $"{equipment.ShortDisplayName}", Indent: 3, Toggle: doDebug);
+
+                if (equipment != null
+                    && equipment.HasPartDescendedFrom<IModification>()
+                    && !equipment.HasPartDescendedFrom<CyberneticsBaseItem>())
                 {
                     List<IModification> modifications = equipment.GetPartsDescendedFrom<IModification>();
                     bool doEquippedEvent = false;
                     foreach (IModification modification in modifications)
-                    {
                         if ($"{modification.GetType().BaseType}".Contains("ModImprovedMutationBase"))
                         {
                             doEquippedEvent = true;
                             break;
                         }
-                    }
+
                     if (doEquippedEvent)
                     {
                         EquippedEvent.Send(Object, equipment, part);
@@ -240,14 +185,11 @@ namespace HNPS_GigantismPlus.Harmony
                         Debug.CheckYeh(4, $"{nameof(EquippedEvent)}", "Sent", Indent: 4, Toggle: doDebug);
                     }
                     else
-                    {
                         Debug.CheckNah(4, $"No ModImprovedMutation", Indent: 4, Toggle: doDebug);
-                    }
                 }
-                else if (equipment != null)
-                {
+                else
+                if (equipment != null)
                     Debug.CheckNah(4, $"No ModPart or item is Cybernetics", Indent: 4, Toggle: doDebug);
-                }
             }
             Debug.Divider(4, HONLY, Count: 25, Indent: 2, Toggle: doDebug);
             Debug.Entry(4, $"x foreach (BodyPart part in Object.Actor.LoopParts()) >//", Indent: 1, Toggle: doDebug);
